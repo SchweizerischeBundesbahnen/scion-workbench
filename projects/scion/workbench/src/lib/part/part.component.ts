@@ -17,7 +17,7 @@ import {Logger, LoggerNames} from '../logging';
 import {PartBarComponent} from './part-bar/part-bar.component';
 import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
-import {WORKBENCH_ID} from '../workbench-id';
+import {WORKBENCH_ID} from '../workbench.identifiers';
 import {synchronizeCssClasses} from '../common/css-class.util';
 import {dasherize} from '../common/dasherize.util';
 

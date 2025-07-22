@@ -13,8 +13,7 @@ import CustomMatcherResult = jasmine.CustomMatcherResult;
 import {TestBed} from '@angular/core/testing';
 import {WORKBENCH_VIEW_REGISTRY} from '../../../view/workbench-view.registry';
 import {WORKBENCH_PART_REGISTRY} from '../../../part/workbench-part.registry';
-import {ViewId} from '../../../view/workbench-view.model';
-import {PartId} from '../../../part/workbench-part.model';
+import {PartId, ViewId} from '../../../workbench.identifiers';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toBeRegistered}.

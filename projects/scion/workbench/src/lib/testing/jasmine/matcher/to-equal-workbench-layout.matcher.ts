@@ -24,8 +24,9 @@ import {NavigationStates, Outlets} from '../../../routing/routing.model';
 import {WorkbenchLayoutService} from '../../../layout/workbench-layout.service';
 import {Objects} from '../../../common/objects.util';
 import {WorkbenchComponent} from '../../../workbench.component';
-import {ActivityId, MActivity as _MActivity, MActivityLayout as _MActivityLayout, MActivityStack as _MActivityStack} from '../../../activity/workbench-activity.model';
+import {MActivity as _MActivity, MActivityLayout as _MActivityLayout, MActivityStack as _MActivityStack} from '../../../activity/workbench-activity.model';
 import {throwError} from '../../../common/throw-error.util';
+import {ActivityId} from '../../../workbench.identifiers';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.

@@ -14,6 +14,7 @@ import {CdkPortalOutlet, ComponentPortal} from '@angular/cdk/portal';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
+import {PopupId} from '../workbench.identifiers';
 
 /**
  * Displays the configured popup component in the popup overlay.
@@ -80,7 +81,7 @@ export class PopupComponent {
   }
 
   @HostBinding('attr.data-popupid')
-  protected get id(): string {
+  protected get id(): PopupId {
     return this._popup.id;
   }
 

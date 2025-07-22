@@ -35,6 +35,7 @@ import {Blocking} from '../glass-pane/blocking';
 import {provideViewContext} from '../view/view-context-provider';
 import {boundingClientRect} from '@scion/components/dimension';
 import {Translatable} from '../text/workbench-text-provider.model';
+import {DialogId} from '../workbench.identifiers';
 
 /** @inheritDoc */
 export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Blockable, Blocking {
@@ -74,7 +75,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   public footer: WorkbenchDialogFooterDirective | undefined;
   public actions = new Array<WorkbenchDialogActionDirective>();
 
-  constructor(public id: string,
+  constructor(public id: DialogId,
               public component: ComponentType<unknown>,
               private _options: WorkbenchDialogOptions) {
     this._overlayRef = this.createOverlay();

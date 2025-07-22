@@ -13,7 +13,7 @@ import {WorkbenchViewCapability, ɵMicrofrontendRouteParams} from '@scion/workbe
 import {inject, Injector} from '@angular/core';
 import {Commands} from '../../routing/routing.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
-import {Routing} from '../../routing/routing.util';
+import {isViewOutlet} from '../../workbench.identifiers';
 import {WorkbenchRouteData} from '../../routing/workbench-route-data';
 import {MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
@@ -58,7 +58,7 @@ export const MicrofrontendViewRoutes = {
 
       // Test if navigating a view.
       const outlet = route.data?.[WorkbenchRouteData.ɵoutlet] as string | undefined;
-      if (!Routing.isViewOutlet(outlet)) {
+      if (!isViewOutlet(outlet)) {
         return null;
       }
 

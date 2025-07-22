@@ -19,10 +19,9 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Defined} from '@scion/toolkit/util';
 import {generatePerspectiveWindowName} from '../perspective/workbench-perspective.service';
 import {ANONYMOUS_PERSPECTIVE_ID_PREFIX} from '../workbench.constants';
-import {WORKBENCH_ID} from '../workbench-id';
+import {computePartId, computeViewId, WORKBENCH_ID} from '../workbench.identifiers';
 import {UID} from '../common/uid.util';
 import {filter} from 'rxjs/operators';
-import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 
 /**
  * Updates the workbench layout when receiving a {@link ViewMoveEvent} event relevant for this application.
@@ -72,9 +71,9 @@ export class ViewMoveHandler {
     const commands = Routing.segmentsToCommands(event.source.navigation?.path ?? []);
 
     await this._workbenchRouter.navigate(layout => {
-      const newViewId = event.source.alternativeViewId ?? WorkbenchLayouts.computeViewId();
+      const newViewId = event.source.alternativeViewId ?? computeViewId();
       if (addToNewPart) {
-        const newPartId = event.target.newPart?.id ?? WorkbenchLayouts.computePartId();
+        const newPartId = event.target.newPart?.id ?? computePartId();
         return layout
           .addPart(newPartId, {relativeTo: event.target.elementId, align: coerceAlignProperty(region), ratio: event.target.newPart?.ratio}, {structural: false})
           .addView(newViewId, {partId: newPartId, activateView: true, activatePart: true, cssClass: event.source.classList?.get('layout')})
@@ -98,7 +97,7 @@ export class ViewMoveHandler {
     // Open the view "standalone" in a blank window in an anonymous perspective.
     const urlTree = await this._workbenchRouter.createUrlTree(() => {
       const newLayout = this._workbenchLayoutFactory.create();
-      const newViewId = event.source.alternativeViewId ?? WorkbenchLayouts.computeViewId();
+      const newViewId = event.source.alternativeViewId ?? computeViewId();
       const commands = Routing.segmentsToCommands(event.source.navigation?.path ?? []);
       return newLayout
         .addView(newViewId, {
@@ -121,7 +120,7 @@ export class ViewMoveHandler {
   private async moveView(event: ViewMoveEvent): Promise<void> {
     const addToNewPart = !!event.target.region;
     if (addToNewPart) {
-      const newPartId = event.target.newPart?.id ?? WorkbenchLayouts.computePartId();
+      const newPartId = event.target.newPart?.id ?? computePartId();
       await this._workbenchRouter.navigate(layout => layout
         .addPart(newPartId, {relativeTo: event.target.elementId, align: coerceAlignProperty(event.target.region!), ratio: event.target.newPart?.ratio}, {structural: false})
         .moveView(event.source.viewId, newPartId, {activatePart: true, activateView: true}),

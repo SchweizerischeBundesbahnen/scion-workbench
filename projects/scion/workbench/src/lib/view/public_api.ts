@@ -8,4 +8,4 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {WorkbenchView, type WorkbenchViewNavigation, type ViewId} from './workbench-view.model';
+export {WorkbenchView, type WorkbenchViewNavigation} from './workbench-view.model';

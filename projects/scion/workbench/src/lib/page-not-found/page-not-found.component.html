@@ -1,9 +1,9 @@
 <header>{{('%workbench.page_not_found.title' | wbText)()}}</header>
 
-@if (Routing.isViewOutlet(outlet)) {
+@if (isViewOutlet(outlet)) {
   @let message = '%workbench.page_not_found_view.message;path=' + path() | wbText;
   <section class="message" [innerHTML]="message()"></section>
-} @else if (Routing.isPartOutlet(outlet)) {
+} @else if (isPartOutlet(outlet)) {
   @let message = '%workbench.page_not_found_part.message;path=' + path() | wbText;
   <section class="message" [innerHTML]="message()"></section>
 } @else {
@@ -12,16 +12,14 @@
 }
 
 <section class="actions">
-  @if (Routing.isViewOutlet(outlet)) {
+  @if (isViewOutlet(outlet)) {
     <button (click)="workbenchService.resetPerspective()">{{('%workbench.reset_perspective.action' | wbText)()}}</button>
     <button (click)="view!.close()">{{('%workbench.close.action' | wbText)()}}</button>
-  } @else if (Routing.isPartOutlet(outlet)) {
+  } @else if (isPartOutlet(outlet)) {
     <button (click)="workbenchService.resetPerspective()">{{('%workbench.reset_perspective.action' | wbText)()}}</button>
-  } @else if (Routing.isDialogOutlet(outlet)) {
+  } @else if (isDialogOutlet(outlet)) {
     <button (click)="dialog!.close()">{{('%workbench.close.action' | wbText)()}}</button>
-  } @else if (Routing.isMessageBoxOutlet(outlet)) {
-    <button (click)="dialog!.close()">{{('%workbench.close.action' | wbText)()}}</button>
-  } @else if (Routing.isPopupOutlet(outlet)) {
+  } @else if (isPopupOutlet(outlet)) {
     <button (click)="popup!.close()">{{('%workbench.close.action' | wbText)()}}</button>
   }
 </section>

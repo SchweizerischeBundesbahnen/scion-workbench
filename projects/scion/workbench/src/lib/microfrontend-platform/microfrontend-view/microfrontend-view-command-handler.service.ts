@@ -11,7 +11,8 @@
 import {EnvironmentProviders, inject, Injectable, makeEnvironmentProviders, OnDestroy} from '@angular/core';
 import {Message, MessageClient, MessageHeaders} from '@scion/microfrontend-platform';
 import {Logger} from '../../logging';
-import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
+import {ViewId} from '../../workbench.identifiers';
+import {WorkbenchView} from '../../view/workbench-view.model';
 import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {ɵWorkbenchCommands} from '@scion/workbench-client';
 import {Subscription} from 'rxjs';

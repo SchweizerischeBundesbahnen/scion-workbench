@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {Injector} from '@angular/core';
-import {ViewId} from '../view/workbench-view.model';
+import {ViewId} from '../workbench.identifiers';
 import {Translatable} from '../text/workbench-text-provider.model';
 
 /**

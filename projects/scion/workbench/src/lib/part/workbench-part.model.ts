@@ -9,11 +9,11 @@
  */
 
 import {WorkbenchPartAction} from '../workbench.model';
-import {ViewId, WorkbenchView} from '../view/workbench-view.model';
+import {WorkbenchView} from '../view/workbench-view.model';
 import {Signal} from '@angular/core';
-import {PartOutlet} from '../workbench.constants';
 import {NavigationData, NavigationState} from '../routing/routing.model';
 import {UrlSegment} from '@angular/router';
+import {PartId, ViewId} from '../workbench.identifiers';
 
 /**
  * A part is a visual workbench element to create the workbench layout. Parts can be docked to the side or
@@ -118,15 +118,6 @@ export abstract class WorkbenchPart {
    */
   public abstract readonly navigation: Signal<WorkbenchPartNavigation | undefined>;
 }
-
-/**
- * Format of a part identifier.
- *
- * Each part is assigned a unique identifier (e.g., `part.9fdf7ab4`, `part.c6485225`, etc.).
- * A part can also have an alternative id, a meaningful but not necessarily unique name. A part can
- * be identified either by its unique or alternative id.
- */
-export type PartId = PartOutlet;
 
 /**
  * Provides navigation details of a workbench part.

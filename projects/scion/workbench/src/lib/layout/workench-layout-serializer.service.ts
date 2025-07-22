@@ -18,7 +18,7 @@ import {WorkbenchGridMigrationV4} from './migration/workbench-grid-migration-v4.
 import {WorkbenchGridMigrationV5} from './migration/workbench-grid-migration-v5.service';
 import {WorkbenchGridMigrationV6} from './migration/workbench-grid-migration-v6.service';
 import {Exclusion, stringify} from './stringifier';
-import {WorkbenchOutlet} from '../workbench.constants';
+import {WorkbenchOutlet} from '../workbench.identifiers';
 import {WorkbenchGridMigrationV7} from './migration/workbench-grid-migration-v7.service';
 import {MActivityLayout} from '../activity/workbench-activity.model';
 import {WorkbenchLayoutMigrationV2} from './migration/workbench-layout-migration-v2.service';

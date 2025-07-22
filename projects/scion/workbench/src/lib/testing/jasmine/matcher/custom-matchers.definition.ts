@@ -9,7 +9,7 @@
  */
 import {DebugElement, Predicate, Type} from '@angular/core';
 import {ExpectedWorkbenchLayout} from './to-equal-workbench-layout.matcher';
-import {PartId} from '../../../part/workbench-part.model';
+import {PartId} from '../../../workbench.identifiers';
 
 /**
  * Extends the Jasmine expect API with project specific custom matchers.

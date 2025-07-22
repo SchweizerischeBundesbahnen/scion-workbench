@@ -17,8 +17,8 @@ import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workben
 import {WorkbenchConfig} from '../../workbench-config';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
 import {ViewMenuService} from '../view-context-menu/view-menu.service';
-import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
-import {WORKBENCH_ID} from '../../workbench-id';
+import {ViewId, WORKBENCH_ID} from '../../workbench.identifiers';
+import {WorkbenchView} from '../../view/workbench-view.model';
 import {boundingClientRect} from '@scion/components/dimension';
 import {UUID} from '@scion/toolkit/uuid';
 import {synchronizeCssClasses} from '../../common/css-class.util';

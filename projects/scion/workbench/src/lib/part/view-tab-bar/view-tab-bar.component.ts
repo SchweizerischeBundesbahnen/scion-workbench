@@ -21,7 +21,7 @@ import {SciViewportComponent} from '@scion/components/viewport';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {boundingClientRect, dimension} from '@scion/components/dimension';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {WORKBENCH_ID} from '../../workbench-id';
+import {WORKBENCH_ID} from '../../workbench.identifiers';
 import {clamp} from '../../common/math.util';
 import {PART_BAR_ELEMENT} from '../part-bar/part-bar.component';
 

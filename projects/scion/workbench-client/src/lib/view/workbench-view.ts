@@ -10,6 +10,7 @@
 
 import {Observable} from 'rxjs';
 import {WorkbenchViewCapability} from './workbench-view-capability';
+import {PartId, ViewId} from '../workbench.identifiers';
 
 /**
  * A view is a visual workbench element for displaying content stacked or side-by-side in the workbench layout.
@@ -76,7 +77,7 @@ export abstract class WorkbenchView {
    * The Observable completes when navigating to a microfrontend of another application, but not when navigating to a different microfrontend
    * of the same application.
    */
-  public abstract readonly partId$: Observable<string>;
+  public abstract readonly partId$: Observable<PartId>;
 
   /**
    * Sets the title to be displayed in the view tab.
@@ -174,14 +175,5 @@ export interface ViewSnapshot {
   /**
    * The identity of the part that contains the view.
    */
-  partId: string;
+  partId: PartId;
 }
-
-/**
- * Format of a view identifier.
- *
- * Each view is assigned a unique identifier (e.g., `view.d4de99fb`, `view.cad347dd`, etc.).
- *
- * @category View
- */
-export type ViewId = `view.${string}`;

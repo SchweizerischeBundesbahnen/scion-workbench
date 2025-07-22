@@ -25,7 +25,7 @@ import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {WorkbenchComponent} from '../workbench.component';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {WorkbenchService} from '../workbench.service';
-import {PartId} from '../part/workbench-part.model';
+import {PartId} from '../workbench.identifiers';
 import {ACTIVITY_PANEL_HEIGHT, ACTIVITY_PANEL_RATIO, ACTIVITY_PANEL_WIDTH, MActivityLayout} from '../activity/workbench-activity.model';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 

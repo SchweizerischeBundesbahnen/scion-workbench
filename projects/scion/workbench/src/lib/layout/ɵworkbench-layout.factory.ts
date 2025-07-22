@@ -8,13 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {isPartId, WorkbenchLayoutConstructConfig, ɵWorkbenchLayout} from './ɵworkbench-layout';
+import {WorkbenchLayoutConstructConfig, ɵWorkbenchLayout} from './ɵworkbench-layout';
 import {MPart} from './workbench-grid.model';
 import {WorkbenchLayoutFactory} from './workbench-layout.factory';
 import {inject, Injectable, Injector, runInInjectionContext} from '@angular/core';
 import {MAIN_AREA, MAIN_AREA_ALTERNATIVE_ID, PartExtras} from './workbench-layout';
-import {WorkbenchLayouts} from './workbench-layouts.util';
 import {Arrays} from '@scion/toolkit/util';
+import {computePartId, isPartId} from '../workbench.identifiers';
 
 /**
  * @inheritDoc
@@ -28,7 +28,7 @@ export class ɵWorkbenchLayoutFactory implements WorkbenchLayoutFactory {
    * @inheritDoc
    */
   public addPart(id: string | MAIN_AREA, extras?: PartExtras): ɵWorkbenchLayout {
-    const partId = isPartId(id) ? id : (id === MAIN_AREA_ALTERNATIVE_ID ? MAIN_AREA : WorkbenchLayouts.computePartId());
+    const partId = isPartId(id) ? id : (id === MAIN_AREA_ALTERNATIVE_ID ? MAIN_AREA : computePartId());
     const alternativeId = isPartId(id) ? (id === MAIN_AREA ? MAIN_AREA_ALTERNATIVE_ID : undefined) : id;
 
     return this.create({

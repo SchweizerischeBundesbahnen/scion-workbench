@@ -12,7 +12,7 @@ import {inject, Injectable, IterableChanges, IterableDiffers} from '@angular/cor
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {UrlTree} from '@angular/router';
 import {Routing} from './routing.util';
-import {DialogOutlet, MessageBoxOutlet, PartOutlet, PopupOutlet, ViewOutlet} from '../workbench.constants';
+import {DialogOutlet, PartOutlet, PopupOutlet, ViewOutlet} from '../workbench.identifiers';
 
 /**
  * Stateful differ to compute added and removed outlets.
@@ -26,7 +26,6 @@ export class WorkbenchOutletDiffer {
   private readonly _partsDiffer = inject(IterableDiffers).find([]).create<PartOutlet>();
   private readonly _popupsDiffer = inject(IterableDiffers).find([]).create<PopupOutlet>();
   private readonly _dialogsDiffer = inject(IterableDiffers).find([]).create<DialogOutlet>();
-  private readonly _messageBoxDiffer = inject(IterableDiffers).find([]).create<MessageBoxOutlet>();
 
   /**
    * Computes differences since last time {@link WorkbenchOutletDiffer#diff} was invoked.
@@ -49,14 +48,12 @@ export class WorkbenchOutletDiffer {
 
     const popupOutlets = Routing.parseOutlets(urlTree, {popup: true}).keys();
     const dialogOutlets = Routing.parseOutlets(urlTree, {dialog: true}).keys();
-    const messageBoxOutlets = Routing.parseOutlets(urlTree, {messagebox: true}).keys();
 
     return new WorkbenchOutletDiff({
       views: this._viewsDiffer.diff(viewOutlets),
       parts: this._partsDiffer.diff(partOutlets),
       popups: this._popupsDiffer.diff(popupOutlets),
       dialogs: this._dialogsDiffer.diff(dialogOutlets),
-      messageBoxes: this._messageBoxDiffer.diff(messageBoxOutlets),
     });
   }
 }
@@ -78,9 +75,6 @@ export class WorkbenchOutletDiff {
   public readonly addedDialogOutlets = new Array<DialogOutlet>();
   public readonly removedDialogOutlets = new Array<DialogOutlet>();
 
-  public readonly addedMessageBoxOutlets = new Array<MessageBoxOutlet>();
-  public readonly removedMessageBoxOutlets = new Array<MessageBoxOutlet>();
-
   constructor(changes: WorkbenchOutletChanges) {
     changes.views?.forEachAddedItem(({item}) => this.addedViewOutlets.push(item));
     changes.views?.forEachRemovedItem(({item}) => this.removedViewOutlets.push(item));
@@ -93,9 +87,6 @@ export class WorkbenchOutletDiff {
 
     changes.dialogs?.forEachAddedItem(({item}) => this.addedDialogOutlets.push(item));
     changes.dialogs?.forEachRemovedItem(({item}) => this.removedDialogOutlets.push(item));
-
-    changes.messageBoxes?.forEachAddedItem(({item}) => this.addedMessageBoxOutlets.push(item));
-    changes.messageBoxes?.forEachRemovedItem(({item}) => this.removedMessageBoxOutlets.push(item));
   }
 
   public toString(): string {
@@ -111,9 +102,6 @@ export class WorkbenchOutletDiff {
 
       .concat(this.addedDialogOutlets.length ? `addedDialogOutlets=[${this.addedDialogOutlets}]` : [])
       .concat(this.removedDialogOutlets.length ? `removedDialogOutlets=[${this.removedDialogOutlets}]` : [])
-
-      .concat(this.addedMessageBoxOutlets.length ? `addedMessageBoxOutlets=[${this.addedMessageBoxOutlets}]` : [])
-      .concat(this.removedMessageBoxOutlets.length ? `removedMessageBoxOutlets=[${this.removedMessageBoxOutlets}]` : [])
       .join(', ');
   }
 }
@@ -123,5 +111,4 @@ interface WorkbenchOutletChanges {
   parts: IterableChanges<PartOutlet> | null;
   popups: IterableChanges<PopupOutlet> | null;
   dialogs: IterableChanges<DialogOutlet> | null;
-  messageBoxes: IterableChanges<MessageBoxOutlet> | null;
 }

@@ -12,7 +12,7 @@ import CustomMatcher = jasmine.CustomMatcher;
 import CustomMatcherResult = jasmine.CustomMatcherResult;
 import {TestBed} from '@angular/core/testing';
 import {WORKBENCH_VIEW_REGISTRY} from '../../../view/workbench-view.registry';
-import {ViewId} from '../../../view/workbench-view.model';
+import {ViewId} from '../../../workbench.identifiers';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toHaveComponentState}.

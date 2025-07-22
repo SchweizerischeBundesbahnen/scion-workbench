@@ -16,8 +16,9 @@ import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {distinctUntilChanged, filter, map, mergeMap, shareReplay, skip, switchMap, takeUntil, tap} from 'rxjs/operators';
 import {ɵMicrofrontendRouteParams} from '../routing/workbench-router';
 import {Observables} from '@scion/toolkit/util';
-import {CanCloseFn, CanCloseRef, ViewId, ViewSnapshot, WorkbenchView} from './workbench-view';
+import {CanCloseFn, CanCloseRef, ViewSnapshot, WorkbenchView} from './workbench-view';
 import {decorateObservable} from '../observable-decorator';
+import {PartId, ViewId} from '../workbench.identifiers';
 
 export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
 
@@ -36,7 +37,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
   private _canCloseSubscription: Subscription | undefined;
 
   public active$: Observable<boolean>;
-  public partId$: Observable<string>;
+  public partId$: Observable<PartId>;
   public params$: Observable<ReadonlyMap<string, any>>;
   public capability$: Observable<WorkbenchViewCapability>;
   public whenProperties: Promise<void>;
@@ -73,7 +74,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
         takeUntil(this._beforeUnload$),
       );
 
-    this.partId$ = Beans.get(MessageClient).observe$<string>(ɵWorkbenchCommands.viewPartIdTopic(this.id))
+    this.partId$ = Beans.get(MessageClient).observe$<PartId>(ɵWorkbenchCommands.viewPartIdTopic(this.id))
       .pipe(
         mapToBody(),
         shareReplay({refCount: false, bufferSize: 1}),

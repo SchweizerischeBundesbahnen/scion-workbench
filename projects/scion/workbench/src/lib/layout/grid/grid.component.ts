@@ -14,7 +14,7 @@ import {RequiresDropZonePipe} from '../../view-dnd/requires-drop-zone.pipe';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../../view-dnd/view-drop-zone.directive';
 import {MPartGrid} from '../workbench-grid.model';
 import {GridDropTargets} from '../../view-dnd/grid-drop-targets.util';
-import {WORKBENCH_ID} from '../../workbench-id';
+import {WORKBENCH_ID} from '../../workbench.identifiers';
 import {ViewDragService} from '../../view-dnd/view-drag.service';
 
 /**

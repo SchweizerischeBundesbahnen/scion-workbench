@@ -10,7 +10,8 @@
 import {assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, TemplateRef, untracked, WritableSignal} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchPartAction, WorkbenchPartActionFn} from '../workbench.model';
-import {PartId, WorkbenchPart, WorkbenchPartNavigation} from './workbench-part.model';
+import {WorkbenchPart, WorkbenchPartNavigation} from './workbench-part.model';
+import {PartId} from '../workbench.identifiers';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {ComponentType} from '@angular/cdk/portal';
 import {ActivationInstantProvider} from '../activation-instant.provider';

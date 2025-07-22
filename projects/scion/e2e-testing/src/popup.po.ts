@@ -11,6 +11,7 @@
 import {Locator} from '@playwright/test';
 import {DomRect, fromRect, getCssClasses, hasCssClass} from './helper/testing.util';
 import {POPUP_DIAMOND_ANCHOR_SIZE} from './workbench/workbench-layout-constants';
+import {PopupId} from '@scion/workbench';
 
 /**
  * Handle for interacting with a workbench popup.
@@ -23,8 +24,8 @@ export class PopupPO {
     this._overlay = this.locator.page().locator('.cdk-overlay-pane.wb-popup', {has: this.locator});
   }
 
-  public async getPopupId(): Promise<string> {
-    return (await this.locator.getAttribute('data-popupid'))!;
+  public async getPopupId(): Promise<PopupId> {
+    return (await this.locator.getAttribute('data-popupid')) as PopupId;
   }
 
   /**

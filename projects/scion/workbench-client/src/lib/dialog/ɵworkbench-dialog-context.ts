@@ -9,6 +9,7 @@
  */
 
 import {WorkbenchDialogCapability} from './workbench-dialog-capability';
+import {DialogId} from '../workbench.identifiers';
 
 /**
  * Context when displaying a microfrontend in a dialog.
@@ -19,7 +20,7 @@ import {WorkbenchDialogCapability} from './workbench-dialog-capability';
  * @ignore
  */
 export interface ɵDialogContext {
-  dialogId: string;
+  dialogId: DialogId;
   capability: WorkbenchDialogCapability;
   params: Map<string, unknown>;
 }

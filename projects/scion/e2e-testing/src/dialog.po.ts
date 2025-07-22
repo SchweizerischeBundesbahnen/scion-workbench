@@ -11,13 +11,14 @@
 import {Locator} from '@playwright/test';
 import {DomRect, fromRect} from './helper/testing.util';
 import {AppPO} from './app.po';
+import {DialogId} from '@scion/workbench';
 
 /**
  * PO for interacting with a workbench dialog.
  */
 export class DialogPO {
 
-  private readonly _dialog: Locator;
+  public readonly dialog: Locator;
 
   public readonly header: Locator;
   public readonly title: Locator;
@@ -31,28 +32,28 @@ export class DialogPO {
   };
 
   constructor(public readonly locator: Locator) {
-    this._dialog = this.locator.locator('div.e2e-dialog');
-    this.header = this._dialog.locator('header.e2e-dialog-header');
+    this.dialog = this.locator.locator('div.e2e-dialog');
+    this.header = this.dialog.locator('header.e2e-dialog-header');
     this.title = this.header.locator('div.e2e-title > span');
     this.closeButton = this.header.locator('button.e2e-close');
-    this.footer = this._dialog.locator('footer.e2e-dialog-footer');
-    this.resizeHandles = this._dialog.locator('div.e2e-resize-handle');
+    this.footer = this.dialog.locator('footer.e2e-dialog-footer');
+    this.resizeHandles = this.dialog.locator('div.e2e-resize-handle');
     this.contentScrollbars = {
-      vertical: this._dialog.locator('sci-viewport.e2e-dialog-content sci-scrollbar.e2e-vertical'),
-      horizontal: this._dialog.locator('sci-viewport.e2e-dialog-content sci-scrollbar.e2e-horizontal'),
+      vertical: this.dialog.locator('sci-viewport.e2e-dialog-content sci-scrollbar.e2e-vertical'),
+      horizontal: this.dialog.locator('sci-viewport.e2e-dialog-content sci-scrollbar.e2e-horizontal'),
     };
   }
 
-  public async getDialogId(): Promise<string> {
-    return (await this.locator.getAttribute('data-dialogid'))!;
+  public async getDialogId(): Promise<DialogId> {
+    return (await this.locator.getAttribute('data-dialogid')) as DialogId;
   }
 
   public async getDialogBoundingBox(): Promise<DomRect> {
-    return fromRect(await this._dialog.boundingBox());
+    return fromRect(await this.dialog.boundingBox());
   }
 
   public getComputedStyle(): Promise<CSSStyleDeclaration> {
-    return this._dialog.evaluate((dialogElement: HTMLElement) => getComputedStyle(dialogElement));
+    return this.dialog.evaluate((dialogElement: HTMLElement) => getComputedStyle(dialogElement));
   }
 
   public async getGlassPaneBoundingBoxes(): Promise<Set<DomRect>> {
@@ -74,7 +75,7 @@ export class DialogPO {
   }
 
   public async getDialogBorderWidth(): Promise<number> {
-    return this._dialog.locator('div.e2e-dialog-box').evaluate((element: HTMLElement) => parseInt(getComputedStyle(element).borderWidth, 10));
+    return this.dialog.locator('div.e2e-dialog-box').evaluate((element: HTMLElement) => parseInt(getComputedStyle(element).borderWidth, 10));
   }
 
   public async close(options?: {timeout?: number}): Promise<void> {

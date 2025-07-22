@@ -16,7 +16,7 @@ import {ActivationInstantProvider} from '../activation-instant.provider';
 import {MAIN_AREA_INITIAL_PART_ID} from '../layout/ɵworkbench-layout';
 import {ComponentFixtureAutoDetect} from '@angular/core/testing';
 import {Router} from '@angular/router';
-import {PartId} from '../part/workbench-part.model';
+import {PartId} from '../workbench.identifiers';
 
 /**
  * Enables and configures the SCION Workbench in tests., returning a set of dependency-injection providers to be registered in Angular.

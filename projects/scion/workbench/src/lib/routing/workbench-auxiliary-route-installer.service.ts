@@ -15,9 +15,10 @@ import PageNotFoundComponent from '../page-not-found/page-not-found.component';
 import {WorkbenchRouteData} from './workbench-route-data';
 import {ɵEmptyOutletComponent} from './empty-outlet/empty-outlet.component';
 import {NullContentComponent} from '../null-content/null-content.component';
-import {WORKBENCH_ROUTE, WorkbenchOutlet} from '../workbench.constants';
+import {WORKBENCH_ROUTE} from '../workbench.constants';
 import {matchesIfNavigated} from './workbench-route-guards';
 import {ComponentType} from '@angular/cdk/portal';
+import {WorkbenchOutlet} from '../workbench.identifiers';
 
 /**
  * Enables the registration of auxiliary routes of top-level primary routes.

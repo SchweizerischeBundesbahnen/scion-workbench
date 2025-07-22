@@ -11,7 +11,7 @@
 import {InjectionToken} from '@angular/core';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
 import {WorkbenchObjectRegistry} from '../registry/workbench-object-registry';
-import {ViewId} from './workbench-view.model';
+import {ViewId} from '../workbench.identifiers';
 
 /**
  * Registry for {@link WorkbenchView} model objects.

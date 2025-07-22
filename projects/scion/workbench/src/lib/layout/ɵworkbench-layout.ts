@@ -17,14 +17,12 @@ import {DOCUMENT, inject, Injectable, InjectionToken, Injector, runInInjectionCo
 import {Routing} from '../routing/routing.util';
 import {Commands, NavigationData, NavigationState, NavigationStates, Outlets} from '../routing/routing.model';
 import {ActivatedRoute, UrlSegment} from '@angular/router';
-import {ViewId} from '../view/workbench-view.model';
+import {ACTIVITY_ID_PREFIX, ActivityId, computeActivityId, computePartId, computeViewId, isPartId, isViewId, PART_ID_PREFIX, PartId, VIEW_ID_PREFIX, ViewId, WorkbenchOutlet} from '../workbench.identifiers';
 import {Arrays} from '@scion/toolkit/util';
 import {UrlSegmentMatcher} from '../routing/url-segment-matcher';
 import {WorkbenchLayouts} from './workbench-layouts.util';
 import {Logger} from '../logging';
-import {ACTIVITY_ID_PREFIX, PART_ID_PREFIX, VIEW_ID_PREFIX, WorkbenchOutlet} from '../workbench.constants';
-import {PartId} from '../part/workbench-part.model';
-import {ACTIVITY_PANEL_HEIGHT, ACTIVITY_PANEL_RATIO, ACTIVITY_PANEL_WIDTH, ActivityId, MActivity, MActivityLayout, MActivityStack} from '../activity/workbench-activity.model';
+import {ACTIVITY_PANEL_HEIGHT, ACTIVITY_PANEL_RATIO, ACTIVITY_PANEL_WIDTH, MActivity, MActivityLayout, MActivityStack} from '../activity/workbench-activity.model';
 import {Objects} from '../common/objects.util';
 import {RequireOne} from '../common/utility-types';
 import {readCssVariable} from '../common/dom.util';
@@ -389,7 +387,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public addPart(id: string | MAIN_AREA, relativeTo: ReferenceElement, extras?: PartExtras & {structural?: boolean}): ɵWorkbenchLayout;
   public addPart(id: string, dockTo: DockingArea, extras: DockedPartExtras): ɵWorkbenchLayout;
   public addPart(id: string, reference: ReferencePart | DockingArea, extras?: (PartExtras & {structural?: boolean}) | DockedPartExtras): ɵWorkbenchLayout {
-    const partId = isPartId(id) ? id : (id === MAIN_AREA_ALTERNATIVE_ID ? MAIN_AREA : WorkbenchLayouts.computePartId());
+    const partId = isPartId(id) ? id : (id === MAIN_AREA_ALTERNATIVE_ID ? MAIN_AREA : computePartId());
     const alternativeId = isPartId(id) ? (id === MAIN_AREA ? MAIN_AREA_ALTERNATIVE_ID : undefined) : id;
     const workingCopy = this.workingCopy();
 
@@ -518,7 +516,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       workingCopy.__addView({id}, extras);
     }
     else {
-      workingCopy.__addView({id: WorkbenchLayouts.computeViewId(), alternativeId: id}, extras);
+      workingCopy.__addView({id: computeViewId(), alternativeId: id}, extras);
     }
     return workingCopy;
   }
@@ -699,7 +697,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       throw Error(`[ActivityAddError] Activity id must be unique. The layout already contains an activity with the id '${extras.ɵactivityId}'.`);
     }
 
-    const activityId = extras.ɵactivityId ?? WorkbenchLayouts.computeActivityId();
+    const activityId = extras.ɵactivityId ?? computeActivityId();
     const title = extras.title === false ? undefined : extras.title ?? extras.label;
     this._grids[activityId] = {
       root: new MPart({
@@ -1588,7 +1586,7 @@ export interface ReferenceElement extends ReferencePart {
  */
 export const MAIN_AREA_INITIAL_PART_ID = new InjectionToken<PartId>('MAIN_AREA_INITIAL_PART_ID', {
   providedIn: 'root',
-  factory: () => WorkbenchLayouts.computePartId(),
+  factory: () => computePartId(),
 });
 
 /**
@@ -1655,27 +1653,6 @@ function matchesPartId(id: PartId | string, part: MPart): boolean {
   else {
     return part.alternativeId === id;
   }
-}
-
-/**
- * Tests if the given id matches the format of an activity identifier.
- */
-export function isActivityId(activityId: string | undefined | null): activityId is ActivityId {
-  return activityId?.startsWith(ACTIVITY_ID_PREFIX) ?? false;
-}
-
-/**
- * Tests if the given id matches the format of a part identifier.
- */
-export function isPartId(partId: string | undefined | null): partId is PartId {
-  return Routing.isPartOutlet(partId);
-}
-
-/**
- * Tests if the given id matches the format of a view identifier.
- */
-function isViewId(viewId: string | undefined | null): viewId is ViewId {
-  return Routing.isViewOutlet(viewId);
 }
 
 /**

@@ -19,7 +19,7 @@ import {MessageBoxPO} from './message-box.po';
 import {NotificationPO} from './notification.po';
 import {AppHeaderPO} from './app-header.po';
 import {DialogPO} from './dialog.po';
-import {ActivityId, PartId, ViewId} from '@scion/workbench';
+import {ActivityId, DialogId, PartId, PopupId, ViewId} from '@scion/workbench';
 import {WorkbenchAccessor} from './workbench-accessor';
 import {ActivityItemPO} from './activity-item.po';
 import {ActivityPanelPO} from './activity-panel.po';
@@ -246,16 +246,22 @@ export class AppPO {
    * @param locateBy.peripheral - Controls whether to locate views located in the peripheral area.
    */
   public views(locateBy?: {peripheral?: boolean; cssClass?: string}): Locator {
-    const locateByCssClass = locateBy?.cssClass ? `:scope.${locateBy.cssClass}` : ':scope';
+    let locator: Locator;
     if (locateBy?.peripheral === true) {
-      return this.page.locator('wb-part[data-peripheral] wb-view-tab').locator(locateByCssClass);
+      locator = this.page.locator('wb-part[data-peripheral] wb-view-tab');
     }
-    if (locateBy?.peripheral === false) {
-      return this.page.locator(`wb-part:not([data-peripheral]):not([data-partid="${MAIN_AREA}"] wb-view-tab`).locator(locateByCssClass);
+    else if (locateBy?.peripheral === false) {
+      locator = this.page.locator(`wb-part:not([data-peripheral]):not([data-partid="${MAIN_AREA}"] wb-view-tab`);
     }
     else {
-      return this.page.locator('wb-view-tab').locator(locateByCssClass);
+      locator = this.page.locator('wb-view-tab');
     }
+
+    const cssClasses = coerceArray(locateBy?.cssClass);
+    if (cssClasses.length) {
+      locator = locator.locator(`:scope.${cssClasses.map(escapeCssClass).join('.')}`);
+    }
+    return locator;
   }
 
   /**
@@ -328,9 +334,16 @@ export class AppPO {
   /**
    * Handle to the specified popup.
    */
-  public popup(locateBy?: {cssClass?: string | string[]}): PopupPO {
-    const cssClasses = coerceArray(locateBy?.cssClass).map(cssClass => cssClass.replace(/\./g, '\\.'));
-    return new PopupPO(this.page.locator(['wb-popup'].concat(cssClasses).join('.')));
+  public popup(locateBy?: {popupId?: PopupId; cssClass?: string | string[]}): PopupPO {
+    let locator = this.page.locator('wb-popup');
+    if (locateBy?.popupId) {
+      locator = locator.locator(`:scope[data-popupid="${locateBy.popupId}"]`);
+    }
+    const cssClasses = coerceArray(locateBy?.cssClass);
+    if (cssClasses.length) {
+      locator = locator.locator(`:scope.${cssClasses.map(escapeCssClass).join('.')}`);
+    }
+    return new PopupPO(locator);
   }
 
   /**
@@ -351,7 +364,7 @@ export class AppPO {
    * Handle to the specified notification.
    */
   public notification(locateBy?: {cssClass?: string | string[]; nth?: number}): NotificationPO {
-    const cssClasses = coerceArray(locateBy?.cssClass).map(cssClass => cssClass.replace(/\./g, '\\.'));
+    const cssClasses = coerceArray(locateBy?.cssClass).map(escapeCssClass);
     const locator = this.page.locator(['wb-notification'].concat(cssClasses).join('.'));
     return new NotificationPO(locateBy?.nth !== undefined ? locator.nth(locateBy.nth) : locator);
   }
@@ -359,16 +372,22 @@ export class AppPO {
   /**
    * Handle to the specified message box.
    */
-  public messagebox(locateBy?: {cssClass?: string | string[]; nth?: number}): MessageBoxPO {
-    return new MessageBoxPO(this.dialog(locateBy));
+  public messagebox(locateBy?: {dialogId?: DialogId; cssClass?: string | string[]; nth?: number}): MessageBoxPO {
+    return new MessageBoxPO(this.dialog({dialogId: locateBy?.dialogId, cssClass: locateBy?.cssClass, nth: locateBy?.nth}));
   }
 
   /**
    * Handle to the specified dialog.
    */
-  public dialog(locateBy?: {cssClass?: string | string[]; nth?: number}): DialogPO {
-    const cssClasses = coerceArray(locateBy?.cssClass).map(cssClass => cssClass.replace(/\./g, '\\.'));
-    const locator = this.page.locator(['wb-dialog'].concat(cssClasses).join('.'));
+  public dialog(locateBy?: {dialogId?: DialogId; cssClass?: string | string[]; nth?: number}): DialogPO {
+    let locator = this.page.locator('wb-dialog');
+    if (locateBy?.dialogId) {
+      locator = locator.locator(`:scope[data-dialogid="${locateBy.dialogId}"]`);
+    }
+    const cssClasses = coerceArray(locateBy?.cssClass);
+    if (cssClasses.length) {
+      locator = locator.locator(`:scope.${cssClasses.map(escapeCssClass).join('.')}`);
+    }
     return new DialogPO(locateBy?.nth !== undefined ? locator.nth(locateBy.nth) : locator);
   }
 
@@ -477,14 +496,14 @@ export class AppPO {
   /**
    * Indicates if the specified dialog is blocked by a dialog.
    */
-  public async isDialogBlocked(dialogId: string | Promise<string>): Promise<boolean> {
+  public async isDialogBlocked(dialogId: DialogId | Promise<string>): Promise<boolean> {
     return (await this.page.locator(`.e2e-glasspane[data-dialogid="${await dialogId}"]`).count()) > 0;
   }
 
   /**
    * Indicates if the specified popup is blocked by a dialog.
    */
-  public async isPopupBlocked(popupId: string | Promise<string>): Promise<boolean> {
+  public async isPopupBlocked(popupId: PopupId | Promise<string>): Promise<boolean> {
     return (await this.page.locator(`.e2e-glasspane[data-popupid="${await popupId}"]`).count()) > 0;
   }
 }
@@ -623,4 +642,11 @@ export enum WorkbenchStartupQueryParams {
    * Query param to control the identity of the initial part in the main area.
    */
   MAIN_AREA_INITIAL_PART_ID = 'mainAreaInitialPartId',
+}
+
+/**
+ * Escapes the CSS class to support passing a workbench element id (such as a view id) as CSS class.
+ */
+function escapeCssClass(cssClass: string): string {
+  return cssClass.replace(/\./g, '\\.');
 }

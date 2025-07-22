@@ -8,14 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DestroyRef, effect, ElementRef, inject, Injector, input, runInInjectionContext, StaticProvider, untracked} from '@angular/core';
+import {Component, computed, DestroyRef, effect, ElementRef, inject, Injector, input, runInInjectionContext, Signal, StaticProvider, untracked} from '@angular/core';
 import {WorkbenchMessageBox, WorkbenchMessageBoxCapability} from '@scion/workbench-client';
 import {Routing} from '../../routing/routing.util';
 import {Commands} from '../../routing/routing.model';
 import {Router, RouterOutlet} from '@angular/router';
 import {NgTemplateOutlet} from '@angular/common';
-import {MESSAGE_BOX_ID_PREFIX} from '../../workbench.constants';
-import {UUID} from '@scion/toolkit/uuid';
 import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog';
 import {Microfrontends} from '../common/microfrontend.util';
 import {ANGULAR_ROUTER_MUTEX} from '../../executor/single-task-executor';
@@ -44,19 +42,16 @@ export class MicrofrontendHostMessageBoxComponent {
   public readonly params = input.required<Map<string, unknown>>();
 
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
-  private readonly _dialog = inject(ɵWorkbenchDialog);
   private readonly _injector = inject(Injector);
   private readonly _router = inject(Router);
   /** Mutex to serialize Angular Router navigation requests, preventing the cancellation of previously initiated asynchronous navigations. */
   private readonly _angularRouterMutex = inject(ANGULAR_ROUTER_MUTEX);
 
-  protected readonly outletName = MESSAGE_BOX_ID_PREFIX.concat(UUID.randomUUID());
-
-  protected outletInjector!: Injector;
+  protected readonly dialog = inject(ɵWorkbenchDialog);
+  protected readonly outletInjector = this.computeOutletInjector();
 
   constructor() {
     this.setMessageBoxProperties();
-    this.createOutletInjector();
     this.navigateCapability();
 
     inject(DestroyRef).onDestroy(() => void this.navigate(null)); // Remove the outlet from the URL
@@ -70,7 +65,7 @@ export class MicrofrontendHostMessageBoxComponent {
       untracked(() => {
         void this.navigate(capability.properties.path, {params}).then(success => {
           if (!success) {
-            this._dialog.close(Error('[MessageBoxNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
+            this.dialog.close(Error('[MessageBoxNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
           }
         });
       });
@@ -84,21 +79,21 @@ export class MicrofrontendHostMessageBoxComponent {
     path = Microfrontends.substituteNamedParameters(path, extras?.params);
 
     const outletCommands: Commands | null = (path !== null ? runInInjectionContext(this._injector, () => Routing.pathToCommands(path)) : null);
-    const commands: Commands = [{outlets: {[this.outletName]: outletCommands}}];
+    const commands: Commands = [{outlets: {[this.dialog.id]: outletCommands}}];
     return this._angularRouterMutex.submit(() => this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'preserve'}));
   }
 
-  private createOutletInjector(): void {
-    effect(() => {
+  private computeOutletInjector(): Signal<Injector> {
+    const injector = inject(Injector);
+
+    return computed(() => {
       const capability = this.capability();
       const params = this.params();
 
-      untracked(() => {
-        this.outletInjector = Injector.create({
-          parent: this._injector,
-          providers: [provideWorkbenchClientMessageBoxHandle(capability, params)],
-        });
-      });
+      return untracked(() => Injector.create({
+        parent: injector,
+        providers: [provideWorkbenchClientMessageBoxHandle(capability, params)],
+      }));
     });
   }
 

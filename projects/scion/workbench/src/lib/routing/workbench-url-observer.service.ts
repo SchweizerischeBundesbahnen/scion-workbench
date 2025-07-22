@@ -23,13 +23,12 @@ import {WorkbenchNavigationalStates} from './workbench-navigational-states';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 import {Routing} from './routing.util';
-import {ViewId} from '../view/workbench-view.model';
 import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 import {WorkbenchNavigationContext} from './routing.model';
 import {matchesIfNavigated} from './workbench-route-guards';
 import {WorkbenchOutletDiffer} from './workbench-outlet-differ';
 import {filter} from 'rxjs/operators';
-import {PartId} from '../part/workbench-part.model';
+import {PartId, ViewId} from '../workbench.identifiers';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 import {MPartGrid} from '../layout/workbench-grid.model';
@@ -195,16 +194,9 @@ export class WorkbenchUrlObserver {
       this._logger.debug(() => `Registered auxiliary routes for dialogs: ${addedDialogOutlets}`, LoggerNames.ROUTING, auxiliaryRoutes);
     }
 
-    // Register message box auxiliary routes.
-    const addedMessageBoxOutlets = navigationContext.outletDiff.addedMessageBoxOutlets;
-    if (addedMessageBoxOutlets.length) {
-      const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedMessageBoxOutlets, {notFoundRoute: true});
-      this._logger.debug(() => `Registered auxiliary routes for message boxes: ${addedMessageBoxOutlets}`, LoggerNames.ROUTING, auxiliaryRoutes);
-    }
-
     // Revert registration if the navigation fails.
     navigationContext.registerUndoAction(() => {
-      const addedOutlets = [...addedViewOutlets, ...addedPartOutlets, ...addedPopupOutlets, ...addedDialogOutlets, ...addedMessageBoxOutlets];
+      const addedOutlets = [...addedViewOutlets, ...addedPartOutlets, ...addedPopupOutlets, ...addedDialogOutlets];
       this._auxiliaryRouteInstaller.unregisterAuxiliaryRoutes(addedOutlets);
     });
   }
@@ -219,7 +211,6 @@ export class WorkbenchUrlObserver {
       ...navigationContext.outletDiff.removedPartOutlets,
       ...navigationContext.outletDiff.removedPopupOutlets,
       ...navigationContext.outletDiff.removedDialogOutlets,
-      ...navigationContext.outletDiff.removedMessageBoxOutlets,
     ];
     if (removedOutlets.length) {
       this._logger.debug(() => 'Unregistering outlet auxiliary routes: ', LoggerNames.ROUTING, removedOutlets);

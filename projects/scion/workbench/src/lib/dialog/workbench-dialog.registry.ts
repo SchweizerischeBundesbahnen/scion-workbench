@@ -12,7 +12,7 @@ import {Injectable, OnDestroy} from '@angular/core';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {distinctUntilChanged, map} from 'rxjs/operators';
-import {ViewId} from '../view/workbench-view.model';
+import {ViewId} from '../workbench.identifiers';
 
 /**
  * Registry for {@link ɵWorkbenchDialog} objects.

@@ -12,7 +12,7 @@ import {firstValueFrom, Observable} from 'rxjs';
 import {ActivatedRouteSnapshot, ChildrenOutletContexts} from '@angular/router';
 import {ViewDragService, ViewMoveEventSource} from '../view-dnd/view-drag.service';
 import {CanCloseFn, CanCloseRef, WorkbenchMenuItem, WorkbenchViewMenuItemFn} from '../workbench.model';
-import {ViewId, WorkbenchView, WorkbenchViewNavigation} from './workbench-view.model';
+import {WorkbenchView, WorkbenchViewNavigation} from './workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {WbComponentPortal} from '../portal/wb-component-portal';
@@ -26,7 +26,7 @@ import {takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-int
 import {provideViewContext} from './view-context-provider';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
 import {Blockable} from '../glass-pane/blockable';
-import {WORKBENCH_ID} from '../workbench-id';
+import {ViewId, WORKBENCH_ID} from '../workbench.identifiers';
 import {ClassList} from '../common/class-list';
 import {Routing} from '../routing/routing.util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';

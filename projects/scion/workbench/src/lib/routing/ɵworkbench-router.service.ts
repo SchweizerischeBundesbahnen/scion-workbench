@@ -13,7 +13,7 @@ import {WorkbenchRouter} from './workbench-router.service';
 import {Defined} from '@scion/toolkit/util';
 import {assertNotInReactiveContext, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
-import {MAIN_AREA_LAYOUT_QUERY_PARAM, WorkbenchOutlet} from '../workbench.constants';
+import {MAIN_AREA_LAYOUT_QUERY_PARAM} from '../workbench.constants';
 import {ANGULAR_ROUTER_MUTEX, SingleTaskExecutor} from '../executor/single-task-executor';
 import {firstValueFrom} from 'rxjs';
 import {WorkbenchNavigationalStates} from './workbench-navigational-states';
@@ -24,9 +24,9 @@ import {UrlSegmentMatcher} from './url-segment-matcher';
 import {Objects} from '../common/objects.util';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
-import {ViewId} from '../view/workbench-view.model';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 import {MAIN_AREA} from '../layout/workbench-layout';
+import {computeViewId, ViewId, WorkbenchOutlet} from '../workbench.identifiers';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})
@@ -263,7 +263,7 @@ export function createNavigationFromCommands(commands: Commands, extras: Workben
     else {
       switch (extras.target ?? 'auto') {
         case 'blank': {
-          return addView(WorkbenchLayouts.computeViewId(), layout);
+          return addView(computeViewId(), layout);
         }
         case 'auto': {
           const urlSegments = Routing.commandsToSegments(commands, {relativeTo: extras.relativeTo});
@@ -277,7 +277,7 @@ export function createNavigationFromCommands(commands: Commands, extras: Workben
             return views.reduce((layout, view) => updateView(view.id, layout), layout);
           }
           else {
-            return addView(WorkbenchLayouts.computeViewId(), layout);
+            return addView(computeViewId(), layout);
           }
         }
         default: {

@@ -8,4 +8,4 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {type ActivityId} from './workbench-activity.model';
+export {} from '';

@@ -18,9 +18,9 @@ import {concat, firstValueFrom, NEVER, Observable} from 'rxjs';
 import {WorkbenchView} from '../view/workbench-view';
 import {ɵWorkbenchPopupCommand} from './workbench-popup-open-command';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
-import {UUID} from '@scion/toolkit/uuid';
 import {WorkbenchPopupConfig} from './workbench-popup.config';
 import {PopupOrigin} from './popup.origin';
+import {computePopupId} from '../workbench.identifiers';
 
 /**
  * Displays a microfrontend in a popup.
@@ -60,7 +60,7 @@ export class WorkbenchPopupService {
    */
   public async open<T>(qualifier: Qualifier, config: WorkbenchPopupConfig): Promise<T | undefined> {
     const popupCommand: ɵWorkbenchPopupCommand = {
-      popupId: UUID.randomUUID(),
+      popupId: computePopupId(),
       align: config.align,
       closeStrategy: config.closeStrategy,
       cssClass: config.cssClass,

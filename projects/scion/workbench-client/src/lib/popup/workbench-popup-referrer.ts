@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ViewId} from '../view/workbench-view';
+import {ViewId} from '../workbench.identifiers';
 
 /**
  * Information about the context in which a popup was opened.

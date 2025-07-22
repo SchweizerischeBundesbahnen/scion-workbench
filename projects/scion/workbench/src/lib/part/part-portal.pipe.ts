@@ -11,7 +11,7 @@
 import {inject, Pipe, PipeTransform} from '@angular/core';
 import {WORKBENCH_PART_REGISTRY} from './workbench-part.registry';
 import type {PartComponent} from './part.component';
-import {PartId} from './workbench-part.model';
+import {PartId} from '../workbench.identifiers';
 import {WbComponentPortal} from '../portal/wb-component-portal';
 import {MainAreaPartComponent} from './main-area-part/main-area-part.component';
 

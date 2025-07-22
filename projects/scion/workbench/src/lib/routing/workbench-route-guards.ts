@@ -11,8 +11,8 @@
 import {CanMatchFn, Route, UrlSegment} from '@angular/router';
 import {inject} from '@angular/core';
 import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
-import {Routing} from './routing.util';
 import {WORKBENCH_OUTLET} from './workbench-auxiliary-route-installer.service';
+import {isDialogOutlet, isPartOutlet, isViewOutlet, isWorkbenchOutlet} from '../workbench.identifiers';
 
 /**
  * Configures a route to only match workbench views navigated with a specific hint.
@@ -47,11 +47,11 @@ export function canMatchWorkbenchView(condition: string | boolean): CanMatchFn {
 
     switch (condition) {
       case true:
-        return Routing.isViewOutlet(outlet);
+        return isViewOutlet(outlet);
       case false:
-        return !Routing.isViewOutlet(outlet);
+        return !isViewOutlet(outlet);
       default: { // hint
-        if (!Routing.isViewOutlet(outlet)) {
+        if (!isViewOutlet(outlet)) {
           return false;
         }
 
@@ -97,11 +97,11 @@ export function canMatchWorkbenchPart(condition: string | boolean): CanMatchFn {
 
     switch (condition) {
       case true:
-        return Routing.isPartOutlet(outlet);
+        return isPartOutlet(outlet);
       case false:
-        return !Routing.isPartOutlet(outlet);
+        return !isPartOutlet(outlet);
       default: { // hint
-        if (!Routing.isPartOutlet(outlet)) {
+        if (!isPartOutlet(outlet)) {
           return false;
         }
 
@@ -110,6 +110,18 @@ export function canMatchWorkbenchPart(condition: string | boolean): CanMatchFn {
         return part?.navigation?.hint === condition;
       }
     }
+  };
+}
+
+/**
+ * Configures a route to only or never match workbench dialogs.
+ *
+ * @see canMatchWorkbenchOutlet
+ */
+export function canMatchWorkbenchDialog(condition: boolean): CanMatchFn {
+  return (): boolean => {
+    const outlet = inject(WORKBENCH_OUTLET, {optional: true});
+    return isDialogOutlet(outlet) === condition;
   };
 }
 
@@ -162,7 +174,7 @@ export function canMatchWorkbenchPart(condition: string | boolean): CanMatchFn {
 export function canMatchWorkbenchOutlet(matchWorkbenchOutlet: boolean): CanMatchFn {
   return (): boolean => {
     const outlet = inject(WORKBENCH_OUTLET, {optional: true});
-    return matchWorkbenchOutlet ? Routing.isWorkbenchOutlet(outlet) : !Routing.isWorkbenchOutlet(outlet);
+    return matchWorkbenchOutlet ? isWorkbenchOutlet(outlet) : !isWorkbenchOutlet(outlet);
   };
 }
 
@@ -185,12 +197,12 @@ export function canMatchWorkbenchPerspective(id: string): CanMatchFn {
 export const matchesIfNavigated: CanMatchFn = (_route: Route, segments: UrlSegment[]): boolean => {
   const outlet = inject(WORKBENCH_OUTLET, {optional: true});
 
-  if (Routing.isViewOutlet(outlet)) {
+  if (isViewOutlet(outlet)) {
     const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
     const view = layout.view({viewId: outlet}, {orElse: null});
     return !!view?.navigation;
   }
-  if (Routing.isPartOutlet(outlet)) {
+  if (isPartOutlet(outlet)) {
     const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
     const part = layout.part({partId: outlet}, {orElse: null});
     return !!part?.navigation;
