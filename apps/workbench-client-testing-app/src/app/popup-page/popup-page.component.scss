@@ -12,73 +12,73 @@
   > sci-viewport {
     flex: auto;
 
-    > form {
+    &::part(content) {
       display: grid;
       grid-template-columns: 1fr 1fr;
       align-content: start;
       gap: 1em;
+    }
 
-      > section {
-        display: flex;
-        flex-direction: column;
-        gap: .5em;
-        border: 1px solid var(--sci-color-border);
-        border-radius: var(--sci-corner);
-        padding: 1em;
+    > section {
+      display: flex;
+      flex-direction: column;
+      gap: .5em;
+      border: 1px solid var(--sci-color-border);
+      border-radius: var(--sci-corner);
+      padding: 1em;
 
-        > header {
-          margin-bottom: 1em;
-          font-weight: bold;
+      > header {
+        margin-bottom: 1em;
+        font-weight: bold;
+      }
+    }
+
+    > section.general {
+      grid-column: 1/-1;
+    }
+
+    > section.component-size {
+      grid-column: 1;
+    }
+
+    > section.properties {
+      grid-column: 2;
+    }
+
+    > sci-accordion.return-value {
+      grid-column: 1/-1;
+    }
+
+    sci-accordion {
+      header {
+        font-weight: bold;
+      }
+
+      &.popup-capability sci-viewport {
+        max-height: 200px;
+        max-width: 260px;
+
+        div.capability {
+          white-space: pre;
+          font-family: monospace;
         }
       }
 
-      > section.general {
-        grid-column: 1/-1;
+      &.e2e-popup-params sci-viewport {
+        max-height: 200px;
       }
 
-      > section.component-size {
-        grid-column: 1;
+      &.preferred-popup-size sci-viewport {
+        max-height: 200px;
+
+        div.preferred-popup-size {
+          white-space: pre;
+          font-family: monospace;
+        }
       }
 
-      > section.properties {
-        grid-column: 2;
-      }
-
-      > sci-accordion.return-value {
-        grid-column: 1/-1;
-      }
-
-      sci-accordion {
-        header {
-          font-weight: bold;
-        }
-
-        &.popup-capability sci-viewport {
-          max-height: 200px;
-          max-width: 260px;
-
-          div.capability {
-            white-space: pre;
-            font-family: monospace;
-          }
-        }
-
-        &.e2e-popup-params sci-viewport {
-          max-height: 200px;
-        }
-
-        &.preferred-popup-size sci-viewport {
-          max-height: 200px;
-
-          div.preferred-popup-size {
-            white-space: pre;
-            font-family: monospace;
-          }
-        }
-
-        &.return-value input {
-          @include sci-design.style-input-field();
-        }
+      &.return-value input {
+        @include sci-design.style-input-field();
       }
     }
   }

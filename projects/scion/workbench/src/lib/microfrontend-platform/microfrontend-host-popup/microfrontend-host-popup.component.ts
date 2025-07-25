@@ -13,10 +13,11 @@ import {WorkbenchPopup, ɵPopupContext} from '@scion/workbench-client';
 import {Routing} from '../../routing/routing.util';
 import {Commands} from '../../routing/routing.model';
 import {Router, RouterOutlet} from '@angular/router';
-import {Popup, ɵPopup} from '../../popup/popup.config';
+import {ɵPopup} from '../../popup/popup.config';
 import {NgTemplateOutlet} from '@angular/common';
 import {Microfrontends} from '../common/microfrontend.util';
 import {ANGULAR_ROUTER_MUTEX} from '../../executor/single-task-executor';
+import {toObservable} from '@angular/core/rxjs-interop';
 
 /**
  * Displays the microfrontend of a popup capability provided by the host inside a workbench popup.
@@ -81,12 +82,14 @@ function provideWorkbenchPopupHandle(popupContext: ɵPopupContext): StaticProvid
   return {
     provide: WorkbenchPopup,
     useFactory: (): WorkbenchPopup => {
-      const popup = inject(Popup);
+      const popup = inject(ɵPopup);
 
       return new class implements WorkbenchPopup {
+        public readonly id = popup.id;
         public readonly capability = popupContext.capability;
         public readonly params = popupContext.params;
         public readonly referrer = popupContext.referrer;
+        public readonly focused$ = toObservable(popup.focused, {injector: popup.injector});
 
         public setResult(result?: unknown): void {
           popup.setResult(result);

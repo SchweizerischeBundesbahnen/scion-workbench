@@ -98,6 +98,13 @@ export const ɵWorkbenchCommands = {
   popupOriginTopic: (popupId: PopupId) => `ɵworkbench/popups/${popupId}/origin`,
 
   /**
+   * Computes the topic to notify the focused state of a popup.
+   *
+   * The focused state is published as a retained message.
+   */
+  popupFocusedTopic: (popupId: PopupId) => `ɵworkbench/popups/${popupId}/focused`,
+
+  /**
    * Computes the topic via which a popup can be closed.
    */
   popupCloseTopic: (popupId: PopupId) => `ɵworkbench/popups/${popupId}/close`,

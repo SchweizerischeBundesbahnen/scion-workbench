@@ -52,7 +52,7 @@ export default [
   {
     path: 'host-focus-test-page',
     loadComponent: () => import('./host-focus-test-page/host-focus-test-page.component'),
-    data: {[WorkbenchRouteData.title]: 'Focus Test Page', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-focus-test-page'},
+    data: {[WorkbenchRouteData.title]: 'Focus Test Page', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-host-focus-test-page'},
   },
   {
     path: 'angular-router-test-page',

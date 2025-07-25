@@ -38,6 +38,7 @@ export class MicrofrontendPopupComponent {
 
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _outletRouter = inject(OutletRouter);
+  private readonly _messageClient = inject(MessageClient);
   private readonly _logger = inject(Logger);
   private readonly _routerOutletElement = viewChild.required<ElementRef<SciRouterOutletElement>>('router_outlet');
 
@@ -54,10 +55,16 @@ export class MicrofrontendPopupComponent {
     this.installPopupCloseListener();
     this.propagatePopupContext();
     this.propagateWorkbenchTheme();
+    this.installPopupFocusedPublisher();
 
     void this.navigate();
 
-    inject(DestroyRef).onDestroy(() => void this._outletRouter.navigate(null, {outlet: this.popup.id})); // Clear the outlet.
+    inject(DestroyRef).onDestroy(() => {
+      // Clear the outlet.
+      void this._outletRouter.navigate(null, {outlet: this.popup.id});
+      // Delete retained messages to free resources.
+      void this._messageClient.publish(ɵWorkbenchCommands.popupFocusedTopic(this.popup.id), undefined, {retain: true});
+    });
   }
 
   private async navigate(): Promise<void> {
@@ -84,6 +91,16 @@ export class MicrofrontendPopupComponent {
       const routerOutletElement = this._routerOutletElement();
 
       untracked(() => routerOutletElement.nativeElement.setContextValue(ɵPOPUP_CONTEXT, this.popupContext));
+    });
+  }
+
+  private installPopupFocusedPublisher(): void {
+    effect(() => {
+      const focused = this.popup.focused();
+      untracked(() => {
+        const commandTopic = ɵWorkbenchCommands.popupFocusedTopic(this.popup.id);
+        void this._messageClient.publish(commandTopic, focused, {retain: true});
+      });
     });
   }
 
