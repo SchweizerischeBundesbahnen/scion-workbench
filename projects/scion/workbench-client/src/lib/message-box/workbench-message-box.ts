@@ -9,6 +9,8 @@
  */
 
 import {WorkbenchMessageBoxCapability} from '../message-box/workbench-message-box-capability';
+import {DialogId} from '../workbench.identifiers';
+import {Observable} from 'rxjs';
 
 /**
  * Handle to interact with a message box opened via {@link WorkbenchMessageBoxService}.
@@ -23,6 +25,11 @@ import {WorkbenchMessageBoxCapability} from '../message-box/workbench-message-bo
 export abstract class WorkbenchMessageBox {
 
   /**
+   * Represents the identity of this message box.
+   */
+  public abstract readonly id: DialogId;
+
+  /**
    * Capability of the microfrontend loaded into this message box.
    */
   public abstract readonly capability: WorkbenchMessageBoxCapability;
@@ -31,6 +38,11 @@ export abstract class WorkbenchMessageBox {
    * Parameters as passed by the message box opener.
    */
   public abstract readonly params: Map<string, unknown>;
+
+  /**
+   * Indicates whether this message box has the focus.
+   */
+  public abstract readonly focused$: Observable<boolean>;
 
   /**
    * Signals readiness, notifying the workbench that this message box has completed initialization.

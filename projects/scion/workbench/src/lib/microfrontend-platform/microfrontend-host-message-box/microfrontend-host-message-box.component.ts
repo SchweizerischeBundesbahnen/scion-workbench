@@ -18,6 +18,7 @@ import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog';
 import {Microfrontends} from '../common/microfrontend.util';
 import {ANGULAR_ROUTER_MUTEX} from '../../executor/single-task-executor';
 import {setStyle} from '../../common/dom.util';
+import {toObservable} from '@angular/core/rxjs-interop';
 
 /**
  * Navigates to the microfrontend of a given {@link WorkbenchMessageBoxCapability} via {@link Router}.
@@ -122,10 +123,13 @@ export function provideWorkbenchClientMessageBoxHandle(capability: WorkbenchMess
   return {
     provide: WorkbenchMessageBox,
     useFactory: (): WorkbenchMessageBox => {
+      const dialog = inject(ɵWorkbenchDialog);
 
       return new class implements WorkbenchMessageBox {
         public readonly capability = capability;
         public readonly params = params;
+        public readonly id = dialog.id;
+        public readonly focused$ = toObservable(dialog.focused, {injector: dialog.injector});
 
         public signalReady(): void {
           // nothing to do since not an iframe-based microfrontend

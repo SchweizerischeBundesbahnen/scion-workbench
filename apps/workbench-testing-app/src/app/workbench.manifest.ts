@@ -186,7 +186,7 @@ export const workbenchManifest: Manifest = {
       private: false,
       description: 'Represents a message box provided by the host app that displays the focus test page.',
       properties: {
-        path: 'test-pages/focus-test-page',
+        path: 'test-pages/host-focus-test-page',
       },
     } satisfies WorkbenchMessageBoxCapability,
   ],
