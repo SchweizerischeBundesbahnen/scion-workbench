@@ -9,7 +9,7 @@
  */
 
 import {Component, inject} from '@angular/core';
-import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
+import {FormGroup, FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {CanCloseRef, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
@@ -22,7 +22,7 @@ import {parseTypedObject} from '../common/parse-typed-value.util';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {AppendParamDataTypePipe} from '../common/append-param-data-type.pipe';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
@@ -45,6 +45,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
     SciCheckboxComponent,
     SciKeyValueFieldComponent,
     SciViewportComponent,
+    FormsModule,
   ],
 })
 export default class ViewPageComponent {
@@ -58,6 +59,7 @@ export default class ViewPageComponent {
   protected readonly location = inject(Location);
   protected readonly appInstanceId = inject(APP_INSTANCE_ID);
   protected readonly uuid = UUID.randomUUID();
+  protected readonly focused = toSignal(inject(WorkbenchView).focused$, {initialValue: true});
 
   protected readonly form = this._formBuilder.group({
     title: this._formBuilder.control(''),
@@ -183,6 +185,9 @@ export default class ViewPageComponent {
       .subscribe();
     this.view.active$
       .pipe(this.logCompletion('ActiveObservableComplete'))
+      .subscribe();
+    this.view.focused$
+      .pipe(this.logCompletion('FocusedObservableComplete'))
       .subscribe();
   }
 

@@ -71,6 +71,15 @@ export abstract class WorkbenchView {
   public abstract readonly active$: Observable<boolean>;
 
   /**
+   * Indicates whether this view has the focus.
+   *
+   * Upon subscription, emits the focused state of this view, and then emits continuously when it changes.
+   * The Observable completes when navigating to a microfrontend of another application, but not when navigating to a different microfrontend
+   * of the same application.
+   */
+  public abstract readonly focused$: Observable<boolean>;
+
+  /**
    * Provides the identity of the part that contains this view.
    *
    * Upon subscription, emits the identity of this view's part, and then emits continuously when it changes.
@@ -176,4 +185,12 @@ export interface ViewSnapshot {
    * The identity of the part that contains the view.
    */
   partId: PartId;
+  /**
+   * Indicates whether this view is active.
+   */
+  active: boolean;
+  /**
+   * Indicates whether this view has the focus.
+   */
+  focused: boolean;
 }

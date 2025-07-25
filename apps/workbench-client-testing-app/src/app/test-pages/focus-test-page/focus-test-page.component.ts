@@ -8,14 +8,28 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, inject, signal, Signal} from '@angular/core';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {WorkbenchView} from '@scion/workbench-client';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-focus-test-page',
   templateUrl: './focus-test-page.component.html',
   styleUrls: ['./focus-test-page.component.scss'],
-  imports: [SciFormFieldComponent],
+  imports: [SciFormFieldComponent, FormsModule],
 })
 export default class FocusTestPageComponent {
+
+  protected readonly focused: Signal<boolean>;
+
+  constructor() {
+    if (inject(WorkbenchView, {optional: true})) {
+      this.focused = toSignal(inject(WorkbenchView).focused$, {initialValue: true});
+    }
+    else {
+      this.focused = signal(false).asReadonly();
+    }
+  }
 }

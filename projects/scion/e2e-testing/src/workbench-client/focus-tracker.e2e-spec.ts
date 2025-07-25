@@ -62,6 +62,7 @@ test.describe('Focus Tracker', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual(viewId);
     await expect.poll(() => logPart.getLog()).toEqual([viewId]);
     await expect(appPO.view({viewId}).locator).toContainFocus();
+    await expect.poll(() => focusTestPage.isFocused()).toBe(true);
 
     // TEST: Focus element outside the view.
     await appPO.part({partId: 'part.right'}).bar.filler.click();
@@ -69,6 +70,7 @@ test.describe('Focus Tracker', () => {
     // Expect view not to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right');
     await expect.poll(() => logPart.getLog()).toEqual([viewId, 'part.right']);
+    await expect.poll(() => focusTestPage.isFocused()).toBe(false);
 
     // TEST: Focus element in the view.
     await focusTestPage.firstField.click();
@@ -77,6 +79,7 @@ test.describe('Focus Tracker', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual(viewId);
     await expect.poll(() => logPart.getLog()).toEqual([viewId, 'part.right', viewId]);
     await expect(focusTestPage.firstField).toBeFocused();
+    await expect.poll(() => focusTestPage.isFocused()).toBe(true);
 
     // TEST: Focus element outside the view.
     await appPO.part({partId: 'part.right'}).bar.filler.click();
@@ -85,6 +88,7 @@ test.describe('Focus Tracker', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right');
     await expect.poll(() => logPart.getLog()).toEqual([viewId, 'part.right', viewId, 'part.right']);
     await expect(appPO.part({partId: 'part.right'}).locator).toContainFocus();
+    await expect.poll(() => focusTestPage.isFocused()).toBe(false);
 
     // TEST: Focus element in the view.
     await focusTestPage.firstField.click();
@@ -93,6 +97,7 @@ test.describe('Focus Tracker', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual(viewId);
     await expect.poll(() => logPart.getLog()).toEqual([viewId, 'part.right', viewId, 'part.right', viewId]);
     await expect(focusTestPage.firstField).toBeFocused();
+    await expect.poll(() => focusTestPage.isFocused()).toBe(true);
 
     // TEST: Close the view.
     await appPO.view({viewId: viewId}).tab.close();

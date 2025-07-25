@@ -12,6 +12,7 @@ import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
 import {DialogId, PopupId, ViewId} from '@scion/workbench-client';
 import {AppPO} from '../../../app.po';
+import {coerceBooleanProperty} from '@angular/cdk/coercion';
 
 /**
  * Page object to interact with {@link FocusTestPageComponent}.
@@ -34,5 +35,9 @@ export class FocusTestPagePO {
 
   public waitUntilAttached(): Promise<void> {
     return this.locator.waitFor({state: 'attached'});
+  }
+
+  public async isFocused(): Promise<boolean> {
+    return coerceBooleanProperty(await this.locator.locator('input.e2e-focused').inputValue());
   }
 }

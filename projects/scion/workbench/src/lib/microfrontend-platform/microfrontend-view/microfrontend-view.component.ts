@@ -94,6 +94,7 @@ export class MicrofrontendViewComponent {
     this._logger.debug(() => `Constructing MicrofrontendViewComponent. [viewId=${this.view.id}]`, LoggerNames.MICROFRONTEND_ROUTING);
     this.keystrokesToBubble = this.computeKeyStrokesToBubble();
     this.installViewActivePublisher();
+    this.installViewFocusedPublisher();
     this.installPartIdPublisher();
     this.installCanCloseGuard();
     this.installMenuAccelerators();
@@ -248,6 +249,17 @@ export class MicrofrontendViewComponent {
     });
   }
 
+  private installViewFocusedPublisher(): void {
+    // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+    rootEffect(() => {
+      const focused = this.view.focused();
+      untracked(() => {
+        const commandTopic = ɵWorkbenchCommands.viewFocusedTopic(this.view.id);
+        void this._messageClient.publish(commandTopic, focused, {retain: true});
+      });
+    });
+  }
+
   private installPartIdPublisher(): void {
     // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
     rootEffect(() => {
@@ -332,6 +344,7 @@ export class MicrofrontendViewComponent {
   private unload(): void {
     // Delete retained messages to free resources.
     void this._messageClient.publish(ɵWorkbenchCommands.viewActiveTopic(this.view.id), undefined, {retain: true});
+    void this._messageClient.publish(ɵWorkbenchCommands.viewFocusedTopic(this.view.id), undefined, {retain: true});
     void this._messageClient.publish(ɵWorkbenchCommands.viewParamsTopic(this.view.id), undefined, {retain: true});
     void this._messageClient.publish(ɵWorkbenchCommands.viewPartIdTopic(this.view.id), undefined, {retain: true});
     void this._outletRouter.navigate(null, {outlet: this.view.id});

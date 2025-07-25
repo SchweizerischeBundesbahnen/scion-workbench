@@ -50,6 +50,13 @@ export const ɵWorkbenchCommands = {
   viewActiveTopic: (viewId: ViewId) => `ɵworkbench/views/${viewId}/active`,
 
   /**
+   * Computes the topic to notify the focused state of a view.
+   *
+   * The focused state is published as a retained message.
+   */
+  viewFocusedTopic: (viewId: ViewId) => `ɵworkbench/views/${viewId}/focused`,
+
+  /**
    * Computes the topic to notify the part of a view.
    *
    * The part identity is published as a retained message.
