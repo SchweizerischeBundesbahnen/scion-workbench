@@ -31,7 +31,7 @@ test.describe('Focus Tracker', () => {
       .addView('view.1', {partId: 'part.main'})
       .activatePart('part.main')
       .activatePart('part.activity')
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -74,7 +74,7 @@ test.describe('Focus Tracker', () => {
       .navigateView('view.1', ['test-pages/focus-test-page'])
       .activatePart('part.main')
       .activatePart('part.activity')
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -117,7 +117,7 @@ test.describe('Focus Tracker', () => {
       .addView('view.1', {partId: 'part.main'})
       .activatePart('part.main')
       .activatePart('part.activity')
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -158,7 +158,7 @@ test.describe('Focus Tracker', () => {
       .addPart('part.right', {align: 'right'})
       .navigatePart('part.left', ['path/to/part'])
       .addView('view.1', {partId: 'part.right'})
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -200,7 +200,7 @@ test.describe('Focus Tracker', () => {
       .navigatePart('part.left', ['path/to/part'])
       .addView('view.1', {partId: 'part.right'})
       .navigateView('view.1', ['test-pages/focus-test-page'])
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -243,7 +243,7 @@ test.describe('Focus Tracker', () => {
       .navigatePart('part.left', ['path/to/part'])
       .addView('view.1', {partId: 'part.right'})
       .navigateView('view.1', ['test-pages/focus-test-page'])
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -286,7 +286,7 @@ test.describe('Focus Tracker', () => {
       .addView('view.2', {partId: 'part.main'})
       .activatePart('part.main')
       .activatePart('part.activity')
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -328,7 +328,7 @@ test.describe('Focus Tracker', () => {
       .addView('view.2', {partId: 'part.main'})
       .activatePart('part.main')
       .activatePart('part.activity')
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -369,7 +369,7 @@ test.describe('Focus Tracker', () => {
       .navigatePart('part.left', ['path/to/part'])
       .addView('view.1', {partId: 'part.right'})
       .addView('view.2', {partId: 'part.right'})
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -410,7 +410,7 @@ test.describe('Focus Tracker', () => {
       .navigatePart('part.left', ['path/to/part'])
       .addView('view.1', {partId: 'part.right'})
       .addView('view.2', {partId: 'part.right'})
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -451,7 +451,7 @@ test.describe('Focus Tracker', () => {
       .navigatePart('part.main', ['path/to/part'])
       .activatePart('part.main')
       .activatePart('part.activity')
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -489,7 +489,7 @@ test.describe('Focus Tracker', () => {
       .navigatePart('part.main', ['test-pages/focus-test-page'])
       .activatePart('part.main')
       .activatePart('part.activity')
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -528,7 +528,7 @@ test.describe('Focus Tracker', () => {
       .navigatePart('part.main', ['path/to/part'])
       .activatePart('part.main')
       .activatePart('part.activity')
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -565,7 +565,7 @@ test.describe('Focus Tracker', () => {
       .addPart('part.right', {align: 'right'})
       .navigatePart('part.left', ['path/to/part'])
       .navigatePart('part.right', ['path/to/part'])
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -602,7 +602,7 @@ test.describe('Focus Tracker', () => {
       .addPart('part.right', {align: 'right'})
       .navigatePart('part.left', ['path/to/part'])
       .navigatePart('part.right', ['test-pages/focus-test-page'])
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -640,7 +640,7 @@ test.describe('Focus Tracker', () => {
       .addPart('part.right', {align: 'right'})
       .navigatePart('part.left', ['path/to/part'])
       .navigatePart('part.right', ['path/to/part'])
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -677,7 +677,7 @@ test.describe('Focus Tracker', () => {
       .addView('view.1', {partId: 'part.main'})
       .addView('view.2', {partId: 'part.main'})
       .addView('view.3', {partId: 'part.main'})
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -735,7 +735,7 @@ test.describe('Focus Tracker', () => {
     await workbenchNavigator.createPerspective(factory => factory
       .addPart('part.main')
       .addPart('part.activity', {dockTo: 'left-top'}, {label: 'Activity', icon: 'folder', ɵactivityId: 'activity.1'})
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -779,7 +779,7 @@ test.describe('Focus Tracker', () => {
       .addPart('part.activity', {dockTo: 'left-top'}, {label: 'Activity', icon: 'folder', ɵactivityId: 'activity.1'})
       .addView('view.1', {partId: 'part.activity'})
       .addView('view.2', {partId: 'part.activity'})
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -828,7 +828,7 @@ test.describe('Focus Tracker', () => {
       .addPart('part.main')
       .addPart('part.activity', {dockTo: 'left-top'}, {label: 'Activity', icon: 'folder', ɵactivityId: 'activity.1'})
       .navigatePart('part.activity', ['test-pages/focus-test-page'])
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -877,7 +877,7 @@ test.describe('Focus Tracker', () => {
       .addPart('part.activity', {dockTo: 'left-top'}, {label: 'Activity', icon: 'folder', ɵactivityId: 'activity.1'})
       .addView('view.1', {partId: 'part.activity'})
       .navigateView('view.1', ['test-pages/focus-test-page'])
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -927,7 +927,7 @@ test.describe('Focus Tracker', () => {
       .addPart('part.main')
       .addView('view.1', {partId: 'part.main'})
       .navigateView('view.1', ['test-pages/focus-test-page'])
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -962,7 +962,7 @@ test.describe('Focus Tracker', () => {
       .addPart('part.main')
       .addView('view.1', {partId: 'part.main'})
       .navigateView('view.1', ['test-pages/focus-test-page'])
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     // Register part action.
@@ -1003,7 +1003,7 @@ test.describe('Focus Tracker', () => {
       .addPart('part.main')
       .addView('view.1', {partId: 'part.main'})
       .navigateView('view.1', ['test-pages/focus-test-page'])
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -1038,7 +1038,7 @@ test.describe('Focus Tracker', () => {
       .addPart('part.main', {title: 'Part'})
       .addView('view.1', {partId: 'part.main'})
       .navigateView('view.1', ['test-pages/focus-test-page'])
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -1073,7 +1073,7 @@ test.describe('Focus Tracker', () => {
       .addPart('part.main', {title: 'Part'})
       .addView('view.1', {partId: 'part.main'})
       .navigateView('view.1', ['test-pages/focus-test-page'])
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -1109,7 +1109,7 @@ test.describe('Focus Tracker', () => {
       .addView('view.1', {partId: 'part.main'})
       .navigateView('view.1', ['test-layout'])
       .activateView('view.1')
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -1166,7 +1166,7 @@ test.describe('Focus Tracker', () => {
       .addPart('part.main')
       .navigatePart('part.main', ['test-layout'])
       .activatePart('part.main')
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -1218,7 +1218,7 @@ test.describe('Focus Tracker', () => {
 
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -1270,7 +1270,7 @@ test.describe('Focus Tracker', () => {
       .addView('view.1', {partId: 'part.left'})
       .addView('view.2', {partId: 'part.right'})
       .navigateView('view.1', ['test-dialog-opener'])
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -1351,7 +1351,7 @@ test.describe('Focus Tracker', () => {
       .addView('view.1', {partId: 'part.main'})
       .addView('view.2', {partId: 'part.main'})
       .navigateView('view.1', ['test-dialog-opener'])
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     // Open dialog.
@@ -1388,7 +1388,7 @@ test.describe('Focus Tracker', () => {
       .addPart('part.main')
       .addView('view.1', {partId: 'part.main'})
       .navigateView('view.1', ['test-dialog-opener'])
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -1423,7 +1423,7 @@ test.describe('Focus Tracker', () => {
       .addView('view.1', {partId: 'part.left'})
       .addView('view.2', {partId: 'part.right'})
       .navigateView('view.1', ['test-dialog-opener'])
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     // Open dialog.
@@ -1459,7 +1459,7 @@ test.describe('Focus Tracker', () => {
       .addPart('part.main')
       .addView('view.1', {partId: 'part.main'})
       .navigateView('view.1', ['test-message-box-opener'])
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -1500,7 +1500,7 @@ test.describe('Focus Tracker', () => {
       .addView('view.1', {partId: 'part.main'})
       .addView('view.2', {partId: 'part.main'})
       .navigateView('view.1', ['test-message-box-opener'])
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     // Open messagebox.
@@ -1539,7 +1539,7 @@ test.describe('Focus Tracker', () => {
       .addView('view.1', {partId: 'part.left'})
       .addView('view.2', {partId: 'part.right'})
       .navigateView('view.1', ['test-popup-opener'])
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -1599,7 +1599,7 @@ test.describe('Focus Tracker', () => {
       .addView('view.1', {partId: 'part.main'})
       .addView('view.2', {partId: 'part.main'})
       .navigateView('view.1', ['test-popup-opener'])
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     // Open popup.
@@ -1640,7 +1640,7 @@ test.describe('Focus Tracker', () => {
       .addPart('part.main')
       .addView('view.1', {partId: 'part.main'})
       .navigateView('view.1', ['test-pages/focus-test-page'])
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -1673,7 +1673,7 @@ test.describe('Focus Tracker', () => {
       .addView('view.2', {partId: 'part.main'})
       .navigatePart('part.main', ['path/to/part'])
       .activateView('view.1')
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -1708,7 +1708,7 @@ test.describe('Focus Tracker', () => {
       .addView('view.1', {partId: 'part.main'})
       .addView('view.2', {partId: 'part.main'})
       .activateView('view.1')
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -1737,7 +1737,7 @@ test.describe('Focus Tracker', () => {
       .addView('view.1', {partId: 'part.main'})
       .addView('view.2', {partId: 'part.main'})
       .activateView('view.1')
-      .modify(addActiveWorkbenchElementPart('part.log')),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -1779,12 +1779,10 @@ test.describe('Focus Tracker', () => {
 
     await workbenchNavigator.createPerspective(factory => factory
       .addPart('part.main')
-      .addPart('part.log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal'})
       .addView('view.1', {partId: 'part.main'})
       .addView('view.2', {partId: 'part.main'})
       .addView('view.3', {partId: 'part.main'})
-      .navigatePart('part.log', ['active-workbench-element-log'])
-      .activatePart('part.log'),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -2178,9 +2176,9 @@ test.describe('Focus Tracker', () => {
 /**
  * Adds a part logging the active workbench element.
  */
-function addActiveWorkbenchElementPart(part: PartId): (layout: WorkbenchLayout) => WorkbenchLayout {
+function addActiveWorkbenchElementPart(partId: PartId, options?: {activate?: true}): (layout: WorkbenchLayout) => WorkbenchLayout {
   return (layout: WorkbenchLayout) => layout
-    .addPart(part, {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal', ɵactivityId: 'activity.log'})
-    .navigatePart(part, ['active-workbench-element-log'])
-    .activatePart(part);
+    .addPart(partId, {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal', ɵactivityId: 'activity.log'})
+    .navigatePart(partId, [], {hint: 'active-workbench-element-log'})
+    .modify(layout => options?.activate ? layout.activatePart(partId) : layout);
 }

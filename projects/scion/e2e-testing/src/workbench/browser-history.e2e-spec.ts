@@ -17,6 +17,7 @@ import {expectView} from '../matcher/view-matcher';
 import {ViewPagePO} from './page-object/view-page.po';
 import {expect, Page} from '@playwright/test';
 import {ActiveWorkbenchElementLogPagePO} from './page-object/test-pages/active-workbench-element-log-page.po';
+import {PartId, WorkbenchLayout} from '@scion/workbench';
 
 test.describe('Browser Session History', () => {
 
@@ -314,10 +315,9 @@ test.describe('Browser Session History', () => {
     await workbenchNavigator.createPerspective(factory => factory
       .addPart('part.left')
       .addPart('part.right', {align: 'right'})
-      .addPart('part.log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal', ɵactivityId: 'activity.log'})
       .addView('view.1', {partId: 'part.left'})
       .addView('view.2', {partId: 'part.right'})
-      .navigatePart('part.log', ['active-workbench-element-log']),
+      .modify(addActiveWorkbenchElementPart('part.log')),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -380,11 +380,9 @@ test.describe('Browser Session History', () => {
       .addPart('part.main')
       .addPart('part.activity-1', {dockTo: 'left-top'}, {label: 'Activity 1', icon: 'folder', ɵactivityId: 'activity.1'})
       .addPart('part.activity-2', {dockTo: 'right-top'}, {label: 'Activity 2', icon: 'folder', ɵactivityId: 'activity.2'})
-      .addPart('part.log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal', ɵactivityId: 'activity.log'})
       .addView('view.1', {partId: 'part.activity-1'})
       .addView('view.2', {partId: 'part.activity-2'})
-      .navigatePart('part.log', ['active-workbench-element-log'])
-      .activatePart('part.log'),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const tab1 = appPO.view({viewId: 'view.1'}).tab;
@@ -468,10 +466,9 @@ test.describe('Browser Session History', () => {
     await workbenchNavigator.createPerspective(factory => factory
       .addPart('part.left', {title: 'Left Part'})
       .addPart('part.right', {align: 'right'}, {title: 'Right Part'})
-      .addPart('part.log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal', ɵactivityId: 'activity.log'})
       .navigatePart('part.left', ['path/to/part'])
       .navigatePart('part.right', ['path/to/part'])
-      .navigatePart('part.log', ['active-workbench-element-log']),
+      .modify(addActiveWorkbenchElementPart('part.log')),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -534,11 +531,9 @@ test.describe('Browser Session History', () => {
       .addPart('part.main')
       .addPart('part.activity-left', {dockTo: 'left-top'}, {label: 'Activity Left', icon: 'folder', ɵactivityId: 'activity.left'})
       .addPart('part.activity-right', {dockTo: 'right-top'}, {label: 'Activity Right', icon: 'folder', ɵactivityId: 'activity.right'})
-      .addPart('part.log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal', ɵactivityId: 'activity.log'})
       .navigatePart('part.activity-left', ['path/to/part'])
       .navigatePart('part.activity-right', ['path/to/part'])
-      .navigatePart('part.log', ['active-workbench-element-log'])
-      .activatePart('part.log'),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const leftPart = appPO.part({partId: 'part.activity-left'});
@@ -623,11 +618,9 @@ test.describe('Browser Session History', () => {
       .addPart('part.main')
       .addPart('part.activity-1', {dockTo: 'left-top'}, {label: 'Activity 1', icon: 'folder', ɵactivityId: 'activity.1'})
       .addPart('part.activity-2', {dockTo: 'left-top'}, {label: 'Activity 2', icon: 'folder', ɵactivityId: 'activity.2'})
-      .addPart('part.log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal', ɵactivityId: 'activity.log'})
       .navigatePart('part.activity-1', ['path/to/part'])
       .navigatePart('part.activity-2', ['path/to/part'])
-      .navigatePart('part.log', ['active-workbench-element-log'])
-      .activatePart('part.log'),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -720,10 +713,8 @@ test.describe('Browser Session History', () => {
     await workbenchNavigator.createPerspective(factory => factory
       .addPart('part.main')
       .addPart('part.activity-1', {dockTo: 'left-top'}, {label: 'Activity 1', icon: 'folder', ɵactivityId: 'activity.1'})
-      .addPart('part.log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal', ɵactivityId: 'activity.log'})
       .navigatePart('part.activity-1', ['path/to/part'])
-      .navigatePart('part.log', ['active-workbench-element-log'])
-      .activatePart('part.log'),
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
     );
 
     const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
@@ -995,4 +986,14 @@ test.describe('Browser Session History', () => {
  */
 function getBrowserHistoryStackSize(page: Page): Promise<number> {
   return page.evaluate(() => history.length);
+}
+
+/**
+ * Adds a part logging the active workbench element.
+ */
+function addActiveWorkbenchElementPart(partId: PartId, options?: {activate?: true}): (layout: WorkbenchLayout) => WorkbenchLayout {
+  return (layout: WorkbenchLayout) => layout
+    .addPart(partId, {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal', ɵactivityId: 'activity.log'})
+    .navigatePart(partId, [], {hint: 'active-workbench-element-log'})
+    .modify(layout => options?.activate ? layout.activatePart(partId) : layout);
 }

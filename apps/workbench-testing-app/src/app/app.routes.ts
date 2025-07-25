@@ -168,7 +168,8 @@ export const routes: Routes = [
     loadComponent: () => import('./host-message-box-page/host-message-box-page.component'),
   },
   {
-    path: 'active-workbench-element-log',
+    path: '',
+    canMatch: [canMatchWorkbenchPart('active-workbench-element-log')],
     loadComponent: () => import('./active-workbench-element-log-page/active-workbench-element-log-page.component'),
   },
   {

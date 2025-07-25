@@ -179,7 +179,7 @@ function provideActivityPerspectiveLayout1(factory: WorkbenchLayoutFactory): Wor
 
     // Add active workbench element log.
     .addPart('active-workbench-element-log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal'})
-    .navigatePart('active-workbench-element-log', ['active-workbench-element-log']);
+    .navigatePart('active-workbench-element-log', [], {hint: 'active-workbench-element-log'});
 }
 
 function provideActivityPerspectiveLayout2(factory: WorkbenchLayoutFactory): WorkbenchLayout {
@@ -238,7 +238,7 @@ function provideActivityPerspectiveLayout2(factory: WorkbenchLayoutFactory): Wor
 
     // Add active workbench element log.
     .addPart('active-workbench-element-log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal'})
-    .navigatePart('active-workbench-element-log', ['active-workbench-element-log']);
+    .navigatePart('active-workbench-element-log', [], {hint: 'active-workbench-element-log'});
 }
 
 function providePerspectiveLayout1(factory: WorkbenchLayoutFactory): WorkbenchLayout {
@@ -330,7 +330,7 @@ function provideFocusTestPerspective(factory: WorkbenchLayoutFactory): Workbench
 
     // Add active workbench element log.
     .addPart('part.log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal'})
-    .navigatePart('part.log', ['active-workbench-element-log'])
+    .navigatePart('part.log', [], {hint: 'active-workbench-element-log'})
     .activatePart('part.log')
 
     // Add peripheral parts on the right
