@@ -124,7 +124,7 @@ export const workbenchManifest: Manifest = {
       private: false,
       description: 'Represents a dialog provided by the host app that displays the focus test page.',
       properties: {
-        path: 'test-pages/focus-test-page',
+        path: 'test-pages/host-focus-test-page',
       },
     } satisfies WorkbenchDialogCapability,
     // TODO [#271]: Remove this messagebox capability when implemented the issue #271

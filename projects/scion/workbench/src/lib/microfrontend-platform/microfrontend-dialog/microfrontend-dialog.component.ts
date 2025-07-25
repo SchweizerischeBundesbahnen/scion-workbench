@@ -43,6 +43,7 @@ export class MicrofrontendDialogComponent {
 
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _outletRouter = inject(OutletRouter);
+  private readonly _messageClient = inject(MessageClient);
   private readonly _logger = inject(Logger);
   private readonly _routerOutletElement = viewChild.required<ElementRef<SciRouterOutletElement>>('router_outlet');
 
@@ -59,9 +60,15 @@ export class MicrofrontendDialogComponent {
     this.setDialogProperties();
     this.propagateDialogContext();
     this.propagateWorkbenchTheme();
+    this.installDialogFocusedPublisher();
     this.installNavigator();
 
-    inject(DestroyRef).onDestroy(() => void this._outletRouter.navigate(null, {outlet: this.dialog.id})); // Clear the outlet.
+    inject(DestroyRef).onDestroy(() => {
+      // Clear the outlet.
+      void this._outletRouter.navigate(null, {outlet: this.dialog.id});
+      // Delete retained messages to free resources.
+      void this._messageClient.publish(ɵWorkbenchCommands.dialogFocusedTopic(this.dialog.id), undefined, {retain: true});
+    });
   }
 
   private installNavigator(): void {
@@ -103,6 +110,16 @@ export class MicrofrontendDialogComponent {
       const routerOutletElement = this._routerOutletElement().nativeElement;
 
       untracked(() => routerOutletElement.setContextValue(ɵDIALOG_CONTEXT, context));
+    });
+  }
+
+  private installDialogFocusedPublisher(): void {
+    effect(() => {
+      const focused = this.dialog.focused();
+      untracked(() => {
+        const commandTopic = ɵWorkbenchCommands.dialogFocusedTopic(this.dialog.id);
+        void this._messageClient.publish(commandTopic, focused, {retain: true});
+      });
     });
   }
 

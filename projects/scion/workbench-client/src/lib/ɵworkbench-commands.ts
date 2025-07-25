@@ -113,6 +113,13 @@ export const ɵWorkbenchCommands = {
   dialogTitleTopic: (dialogId: DialogId) => `ɵworkbench/dialogs/${dialogId}/title`,
 
   /**
+   * Computes the topic to notify the focused state of a dialog.
+   *
+   * The focused state is published as a retained message.
+   */
+  dialogFocusedTopic: (dialogId: DialogId) => `ɵworkbench/dialogs/${dialogId}/focused`,
+
+  /**
    * Computes the topic via which a dialog can be closed.
    */
   dialogCloseTopic: (dialogId: DialogId) => `ɵworkbench/dialogs/${dialogId}/close`,

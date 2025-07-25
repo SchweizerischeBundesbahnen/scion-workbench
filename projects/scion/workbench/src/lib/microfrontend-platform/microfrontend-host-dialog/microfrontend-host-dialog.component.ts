@@ -20,7 +20,7 @@ import {Microfrontends} from '../common/microfrontend.util';
 import {ANGULAR_ROUTER_MUTEX} from '../../executor/single-task-executor';
 import {Observables} from '@scion/toolkit/util';
 import {takeUntil} from 'rxjs/operators';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 
 /**
  * Navigates to the microfrontend of a given {@link WorkbenchDialogCapability} via {@link Router}.
@@ -132,8 +132,10 @@ function provideWorkbenchClientDialogHandle(capability: WorkbenchDialogCapabilit
       const titleChange$ = new Subject<void>();
 
       return new class implements WorkbenchClientDialog {
+        public readonly id = dialog.id;
         public readonly capability = capability;
         public readonly params = params;
+        public readonly focused$ = toObservable(dialog.focused, {injector: dialog.injector});
 
         public setTitle(title: string | Observable<string>): void {
           titleChange$.next();

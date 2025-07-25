@@ -20,7 +20,7 @@ import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
 
 @Component({
@@ -49,6 +49,7 @@ export default class DialogPageComponent {
   protected readonly route = inject(ActivatedRoute);
   protected readonly dialog = inject<WorkbenchDialog<string>>(WorkbenchDialog);
   protected readonly uuid = UUID.randomUUID();
+  protected readonly focused = toSignal(inject(WorkbenchDialog).focused$, {initialValue: true});
 
   protected readonly form = this._formBuilder.group({
     title: this._formBuilder.control(''),

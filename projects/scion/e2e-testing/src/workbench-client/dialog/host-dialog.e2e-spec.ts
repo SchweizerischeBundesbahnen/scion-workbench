@@ -13,7 +13,7 @@ import {expect} from '@playwright/test';
 import {DialogOpenerPagePO} from '../page-object/dialog-opener-page.po';
 import {expectDialog} from '../../matcher/dialog-matcher';
 import {HostDialogPagePO} from '../page-object/host-dialog-page.po';
-import {FocusTestPagePO} from '../../workbench/page-object/test-pages/focus-test-page.po';
+import {HostFocusTestPagePO} from '../../workbench/page-object/test-pages/host-focus-test-page.po';
 
 test.describe('Workbench Host Dialog', () => {
 
@@ -112,7 +112,7 @@ test.describe('Workbench Host Dialog', () => {
     await dialogOpenerPage.open({component: 'host-dialog', variant: 'focus-page'}, {cssClass: 'testee'});
 
     const dialog = appPO.dialog({cssClass: 'testee'});
-    const focusTestPage = new FocusTestPagePO(dialog);
+    const focusTestPage = new HostFocusTestPagePO(dialog);
 
     await expect(focusTestPage.firstField).toBeFocused();
   });

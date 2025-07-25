@@ -19,6 +19,7 @@ import {RouterPagePO} from './page-object/router-page.po';
 import {PartId, WorkbenchLayout} from '@scion/workbench';
 import {ActiveWorkbenchElementLogPagePO} from '../workbench/page-object/test-pages/active-workbench-element-log-page.po';
 import {MAIN_AREA} from '../workbench.model';
+import {HostFocusTestPagePO} from '../workbench/page-object/test-pages/host-focus-test-page.po';
 
 test.describe('Focus Tracker', () => {
 
@@ -148,6 +149,7 @@ test.describe('Focus Tracker', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual(dialogId);
     await expect.poll(() => logPart.getLog()).toEqual([dialogId]);
     await expect(appPO.dialog({dialogId}).locator).toContainFocus();
+    await expect.poll(() => focusTestPage.isFocused()).toBe(true);
 
     // TEST: Focus element outside the dialog.
     await appPO.part({partId: 'part.right'}).bar.filler.click();
@@ -155,6 +157,7 @@ test.describe('Focus Tracker', () => {
     // Expect dialog not to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right');
     await expect.poll(() => logPart.getLog()).toEqual([dialogId, 'part.right']);
+    await expect.poll(() => focusTestPage.isFocused()).toBe(false);
 
     // TEST: Focus element in the dialog.
     await focusTestPage.firstField.click();
@@ -163,6 +166,7 @@ test.describe('Focus Tracker', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual(dialogId);
     await expect.poll(() => logPart.getLog()).toEqual([dialogId, 'part.right', dialogId]);
     await expect(focusTestPage.firstField).toBeFocused();
+    await expect.poll(() => focusTestPage.isFocused()).toBe(true);
 
     // TEST: Focus element outside the dialog.
     await appPO.part({partId: 'part.right'}).bar.filler.click();
@@ -170,6 +174,7 @@ test.describe('Focus Tracker', () => {
     // Expect dialog not to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right');
     await expect.poll(() => logPart.getLog()).toEqual([dialogId, 'part.right', dialogId, 'part.right']);
+    await expect.poll(() => focusTestPage.isFocused()).toBe(false);
 
     // TEST: Focus element in the dialog.
     await focusTestPage.firstField.click();
@@ -178,6 +183,7 @@ test.describe('Focus Tracker', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual(dialogId);
     await expect.poll(() => logPart.getLog()).toEqual([dialogId, 'part.right', dialogId, 'part.right', dialogId]);
     await expect(focusTestPage.firstField).toBeFocused();
+    await expect.poll(() => focusTestPage.isFocused()).toBe(true);
 
     // TEST: Close the dialog.
     await appPO.dialog({dialogId}).close();
@@ -215,12 +221,13 @@ test.describe('Focus Tracker', () => {
     // TEST: Open dialog.
     await dialogOpener.open({component: 'host-dialog', variant: 'focus-page'}, {cssClass: 'testee'});
     const dialogId = await appPO.dialog({cssClass: 'testee'}).getDialogId();
-    const focusTestPage = new WorkbenchFocusTestPagePO(appPO.dialog({dialogId}));
+    const focusTestPage = new HostFocusTestPagePO(appPO.dialog({dialogId}));
 
     // Expect dialog to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual(dialogId);
     await expect.poll(() => logPart.getLog()).toEqual([dialogId]);
     await expect(appPO.dialog({dialogId}).locator).toContainFocus();
+    await expect.poll(() => focusTestPage.isFocused()).toBe(true);
 
     // TEST: Focus element outside the dialog.
     await appPO.part({partId: 'part.right'}).bar.filler.click();
@@ -228,6 +235,7 @@ test.describe('Focus Tracker', () => {
     // Expect dialog not to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right');
     await expect.poll(() => logPart.getLog()).toEqual([dialogId, 'part.right']);
+    await expect.poll(() => focusTestPage.isFocused()).toBe(false);
 
     // TEST: Focus element in the dialog.
     await focusTestPage.firstField.click();
@@ -236,6 +244,7 @@ test.describe('Focus Tracker', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual(dialogId);
     await expect.poll(() => logPart.getLog()).toEqual([dialogId, 'part.right', dialogId]);
     await expect(focusTestPage.firstField).toBeFocused();
+    await expect.poll(() => focusTestPage.isFocused()).toBe(true);
 
     // TEST: Focus element outside the dialog.
     await appPO.part({partId: 'part.right'}).bar.filler.click();
@@ -243,6 +252,7 @@ test.describe('Focus Tracker', () => {
     // Expect dialog not to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right');
     await expect.poll(() => logPart.getLog()).toEqual([dialogId, 'part.right', dialogId, 'part.right']);
+    await expect.poll(() => focusTestPage.isFocused()).toBe(false);
 
     // TEST: Focus element in the dialog.
     await focusTestPage.firstField.click();
@@ -251,6 +261,7 @@ test.describe('Focus Tracker', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual(dialogId);
     await expect.poll(() => logPart.getLog()).toEqual([dialogId, 'part.right', dialogId, 'part.right', dialogId]);
     await expect(focusTestPage.firstField).toBeFocused();
+    await expect.poll(() => focusTestPage.isFocused()).toBe(true);
 
     // TEST: Close the dialog.
     await appPO.dialog({dialogId}).close();
