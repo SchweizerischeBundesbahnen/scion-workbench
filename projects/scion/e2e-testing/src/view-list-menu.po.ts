@@ -15,6 +15,9 @@ import {Locator} from '@playwright/test';
  */
 export class ViewListMenuPO {
 
+  public readonly filter: Locator;
+
   constructor(public locator: Locator) {
+    this.filter = this.locator.locator('wb-filter-field.e2e-view-filter > input');
   }
 }

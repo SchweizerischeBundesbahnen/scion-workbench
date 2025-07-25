@@ -8,12 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, viewChild} from '@angular/core';
+import {afterRenderEffect, Component, DOCUMENT, ElementRef, inject, untracked, viewChild} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {RouterOutletRootContextDirective} from '../../routing/router-outlet-root-context.directive';
-import {WorkbenchPart} from '../workbench-part.model';
+import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {OnAttach, OnDetach} from '../../portal/wb-component-portal';
+import {FocusTrackerRef, trackFocus} from '../../focus/workbench-focus-tracker.service';
 
 /**
  * Acts as a placeholder for a part's content that Angular fills based on the current router state of the associated part outlet.
@@ -30,12 +31,27 @@ import {OnAttach, OnDetach} from '../../portal/wb-component-portal';
 })
 export class PartSlotComponent implements OnAttach, OnDetach {
 
-  protected readonly part = inject(WorkbenchPart);
+  protected readonly part = inject(ɵWorkbenchPart);
 
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
+  private readonly _document = inject(DOCUMENT);
   private readonly _viewport = viewChild.required(SciViewportComponent);
+  private readonly _focusTrackerRef: FocusTrackerRef;
 
   private _scrollTop = 0;
   private _scrollLeft = 0;
+  private _activeElementBeforeDetach: HTMLElement | undefined;
+
+  constructor() {
+    this._focusTrackerRef = trackFocus(this._host, this.part);
+    this.unsetActiveElementOnPartDeactivate();
+  }
+
+  public focus(): void {
+    if (!this._host.contains(this._document.activeElement)) {
+      this._viewport().focus();
+    }
+  }
 
   /**
    * Method invoked after attached this component to the DOM.
@@ -43,6 +59,11 @@ export class PartSlotComponent implements OnAttach, OnDetach {
   public onAttach(): void {
     this._viewport().scrollTop = this._scrollTop;
     this._viewport().scrollLeft = this._scrollLeft;
+
+    if (this.part.focused()) {
+      this._activeElementBeforeDetach?.focus();
+      this._activeElementBeforeDetach = undefined;
+    }
   }
 
   /**
@@ -51,5 +72,25 @@ export class PartSlotComponent implements OnAttach, OnDetach {
   public onDetach(): void {
     this._scrollTop = this._viewport().scrollTop;
     this._scrollLeft = this._viewport().scrollLeft;
+
+    if (this.part.focused()) {
+      const activeElement = this._document.activeElement;
+      if (this._host.contains(activeElement) && activeElement instanceof HTMLElement) {
+        this._activeElementBeforeDetach = activeElement;
+      }
+    }
+  }
+
+  /**
+   * Unsets the active workbench element if this part was the focused element when it is deactivated,
+   * such as when closing the activity containing this part. Otherwise, the active element would not be unset.
+   */
+  private unsetActiveElementOnPartDeactivate(): void {
+    afterRenderEffect(() => {
+      const active = this.part.active();
+      if (!active) {
+        untracked(() => this._focusTrackerRef.unsetActiveElement());
+      }
+    });
   }
 }

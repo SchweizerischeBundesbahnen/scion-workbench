@@ -82,9 +82,9 @@ test.describe('Main Area', () => {
         },
       },
     });
-    await expect.poll(() => appPO.workbench.view({id: 'view.1'}).then(view => view.navigation.path)).toEqual('path/to/view/1');
-    await expect.poll(() => appPO.workbench.view({id: 'view.2'}).then(view => view.navigation.path)).toEqual('path/to/view/2');
-    await expect.poll(() => appPO.workbench.view({id: 'view.3'}).then(view => view.navigation.path)).toEqual('path/to/view/3');
+    await expect.poll(() => appPO.view({viewId: 'view.1'}).navigation().then(navigation => navigation.path)).toEqual('path/to/view/1');
+    await expect.poll(() => appPO.view({viewId: 'view.2'}).navigation().then(navigation => navigation.path)).toEqual('path/to/view/2');
+    await expect.poll(() => appPO.view({viewId: 'view.3'}).navigation().then(navigation => navigation.path)).toEqual('path/to/view/3');
 
     // Switch to perspective 2.
     await appPO.switchPerspective('perspective.2');
@@ -118,9 +118,9 @@ test.describe('Main Area', () => {
         },
       },
     });
-    await expect.poll(() => appPO.workbench.view({id: 'view.1'}).then(view => view.navigation.path)).toEqual('path/to/view/1');
-    await expect.poll(() => appPO.workbench.view({id: 'view.2'}).then(view => view.navigation.path)).toEqual('path/to/view/2');
-    await expect.poll(() => appPO.workbench.view({id: 'view.3'}).then(view => view.navigation.path)).toEqual('path/to/view/3');
+    await expect.poll(() => appPO.view({viewId: 'view.1'}).navigation().then(navigation => navigation.path)).toEqual('path/to/view/1');
+    await expect.poll(() => appPO.view({viewId: 'view.2'}).navigation().then(navigation => navigation.path)).toEqual('path/to/view/2');
+    await expect.poll(() => appPO.view({viewId: 'view.3'}).navigation().then(navigation => navigation.path)).toEqual('path/to/view/3');
 
     // Switch to perspective 3 (no main area).
     await appPO.switchPerspective('perspective.3');
@@ -133,9 +133,6 @@ test.describe('Main Area', () => {
         },
       },
     });
-    await expect.poll(() => appPO.workbench.view({id: 'view.1'}).then(view => view.navigation.path)).toEqual('path/to/view/1');
-    await expect.poll(() => appPO.workbench.view({id: 'view.2'}).then(view => view.navigation.path)).toEqual('path/to/view/2');
-    await expect.poll(() => appPO.workbench.view({id: 'view.3'}).then(view => view.navigation.path)).toEqual('path/to/view/3');
 
     // Switch to perspective 1.
     await appPO.switchPerspective('perspective.1');
@@ -168,8 +165,8 @@ test.describe('Main Area', () => {
         },
       },
     });
-    await expect.poll(() => appPO.workbench.view({id: 'view.1'}).then(view => view.navigation.path)).toEqual('path/to/view/1');
-    await expect.poll(() => appPO.workbench.view({id: 'view.2'}).then(view => view.navigation.path)).toEqual('path/to/view/2');
-    await expect.poll(() => appPO.workbench.view({id: 'view.3'}).then(view => view.navigation.path)).toEqual('path/to/view/3');
+    await expect.poll(() => appPO.view({viewId: 'view.1'}).navigation().then(navigation => navigation.path)).toEqual('path/to/view/1');
+    await expect.poll(() => appPO.view({viewId: 'view.2'}).navigation().then(navigation => navigation.path)).toEqual('path/to/view/2');
+    await expect.poll(() => appPO.view({viewId: 'view.3'}).navigation().then(navigation => navigation.path)).toEqual('path/to/view/3');
   });
 });

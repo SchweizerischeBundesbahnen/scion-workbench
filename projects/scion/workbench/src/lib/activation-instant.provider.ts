@@ -12,14 +12,18 @@ import {Injectable} from '@angular/core';
 
 /**
  * Provides instants for the activation of workbench components like parts or views.
+ *
+ * Two consecutive calls always have different instants, in ascending order.
  */
 @Injectable({providedIn: 'root'})
 export class ActivationInstantProvider {
 
+  private _origin = Date.now();
+
   /**
-   * Provides the current instant.
+   * Provides the next instant.
    */
-  public now(): number {
-    return Date.now();
+  public next(): number {
+    return ++this._origin;
   }
 }

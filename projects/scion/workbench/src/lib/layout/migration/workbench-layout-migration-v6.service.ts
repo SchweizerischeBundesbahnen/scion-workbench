@@ -11,7 +11,7 @@
 import {inject, Injectable, Injector, runInInjectionContext} from '@angular/core';
 import {WorkbenchMigration} from '../../migration/workbench-migration';
 import {MWorkbenchLayoutV5} from './model/workbench-layout-migration-v5.model';
-import {WorkbenchLayoutSerializer} from '../workench-layout-serializer.service';
+import {WorkbenchLayoutSerializer} from '../workbench-layout-serializer.service';
 import {MWorkbenchLayoutV6} from './model/workbench-layout-migration-v6.model';
 import {MActivity} from '../../activity/workbench-activity.model';
 import {ActivityId, PartId} from '../../workbench.identifiers';

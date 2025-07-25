@@ -71,6 +71,39 @@ describe('WorkbenchLayoutSerializer', () => {
     expect(deserializedLayout.part({partId: 'part.1'}).navigation!.id).toBeUndefined();
   });
 
+  it('should not serialize "view.activationInstant" field', () => {
+    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part.main')
+      .addView('view.1', {partId: 'part.main'})
+      .activateView('view.1');
+
+    // Expect activation id to be set.
+    expect(layout.view({viewId: 'view.1'}).activationInstant).not.toBeUndefined();
+
+    // Serialize layout without "view.activation.id".
+    const serializedLayout = layout.serialize({excludeViewActivationInstant: true});
+    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({grids: serializedLayout.grids});
+
+    // Expect activation id not to be serialized.
+    expect(deserializedLayout.view({viewId: 'view.1'}).activationInstant).toBeUndefined();
+  });
+
+  it('should not serialize "part.activationInstant" field', () => {
+    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part.main')
+      .activatePart('part.main');
+
+    // Expect activation id to be set.
+    expect(layout.part({partId: 'part.main'}).activationInstant).not.toBeUndefined();
+
+    // Serialize layout without "part.activation.id".
+    const serializedLayout = layout.serialize({excludePartActivationInstant: true});
+    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({grids: serializedLayout.grids});
+
+    // Expect activation id not to be serialized.
+    expect(deserializedLayout.part({partId: 'part.main'}).activationInstant).toBeUndefined();
+  });
+
   it('should not serialize "TreeNode.id" field', () => {
     const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart('part.left')

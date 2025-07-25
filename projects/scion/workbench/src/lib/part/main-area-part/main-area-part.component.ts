@@ -53,7 +53,7 @@ import {WorkbenchDesktop} from '../../desktop/workbench-desktop.model';
   ],
   host: {
     '[attr.data-grid]': 'dasherize(part.gridName())',
-    '[class.active]': 'part.active()',
+    '[attr.data-active]': `part.active() ? '' : null`,
   },
 })
 export class MainAreaPartComponent {

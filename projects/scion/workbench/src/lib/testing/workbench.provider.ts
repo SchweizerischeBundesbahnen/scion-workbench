@@ -9,10 +9,9 @@
  */
 
 import {WorkbenchConfig} from '../workbench-config';
-import {EnvironmentProviders, inject, Injectable, makeEnvironmentProviders, provideEnvironmentInitializer} from '@angular/core';
+import {EnvironmentProviders, inject, makeEnvironmentProviders, provideEnvironmentInitializer} from '@angular/core';
 import {provideWorkbench} from '../workbench.provider';
 import {provideNoopAnimations} from '@angular/platform-browser/animations';
-import {ActivationInstantProvider} from '../activation-instant.provider';
 import {MAIN_AREA_INITIAL_PART_ID} from '../layout/ɵworkbench-layout';
 import {ComponentFixtureAutoDetect} from '@angular/core/testing';
 import {Router} from '@angular/router';
@@ -23,7 +22,6 @@ import {PartId} from '../workbench.identifiers';
  *
  * Does the following:
  * - provides the workbench with given config
- * - installs a sequence for activation instants
  * - configures the testbed to auto-detect changes
  * - disables animations
  * - performs the initial navigation
@@ -44,21 +42,10 @@ export function provideWorkbenchForTest(config?: WorkbenchConfig & {mainAreaInit
   return makeEnvironmentProviders([
     provideWorkbench(config),
     provideNoopAnimations(),
-    {provide: ActivationInstantProvider, useClass: SequenceInstantProvider},
     config?.mainAreaInitialPartId ? {provide: MAIN_AREA_INITIAL_PART_ID, useValue: config.mainAreaInitialPartId} : [],
     {provide: ComponentFixtureAutoDetect, useValue: true},
     provideEnvironmentInitializer(() => inject(Router).initialNavigation()),
     provideEnvironmentInitializer(() => localStorage.clear()),
     provideEnvironmentInitializer(() => window.name = ''),
   ]);
-}
-
-@Injectable(/* DO NOT provide via 'providedIn' metadata as registered only if using `WorkbenchTestingModule`. */)
-class SequenceInstantProvider implements ActivationInstantProvider {
-
-  private _sequence = 0;
-
-  public now(): number {
-    return this._sequence++;
-  }
 }

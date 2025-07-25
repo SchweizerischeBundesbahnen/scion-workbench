@@ -124,15 +124,15 @@ test.describe('Workbench View', () => {
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // View tab expected to be pristine for new views
-    await expect.poll(() => viewPage.view.tab.isDirty()).toBe(false);
+    await expect(viewPage.view.tab.state('dirty')).not.toBeVisible();
 
     // Mark the view dirty
     await viewPage.checkDirty(true);
-    await expect.poll(() => viewPage.view.tab.isDirty()).toBe(true);
+    await expect(viewPage.view.tab.state('dirty')).toBeVisible();
 
     // Mark the view pristine
     await viewPage.checkDirty(false);
-    await expect.poll(() => viewPage.view.tab.isDirty()).toBe(false);
+    await expect(viewPage.view.tab.state('dirty')).not.toBeVisible();
   });
 
   test('should unset the dirty state when navigating to a different route', async ({appPO, workbenchNavigator}) => {
@@ -143,7 +143,7 @@ test.describe('Workbench View', () => {
 
     // Mark the view dirty
     await viewPage.checkDirty(true);
-    await expect.poll(() => viewPage.view.tab.isDirty()).toBe(true);
+    await expect(viewPage.view.tab.state('dirty')).toBeVisible();
 
     // Navigate to a different route in the same view
     await routerPage.view.tab.click();
@@ -153,7 +153,7 @@ test.describe('Workbench View', () => {
 
     // Expect the view to be pristine
     const testeeView = appPO.view({viewId});
-    await expect.poll(() => testeeView.tab.isDirty()).toBe(false);
+    await expect(testeeView.tab.state('dirty')).not.toBeVisible();
   });
 
   test('should not unset the dirty state when the navigation resolves to the same route, e.g., when updating matrix params or route params', async ({appPO, workbenchNavigator}) => {
@@ -163,7 +163,7 @@ test.describe('Workbench View', () => {
 
     // Mark the view dirty
     await viewPage.checkDirty(true);
-    await expect.poll(() => viewPage.view.tab.isDirty()).toBe(true);
+    await expect(viewPage.view.tab.state('dirty')).toBeVisible();
 
     // Update matrix params (does not affect routing)
     await routerPage.view.tab.click();
@@ -172,7 +172,7 @@ test.describe('Workbench View', () => {
     });
 
     // Expect the view to still be dirty
-    await expect.poll(() => viewPage.view.tab.isDirty()).toBe(true);
+    await expect(viewPage.view.tab.state('dirty')).toBeVisible();
 
     // Verify matrix params have changed
     await viewPage.view.tab.click();
@@ -460,7 +460,7 @@ test.describe('Workbench View', () => {
     // Close view via router (target) (prevent).
     // Do not wait for the navigation to complete because the message box blocks navigation.
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.navigate([], {target: await testeeViewPage.view.getViewId(), close: true, waitForNavigation: false});
+    await routerPage.navigate([], {target: await testeeViewPage.view.getViewId(), close: true, noWaitAfter: false});
     await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeHidden();
 
     // Activate test view.
@@ -474,7 +474,7 @@ test.describe('Workbench View', () => {
 
     // Close view via router (path) (prevent).
     // Do not wait for the navigation to complete because the message box blocks navigation.
-    await routerPage.navigate(['test-view'], {close: true, waitForNavigation: false});
+    await routerPage.navigate(['test-view'], {close: true, noWaitAfter: false});
     await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeHidden();
 
     // Activate test view.

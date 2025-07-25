@@ -9,7 +9,7 @@
  */
 import {Injectable} from '@angular/core';
 import {ɵWorkbenchLayout} from './ɵworkbench-layout';
-import {LayoutSerializationFlags} from './workench-layout-serializer.service';
+import {LayoutSerializationFlags} from './workbench-layout-serializer.service';
 
 /**
  * Performs a three-way merge of the local and remote layouts, using the base layout (common ancestor) as the base of the merge operation.
@@ -38,6 +38,8 @@ const compareFlags: LayoutSerializationFlags = {
   excludeTreeNodeId: true,
   excludePartNavigationId: true,
   excludeViewNavigationId: true,
+  excludePartActivationInstant: true,
+  excludeViewActivationInstant: true,
   assignStablePartIdentifier: true,
   assignStableViewIdentifier: true,
   assignStableActivityIdentifier: true,

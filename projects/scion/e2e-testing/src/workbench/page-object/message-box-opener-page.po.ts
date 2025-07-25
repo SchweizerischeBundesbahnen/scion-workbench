@@ -22,24 +22,23 @@ import {WorkbenchViewPagePO} from './workbench-view-page.po';
  */
 export class MessageBoxOpenerPagePO implements WorkbenchViewPagePO {
 
-  private readonly _openButton: Locator;
-
   public readonly locator: Locator;
   public readonly closeAction: Locator;
   public readonly error: Locator;
   public readonly view: ViewPO;
+  public readonly openButton: Locator;
 
   constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.view.locator.locator('app-message-box-opener-page');
     this.closeAction = this.locator.locator('output.e2e-close-action');
     this.error = this.locator.locator('output.e2e-message-box-error');
-    this._openButton = this.locator.locator('button.e2e-open');
+    this.openButton = this.locator.locator('button.e2e-open');
   }
 
   public async open(message: string, options?: WorkbenchMessageBoxOptions): Promise<void>;
-  public async open(component: 'component:message-box-page', options?: WorkbenchMessageBoxOptions): Promise<void>;
-  public async open(content: string | 'component:message-box-page', options?: WorkbenchMessageBoxOptions): Promise<void> {
+  public async open(component: 'component:message-box-page' | 'component:focus-test-page', options?: WorkbenchMessageBoxOptions): Promise<void>;
+  public async open(content: string | 'component:message-box-page' | 'component:focus-test-page', options?: WorkbenchMessageBoxOptions): Promise<void> {
     if (options?.injector) {
       throw Error('[PageObjectError] PageObject does not support the option `injector`.');
     }
@@ -87,7 +86,7 @@ export class MessageBoxOpenerPagePO implements WorkbenchViewPagePO {
       await this.locator.locator('app-multi-value-input.e2e-class input').fill(coerceArray(options.cssClass).join(' '));
     }
 
-    await this._openButton.click();
+    await this.openButton.click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([

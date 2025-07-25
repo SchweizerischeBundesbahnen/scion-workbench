@@ -200,13 +200,13 @@ function assertActivityStackDOM(expectedStack: MActivityStack, actualElement: El
     }
   }
   if (expectedStack.activeActivityId === 'none') {
-    const activityElement = actualElement.querySelector(`wb-activity-item.active`);
+    const activityElement = actualElement.querySelector(`wb-activity-item[data-active]`);
     if (activityElement) {
       throw Error(`[DOMAssertError] Expected no activity to be active in group, but is. [dockingArea=${dockingArea}, activityId=${activityElement.getAttribute('data-activityid')}]`);
     }
   }
   else if (expectedStack.activeActivityId !== undefined) {
-    const activityElement = actualElement.querySelector(`wb-activity-item[data-activityid="${expectedStack.activeActivityId}"].active`);
+    const activityElement = actualElement.querySelector(`wb-activity-item[data-activityid="${expectedStack.activeActivityId}"][data-active]`);
     if (!activityElement) {
       throw Error(`[DOMAssertError] Expected activity to be active, but is not. [dockingArea=${dockingArea}, activityId=${expectedStack.activeActivityId}]`);
     }
@@ -429,7 +429,7 @@ function assertMPartDOM(expectedPart: Partial<MPart>, actualElement: Element, ex
       throw Error(`[DOMAssertError]: Expected element 'wb-view-slot[data-viewid="${expectedPart.activeViewId}"]' to be in the DOM, but is not. [MPart=${JSON.stringify(expectedPart)}]`);
     }
 
-    if (!actualPartElement.querySelector(`wb-part-bar wb-view-tab[data-viewid="${expectedPart.activeViewId}"].active`)) {
+    if (!actualPartElement.querySelector(`wb-part-bar wb-view-tab[data-viewid="${expectedPart.activeViewId}"][data-active]`)) {
       throw Error(`[DOMAssertError]: Expected view tab 'wb-view-slot[data-viewid="${expectedPart.activeViewId}"]' to be active, but is not. [MPart=${JSON.stringify(expectedPart)}]`);
     }
   }

@@ -27,6 +27,7 @@ import {provideViewContext} from '../view/view-context-provider';
 import {boundingClientRect} from '@scion/components/dimension';
 import {clamp} from '../common/math.util';
 import {coerceElement} from '@angular/cdk/coercion';
+import {WORKBENCH_POPUP_REGISTRY} from './workbench-popup.registry';
 import {computePopupId} from '../workbench.identifiers';
 
 const NORTH: ConnectedPosition = {originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom', panelClass: 'wb-north'};
@@ -47,6 +48,7 @@ export class PopupService {
   private readonly _overlay = inject(Overlay);
   private readonly _focusManager = inject(FocusMonitor);
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _popupRegistry = inject(WORKBENCH_POPUP_REGISTRY);
   private readonly _zone = inject(NgZone);
   private readonly _document = inject(DOCUMENT);
   private readonly _view = inject(ɵWorkbenchView, {optional: true});
@@ -81,6 +83,7 @@ export class PopupService {
     const popup = this.createPopup(config, {view: contextualView});
     const popupDestroyRef = popup.injector.get(DestroyRef);
     const popupOrigin = this.trackPopupOrigin(config, contextualView, popup.injector);
+    this._popupRegistry.register(popup.id, popup);
 
     // Wait for the initial position.
     const initialPosition = await firstValueFrom(toObservable(popupOrigin, {injector: popup.injector}).pipe(filter(Boolean)));
@@ -160,13 +163,10 @@ export class PopupService {
       this.hidePopupOnViewDetach(overlayRef, contextualView, popup);
     }
 
-    // Dispose the popup when closing it.
-    popupDestroyRef.onDestroy(() => {
-      overlayRef.dispose();
-    });
-
     return new Promise<R | undefined>((resolve, reject) => {
       popupDestroyRef.onDestroy(() => {
+        this._popupRegistry.unregister(popup.id);
+        overlayRef.dispose();
         popup.result instanceof Error ? reject(popup.result) : resolve(popup.result as R);
       });
     });

@@ -41,13 +41,14 @@ import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
     IconComponent,
   ],
   host: {
-    '[class.view-drag]': 'viewDragService.dragging()',
-    '[class.active]': 'view().active()',
-    '[class.part-active]': 'view().part().active()',
-    '[class.e2e-dirty]': 'view().dirty()',
     '[attr.data-viewid]': 'view().id',
+    '[attr.data-active]': `view().active() ? '' : null`,
+    '[attr.data-dirty]': `view().dirty() ? '' : null`,
+    '[attr.data-focus-within-view]': `view().focused() ? '' : null`,
     '[attr.draggable]': 'true',
     '[attr.tabindex]': '-1', // make the view focusable to install view menu accelerators
+    '[class.part-active]': 'view().part().active()',
+    '[class.view-drag]': 'viewDragService.dragging()',
     '[style.--sci-workbench-tab-title-offset-right]': 'viewTitleOffsetRight()',
   },
 })
@@ -142,9 +143,7 @@ export class ViewTabComponent {
       activityId: this._layout().activity({viewId: view.id}, {orElse: null})?.id,
     });
 
-    if (!view.active()) {
-      void view.activate();
-    }
+    void view.activate();
   }
 
   @HostListener('dragend')

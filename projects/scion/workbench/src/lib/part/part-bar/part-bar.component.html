@@ -1,6 +1,6 @@
 <!-- Title -->
 @if (part.title()) {
-  <span class="title e2e-title">{{(part.title() | wbText)()}}</span>
+  <span class="title e2e-title" (mousedown)="onPartBarMouseDown($event)">{{(part.title() | wbText)()}}</span>
 }
 
 <!-- View Tabs -->
@@ -18,7 +18,7 @@
 }
 
 <!-- Filler -->
-<div class="filler" #filler></div>
+<div class="filler e2e-filler" #filler (mousedown)="onPartBarMouseDown($event)"></div>
 
 <!-- End Actions -->
 @if (endActions().length) {

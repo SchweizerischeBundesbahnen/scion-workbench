@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, inject, input, model, signal} from '@angular/core';
+import {Component, inject, input, model, signal} from '@angular/core';
 import {WorkbenchPart, WorkbenchView} from '@scion/workbench';
 import {ArrayPipe} from '../array.pipe';
 
@@ -22,18 +22,16 @@ import {ArrayPipe} from '../array.pipe';
   imports: [
     ArrayPipe,
   ],
+  host: {
+    '[class.active]': 'active()',
+  },
 })
 export class TabbarSkeletonComponent {
-
-  private readonly _active = inject(WorkbenchView, {optional: true})?.part().active ?? inject(WorkbenchPart, {optional: true})?.active ?? signal(false);
 
   public readonly tabs = input.required<number>();
   public readonly selectedTab = model.required<number>();
 
-  @HostBinding('class.active')
-  protected get active(): boolean {
-    return this._active();
-  }
+  protected readonly active = inject(WorkbenchView, {optional: true})?.part().active ?? inject(WorkbenchPart, {optional: true})?.active ?? signal(false);
 
   protected onTabSelect(index: number): void {
     this.selectedTab.set(index);

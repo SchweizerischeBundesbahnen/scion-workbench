@@ -58,6 +58,19 @@ export class PartBarComponent {
     this.installActivityMinimizer();
   }
 
+  protected onPartBarMouseDown(event: Event): void {
+    // Activate the part or its active view, if any.
+    if (this.part.activeView()) {
+      void this.part.activeView()!.activate();
+    }
+    else {
+      void this.part.activate();
+    }
+
+    // Prevent default to maintain focus on part and view content.
+    event.preventDefault();
+  }
+
   protected onMinimize(): void {
     void this._router.navigate(layout => layout.toggleActivity(this.part.activity()!.id));
   }

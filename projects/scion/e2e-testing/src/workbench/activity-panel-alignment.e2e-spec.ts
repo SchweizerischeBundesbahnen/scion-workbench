@@ -26,7 +26,7 @@ test.describe('Activity Panel Alignment', () => {
       .activatePart('part.activity-bottom'),
     );
 
-    await appPO.header.setPanelAlignment('left');
+    await appPO.header.clickSettingMenuItem({cssClass: 'e2e-change-panel-alignment-left'});
 
     const mainGrid = appPO.grid({grid: 'main'});
     const leftPanel = appPO.activityPanel('left');
@@ -175,7 +175,7 @@ test.describe('Activity Panel Alignment', () => {
       .activatePart('part.activity-bottom'),
     );
 
-    await appPO.header.setPanelAlignment('right');
+    await appPO.header.clickSettingMenuItem({cssClass: 'e2e-change-panel-alignment-right'});
 
     const mainGrid = appPO.grid({grid: 'main'});
     const rightPanel = appPO.activityPanel('right');
@@ -323,7 +323,7 @@ test.describe('Activity Panel Alignment', () => {
       .activatePart('part.activity-bottom'),
     );
 
-    await appPO.header.setPanelAlignment('center');
+    await appPO.header.clickSettingMenuItem({cssClass: 'e2e-change-panel-alignment-center'});
 
     const mainGrid = appPO.grid({grid: 'main'});
     const bottomPanel = appPO.activityPanel('bottom');
@@ -469,7 +469,7 @@ test.describe('Activity Panel Alignment', () => {
       .activatePart('part.activity-bottom'),
     );
 
-    await appPO.header.setPanelAlignment('justify');
+    await appPO.header.clickSettingMenuItem({cssClass: 'e2e-change-panel-alignment-justify'});
 
     const mainGrid = appPO.grid({grid: 'main'});
     const leftPanel = appPO.activityPanel('left');

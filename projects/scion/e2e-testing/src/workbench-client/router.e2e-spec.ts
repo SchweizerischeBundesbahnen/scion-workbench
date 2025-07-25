@@ -1126,7 +1126,7 @@ test.describe('Workbench Router', () => {
 
     // expect the view to still be dirty
     await testeeViewPage.view.tab.click();
-    await expect.poll(() => testeeViewPage.view.tab.isDirty()).toBe(true);
+    await expect(testeeViewPage.view.tab.state('dirty')).toBeVisible();
   });
 
   test('should make the view pristine when navigating to another view in the current view tab', async ({appPO, microfrontendNavigator}) => {
@@ -1160,7 +1160,7 @@ test.describe('Workbench Router', () => {
 
     // mark the view dirty
     await testeeViewPage.markDirty();
-    await expect.poll(() => testeeViewPage.view.tab.isDirty()).toBe(true);
+    await expect(testeeViewPage.view.tab.state('dirty')).toBeVisible();
 
     // navigate to another view in the testee view tab
     await routerPage.view.tab.click();
@@ -1170,7 +1170,7 @@ test.describe('Workbench Router', () => {
 
     // expect the view to be pristine
     await testeeViewPage.view.tab.click();
-    await expect.poll(() => testeeViewPage.view.tab.isDirty()).toBe(false);
+    await expect(testeeViewPage.view.tab.state('dirty')).not.toBeVisible();
   });
 
   test('should display "Not Found" page when removing the capability', async ({appPO, microfrontendNavigator, consoleLogs}) => {

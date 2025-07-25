@@ -1,0 +1,82 @@
+@use 'sass:map';
+
+/**
+ * Highlights the active and focused workbench element, only if the `data-highlight-focus`
+ * attribute is set on the HTML root element.
+ */
+:root[data-highlight-focus] {
+  $border-width: 2px;
+
+  @mixin highlight($options: ()) {
+    position: absolute;
+    inset: 0;
+    padding: .25em;
+    font-size: smaller;
+    display: grid;
+    place-content: map.get($options, place-content);
+    pointer-events: none;
+    content: '';
+    border: $border-width solid transparent;
+  }
+
+  @layer app-highlight-focus {
+    wb-part {
+      position: relative; // Positioning context to visualize the active and focused state.
+
+      &::after {
+        @include highlight((place-content: end end));
+        content: attr(data-partid);
+      }
+
+      &[data-partid="part.main-area"]::after {
+        content: '';
+      }
+
+      &[data-active]:not([data-focus])::after {
+        border: $border-width solid var(--sci-color-border);
+      }
+
+      &[data-focus]:not([data-active])::after {
+        border: $border-width dashed var(--sci-color-accent); // invalid state
+      }
+
+      &[data-active][data-focus]::after {
+        border: $border-width solid var(--sci-color-accent);
+      }
+    }
+
+    wb-view-slot {
+      position: relative; // Positioning context to visualize the active and focused state.
+
+      &::after {
+        @include highlight((place-content: end start));
+        content: attr(data-viewid);
+        margin-left: $border-width;
+        margin-right: $border-width;
+        margin-bottom: $border-width;
+      }
+
+      &[data-focus]::after {
+        border: $border-width solid var(--sci-color-accent);
+      }
+    }
+
+    wb-dialog[data-focus] div.e2e-dialog {
+      position: relative; // Positioning context to visualize the active and focused state.
+
+      &::after {
+        @include highlight();
+        border: $border-width solid var(--sci-color-accent);
+      }
+    }
+
+    wb-popup[data-focus] {
+      position: relative; // Positioning context to visualize the active and focused state.
+
+      &::after {
+        @include highlight();
+        border: $border-width solid var(--sci-color-accent);
+      }
+    }
+  }
+}

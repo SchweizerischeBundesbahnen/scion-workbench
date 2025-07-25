@@ -9,7 +9,7 @@
  */
 
 import {Disposable} from './common/disposable';
-import {WorkbenchPartActionFn, WorkbenchTheme, WorkbenchViewMenuItemFn} from './workbench.model';
+import {WorkbenchElement, WorkbenchPartActionFn, WorkbenchTheme, WorkbenchViewMenuItemFn} from './workbench.model';
 import {WorkbenchView} from './view/workbench-view.model';
 import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
 import {WorkbenchPart} from './part/workbench-part.model';
@@ -211,6 +211,11 @@ export abstract class WorkbenchService {
      */
     panelAnimation: WritableSignal<boolean>;
   };
+
+  /**
+   * Provides the focused workbench element, or `null` if the focus is on a DOM element outside any workbench element.
+   */
+  public abstract readonly activeElement: Signal<WorkbenchElement | null>;
 
   /**
    * Provides the current workbench theme, if any.

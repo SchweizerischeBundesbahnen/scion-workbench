@@ -137,12 +137,11 @@ test.describe('Workbench Layout Storage', () => {
   test('should select the initial perspective from storage', async ({appPO}) => {
     await appPO.navigateTo({
       microfrontendSupport: false,
-      perspectives: ['testee-1', 'testee-2', 'testee-3'],
       localStorage: {
-        'scion.workbench.perspective': 'testee-2',
+        'scion.workbench.perspective': 'e2e-perspective-with-main-area',
       },
     });
 
-    await expect.poll(() => appPO.getActivePerspectiveId()).toEqual('testee-2');
+    await expect.poll(() => appPO.getActivePerspectiveId()).toEqual('e2e-perspective-with-main-area');
   });
 });

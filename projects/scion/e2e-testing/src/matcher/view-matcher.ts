@@ -28,13 +28,13 @@ function expectWorkbenchView(viewPage: WorkbenchViewPagePO): ViewMatcher {
   return {
     toBeActive: async (): Promise<void> => {
       await expect(viewPage.view.tab.locator).toBeVisible();
-      await expect(viewPage.view.tab.locator).toHaveClass(activeViewCssClassRegex);
+      await expect(viewPage.view.tab.locator).toHaveAttribute('data-active');
       await expect(viewPage.view.locator).toBeVisible();
       await expect(viewPage.locator).toBeVisible();
     },
     toBeInactive: async (): Promise<void> => {
       await expect(viewPage.view.tab.locator).toBeVisible();
-      await expect(viewPage.view.tab.locator).not.toHaveClass(activeViewCssClassRegex);
+      await expect(viewPage.view.tab.locator).not.toHaveAttribute('data-active');
       await expect(viewPage.view.locator).not.toBeAttached();
       await expect(viewPage.locator).not.toBeAttached();
     },
@@ -55,14 +55,14 @@ function expectMicrofrontendView(viewPage: MicrofrontendViewPagePO): ViewMatcher
   return {
     toBeActive: async (): Promise<void> => {
       await expect(viewPage.view.tab.locator).toBeVisible();
-      await expect(viewPage.view.tab.locator).toHaveClass(activeViewCssClassRegex);
+      await expect(viewPage.view.tab.locator).toHaveAttribute('data-active');
       await expect(viewPage.view.locator).toBeVisible();
       await expect(viewPage.outlet.locator).toBeVisible();
       await expect(viewPage.locator).toBeVisible();
     },
     toBeInactive: async (): Promise<void> => {
       await expect(viewPage.view.tab.locator).toBeVisible();
-      await expect(viewPage.view.tab.locator).not.toHaveClass(activeViewCssClassRegex);
+      await expect(viewPage.view.tab.locator).not.toHaveAttribute('data-active');
       await expect(viewPage.view.locator).not.toBeAttached();
       await expect(viewPage.outlet.locator).toBeAttached();
       await expect(viewPage.outlet.locator).not.toBeVisible();
@@ -105,5 +105,3 @@ export interface ViewMatcher {
 function isMicrofrontendView(viewPage: WorkbenchViewPagePO | MicrofrontendViewPagePO): viewPage is MicrofrontendViewPagePO {
   return !!(viewPage as MicrofrontendViewPagePO).outlet;
 }
-
-const activeViewCssClassRegex: RegExp = /(^|\s)active($|\s)/;

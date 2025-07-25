@@ -75,17 +75,17 @@
     }
 
     // Do not render divider following the active tab or drag source.
-    > wb-view-tab:is(.active, .drag-source) + div.divider {
+    > wb-view-tab:is([data-active], .drag-source) + div.divider {
       display: none;
     }
 
     // Do not render divider preceding the active tab
-    > div.divider:has(+ wb-view-tab.active:not(.drag-source)) {
+    > div.divider:has(+ wb-view-tab[data-active]:not(.drag-source)) {
       display: none;
     }
 
     // Do not render divider preceding the tab being dragged out of its tabbar
-    > div.divider:has(+ wb-view-tab.drag-source:not(.active)) {
+    > div.divider:has(+ wb-view-tab.drag-source:not([data-active])) {
       display: none;
     }
   }

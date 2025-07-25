@@ -1,0 +1,16 @@
+<textarea [value]="log()" readonly class="e2e-log" #text_area></textarea>
+
+<!-- Follow Tail Checkbox -->
+<ng-template wbPartAction>
+  <label class="follow-tail">
+    <input type="checkbox" [(ngModel)]="followTail">
+    Follow tail
+  </label>
+</ng-template>
+
+<!-- Clear Action -->
+<ng-template wbPartAction cssClass="e2e-clear">
+  <button (click)="onClear()" title="Clear" sciMaterialIcon>
+    delete
+  </button>
+</ng-template>

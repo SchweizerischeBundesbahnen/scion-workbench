@@ -121,9 +121,6 @@ export class AppPO {
     if (options?.simulateSlowCapabilityLookup) {
       this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.SIMULATE_SLOW_CAPABILITY_LOOKUP, String(true));
     }
-    if (options?.perspectives?.length) {
-      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.PERSPECTIVES, options.perspectives.join(';'));
-    }
     if (options?.designTokens) {
       this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.DESIGN_TOKENS, JSON.stringify(options.designTokens));
     }
@@ -213,10 +210,17 @@ export class AppPO {
   }
 
   /**
-   * Handle for interacting with the currently active workbench part in the specified grid.
+   * Handle for interacting with the active workbench part in the specified grid.
    */
   public activePart(locateBy: {grid: 'main' | 'mainArea' | ActivityId}): PartPO {
-    return new PartPO(this.page.locator(`wb-part[data-grid="${dasherize(locateBy.grid)}"].active`));
+    return new PartPO(this.page.locator(`wb-part[data-grid="${dasherize(locateBy.grid)}"][data-active]`));
+  }
+
+  /**
+   * Handle for interacting with the active workbench view in the specified part.
+   */
+  public activeView(locateBy: {partId: PartId}): ViewPO {
+    return this.part({partId: locateBy.partId}).activeView;
   }
 
   /**
@@ -399,8 +403,11 @@ export class AppPO {
     await this.header.clickSettingMenuItem({cssClass: 'e2e-open-start-page'});
     // Wait until opened the start page to get its view id.
     await waitForCondition(async () => (await this.getCurrentNavigationId()) !== navigationId);
-    const activePart = new PartPO(this.page.locator(`wb-part:not([data-peripheral]):not([data-partid="${MAIN_AREA}"]).active`));
-    return new StartPagePO(this, {viewId: await activePart.activeView.getViewId()});
+    const focusOwner = await waitUntilStable(() => this.focusOwner());
+    if (!focusOwner?.startsWith('view.')) {
+      throw Error(`[PageObjectError] Expected view to have focus, but was ${focusOwner}.`);
+    }
+    return new StartPagePO(this, {viewId: focusOwner as ViewId});
   }
 
   /**
@@ -430,14 +437,12 @@ export class AppPO {
   }
 
   /**
-   * Returns a unique id set after a navigation has been performed.
-   *
-   * This identifier should be used to detect when the current navigation has completed.
+   * Returns a unique id that increments with each navigation event.
    *
    * This flag is set in `app.component.ts` in the 'workbench-testing-app'.
    */
-  public getCurrentNavigationId(): Promise<string | undefined> {
-    return this.page.locator('app-root').getAttribute('data-navigationid').then(value => value ?? undefined);
+  public getCurrentNavigationId(): Promise<number> {
+    return this.page.locator('app-root').getAttribute('data-navigationid').then(value => value ? Number.parseInt(value) : 0);
   }
 
   /**
@@ -454,6 +459,15 @@ export class AppPO {
    */
   public getActivePerspectiveId(): Promise<string> {
     return this.page.locator('app-root').getAttribute('data-perspective-id').then(id => id!);
+  }
+
+  /**
+   * Returns the id of the focused workbench element, or `null` if no workbench element has the focus.
+   *
+   * Note that the focused workbench element does not necessarily correspond to the active DOM element.
+   */
+  public async focusOwner(): Promise<PartId | ViewId | DialogId | PopupId | null> {
+    return this.workbench.activeElement();
   }
 
   /**
@@ -547,10 +561,6 @@ export interface Options {
    */
   simulateSlowCapabilityLookup?: boolean;
   /**
-   * Specifies perspectives to be registered in the testing app. Separate multiple perspectives by semicolon.
-   */
-  perspectives?: string[];
-  /**
    * Controls the scope of application-modal workbench dialogs. Defaults to `workbench`.
    */
   dialogModalityScope?: 'workbench' | 'viewport';
@@ -570,10 +580,12 @@ export interface Options {
    * Specifies the component to display as desktop. Defaults to `StartPageComponent`.
    *
    * Available desktops:
-   * - 'legacyStartPage': Displays the start page using a primary router-outlet. No longer required with the removal of legacy start page support.
+   * - 'legacy-start-page': Displays the start page using a primary router-outlet. No longer required with the removal of legacy start page support.
    * - 'desktop-page': Displays the 'DesktopPageComponent'.
+   * - 'focus-page': Displays the 'FocusTestPageComponent'.
+   * - 'layout-page': Displays the 'LayoutPageComponent'.
    */
-  desktop?: 'legacyStartPage' | 'desktop-page';
+  desktop?: 'legacy-start-page' | 'desktop-page' | 'focus-page' | 'layout-page';
   /**
    * Wait until the workbench completed startup.
    */

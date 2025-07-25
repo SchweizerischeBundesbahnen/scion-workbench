@@ -21,7 +21,7 @@
   border-top-left-radius: var(--sci-workbench-tab-border-radius);
   border-top-right-radius: var(--sci-workbench-tab-border-radius);
 
-  &.active {
+  &[data-active] {
     cursor: default;
     border-left-color: var(--sci-workbench-tab-border-color);
     border-right-color: var(--sci-workbench-tab-border-color);
@@ -66,7 +66,7 @@
     }
   }
 
-  &.active, &:hover:not(.view-drag) {
+  &[data-active], &:hover:not(.view-drag) {
     > button.close:is(button, #sci-reset) {
       visibility: visible;
     }
@@ -74,7 +74,7 @@
 
   // Indicator when hovering the tab
   @container style(--sci-workbench-tab-background-color-hover) {
-    &:hover:not(.active):not(.view-drag) {
+    &:hover:not([data-active]):not(.view-drag) {
       &::before {
         content: '';
         position: absolute;

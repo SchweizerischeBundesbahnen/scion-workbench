@@ -10,6 +10,7 @@
 
 import {signal, Signal, untracked} from '@angular/core';
 import {Translatable} from '../text/workbench-text-provider.model';
+import {DialogId} from '../workbench.identifiers';
 
 /**
  * Handle to interact with a dialog opened via {@link WorkbenchDialogService}.
@@ -19,6 +20,11 @@ import {Translatable} from '../text/workbench-text-provider.model';
  * Dialog inputs are available as input properties in the dialog component.
  */
 export abstract class WorkbenchDialog<R = unknown> {
+
+  /**
+   * Unique identity of this dialog.
+   */
+  public abstract readonly id: DialogId;
 
   /**
    * Sets the title of the dialog.
@@ -58,6 +64,11 @@ export abstract class WorkbenchDialog<R = unknown> {
    */
   public abstract get cssClass(): Signal<string[]>;
   public abstract set cssClass(cssClass: string | string[]);
+
+  /**
+   * Indicates whether this dialog has the focus.
+   */
+  public abstract readonly focused: Signal<boolean>;
 
   /**
    * Closes the dialog. Optionally, pass a result or an error to the dialog opener.

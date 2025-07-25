@@ -12,7 +12,7 @@ import {DestroyRef} from '@angular/core';
 import {noop} from 'rxjs';
 
 /**
- * Implementation of {@link DestroyRef} that can be used in non-Angular managed workbench objects such as handles.
+ * Implementation of {@link DestroyRef} that can be used in non-Angular managed workbench elements such as handles.
  */
 export class ɵDestroyRef implements DestroyRef {
 
