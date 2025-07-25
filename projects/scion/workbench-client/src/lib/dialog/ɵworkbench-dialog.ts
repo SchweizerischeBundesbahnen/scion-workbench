@@ -8,15 +8,17 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {MessageClient, MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
+import {mapToBody, MessageClient, MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
 import {ɵDialogContext} from './ɵworkbench-dialog-context';
 import {WorkbenchDialog} from './workbench-dialog';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {merge, Observable, Subject} from 'rxjs';
 import {Observables} from '@scion/toolkit/util';
-import {takeUntil} from 'rxjs/operators';
+import {shareReplay, takeUntil} from 'rxjs/operators';
 import {WorkbenchDialogCapability} from './workbench-dialog-capability';
+import {decorateObservable} from '../observable-decorator';
+import {DialogId} from '../workbench.identifiers';
 
 /**
  * @ignore
@@ -27,12 +29,21 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog {
   private _destroy$ = new Subject<void>();
   private _titleChange$ = new Subject<void>();
 
+  public readonly id: DialogId;
   public readonly capability: WorkbenchDialogCapability;
   public readonly params: Map<string, unknown>;
+  public readonly focused$: Observable<boolean>;
 
   constructor(private _context: ɵDialogContext) {
+    this.id = this._context.dialogId;
     this.capability = this._context.capability;
     this.params = this._context.params;
+    this.focused$ = Beans.get(MessageClient).observe$<boolean>(ɵWorkbenchCommands.dialogFocusedTopic(this.id))
+      .pipe(
+        mapToBody(),
+        shareReplay({refCount: false, bufferSize: 1}),
+        decorateObservable(),
+      );
   }
 
   /**

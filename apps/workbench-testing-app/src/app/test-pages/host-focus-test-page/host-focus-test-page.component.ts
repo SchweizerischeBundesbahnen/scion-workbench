@@ -10,17 +10,17 @@
 
 import {Component, inject, signal, Signal} from '@angular/core';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
-import {toSignal} from '@angular/core/rxjs-interop';
-import {WorkbenchDialog, WorkbenchView} from '@scion/workbench-client';
 import {FormsModule} from '@angular/forms';
+import {WorkbenchDialog, WorkbenchView} from '@scion/workbench-client';
+import {toSignal} from '@angular/core/rxjs-interop';
 
 @Component({
-  selector: 'app-focus-test-page',
-  templateUrl: './focus-test-page.component.html',
-  styleUrls: ['./focus-test-page.component.scss'],
+  selector: 'app-host-focus-test-page',
+  templateUrl: './host-focus-test-page.component.html',
+  styleUrls: ['./host-focus-test-page.component.scss'],
   imports: [SciFormFieldComponent, FormsModule],
 })
-export default class FocusTestPageComponent {
+export default class HostFocusTestPageComponent {
 
   protected readonly focused: Signal<boolean>;
 

@@ -1,10 +1,14 @@
-<sci-viewport class="content" [formGroup]="form" cdkTrapFocus cdkTrapFocusAutoCapture>
+<sci-viewport class="content" cdkTrapFocus cdkTrapFocusAutoCapture>
   <sci-form-field label="Title" direction="column">
     <input [formControl]="form.controls.title" class="e2e-title">
   </sci-form-field>
 
   <sci-form-field label="Instance ID" title="Unique identifier of this component instance">
     <input class="e2e-component-instance-id" [value]="uuid" disabled>
+  </sci-form-field>
+
+  <sci-form-field label="Focused">
+    <input [ngModel]="focused()" disabled>
   </sci-form-field>
 
   <sci-accordion class="e2e-component-size" variant="solid">

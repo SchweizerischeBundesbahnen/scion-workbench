@@ -10,6 +10,7 @@
 
 import {WorkbenchDialogCapability} from './workbench-dialog-capability';
 import {Observable} from 'rxjs';
+import {DialogId} from '../workbench.identifiers';
 
 /**
  * Handle to interact with a dialog opened via {@link WorkbenchDialogService}.
@@ -22,6 +23,11 @@ import {Observable} from 'rxjs';
  * @see WorkbenchDialogService
  */
 export abstract class WorkbenchDialog<R = unknown> {
+
+  /**
+   * Represents the identity of this dialog.
+   */
+  public abstract readonly id: DialogId;
 
   /**
    * Capability of the microfrontend loaded into this dialog.
@@ -37,6 +43,11 @@ export abstract class WorkbenchDialog<R = unknown> {
    * Sets the title of the dialog.
    */
   public abstract setTitle(title: string | Observable<string>): void;
+
+  /**
+   * Indicates whether this dialog has the focus.
+   */
+  public abstract readonly focused$: Observable<boolean>;
 
   /**
    * Signals readiness, notifying the workbench that this dialog has completed initialization.
