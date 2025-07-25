@@ -47,7 +47,6 @@ import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
     '[attr.data-focus-within-view]': `view().focused() ? '' : null`,
     '[attr.draggable]': 'true',
     '[attr.tabindex]': '-1', // make the view focusable to install view menu accelerators
-    '[class.part-active]': 'view().part().active()',
     '[class.view-drag]': 'viewDragService.dragging()',
     '[style.--sci-workbench-tab-title-offset-right]': 'viewTitleOffsetRight()',
   },
