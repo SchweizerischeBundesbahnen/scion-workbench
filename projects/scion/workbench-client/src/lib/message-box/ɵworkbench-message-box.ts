@@ -8,10 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
+import {mapToBody, MessageClient, MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
 import {ɵMessageBoxContext} from './ɵworkbench-message-box-context';
 import {WorkbenchMessageBox} from './workbench-message-box';
 import {WorkbenchMessageBoxCapability} from '../message-box/workbench-message-box-capability';
+import {Observable} from 'rxjs';
+import {Beans} from '@scion/toolkit/bean-manager';
+import {shareReplay} from 'rxjs/operators';
+import {decorateObservable} from '../observable-decorator';
+import {DialogId} from '../workbench.identifiers';
+import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 
 /**
  * @ignore
@@ -19,12 +25,21 @@ import {WorkbenchMessageBoxCapability} from '../message-box/workbench-message-bo
  */
 export class ɵWorkbenchMessageBox implements WorkbenchMessageBox {
 
-  public capability: WorkbenchMessageBoxCapability;
-  public params: Map<string, unknown>;
+  public readonly id: DialogId;
+  public readonly capability: WorkbenchMessageBoxCapability;
+  public readonly params: Map<string, unknown>;
+  public readonly focused$: Observable<boolean>;
 
   constructor(private _context: ɵMessageBoxContext) {
+    this.id = this._context.dialogId;
     this.capability = this._context.capability;
     this.params = this._context.params;
+    this.focused$ = Beans.get(MessageClient).observe$<boolean>(ɵWorkbenchCommands.dialogFocusedTopic(this.id))
+      .pipe(
+        mapToBody(),
+        shareReplay({refCount: false, bufferSize: 1}),
+        decorateObservable(),
+      );
   }
 
   /** @inheritDoc */

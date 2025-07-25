@@ -21,7 +21,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {PreferredSizeService} from '@scion/microfrontend-platform';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {startWith} from 'rxjs/operators';
 
 @Component({
@@ -51,6 +51,7 @@ export default class MessageBoxPageComponent {
   protected readonly route = inject(ActivatedRoute);
   protected readonly messageBox = inject(WorkbenchMessageBox);
   protected readonly uuid = UUID.randomUUID();
+  protected readonly focused = toSignal(inject(WorkbenchMessageBox).focused$, {initialValue: true});
 
   protected readonly form = this._formBuilder.group({
     height: this._formBuilder.control(''),

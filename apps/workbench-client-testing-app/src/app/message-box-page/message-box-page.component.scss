@@ -1,24 +1,20 @@
 :host {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
   padding-top: 2em; // add empty space at the top to display the metadata chips contributed by the app component
 
-  > form {
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
+  > sci-accordion {
+    header {
+      font-weight: bold;
+    }
 
-    > sci-accordion {
-      header {
-        font-weight: bold;
-      }
+    &.message-box-capability sci-viewport {
+      max-height: 200px;
 
-      &.message-box-capability sci-viewport {
-        max-height: 200px;
-
-        div.capability {
-          white-space: pre;
-          font-family: monospace;
-        }
+      div.capability {
+        white-space: pre;
+        font-family: monospace;
       }
     }
   }

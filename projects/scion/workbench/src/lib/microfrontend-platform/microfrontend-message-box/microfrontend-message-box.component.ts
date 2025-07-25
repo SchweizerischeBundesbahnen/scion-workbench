@@ -9,9 +9,9 @@
  */
 
 import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, input, untracked, viewChild} from '@angular/core';
-import {ManifestService, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
+import {ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
-import {WorkbenchMessageBoxCapability, ɵMESSAGE_BOX_CONTEXT, ɵMessageBoxContext} from '@scion/workbench-client';
+import {WorkbenchMessageBoxCapability, ɵMESSAGE_BOX_CONTEXT, ɵMessageBoxContext, ɵWorkbenchCommands} from '@scion/workbench-client';
 import {NgComponentOutlet} from '@angular/common';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
@@ -43,6 +43,7 @@ export class MicrofrontendMessageBoxComponent {
 
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _outletRouter = inject(OutletRouter);
+  private readonly _messageClient = inject(MessageClient);
   private readonly _logger = inject(Logger);
   private readonly _routerOutletElement = viewChild.required<ElementRef<SciRouterOutletElement>>('router_outlet');
 
@@ -56,9 +57,15 @@ export class MicrofrontendMessageBoxComponent {
     this.setMessageBoxProperties();
     this.propagateMessageBoxContext();
     this.propagateWorkbenchTheme();
+    this.installDialogFocusedPublisher();
     this.installNavigator();
 
-    inject(DestroyRef).onDestroy(() => void this._outletRouter.navigate(null, {outlet: this.dialog.id})); // Clear the outlet.
+    inject(DestroyRef).onDestroy(() => {
+      // Clear the outlet.
+      void this._outletRouter.navigate(null, {outlet: this.dialog.id});
+      // Delete retained messages to free resources.
+      void this._messageClient.publish(ɵWorkbenchCommands.dialogFocusedTopic(this.dialog.id), undefined, {retain: true});
+    });
   }
 
   private installNavigator(): void {
@@ -100,12 +107,23 @@ export class MicrofrontendMessageBoxComponent {
   private propagateMessageBoxContext(): void {
     effect(() => {
       const context: ɵMessageBoxContext = {
+        dialogId: this.dialog.id,
         capability: this.capability(),
         params: this.params(),
       };
       const routerOutletElement = this._routerOutletElement().nativeElement;
 
       untracked(() => routerOutletElement.setContextValue(ɵMESSAGE_BOX_CONTEXT, context));
+    });
+  }
+
+  private installDialogFocusedPublisher(): void {
+    effect(() => {
+      const focused = this.dialog.focused();
+      untracked(() => {
+        const commandTopic = ɵWorkbenchCommands.dialogFocusedTopic(this.dialog.id);
+        void this._messageClient.publish(commandTopic, focused, {retain: true});
+      });
     });
   }
 

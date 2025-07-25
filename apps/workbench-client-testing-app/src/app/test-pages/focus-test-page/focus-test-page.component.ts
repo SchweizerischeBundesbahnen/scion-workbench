@@ -11,7 +11,7 @@
 import {Component, inject, signal, Signal} from '@angular/core';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {WorkbenchDialog, WorkbenchView} from '@scion/workbench-client';
+import {WorkbenchDialog, WorkbenchMessageBox, WorkbenchView} from '@scion/workbench-client';
 import {FormsModule} from '@angular/forms';
 
 @Component({
@@ -30,6 +30,9 @@ export default class FocusTestPageComponent {
     }
     else if (inject(WorkbenchDialog, {optional: true})) {
       this.focused = toSignal(inject(WorkbenchDialog).focused$, {initialValue: true});
+    }
+    else if (inject(WorkbenchMessageBox, {optional: true})) {
+      this.focused = toSignal(inject(WorkbenchMessageBox).focused$, {initialValue: true});
     }
     else {
       this.focused = signal(false).asReadonly();

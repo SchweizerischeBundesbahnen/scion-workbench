@@ -9,6 +9,7 @@
  */
 
 import {WorkbenchMessageBoxCapability} from '../message-box/workbench-message-box-capability';
+import {DialogId} from '../workbench.identifiers';
 
 /**
  * Information about the message box embedding a microfrontend.
@@ -19,6 +20,7 @@ import {WorkbenchMessageBoxCapability} from '../message-box/workbench-message-bo
  * @ignore
  */
 export interface ɵMessageBoxContext {
+  dialogId: DialogId;
   capability: WorkbenchMessageBoxCapability;
   params: Map<string, unknown>;
 }
