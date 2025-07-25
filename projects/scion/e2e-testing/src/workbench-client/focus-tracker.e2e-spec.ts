@@ -12,7 +12,6 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
 import {FocusTestPagePO} from './page-object/test-pages/focus-test-page.po';
-import {FocusTestPagePO as WorkbenchFocusTestPagePO} from '../workbench/page-object/test-pages/focus-test-page.po';
 import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
@@ -478,6 +477,7 @@ test.describe('Focus Tracker', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual(popupId);
     await expect.poll(() => logPart.getLog()).toEqual([popupId]);
     await expect(appPO.popup({popupId}).locator).toContainFocus();
+    await expect.poll(() => focusTestPage.isFocused()).toBe(true);
 
     // TEST: Focus element outside the popup.
     await appPO.part({partId: 'part.right'}).bar.filler.click();
@@ -485,6 +485,7 @@ test.describe('Focus Tracker', () => {
     // Expect popup not to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right');
     await expect.poll(() => logPart.getLog()).toEqual([popupId, 'part.right']);
+    await expect.poll(() => focusTestPage.isFocused()).toBe(false);
 
     // TEST: Focus element in the popup.
     await focusTestPage.firstField.click();
@@ -493,6 +494,7 @@ test.describe('Focus Tracker', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual(popupId);
     await expect.poll(() => logPart.getLog()).toEqual([popupId, 'part.right', popupId]);
     await expect(focusTestPage.firstField).toBeFocused();
+    await expect.poll(() => focusTestPage.isFocused()).toBe(true);
 
     // TEST: Focus element outside the popup.
     await appPO.part({partId: 'part.right'}).bar.filler.click();
@@ -500,6 +502,7 @@ test.describe('Focus Tracker', () => {
     // Expect popup not to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right');
     await expect.poll(() => logPart.getLog()).toEqual([popupId, 'part.right', popupId, 'part.right']);
+    await expect.poll(() => focusTestPage.isFocused()).toBe(false);
 
     // TEST: Focus element in the popup.
     await focusTestPage.firstField.click();
@@ -508,6 +511,7 @@ test.describe('Focus Tracker', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual(popupId);
     await expect.poll(() => logPart.getLog()).toEqual([popupId, 'part.right', popupId, 'part.right', popupId]);
     await expect(focusTestPage.firstField).toBeFocused();
+    await expect.poll(() => focusTestPage.isFocused()).toBe(true);
 
     // TEST: Close the popup by pressing Escape.
     await page.keyboard.press('Escape');
@@ -548,12 +552,13 @@ test.describe('Focus Tracker', () => {
     await popupOpener.enterCloseStrategy({closeOnFocusLost: false});
     await popupOpener.open();
     const popupId = await appPO.popup({cssClass: 'testee'}).getPopupId();
-    const focusTestPage = new WorkbenchFocusTestPagePO(appPO.popup({popupId}));
+    const focusTestPage = new HostFocusTestPagePO(appPO.popup({popupId}));
 
     // Expect popup to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual(popupId);
     await expect.poll(() => logPart.getLog()).toEqual([popupId]);
     await expect(appPO.popup({popupId}).locator).toContainFocus();
+    await expect.poll(() => focusTestPage.isFocused()).toBe(true);
 
     // TEST: Focus element outside the popup.
     await appPO.part({partId: 'part.right'}).bar.filler.click();
@@ -561,6 +566,7 @@ test.describe('Focus Tracker', () => {
     // Expect popup not to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right');
     await expect.poll(() => logPart.getLog()).toEqual([popupId, 'part.right']);
+    await expect.poll(() => focusTestPage.isFocused()).toBe(false);
 
     // TEST: Focus element in the popup.
     await focusTestPage.firstField.click();
@@ -569,6 +575,7 @@ test.describe('Focus Tracker', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual(popupId);
     await expect.poll(() => logPart.getLog()).toEqual([popupId, 'part.right', popupId]);
     await expect(focusTestPage.firstField).toBeFocused();
+    await expect.poll(() => focusTestPage.isFocused()).toBe(true);
 
     // TEST: Focus element outside the popup.
     await appPO.part({partId: 'part.right'}).bar.filler.click();
@@ -576,6 +583,7 @@ test.describe('Focus Tracker', () => {
     // Expect popup not to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right');
     await expect.poll(() => logPart.getLog()).toEqual([popupId, 'part.right', popupId, 'part.right']);
+    await expect.poll(() => focusTestPage.isFocused()).toBe(false);
 
     // TEST: Focus element in the popup.
     await focusTestPage.firstField.click();
@@ -584,6 +592,7 @@ test.describe('Focus Tracker', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual(popupId);
     await expect.poll(() => logPart.getLog()).toEqual([popupId, 'part.right', popupId, 'part.right', popupId]);
     await expect(focusTestPage.firstField).toBeFocused();
+    await expect.poll(() => focusTestPage.isFocused()).toBe(true);
 
     // TEST: Close the popup by pressing Escape.
     await page.keyboard.press('Escape');

@@ -10,10 +10,14 @@
 
 import {WorkbenchPopupCapability} from './workbench-popup-capability';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {ContextService, MessageClient, MicrofrontendPlatformClient, OUTLET_CONTEXT, OutletContext} from '@scion/microfrontend-platform';
+import {ContextService, mapToBody, MessageClient, MicrofrontendPlatformClient, OUTLET_CONTEXT, OutletContext} from '@scion/microfrontend-platform';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {ɵPopupContext} from './workbench-popup-context';
 import {WorkbenchPopupReferrer} from './workbench-popup-referrer';
+import {Observable} from 'rxjs';
+import {shareReplay} from 'rxjs/operators';
+import {decorateObservable} from '../observable-decorator';
+import {PopupId} from '../workbench.identifiers';
 
 /**
  * A popup is a visual workbench component for displaying content above other content.
@@ -40,9 +44,19 @@ import {WorkbenchPopupReferrer} from './workbench-popup-referrer';
 export abstract class WorkbenchPopup<R = unknown> {
 
   /**
+   * Represents the identity of this popup.
+   */
+  public abstract readonly id: PopupId;
+
+  /**
    * Capability that represents the microfrontend loaded into this workbench popup.
    */
   public abstract readonly capability: WorkbenchPopupCapability;
+
+  /**
+   * Indicates whether this popup has the focus.
+   */
+  public abstract readonly focused$: Observable<boolean>;
 
   /**
    * Signals readiness, notifying the workbench that this popup has completed initialization.
@@ -79,15 +93,24 @@ export abstract class WorkbenchPopup<R = unknown> {
  */
 export class ɵWorkbenchPopup implements WorkbenchPopup {
 
-  public params: Map<string, any>;
-  public capability: WorkbenchPopupCapability;
-  public referrer: WorkbenchPopupReferrer;
+  public readonly id: PopupId;
+  public readonly params: Map<string, any>;
+  public readonly capability: WorkbenchPopupCapability;
+  public readonly referrer: WorkbenchPopupReferrer;
+  public readonly focused$: Observable<boolean>;
 
   constructor(private _context: ɵPopupContext) {
+    this.id = this._context.popupId;
     this.capability = this._context.capability;
     this.params = this._context.params;
     this.referrer = this._context.referrer;
     void this.requestFocus();
+    this.focused$ = Beans.get(MessageClient).observe$<boolean>(ɵWorkbenchCommands.popupFocusedTopic(this.id))
+      .pipe(
+        mapToBody(),
+        shareReplay({refCount: false, bufferSize: 1}),
+        decorateObservable(),
+      );
   }
 
   /**

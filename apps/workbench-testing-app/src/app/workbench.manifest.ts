@@ -55,7 +55,7 @@ export const workbenchManifest: Manifest = {
       private: false,
       description: 'Represents a popup provided by the host app that displays the focus test page.',
       properties: {
-        path: 'test-pages/focus-test-page',
+        path: 'test-pages/host-focus-test-page',
       },
     } satisfies WorkbenchPopupCapability,
     // TODO [#271]: Remove this dialog capability when implemented the issue #271

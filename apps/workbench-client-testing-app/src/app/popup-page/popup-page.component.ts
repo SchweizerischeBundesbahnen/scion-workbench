@@ -23,6 +23,7 @@ import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {toSignal} from '@angular/core/rxjs-interop';
 
 /**
  * Popup test component which can grow and shrink.
@@ -53,6 +54,7 @@ export default class PopupPageComponent {
   protected readonly route = inject(ActivatedRoute);
   protected readonly popup = inject(WorkbenchPopup);
   protected readonly uuid = UUID.randomUUID();
+  protected readonly focused = toSignal(inject(WorkbenchPopup).focused$, {initialValue: true});
 
   protected readonly form = this._formBuilder.group({
     minHeight: this._formBuilder.control(''),
