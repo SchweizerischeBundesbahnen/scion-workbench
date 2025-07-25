@@ -20,12 +20,22 @@
 
     &:hover {
       background-color: var(--sci-workbench-activity-item-background-color-hover);
+      border-color: var(--sci-workbench-activity-item-border-color-hover);
       color: var(--sci-workbench-activity-item-text-color-hover);
     }
 
-    &.active, &:active {
+    &.active {
       background-color: var(--sci-workbench-activity-item-background-color-active);
+      border-color: var(--sci-workbench-activity-item-border-color-active);
       color: var(--sci-workbench-activity-item-text-color-active);
+
+      &:hover {
+        background-color: color-mix(in srgb, var(--sci-workbench-activity-item-background-color-active) 95%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+      }
+
+      &:active {
+        background-color: color-mix(in srgb, var(--sci-workbench-activity-item-background-color-active) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+      }
     }
 
     &:focus:not(:focus-visible) {
@@ -34,6 +44,21 @@
 
     &:focus-visible {
       outline: var(--sci-workbench-button-outline-width-focus) solid var(--sci-color-accent);
+      background-clip: padding-box;
+    }
+
+    &.focus-within-activity {
+      background-color: var(--sci-workbench-activity-item-background-color-focus);
+      border-color: var(--sci-workbench-activity-item-border-color-focus);
+      color: var(--sci-workbench-activity-item-text-color-focus);
+
+      &:hover {
+        background-color: color-mix(in srgb, var(--sci-workbench-activity-item-background-color-focus) 95%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+      }
+
+      &:active {
+        background-color: color-mix(in srgb, var(--sci-workbench-activity-item-background-color-focus) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+      }
     }
   }
 }

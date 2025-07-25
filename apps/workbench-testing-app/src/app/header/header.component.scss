@@ -24,7 +24,7 @@
     }
 
     &:hover, &.menu-open {
-      background-color: color-mix(in srgb, var(--sci-color-accent) 95%, var(--sci-static-color-black));
+      background-color: color-mix(in srgb, var(--sci-color-accent) 95%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
     }
   }
 

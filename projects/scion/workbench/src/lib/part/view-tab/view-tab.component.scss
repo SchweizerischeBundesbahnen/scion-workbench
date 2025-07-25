@@ -36,7 +36,7 @@
       color: var(--sci-workbench-tab-text-color-active);
     }
 
-    &.part-active > div.content {
+    &[data-focus-within-view] > div.content {
       color: var(--sci-workbench-part-active-tab-text-color-active);
     }
   }
