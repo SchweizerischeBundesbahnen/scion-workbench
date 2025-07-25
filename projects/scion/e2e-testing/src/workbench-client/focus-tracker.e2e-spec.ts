@@ -606,9 +606,9 @@ test.describe('Focus Tracker', () => {
 /**
  * Adds a part logging the active workbench element.
  */
-function addActiveWorkbenchElementPart(part: PartId): (layout: WorkbenchLayout) => WorkbenchLayout {
+function addActiveWorkbenchElementPart(partId: PartId): (layout: WorkbenchLayout) => WorkbenchLayout {
   return (layout: WorkbenchLayout) => layout
-    .addPart(part, {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal', ɵactivityId: 'activity.log'})
-    .navigatePart(part, ['active-workbench-element-log'])
-    .activatePart(part);
+    .addPart(partId, {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal', ɵactivityId: 'activity.log'})
+    .navigatePart(partId, [], {hint: 'active-workbench-element-log'})
+    .activatePart(partId);
 }
