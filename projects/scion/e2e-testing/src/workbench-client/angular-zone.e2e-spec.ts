@@ -81,4 +81,24 @@ test.describe('Angular Zone Synchronization', () => {
       await expect.poll(() => activePanel.isEmissionReceivedInAngularZone({nth: 1})).toBe(false);
     });
   });
+
+  test('should emit in the same Angular zone as subscribed to "WorkbenchView#focused$"', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    const angularZoneTestPage = await AngularZoneTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+
+    const focusedPanel = angularZoneTestPage.workbenchView.focusedPanel;
+    await focusedPanel.expand();
+
+    await test.step('subscribeInsideAngularZone', async () => {
+      await focusedPanel.subscribe({subscribeInAngularZone: true});
+      await expect.poll(() => focusedPanel.isEmissionReceivedInAngularZone({nth: 0})).toBe(true);
+      await expect.poll(() => focusedPanel.isEmissionReceivedInAngularZone({nth: 1})).toBe(true);
+    });
+    await test.step('subscribeOutsideAngularZone', async () => {
+      await focusedPanel.subscribe({subscribeInAngularZone: false});
+      await expect.poll(() => focusedPanel.isEmissionReceivedInAngularZone({nth: 0})).toBe(false);
+      await expect.poll(() => focusedPanel.isEmissionReceivedInAngularZone({nth: 1})).toBe(false);
+    });
+  });
 });

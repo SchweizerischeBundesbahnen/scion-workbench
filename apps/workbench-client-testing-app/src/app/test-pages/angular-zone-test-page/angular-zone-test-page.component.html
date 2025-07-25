@@ -25,6 +25,15 @@
   <ng-template #panel3>
     <ng-container *ngTemplateOutlet="test_template; context: {$implicit: tests.workbenchView.active}"/>
   </ng-template>
+
+  <!-- WorkbenchView#focused$ -->
+  <ng-template sciAccordionItem [panel]="panel4" cssClass="e2e-workbench-view e2e-focused">
+    <header>WorkbenchView#focused$</header>
+  </ng-template>
+
+  <ng-template #panel4>
+    <ng-container *ngTemplateOutlet="test_template; context: {$implicit: tests.workbenchView.focused}"/>
+  </ng-template>
 </sci-accordion>
 
 <ng-template #test_template let-test>

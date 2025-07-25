@@ -28,6 +28,7 @@ export class AngularZoneTestPagePO implements MicrofrontendViewPagePO {
     capabilityPanel: PanelPO;
     paramsPanel: PanelPO;
     activePanel: PanelPO;
+    focusedPanel: PanelPO;
   };
 
   constructor(appPO: AppPO, viewId: ViewId) {
@@ -39,6 +40,7 @@ export class AngularZoneTestPagePO implements MicrofrontendViewPagePO {
       capabilityPanel: new PanelPO(this.locator.locator('sci-accordion'), 'e2e-workbench-view.e2e-capability'),
       paramsPanel: new PanelPO(this.locator.locator('sci-accordion'), 'e2e-workbench-view.e2e-params'),
       activePanel: new PanelPO(this.locator.locator('sci-accordion'), 'e2e-workbench-view.e2e-active'),
+      focusedPanel: new PanelPO(this.locator.locator('sci-accordion'), 'e2e-workbench-view.e2e-focused'),
     };
   }
 

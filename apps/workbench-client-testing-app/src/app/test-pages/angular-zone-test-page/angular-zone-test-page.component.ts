@@ -39,6 +39,7 @@ export default class AngularZoneTestPageComponent {
       capability: new TestCaseModel(model => void this.testWorkbenchViewCapability(model)),
       params: new TestCaseModel(model => void this.testWorkbenchViewParams(model)),
       active: new TestCaseModel(model => void this.testWorkbenchViewActive(model)),
+      focused: new TestCaseModel(model => void this.testWorkbenchViewFocused(model)),
     },
   };
 
@@ -110,6 +111,24 @@ export default class AngularZoneTestPageComponent {
     await firstValueFrom(workbenchViewTestee.active$);
     // Simulate second emission
     await Beans.get(MessageClient).publish(viewActiveTopic, false);
+  }
+
+  private async testWorkbenchViewFocused(model: TestCaseModel): Promise<void> {
+    const workbenchViewTestee = this._zone.runOutsideAngular(() => new ɵWorkbenchView('view.999'));
+
+    // Subscribe to focused state
+    workbenchViewTestee.focused$
+      .pipe(take(2))
+      .subscribe(() => model.addEmission('Received focused state'));
+
+    const viewFocusedTopic = ɵWorkbenchCommands.viewFocusedTopic(workbenchViewTestee.id);
+
+    // Simulate first emission
+    await Beans.get(MessageClient).publish(viewFocusedTopic, true);
+    //  Wait until received first emission
+    await firstValueFrom(workbenchViewTestee.focused$);
+    // Simulate second emission
+    await Beans.get(MessageClient).publish(viewFocusedTopic, false);
   }
 }
 

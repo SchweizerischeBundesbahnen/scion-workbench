@@ -28,7 +28,7 @@ test.describe('Workbench View', () => {
 
   test('should complete view Observables on navigation', async ({appPO, microfrontendNavigator, consoleLogs}) => {
     // Observable completion expectations:
-    // - should complete params$, capability$, active$ observables only when navigating to a view capability of a different app
+    // - should complete params$, capability$, active$, focused$ observables only when navigating to a view capability of a different app
     // - should complete title$, heading$, dirty$ and closable$ observables when navigating to a different view capability
     await appPO.navigateTo({microfrontendSupport: true});
 
@@ -117,10 +117,12 @@ test.describe('Workbench View', () => {
       `[ParamsObservableComplete] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[CapabilityObservableComplete] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[ActiveObservableComplete] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
+      `[FocusedObservableComplete] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
 
       `[ParamsObservableComplete] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
       `[CapabilityObservableComplete] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
       `[ActiveObservableComplete] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
+      `[FocusedObservableComplete] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
 
       `[TitleObservableComplete] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
       `[HeadingObservableComplete] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
@@ -143,6 +145,7 @@ test.describe('Workbench View', () => {
       `[ParamsObservableComplete] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
       `[CapabilityObservableComplete] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
       `[ActiveObservableComplete] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
+      `[FocusedObservableComplete] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
 
       `[TitleObservableComplete] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
       `[HeadingObservableComplete] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,

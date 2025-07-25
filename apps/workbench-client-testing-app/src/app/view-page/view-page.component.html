@@ -18,6 +18,10 @@
   <sci-form-field label="Path">
     <span class="e2e-path">{{location.path()}}</span>
   </sci-form-field>
+
+  <sci-form-field label="Focused">
+    <input [ngModel]="focused()" disabled>
+  </sci-form-field>
 </section>
 
 @if (view.capability$ | async; as capability) {

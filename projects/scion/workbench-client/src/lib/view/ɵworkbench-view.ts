@@ -37,6 +37,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
   private _canCloseSubscription: Subscription | undefined;
 
   public active$: Observable<boolean>;
+  public focused$: Observable<boolean>;
   public partId$: Observable<PartId>;
   public params$: Observable<ReadonlyMap<string, any>>;
   public capability$: Observable<WorkbenchViewCapability>;
@@ -44,6 +45,8 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
   public snapshot: ViewSnapshot = {
     params: new Map<string, any>(),
     partId: undefined!,
+    active: false,
+    focused: false,
   };
 
   constructor(public id: ViewId) {
@@ -74,6 +77,14 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
         takeUntil(this._beforeUnload$),
       );
 
+    this.focused$ = Beans.get(MessageClient).observe$<boolean>(ɵWorkbenchCommands.viewFocusedTopic(this.id))
+      .pipe(
+        mapToBody(),
+        shareReplay({refCount: false, bufferSize: 1}),
+        decorateObservable(),
+        takeUntil(this._beforeUnload$),
+      );
+
     this.partId$ = Beans.get(MessageClient).observe$<PartId>(ɵWorkbenchCommands.viewPartIdTopic(this.id))
       .pipe(
         mapToBody(),
@@ -89,6 +100,14 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
     this.params$
       .pipe(takeUntil(this._destroy$))
       .subscribe(params => this.snapshot.params = new Map(params));
+    // Update active snapshot when the active state changes.
+    this.active$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(active => this.snapshot.active = active);
+    // Update active snapshot when the active state changes.
+    this.focused$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(focused => this.snapshot.focused = focused);
     // Detect navigation to a different view capability of the same app.
     // Do NOT use `capability$` observable to detect capability change, as its lookup is asynchronous.
     this.params$
