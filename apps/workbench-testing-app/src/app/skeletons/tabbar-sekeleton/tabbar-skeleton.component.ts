@@ -31,7 +31,7 @@ export class TabbarSkeletonComponent {
   public readonly tabs = input.required<number>();
   public readonly selectedTab = model.required<number>();
 
-  protected readonly active = inject(WorkbenchView, {optional: true})?.part().active ?? inject(WorkbenchPart, {optional: true})?.active ?? signal(false);
+  protected readonly active = inject(WorkbenchView, {optional: true})?.focused ?? inject(WorkbenchPart, {optional: true})?.focused ?? signal(false);
 
   protected onTabSelect(index: number): void {
     this.selectedTab.set(index);
