@@ -1,11 +1,21 @@
 <wb-workbench>
   @switch (desktop()) {
-    @case ('legacyStartPage') {
+    @case ('legacy-start-page') {
       <!-- No longer required with the removal of legacy start page support. -->
     }
     @case ('desktop-page') {
       <ng-template wbDesktop>
         <app-desktop-page/>
+      </ng-template>
+    }
+    @case ('focus-page') {
+      <ng-template wbDesktop>
+        <app-focus-test-page/>
+      </ng-template>
+    }
+    @case ('layout-page') {
+      <ng-template wbDesktop>
+        <app-layout-page/>
       </ng-template>
     }
     @default {

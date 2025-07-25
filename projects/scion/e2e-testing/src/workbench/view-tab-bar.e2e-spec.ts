@@ -19,7 +19,7 @@ import {waitForCondition} from '../helper/testing.util';
 
 test.describe('View Tabbar', () => {
 
-  test('should activate the most recent view when closing a view', async ({appPO, workbenchNavigator}) => {
+  test('should activate the last used view when closing a view', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
 
@@ -219,7 +219,7 @@ test.describe('View Tabbar', () => {
     });
   });
 
-  test('should activate the view to the left of the view that is dragged out of the tab bar', async ({appPO, workbenchNavigator}) => {
+  test('should activate the view to the right of the view that is dragged out of the tab bar', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective(factory => factory
@@ -242,7 +242,7 @@ test.describe('View Tabbar', () => {
           root: new MPart({
             id: 'part.part',
             views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.4'}],
-            activeViewId: 'view.2',
+            activeViewId: 'view.4',
           }),
           activePartId: 'part.part',
         },
@@ -539,7 +539,7 @@ test.describe('View Tabbar', () => {
       await expect.poll(() => tabbar.getHiddenTabCount()).toBeGreaterThan(0);
 
       // Expect first tab to be active and scrolled into view.
-      await expect.poll(() => tab1.isActive()).toBe(true);
+      await expect(tab1.state('active')).toBeVisible();
       await expect.poll(() => tab1.isScrolledIntoView()).toBe(true);
 
       // Drag tab to the end, scrolling the viewport.
@@ -569,7 +569,7 @@ test.describe('View Tabbar', () => {
       ]);
 
       // Expect tab to be fully scrolled into view.
-      await expect.poll(() => tab1.isActive()).toBe(true);
+      await expect(tab1.state('active')).toBeVisible();
       await expect.poll(() => tab1.isScrolledIntoView()).toBe(true);
     });
 
@@ -596,7 +596,7 @@ test.describe('View Tabbar', () => {
       await expect.poll(() => appPO.part({partId: 'part.left'}).bar.getHiddenTabCount()).toBeGreaterThan(1);
 
       // Expect first tab to be active and scrolled into view.
-      await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.isActive()).toBe(true);
+      await expect(appPO.view({viewId: 'view.101'}).tab.state('active')).toBeVisible();
       await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.isScrolledIntoView()).toBe(true);
 
       // Open new tab at the end.
@@ -604,7 +604,7 @@ test.describe('View Tabbar', () => {
       await routerPage.navigate(['test-view'], {partId: 'part.left', target: 'view.999', position: 'end'});
 
       // Expect new tab to be active and scrolled into view.
-      await expect.poll(() => appPO.view({viewId: 'view.999'}).tab.isActive()).toBe(true);
+      await expect(appPO.view({viewId: 'view.999'}).tab.state('active')).toBeVisible();
       await expect.poll(() => appPO.view({viewId: 'view.999'}).tab.isScrolledIntoView()).toBe(true);
     });
 
@@ -635,7 +635,7 @@ test.describe('View Tabbar', () => {
       await routerPage.navigate(['test-pages/navigation-test-page', {title: 'Workbench Navigation Test Page (long title)'}], {target: 'view.110'});
 
       // Expect tab to be fully scrolled into view.
-      await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isActive()).toBe(true);
+      await expect(appPO.view({viewId: 'view.110'}).tab.state('active')).toBeVisible();
       await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isScrolledIntoView()).toBe(true);
     });
 
@@ -662,14 +662,14 @@ test.describe('View Tabbar', () => {
       await expect.poll(() => appPO.part({partId: 'part.left'}).bar.getHiddenTabCount()).toBeGreaterThan(1);
 
       // Expect last tab to be active and scrolled into view.
-      await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isActive()).toBe(true);
+      await expect(appPO.view({viewId: 'view.110'}).tab.state('active')).toBeVisible();
       await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isScrolledIntoView()).toBe(true);
 
       // Reload the application.
       await appPO.reload();
 
       // Expect last tab to be active and scrolled into view.
-      await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isActive()).toBe(true);
+      await expect(appPO.view({viewId: 'view.110'}).tab.state('active')).toBeVisible();
       await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isScrolledIntoView()).toBe(true);
     });
 
@@ -696,19 +696,19 @@ test.describe('View Tabbar', () => {
       await expect.poll(() => appPO.part({partId: 'part.left'}).bar.getHiddenTabCount()).toBeGreaterThan(1);
 
       // Expect "view.103" to be active and scrolled into view.
-      await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isActive()).toBe(true);
+      await expect(appPO.view({viewId: 'view.103'}).tab.state('active')).toBeVisible();
       await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isScrolledIntoView()).toBe(true);
 
       // Activate the last tab (view.110).
       await appPO.view({viewId: 'view.110'}).tab.click();
-      await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isActive()).toBe(true);
+      await expect(appPO.view({viewId: 'view.110'}).tab.state('active')).toBeVisible();
       await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isScrolledIntoView()).toBe(true);
 
       // Close the active tab (view.110).
       await appPO.view({viewId: 'view.110'}).tab.close();
 
       // Expect "view.103" to be active and scrolled into view.
-      await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isActive()).toBe(true);
+      await expect(appPO.view({viewId: 'view.103'}).tab.state('active')).toBeVisible();
       await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isScrolledIntoView()).toBe(true);
     });
 
@@ -738,7 +738,7 @@ test.describe('View Tabbar', () => {
       await appPO.part({partId: 'part.left'}).bar.viewTabBar.setViewportScrollLeft(Number.MAX_SAFE_INTEGER);
 
       // Expect "view.103" to be active and scrolled out of view.
-      await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isActive()).toBe(true);
+      await expect(appPO.view({viewId: 'view.103'}).tab.state('active')).toBeVisible();
       await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isScrolledIntoView()).toBe(false);
 
       // Navigate the active tab (view.103).
@@ -746,7 +746,7 @@ test.describe('View Tabbar', () => {
       await routerPage.navigate(['test-view', {navigated: true}], {target: 'view.103'});
 
       // Expect active tab to be scrolled into view.
-      await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isActive()).toBe(true);
+      await expect(appPO.view({viewId: 'view.103'}).tab.state('active')).toBeVisible();
       await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isScrolledIntoView()).toBe(true);
     });
 
@@ -774,7 +774,7 @@ test.describe('View Tabbar', () => {
 
       // Expect last tab to be active and scrolled into view.
       await appPO.view({viewId: 'view.110'}).tab.click();
-      await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isActive()).toBe(true);
+      await expect(appPO.view({viewId: 'view.110'}).tab.state('active')).toBeVisible();
       await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isScrolledIntoView()).toBe(true);
 
       // Scroll tabbar to the start.
@@ -787,7 +787,7 @@ test.describe('View Tabbar', () => {
       await appPO.view({viewId: 'view.103'}).tab.close();
 
       // Expect active tab (last tab) to be active but not scrolled into view.
-      await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isActive()).toBe(true);
+      await expect(appPO.view({viewId: 'view.110'}).tab.state('active')).toBeVisible();
       await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isScrolledIntoView()).toBe(false);
     });
 
@@ -814,7 +814,7 @@ test.describe('View Tabbar', () => {
       await expect.poll(() => appPO.part({partId: 'part.left'}).bar.getHiddenTabCount()).toBeGreaterThan(1);
 
       // Expect first tab to be active and scrolled into view.
-      await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.isActive()).toBe(true);
+      await expect(appPO.view({viewId: 'view.101'}).tab.state('active')).toBeVisible();
       await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.isScrolledIntoView()).toBe(true);
 
       // Scroll tabbar to the end.
@@ -825,7 +825,7 @@ test.describe('View Tabbar', () => {
       await routerPage.navigate(['test-view'], {partId: 'part.left', target: 'view.999', position: 'end', activate: false});
 
       // Expect first tab to be active but not scrolled into view.
-      await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.isActive()).toBe(true);
+      await expect(appPO.view({viewId: 'view.101'}).tab.state('active')).toBeVisible();
       await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.isScrolledIntoView()).toBe(false);
     });
   });

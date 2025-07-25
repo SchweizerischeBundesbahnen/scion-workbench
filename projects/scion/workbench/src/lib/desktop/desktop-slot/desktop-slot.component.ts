@@ -8,10 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, viewChild} from '@angular/core';
+import {Component, DOCUMENT, ElementRef, inject, viewChild} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {OnAttach, OnDetach} from '../../portal/wb-component-portal';
+import {trackFocus} from '../../focus/workbench-focus-tracker.service';
 import {WorkbenchDesktop} from '../workbench-desktop.model';
 import {NgTemplateOutlet} from '@angular/common';
 import {Logger} from '../../logging';
@@ -33,11 +34,18 @@ export class DesktopSlotComponent implements OnAttach, OnDetach {
 
   protected readonly desktop = inject(WorkbenchDesktop);
 
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
+  private readonly _document = inject(DOCUMENT);
   private readonly _viewport = viewChild.required(SciViewportComponent);
   private readonly _logger = inject(Logger);
 
   private _scrollTop = 0;
   private _scrollLeft = 0;
+  private _activeElementBeforeDetach: HTMLElement | undefined;
+
+  constructor() {
+    trackFocus(this._host, null);
+  }
 
   /**
    * Method invoked after attached this component to the DOM.
@@ -45,6 +53,9 @@ export class DesktopSlotComponent implements OnAttach, OnDetach {
   public onAttach(): void {
     this._viewport().scrollTop = this._scrollTop;
     this._viewport().scrollLeft = this._scrollLeft;
+
+    this._activeElementBeforeDetach?.focus();
+    this._activeElementBeforeDetach = undefined;
   }
 
   /**
@@ -53,6 +64,11 @@ export class DesktopSlotComponent implements OnAttach, OnDetach {
   public onDetach(): void {
     this._scrollTop = this._viewport().scrollTop;
     this._scrollLeft = this._viewport().scrollLeft;
+
+    const activeElement = this._document.activeElement;
+    if (this._host.contains(activeElement) && activeElement instanceof HTMLElement) {
+      this._activeElementBeforeDetach = activeElement;
+    }
   }
 
   protected onLegacyDesktopActivate(): void {

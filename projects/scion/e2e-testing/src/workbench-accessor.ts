@@ -9,7 +9,7 @@
  */
 
 import {Page} from '@playwright/test';
-import {PartId, ViewId, WorkbenchService} from '@scion/workbench';
+import {DialogId, PartId, PopupId, ViewId, WorkbenchService} from '@scion/workbench';
 import {RequireOne} from './helper/utility-types';
 
 /**
@@ -18,6 +18,13 @@ import {RequireOne} from './helper/utility-types';
 export class WorkbenchAccessor {
 
   constructor(private _page: Page) {
+  }
+
+  public activeElement(): Promise<PartId | ViewId | DialogId | PopupId | null> {
+    return this._page.evaluate(() => {
+      const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
+      return workbenchService.activeElement()?.id ?? null;
+    });
   }
 
   public closeViews(...viewIds: ViewId[]): Promise<boolean> {
@@ -30,12 +37,12 @@ export class WorkbenchAccessor {
   /**
    * Finds views based on given criteria.
    */
-  public views(findBy?: {id?: ViewId; alternativeId?: string}): Promise<E2EWorkbenchView[]> {
+  public views(findBy?: {viewId?: ViewId; alternativeId?: string}): Promise<WorkbenchViewE2E[]> {
     return this._page.evaluate(findBy => {
       const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
       return workbenchService.views()
         .filter(view => {
-          if (findBy?.id && findBy.id !== view.id) {
+          if (findBy?.viewId && findBy.viewId !== view.id) {
             return false;
           }
           if (findBy?.alternativeId && findBy.alternativeId !== view.alternativeId) {
@@ -47,9 +54,11 @@ export class WorkbenchAccessor {
           id: view.id,
           alternativeId: view.alternativeId,
           partId: view.part().id,
+          activationInstant: view.activationInstant(),
           navigation: {
             path: view.navigation()?.path.join('/'),
             hint: view.navigation()?.hint,
+            state: view.navigation()?.state,
           },
         }));
     }, findBy);
@@ -58,12 +67,12 @@ export class WorkbenchAccessor {
   /**
    * Finds parts based on given criteria.
    */
-  public parts(findBy?: {id?: PartId; alternativeId?: string}): Promise<E2EWorkbenchPart[]> {
+  public parts(findBy?: {partId?: PartId; alternativeId?: string}): Promise<WorkbenchPartE2E[]> {
     return this._page.evaluate(findBy => {
       const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
       return workbenchService.parts()
         .filter(part => {
-          if (findBy?.id && findBy.id !== part.id) {
+          if (findBy?.partId && findBy.partId !== part.id) {
             return false;
           }
           if (findBy?.alternativeId && findBy.alternativeId !== part.alternativeId) {
@@ -74,9 +83,11 @@ export class WorkbenchAccessor {
         .map(part => ({
           id: part.id,
           alternativeId: part.alternativeId,
+          activationInstant: part.activationInstant(),
           navigation: {
             path: part.navigation()?.path.join('/'),
             hint: part.navigation()?.hint,
+            state: part.navigation()?.state,
           },
         }));
     }, findBy);
@@ -85,7 +96,7 @@ export class WorkbenchAccessor {
   /**
    * Finds a view based on given criteria, throwing an error if none or multiple views are found.
    */
-  public async view(findBy: RequireOne<{id: ViewId; alternativeId: string}>): Promise<E2EWorkbenchView> {
+  public async view(findBy: RequireOne<{viewId: ViewId; alternativeId: string}>): Promise<WorkbenchViewE2E> {
     const views = await this.views(findBy);
     if (!views.length) {
       throw Error(`[PageObjectError] No view found: ${JSON.stringify(findBy)}`);
@@ -99,7 +110,7 @@ export class WorkbenchAccessor {
   /**
    * Finds a part based on given criteria, throwing an error if none or multiple parts are found.
    */
-  public async part(findBy: RequireOne<{id: PartId; alternativeId: string}>): Promise<E2EWorkbenchPart> {
+  public async part(findBy: RequireOne<{partId: PartId; alternativeId: string}>): Promise<WorkbenchPartE2E> {
     const parts = await this.parts(findBy);
     if (!parts.length) {
       throw Error(`[PageObjectError] No part found: ${JSON.stringify(findBy)}`);
@@ -109,22 +120,51 @@ export class WorkbenchAccessor {
     }
     return parts[0]!;
   }
+
+  /**
+   * Activates specified part.
+   */
+  public activatePart(partId: PartId): Promise<boolean> {
+    return this._page.evaluate(partId => {
+      const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
+      return workbenchService.getPart(partId)!.activate();
+    }, partId);
+  }
+
+  /**
+   * Activates specified view.
+   */
+  public activateView(viewId: ViewId): Promise<boolean> {
+    return this._page.evaluate(viewId => {
+      const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
+      return workbenchService.getView(viewId)!.activate();
+    }, viewId);
+  }
 }
 
-export interface E2EWorkbenchView {
+export interface WorkbenchViewE2E {
   id: ViewId;
   alternativeId: string | undefined;
   partId: PartId;
-  navigation: E2EWorkbenchViewNavigation;
+  activationInstant: number;
+  navigation: WorkbenchViewNavigationE2E;
 }
 
-export interface E2EWorkbenchPart {
+export interface WorkbenchPartE2E {
   id: PartId;
   alternativeId: string | undefined;
-  navigation: E2EWorkbenchViewNavigation;
+  activationInstant: number;
+  navigation: WorkbenchPartNavigationE2E;
 }
 
-export interface E2EWorkbenchViewNavigation {
+export interface WorkbenchViewNavigationE2E {
   path?: string;
   hint?: string;
+  state?: Record<string, unknown>;
+}
+
+export interface WorkbenchPartNavigationE2E {
+  path?: string;
+  hint?: string;
+  state?: Record<string, unknown>;
 }

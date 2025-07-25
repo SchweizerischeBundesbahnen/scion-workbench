@@ -12,9 +12,11 @@ import {Locator} from '@playwright/test';
 import {PopupPO} from '../../../popup.po';
 import {ViewPO} from '../../../view.po';
 import {DialogPO} from '../../../dialog.po';
+import {PartPO} from '../../../part.po';
 import {WorkbenchDialogPagePO} from '../workbench-dialog-page.po';
 import {WorkbenchViewPagePO} from '../workbench-view-page.po';
 import {WorkbenchPopupPagePO} from '../workbench-popup-page.po';
+import {DesktopPO} from '../../../desktop.po';
 
 /**
  * Page object to interact with {@link FocusTestPageComponent}.
@@ -27,7 +29,7 @@ export class FocusTestPagePO implements WorkbenchViewPagePO, WorkbenchDialogPage
   public middleField: Locator;
   public lastField: Locator;
 
-  constructor(private _locateBy: ViewPO | DialogPO | PopupPO) {
+  constructor(private _locateBy: PartPO | ViewPO | DialogPO | PopupPO | DesktopPO) {
     this.locator = _locateBy.locator.locator('app-focus-test-page');
     this.firstField = this.locator.locator('input.e2e-first-field');
     this.middleField = this.locator.locator('input.e2e-middle-field');

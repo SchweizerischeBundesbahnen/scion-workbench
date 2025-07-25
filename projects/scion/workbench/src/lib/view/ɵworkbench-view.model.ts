@@ -16,9 +16,8 @@ import {WorkbenchView, WorkbenchViewNavigation} from './workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {WbComponentPortal} from '../portal/wb-component-portal';
-import {AbstractType, assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, Type, untracked} from '@angular/core';
+import {AbstractType, afterRenderEffect, assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, Type, untracked} from '@angular/core';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
-import {ActivationInstantProvider} from '../activation-instant.provider';
 import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
@@ -37,6 +36,8 @@ import {Logger} from '../logging/logger';
 import {WORKBENCH_VIEW_MENU_ITEM_REGISTRY} from './workbench-view-menu-item.registry';
 import {Translatable} from '../text/workbench-text-provider.model';
 import {ViewSlotComponent} from './view-slot.component';
+import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
+import {WORKBENCH_POPUP_REGISTRY} from '../popup/workbench-popup.registry';
 
 export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
@@ -48,8 +49,8 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _rootOutletContexts = inject(ChildrenOutletContexts);
   private readonly _partRegistry = inject(WORKBENCH_PART_REGISTRY);
   private readonly _viewDragService = inject(ViewDragService);
-  private readonly _activationInstantProvider = inject(ActivationInstantProvider);
   private readonly _workbenchDialogRegistry = inject(WorkbenchDialogRegistry);
+  private readonly _focusMonitor = inject(WorkbenchFocusMonitor);
   private readonly _logger = inject(Logger);
 
   private readonly _adapters = new Map<Type<unknown> | AbstractType<unknown>, unknown>();
@@ -60,8 +61,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _closable = signal(true);
   private readonly _blockedBy: Signal<ɵWorkbenchDialog | null>;
   private readonly _scrolledIntoView = signal(true);
-
-  private _activationInstant: number | undefined;
 
   public alternativeId: string | undefined;
   public readonly navigation = signal<WorkbenchViewNavigation | undefined>(undefined);
@@ -74,7 +73,9 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public readonly last = computed(() => this.position() === this.part().views().length - 1);
 
   public readonly part = signal<ɵWorkbenchPart>(null!);
+  public readonly activationInstant = signal(0);
   public readonly active = signal<boolean>(false);
+  public readonly focused = computed(() => this._focusMonitor.activeElement()?.id === this.id);
   public readonly menuItems: Signal<WorkbenchMenuItem[]>;
   public readonly blockedBy$: Observable<ɵWorkbenchDialog | null>;
   public readonly slot: {portal: WbComponentPortal<ViewSlotComponent>};
@@ -94,9 +95,10 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     this.menuItems = this.computeMenuItems();
     this._blockedBy = toSignal(inject(WorkbenchDialogRegistry).top$({viewId: this.id}), {requireSync: true});
     this.blockedBy$ = toObservable<ɵWorkbenchDialog | null>(this._blockedBy);
-    this.touchOnActivate();
     this.installModelUpdater();
     this.onLayoutChange({layout});
+    this.activateOnFocus();
+    this.focusOnActivate();
   }
 
   private createPortal(): WbComponentPortal<ViewSlotComponent> {
@@ -125,6 +127,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
     this.part.set(this._partRegistry.get(mPart.id));
     this.active.set(mPart.activeViewId === this.id);
+    this.activationInstant.set(mView.activationInstant ?? 0);
 
     // TODO [#626]: Remove assignment and change `alternativeId` to read only when resolved the issue #626
     this.alternativeId = mView.alternativeId;
@@ -161,6 +164,11 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     if (!this.active() && this.slot.portal.constructed() && routeChanged) {
       this._workbenchRouter.getCurrentNavigationContext().registerPostNavigationAction(() => this.slot.portal.componentRef()!.changeDetectorRef.detectChanges());
     }
+  }
+
+  public focus(): void {
+    assertNotInReactiveContext(this.focus, 'Call WorkbenchView.focus() in a non-reactive (non-tracking) context, such as within the untracked() function.');
+    this.slot.portal.componentRef()?.instance.focus();
   }
 
   /**
@@ -233,19 +241,17 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   /** @inheritDoc */
   public async activate(options?: {skipLocationChange?: boolean}): Promise<boolean> {
     assertNotInReactiveContext(this.activate, 'Call WorkbenchView.activate() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    if (this.active() && this.part().active()) {
+
+    if (this.active() && this.part().active() && this.focused() && this._layout().isLatestActivationInstant(this.activationInstant())) {
       return true;
     }
 
+    const skipLocationChange = options?.skipLocationChange ?? this.active();
     const currentLayout = this._layout();
     return this._workbenchRouter.navigate(
       layout => currentLayout === layout ? layout.activateView(this.id, {activatePart: true}) : null, // cancel navigation if the layout has become stale
-      {skipLocationChange: options?.skipLocationChange},
+      {skipLocationChange},
     );
-  }
-
-  public get activationInstant(): number | undefined {
-    return this._activationInstant;
   }
 
   /** @inheritDoc */
@@ -361,20 +367,8 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     return adapter ? adapter as T : null;
   }
 
-  /** @inheritDoc */
-  public get destroyed(): boolean {
-    return this.slot.portal.destroyed();
-  }
-
-  /**
-   * Updates the activation instant when this view is activated.
-   */
-  private touchOnActivate(): void {
-    effect(() => {
-      if (this.active()) {
-        this._activationInstant = this._activationInstantProvider.now();
-      }
-    });
+  public get destroyed(): Signal<boolean> {
+    return this.slot.portal.destroyed;
   }
 
   /**
@@ -430,6 +424,68 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
           navigationContext.registerUndoAction(() => this.onLayoutChange({layout: previousLayout, route: previousRoute!, previousRoute: route}));
         }
       });
+  }
+
+  /**
+   * Focuses this view when activated, either by focus or routing.
+   */
+  private activateOnFocus(): void {
+    effect(() => {
+      if (this.focused()) {
+        untracked(() => void this.activate());
+      }
+    });
+  }
+
+  /**
+   * Focuses this view when activated, either by focus or routing.
+   */
+  private focusOnActivate(): void {
+    const dialogRegistry = inject(WorkbenchDialogRegistry);
+    const popupRegistry = inject(WORKBENCH_POPUP_REGISTRY);
+
+    afterRenderEffect(() => {
+      const activationInstant = this.activationInstant();
+
+      // Request focus only once attached to the DOM.
+      if (!this.slot.portal.attached()) {
+        return;
+      }
+
+      untracked(() => {
+        // Do not request focus if no interaction has occurred yet.
+        if (!activationInstant) {
+          return;
+        }
+
+        // Do not request focus if already focused.
+        if (this.focused()) {
+          return;
+        }
+
+        // Do not request focus if the part is inactive, such as closed activities.
+        if (!this.part().active()) {
+          return;
+        }
+
+        // Do not request focus if the view is blocked by a dialog.
+        if (dialogRegistry.dialogs().some(dialog => !dialog.context.view || dialog.context.view === this)) {
+          return;
+        }
+
+        // Do not request focus if a popup is opened within this view.
+        if (popupRegistry.objects().some(popup => popup.context.view === this)) {
+          return;
+        }
+
+        // Do not request focus if not the most recently interacted element, avoiding stale focus requests when switching perspectives.
+        if (!this._layout().isLatestActivationInstant(activationInstant) && !this._layout().isLatestActivationInstant(this.part().activationInstant())) {
+          return;
+        }
+
+        this.focus();
+      });
+    });
   }
 
   public destroy(): void {

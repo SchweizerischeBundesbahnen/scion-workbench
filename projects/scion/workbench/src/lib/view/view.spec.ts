@@ -321,9 +321,9 @@ describe('View', () => {
     await waitUntilStable();
 
     // Expect view 1 and view 2 not to be destroyed.
-    expect(view1.destroyed).toBeFalse();
+    expect(view1.destroyed()).toBeFalse();
     expect(view1.getComponent<SpecViewComponent>()!.destroyed).toBeFalse();
-    expect(view2.destroyed).toBeFalse();
+    expect(view2.destroyed()).toBeFalse();
     expect(view2.getComponent<SpecViewComponent>()!.destroyed).toBeFalse();
     const viewComponent1 = view1.getComponent();
 
@@ -332,9 +332,9 @@ describe('View', () => {
     await waitUntilStable();
 
     // Expect view 1 and view 2 not to be destroyed.
-    expect(view1.destroyed).toBeFalse();
+    expect(view1.destroyed()).toBeFalse();
     expect(view1.getComponent<SpecViewComponent>()!.destroyed).toBeFalse();
-    expect(view2.destroyed).toBeFalse();
+    expect(view2.destroyed()).toBeFalse();
     expect(view2.getComponent<SpecViewComponent>()!.destroyed).toBeFalse();
 
     // Activate view 1.
@@ -342,9 +342,9 @@ describe('View', () => {
     await waitUntilStable();
 
     // Expect view 1 and view 2 not to be destroyed.
-    expect(view1.destroyed).toBeFalse();
+    expect(view1.destroyed()).toBeFalse();
     expect(view1.getComponent<SpecViewComponent>()!.destroyed).toBeFalse();
-    expect(view2.destroyed).toBeFalse();
+    expect(view2.destroyed()).toBeFalse();
     expect(view2.getComponent<SpecViewComponent>()!.destroyed).toBeFalse();
 
     // Expect view 1 not be constructed anew.
@@ -372,7 +372,7 @@ describe('View', () => {
     const component = view.getComponent<SpecViewComponent>()!;
 
     // Expect component not to be destroyed.
-    expect(view.destroyed).toBeFalse();
+    expect(view.destroyed()).toBeFalse();
     expect(component.destroyed).toBeFalse();
 
     // Close the view.
@@ -380,7 +380,7 @@ describe('View', () => {
     await waitUntilStable();
 
     // Expect component to be destroyed.
-    expect(view.destroyed).toBeTrue();
+    expect(view.destroyed()).toBeTrue();
     expect(component.destroyed).toBeTrue();
     expect(view.getComponent<SpecViewComponent>()).toBeNull();
   });
@@ -564,7 +564,7 @@ describe('View', () => {
     await waitUntilStable();
 
     // Expect view not to be closed.
-    expect(view.destroyed).toBeFalse();
+    expect(view.destroyed()).toBeFalse();
     expect(component.destroyed).toBeFalse();
     expect(fixture).toShow(SpecViewComponent);
 
@@ -574,7 +574,7 @@ describe('View', () => {
     await waitUntilStable();
 
     // Expect view to be closed.
-    expect(view.destroyed).toBeTrue();
+    expect(view.destroyed()).toBeTrue();
     expect(component.destroyed).toBeTrue();
     expect(fixture).not.toShow(SpecViewComponent);
   });
@@ -605,7 +605,7 @@ describe('View', () => {
     await waitUntilStable();
 
     // Expect view not to be closed.
-    expect(view.destroyed).toBeFalse();
+    expect(view.destroyed()).toBeFalse();
     expect(component.destroyed).toBeFalse();
     expect(fixture).toShow(SpecViewComponent);
 
@@ -615,7 +615,7 @@ describe('View', () => {
     await waitUntilStable();
 
     // Expect view to be closed.
-    expect(view.destroyed).toBeTrue();
+    expect(view.destroyed()).toBeTrue();
     expect(component.destroyed).toBeTrue();
     expect(fixture).not.toShow(SpecViewComponent);
   });
@@ -661,7 +661,7 @@ describe('View', () => {
     await waitUntilStable();
 
     // Expect view not to be closed.
-    expect(view.destroyed).toBeFalse();
+    expect(view.destroyed()).toBeFalse();
     expect(component.destroyed).toBeFalse();
     expect(fixture).toShow(SpecViewComponent);
 
@@ -671,7 +671,7 @@ describe('View', () => {
     await waitUntilStable();
 
     // Expect view to be closed.
-    expect(view.destroyed).toBeTrue();
+    expect(view.destroyed()).toBeTrue();
     expect(component.destroyed).toBeTrue();
     expect(fixture).not.toShow(SpecViewComponent);
   });
@@ -708,7 +708,7 @@ describe('View', () => {
     await fixture.whenStable();
 
     // Expect view not to be closed.
-    expect(view.destroyed).toBeFalse();
+    expect(view.destroyed()).toBeFalse();
     expect(fixture).toShow(SpecViewComponent);
 
     // Close the message box.
@@ -717,7 +717,7 @@ describe('View', () => {
     await waitUntilStable();
 
     // Expect view not to be closed.
-    expect(view.destroyed).toBeFalse();
+    expect(view.destroyed()).toBeFalse();
     expect(fixture).toShow(SpecViewComponent);
 
     // Close the view.
@@ -725,7 +725,7 @@ describe('View', () => {
     await fixture.whenStable();
 
     // Expect view to be closed.
-    expect(view.destroyed).toBeTrue();
+    expect(view.destroyed()).toBeTrue();
     expect(fixture).not.toShow(SpecViewComponent);
   });
 
@@ -760,7 +760,7 @@ describe('View', () => {
     await fixture.whenStable();
 
     // Expect view not to be closed.
-    expect(view.destroyed).toBeFalse();
+    expect(view.destroyed()).toBeFalse();
     expect(fixture).toShow(SpecViewComponent);
 
     // Close the message box.
@@ -769,7 +769,7 @@ describe('View', () => {
     await waitUntilStable();
 
     // Expect view not to be closed.
-    expect(view.destroyed).toBeFalse();
+    expect(view.destroyed()).toBeFalse();
     expect(fixture).toShow(SpecViewComponent);
 
     // Close the view.
@@ -777,7 +777,7 @@ describe('View', () => {
     await fixture.whenStable();
 
     // Expect view to be closed.
-    expect(view.destroyed).toBeTrue();
+    expect(view.destroyed()).toBeTrue();
     expect(fixture).not.toShow(SpecViewComponent);
   });
 
@@ -813,7 +813,7 @@ describe('View', () => {
     await fixture.whenStable();
 
     // Expect view not to be closed.
-    expect(view.destroyed).toBeFalse();
+    expect(view.destroyed()).toBeFalse();
     expect(fixture).toShow(SpecViewComponent);
 
     // Close the dialog.
@@ -822,7 +822,7 @@ describe('View', () => {
     await waitUntilStable();
 
     // Expect view not to be closed.
-    expect(view.destroyed).toBeFalse();
+    expect(view.destroyed()).toBeFalse();
     expect(fixture).toShow(SpecViewComponent);
 
     // Close the view.
@@ -830,7 +830,7 @@ describe('View', () => {
     await fixture.whenStable();
 
     // Expect view to be closed.
-    expect(view.destroyed).toBeTrue();
+    expect(view.destroyed()).toBeTrue();
     expect(fixture).not.toShow(SpecViewComponent);
   });
 
@@ -865,7 +865,7 @@ describe('View', () => {
     await fixture.whenStable();
 
     // Expect view not to be closed.
-    expect(view.destroyed).toBeFalse();
+    expect(view.destroyed()).toBeFalse();
     expect(fixture).toShow(SpecViewComponent);
 
     // Close the dialog.
@@ -874,7 +874,7 @@ describe('View', () => {
     await waitUntilStable();
 
     // Expect view not to be closed.
-    expect(view.destroyed).toBeFalse();
+    expect(view.destroyed()).toBeFalse();
     expect(fixture).toShow(SpecViewComponent);
 
     // Close the view.
@@ -882,7 +882,7 @@ describe('View', () => {
     await fixture.whenStable();
 
     // Expect view to be closed.
-    expect(view.destroyed).toBeTrue();
+    expect(view.destroyed()).toBeTrue();
     expect(fixture).not.toShow(SpecViewComponent);
   });
 

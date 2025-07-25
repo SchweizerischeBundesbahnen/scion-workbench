@@ -1,4 +1,4 @@
-import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchPopupCapability} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchPopupCapability} from '@scion/workbench-client';
 import {Capability, Manifest} from '@scion/microfrontend-platform';
 
 /**
@@ -43,6 +43,19 @@ export const workbenchManifest: Manifest = {
       description: 'Represents a popup provided by the host app that has an invalid path.',
       properties: {
         path: 'does/not/exist',
+      },
+    } satisfies WorkbenchPopupCapability,
+    // TODO [#271]: Remove this popup capability when implemented the issue #271
+    {
+      type: WorkbenchCapabilities.Popup,
+      qualifier: {
+        component: 'host-popup',
+        variant: 'focus-page',
+      },
+      private: false,
+      description: 'Represents a popup provided by the host app that displays the focus test page.',
+      properties: {
+        path: 'test-pages/focus-test-page',
       },
     } satisfies WorkbenchPopupCapability,
     // TODO [#271]: Remove this dialog capability when implemented the issue #271
@@ -128,7 +141,7 @@ export const workbenchManifest: Manifest = {
       properties: {
         path: 'test-host-message-box;matrixParam=:param',
       },
-    },
+    } satisfies WorkbenchMessageBoxCapability,
     // TODO [#271]: Remove this messagebox capability when implemented the issue #271
     {
       type: WorkbenchCapabilities.MessageBox,
@@ -141,7 +154,7 @@ export const workbenchManifest: Manifest = {
       properties: {
         path: 'does/not/exist',
       },
-    },
+    } satisfies WorkbenchMessageBoxCapability,
     // TODO [#271]: Remove this messagebox capability when implemented the issue #271
     {
       type: WorkbenchCapabilities.MessageBox,
@@ -162,7 +175,20 @@ export const workbenchManifest: Manifest = {
           maxWidth: '355px',
         },
       },
-    },
+    } satisfies WorkbenchMessageBoxCapability,
+    // TODO [#271]: Remove this messagebox capability when implemented the issue #271
+    {
+      type: WorkbenchCapabilities.MessageBox,
+      qualifier: {
+        component: 'host-messagebox',
+        variant: 'focus-page',
+      },
+      private: false,
+      description: 'Represents a message box provided by the host app that displays the focus test page.',
+      properties: {
+        path: 'test-pages/focus-test-page',
+      },
+    } satisfies WorkbenchMessageBoxCapability,
   ],
   intentions: [
     // allow opening test views

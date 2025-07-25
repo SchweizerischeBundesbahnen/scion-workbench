@@ -133,6 +133,7 @@ test.describe('Workbench Part Action', () => {
     const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     await test.step('register action in view.101', async () => {
+      await layoutPage.view.tab.click();
       await layoutPage.registerPartAction('Action 1', {viewId: 'view.101', cssClass: 'e2e-action-1'});
 
       // Expect the action-1 to be displayed only in the left part
@@ -142,6 +143,7 @@ test.describe('Workbench Part Action', () => {
     });
 
     await test.step('register action in view.101 and view.103', async () => {
+      await layoutPage.view.tab.click();
       await layoutPage.registerPartAction('Action 2', {viewId: ['view.101', 'view.103'], cssClass: 'e2e-action-2'});
 
       // Expect the action-1 to be displayed only in the left part
@@ -156,6 +158,7 @@ test.describe('Workbench Part Action', () => {
     });
 
     await test.step('register action in initial part', async () => {
+      await layoutPage.view.tab.click();
       await layoutPage.registerPartAction('Action 3', {viewId: await viewPage1.view.getViewId(), cssClass: 'e2e-action-3'});
       await viewPage1.view.tab.click();
 
@@ -268,6 +271,7 @@ test.describe('Workbench Part Action', () => {
 
     // Open a view
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    await layoutPage.view.tab.click();
     await layoutPage.registerPartAction('View Action', {viewId: await viewPage.view.getViewId(), cssClass: 'e2e-action-view'});
 
     // Drag the view
@@ -287,6 +291,7 @@ test.describe('Workbench Part Action', () => {
 
     // Open a view
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    await layoutPage.view.tab.click();
     await layoutPage.registerPartAction('View Action', {viewId: await viewPage.view.getViewId(), cssClass: 'e2e-action-view'});
 
     // Drag the view

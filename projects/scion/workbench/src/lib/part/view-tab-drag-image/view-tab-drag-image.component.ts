@@ -38,8 +38,9 @@ import {PartId} from '../../workbench.identifiers';
     IconComponent,
   ],
   host: {
+    '[attr.data-viewid]': 'view().id',
+    '[attr.data-active]': `view().active() ? '' : null`,
     '[class.view-drag]': 'true',
-    '[class.active]': 'true',
     '[class.can-drop]': 'canDrop()',
     '[class.drag-over-tabbar]': 'isDragOverTabbar()',
     '[class.drag-over-peripheral-tabbar]': 'isDragOverPeripheralTabbar()',

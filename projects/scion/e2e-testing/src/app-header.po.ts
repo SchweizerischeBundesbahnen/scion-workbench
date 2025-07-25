@@ -50,16 +50,9 @@ export class AppHeaderPO {
   }
 
   /**
-   * Configures how to align the bottom activity panel.
+   * Opens the settings menu.
    */
-  public async setPanelAlignment(alignment: 'left' | 'right' | 'center' | 'justify'): Promise<void> {
-    await this.clickSettingMenuItem({cssClass: `e2e-change-panel-alignment-${alignment}`});
-  }
-
-  /**
-   * Clicks specified setting in settings menu.
-   */
-  public async clickSettingMenuItem(locateBy: {cssClass: string}, options?: {check?: boolean}): Promise<void> {
+  public async openSettingsMenu(): Promise<Locator> {
     const menu = this._locator.page()
       .locator('.e2e-application-menu') // CDK overlay
       .locator('app-menu');
@@ -70,6 +63,14 @@ export class AppHeaderPO {
       // Wait until the menu is opened.
       await menu.waitFor({state: 'visible'});
     }
+    return menu;
+  }
+
+  /**
+   * Clicks specified setting in settings menu.
+   */
+  public async clickSettingMenuItem(locateBy: {cssClass: string}, options?: {check?: boolean}): Promise<void> {
+    const menu = await this.openSettingsMenu();
 
     // Locate the menu item.
     const menuItem = menu.locator(`button.e2e-menu-item.${locateBy.cssClass}`);

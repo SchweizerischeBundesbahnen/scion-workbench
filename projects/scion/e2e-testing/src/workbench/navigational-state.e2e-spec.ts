@@ -174,20 +174,19 @@ test.describe('Navigational State', () => {
       await workbenchNavigator.createPerspective(factory => factory
         .addPart('part.left')
         .addPart('part.right', {align: 'right'})
-        .addView('router', {partId: 'part.left', cssClass: 'router'})
-        .addView('testee', {partId: 'part.right', cssClass: 'testee'})
-        .navigateView('router', ['test-router'])
-        .navigateView('testee', ['test-view']),
+        .addView('view.1', {partId: 'part.left', cssClass: 'router'})
+        .addView('view.2', {partId: 'part.right', cssClass: 'testee'})
+        .navigateView('view.1', ['test-router'])
+        .navigateView('view.2', ['test-view']),
       );
-
-      const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
-
-      const routerPage = new RouterPagePO(appPO, {cssClass: 'router'});
+      const viewPage = new ViewPagePO(appPO, {viewId: 'view.2'});
+      const routerPage = new RouterPagePO(appPO, {viewId: 'view.1'});
       await routerPage.navigate(['test-view'], {
-        target: 'testee',
+        target: 'view.2',
         state: {'state': 'a'},
+        activate: false,
       });
-      await expect.poll(() => viewPage.getNavigationState()).toEqual({state: 'a'});
+      await expect.poll(() => appPO.view({viewId: 'view.2'}).navigation().then(navigation => navigation.state)).toEqual({state: 'a'});
 
       // Move the view to the left and back again, simulating navigation without explicitly setting the state.
       // When navigating back, expect the view state to be restored.
@@ -195,28 +194,30 @@ test.describe('Navigational State', () => {
       await viewPage.view.tab.moveTo('part.right');
 
       await routerPage.navigate(['test-view'], {
-        target: 'testee',
+        target: 'view.2',
         state: {'state': 'b'},
+        activate: false,
       });
-      await expect.poll(() => viewPage.getNavigationState()).toEqual({state: 'b'});
+      await expect.poll(() => appPO.view({viewId: 'view.2'}).navigation().then(navigation => navigation.state)).toEqual({state: 'b'});
 
       await routerPage.navigate(['test-view'], {
-        target: 'testee',
+        target: 'view.2',
         state: {'state': 'c'},
+        activate: false,
       });
-      await expect.poll(() => viewPage.getNavigationState()).toEqual({state: 'c'});
+      await expect.poll(() => appPO.view({viewId: 'view.2'}).navigation().then(navigation => navigation.state)).toEqual({state: 'c'});
 
       await appPO.navigateBack();
-      await expect.poll(() => viewPage.getNavigationState()).toEqual({state: 'b'});
+      await expect.poll(() => appPO.view({viewId: 'view.2'}).navigation().then(navigation => navigation.state)).toEqual({state: 'b'});
 
       await appPO.navigateBack();
-      await expect.poll(() => viewPage.getNavigationState()).toEqual({state: 'a'});
+      await expect.poll(() => appPO.view({viewId: 'view.2'}).navigation().then(navigation => navigation.state)).toEqual({state: 'a'});
 
       await appPO.navigateForward();
-      await expect.poll(() => viewPage.getNavigationState()).toEqual({state: 'b'});
+      await expect.poll(() => appPO.view({viewId: 'view.2'}).navigation().then(navigation => navigation.state)).toEqual({state: 'b'});
 
       await appPO.navigateForward();
-      await expect.poll(() => viewPage.getNavigationState()).toEqual({state: 'c'});
+      await expect.poll(() => appPO.view({viewId: 'view.2'}).navigation().then(navigation => navigation.state)).toEqual({state: 'c'});
     });
 
     test('should maintain state when navigating through the Angular router', async ({appPO, workbenchNavigator}) => {
@@ -396,46 +397,40 @@ test.describe('Navigational State', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // Add part.
-      await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('part.testee', {align: 'right'})
-        .addPart('part.left', {align: 'left'})
-        .addView('view.100', {partId: 'part.left'})
-        .navigateView('view.100', ['test-layout']),
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.left')
+        .addPart('part.right', {align: 'right'})
+        .addView('view.1', {partId: 'part.left'})
+        .navigatePart('part.right', ['test-part'])
+        .navigateView('view.1', ['test-layout']),
       );
 
-      const layoutPage = new LayoutPagePO(appPO, {viewId: 'view.100'});
-      const partPage = new PartPagePO(appPO, {partId: 'part.testee'});
-      await expect.poll(() => partPage.getNavigationState()).toEqual({});
+      const layoutPage = new LayoutPagePO(appPO.view({viewId: 'view.1'}));
+      await expect.poll(() => appPO.part({partId: 'part.right'}).navigation().then(navigation => navigation.state)).toEqual({});
 
       // Navigate part with state 'a'.
-      await layoutPage.modifyLayout(layout => layout
-        .navigatePart('part.testee', ['test-part'], {state: {state: 'a'}}),
-      );
-      await expect.poll(() => partPage.getNavigationState()).toEqual({state: 'a'});
+      await layoutPage.modifyLayout(layout => layout.navigatePart('part.right', ['test-part'], {state: {state: 'a'}}));
+      await expect.poll(() => appPO.part({partId: 'part.right'}).navigation().then(navigation => navigation.state)).toEqual({state: 'a'});
 
       // Navigate part with state 'b'.
-      await layoutPage.modifyLayout(layout => layout
-        .navigatePart('part.testee', ['test-part'], {state: {state: 'b'}}),
-      );
-      await expect.poll(() => partPage.getNavigationState()).toEqual({state: 'b'});
+      await layoutPage.modifyLayout(layout => layout.navigatePart('part.right', ['test-part'], {state: {state: 'b'}}));
+      await expect.poll(() => appPO.part({partId: 'part.right'}).navigation().then(navigation => navigation.state)).toEqual({state: 'b'});
 
       // Navigate part with state 'c'.
-      await layoutPage.modifyLayout(layout => layout
-        .navigatePart('part.testee', ['test-part'], {state: {state: 'c'}}),
-      );
-      await expect.poll(() => partPage.getNavigationState()).toEqual({state: 'c'});
+      await layoutPage.modifyLayout(layout => layout.navigatePart('part.right', ['test-part'], {state: {state: 'c'}}));
+      await expect.poll(() => appPO.part({partId: 'part.right'}).navigation().then(navigation => navigation.state)).toEqual({state: 'c'});
 
       await appPO.navigateBack();
-      await expect.poll(() => partPage.getNavigationState()).toEqual({state: 'b'});
+      await expect.poll(() => appPO.part({partId: 'part.right'}).navigation().then(navigation => navigation.state)).toEqual({state: 'b'});
 
       await appPO.navigateBack();
-      await expect.poll(() => partPage.getNavigationState()).toEqual({state: 'a'});
+      await expect.poll(() => appPO.part({partId: 'part.right'}).navigation().then(navigation => navigation.state)).toEqual({state: 'a'});
 
       await appPO.navigateForward();
-      await expect.poll(() => partPage.getNavigationState()).toEqual({state: 'b'});
+      await expect.poll(() => appPO.part({partId: 'part.right'}).navigation().then(navigation => navigation.state)).toEqual({state: 'b'});
 
       await appPO.navigateForward();
-      await expect.poll(() => partPage.getNavigationState()).toEqual({state: 'c'});
+      await expect.poll(() => appPO.part({partId: 'part.right'}).navigation().then(navigation => navigation.state)).toEqual({state: 'c'});
     });
   });
 });

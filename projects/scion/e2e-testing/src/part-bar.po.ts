@@ -24,12 +24,14 @@ export class PartBarPO {
   public readonly viewListButton: Locator;
   public readonly minimizeButton: Locator;
   public readonly title: Locator;
+  public readonly filler: Locator;
 
   constructor(public locator: Locator, public part: PartPO) {
     this.viewTabBar = new ViewTabBarPO(this.locator.locator('wb-view-tab-bar'));
     this.viewListButton = this.locator.locator('wb-view-list-button');
     this.minimizeButton = this.locator.locator(':scope > button.e2e-minimize');
     this.title = this.locator.locator(':scope > span.e2e-title');
+    this.filler = this.locator.locator(':scope > div.e2e-filler');
   }
 
   /**

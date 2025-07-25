@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DestroyRef, effect, ElementRef, inject, Provider, untracked, viewChild} from '@angular/core';
+import {afterRenderEffect, Component, DestroyRef, DOCUMENT, ElementRef, inject, Provider, untracked, viewChild} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ViewMenuService} from '../part/view-context-menu/view-menu.service';
@@ -21,6 +21,7 @@ import {WorkbenchView} from './workbench-view.model';
 import {OnAttach, OnDetach} from '../portal/wb-component-portal';
 import {synchronizeCssClasses} from '../common/css-class.util';
 import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-context.directive';
+import {FocusTrackerRef, trackFocus} from '../focus/workbench-focus-tracker.service';
 
 /**
  * Acts as a placeholder for a view's content that Angular fills based on the current router state of the associated view outlet.
@@ -40,6 +41,7 @@ import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-co
   ],
   host: {
     '[attr.data-viewid]': 'view.id',
+    '[attr.data-active]': `view.active() ? '' : null`,
     '[class.view-drag]': 'viewDragService.dragging()',
   },
   providers: [
@@ -51,16 +53,28 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
   protected readonly view = inject(ɵWorkbenchView);
   protected readonly viewDragService = inject(ViewDragService);
 
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
+  private readonly _document = inject(DOCUMENT);
   private readonly _viewport = viewChild.required(SciViewportComponent);
+  private readonly _focusTrackerRef: FocusTrackerRef;
 
   private _scrollTop = 0;
   private _scrollLeft = 0;
+  private _activeElementBeforeDetach: HTMLElement | undefined;
 
   constructor() {
+    this._focusTrackerRef = trackFocus(this._host, this.view);
+
     this.installComponentLifecycleLogger();
     this.installMenuAccelerators();
-    this.installOnActivateView();
+    this.unsetActiveElementOnPartDeactivate();
     this.addHostCssClasses();
+  }
+
+  public focus(): void {
+    if (!this._host.contains(this._document.activeElement)) {
+      this._viewport().focus();
+    }
   }
 
   /**
@@ -69,6 +83,11 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
   public onAttach(): void {
     this._viewport().scrollTop = this._scrollTop;
     this._viewport().scrollLeft = this._scrollLeft;
+
+    if (this.view.focused()) {
+      this._activeElementBeforeDetach?.focus();
+      this._activeElementBeforeDetach = undefined;
+    }
   }
 
   /**
@@ -77,12 +96,12 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
   public onDetach(): void {
     this._scrollTop = this._viewport().scrollTop;
     this._scrollLeft = this._viewport().scrollLeft;
-  }
 
-  private onActivateView(): void {
-    // Gain focus only if in the active part.
-    if (this.view.part().active()) {
-      this._viewport().focus();
+    if (this.view.focused()) {
+      const activeElement = this._document.activeElement;
+      if (this._host.contains(activeElement) && activeElement instanceof HTMLElement) {
+        this._activeElementBeforeDetach = activeElement;
+      }
     }
   }
 
@@ -90,17 +109,22 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
     inject(ViewMenuService).installMenuAccelerators(inject(ElementRef), this.view);
   }
 
-  private installOnActivateView(): void {
-    effect(() => {
-      if (this.view.active()) {
-        untracked(() => this.onActivateView());
-      }
-    });
-  }
-
   private addHostCssClasses(): void {
     const host = inject(ElementRef).nativeElement as HTMLElement;
     synchronizeCssClasses(host, this.view.classList.asList);
+  }
+
+  /**
+   * Unsets the active workbench element if this view was the focused element when its part is deactivated,
+   * such as when closing the activity containing this view. Otherwise, the active element would not be unset.
+   */
+  private unsetActiveElementOnPartDeactivate(): void {
+    afterRenderEffect(() => {
+      const partActive = this.view.part().active();
+      if (!partActive) {
+        untracked(() => this._focusTrackerRef.unsetActiveElement());
+      }
+    });
   }
 
   private installComponentLifecycleLogger(): void {

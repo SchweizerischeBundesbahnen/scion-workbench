@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertNotInReactiveContext, ElementRef, EnvironmentInjector, inject, Injector, StaticProvider, Type, ViewContainerRef} from '@angular/core';
+import {assertNotInReactiveContext, computed, ElementRef, EnvironmentInjector, inject, Injector, Signal, StaticProvider, Type, ViewContainerRef} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {PopupOrigin} from './popup.origin';
 import {Arrays} from '@scion/toolkit/util';
@@ -18,6 +18,7 @@ import {map} from 'rxjs/operators';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
 import {Blockable} from '../glass-pane/blockable';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
+import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
 import {PopupId, ViewId} from '../workbench.identifiers';
 
 /**
@@ -179,6 +180,11 @@ export interface PopupSize {
 export abstract class Popup<T = unknown, R = unknown> {
 
   /**
+   * Unique identity of this popup.
+   */
+  public abstract readonly id: PopupId;
+
+  /**
    * Input data as passed by the popup opener when opened the popup, or `undefined` if not passed.
    */
   public abstract readonly input: T | undefined;
@@ -192,6 +198,11 @@ export abstract class Popup<T = unknown, R = unknown> {
    * CSS classes associated with the popup.
    */
   public abstract readonly cssClasses: string[];
+
+  /**
+   * Indicates whether this popup has the focus.
+   */
+  public abstract readonly focused: Signal<boolean>;
 
   /**
    * Sets a result that will be passed to the popup opener when the popup is closed on focus loss {@link CloseStrategy#onFocusLost}.
@@ -210,11 +221,15 @@ export abstract class Popup<T = unknown, R = unknown> {
 export class ɵPopup<T = unknown, R = unknown> implements Popup<T, R>, Blockable {
 
   private readonly _popupEnvironmentInjector = inject(EnvironmentInjector);
-  private readonly _context = {
+  private readonly _focusMonitor = inject(WorkbenchFocusMonitor);
+  public readonly context = {
     view: inject(ɵWorkbenchView, {optional: true}),
   };
 
+  private _destroyed = false;
+
   public readonly cssClasses: string[];
+  public readonly focused = computed(() => this._focusMonitor.activeElement()?.id === this.id);
 
   /**
    * Indicates whether this popup is blocked by dialog(s) that overlay it.
@@ -232,9 +247,9 @@ export class ɵPopup<T = unknown, R = unknown> implements Popup<T, R>, Blockable
    */
   private blockWhenDialogOpened(): void {
     const workbenchDialogRegistry = inject(WorkbenchDialogRegistry);
-    const initialTop = workbenchDialogRegistry.top({viewId: this._context.view?.id});
+    const initialTop = workbenchDialogRegistry.top({viewId: this.context.view?.id});
 
-    workbenchDialogRegistry.top$({viewId: this._context.view?.id})
+    workbenchDialogRegistry.top$({viewId: this.context.view?.id})
       .pipe(
         map(top => top === initialTop ? null : top),
         takeUntilDestroyed(),
@@ -283,6 +298,9 @@ export class ɵPopup<T = unknown, R = unknown> implements Popup<T, R>, Blockable
    * Destroys this popup and associated resources.
    */
   public destroy(): void {
-    this._popupEnvironmentInjector.destroy();
+    if (!this._destroyed) { // TODO [Angular 21] Destroy property not required anymore because EnvironmentInjector has a destroyed property.
+      this._destroyed = true;
+      this._popupEnvironmentInjector.destroy();
+    }
   }
 }

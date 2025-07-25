@@ -179,13 +179,13 @@ test.describe('Workbench View', () => {
     const viewPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
 
     await viewPage.markDirty(true);
-    await expect.poll(() => viewPage.view.tab.isDirty()).toBe(true);
+    await expect(viewPage.view.tab.state('dirty')).toBeVisible();
 
     await viewPage.markDirty(false);
-    await expect.poll(() => viewPage.view.tab.isDirty()).toBe(false);
+    await expect(viewPage.view.tab.state('dirty')).not.toBeVisible();
 
     await viewPage.markDirty(); // noarg
-    await expect.poll(() => viewPage.view.tab.isDirty()).toBe(true);
+    await expect(viewPage.view.tab.state('dirty')).toBeVisible();
   });
 
   test('should allow updating the viewtab closable flag', async ({appPO, microfrontendNavigator}) => {

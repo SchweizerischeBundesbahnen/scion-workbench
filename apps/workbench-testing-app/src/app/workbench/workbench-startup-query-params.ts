@@ -43,11 +43,6 @@ export const WorkbenchStartupQueryParams = {
   STANDALONE_QUERY_PARAM: 'standalone',
 
   /**
-   * Query param to register perspectives. Multiple perspectives are separated by semicolon.
-   */
-  PERSPECTIVES_QUERY_PARAM: 'perspectives',
-
-  /**
    * Query param to read provided design tokens.
    */
   DESIGN_TOKENS: 'designTokens',
@@ -79,8 +74,10 @@ export const WorkbenchStartupQueryParams = {
    * Query param to control which desktop component to display. Defaults to {@link StartPageComponent}.
    *
    * Available desktops:
-   * - 'legacyStartPage': Displays the start page using a primary router-outlet. No longer required with the removal of legacy start page support.
+   * - 'legacy-start-page': Displays the start page using a primary router-outlet. No longer required with the removal of legacy start page support.
    * - 'desktop-page': Displays the 'DesktopPageComponent'.
+   * - 'focus-page': Displays {@link FocusTestPageComponent}.
+   * - 'layout-page': Displays {@link LayoutPageComponent}.
    */
   DESKTOP: 'desktop',
 
@@ -112,13 +109,6 @@ export const WorkbenchStartupQueryParams = {
    */
   standalone: (): boolean => {
     return booleanAttribute(new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.STANDALONE_QUERY_PARAM));
-  },
-
-  /**
-   * Reads perspectives to register from query params.
-   */
-  perspectiveIds: (): string[] => {
-    return new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.PERSPECTIVES_QUERY_PARAM)?.split(';').filter(Boolean) ?? [];
   },
 
   /**

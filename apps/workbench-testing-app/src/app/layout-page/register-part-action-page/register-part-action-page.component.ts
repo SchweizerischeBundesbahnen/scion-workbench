@@ -18,6 +18,7 @@ import {SettingsService} from '../../settings.service';
 import {MultiValueInputComponent} from '../../multi-value-input/multi-value-input.component';
 import {UUID} from '@scion/toolkit/uuid';
 import {Arrays} from '@scion/toolkit/util';
+import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 
 @Component({
   selector: 'app-register-part-action-page',
@@ -66,7 +67,7 @@ export default class RegisterPartActionPageComponent {
       if (canMatchPartIds && !Arrays.coerce(canMatchPartIds).includes(part.id)) {
         return false;
       }
-      if (canMatchViewIds && (!part.activeViewId() || !Arrays.coerce(canMatchViewIds).includes(part.activeViewId()!))) {
+      if (canMatchViewIds && (!part.activeView() || !Arrays.coerce(canMatchViewIds).includes(part.activeView()!.id))) {
         return false;
       }
       if (canMatchGrid && canMatchGrid !== (part.peripheral() ? 'main' : 'mainArea')) {
@@ -76,7 +77,18 @@ export default class RegisterPartActionPageComponent {
     };
 
     try {
-      this.workbenchService.registerPartAction(part => matchesContext(part) ? {content: TextComponent, inputs: {text: content}, align, cssClass} : null);
+      const buttonMatch = /^<button>(?<ligature>.+)<\/button>$/.exec(content);
+      this.workbenchService.registerPartAction(part => {
+        if (!matchesContext(part)) {
+          return null;
+        }
+        if (buttonMatch) {
+          return {content: MaterialButtonComponent, inputs: {ligature: buttonMatch.groups!['ligature']!}, align, cssClass};
+        }
+        else {
+          return {content: TextComponent, inputs: {text: content}, align, cssClass};
+        }
+      });
       this.registerError = false;
       this.resetForm();
     }
@@ -99,4 +111,16 @@ export default class RegisterPartActionPageComponent {
 class TextComponent {
 
   public readonly text = input.required<string>();
+}
+
+@Component({
+  selector: 'app-mat-button',
+  template: '<button sciMaterialIcon>{{ligature()}}</button>',
+  imports: [
+    SciMaterialIconDirective,
+  ],
+})
+class MaterialButtonComponent {
+
+  public readonly ligature = input.required<string>();
 }

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, effect, inject, signal, untracked, WritableSignal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject, Injector, runInInjectionContext, signal, untracked, WritableSignal} from '@angular/core';
 import {PerspectiveData} from '../workbench.perspectives';
 import {MenuItem, MenuItemSeparator} from '../menu/menu-item';
 import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-params';
@@ -40,6 +40,7 @@ export class HeaderComponent {
   private readonly _wbRouter = inject(WorkbenchRouter);
   private readonly _menuService = inject(MenuService);
   private readonly _settingsService = inject(SettingsService);
+  private readonly _injector = inject(Injector);
   private readonly _logger = inject(Logger);
 
   protected readonly workbenchService = inject(WorkbenchService);
@@ -197,6 +198,12 @@ export class HeaderComponent {
         onAction: () => this._settingsService.toggle('resetFormsOnSubmit'),
       }),
       new MenuItem({
+        text: 'Highlight Focus',
+        cssClass: 'e2e-highlight-focus',
+        checked: this._settingsService.isEnabled('highlightFocus'),
+        onAction: () => this._settingsService.toggle('highlightFocus'),
+      }),
+      new MenuItem({
         text: 'Display Skeletons in Sample View',
         checked: this._settingsService.isEnabled('displaySkeletons'),
         onAction: () => {
@@ -204,6 +211,12 @@ export class HeaderComponent {
           // Perform navigation for Angular to evaluate `CanMatch` guards.
           void inject(Router).navigate([{outlets: {}}], {skipLocationChange: true});
         },
+      }),
+      new MenuItem({
+        text: 'Show Test Perspectives',
+        cssClass: 'e2e-show-test-perspectives',
+        checked: this._settingsService.isEnabled('showTestPerspectives'),
+        onAction: () => this._settingsService.toggle('showTestPerspectives'),
       }),
       new MenuItem({
         text: 'Log Angular Change Detection Cycles',
@@ -256,11 +269,13 @@ export class HeaderComponent {
   private findPerspectiveSwitcherMenuItems(): Array<MenuItem | MenuItemSeparator> {
     const groupLabels = new Map<string, string>()
       .set('docked-parts-layout', 'Layout with Parts Docked to the Side')
-      .set('peripheral-part-layout', 'Layout with Parts Around the Main Area');
-
+      .set('peripheral-part-layout', 'Layout with Parts Around the Main Area')
+      .set('test-perspectives', 'Test Perspectives');
     const menuItems = new Array<MenuItem | MenuItemSeparator>();
 
     [...this.workbenchService.perspectives()]
+      // Filter perspectives based on the visible flag.
+      .filter(perspective => runInInjectionContext(this._injector, () => isPerspectiveVisible(perspective)))
       // Sort perspectives.
       .sort(comparePerspectives)
       // Group perspectives.
@@ -281,6 +296,11 @@ export class HeaderComponent {
       });
     return menuItems;
   }
+}
+
+function isPerspectiveVisible(perspective: WorkbenchPerspective): boolean {
+  const visible = perspective.data[PerspectiveData.visible] as boolean | (() => boolean) | undefined ?? true;
+  return typeof visible === 'function' ? visible() : visible;
 }
 
 async function runIfMenuClosed(openFn: () => Promise<void>, state: WritableSignal<'open' | 'closed'>): Promise<void> {

@@ -41,6 +41,7 @@ export class MicrofrontendDialogComponent {
   public readonly capability = input.required<WorkbenchDialogCapability>();
   public readonly params = input.required<Map<string, unknown>>();
 
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _outletRouter = inject(OutletRouter);
   private readonly _logger = inject(Logger);
   private readonly _routerOutletElement = viewChild.required<ElementRef<SciRouterOutletElement>>('router_outlet');
@@ -124,6 +125,13 @@ export class MicrofrontendDialogComponent {
         this.dialog.padding = properties.padding ?? false;
       });
     });
+  }
+
+  protected onFocusWithin(event: Event): void {
+    const {detail: focusWithin} = event as CustomEvent<boolean>;
+    if (focusWithin) {
+      this._host.dispatchEvent(new CustomEvent('sci-microfrontend-focusin', {bubbles: true}));
+    }
   }
 
   private propagateWorkbenchTheme(): void {

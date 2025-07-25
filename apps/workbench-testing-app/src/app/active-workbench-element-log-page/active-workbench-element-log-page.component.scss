@@ -1,0 +1,17 @@
+:host {
+  display: grid;
+
+  > textarea {
+    padding: .5em;
+    border: none;
+    outline: none;
+  }
+}
+
+label.follow-tail {
+  display: flex;
+  gap: .5em;
+  align-items: center;
+  user-select: none;
+  font-size: smaller;
+}

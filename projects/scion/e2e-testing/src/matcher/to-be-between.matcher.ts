@@ -7,12 +7,12 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ExpectationResult} from './custom-matchers.definition';
+import {MatcherReturnType} from 'playwright/types/test';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toBeBetween}.
  */
-export function toBeBetween(actual: number, expectedFrom: number, expectedTo: number): ExpectationResult {
+export function toBeBetween(actual: number, expectedFrom: number, expectedTo: number): MatcherReturnType {
   if (actual >= expectedFrom && actual <= expectedTo) {
     return {
       pass: true,

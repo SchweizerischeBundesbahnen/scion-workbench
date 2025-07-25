@@ -9,7 +9,7 @@
  */
 
 /**
- * Represents a migration to migrate a workbench object to the next version.
+ * Represents a migration to migrate a workbench element to the next version.
  */
 export interface WorkbenchMigration {
 

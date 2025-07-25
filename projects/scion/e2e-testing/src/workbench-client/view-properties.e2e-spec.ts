@@ -109,7 +109,7 @@ test.describe('Workbench View Properties', () => {
         target: viewId,
         params: {dirty: 'true,false'},
       });
-      await expect.poll(() => appPO.view({viewId}).tab.isDirty()).toBe(false);
+      await expect(appPO.view({viewId}).tab.state('dirty')).not.toBeVisible();
     });
 
     await test.step('navigating to new view [target="blank"]', async () => {
@@ -122,7 +122,7 @@ test.describe('Workbench View Properties', () => {
 
       const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
       const viewPropertiesTest = new ViewPropertiesTestPagePO(appPO, viewId);
-      await expect.poll(() => viewPropertiesTest.view.tab.isDirty()).toBe(false);
+      await expect(viewPropertiesTest.view.tab.state('dirty')).not.toBeVisible();
     });
   });
 
@@ -146,7 +146,7 @@ test.describe('Workbench View Properties', () => {
         target: viewId,
         params: {dirty: 'true,false,true'},
       });
-      await expect.poll(() => appPO.view({viewId}).tab.isDirty()).toBe(true);
+      await expect(appPO.view({viewId}).tab.state('dirty')).toBeVisible();
     });
 
     await test.step('navigating to new view [target="blank"]', async () => {
@@ -159,7 +159,7 @@ test.describe('Workbench View Properties', () => {
 
       const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
       const viewPropertiesTest = new ViewPropertiesTestPagePO(appPO, viewId);
-      await expect.poll(() => viewPropertiesTest.view.tab.isDirty()).toBe(true);
+      await expect(viewPropertiesTest.view.tab.state('dirty')).toBeVisible();
     });
   });
 

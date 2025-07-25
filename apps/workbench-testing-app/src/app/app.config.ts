@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationConfig, EnvironmentProviders, makeEnvironmentProviders} from '@angular/core';
+import {ApplicationConfig, EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
 import {PreloadAllModules, provideRouter, withHashLocation, withPreloading} from '@angular/router';
 import {routes} from './app.routes';
 import {workbenchConfig} from './workbench.config';
@@ -19,9 +19,10 @@ import {provideDevToolsInterceptor} from './devtools/devtools-capability-interce
 import {provideCustomNotificationIntentHandler} from './notification-page/notification-page-intent-handler';
 import {environment} from '../environments/environment';
 import {provideAnimations, provideNoopAnimations} from '@angular/platform-browser/animations';
-import {provideWorkbench} from '@scion/workbench';
+import {provideWorkbench, provideWorkbenchInitializer} from '@scion/workbench';
 import {provideMainAreaInitialPartId} from './workbench/main-area-initial-part-id.provider';
 import {provideDesignTokens} from './workbench/provide-design-tokens';
+import {ActiveWorkbenchElementCollector} from './active-workbench-element-log-page/active-workbench-element-collector.service';
 
 /**
  * Central place to configure the workbench-testing-app.
@@ -37,6 +38,7 @@ export const appConfig: ApplicationConfig = {
     provideWorkbenchLifecycleHookLoggers(),
     provideDevToolsInterceptor(),
     provideCustomNotificationIntentHandler(),
+    provideWorkbenchInitializer(() => void inject(ActiveWorkbenchElementCollector)),
     provideAnimationsIfEnabled(),
   ],
 };

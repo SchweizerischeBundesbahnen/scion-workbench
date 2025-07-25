@@ -168,6 +168,10 @@ export const routes: Routes = [
     loadComponent: () => import('./host-message-box-page/host-message-box-page.component'),
   },
   {
+    path: 'active-workbench-element-log',
+    loadComponent: () => import('./active-workbench-element-log-page/active-workbench-element-log-page.component'),
+  },
+  {
     path: 'test-pages',
     loadChildren: () => import('./test-pages/routes'),
   },

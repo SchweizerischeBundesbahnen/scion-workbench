@@ -18,7 +18,9 @@ import {ViewMoveDialogTestPageComponent} from '../test-pages/view-move-dialog-te
 import {ViewInfoDialogComponent} from '../view-info-dialog/view-info-dialog.component';
 import StartPageComponent from '../start-page/start-page.component';
 import {WorkbenchStartupQueryParams} from './workbench-startup-query-params';
+import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import {DesktopPageComponent} from '../desktop/desktop-page.component';
+import LayoutPageComponent from '../layout-page/layout-page.component';
 
 @Component({
   selector: 'app-workbench',
@@ -32,7 +34,9 @@ import {DesktopPageComponent} from '../desktop/desktop-page.component';
     WorkbenchViewMenuItemDirective,
     WorkbenchDesktopDirective,
     StartPageComponent,
+    FocusTestPageComponent,
     DesktopPageComponent,
+    LayoutPageComponent,
   ],
 })
 export class WorkbenchComponent implements OnDestroy {
@@ -41,7 +45,7 @@ export class WorkbenchComponent implements OnDestroy {
   private readonly _dialogService = inject(WorkbenchDialogService);
 
   protected readonly workbenchService = inject(WorkbenchService);
-  protected readonly desktop = this.readQueryParamFlag<'legacyStartPage' | 'desktop-page'>(WorkbenchStartupQueryParams.DESKTOP);
+  protected readonly desktop = this.readQueryParamFlag<'legacy-start-page' | 'desktop-page' | 'focus-page' | 'layout-page'>(WorkbenchStartupQueryParams.DESKTOP);
 
   constructor() {
     console.debug('[WorkbenchComponent#construct]');

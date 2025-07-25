@@ -13,6 +13,8 @@ import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchView} from './view/workbench-view.model';
 import {Injector, TemplateRef} from '@angular/core';
 import {WorkbenchPart} from './part/workbench-part.model';
+import {WorkbenchDialog} from './dialog/workbench-dialog';
+import {Popup} from './popup/popup.config';
 
 /**
  * The signature of a function to confirm closing a view., e.g., if dirty.
@@ -204,3 +206,8 @@ export interface WorkbenchTheme {
    */
   colorScheme: 'light' | 'dark';
 }
+
+/**
+ * Union of workbench elements.
+ */
+export type WorkbenchElement = WorkbenchPart | WorkbenchView | WorkbenchDialog | Popup;

@@ -35,6 +35,7 @@ import {Blocking} from '../glass-pane/blocking';
 import {provideViewContext} from '../view/view-context-provider';
 import {boundingClientRect} from '@scion/components/dimension';
 import {Translatable} from '../text/workbench-text-provider.model';
+import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
 import {DialogId} from '../workbench.identifiers';
 
 /** @inheritDoc */
@@ -48,6 +49,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   private readonly _workbenchConfig = inject(WorkbenchConfig);
   private readonly _destroyRef = new ɵDestroyRef();
   private readonly _blink$ = new Subject<void>();
+  private readonly _focusMonitor = inject(WorkbenchFocusMonitor);
   private readonly _attached: Signal<boolean>;
   private readonly _title = signal<Translatable | undefined>(undefined);
   private readonly _closable = signal(true);
@@ -66,6 +68,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
    */
   public readonly blockedBy$ = new BehaviorSubject<ɵWorkbenchDialog | null>(null);
   public readonly size: WorkbenchDialogSize = new ɵWorkbenchDialogSize();
+  public readonly focused = computed(() => this._focusMonitor.activeElement()?.id === this.id);
   public readonly blinking$ = new BehaviorSubject(false);
   public readonly context = {
     view: inject(ɵWorkbenchView, {optional: true}),
@@ -374,7 +377,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
    * Destroys this dialog and associated resources.
    */
   public destroy(): void {
-    if (!this._destroyRef.destroyed) {
+    if (!this._destroyRef.destroyed) { // TODO [Angular 21] DestroyRef not required anymore because EnvironmentInjector has a destroyed property.
       this._dialogEnvironmentInjector.destroy();
       this._destroyRef.destroy();
       this._overlayRef.dispose();

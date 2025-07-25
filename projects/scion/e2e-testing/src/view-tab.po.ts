@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DomRect, fromRect, getCssClasses, getPerspectiveId, hasCssClass} from './helper/testing.util';
+import {DomRect, fromRect, getCssClasses, getPerspectiveId} from './helper/testing.util';
 import {Locator, Page} from '@playwright/test';
 import {PartPO} from './part.po';
 import {ViewTabContextMenuPO} from './view-tab-context-menu.po';
@@ -78,17 +78,32 @@ export class ViewTabPO {
     await this.locator.dblclick();
   }
 
-  public async close(): Promise<void> {
+  /**
+   * Closes the view tab, optionally performing a programmatic click to not gain focus.
+   */
+  public async close(options?: {programmatic?: true}): Promise<void> {
+    const closeButton = this.locator.locator('.e2e-close');
     await this.locator.hover();
-    await this.locator.locator('.e2e-close').click();
+    if (options?.programmatic) {
+      await closeButton.evaluate((button: HTMLElement) => button.click());
+    }
+    else {
+      await closeButton.click();
+    }
   }
 
-  public isDirty(): Promise<boolean> {
-    return hasCssClass(this.locator, 'e2e-dirty');
-  }
-
-  public isActive(): Promise<boolean> {
-    return hasCssClass(this.locator, 'active');
+  /**
+   * Locates this view in the specified state.
+   */
+  public state(state: 'active' | 'dirty' | 'focus-within-view'): Locator {
+    switch (state) {
+      case 'active':
+        return this.locator.locator(':scope[data-active]');
+      case 'dirty':
+        return this.locator.locator(':scope[data-dirty]');
+      case 'focus-within-view':
+        return this.locator.locator(':scope[data-focus-within-view]');
+    }
   }
 
   /**

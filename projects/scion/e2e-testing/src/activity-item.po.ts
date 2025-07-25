@@ -15,17 +15,26 @@ import {Locator} from '@playwright/test';
  */
 export class ActivityItemPO {
 
-  public readonly button: Locator;
-
   constructor(public readonly locator: Locator) {
-    this.button = locator.locator('button');
   }
 
   public async click(): Promise<void> {
-    await this.button.click();
+    await this.locator.locator('button').click();
   }
 
   public getTooltip(): Promise<string | null> {
     return this.locator.getAttribute('title');
+  }
+
+  /**
+   * Locates this activity item in the specified state.
+   */
+  public state(state: 'active' | 'focus-within-activity'): Locator {
+    switch (state) {
+      case 'active':
+        return this.locator.locator(':scope[data-active]');
+      case 'focus-within-activity':
+        return this.locator.locator(':scope[data-focus-within-activity]');
+    }
   }
 }

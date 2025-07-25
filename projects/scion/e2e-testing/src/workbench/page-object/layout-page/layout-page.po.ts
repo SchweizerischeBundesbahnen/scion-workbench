@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../../../app.po';
 import {ViewPO} from '../../../view.po';
 import {Locator} from '@playwright/test';
 import {PartId, ViewId, WorkbenchLayout} from '@scion/workbench';
@@ -17,6 +16,8 @@ import {WorkbenchViewPagePO} from '../workbench-view-page.po';
 import {RegisterPartActionPagePO} from './register-part-action-page.po';
 import {ModifyLayoutPagePO} from './modify-layout-page.po';
 import {CreatePerspectivePagePO, PerspectiveDefinition} from './create-perspective-page.po';
+import {PartPO} from '../../../part.po';
+import {DesktopPO} from '../../../desktop.po';
 
 /**
  * Page object to interact with {@link LayoutPageComponent}.
@@ -26,12 +27,19 @@ export class LayoutPagePO implements WorkbenchViewPagePO {
   private readonly _tabbar: SciTabbarPO;
 
   public readonly locator: Locator;
-  public readonly view: ViewPO;
 
-  constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.locator = this.view.locator.locator('app-layout-page');
+  constructor(private _locateBy: ViewPO | PartPO | DesktopPO) {
+    this.locator = this._locateBy.locator.locator('app-layout-page');
     this._tabbar = new SciTabbarPO(this.locator.locator('sci-tabbar'));
+  }
+
+  public get view(): ViewPO {
+    if (this._locateBy instanceof ViewPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a view.');
+    }
   }
 
   /**
@@ -40,7 +48,6 @@ export class LayoutPagePO implements WorkbenchViewPagePO {
    * @see WorkbenchService.registerPerspective
    */
   public async createPerspective(id: string, definition: PerspectiveDefinition): Promise<void> {
-    await this.view.tab.click();
     await this._tabbar.selectTab('e2e-create-perspective');
 
     const createPerspectivePage = new CreatePerspectivePagePO(this.locator.locator('app-create-perspective-page'));
@@ -53,7 +60,6 @@ export class LayoutPagePO implements WorkbenchViewPagePO {
    * @see WorkbenchRouter.navigate
    */
   public async modifyLayout(fn: (layout: WorkbenchLayout) => WorkbenchLayout): Promise<void> {
-    await this.view.tab.click();
     await this._tabbar.selectTab('e2e-modify-layout');
 
     const modifyLayoutPage = new ModifyLayoutPagePO(this.locator.locator('app-modify-layout-page'));
@@ -61,7 +67,6 @@ export class LayoutPagePO implements WorkbenchViewPagePO {
   }
 
   public async registerPartAction(content: string, options?: {align?: 'start' | 'end'; viewId?: ViewId | ViewId[]; partId?: PartId | PartId[]; grid?: 'main' | 'mainArea'; cssClass?: string | string[]}): Promise<void> {
-    await this.view.tab.click();
     await this._tabbar.selectTab('e2e-register-part-action');
 
     const registerPartActionPage = new RegisterPartActionPagePO(this.locator.locator('app-register-part-action-page'));

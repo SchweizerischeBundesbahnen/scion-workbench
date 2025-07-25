@@ -17,6 +17,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {MessageBoxPageComponent} from '../message-box-page/message-box-page.component';
 import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
+import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 
 @Component({
   selector: 'app-message-box-opener-page',
@@ -80,10 +81,12 @@ export default class MessageBoxOpenerPageComponent {
     }
   }
 
-  private parseComponentFromUI(): Type<MessageBoxPageComponent> {
+  private parseComponentFromUI(): Type<unknown> {
     switch (this.form.controls.component.value) {
       case 'message-box-page':
         return MessageBoxPageComponent;
+      case 'focus-test-page':
+        return FocusTestPageComponent;
       default:
         throw Error(`[IllegalMessageBoxComponent] Message box component not supported: ${this.form.controls.component.value}`);
     }

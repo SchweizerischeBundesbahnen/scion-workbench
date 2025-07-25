@@ -603,7 +603,7 @@ test.describe('View Drag & Drop', () => {
 
     /** @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support. */
     test('should drop view on start page of the main area [deprecated]', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false, desktop: 'legacyStartPage'});
+      await appPO.navigateTo({microfrontendSupport: false, desktop: 'legacy-start-page'});
 
       await workbenchNavigator.createPerspective(factory => factory
         .addPart(MAIN_AREA)
@@ -995,7 +995,7 @@ test.describe('View Drag & Drop', () => {
 
     /** @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support. */
     test('should activate drop zone when dragging over the desktop of the main area [deprecated]', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial', desktop: 'legacyStartPage'});
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial', desktop: 'legacy-start-page'});
 
       await workbenchNavigator.createPerspective(layout => layout.addPart(MAIN_AREA));
       await workbenchNavigator.modifyLayout(layout => layout.addView('view.100', {partId: 'part.initial'}));
@@ -1080,7 +1080,7 @@ test.describe('View Drag & Drop', () => {
 
     /** @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support. */
     test('should activate drop zone when dragging over the desktop of the workbench [deprecated]', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false, desktop: 'legacyStartPage'});
+      await appPO.navigateTo({microfrontendSupport: false, desktop: 'legacy-start-page'});
 
       await workbenchNavigator.createPerspective(layout => layout
         .addPart('part.part')

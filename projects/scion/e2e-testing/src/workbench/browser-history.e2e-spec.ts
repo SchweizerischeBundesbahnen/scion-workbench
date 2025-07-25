@@ -16,6 +16,7 @@ import {MAIN_AREA} from '../workbench.model';
 import {expectView} from '../matcher/view-matcher';
 import {ViewPagePO} from './page-object/view-page.po';
 import {expect, Page} from '@playwright/test';
+import {ActiveWorkbenchElementLogPagePO} from './page-object/test-pages/active-workbench-element-log-page.po';
 
 test.describe('Browser Session History', () => {
 
@@ -302,6 +303,508 @@ test.describe('Browser Session History', () => {
 
     // Expect title to be set on the "new" view handle. Would have no effect if set on the "old" handle.
     await expect(appPO.view({viewId: 'view.1'}).tab.title).toHaveText('B');
+  });
+
+  /**
+   * This test clicks on active tabs located in different parts of the same grid, activating the containing part when clicked.
+   */
+  test('should not create entry in browser session history when clicking on active tabs located in different parts of the same grid', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right'})
+      .addPart('part.log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal', ɵactivityId: 'activity.log'})
+      .addView('view.1', {partId: 'part.left'})
+      .addView('view.2', {partId: 'part.right'})
+      .navigatePart('part.log', ['active-workbench-element-log']),
+    );
+
+    const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
+    const tab1 = appPO.view({viewId: 'view.1'}).tab;
+    const tab2 = appPO.view({viewId: 'view.2'}).tab;
+
+    // Open the activity panel, creating new entry in browser session history.
+    await appPO.activityItem({activityId: 'activity.log'}).click();
+    await logPart.clearLog();
+
+    // PRECONDITION: Expect the bottom panel to be opened.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        panels: {
+          bottom: 'opened',
+        },
+      },
+    });
+
+    // Click tab of 'view.1', not creating new entry in browser session history.
+    await tab1.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
+    await expect.poll(() => logPart.getLog()).toEqual(['view.1']);
+
+    // Click tab of 'view.2', not creating new entry in browser session history.
+    await tab2.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.2');
+    await expect.poll(() => logPart.getLog()).toEqual(['view.1', 'view.2']);
+
+    // Click tab of 'view.1', not creating new entry in browser session history.
+    await tab1.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
+    await expect.poll(() => logPart.getLog()).toEqual(['view.1', 'view.2', 'view.1']);
+
+    // Click tab of 'view.2', not creating new entry in browser session history.
+    await tab2.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.2');
+    await expect.poll(() => logPart.getLog()).toEqual(['view.1', 'view.2', 'view.1', 'view.2']);
+
+    // TEST: Perform history back.
+    await appPO.navigateBack();
+
+    // Expect the bottom panel to be closed as tab activations should not create new browser session history entries.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        panels: {
+          bottom: 'closed',
+        },
+      },
+    });
+  });
+
+  /**
+   * This test clicks on different active tabs located in different active parts of different grids.
+   */
+  test('should not create entry in browser session history when clicking on active tabs located in different active parts of different grids', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {label: 'Activity 1', icon: 'folder', ɵactivityId: 'activity.1'})
+      .addPart('part.activity-2', {dockTo: 'right-top'}, {label: 'Activity 2', icon: 'folder', ɵactivityId: 'activity.2'})
+      .addPart('part.log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal', ɵactivityId: 'activity.log'})
+      .addView('view.1', {partId: 'part.activity-1'})
+      .addView('view.2', {partId: 'part.activity-2'})
+      .navigatePart('part.log', ['active-workbench-element-log'])
+      .activatePart('part.log'),
+    );
+
+    const tab1 = appPO.view({viewId: 'view.1'}).tab;
+    const tab2 = appPO.view({viewId: 'view.2'}).tab;
+
+    // Open the activity panel, creating new entry in browser session history.
+    await appPO.activityItem({activityId: 'activity.1'}).click();
+
+    // Open the activity panel, creating new entry in browser session history.
+    await appPO.activityItem({activityId: 'activity.2'}).click();
+
+    const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
+    await logPart.clearLog();
+
+    // PRECONDITION: Expect the bottom panel to be opened.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        panels: {
+          left: 'opened',
+          right: 'opened',
+          bottom: 'opened',
+        },
+      },
+    });
+
+    // Click tab of 'view.1', not creating new entry in browser session history.
+    await tab1.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
+    await expect.poll(() => logPart.getLog()).toEqual(['view.1']);
+
+    // Click tab of 'view.2', not creating new entry in browser session history.
+    await tab2.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.2');
+    await expect.poll(() => logPart.getLog()).toEqual(['view.1', 'view.2']);
+
+    // Click tab of 'view.1', not creating new entry in browser session history.
+    await tab1.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
+    await expect.poll(() => logPart.getLog()).toEqual(['view.1', 'view.2', 'view.1']);
+
+    // Click tab of 'view.2', not creating new entry in browser session history.
+    await tab2.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.2');
+    await expect.poll(() => logPart.getLog()).toEqual(['view.1', 'view.2', 'view.1', 'view.2']);
+
+    // TEST: Perform history back.
+    await appPO.navigateBack();
+
+    // Expect the right panel to be closed as tab activations should not create new browser session history entries.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        panels: {
+          left: 'opened',
+          right: 'closed',
+          bottom: 'opened',
+        },
+      },
+    });
+
+    // TEST: Perform history back.
+    await appPO.navigateBack();
+
+    // Expect the left panel to be closed as tab activations should not create new browser session history entries.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        panels: {
+          left: 'closed',
+          right: 'closed',
+          bottom: 'opened',
+        },
+      },
+    });
+  });
+
+  /**
+   * This test clicks on different parts located in the same grid, activating the part when clicked.
+   */
+  test('should not create entry in browser session history when clicking on different parts located in the same grid', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.left', {title: 'Left Part'})
+      .addPart('part.right', {align: 'right'}, {title: 'Right Part'})
+      .addPart('part.log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal', ɵactivityId: 'activity.log'})
+      .navigatePart('part.left', ['path/to/part'])
+      .navigatePart('part.right', ['path/to/part'])
+      .navigatePart('part.log', ['active-workbench-element-log']),
+    );
+
+    const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
+    const leftPart = appPO.part({partId: 'part.left'});
+    const rightPart = appPO.part({partId: 'part.right'});
+
+    // Open the activity panel, creating new entry in browser session history.
+    await appPO.activityItem({activityId: 'activity.log'}).click();
+    await logPart.clearLog();
+
+    // PRECONDITION: Expect the bottom panel to be opened.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        panels: {
+          bottom: 'opened',
+        },
+      },
+    });
+
+    // Click 'part.left', not creating new entry in browser session history.
+    await leftPart.bar.title.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.left');
+    await expect.poll(() => logPart.getLog()).toEqual(['part.left']);
+
+    // Click 'part.right', not creating new entry in browser session history.
+    await rightPart.bar.title.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.right');
+    await expect.poll(() => logPart.getLog()).toEqual(['part.left', 'part.right']);
+
+    // Click 'part.left', not creating new entry in browser session history.
+    await leftPart.bar.title.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.left');
+    await expect.poll(() => logPart.getLog()).toEqual(['part.left', 'part.right', 'part.left']);
+
+    // Click 'part.right', not creating new entry in browser session history.
+    await rightPart.bar.title.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.right');
+    await expect.poll(() => logPart.getLog()).toEqual(['part.left', 'part.right', 'part.left', 'part.right']);
+
+    // TEST: Perform history back.
+    await appPO.navigateBack();
+
+    // Expect the bottom panel to be closed as tab activations should not create new browser session history entries.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        panels: {
+          bottom: 'closed',
+        },
+      },
+    });
+  });
+
+  /**
+   * This test clicks on active parts located in different grids.
+   */
+  test('should not create entry in browser session history when clicking on active parts located in different grids', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addPart('part.activity-left', {dockTo: 'left-top'}, {label: 'Activity Left', icon: 'folder', ɵactivityId: 'activity.left'})
+      .addPart('part.activity-right', {dockTo: 'right-top'}, {label: 'Activity Right', icon: 'folder', ɵactivityId: 'activity.right'})
+      .addPart('part.log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal', ɵactivityId: 'activity.log'})
+      .navigatePart('part.activity-left', ['path/to/part'])
+      .navigatePart('part.activity-right', ['path/to/part'])
+      .navigatePart('part.log', ['active-workbench-element-log'])
+      .activatePart('part.log'),
+    );
+
+    const leftPart = appPO.part({partId: 'part.activity-left'});
+    const rightPart = appPO.part({partId: 'part.activity-right'});
+
+    // Open the activity panel, creating new entry in browser session history.
+    await appPO.activityItem({activityId: 'activity.left'}).click();
+
+    // Open the activity panel, creating new entry in browser session history.
+    await appPO.activityItem({activityId: 'activity.right'}).click();
+
+    const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
+    await logPart.clearLog();
+
+    // PRECONDITION: Expect the bottom panel to be opened.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        panels: {
+          left: 'opened',
+          right: 'opened',
+          bottom: 'opened',
+        },
+      },
+    });
+
+    // Click 'part.activity-left', not creating new entry in browser session history.
+    await leftPart.bar.title.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-left');
+    await expect.poll(() => logPart.getLog()).toEqual(['part.activity-left']);
+
+    // Click 'part.activity-right', not creating new entry in browser session history.
+    await rightPart.bar.title.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-right');
+    await expect.poll(() => logPart.getLog()).toEqual(['part.activity-left', 'part.activity-right']);
+
+    // Click 'part.activity-left', not creating new entry in browser session history.
+    await leftPart.bar.title.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-left');
+    await expect.poll(() => logPart.getLog()).toEqual(['part.activity-left', 'part.activity-right', 'part.activity-left']);
+
+    // Click 'part.activity-right', not creating new entry in browser session history.
+    await rightPart.bar.title.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-right');
+    await expect.poll(() => logPart.getLog()).toEqual(['part.activity-left', 'part.activity-right', 'part.activity-left', 'part.activity-right']);
+
+    // TEST: Perform history back.
+    await appPO.navigateBack();
+
+    // Expect the right panel to be closed as tab activations should not create new browser session history entries.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        panels: {
+          left: 'opened',
+          right: 'closed',
+          bottom: 'opened',
+        },
+      },
+    });
+
+    // TEST: Perform history back.
+    await appPO.navigateBack();
+
+    // Expect the left panel to be closed as tab activations should not create new browser session history entries.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        panels: {
+          left: 'closed',
+          right: 'closed',
+          bottom: 'opened',
+        },
+      },
+    });
+  });
+
+  /**
+   * This test switches between activities in the same activity stack.
+   */
+  test('should create entry in browser session history when switching between activities in the same activity stack', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {label: 'Activity 1', icon: 'folder', ɵactivityId: 'activity.1'})
+      .addPart('part.activity-2', {dockTo: 'left-top'}, {label: 'Activity 2', icon: 'folder', ɵactivityId: 'activity.2'})
+      .addPart('part.log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal', ɵactivityId: 'activity.log'})
+      .navigatePart('part.activity-1', ['path/to/part'])
+      .navigatePart('part.activity-2', ['path/to/part'])
+      .navigatePart('part.log', ['active-workbench-element-log'])
+      .activatePart('part.log'),
+    );
+
+    const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
+    await logPart.clearLog();
+
+    // Click 'activity.1', creating new entry in browser session history.
+    await appPO.activityItem({activityId: 'activity.1'}).click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-1');
+    await expect.poll(() => logPart.getLog()).toEqual(['part.activity-1']);
+
+    // Click 'activity.2', creating new entry in browser session history.
+    await appPO.activityItem({activityId: 'activity.2'}).click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-2');
+    await expect.poll(() => logPart.getLog()).toEqual(['part.activity-1', 'part.activity-2']);
+
+    // Click 'activity.1', creating new entry in browser session history.
+    await appPO.activityItem({activityId: 'activity.1'}).click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-1');
+    await expect.poll(() => logPart.getLog()).toEqual(['part.activity-1', 'part.activity-2', 'part.activity-1']);
+
+    // Click 'activity.2', creating new entry in browser session history.
+    await appPO.activityItem({activityId: 'activity.2'}).click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-2');
+    await expect.poll(() => logPart.getLog()).toEqual(['part.activity-1', 'part.activity-2', 'part.activity-1', 'part.activity-2']);
+
+    // PRECONDITION: Expect 'activity.2' to be opened.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activeActivityId: 'activity.2',
+            activities: [{id: 'activity.1'}, {id: 'activity.2'}],
+          },
+        },
+      },
+    });
+
+    // TEST: Perform history back.
+    await appPO.navigateBack();
+
+    // Expect 'part.activity-1' to be active as created new entry in browser session history.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activeActivityId: 'activity.1',
+            activities: [{id: 'activity.1'}, {id: 'activity.2'}],
+          },
+        },
+      },
+    });
+
+    // TEST: Perform history back.
+    await appPO.navigateBack();
+
+    // Expect 'part.activity-2' to be active as created new entry in browser session history.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activeActivityId: 'activity.2',
+            activities: [{id: 'activity.1'}, {id: 'activity.2'}],
+          },
+        },
+      },
+    });
+
+    // TEST: Perform history back.
+    await appPO.navigateBack();
+
+    // Expect 'part.activity-1' to be active as created new entry in browser session history.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activeActivityId: 'activity.1',
+            activities: [{id: 'activity.1'}, {id: 'activity.2'}],
+          },
+        },
+      },
+    });
+  });
+
+  /**
+   * This test opens and closes an activity.
+   */
+  test('should create entry in browser session history when opening and closing an activity', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {label: 'Activity 1', icon: 'folder', ɵactivityId: 'activity.1'})
+      .addPart('part.log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal', ɵactivityId: 'activity.log'})
+      .navigatePart('part.activity-1', ['path/to/part'])
+      .navigatePart('part.log', ['active-workbench-element-log'])
+      .activatePart('part.log'),
+    );
+
+    const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
+    await logPart.clearLog();
+
+    // Open 'activity.1', creating new entry in browser session history.
+    await appPO.activityItem({activityId: 'activity.1'}).click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-1');
+    await expect.poll(() => logPart.getLog()).toEqual(['part.activity-1']);
+
+    // Close 'activity.1', creating new entry in browser session history.
+    await appPO.activityItem({activityId: 'activity.1'}).click();
+    await expect.poll(() => appPO.focusOwner()).toBeNull();
+    await expect.poll(() => logPart.getLog()).toEqual(['part.activity-1', null]);
+
+    // Open 'activity.1', creating new entry in browser session history.
+    await appPO.activityItem({activityId: 'activity.1'}).click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-1');
+    await expect.poll(() => logPart.getLog()).toEqual(['part.activity-1', null, 'part.activity-1']);
+
+    // Close 'activity.1', creating new entry in browser session history.
+    await appPO.activityItem({activityId: 'activity.1'}).click();
+    await expect.poll(() => appPO.focusOwner()).toBeNull();
+    await expect.poll(() => logPart.getLog()).toEqual(['part.activity-1', null, 'part.activity-1', null]);
+
+    // Expect no activity to be opened.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activeActivityId: 'none',
+            activities: [{id: 'activity.1'}],
+          },
+        },
+      },
+    });
+
+    // TEST: Perform history back.
+    await appPO.navigateBack();
+
+    // Expect 'activity.1' to be opened as created new entry in browser session history.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activeActivityId: 'activity.1',
+            activities: [{id: 'activity.1'}],
+          },
+        },
+      },
+    });
+
+    // Perform history back.
+    await appPO.navigateBack();
+
+    // Expect 'activity.1' to be closed as created new entry in browser session history.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activeActivityId: 'none',
+            activities: [{id: 'activity.1'}],
+          },
+        },
+      },
+    });
+
+    // Perform history back.
+    await appPO.navigateBack();
+
+    // Expect 'activity.1' to be opened as created new entry in browser session history.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activeActivityId: 'activity.1',
+            activities: [{id: 'activity.1'}],
+          },
+        },
+      },
+    });
   });
 
   test.describe('Standalone Component', () => {

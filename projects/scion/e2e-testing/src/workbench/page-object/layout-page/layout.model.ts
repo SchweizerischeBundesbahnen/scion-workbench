@@ -150,7 +150,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   public modify(modifyFn: (layout: WorkbenchLayout) => WorkbenchLayout): WorkbenchLayout {
-    throw Error('[PageObjectError] Operation `WorkbenchLayout.modify` is not supported.');
+    return modifyFn(this);
   }
 }
 

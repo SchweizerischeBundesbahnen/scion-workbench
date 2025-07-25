@@ -71,8 +71,8 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await dragHandle.drop();
 
     // Expect the view to be active.
-    await expect.poll(() => tab1.isActive()).toBe(false);
-    await expect.poll(() => tab2.isActive()).toBe(true);
+    await expect(tab1.state('active')).not.toBeVisible();
+    await expect(tab2.state('active')).toBeVisible();
 
     // Expect same tab order
     await expect.poll(() => appPO.part({partId: 'part.part'}).bar.viewTabBar.getViewIds()).toEqual(['view.101', 'view.102']);
@@ -1077,16 +1077,17 @@ test.describe('View Drag & Drop (Tabbar)', () => {
 
     // Expect adjacent tab to be activated.
     await expect.poll(() => appPO.part({partId: 'part.part'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.101']);
-    await expect.poll(() => tab1.isActive()).toBe(true);
+    await expect(tab1.state('active')).toBeVisible();
   });
 
-  test('should activate adjacent tab when dragging tab out of its tabbar', async ({appPO, workbenchNavigator}) => {
+  test('should activate tab to the right when dragging tab out of its tabbar', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective(layout => layout
       .addPart('part.part')
       .addView('view.101', {partId: 'part.part'})
-      .addView('view.102', {partId: 'part.part', activateView: true}),
+      .addView('view.102', {partId: 'part.part'})
+      .addView('view.103', {partId: 'part.part'}),
     );
 
     const tab1 = appPO.view({viewId: 'view.101'}).tab;
@@ -1095,13 +1096,44 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     const tab2 = appPO.view({viewId: 'view.102'}).tab;
     await tab2.setTitle('view.102');
 
-    // Drag tab out of the window.
+    const tab3 = appPO.view({viewId: 'view.103'}).tab;
+    await tab3.setTitle('view.103');
+
+    // Drag tab 'view.102' out of the tabbar.
     const dragHandle = await tab2.startDrag();
     await dragHandle.dragTo({deltaX: 0, deltaY: 300});
 
-    // Expect adjacent tab to be activated.
-    await expect.poll(() => appPO.part({partId: 'part.part'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.101']);
-    await expect.poll(() => tab1.isActive()).toBe(true);
+    // Expect tab to the right to be activated.
+    await expect.poll(() => appPO.part({partId: 'part.part'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.101', 'view.103']);
+    await expect(tab3.state('active')).toBeVisible();
+  });
+
+  test('should activate tab to the left when dragging tab out of its tabbar', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective(layout => layout
+      .addPart('part.part')
+      .addView('view.101', {partId: 'part.part'})
+      .addView('view.102', {partId: 'part.part'})
+      .addView('view.103', {partId: 'part.part'}),
+    );
+
+    const tab1 = appPO.view({viewId: 'view.101'}).tab;
+    await tab1.setTitle('view.101');
+
+    const tab2 = appPO.view({viewId: 'view.102'}).tab;
+    await tab2.setTitle('view.102');
+
+    const tab3 = appPO.view({viewId: 'view.103'}).tab;
+    await tab3.setTitle('view.103');
+
+    // Drag tab out of the window.
+    const dragHandle = await tab3.startDrag();
+    await dragHandle.dragTo({deltaX: 0, deltaY: 300});
+
+    // Expect tab to the right to be activated.
+    await expect.poll(() => appPO.part({partId: 'part.part'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.101', 'view.102']);
+    await expect(tab2.state('active')).toBeVisible();
   });
 });
 

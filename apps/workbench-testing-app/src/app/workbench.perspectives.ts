@@ -10,7 +10,6 @@
 
 import {Route, Routes, UrlSegment} from '@angular/router';
 import {canMatchWorkbenchPart, canMatchWorkbenchView, MAIN_AREA, WorkbenchLayout, WorkbenchLayoutFactory, WorkbenchPerspectiveDefinition, WorkbenchRouteData} from '@scion/workbench';
-import {WorkbenchStartupQueryParams} from './workbench/workbench-startup-query-params';
 import {inject} from '@angular/core';
 import {ViewSkeletonNavigationData} from './sample-view/sample-view.component';
 import {SettingsService} from './settings.service';
@@ -33,6 +32,12 @@ export const PerspectiveData = {
    * Enables grouping in the perspective switcher menu.
    */
   menuGroup: 'menuGroup',
+  /**
+   * Controls whether to display the perspective in the perspective switcher menu. Defaults to `true`.
+   *
+   * Can be a `boolean` or a predicate function. The function can call `inject` to get any required dependencies.
+   */
+  visible: 'visible',
 } as const;
 
 /**
@@ -93,27 +98,34 @@ export const Perspectives = {
         [PerspectiveData.menuGroup]: 'peripheral-part-layout',
       },
     },
-    // Create definitions for perspectives defined via query parameter {@link PERSPECTIVES_QUERY_PARAM}.
-    ...WorkbenchStartupQueryParams.perspectiveIds().map(perspectiveId => {
-      switch (perspectiveId) {
-        case 'e2e-layout-migration-v5': {
-          return {
-            id: perspectiveId,
-            layout: (factory: WorkbenchLayoutFactory) => factory
-              .addPart(MAIN_AREA)
-              .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity', ɵactivityId: 'activity.1'})
-              .navigatePart('part.activity-1', ['test-part'])
-              .activatePart('part.activity-1'),
-          };
-        }
-        default: {
-          return {
-            id: perspectiveId,
-            layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA),
-          };
-        }
-      }
-    }),
+    {
+      id: 'e2e-focus-test-perspective',
+      layout: provideFocusTestPerspective,
+      data: {
+        [PerspectiveData.label]: 'Focus Test Perspective',
+        [PerspectiveData.menuItemLabel]: 'Focus Test Perspective',
+        [PerspectiveData.menuGroup]: 'test-perspectives',
+        [PerspectiveData.visible]: () => inject(SettingsService).isEnabled('showTestPerspectives'),
+      },
+    },
+    {
+      id: 'e2e-perspective-with-main-area',
+      layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA),
+      data: {
+        [PerspectiveData.visible]: false,
+      },
+    },
+    {
+      id: 'e2e-layout-migration-v5',
+      layout: (factory: WorkbenchLayoutFactory) => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity', ɵactivityId: 'activity.1'})
+        .navigatePart('part.activity-1', ['test-part'])
+        .activatePart('part.activity-1'),
+      data: {
+        [PerspectiveData.visible]: false,
+      },
+    },
   ] satisfies WorkbenchPerspectiveDefinition[],
 
   /**
@@ -163,7 +175,11 @@ function provideActivityPerspectiveLayout1(factory: WorkbenchLayoutFactory): Wor
     // Activate parts to open docked parts.
     .activatePart('projects')
     .activatePart('find')
-    .activatePart('inventory');
+    .activatePart('inventory')
+
+    // Add active workbench element log.
+    .addPart('active-workbench-element-log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal'})
+    .navigatePart('active-workbench-element-log', ['active-workbench-element-log']);
 }
 
 function provideActivityPerspectiveLayout2(factory: WorkbenchLayoutFactory): WorkbenchLayout {
@@ -218,7 +234,11 @@ function provideActivityPerspectiveLayout2(factory: WorkbenchLayoutFactory): Wor
     .activatePart('project')
     .activatePart('find')
     .activatePart('databases')
-    .activateView('terminal4');
+    .activateView('terminal4')
+
+    // Add active workbench element log.
+    .addPart('active-workbench-element-log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal'})
+    .navigatePart('active-workbench-element-log', ['active-workbench-element-log']);
 }
 
 function providePerspectiveLayout1(factory: WorkbenchLayoutFactory): WorkbenchLayout {
@@ -275,4 +295,57 @@ function providePerspectiveLayout2(factory: WorkbenchLayoutFactory): WorkbenchLa
     .navigateView('sample-view-9', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
     .navigateView('sample-view-10', [], {hint: 'sample-view', data: {style: 'form', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
     .activateView('sample-view-6');
+}
+
+function provideFocusTestPerspective(factory: WorkbenchLayoutFactory): WorkbenchLayout {
+  return factory
+    .addPart(MAIN_AREA)
+
+    // Add Activity 1 (grid)
+    .addPart('part.activity-1a', {dockTo: 'left-top'}, {label: 'Activity 1', tooltip: 'Activity with a grid', icon: 'folder', ɵactivityId: 'activity.1'})
+    .addPart('part.activity-1b', {align: 'bottom', relativeTo: 'part.activity-1a', ratio: .8})
+    .addPart('part.activity-1c', {align: 'bottom', relativeTo: 'part.activity-1b', ratio: .7})
+    .addPart('part.activity-1d', {align: 'bottom', relativeTo: 'part.activity-1c'})
+    .addView('view.101', {partId: 'part.activity-1c'})
+    .addView('view.102', {partId: 'part.activity-1c'})
+    .addView('view.103', {partId: 'part.activity-1d'})
+    .addView('view.104', {partId: 'part.activity-1d'})
+    .navigatePart('part.activity-1a', ['test-pages/focus-test-page'])
+    .navigatePart('part.activity-1b', ['test-pages/focus-test-page'])
+    .navigateView('view.101', ['test-pages/focus-test-page'])
+    .navigateView('view.102', ['test-pages/focus-test-page'])
+    .navigateView('view.103', ['test-pages/focus-test-page'])
+    .navigateView('view.104', ['test-pages/focus-test-page'])
+
+    // Add Activity 2 (part)
+    .addPart('part.activity-2', {dockTo: 'left-bottom'}, {label: 'Activity 2', tooltip: 'Activity with a single part', icon: 'folder', ɵactivityId: 'activity.2'})
+    .navigatePart('part.activity-2', ['test-pages/focus-test-page'])
+
+    // Add Activity 3 (views)
+    .addPart('part.activity-3', {dockTo: 'bottom-left'}, {label: 'Activity 3', tooltip: 'Activity with views', icon: 'folder', ɵactivityId: 'activity.3'})
+    .addView('view.301', {partId: 'part.activity-3'})
+    .addView('view.302', {partId: 'part.activity-3'})
+    .navigateView('view.301', ['test-pages/focus-test-page'])
+    .navigateView('view.302', ['test-pages/focus-test-page'])
+
+    // Add active workbench element log.
+    .addPart('part.log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal'})
+    .navigatePart('part.log', ['active-workbench-element-log'])
+    .activatePart('part.log')
+
+    // Add peripheral parts on the right
+    .addPart('part.right-1', {align: 'right', ratio: .25}, {title: 'Part 1'})
+    .addPart('part.right-2', {align: 'bottom', relativeTo: 'part.right-1', ratio: .8}, {title: 'Part 2'})
+    .addPart('part.right-3', {align: 'bottom', relativeTo: 'part.right-2', ratio: .7}, {title: 'Part 3'})
+    .addPart('part.right-4', {align: 'bottom', relativeTo: 'part.right-3'}, {title: 'Part 4'})
+    .addView('view.201', {partId: 'part.right-3'})
+    .addView('view.202', {partId: 'part.right-3'})
+    .addView('view.203', {partId: 'part.right-4'})
+    .addView('view.204', {partId: 'part.right-4'})
+    .navigatePart('part.right-1', ['test-pages/focus-test-page'])
+    .navigatePart('part.right-2', ['test-pages/focus-test-page'])
+    .navigateView('view.201', ['test-pages/focus-test-page'])
+    .navigateView('view.202', ['test-pages/focus-test-page'])
+    .navigateView('view.203', ['test-pages/focus-test-page'])
+    .navigateView('view.204', ['test-pages/focus-test-page']);
 }

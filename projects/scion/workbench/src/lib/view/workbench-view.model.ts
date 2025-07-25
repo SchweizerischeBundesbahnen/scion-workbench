@@ -123,6 +123,11 @@ export abstract class WorkbenchView {
   public abstract readonly active: Signal<boolean>;
 
   /**
+   * Indicates whether this view has the focus.
+   */
+  public abstract readonly focused: Signal<boolean>;
+
+  /**
    * The position of this view in the tabbar.
    */
   public abstract readonly position: Signal<number>;
@@ -148,11 +153,6 @@ export abstract class WorkbenchView {
   public abstract readonly menuItems: Signal<WorkbenchMenuItem[]>;
 
   /**
-   * Indicates whether this view is destroyed.
-   */
-  public abstract readonly destroyed: boolean;
-
-  /**
    * URL associated with this view.
    *
    * @deprecated since version 19.0.0-beta.2. Use {@link navigation.path} instead. API will be removed in version 21.
@@ -160,16 +160,17 @@ export abstract class WorkbenchView {
   public abstract readonly urlSegments: Signal<UrlSegment[]>;
 
   /**
+   * Gets the activation instant of this view.
+   */
+  public abstract readonly activationInstant: Signal<number>;
+
+  /**
    * Activates this view.
-   *
-   * Note: This instruction runs asynchronously via URL routing.
    */
   public abstract activate(): Promise<boolean>;
 
   /**
    * Destroys this view (or sibling views) and the associated routed component.
-   *
-   * Note: This instruction runs asynchronously via URL routing.
    *
    * @param target
    *        Allows to control which view(s) to close:
