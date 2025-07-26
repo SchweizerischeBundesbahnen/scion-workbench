@@ -24,6 +24,10 @@
       color: var(--sci-workbench-activity-item-text-color-hover);
     }
 
+    &:active {
+      background-color: color-mix(in srgb, var(--sci-workbench-activity-item-background-color-hover) 95%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+    }
+
     &.active {
       background-color: var(--sci-workbench-activity-item-background-color-active);
       border-color: var(--sci-workbench-activity-item-border-color-active);
