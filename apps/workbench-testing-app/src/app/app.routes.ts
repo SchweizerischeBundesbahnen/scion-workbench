@@ -77,6 +77,17 @@ export const routes: Routes = [
     },
   },
   {
+    path: '',
+    canMatch: [canMatchWorkbenchView('inspect-selection')],
+    loadComponent: () => import('./selection-page/selection-inspect-page/selection-inspect-page.component'),
+    data: {
+      [WorkbenchRouteData.title]: 'Workbench Selection',
+      [WorkbenchRouteData.cssClass]: 'e2e-inspect-selection',
+      path: '',
+      navigationHint: 'inspect-selection',
+    },
+  },
+  {
     path: 'start-page',
     loadComponent: () => import('./start-page/start-page.component'),
     data: {[WorkbenchRouteData.title]: 'New Tab', [WorkbenchRouteData.cssClass]: 'e2e-start-page'},

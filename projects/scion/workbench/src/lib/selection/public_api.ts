@@ -8,6 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
+export {WorkbenchSelectionManagerService} from './workbench-selection-manager.service'; // TODO remove
+export {ɵWorkbenchSelectionManagerService} from './ɵworkbench-selection-manager.service'; // TODO remove
 export {type WorkbenchSelection} from './workbench-selection.model';
 export {WorkbenchSelectionService} from './workbench-selection.service';
 export {WorkbenchSelectionProvider} from './workbench-selection.model';

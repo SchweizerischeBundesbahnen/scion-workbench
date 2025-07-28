@@ -27,10 +27,13 @@ export class ɵWorkbenchSelectionManagerService implements WorkbenchSelectionMan
     data: {},
     provider: undefined!,
   });
-  private readonly _selections = new Map<string, ɵWorkbenchSelection>();
+  public readonly _selections = new Map<string, ɵWorkbenchSelection>();
 
   constructor() {
     this.installSelectionChangeListener();
+    effect(() => {
+      console.log('>>> global selection', this.selection());
+    });
   }
 
   /**
@@ -93,6 +96,7 @@ export class ɵWorkbenchSelectionManagerService implements WorkbenchSelectionMan
         [type]: elements,
       });
     }, this.selection().data);
+    console.log('>>> update selection', value);
     this.selection.set({data: value, provider: selection.provider});
   }
 
