@@ -109,6 +109,16 @@ export const Perspectives = {
       },
     },
     {
+      id: 'e2e-selection-test-perspective',
+      layout: provideSelectionTestPerspective,
+      data: {
+        [PerspectiveData.label]: 'Selection Test Perspective',
+        [PerspectiveData.menuItemLabel]: 'Selection Test Perspective',
+        [PerspectiveData.menuGroup]: 'test-perspectives',
+        [PerspectiveData.visible]: () => inject(SettingsService).isEnabled('showTestPerspectives'),
+      },
+    },
+    {
       id: 'e2e-perspective-with-main-area',
       layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA),
       data: {
@@ -348,4 +358,32 @@ function provideFocusTestPerspective(factory: WorkbenchLayoutFactory): Workbench
     .navigateView('view.202', ['test-pages/focus-test-page'])
     .navigateView('view.203', ['test-pages/focus-test-page'])
     .navigateView('view.204', ['test-pages/focus-test-page']);
+}
+
+function provideSelectionTestPerspective(factory: WorkbenchLayoutFactory): WorkbenchLayout {
+  return factory
+    .addPart(MAIN_AREA)
+
+    .addPart('part.activity-1-top', {dockTo: 'left-top'}, {label: 'Activity 1', icon: 'folder', ɵactivityId: 'activity.1'})
+    .addPart('part.activity-1-bottom', {relativeTo: 'part.activity-1-top', align: 'bottom'})
+    .addView('selection-1', {partId: 'part.activity-1-top'})
+    .addView('selection-2', {partId: 'part.activity-1-bottom'})
+    .navigateView('selection-1', [], {hint: 'test-selection'})
+    .navigateView('selection-2', [], {hint: 'test-selection'})
+    .activatePart('part.activity-1-top')
+
+    .addPart('part.activity-2-top', {dockTo: 'right-top'}, {label: 'Activity 2', icon: 'folder', ɵactivityId: 'activity.2'})
+    .addPart('part.activity-2-bottom', {relativeTo: 'part.activity-2-top', align: 'bottom'})
+    .addView('selection-3', {partId: 'part.activity-2-top'})
+    .addView('selection-4', {partId: 'part.activity-2-bottom'})
+    .navigateView('selection-3', [], {hint: 'test-selection'})
+    .navigateView('selection-4', [], {hint: 'test-selection'})
+    .activatePart('part.activity-2-top')
+
+    .addPart('part.activity-3', {dockTo: 'bottom-right'}, {label: 'Activity 3', icon: 'terminal', ɵactivityId: 'activity.3'})
+    .addView('selection-5', {partId: 'part.activity-3'})
+    .navigateView('selection-5', [], {hint: 'test-selection'})
+    .activatePart('part.activity-3')
+
+    ;
 }

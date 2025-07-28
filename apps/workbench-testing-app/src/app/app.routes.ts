@@ -66,6 +66,17 @@ export const routes: Routes = [
     },
   },
   {
+    path: '',
+    canMatch: [canMatchWorkbenchView('test-selection')],
+    loadComponent: () => import('./selection-page/selection-page.component'),
+    data: {
+      [WorkbenchRouteData.title]: 'Workbench Selection',
+      [WorkbenchRouteData.cssClass]: 'e2e-test-selection',
+      path: '',
+      navigationHint: 'test-selection',
+    },
+  },
+  {
     path: 'start-page',
     loadComponent: () => import('./start-page/start-page.component'),
     data: {[WorkbenchRouteData.title]: 'New Tab', [WorkbenchRouteData.cssClass]: 'e2e-start-page'},
@@ -129,6 +140,11 @@ export const routes: Routes = [
       path: 'test-part',
       navigationHint: '',
     },
+  },
+  {
+    path: 'test-selection',
+    loadComponent: () => import('./selection-page/selection-page.component'),
+    data: {[WorkbenchRouteData.title]: 'Workbench Selection', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-selection', pinToDesktop: true},
   },
   {
     path: 'test-layout',

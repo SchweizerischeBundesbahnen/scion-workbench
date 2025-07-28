@@ -1,0 +1,14 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  padding: 1em;
+
+  > div.selection {
+    white-space: pre;
+    font-family: monospace;
+    padding: 1em;
+    border: 1px solid var(--sci-color-border);
+    border-radius: var(--sci-corner);
+  }
+}
