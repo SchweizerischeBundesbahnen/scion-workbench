@@ -8,14 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable, Signal} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {ɵWorkbenchSelectionManagerService} from './ɵworkbench-selection-manager.service';
 import {ɵWorkbenchSelection} from './workbench-selection.model';
+import {Observable} from 'rxjs';
 
 @Injectable({providedIn: 'root', useExisting: ɵWorkbenchSelectionManagerService})
 export abstract class WorkbenchSelectionManagerService {
 
-  public abstract readonly selection: Signal<ɵWorkbenchSelection>;
+  public abstract readonly selection: Observable<ɵWorkbenchSelection>;
 
   public abstract setSelection(selection: ɵWorkbenchSelection): void;
 

@@ -385,5 +385,12 @@ function provideSelectionTestPerspective(factory: WorkbenchLayoutFactory): Workb
     .navigateView('inspect-selection', [], {hint: 'inspect-selection'})
     .activatePart('part.activity-3')
 
+    .addPart('part.activity-4-top', {dockTo: 'right-top'}, {label: 'Activity 4', icon: 'list', ɵactivityId: 'activity.4'})
+    .addPart('part.activity-4-bottom', {relativeTo: 'part.activity-4-top', align: 'bottom'})
+    .addView('selection-5', {partId: 'part.activity-4-top'})
+    .addView('selection-6', {partId: 'part.activity-4-bottom'})
+    .navigateView('selection-5', [], {hint: 'selection-list'})
+    .navigateView('selection-6', [], {hint: 'selection-list'})
+    .activatePart('part.activity-4-top')
     ;
 }

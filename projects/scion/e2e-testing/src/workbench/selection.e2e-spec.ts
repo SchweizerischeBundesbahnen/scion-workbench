@@ -54,6 +54,29 @@ test.describe.only('Workbench Selection', () => {
     });
   });
 
+  test('should set selection (bug)', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const selectionProviderPage = await workbenchNavigator.openInNewTab(SelectionPagePO);
+    const selectionListenerPage = await workbenchNavigator.openInNewTab(SelectionPagePO);
+
+    // Move selection listener to the east.
+    await selectionListenerPage.view.tab.moveTo(await selectionListenerPage.view.part.getPartId(), {region: 'east'});
+
+    // Subscribe to selection
+    await selectionListenerPage.subscribe();
+
+    // Set selection
+    await selectionProviderPage.setSelection({
+      testee: ['A', 'B'],
+    });
+
+    // Expect selection to be set
+    await expect.poll(() => selectionListenerPage.getSelection()).toEqual({
+      testee: ['A', 'B'],
+    });
+  });
+
   test('should publish selection to late subscribers', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
@@ -273,7 +296,7 @@ test.describe.only('Workbench Selection', () => {
     await workbenchNavigator.createPerspective(factory => factory
       .addPart('part.left')
       .addPart('part.right', {align: 'right'})
-      .addView('view.selection-provider', {partId: 'part.left', activateView: true,})
+      .addView('view.selection-provider', {partId: 'part.left', activateView: true})
       .addView('view.selection-listener', {partId: 'part.right', activateView: true})
       .navigateView('view.selection-provider', ['test-selection'])
       .navigateView('view.selection-listener', ['test-selection']),

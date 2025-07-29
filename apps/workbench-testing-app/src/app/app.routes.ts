@@ -88,6 +88,17 @@ export const routes: Routes = [
     },
   },
   {
+    path: '',
+    canMatch: [canMatchWorkbenchView('selection-list')],
+    loadComponent: () => import('./selection-demo-page/selection-list-page.component'),
+    data: {
+      [WorkbenchRouteData.title]: 'Workbench Selection List',
+      [WorkbenchRouteData.cssClass]: 'e2e-selection-list',
+      path: '',
+      navigationHint: 'selection-list',
+    },
+  },
+  {
     path: 'start-page',
     loadComponent: () => import('./start-page/start-page.component'),
     data: {[WorkbenchRouteData.title]: 'New Tab', [WorkbenchRouteData.cssClass]: 'e2e-start-page'},

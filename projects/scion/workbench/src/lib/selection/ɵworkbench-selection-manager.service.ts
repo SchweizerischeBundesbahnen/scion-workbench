@@ -8,11 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {effect, inject, Injectable, signal, untracked} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {WorkbenchSelectionManagerService} from './workbench-selection-manager.service';
 import {Dictionaries} from '@scion/toolkit/util';
 import {WorkbenchSelection, ɵWorkbenchSelection} from './workbench-selection.model';
 import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
+import {BehaviorSubject, combineLatest, Subject} from 'rxjs';
+import {toObservable} from '@angular/core/rxjs-interop';
 import withoutUndefinedEntries = Dictionaries.withoutUndefinedEntries;
 
 /** @inheritDoc */
@@ -21,19 +23,17 @@ export class ɵWorkbenchSelectionManagerService implements WorkbenchSelectionMan
 
   private readonly _workbenchFocusMonitor = inject(WorkbenchFocusMonitor);
 
-  private readonly _change = signal<void>(undefined, {equal: () => false});
+  private readonly _change$ = new Subject<void>();
 
-  public readonly selection = signal<ɵWorkbenchSelection>({
+  public readonly selection = new BehaviorSubject<ɵWorkbenchSelection>({
     data: {},
     provider: undefined!,
+    propagate: true,
   });
   public readonly _selections = new Map<string, ɵWorkbenchSelection>();
 
   constructor() {
     this.installSelectionChangeListener();
-    effect(() => {
-      console.log('>>> global selection', this.selection());
-    });
   }
 
   /**
@@ -43,9 +43,10 @@ export class ɵWorkbenchSelectionManagerService implements WorkbenchSelectionMan
    */
   public setSelection(selection: ɵWorkbenchSelection): void {
     const workingCopy: ɵWorkbenchSelection = {
+      ...selection,
       data: {...selection.data},
-      provider: selection.provider,
     };
+    console.log('>>> workingcopy', workingCopy.propagate);
     // Mark selections as undefined, so they can later be removed.
     Object.keys(this._selections.get(selection.provider)?.data ?? {}).forEach(type => {
       workingCopy.data[type] = undefined!;
@@ -55,7 +56,7 @@ export class ɵWorkbenchSelectionManagerService implements WorkbenchSelectionMan
       workingCopy.data[type] = elements;
     });
     this._selections.set(selection.provider, workingCopy);
-    this._change.set();
+    selection.propagate && this._change$.next();
   }
 
   /**
@@ -71,20 +72,32 @@ export class ɵWorkbenchSelectionManagerService implements WorkbenchSelectionMan
   }
 
   private installSelectionChangeListener(): void {
-    effect(() => {
-      const activeElement = this._workbenchFocusMonitor.activeElement();
-      this._change();
+    const activeElement$ = toObservable(this._workbenchFocusMonitor.activeElement);
 
-      untracked(() => {
-        if (!activeElement) {
-          return;
+    combineLatest([activeElement$, this._change$])
+      .subscribe(([activeElement]) => {
+        if (activeElement) {
+          const selection = this._selections.get(activeElement.id);
+          selection && this.updateSelection(selection);
         }
-
-        const selection = this._selections.get(activeElement.id);
-        selection && this.updateSelection(selection);
       });
-    });
   }
+
+  // private installSelectionChangeListener(): void {
+  //   effect(() => {
+  //     const activeElement = this._workbenchFocusMonitor.activeElement();
+  //     this._change();
+  //
+  //     untracked(() => {
+  //       if (!activeElement) {
+  //         return;
+  //       }
+  //
+  //       const selection = this._selections.get(activeElement.id);
+  //       selection && this.updateSelection(selection);
+  //     });
+  //   });
+  // }
 
   /**
    * Updates the selection, removing `undefined` entries.
@@ -95,9 +108,9 @@ export class ɵWorkbenchSelectionManagerService implements WorkbenchSelectionMan
         ...acc,
         [type]: elements,
       });
-    }, this.selection().data);
-    console.log('>>> update selection', value);
-    this.selection.set({data: value, provider: selection.provider});
+    }, this.selection.value.data);
+    console.log('>>> updateSelection', selection.propagate);
+    this.selection.next({data: value, provider: selection.provider, propagate: selection.propagate});
   }
 
   private createSelectionToBeDeleted(selection: ɵWorkbenchSelection): ɵWorkbenchSelection {
@@ -110,6 +123,7 @@ export class ɵWorkbenchSelectionManagerService implements WorkbenchSelectionMan
     return {
       data: value,
       provider: selection.provider,
+      propagate: selection.propagate,
     };
   }
 

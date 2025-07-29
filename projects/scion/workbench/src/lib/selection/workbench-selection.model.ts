@@ -15,6 +15,11 @@ export type WorkbenchSelection = {
 export interface ɵWorkbenchSelection {
   data: WorkbenchSelection;
   provider: string;
+  propagate: boolean;
+}
+
+export interface WorkbenchSelectionOptions {
+  propagate?: false;
 }
 
 export abstract class WorkbenchSelectionProvider {

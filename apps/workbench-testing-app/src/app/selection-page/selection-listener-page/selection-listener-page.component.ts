@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, effect, EffectRef, inject, Injector, signal, untracked} from '@angular/core';
+import {Component, EffectRef, inject, signal} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
 import {WorkbenchSelection, WorkbenchSelectionService} from '@scion/workbench';
 import {JsonPipe} from '@angular/common';
@@ -26,18 +26,21 @@ import {JsonPipe} from '@angular/common';
 export default class SelectionListenerPageComponent {
 
   private readonly _selectionService = inject(WorkbenchSelectionService);
-  private readonly _injector = inject(Injector);
+  // private readonly _injector = inject(Injector);
 
   protected workbenchSelection = signal<WorkbenchSelection | undefined>(undefined);
 
   private _effectRef: EffectRef | undefined;
 
   protected onSubscribe(): void {
-    this._effectRef = effect(() => {
-      const selection = this._selectionService.selection();
-
-      untracked(() => this.workbenchSelection.set(selection))
-    }, {injector: this._injector});
+    this._selectionService.selection
+      .subscribe(selection => this.workbenchSelection.set(selection));
+    //
+    // this._effectRef = effect(() => {
+    //   const selection = this._selectionService.selection();
+    //
+    //   untracked(() => this.workbenchSelection.set(selection))
+    // }, {injector: this._injector});
   }
 
   public onUnsubscribe(): void {
