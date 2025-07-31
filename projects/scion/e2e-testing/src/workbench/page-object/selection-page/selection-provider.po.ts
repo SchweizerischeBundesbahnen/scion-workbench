@@ -14,7 +14,7 @@ import {SciKeyValueFieldPO} from '../../../@scion/components.internal/key-value-
 /**
  * Page object to interact with {@link SelectionProviderPageComponent}.
  */
-export class SelectionProviderPagePO {
+export class SelectionProviderPO {
 
   constructor(public locator: Locator) {
   }
@@ -31,6 +31,28 @@ export class SelectionProviderPagePO {
     await keyValueField.addEntries(selection);
 
     await this.locator.locator('button.e2e-set-selection').click();
+  }
+
+  public async enterSelection(selection: {[type: string]: unknown[]}): Promise<void> {
+    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-selection'));
+    await keyValueField.clear();
+    selection = Object.entries(selection).reduce((acc, [type, elements]) => {
+      return {
+        ...acc,
+        [type]: elements.join(' '),
+      };
+    }, {});
+    await keyValueField.addEntries(selection);
+  }
+
+  public async publishSelection(options?: {programmatic?: true}): Promise<void> {
+    const publishSelectionButton = this.locator.locator('button.e2e-set-selection');
+    if (options?.programmatic) {
+      await publishSelectionButton.evaluate((button: HTMLElement) => button.click());
+    }
+    else {
+      await publishSelectionButton.click();
+    }
   }
 }
 

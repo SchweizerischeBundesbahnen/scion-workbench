@@ -32,6 +32,8 @@ import {MainAreaPartComponent} from './main-area-part/main-area-part.component';
 import {PartComponent} from './part.component';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
+import {WorkbenchSelectionProvider, WorkbenchSelectionService} from '@scion/workbench';
+import {ɵWorkbenchSelectionService} from '../selection/ɵworkbench-selection.service';
 
 export class ɵWorkbenchPart implements WorkbenchPart {
 
@@ -92,6 +94,9 @@ export class ɵWorkbenchPart implements WorkbenchPart {
       providers: [
         {provide: ɵWorkbenchPart, useValue: this},
         {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
+        {provide: WorkbenchSelectionProvider, useExisting: ɵWorkbenchPart},
+        ɵWorkbenchSelectionService,
+        {provide: WorkbenchSelectionService, useExisting: ɵWorkbenchSelectionService},
       ],
     });
   }

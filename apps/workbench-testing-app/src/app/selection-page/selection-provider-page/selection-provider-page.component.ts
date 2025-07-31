@@ -11,7 +11,7 @@
 import {Component, inject} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
-import {WorkbenchSelectionService} from '@scion/workbench';
+import {WorkbenchSelection, WorkbenchSelectionService} from '@scion/workbench';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 
 @Component({
@@ -41,7 +41,7 @@ export default class SelectionProviderPageComponent {
           ...acc,
           [type]: elements.split(/\s+/).filter(Boolean),
         };
-      }, {});
+      }, {} as WorkbenchSelection);
     this._selectionService.setSelection(selection);
   }
 }
