@@ -38,6 +38,7 @@ import {Translatable} from '../text/workbench-text-provider.model';
 import {ViewSlotComponent} from './view-slot.component';
 import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
 import {WORKBENCH_POPUP_REGISTRY} from '../popup/workbench-popup.registry';
+import {WorkbenchSelectionService} from '@scion/workbench';
 
 export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
@@ -136,6 +137,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     // Test if a new route has been activated for this view.
     const routeChanged = route && route.routeConfig !== previousRoute?.routeConfig;
     if (routeChanged) {
+      this.getElementInjector()?.get(WorkbenchSelectionService).deleteSelection();
       this.title = Routing.lookupRouteData(route, WorkbenchRouteData.title) ?? null;
       this.heading = Routing.lookupRouteData(route, WorkbenchRouteData.heading) ?? null;
       this.dirty = false;
@@ -343,6 +345,10 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     return this._viewEnvironmentInjector;
   }
 
+  private getElementInjector(): Injector | undefined {
+    return this.slot.portal.elementInjector();
+  }
+
   /**
    * Registers an adapter for this view, replacing any previously registered adapter of the same type.
    *
@@ -489,6 +495,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   public destroy(): void {
+    this.getElementInjector()?.get(WorkbenchSelectionService).deleteSelection();
     this._viewEnvironmentInjector.destroy();
     this._workbenchDialogRegistry.dialogs({viewId: this.id}).forEach(dialog => dialog.destroy());
   }

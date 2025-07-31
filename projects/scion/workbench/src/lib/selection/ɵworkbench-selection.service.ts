@@ -13,7 +13,7 @@ import {WorkbenchSelectionManagerService} from './workbench-selection-manager.se
 import {WorkbenchSelectionService} from './workbench-selection.service';
 import {WorkbenchSelection, WorkbenchSelectionOptions, WorkbenchSelectionProvider} from './workbench-selection.model';
 import {Observable} from 'rxjs';
-import {filter, map, tap} from 'rxjs/operators';
+import {filter, map} from 'rxjs/operators';
 
 /** @inheritDoc */
 @Injectable()
@@ -31,9 +31,7 @@ export class ɵWorkbenchSelectionService implements WorkbenchSelectionService {
   constructor() {
     this.selection = this._selectionManager.selection
       .pipe(
-        tap(selection => console.log('>>> propagate', selection.propagate)),
         filter(selection => selection.provider !== this._selectionProvider.id),
-        filter(selection => selection.propagate),
         map(selection => selection.data),
       );
     // this.selection = toSignal(this._selectionManager.selection
@@ -49,7 +47,6 @@ export class ɵWorkbenchSelectionService implements WorkbenchSelectionService {
   }
 
   public setSelection(selection: WorkbenchSelection, options?: WorkbenchSelectionOptions): void {
-    console.log(`>>> set selection propagate=${options?.propagate}`);
     this._selectionManager.setSelection({data: selection, provider: this._selectionProvider.id, propagate: options?.propagate ?? true});
   }
 

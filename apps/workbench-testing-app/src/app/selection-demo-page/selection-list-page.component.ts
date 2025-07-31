@@ -37,7 +37,6 @@ export default class SelectionListPageComponent {
       .subscribe(selection => {
         const workbenchElements = selection?.['workbench'];
         if (workbenchElements) {
-          console.log('>>> receive selection');
           this.selectItems(workbenchElements as string[]);
         }
       });
@@ -64,7 +63,6 @@ export default class SelectionListPageComponent {
   }
 
   private selectItems(items: string[]): void {
-    console.log('>>> set selection');
     this.selectedItems.clear();
     items.forEach(item => this.selectedItems.add(item));
     this._selectionService.setSelection({workbench: Array.from(this.selectedItems)}, {propagate: false});

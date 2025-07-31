@@ -13,7 +13,7 @@ import {Locator} from '@playwright/test';
 /**
  * Page object to interact with {@link SelectionListenerPageComponent}.
  */
-export class SelectionListenerPagePO {
+export class SelectionListenerPO {
 
   constructor(public locator: Locator) {
   }

@@ -46,7 +46,6 @@ export class ɵWorkbenchSelectionManagerService implements WorkbenchSelectionMan
       ...selection,
       data: {...selection.data},
     };
-    console.log('>>> workingcopy', workingCopy.propagate);
     // Mark selections as undefined, so they can later be removed.
     Object.keys(this._selections.get(selection.provider)?.data ?? {}).forEach(type => {
       workingCopy.data[type] = undefined!;
@@ -109,7 +108,6 @@ export class ɵWorkbenchSelectionManagerService implements WorkbenchSelectionMan
         [type]: elements,
       });
     }, this.selection.value.data);
-    console.log('>>> updateSelection', selection.propagate);
     this.selection.next({data: value, provider: selection.provider, propagate: selection.propagate});
   }
 

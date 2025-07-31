@@ -1,0 +1,2 @@
+- Do not propagate all selection types? only propagate the latest
+- 

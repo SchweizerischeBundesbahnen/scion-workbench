@@ -99,7 +99,7 @@ export class WorkbenchNavigator {
       }
       case SelectionPagePO: {
         await startPage.openWorkbenchView('e2e-test-selection');
-        return new SelectionPagePO(this._appPO, {viewId, cssClass: 'e2e-test-selection'});
+        return new SelectionPagePO(this._appPO.view({viewId, cssClass: 'e2e-test-selection'}));
       }
       default: {
         throw Error(`[TestError] Page not supported to be opened in a new tab. [page=${page}]`);

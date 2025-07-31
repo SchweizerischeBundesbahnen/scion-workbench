@@ -30,6 +30,7 @@ export class WbComponentPortal<T = unknown> {
    * Gets the {@link ComponentRef} of the portal, or `undefined` if not constructed.
    */
   public readonly componentRef = this._componentRef.asReadonly();
+  public readonly elementInjector = signal<Injector | undefined>(undefined);
 
   /**
    * Gets the {@link HTMLElement} of the portal, or `undefined` if not constructed.
@@ -69,7 +70,9 @@ export class WbComponentPortal<T = unknown> {
     if (this.constructed()) {
       throw Error(`[PortalError] Component already constructed. [component=${this._componentType}]`);
     }
-    this._componentRef.set(createPortalComponent(this._componentType, {providers: this._options?.providers, injector}));
+    const portalComponent = createPortalComponent(this._componentType, {providers: this._options?.providers, injector});
+    this._componentRef.set(portalComponent.ref);
+    this.elementInjector.set(portalComponent.injector);
 
     // Trigger change detection to complete the initialization of the component, necessary for components detached from the Angular component tree.
     this._componentRef()!.changeDetectorRef.detectChanges();
@@ -94,7 +97,9 @@ export class WbComponentPortal<T = unknown> {
     }
 
     this._viewContainerRef.set(viewContainerRef);
-    this._componentRef.update(componentRef => componentRef ?? createPortalComponent(this._componentType, {providers: this._options?.providers, injector: viewContainerRef.injector}));
+    const portalComponent = createPortalComponent(this._componentType, {providers: this._options?.providers, injector: viewContainerRef.injector});
+    this._componentRef.update(componentRef => componentRef ?? portalComponent.ref);
+    this.elementInjector.set(portalComponent.injector);
     this._logger.debug(() => 'Attaching portal', LoggerNames.LIFECYCLE, this._componentRef()!);
     this._componentRef()!.changeDetectorRef.reattach();
     this._viewContainerRef()!.insert(this._componentRef()!.hostView);
@@ -179,13 +184,15 @@ export interface OnDetach {
 /**
  * Creates the specified component based on given options.
  */
-function createPortalComponent<T>(componentType: ComponentType<T>, options: {injector: Injector; providers?: Provider[]}): ComponentRef<T> {
-  return createComponent(componentType, {
-    elementInjector: Injector.create({
-      name: 'WbComponentPortalInjector',
-      parent: options.injector,
-      providers: options.providers ?? [],
-    }),
+function createPortalComponent<T>(componentType: ComponentType<T>, options: {injector: Injector; providers?: Provider[]}): {ref: ComponentRef<T>; injector: Injector} {
+  const elementInjector = Injector.create({
+    name: 'WbComponentPortalInjector',
+    parent: options.injector,
+    providers: options.providers ?? [],
+  });
+  const componentRef = createComponent(componentType, {
+    elementInjector: elementInjector,
     environmentInjector: options.injector.get(EnvironmentInjector),
   });
+  return {ref: componentRef, injector: elementInjector};
 }
