@@ -8,7 +8,4 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-/**
- * Entry point for all public APIs of this package.
- */
-export * from './lib/public_api';
+export {WorkbenchRouter, type WorkbenchNavigationExtras, ɵMicrofrontendRouteParams, type ɵViewParamsUpdateCommand} from './workbench-router';

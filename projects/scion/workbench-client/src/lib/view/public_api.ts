@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-/**
- * Entry point for all public APIs of this package.
- */
-export * from './lib/public_api';
+export {type WorkbenchViewCapability, type ViewParamDefinition} from './workbench-view-capability';
+export {WorkbenchView, type CanCloseFn, type CanCloseRef, type ViewSnapshot} from './workbench-view';
+export {ɵVIEW_ID_CONTEXT_KEY, ɵWorkbenchView} from './ɵworkbench-view';

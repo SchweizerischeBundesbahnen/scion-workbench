@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-/**
- * Entry point for all public APIs of this package.
- */
-export * from './lib/public_api';
+export {type WorkbenchNotificationCapability} from './workbench-notification-capability';
+export {WorkbenchNotificationService} from './workbench-notification-service';
+export {type WorkbenchNotificationConfig} from './workbench-notification.config';
