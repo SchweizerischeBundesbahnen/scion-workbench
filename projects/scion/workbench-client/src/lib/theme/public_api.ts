@@ -8,7 +8,5 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-/**
- * Entry point for all public APIs of this package.
- */
-export * from './lib/public_api';
+export {WorkbenchThemeMonitor, type WorkbenchTheme} from './workbench-theme-monitor';
+export {ɵTHEME_CONTEXT_KEY} from './ɵworkbench-theme-monitor';
