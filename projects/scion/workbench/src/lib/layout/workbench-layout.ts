@@ -262,6 +262,8 @@ export interface ReferencePart {
 export interface PartExtras {
   /**
    * Title displayed in the part bar.
+   *
+   * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    */
   title?: Translatable;
   /**
@@ -299,16 +301,22 @@ export interface DockedPartExtras {
   icon: string;
   /**
    * Label of the toggle button in the sidebar.
+   *
+   * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    */
   label: Translatable;
   /**
    * Tooltip displayed when hovering over the toggle button in the sidebar.
+   *
+   * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    */
   tooltip?: Translatable;
   /**
    * Title displayed in the part bar.
    *
    * If not provided, defaults to {@link DockedPartExtras.label}. Set to `false` to not display a title.
+   *
+   * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    */
   title?: Translatable | false;
   /**

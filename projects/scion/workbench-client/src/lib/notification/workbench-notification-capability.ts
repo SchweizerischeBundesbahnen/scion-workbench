@@ -10,7 +10,7 @@
 
 import {Capability, Qualifier} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
-import {Empty} from '../utility-types';
+import {Empty} from '../common/utility-types';
 
 /**
  * Represents the built-in notification for displaying a plain text message to the user.

@@ -1,0 +1,18 @@
+:host {
+  display: grid;
+  grid-template-columns: auto auto min-content min-content;
+  gap: 1em;
+
+  > button {
+    align-self: end;
+  }
+
+  > output {
+    grid-column: 1/-1;
+    font-family: monospace;
+    border: 1px solid var(--sci-color-border);
+    border-radius: var(--sci-corner);
+    background: var(--sci-color-background-input-disabled);
+    padding: .5em;
+  }
+}

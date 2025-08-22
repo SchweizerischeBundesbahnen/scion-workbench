@@ -23,6 +23,7 @@ import {provideWorkbench, provideWorkbenchInitializer} from '@scion/workbench';
 import {provideMainAreaInitialPartId} from './workbench/main-area-initial-part-id.provider';
 import {provideDesignTokens} from './workbench/provide-design-tokens';
 import {ActiveWorkbenchElementCollector} from './active-workbench-element-log-page/active-workbench-element-collector.service';
+import {provideValueFromStorage} from './text/storage-text-provider';
 
 /**
  * Central place to configure the workbench-testing-app.
@@ -40,6 +41,7 @@ export const appConfig: ApplicationConfig = {
     provideCustomNotificationIntentHandler(),
     provideWorkbenchInitializer(() => void inject(ActiveWorkbenchElementCollector)),
     provideAnimationsIfEnabled(),
+    provideValueFromStorage(),
   ],
 };
 

@@ -9,7 +9,7 @@
  */
 
 import {Component, computed, inject, Signal} from '@angular/core';
-import {WorkbenchPart, WorkbenchPartActionDirective} from '@scion/workbench';
+import {Translatable, WorkbenchPart, WorkbenchPartActionDirective} from '@scion/workbench';
 import {AppendParamDataTypePipe} from '../common/append-param-data-type.pipe';
 import {AsyncPipe} from '@angular/common';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
@@ -63,7 +63,7 @@ export default class PartPageComponent {
     this.installCssClassUpdater();
   }
 
-  protected onPartTitleChange(title: string): void {
+  protected onPartTitleChange(title: Translatable): void {
     this.part.title = parseTypedString(title)!;
   }
 

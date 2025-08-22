@@ -15,13 +15,13 @@ import {Translatable, WORKBENCH_TEXT_PROVIDER, WorkbenchTextProviderFn} from './
  * Provides the text for the given {@link Translatable} based on registered text providers.
  *
  * A {@link Translatable} is a string that, if starting with the percent symbol (`%`), is passed to the text provider for translation, with the percent symbol omitted.
- * Otherwise, the text is returned as is. A translation key can include parameters in matrix notation.
+ * Otherwise, the text is returned as is. A translation key may include parameters in matrix notation for text interpolation.
  *
  * Examples:
- * - `text`: no translatable text
  * - `%key`: translation key
- * - `%key;param=value`: translation key with a single param
- * - `%key;param1=value1;param2=value2`: translation key with multiple parameters
+ * - `%key;param=value`: translation key with a single interpolation parameter
+ * - `%key;param1=value1;param2=value2`: translation key with multiple interpolation parameters
+ * - `text`: no translation key, text is returned as is
  *
  * The function:
  * - Must be called within an injection context, or an explicit {@link Injector} passed.
@@ -84,9 +84,9 @@ function provideText(translatable: Translatable | undefined | null): Signal<stri
  * Parses a translation key into its key and parameters, if any.
  *
  * Examples:
- * - %key // translation key
- * - %key;param=value // translation key with a single param
- * - %key;param1=value1;param2=value2 // translation key with multiple parameters
+ * - `%key`: translation key
+ * - `%key;param=value`: translation key with a single interpolation parameter
+ * - `%key;param1=value1;param2=value2`: translation key with multiple interpolation parameters
  */
 function parseTranslatable(translationKey: `%${string}`): {key: string; params: Record<string, string>} {
   const {key, params} = /^%(?<key>[^;]+)(;(?<params>.*))?$/.exec(translationKey)!.groups!;

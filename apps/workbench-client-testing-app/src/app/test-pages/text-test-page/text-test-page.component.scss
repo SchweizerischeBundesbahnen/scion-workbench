@@ -1,0 +1,48 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: .5em;
+  padding: 1em;
+
+  > section {
+    display: grid;
+    gap: 1em;
+    border: 1px solid var(--sci-color-border);
+    border-radius: var(--sci-corner);
+    padding: 1em;
+
+    &.provide-text {
+      grid-template-columns: min-content auto min-content;
+    }
+
+    &.provide-value {
+      grid-template-columns: min-content auto min-content;
+    }
+
+    &.observe-text {
+      grid-template-columns: 1fr;
+    }
+
+    &.text-provider {
+      grid-template-columns: auto auto;
+    }
+
+    &.view-handle {
+      grid-template-columns: auto min-content;
+    }
+
+    &.dialog-handle {
+      grid-template-columns: auto min-content;
+    }
+
+    > header {
+      margin-bottom: 1em;
+      font-weight: bold;
+      grid-column: 1/-1;
+    }
+
+    > button {
+      align-self: end;
+    }
+  }
+}

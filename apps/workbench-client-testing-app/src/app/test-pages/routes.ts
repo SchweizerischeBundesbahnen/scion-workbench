@@ -111,6 +111,10 @@ const routes: Routes = [
     path: 'size-test-page',
     loadComponent: () => import('./size-test-page/size-test-page.component'),
   },
+  {
+    path: 'text-test-page',
+    loadComponent: () => import('./text-test-page/text-test-page.component'),
+  },
 ];
 
 export default routes;

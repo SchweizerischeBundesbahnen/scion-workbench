@@ -14,7 +14,7 @@ import {PartPO} from './part.po';
 import {ViewTabContextMenuPO} from './view-tab-context-menu.po';
 import {ViewMoveDialogTestPagePO} from './workbench/page-object/test-pages/view-move-dialog-test-page.po';
 import {AppPO} from './app.po';
-import {PartId, ViewId} from '@scion/workbench';
+import {PartId, Translatable, ViewId} from '@scion/workbench';
 import {ViewInfo, ViewInfoDialogPO} from './workbench/page-object/view-info-dialog.po';
 import {ViewDrageHandlePO} from './view-drag-handle.po';
 
@@ -221,7 +221,7 @@ export class ViewTabPO {
   /**
    * Enters the title of the view.
    */
-  public async setTitle(title: string): Promise<void> {
+  public async setTitle(title: Translatable): Promise<void> {
     const infoDialog = await this.openInfoDialog();
     await infoDialog.enterTitle(title);
     await infoDialog.close();

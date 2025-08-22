@@ -50,4 +50,8 @@ export enum WorkbenchCapabilities {
    * It informs the user of a system event, e.g., that a task has been completed or an error has occurred.
    */
   Notification = 'notification',
+  /**
+   * Provides texts to the SCION Workbench and micro apps.
+   */
+  TextProvider = 'text-provider',
 }

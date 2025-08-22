@@ -10,6 +10,7 @@
 
 import {Capability, ParamDefinition, Qualifier} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * Represents a microfrontend for display in a workbench dialog.
@@ -59,23 +60,17 @@ export interface WorkbenchDialogCapability extends Capability {
     /**
      * Specifies the path to the microfrontend.
      *
-     * The path is relative to the base URL specified in the application manifest. If the
-     * application does not declare a base URL, it is relative to the origin of the manifest file.
+     * The path is relative to the base URL given in the application manifest, or to the origin of the manifest file if no base URL is specified.
      *
-     * The path supports placeholders that will be replaced with parameter values. A placeholder
-     * starts with a colon (`:`) followed by the parameter name.
+     * Path segments can reference capability parameters using the colon syntax.
      *
-     * Usage:
      * ```json
      * {
-     *   "type": "dialog",
-     *   "qualifier": {"entity": "product"},
      *   "params": [
-     *     {"name": "id", "required":  true, "description": "Identifies the product."}
+     *     {"name": "id", "required": true}
      *   ],
      *   "properties": {
-     *     "path": "product/:id",
-     *     ...
+     *     "path": "product/:id", // `:id` references a capability parameter
      *   }
      * }
      * ```
@@ -88,10 +83,47 @@ export interface WorkbenchDialogCapability extends Capability {
     /**
      * Specifies the title of this dialog.
      *
-     * The title supports placeholders that will be replaced with parameter values. A placeholder starts with a colon (`:`) followed by the parameter name.
-     * The title can also be set in the microfrontend via {@link WorkbenchDialog} handle.
+     * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+     *
+     * Interpolation parameters can reference capability parameters or resolvers using the colon syntax. Resolvers resolve data based on capability parameters.
+     * See {@link resolve} for defining resolvers.
+     *
+     * ```json
+     * {
+     *   "params": [
+     *     {"name": "id", "required":  true}
+     *   ],
+     *   "properties": {
+     *     "title": "%product.title;name=:productName", // `:productName` references a resolver
+     *     "resolve": {
+     *       "productName": "products/:id/name" // `:id` references a capability parameter
+     *     }
+     *   }
+     * }
+     * ```
      */
-    title?: string;
+    title?: Translatable;
+    /**
+     * Specifies data resolvers for use in the dialog title.
+     *
+     * A resolver defines a topic where a request is sent to resolve data. Topic segments can reference capability parameters using the colon syntax.
+     * Resolvers can be referenced in interpolation parameters of {@link title} using the colon syntax.
+     *
+     * ```json
+     * {
+     *   "params": [
+     *     {"name": "id", "required":  true}
+     *   ],
+     *   "properties": {
+     *     "title": "%product.title;name=:productName", // `:productName` references a resolver
+     *     "resolve": {
+     *       "productName": "products/:id/name" // `:id` references a capability parameter
+     *     }
+     *   }
+     * }
+     * ```
+     */
+    resolve?: {[key: string]: string};
     /**
      * Specifies if to display a close button in the dialog header. Defaults to `true`.
      */

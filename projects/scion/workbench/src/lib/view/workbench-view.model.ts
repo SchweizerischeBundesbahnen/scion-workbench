@@ -81,12 +81,16 @@ export abstract class WorkbenchView {
 
   /**
    * Title displayed in the view tab.
+   *
+   * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    */
   public abstract get title(): Signal<Translatable | null>;
   public abstract set title(title: Translatable | null);
 
   /**
    * Subtitle displayed in the view tab.
+   *
+   * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    */
   public abstract get heading(): Signal<Translatable | null>;
   public abstract set heading(heading: Translatable | null);

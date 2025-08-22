@@ -141,7 +141,7 @@ export class MicrofrontendNavigator {
   /**
    * Use to register a workbench intention.
    */
-  public async registerIntention(app: 'app1' | 'app2', intention: Intention & {type: 'perspective' | 'view' | 'dialog' | 'popup' | 'messagebox' | 'notification'}): Promise<string> {
+  public async registerIntention(app: 'app1' | 'app2', intention: Intention & {type: 'perspective' | 'view' | 'dialog' | 'popup' | 'messagebox' | 'notification' | 'text-provider'}): Promise<string> {
     const registerIntentionPage = await this.openInNewTab(RegisterWorkbenchIntentionPagePO, app);
     try {
       return await registerIntentionPage.registerIntention(intention);
@@ -163,4 +163,26 @@ export class MicrofrontendNavigator {
       await unregisterCapabilityPage.view.tab.close();
     }
   }
+
+  /**
+   * Registers the specified perspective and activates it.
+   */
+  public async createPerspective(app: 'app1' | 'app2', capability: WorkbenchPerspectiveCapability, options?: PerspectiveCreateOptions): Promise<string> {
+    const perspectiveCapability = await this.registerCapability(app, capability);
+    const perspectiveId = perspectiveCapability.metadata!.id;
+    if (options?.activate ?? true) {
+      await this._appPO.switchPerspective(perspectiveId);
+    }
+    return perspectiveId;
+  }
+}
+
+/**
+ * Controls the creation of the perspective.
+ */
+export interface PerspectiveCreateOptions {
+  /**
+   * Controls if to activate the perspective.
+   */
+  activate?: boolean;
 }

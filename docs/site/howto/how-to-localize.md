@@ -28,13 +28,13 @@ provideWorkbench({
 > - If working with observables, the function can use `toSignal` to convert an `Observable` to a `Signal`.
 
 Texts subject to localization are of the type `Translatable`. A `Translatable` is a `string` that, if starting with the percent symbol (`%`), is passed to the text provider for translation, with the percent symbol omitted.
-Otherwise, the text is returned as is. A translation key can include parameters in matrix notation.
+Otherwise, the text is returned as is. A translation key may include parameters in matrix notation for text interpolation.
 
 Examples:
-- `text`: no translatable text
 - `%key`: translation key
-- `%key;param=value`: translation key with a single param
-- `%key;param1=value1;param2=value2`: translation key with multiple parameters
+- `%key;param=value`: translation key with a single interpolation parameter
+- `%key;param1=value1;param2=value2`: translation key with multiple interpolation parameters
+- `text`: no translation key, text is returned as is
 
 Example of using the translation key `%projects` as the label of a workbench part:
 

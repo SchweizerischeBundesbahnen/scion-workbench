@@ -12,6 +12,7 @@ import {WorkbenchStartupQueryParams} from './workbench/workbench-startup-query-p
 import {environment} from '../environments/environment';
 import {Perspectives} from './workbench.perspectives';
 import {WorkbenchConfig} from '@scion/workbench';
+import {provideTextFromStorage} from './text/storage-text-provider';
 
 /**
  * Configures SCION Workbench for the testing application.
@@ -28,4 +29,5 @@ export const workbenchConfig: WorkbenchConfig = {
   dialog: {
     modalityScope: WorkbenchStartupQueryParams.dialogModalityScope(),
   },
+  textProvider: provideTextFromStorage,
 };

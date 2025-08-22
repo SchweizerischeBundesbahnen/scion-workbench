@@ -16,6 +16,7 @@ export class WorkbenchHostManifestInterceptor implements HostManifestInterceptor
       ...hostManifest.intentions ?? [],
       providePerspectiveIntention(),
       provideViewIntention(),
+      provideTextProviderIntention(),
     ];
     hostManifest.capabilities = [
       ...hostManifest.capabilities ?? [],
@@ -42,6 +43,16 @@ function provideViewIntention(): Intention {
   return {
     type: WorkbenchCapabilities.View,
     qualifier: {'*': '*'},
+  };
+}
+
+/**
+ * Provides a wildcard intention for the workbench to request texts from any application.
+ */
+export function provideTextProviderIntention(): Intention {
+  return {
+    type: WorkbenchCapabilities.TextProvider,
+    qualifier: {provider: '*'},
   };
 }
 

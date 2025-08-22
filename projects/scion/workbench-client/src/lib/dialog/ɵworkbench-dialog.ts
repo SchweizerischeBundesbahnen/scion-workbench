@@ -19,6 +19,7 @@ import {shareReplay, takeUntil} from 'rxjs/operators';
 import {WorkbenchDialogCapability} from './workbench-dialog-capability';
 import {decorateObservable} from '../observable-decorator';
 import {DialogId} from '../workbench.identifiers';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * @ignore
@@ -49,7 +50,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog {
   /**
    * @inheritDoc
    */
-  public setTitle(title: string | Observable<string>): void {
+  public setTitle(title: Translatable | Observable<Translatable>): void {
     this._titleChange$.next();
 
     Observables.coerce(title)

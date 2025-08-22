@@ -97,7 +97,7 @@ export const Microfrontends = {
   },
   /**
    * Replaces named parameters in the given value with values contained in the given {@link Map}.
-   * Named parameters begin with a colon (`:`).
+   * Named parameters start with a colon (`:`).
    */
   substituteNamedParameters,
 } as const;

@@ -254,32 +254,6 @@ test.describe('Workbench Dialog', () => {
       await expect(dialog.title).toHaveText('TITLE');
     });
 
-    test('should substitute parameter in title from capability', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      await microfrontendNavigator.registerCapability('app1', {
-        type: 'dialog',
-        qualifier: {component: 'testee'},
-        params: [
-          {name: 'id', required: true},
-        ],
-        properties: {
-          path: 'test-dialog',
-          title: 'TITLE :id',
-          size: {height: '475px', width: '300px'},
-        },
-      });
-
-      // Open the dialog.
-      const dialogOpenerPage = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
-      await dialogOpenerPage.open({component: 'testee'}, {cssClass: 'testee', params: {id: '123'}});
-
-      const dialog = appPO.dialog({cssClass: 'testee'});
-
-      // Expect title to be set and placeholder to be substituted.
-      await expect(dialog.title).toHaveText('TITLE 123');
-    });
-
     test('should update title', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 

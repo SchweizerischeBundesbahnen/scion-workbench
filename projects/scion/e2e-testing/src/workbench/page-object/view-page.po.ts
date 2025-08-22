@@ -17,7 +17,7 @@ import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Params} from '@angular/router';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
-import {NavigationData, NavigationState, ViewId} from '@scion/workbench';
+import {NavigationData, NavigationState, Translatable, ViewId} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link ViewPageComponent}.
@@ -80,11 +80,11 @@ export class ViewPagePO implements WorkbenchViewPagePO {
     }
   }
 
-  public async enterTitle(title: string): Promise<void> {
+  public async enterTitle(title: Translatable): Promise<void> {
     await this.locator.locator('input.e2e-title').fill(title);
   }
 
-  public async enterHeading(heading: string): Promise<void> {
+  public async enterHeading(heading: Translatable): Promise<void> {
     await this.locator.locator('input.e2e-heading').fill(heading);
   }
 

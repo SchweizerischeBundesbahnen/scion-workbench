@@ -14,6 +14,7 @@ import {Signal} from '@angular/core';
 import {NavigationData, NavigationState} from '../routing/routing.model';
 import {UrlSegment} from '@angular/router';
 import {PartId, ViewId} from '../workbench.identifiers';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * A part is a visual workbench element to create the workbench layout. Parts can be docked to the side or
@@ -44,9 +45,11 @@ export abstract class WorkbenchPart {
    * Title displayed in the part bar.
    *
    * Note that the title of the top-leftmost part of a docked part cannot be changed.
+   *
+   * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    */
-  public abstract get title(): Signal<string | undefined>;
-  public abstract set title(title: string | undefined);
+  public abstract get title(): Signal<Translatable | undefined>;
+  public abstract set title(title: Translatable | undefined);
 
   /**
    * Indicates whether this part is located in the workbench main area.

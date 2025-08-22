@@ -36,6 +36,7 @@ import {Microfrontends} from '../common/microfrontend.util';
 import {Objects} from '../../common/objects.util';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {rootEffect} from '../../common/root-effect';
+import {createRemoteTranslatable} from '../text/remote-text-provider';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -231,8 +232,8 @@ export class MicrofrontendViewComponent {
    * Updates the properties of this view, such as the view title, as defined by the capability.
    */
   private setViewProperties(viewCapability: WorkbenchViewCapability, params: Params): void {
-    this.view.title = Microfrontends.substituteNamedParameters(viewCapability.properties.title, Maps.coerce(params)) ?? null;
-    this.view.heading = Microfrontends.substituteNamedParameters(viewCapability.properties.heading, Maps.coerce(params)) ?? null;
+    this.view.title = createRemoteTranslatable(viewCapability.properties.title, {appSymbolicName: viewCapability.metadata!.appSymbolicName, valueParams: params, topicParams: viewCapability.properties.resolve}) ?? null;
+    this.view.heading = createRemoteTranslatable(viewCapability.properties.heading, {appSymbolicName: viewCapability.metadata!.appSymbolicName, valueParams: params, topicParams: viewCapability.properties.resolve}) ?? null;
     this.view.classList.application = viewCapability.properties.cssClass;
     this.view.closable = viewCapability.properties.closable ?? true;
     this.view.dirty = false;

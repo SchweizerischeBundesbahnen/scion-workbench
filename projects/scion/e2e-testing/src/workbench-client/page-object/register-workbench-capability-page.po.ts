@@ -161,6 +161,9 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     if (capability.properties.heading !== undefined) {
       await this.locator.locator('input.e2e-heading').fill(capability.properties.heading);
     }
+    if (capability.properties.resolve !== undefined) {
+      await this.locator.locator('input.e2e-resolve').fill(toMatrixNotation(capability.properties.resolve));
+    }
     if (capability.properties.closable !== undefined) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-closable')).toggle(capability.properties.closable);
     }
@@ -229,6 +232,9 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     }
     if (capability.properties.title !== undefined) {
       await this.locator.locator('input.e2e-title').fill(capability.properties.title);
+    }
+    if (capability.properties.resolve !== undefined) {
+      await this.locator.locator('input.e2e-resolve').fill(toMatrixNotation(capability.properties.resolve));
     }
     if (capability.properties.closable !== undefined) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-closable')).toggle(capability.properties.closable);

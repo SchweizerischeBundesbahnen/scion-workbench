@@ -10,6 +10,7 @@
 
 import {Capability, ParamDefinition, Qualifier} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * Represents a microfrontend for display in a workbench view.
@@ -49,44 +50,91 @@ export interface WorkbenchViewCapability extends Capability {
     /**
      * Specifies the path to the microfrontend.
      *
-     * The path is relative to the base URL specified in the application manifest. If the
-     * application does not declare a base URL, it is relative to the origin of the manifest file.
+     * The path is relative to the base URL given in the application manifest, or to the origin of the manifest file if no base URL is specified.
      *
-     * The path supports placeholders that will be replaced with parameter values. A placeholder
-     * starts with a colon (`:`) followed by the parameter name.
+     * Path segments can reference capability parameters using the colon syntax.
      *
-     * Usage:
      * ```json
      * {
-     *   "type": "view",
-     *   "qualifier": {"entity": "product"},
      *   "params": [
-     *     {"name": "id", "required":  true, "description": "Identifies the product."}
+     *     {"name": "id", "required": true}
      *   ],
      *   "properties": {
-     *     "path": "product/:id",
-     *     ...
+     *     "path": "product/:id", // `:id` references a capability parameter
      *   }
      * }
      * ```
      */
     path: string;
     /**
-     * Specifies the title of this view.
+     * Specifies the title displayed in the view tab.
      *
-     * The title supports placeholders that will be replaced with parameter values. A placeholder starts with a colon (`:`) followed by the parameter name.
-     * The title can also be set in the microfrontend via {@link WorkbenchView} handle.
-     */
-    title?: string;
-    /**
-     * Specifies the subtitle of this view.
+     * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
      *
-     * The heading supports placeholders that will be replaced with parameter values. A placeholder starts with a colon (`:`) followed by the parameter name.
-     * The heading can also be set in the microfrontend via {@link WorkbenchView} handle.
+     * Interpolation parameters can reference capability parameters or resolvers using the colon syntax. Resolvers resolve data based on capability parameters.
+     * See {@link resolve} for defining resolvers.
+     *
+     * ```json
+     * {
+     *   "params": [
+     *     {"name": "id", "required":  true}
+     *   ],
+     *   "properties": {
+     *     "title": "%product.title;name=:productName", // `:productName` references a resolver
+     *     "resolve": {
+     *       "productName": "products/:id/name" // `:id` references a capability parameter
+     *     }
+     *   }
+     * }
+     * ```
      */
-    heading?: string;
+    title?: Translatable;
     /**
-     * Specifies if to display a close button in the view tab. Defaults to `true`.
+     * Specifies the subtitle displayed in the view tab.
+     *
+     * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+     *
+     * Interpolation parameters can reference capability parameters or resolvers using the colon syntax. Resolvers resolve data based on capability parameters.
+     * See {@link resolve} for defining resolvers.
+     *
+     * ```json
+     * {
+     *   "params": [
+     *     {"name": "id", "required":  true}
+     *   ],
+     *   "properties": {
+     *     "heading": "%product_category.title;category=:categoryName", // `:categoryName` references a resolver
+     *     "resolve": {
+     *       "categoryName": "products/:id/category" // `:id` references a capability parameter
+     *     }
+     *   }
+     * }
+     * ```
+     */
+    heading?: Translatable;
+    /**
+     * Specifies data resolvers for use in the view title and heading.
+     *
+     * A resolver defines a topic where a request is sent to resolve data. Topic segments can reference capability parameters using the colon syntax.
+     * Resolvers can be referenced in interpolation parameters of {@link title} and {@link heading} using the colon syntax.
+     *
+     * ```json
+     * {
+     *   "params": [
+     *     {"name": "id", "required":  true}
+     *   ],
+     *   "properties": {
+     *     "title": "%product.title;name=:productName", // `:productName` references a resolver
+     *     "resolve": {
+     *       "productName": "products/:id" // `:id` references a capability parameter
+     *     }
+     *   }
+     * }
+     * ```
+     */
+    resolve?: {[key: string]: string};
+    /**
+     * Controls if to display a close button in the view tab. Defaults to `true`.
      */
     closable?: boolean;
     /**

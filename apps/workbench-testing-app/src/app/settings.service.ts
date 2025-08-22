@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable, isDevMode} from '@angular/core';
-import {WebStorage} from '@scion/toolkit/storage';
+import {inject, Injectable, isDevMode} from '@angular/core';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {environment} from '../environments/environment';
+import {SESSION_STORAGE} from './session.storage';
 
 /**
  * Provides settings for the workbench testing application.
@@ -20,7 +20,7 @@ import {environment} from '../environments/environment';
 @Injectable({providedIn: 'root'})
 export class SettingsService {
 
-  private _sessionStorage = new WebStorage(sessionStorage);
+  private _sessionStorage = inject(SESSION_STORAGE);
 
   /**
    * Toggles specified setting.

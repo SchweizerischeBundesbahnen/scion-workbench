@@ -82,7 +82,7 @@ const workbenchTexts: Record<string, string> = {
  *
  * Register this provider as the last text provider, enabling change or translation of built-in workbench texts.
  */
-export const workbenchTextProvider: WorkbenchTextProviderFn = (key: string, params: Record<string, string>): string | undefined => {
+export const workbenchTextProvider: WorkbenchTextProviderFn = (key: string, params: {[name: string]: string}): string | undefined => {
   // Get the text.
   const text = workbenchTexts[key];
   if (text === undefined) {

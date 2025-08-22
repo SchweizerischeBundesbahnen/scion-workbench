@@ -45,7 +45,6 @@ export abstract class WorkbenchConfig {
    * A text provider is a function that returns the text for a translation key.
    *
    * Texts starting with the percent symbol (`%`) are passed to the text provider for translation, with the percent symbol omitted.
-   * Otherwise, the text is returned as is.
    *
    * The SCION Workbench uses the following translation keys for built-in texts:
    * - workbench.clear.tooltip

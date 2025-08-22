@@ -54,23 +54,17 @@ export interface WorkbenchMessageBoxCapability extends Capability {
     /**
      * Specifies the path to the microfrontend.
      *
-     * The path is relative to the base URL specified in the application manifest. If the
-     * application does not declare a base URL, it is relative to the origin of the manifest file.
+     * The path is relative to the base URL given in the application manifest, or to the origin of the manifest file if no base URL is specified.
      *
-     * The path supports placeholders that will be replaced with parameter values. A placeholder
-     * starts with a colon (`:`) followed by the parameter name.
+     * Path segments can reference capability parameters using the colon syntax.
      *
-     * Usage:
      * ```json
      * {
-     *   "type": "messagebox",
-     *   "qualifier": {"entity": "product"},
      *   "params": [
-     *     {"name": "id", "required":  true, "description": "Identifies the product."}
+     *     {"name": "id", "required": true}
      *   ],
      *   "properties": {
-     *     "path": "product/:id",
-     *     ...
+     *     "path": "product/:id", // `:id` references a capability parameter
      *   }
      * }
      * ```

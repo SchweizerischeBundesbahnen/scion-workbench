@@ -431,7 +431,7 @@ export class AppPO {
   /**
    * Waits for the layout to change.
    */
-  public async waitForLayoutChange(options?: {navigationId?: string}): Promise<void> {
+  public async waitForLayoutChange(options?: {navigationId?: number}): Promise<void> {
     const navigationId = options?.navigationId ?? await this.getCurrentNavigationId();
     await waitForCondition(async () => (await this.getCurrentNavigationId()) !== navigationId);
   }

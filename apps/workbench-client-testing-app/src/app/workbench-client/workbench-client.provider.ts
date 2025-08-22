@@ -10,7 +10,7 @@
 
 import {EnvironmentProviders, inject, InjectionToken, Injector, makeEnvironmentProviders, NgZone, provideAppInitializer} from '@angular/core';
 import {APP_IDENTITY, ContextService, FocusMonitor, IntentClient, ManifestService, MessageClient, ObservableDecorator, OutletRouter, PlatformPropertyService, PreferredSizeService} from '@scion/microfrontend-platform';
-import {WorkbenchClient, WorkbenchDialog, WorkbenchDialogService, WorkbenchMessageBox, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopup, WorkbenchPopupService, WorkbenchRouter, WorkbenchThemeMonitor, WorkbenchView} from '@scion/workbench-client';
+import {WorkbenchClient, WorkbenchTextService, WorkbenchDialog, WorkbenchDialogService, WorkbenchMessageBox, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopup, WorkbenchPopupService, WorkbenchRouter, WorkbenchThemeMonitor, WorkbenchView} from '@scion/workbench-client';
 import {NgZoneObservableDecorator} from './ng-zone-observable-decorator';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {environment} from '../../environments/environment';
@@ -50,6 +50,7 @@ export function provideWorkbenchClient(): EnvironmentProviders | [] {
     {provide: WorkbenchMessageBox, useFactory: () => Beans.opt(WorkbenchMessageBox)},
     {provide: WorkbenchNotificationService, useFactory: () => Beans.get(WorkbenchNotificationService)},
     {provide: WorkbenchThemeMonitor, useFactory: () => Beans.get(WorkbenchThemeMonitor)},
+    {provide: WorkbenchTextService, useFactory: () => Beans.get(WorkbenchTextService)},
   ]);
 }
 

@@ -14,7 +14,6 @@ import {InjectionToken, Signal} from '@angular/core';
  * Signature of a function to provide texts to the SCION Workbench.
  *
  * Texts starting with the percent symbol (`%`) are passed to the text provider for translation, with the percent symbol omitted.
- * Otherwise, the text is returned as is.
  *
  * A text provider can be registered via configuration passed to the {@link provideWorkbench} function.
  *
@@ -22,23 +21,24 @@ import {InjectionToken, Signal} from '@angular/core';
  * - Can call `inject` to get any required dependencies.
  * - Can call `toSignal` to convert an Observable to a Signal.
  *
- * @param key - Key for which to provide the text.
- * @param params - Parameters associated with the translation key.
- * @return The text associated with the provided key, or `undefined` if not found.
+ * @param key - Translation key of the text.
+ * @param params - Parameters used for text interpolation.
+ * @return Text associated with the key, or `undefined` if not found.
+ *         Localized applications should return the text in the current language, and update the signal with the translated text each time when the language changes.
  */
 export type WorkbenchTextProviderFn = (key: string, params: {[name: string]: string}) => Signal<string> | string | undefined;
 
 /**
  * Represents either a text or a key for translation.
  *
- * A translation key starts with the percent symbol (`%`) and can include parameters in matrix notation.
+ * A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
  * Key and parameters are passed to {@link WorkbenchConfig.textProvider} for translation.
  *
  * Examples:
- * - `text`: no translatable text
  * - `%key`: translation key
- * - `%key;param=value`: translation key with a single param
- * - `%key;param1=value1;param2=value2`: translation key with multiple parameters
+ * - `%key;param=value`: translation key with a single interpolation parameter
+ * - `%key;param1=value1;param2=value2`: translation key with multiple interpolation parameters
+ * - `text`: no translation key, text is returned as is
  */
 export type Translatable = string | `%${string}`;
 

@@ -1,0 +1,24 @@
+<sci-form-field label="Translatable" direction="column">
+  <input [formControl]="formGroup.controls.translatable" class="e2e-translatable">
+</sci-form-field>
+<sci-form-field label="App" direction="column">
+  <input [formControl]="formGroup.controls.app" [attr.list]="appList" class="e2e-app">
+</sci-form-field>
+<sci-form-field label="Timeout" direction="column">
+  <input [formControl]="formGroup.controls.timeout" type="number" class="e2e-timeout">
+</sci-form-field>
+
+@if (text$) {
+  <button (click)="onCancel()" class="e2e-cancel">Cancel</button>
+  @if (text$ | async; as text) {
+    <output class="e2e-text">{{text}}</output>
+  }
+} @else {
+  <button (click)="onObserve()" [disabled]="formGroup.invalid" class="e2e-observe">Observe</button>
+}
+
+<datalist [attr.id]="appList">
+  <option value="workbench-host-app">workbench-host-app</option>
+  <option value="workbench-client-testing-app1">workbench-client-testing-app1</option>
+  <option value="workbench-client-testing-app2">workbench-client-testing-app2</option>
+</datalist>

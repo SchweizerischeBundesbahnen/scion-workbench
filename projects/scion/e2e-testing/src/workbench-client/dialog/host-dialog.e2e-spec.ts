@@ -71,14 +71,14 @@ test.describe('Workbench Host Dialog', () => {
 
     // Open the dialog.
     const dialogOpenerPage = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
-    await dialogOpenerPage.open({component: 'host-dialog', variant: 'custom-properties'}, {cssClass: 'testee', params: {id: '123'}});
+    await dialogOpenerPage.open({component: 'host-dialog', variant: 'custom-properties'}, {cssClass: 'testee'});
 
     const dialog = appPO.dialog({cssClass: 'testee'});
     const dialogPage = new HostDialogPagePO(dialog);
 
     // Assert non-default property values of capability defined in workbench.manifest.ts
     // Expect title to be set.
-    await expect(dialog.title).toHaveText('Workbench Host Dialog 123');
+    await expect(dialog.title).toHaveText('Workbench Host Dialog');
     // Expect the close button not to be visible.
     await expect(dialog.closeButton).not.toBeVisible();
     // Expect the dialog not to be resizable.

@@ -18,6 +18,8 @@ export interface WorkbenchMessageBoxOptions {
 
   /**
    * Specifies the title of the message box.
+   *
+   * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    */
   title?: Translatable;
 

@@ -11,6 +11,7 @@
 import {WorkbenchDialogCapability} from './workbench-dialog-capability';
 import {Observable} from 'rxjs';
 import {DialogId} from '../workbench.identifiers';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * Handle to interact with a dialog opened via {@link WorkbenchDialogService}.
@@ -41,8 +42,17 @@ export abstract class WorkbenchDialog<R = unknown> {
 
   /**
    * Sets the title of the dialog.
+   *
+   * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    */
-  public abstract setTitle(title: string | Observable<string>): void;
+  public abstract setTitle(title: Translatable): void;
+
+  /**
+   * Sets the title of the dialog.
+   *
+   * @deprecated since version 1.0.0-beta.31. To migrate, pass a translatable and provide the text using a text provider registered in `WorkbenchClient.registerTextProvider`.
+   */
+  public abstract setTitle(title: Observable<Translatable>): void; // eslint-disable-line @typescript-eslint/unified-signatures
 
   /**
    * Indicates whether this dialog has the focus.

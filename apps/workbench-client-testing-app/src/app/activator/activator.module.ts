@@ -13,6 +13,7 @@ import {Beans} from '@scion/toolkit/bean-manager';
 import {ManifestService, MessageClient} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
 import {APP_SYMBOLIC_NAME} from '../workbench-client/workbench-client.provider';
+import {provideTextFromStorage, provideValueFromStorage} from './storage-text-provider';
 
 @NgModule({})
 export default class ActivatorModule {
@@ -22,6 +23,8 @@ export default class ActivatorModule {
   constructor() {
     const symbolicName = inject(APP_SYMBOLIC_NAME);
     void this.registerManifestObjects(symbolicName).then(() => Beans.get(MessageClient).publish('activator-ready'));
+    provideTextFromStorage();
+    provideValueFromStorage();
   }
 
   private async registerManifestObjects(appSymbolicName: string): Promise<void> {
