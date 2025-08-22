@@ -50,6 +50,10 @@
           <input [formControl]="form.controls.viewProperties.controls.heading" class="e2e-heading">
         </sci-form-field>
 
+        <sci-form-field label="Resolve">
+          <app-record [formControl]="form.controls.viewProperties.controls.resolve" class="e2e-resolve"/>
+        </sci-form-field>
+
         <sci-form-field label="Closable">
           <sci-checkbox [formControl]="form.controls.viewProperties.controls.closable" class="e2e-closable"/>
         </sci-form-field>
@@ -138,6 +142,10 @@
 
         <sci-form-field label="Title">
           <input [formControl]="form.controls.dialogProperties.controls.title" class="e2e-title">
+        </sci-form-field>
+
+        <sci-form-field label="Resolve">
+          <app-record [formControl]="form.controls.dialogProperties.controls.resolve" class="e2e-resolve"/>
         </sci-form-field>
 
         <sci-form-field label="Closable">

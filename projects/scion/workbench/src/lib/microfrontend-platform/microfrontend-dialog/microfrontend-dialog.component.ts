@@ -9,15 +9,16 @@
  */
 
 import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, input, untracked, viewChild} from '@angular/core';
-import {ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
+import {ManifestService, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
-import {WorkbenchDialogCapability, ɵDIALOG_CONTEXT, ɵDialogContext, ɵWorkbenchCommands, ɵWorkbenchDialogMessageHeaders} from '@scion/workbench-client';
+import {Translatable, WorkbenchDialogCapability, ɵDIALOG_CONTEXT, ɵDialogContext, ɵWorkbenchCommands, ɵWorkbenchDialogMessageHeaders} from '@scion/workbench-client';
 import {NgComponentOutlet} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
 import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog';
 import {Microfrontends} from '../common/microfrontend.util';
+import {createRemoteTranslatable} from '../text/remote-text-provider';
 
 /**
  * Displays the microfrontend of a given {@link WorkbenchDialogCapability}.
@@ -127,6 +128,7 @@ export class MicrofrontendDialogComponent {
     effect(() => {
       const properties = this.capability().properties;
       const params = this.params();
+      const appSymbolicName = this.capability().metadata!.appSymbolicName;
 
       untracked(() => {
         this.dialog.size.width = properties.size!.width;
@@ -135,8 +137,7 @@ export class MicrofrontendDialogComponent {
         this.dialog.size.maxWidth = properties.size!.maxWidth;
         this.dialog.size.minHeight = properties.size!.minHeight;
         this.dialog.size.maxHeight = properties.size!.maxHeight;
-
-        this.dialog.title = Microfrontends.substituteNamedParameters(properties.title, params);
+        this.dialog.title = createRemoteTranslatable(properties.title, {appSymbolicName, valueParams: params, topicParams: properties.resolve});
         this.dialog.closable = properties.closable ?? true;
         this.dialog.resizable = properties.resizable ?? true;
         this.dialog.padding = properties.padding ?? false;
@@ -164,10 +165,11 @@ export class MicrofrontendDialogComponent {
   }
 
   private installDialogTitleListener(): void {
-    inject(MessageClient).observe$<string>(ɵWorkbenchCommands.dialogTitleTopic(this.dialog.id))
+    inject(MessageClient).observe$<Translatable>(ɵWorkbenchCommands.dialogTitleTopic(this.dialog.id))
       .pipe(takeUntilDestroyed())
       .subscribe(message => {
-        this.dialog.title = message.body;
+        const sender = message.headers.get(MessageHeaders.AppSymbolicName) as string;
+        this.dialog.title = createRemoteTranslatable(message.body, {appSymbolicName: sender});
       });
   }
 }

@@ -40,10 +40,10 @@ export class RegisterWorkbenchIntentionPagePO implements MicrofrontendViewPagePO
    *
    * Returns a Promise that resolves to the intention ID upon successful registration, or that rejects on registration error.
    */
-  public async registerIntention(intention: Intention & {type: 'perspective' | 'view' | 'dialog' | 'popup' | 'messagebox' | 'notification'}): Promise<string> {
-    await this.selectType(intention.type);
+  public async registerIntention(intention: Intention & {type: 'perspective' | 'view' | 'dialog' | 'popup' | 'messagebox' | 'notification' | 'text-provider'}): Promise<string> {
+    await this.locator.locator('select.e2e-type').selectOption(intention.type);
     await this.enterQualifier(intention.qualifier);
-    await this.clickRegister();
+    await this.locator.locator('button.e2e-register').click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     const responseLocator = this.locator.locator('output.e2e-register-response');
@@ -54,19 +54,11 @@ export class RegisterWorkbenchIntentionPagePO implements MicrofrontendViewPagePO
     ]);
   }
 
-  public async selectType(type: 'perspective' | 'view' | 'dialog' | 'popup' | 'messagebox' | 'notification'): Promise<void> {
-    await this.locator.locator('select.e2e-type').selectOption(type);
-  }
-
-  public async enterQualifier(qualifier: Qualifier | undefined): Promise<void> {
+  private async enterQualifier(qualifier: Qualifier | undefined): Promise<void> {
     const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
     await keyValueField.clear();
     if (qualifier && Object.keys(qualifier).length) {
       await keyValueField.addEntries(qualifier);
     }
-  }
-
-  public async clickRegister(): Promise<void> {
-    await this.locator.locator('button.e2e-register').click();
   }
 }

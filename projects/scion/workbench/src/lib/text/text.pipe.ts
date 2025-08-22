@@ -16,13 +16,13 @@ import {text} from './text';
  * Enables the translation of a given {@link Translatable}.
  *
  * A {@link Translatable} is a string that, if starting with the percent symbol (`%`), is passed to the text provider for translation, with the percent symbol omitted.
- * Otherwise, the text is returned as is. A translation key can include parameters in matrix notation.
+ * Otherwise, the text is returned as is. A translation key may include parameters in matrix notation for text interpolation.
  *
  * Examples:
- * - `text`: no translatable text
  * - `%key`: translation key
- * - `%key;param=value`: translation key with a single param
- * - `%key;param1=value1;param2=value2`: translation key with multiple parameters
+ * - `%key;param=value`: translation key with a single interpolation parameter
+ * - `%key;param1=value1;param2=value2`: translation key with multiple interpolation parameters
+ * - `text`: no translation key, text is returned as is
  *
  * @experimental since 20.0.0-beta.3; API and behavior may change in any version without notice.
  */

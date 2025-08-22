@@ -15,7 +15,7 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {Dictionaries, Dictionary, Maps} from '@scion/toolkit/util';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {lastValueFrom} from 'rxjs';
-import {Empty} from '../utility-types';
+import {Empty} from '../common/utility-types';
 import {PartId} from '../workbench.identifiers';
 
 /**

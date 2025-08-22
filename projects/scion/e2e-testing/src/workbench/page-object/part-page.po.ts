@@ -11,7 +11,7 @@
 import {AppPO} from '../../app.po';
 import {Locator} from '@playwright/test';
 import {PartPO} from '../../part.po';
-import {NavigationData, NavigationState, PartId} from '@scion/workbench';
+import {NavigationData, NavigationState, PartId, Translatable} from '@scion/workbench';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {coerceArray} from '../../helper/testing.util';
@@ -92,7 +92,7 @@ export class PartPagePO {
     }
   }
 
-  public async enterTitle(title: string | undefined): Promise<void> {
+  public async enterTitle(title: Translatable | undefined): Promise<void> {
     await this.locator.locator('input.e2e-title').fill(title ?? '<undefined>');
   }
 

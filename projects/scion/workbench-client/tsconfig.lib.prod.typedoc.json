@@ -24,7 +24,8 @@
       "@scion/microfrontend-platform": {
         "MicrofrontendPlatform": "https://microfrontend-platform-api.scion.vercel.app/classes/MicrofrontendPlatform.html",
         "MicrofrontendPlatformClient.connect": "https://microfrontend-platform-api.scion.vercel.app/classes/MicrofrontendPlatformClient.html#connect",
-        "PreferredSizeService": "https://microfrontend-platform-api.scion.vercel.app/classes/PreferredSizeService.html"
+        "PreferredSizeService": "https://microfrontend-platform-api.scion.vercel.app/classes/PreferredSizeService.html",
+        "ActivatorCapability": "https://microfrontend-platform-api.scion.vercel.app/interfaces/ActivatorCapability.html"
       }
     }
   }

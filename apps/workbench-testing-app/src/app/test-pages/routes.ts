@@ -76,6 +76,10 @@ export default [
     path: 'lifecycle-logger-test-page',
     loadComponent: () => import('./lifecycle-logger-test-page/lifecycle-logger-test-page.component'),
   },
+  {
+    path: 'text-test-page',
+    loadComponent: () => import('./text-test-page/text-test-page.component'),
+  },
 ] satisfies Routes;
 
 /**

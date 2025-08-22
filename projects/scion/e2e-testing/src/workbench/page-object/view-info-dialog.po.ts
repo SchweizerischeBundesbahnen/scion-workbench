@@ -12,7 +12,7 @@ import {Locator} from '@playwright/test';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {DialogPO} from '../../dialog.po';
 import {WorkbenchDialogPagePO} from './workbench-dialog-page.po';
-import {NavigationData, NavigationState, PartId, ViewId} from '@scion/workbench';
+import {NavigationData, NavigationState, PartId, Translatable, ViewId} from '@scion/workbench';
 import {Data, Params} from '@angular/router';
 
 /**
@@ -48,7 +48,7 @@ export class ViewInfoDialogPO implements WorkbenchDialogPagePO {
     };
   }
 
-  public async enterTitle(title: string): Promise<void> {
+  public async enterTitle(title: Translatable): Promise<void> {
     await this.locator.locator('input.e2e-title').fill(title);
   }
 
@@ -62,8 +62,8 @@ export interface ViewInfo {
   alternativeViewId: string;
   partId: PartId;
   alternativePartId: string;
-  title: string;
-  heading: string;
+  title: Translatable;
+  heading: Translatable;
   urlSegments: string;
   navigationHint: string;
   routeParams: Params;

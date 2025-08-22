@@ -11,6 +11,7 @@
 import {Observable} from 'rxjs';
 import {WorkbenchViewCapability} from './workbench-view-capability';
 import {PartId, ViewId} from '../workbench.identifiers';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * A view is a visual workbench element for displaying content stacked or side-by-side in the workbench layout.
@@ -90,13 +91,31 @@ export abstract class WorkbenchView {
 
   /**
    * Sets the title to be displayed in the view tab.
+   *
+   * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    */
-  public abstract setTitle(title: string | Observable<string>): void;
+  public abstract setTitle(title: Translatable): void;
+
+  /**
+   * Sets the title to be displayed in the view tab.
+   *
+   * @deprecated since version 1.0.0-beta.31. To migrate, pass a translatable and provide the text using a text provider registered in `WorkbenchClient.registerTextProvider`.
+   */
+  public abstract setTitle(title: Observable<Translatable>): void; // eslint-disable-line @typescript-eslint/unified-signatures
 
   /**
    * Sets the subtitle to be displayed in the view tab.
+   *
+   * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    */
-  public abstract setHeading(heading: string | Observable<string>): void;
+  public abstract setHeading(heading: Translatable): void;
+
+  /**
+   * Sets the subtitle to be displayed in the view tab.
+   *
+   * @deprecated since version 1.0.0-beta.31. To migrate, pass a translatable and provide the text using a text provider registered in `WorkbenchClient.registerTextProvider`.
+   */
+  public abstract setHeading(heading: Observable<Translatable>): void; // eslint-disable-line @typescript-eslint/unified-signatures
 
   /**
    * Sets whether this view is dirty or pristine. When navigating to another microfrontend, the view's dirty state is set to pristine.

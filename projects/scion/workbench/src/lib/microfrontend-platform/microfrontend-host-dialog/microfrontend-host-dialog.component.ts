@@ -9,7 +9,7 @@
  */
 
 import {Component, computed, DestroyRef, effect, inject, Injector, input, runInInjectionContext, Signal, StaticProvider, untracked} from '@angular/core';
-import {WorkbenchDialog as WorkbenchClientDialog, WorkbenchDialogCapability} from '@scion/workbench-client';
+import {Translatable, WorkbenchDialog as WorkbenchClientDialog, WorkbenchDialogCapability} from '@scion/workbench-client';
 import {Routing} from '../../routing/routing.util';
 import {Commands} from '../../routing/routing.model';
 import {Router, RouterOutlet} from '@angular/router';
@@ -21,6 +21,7 @@ import {ANGULAR_ROUTER_MUTEX} from '../../executor/single-task-executor';
 import {Observables} from '@scion/toolkit/util';
 import {takeUntil} from 'rxjs/operators';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
+import {createRemoteTranslatable} from '../text/remote-text-provider';
 
 /**
  * Navigates to the microfrontend of a given {@link WorkbenchDialogCapability} via {@link Router}.
@@ -103,6 +104,7 @@ export class MicrofrontendHostDialogComponent {
     effect(() => {
       const properties = this.capability().properties;
       const params = this.params();
+      const appSymbolicName = this.capability().metadata!.appSymbolicName;
 
       untracked(() => {
         this.dialog.size.width = properties.size?.width;
@@ -112,7 +114,7 @@ export class MicrofrontendHostDialogComponent {
         this.dialog.size.minHeight = properties.size?.minHeight;
         this.dialog.size.maxHeight = properties.size?.maxHeight;
 
-        this.dialog.title = Microfrontends.substituteNamedParameters(properties.title, params);
+        this.dialog.title = createRemoteTranslatable(properties.title, {appSymbolicName, valueParams: params, topicParams: properties.resolve});
         this.dialog.closable = properties.closable ?? true;
         this.dialog.resizable = properties.resizable ?? true;
         this.dialog.padding = properties.padding ?? true;
@@ -137,7 +139,7 @@ function provideWorkbenchClientDialogHandle(capability: WorkbenchDialogCapabilit
         public readonly params = params;
         public readonly focused$ = toObservable(dialog.focused, {injector: dialog.injector});
 
-        public setTitle(title: string | Observable<string>): void {
+        public setTitle(title: Translatable | Observable<Translatable>): void {
           titleChange$.next();
 
           Observables.coerce(title)
@@ -145,7 +147,7 @@ function provideWorkbenchClientDialogHandle(capability: WorkbenchDialogCapabilit
               takeUntilDestroyed(dialog.injector.get(DestroyRef)),
               takeUntil(titleChange$),
             )
-            .subscribe(title => dialog.title = title);
+            .subscribe(title => dialog.title = createRemoteTranslatable(title, {appSymbolicName: capability.metadata!.appSymbolicName}));
         }
 
         public close(result?: unknown | Error): void {

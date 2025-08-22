@@ -1,0 +1,34 @@
+<section class="e2e-provide-text provide-text">
+  <header>Provide Text for "{{appSymbolicName}}"</header>
+
+  <sci-form-field label="Key" direction="column">
+    <input [formControl]="provideTextFormGroup.controls.key" class="e2e-key">
+  </sci-form-field>
+  <sci-form-field label="Text" direction="column">
+    <input [formControl]="provideTextFormGroup.controls.text" [attr.list]="undefinedList" class="e2e-text">
+  </sci-form-field>
+  <button (click)="onTextSave()" [disabled]="provideTextFormGroup.invalid" class="e2e-save">Save</button>
+</section>
+
+<section class="e2e-provide-value provide-value">
+  <header>Provide Value for "{{appSymbolicName}}"</header>
+
+  <sci-form-field label="Key" direction="column">
+    <input [formControl]="provideValueFormGroup.controls.key" class="e2e-key">
+  </sci-form-field>
+  <sci-form-field label="Value" direction="column">
+    <input [formControl]="provideValueFormGroup.controls.value" [attr.list]="undefinedList" class="e2e-value">
+  </sci-form-field>
+  <button (click)="onValueSave()" [disabled]="provideValueFormGroup.invalid" class="e2e-save">Save</button>
+</section>
+
+<section class="e2e-dialog-handle dialog-handle">
+  <header>WorkbenchDialog Handle</header>
+
+  <sci-form-field label="Title" direction="column"><input class="e2e-title" [attr.list]="undefinedList" #dialog_title></sci-form-field>
+  <button (click)="onDialogTitleSet(dialog_title.value)" class="e2e-set-title">Set</button>
+</section>
+
+<datalist [attr.id]="undefinedList">
+  <option value="<undefined>">&lt;undefined&gt;</option>
+</datalist>

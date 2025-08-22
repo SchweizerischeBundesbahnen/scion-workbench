@@ -9,7 +9,7 @@
  */
 
 import {ChangeDetectionStrategy, Component, computed, inject, input, Signal} from '@angular/core';
-import {WorkbenchDialog, WorkbenchDialogActionDirective, WorkbenchView} from '@scion/workbench';
+import {Translatable, WorkbenchDialog, WorkbenchDialogActionDirective, WorkbenchView} from '@scion/workbench';
 import {ActivatedRoute, Router} from '@angular/router';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {JoinPipe} from '../common/join.pipe';
@@ -55,7 +55,7 @@ export class ViewInfoDialogComponent {
     this._dialog.close();
   }
 
-  protected onPartTitleChange(title: string): void {
+  protected onPartTitleChange(title: Translatable): void {
     this.view().part().title = parseTypedString(title)!;
   }
 

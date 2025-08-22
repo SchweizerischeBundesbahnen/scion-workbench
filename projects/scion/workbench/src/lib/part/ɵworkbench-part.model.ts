@@ -32,6 +32,7 @@ import {MainAreaPartComponent} from './main-area-part/main-area-part.component';
 import {PartComponent} from './part.component';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 export class ɵWorkbenchPart implements WorkbenchPart {
 
@@ -40,7 +41,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   private readonly _rootOutletContexts = inject(ChildrenOutletContexts);
   private readonly _focusMonitor = inject(WorkbenchFocusMonitor);
   private readonly _layout = inject(WorkbenchLayoutService).layout;
-  private readonly _title = signal<string | undefined>(undefined);
+  private readonly _title = signal<Translatable | undefined>(undefined);
   private readonly _titleComputed = this.computeTitle();
 
   public readonly alternativeId: string | undefined;
@@ -141,7 +142,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     }
   }
 
-  private computeTitle(): Signal<string | undefined> {
+  private computeTitle(): Signal<Translatable | undefined> {
     return computed(() => {
       const activity = this.activity();
 
@@ -202,12 +203,12 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   }
 
   /** @inheritDoc */
-  public get title(): Signal<string | undefined> {
+  public get title(): Signal<Translatable | undefined> {
     return this._titleComputed;
   }
 
   /** @inheritDoc */
-  public set title(title: string | undefined) {
+  public set title(title: Translatable | undefined) {
     untracked(() => this._title.set(title));
   }
 

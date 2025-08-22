@@ -23,6 +23,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {parseTypedString} from '../common/parse-typed-value.util';
 import {PerspectiveCapabilityPropertiesComponent, WorkbenchPerspectiveCapabilityProperties} from './perspective-capability-properties/perspective-capability-properties.component';
 import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
+import {RecordComponent} from '../record/record.component';
 
 /**
  * Allows registering workbench capabilities.
@@ -40,6 +41,7 @@ import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.c
     SciViewportComponent,
     PerspectiveCapabilityPropertiesComponent,
     MultiValueInputComponent,
+    RecordComponent,
   ],
 })
 export default class RegisterWorkbenchCapabilityPageComponent {
@@ -59,6 +61,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
       path: this._formBuilder.control(''),
       title: this._formBuilder.control(''),
       heading: this._formBuilder.control(''),
+      resolve: this._formBuilder.control<Record<string, string> | undefined>(undefined),
       closable: this._formBuilder.control<boolean | null>(null),
       showSplash: this._formBuilder.control<boolean | null>(null),
       cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
@@ -89,6 +92,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         maxWidth: this._formBuilder.control(''),
       }),
       title: this._formBuilder.control(''),
+      resolve: this._formBuilder.control<Record<string, string> | undefined>(undefined),
       closable: this._formBuilder.control<boolean | null>(null),
       resizable: this._formBuilder.control<boolean | null>(null),
       padding: this._formBuilder.control<boolean | null>(null),
@@ -181,6 +185,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         path: parseTypedString(this.form.controls.viewProperties.controls.path.value)!, // allow `undefined` to test capability validation
         title: this.form.controls.viewProperties.controls.title.value || undefined,
         heading: this.form.controls.viewProperties.controls.heading.value || undefined,
+        resolve: this.form.controls.viewProperties.controls.resolve.value,
         cssClass: this.form.controls.viewProperties.controls.cssClass.value,
         closable: this.form.controls.viewProperties.controls.closable.value ?? undefined,
         showSplash: this.form.controls.viewProperties.controls.showSplash.value ?? undefined,
@@ -239,6 +244,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
           maxHeight: this.form.controls.dialogProperties.controls.size.controls.maxHeight.value || undefined,
         })!, // allow `undefined` to test capability validation
         title: this.form.controls.dialogProperties.controls.title.value || undefined,
+        resolve: this.form.controls.dialogProperties.controls.resolve.value,
         closable: this.form.controls.dialogProperties.controls.closable.value ?? undefined,
         resizable: this.form.controls.dialogProperties.controls.resizable.value ?? undefined,
         padding: this.form.controls.dialogProperties.controls.padding.value ?? undefined,

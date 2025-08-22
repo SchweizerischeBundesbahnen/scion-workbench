@@ -19,6 +19,7 @@ import {Observables} from '@scion/toolkit/util';
 import {CanCloseFn, CanCloseRef, ViewSnapshot, WorkbenchView} from './workbench-view';
 import {decorateObservable} from '../observable-decorator';
 import {PartId, ViewId} from '../workbench.identifiers';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
 
@@ -134,7 +135,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
   }
 
   /** @inheritDoc */
-  public setTitle(title: string | Observable<string>): void {
+  public setTitle(title: Translatable | Observable<string>): void {
     this._propertyChange$.next('title');
 
     Observables.coerce(title)
@@ -146,7 +147,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
   }
 
   /** @inheritDoc */
-  public setHeading(heading: string | Observable<string>): void {
+  public setHeading(heading: Translatable | Observable<Translatable>): void {
     this._propertyChange$.next('heading');
 
     Observables.coerce(heading)

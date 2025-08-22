@@ -13,7 +13,7 @@ import {EnvironmentProviders, inject, Injectable, makeEnvironmentProviders} from
 import {MicrofrontendPlatformInitializer} from './initialization/microfrontend-platform-initializer.service';
 import {IntentClient, ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, PlatformPropertyService} from '@scion/microfrontend-platform';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter} from '@scion/workbench-client';
+import {WorkbenchTextService, WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter} from '@scion/workbench-client';
 import {NgZoneObservableDecorator} from './initialization/ng-zone-observable-decorator';
 import {WorkbenchConfig} from '../workbench-config';
 import {provideViewCommandHandlers} from './microfrontend-view/microfrontend-view-command-handler.service';
@@ -41,6 +41,8 @@ import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform-config
 import {provideWorkbenchInitializer} from '../startup/workbench-initializer';
 import {Defined} from '@scion/toolkit/util';
 import {WORKBENCH_ROUTE} from '../workbench.constants';
+import {provideRemoteTextProvider} from './text/remote-text-provider';
+import {provideHostTextProvider} from './text/host-text-provider';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -74,6 +76,8 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     provideMicrofrontendViewRoute(),
     provideMicrofrontendPlatformBeans(),
     provideWorkbenchClientBeans(),
+    provideRemoteTextProvider(),
+    provideHostTextProvider(),
   ]);
 }
 
@@ -126,6 +130,7 @@ function provideWorkbenchClientBeans(): EnvironmentProviders {
     {provide: WorkbenchDialogService, useFactory: () => Beans.get(WorkbenchDialogService)},
     {provide: WorkbenchMessageBoxService, useFactory: () => Beans.get(WorkbenchMessageBoxService)},
     {provide: WorkbenchNotificationService, useFactory: () => Beans.get(WorkbenchNotificationService)},
+    {provide: WorkbenchTextService, useFactory: () => Beans.get(WorkbenchTextService)},
   ]);
 }
 

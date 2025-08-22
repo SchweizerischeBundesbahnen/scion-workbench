@@ -1978,64 +1978,6 @@ test.describe('Workbench Router', () => {
     await expectView(testeeViewPage).not.toBeAttached();
   });
 
-  test('should substitute named parameter in title/heading property of view capability', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-    await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
-
-    await microfrontendNavigator.registerCapability('app1', {
-      type: 'view',
-      qualifier: {component: 'testee'},
-      params: [
-        {name: 'title', required: false},
-        {name: 'heading', required: false},
-      ],
-      properties: {
-        path: 'test-pages/microfrontend-test-page',
-        title: ':title',
-        heading: ':heading',
-      },
-    });
-
-    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.navigate({component: 'testee'}, {
-      target: 'view.100',
-      params: {title: 'Title Param', heading: 'Heading Param'},
-    });
-
-    const testeeView = appPO.view({viewId: 'view.100'});
-    await expect(testeeView.tab.title).toHaveText('Title Param');
-    await expect(testeeView.tab.heading).toHaveText('Heading Param');
-  });
-
-  test('should substitute named parameters in title/heading property of view capability', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-    await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
-
-    await microfrontendNavigator.registerCapability('app1', {
-      type: 'view',
-      qualifier: {component: 'testee'},
-      params: [
-        {name: 'param1', required: false},
-        {name: 'param2', required: false},
-      ],
-      properties: {
-        path: 'test-pages/microfrontend-test-page',
-        title: ':param1/:param2/:param3',
-        heading: ':param1 :param2 :param3',
-      },
-    });
-
-    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.navigate({component: 'testee'}, {
-      target: 'view.100',
-      params: {param1: 'value1', param2: 'value2'},
-    });
-
-    const testeeView = appPO.view({viewId: 'view.100'});
-    await expect(testeeView.tab.title).toHaveText('value1/value2/:param3');
-    await expect(testeeView.tab.heading).toHaveText('value1 value2 :param3');
-  });
-
   test('should open view in the specified part', async ({appPO, workbenchNavigator, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 

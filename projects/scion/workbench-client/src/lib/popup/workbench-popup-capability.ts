@@ -21,50 +21,38 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
  * @category Popup
  */
 export interface WorkbenchPopupCapability extends Capability {
-
+  /**
+   * @inheritDoc
+   */
   type: WorkbenchCapabilities.Popup;
 
   /**
    * Qualifies this popup. The qualifier is required for popups.
+   *
+   * @inheritDoc
    */
   qualifier: Qualifier;
-
+  /**
+   * @inheritDoc
+   */
   properties: {
     /**
-     * Specifies the path of the microfrontend to be opened when navigating to this popup capability.
+     * Specifies the path to the microfrontend.
      *
-     * The path is relative to the base URL, as specified in the application manifest. If the
-     * application does not declare a base URL, it is relative to the origin of the manifest file.
+     * The path is relative to the base URL given in the application manifest, or to the origin of the manifest file if no base URL is specified.
      *
-     * In the path, you can reference qualifier and parameter values in the form of named parameters.
-     * Named parameters begin with a colon (`:`) followed by the parameter or qualifier name, and are allowed in path segments, query parameters, matrix parameters
-     * and the fragment part. The popup router will substitute named parameters in the URL accordingly.
+     * Path segments can reference capability parameters using the colon syntax.
      *
-     * In addition to using qualifier and parameter values as named parameters in the URL, params are available in the microfrontend via {@link WorkbenchPopup.params} object.
-     *
-     * #### Usage of named parameters in the path:
      * ```json
      * {
-     *   "type": "popup",
-     *   "qualifier": {"entity": "product"},
      *   "params": [
-     *     {"name": "id", "required":  true, "description": "Identifies the product."}
+     *     {"name": "id", "required": true}
      *   ],
      *   "properties": {
-     *     "path": "product/:id",
-     *     ...
+     *     "path": "product/:id", // `:id` references a capability parameter
      *   }
      * }
      * ```
-     *
-     * #### Path parameter example:
-     * segment/:param1/segment/:param2
-     *
-     * #### Matrix parameter example:
-     * segment/segment;matrixParam1=:param1;matrixParam2=:param2
-     *
-     * #### Query parameter example:
-     * segment/segment?queryParam1=:param1&queryParam2=:param2
      */
     path: string;
     /**

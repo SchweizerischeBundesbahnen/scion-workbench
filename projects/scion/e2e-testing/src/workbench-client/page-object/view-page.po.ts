@@ -12,7 +12,7 @@ import {DomRect, fromRect} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {Params} from '@angular/router';
-import {ViewId, WorkbenchViewCapability} from '@scion/workbench-client';
+import {Translatable, ViewId, WorkbenchViewCapability} from '@scion/workbench-client';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
@@ -106,11 +106,11 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
     }
   }
 
-  public async enterTitle(title: string): Promise<void> {
+  public async enterTitle(title: Translatable): Promise<void> {
     await this.locator.locator('input.e2e-title').fill(title);
   }
 
-  public async enterHeading(heading: string): Promise<void> {
+  public async enterHeading(heading: Translatable): Promise<void> {
     await this.locator.locator('input.e2e-heading').fill(heading);
   }
 

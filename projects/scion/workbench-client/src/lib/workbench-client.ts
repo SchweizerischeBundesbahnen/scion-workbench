@@ -24,6 +24,11 @@ import {ɵWorkbenchDialogService} from './dialog/ɵworkbench-dialog-service';
 import {WorkbenchMessageBoxInitializer} from './message-box/workbench-message-box-initializer';
 import {ɵWorkbenchMessageBoxService} from './message-box/ɵworkbench-message-box-service';
 import {StyleSheetInstaller} from './style-sheet-installer';
+import {registerTextProvider} from './text/workbench-text-provider';
+import {Disposable} from './common/disposable';
+import {WorkbenchTextProviderFn} from './text/workbench-text-provider.model';
+import {WorkbenchTextService} from './text/workbench-text-service';
+import {ɵWorkbenchTextService} from './text/ɵworkbench-text-service';
 
 /**
  * **SCION Workbench Client provides core API for a web app to interact with SCION Workbench and other microfrontends.**
@@ -122,11 +127,30 @@ export class WorkbenchClient {
     Beans.register(WorkbenchDialogService, {useClass: ɵWorkbenchDialogService});
     Beans.register(WorkbenchMessageBoxService, {useClass: ɵWorkbenchMessageBoxService});
     Beans.register(WorkbenchThemeMonitor, {useClass: ɵWorkbenchThemeMonitor});
+    Beans.register(WorkbenchTextService, {useClass: ɵWorkbenchTextService});
     Beans.register(StyleSheetInstaller, {eager: true});
     Beans.registerInitializer({useClass: WorkbenchViewInitializer});
     Beans.registerInitializer({useClass: WorkbenchPopupInitializer});
     Beans.registerInitializer({useClass: WorkbenchDialogInitializer});
     Beans.registerInitializer({useClass: WorkbenchMessageBoxInitializer});
     await MicrofrontendPlatformClient.connect(symbolicName, connectOptions);
+  }
+
+  /**
+   * Provides texts to the SCION Workbench and micro apps.
+   *
+   * A text provider is a function that returns the text for a translation key.
+   *
+   * Texts starting with the percent symbol (`%`) are passed to the text provider for translation, with the percent symbol omitted.
+   *
+   * This function must be called in an Activator. Refer to {@link @scion/microfrontend-platform!ActivatorCapability} for details on activators.
+   *
+   * Applications can use {@link WorkbenchTextService} to get texts from other micro applications.
+   *
+   * @param textProvider - Function to provide the text for a translation key.
+   * @return Object to unregister the text provider.
+   */
+  public static registerTextProvider(textProvider: WorkbenchTextProviderFn): Disposable {
+    return registerTextProvider(textProvider);
   }
 }

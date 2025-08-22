@@ -14,7 +14,7 @@ import {InputFieldSkeletonComponent} from '../skeletons/input-field-sekeleton/in
 import {TabbarSkeletonComponent} from '../skeletons/tabbar-sekeleton/tabbar-skeleton.component';
 import {ChartSkeletonComponent} from '../skeletons/chart-skeleton/chart-skeleton.component';
 import {Skeletons} from '../skeletons/skeletons.util';
-import {NavigationData, WorkbenchRouter, WorkbenchView} from '@scion/workbench';
+import {NavigationData, Translatable, WorkbenchRouter, WorkbenchView} from '@scion/workbench';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ListSkeletonComponent} from '../skeletons/list-sekeleton/list-skeleton.component';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
@@ -72,7 +72,7 @@ export default class SampleViewComponent {
     }
   }
 
-  private onTitleChange(title: string | null): void {
+  private onTitleChange(title: Translatable | null): void {
     this.persist({title});
   }
 
@@ -121,7 +121,7 @@ export interface ViewSkeletonNavigationData extends NavigationData {
   /**
    * Title of the view.
    */
-  title?: string | null;
+  title?: Translatable | null;
   /**
    * Type of skeleton.
    */

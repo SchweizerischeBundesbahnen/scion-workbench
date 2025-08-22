@@ -14,10 +14,11 @@ import {Logger} from '../../logging';
 import {ViewId} from '../../workbench.identifiers';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
-import {ɵWorkbenchCommands} from '@scion/workbench-client';
+import {Translatable, ɵWorkbenchCommands} from '@scion/workbench-client';
 import {Subscription} from 'rxjs';
 import {MicrofrontendWorkbenchView} from './microfrontend-workbench-view.model';
 import {provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer.provider';
+import {createRemoteTranslatable} from '../text/remote-text-provider';
 
 @Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 class MicrofrontendViewCommandHandler implements OnDestroy {
@@ -39,10 +40,11 @@ class MicrofrontendViewCommandHandler implements OnDestroy {
    * Handles commands to update the title of a view.
    */
   private installViewTitleCommandHandler(): Subscription {
-    return this._messageClient.onMessage<string>(ɵWorkbenchCommands.viewTitleTopic(':viewId'), message => {
+    return this._messageClient.onMessage<Translatable>(ɵWorkbenchCommands.viewTitleTopic(':viewId'), message => {
       const viewId = message.params!.get('viewId') as ViewId;
       this.runIfPrivileged(viewId, message, view => {
-        view.title = message.body!;
+        const referrer = message.headers.get(MessageHeaders.AppSymbolicName) as string;
+        view.title = createRemoteTranslatable(message.body, {appSymbolicName: referrer}) ?? null;
       });
     });
   }
@@ -51,10 +53,11 @@ class MicrofrontendViewCommandHandler implements OnDestroy {
    * Handles commands to update the heading of a view.
    */
   private installViewHeadingCommandHandler(): Subscription {
-    return this._messageClient.onMessage<string>(ɵWorkbenchCommands.viewHeadingTopic(':viewId'), message => {
+    return this._messageClient.onMessage<Translatable>(ɵWorkbenchCommands.viewHeadingTopic(':viewId'), message => {
       const viewId = message.params!.get('viewId') as ViewId;
       this.runIfPrivileged(viewId, message, view => {
-        view.heading = message.body!;
+        const referrer = message.headers.get(MessageHeaders.AppSymbolicName) as string;
+        view.heading = createRemoteTranslatable(message.body, {appSymbolicName: referrer}) ?? null;
       });
     });
   }
