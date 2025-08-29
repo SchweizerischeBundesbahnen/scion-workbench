@@ -14,6 +14,7 @@ import {Beans} from '@scion/toolkit/bean-manager';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {Maps} from '@scion/toolkit/util';
 import {lastValueFrom} from 'rxjs';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * Allows displaying a notification to the user.
@@ -56,7 +57,7 @@ export class WorkbenchNotificationService {
    *         the notification intention, or because no notification provider could be found that provides a notification under the specified
    *         qualifier.
    */
-  public async show(notification: string | WorkbenchNotificationConfig, qualifier?: Qualifier): Promise<void> {
+  public async show(notification: Translatable | WorkbenchNotificationConfig, qualifier?: Qualifier): Promise<void> {
     const config: WorkbenchNotificationConfig = typeof notification === 'string' ? {content: notification} : notification;
     const params = Maps.coerce(config.params);
 

@@ -25,9 +25,13 @@ import {Translatable} from '../text/workbench-text-provider.model';
 export interface NotificationConfig {
 
   /**
-   * Optional title of the notification; can be a string literal or an Observable.
+   * Optional title of the notification.
+   *
+   * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   *
+   * TODO [Angular 21] Passing an Observable is deprecated. To migrate, pass a translatable and provide the text using a text provider registered in `WorkbenchClient.registerTextProvider`. API will be removed in version 21.
    */
-  title?: Translatable | Observable<string>;
+  title?: Translatable | Observable<Translatable | undefined>;
 
   /**
    * Content of the notification, can be either a plain text message or a component.

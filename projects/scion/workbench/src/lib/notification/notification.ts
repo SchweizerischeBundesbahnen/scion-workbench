@@ -26,9 +26,16 @@ export abstract class Notification<T = any> {
   public readonly input: T | undefined;
 
   /**
-   * Sets the title of the notification; can be a string literal or an Observable.
+   * Sets the title of the notification.
    */
-  public abstract setTitle(title: Translatable | undefined | Observable<string | undefined>): void;
+  public abstract setTitle(title: Translatable | undefined): void;
+
+  /**
+   * Sets the title of the notification.
+   *
+   * @deprecated since version 20.0.0-beta.6. To migrate, pass a translatable and provide the text using a text provider registered in `WorkbenchClient.registerTextProvider`.
+   */
+  public abstract setTitle(title: Observable<Translatable | undefined>): void; // eslint-disable-line @typescript-eslint/unified-signatures
 
   /**
    * Sets the severity of the notification.

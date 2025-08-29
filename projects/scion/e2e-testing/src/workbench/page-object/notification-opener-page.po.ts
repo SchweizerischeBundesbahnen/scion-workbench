@@ -14,7 +14,7 @@ import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
 import {ViewPO} from '../../view.po';
-import {ViewId} from '@scion/workbench';
+import {Translatable, ViewId} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link NotificationPageComponent}.
@@ -35,7 +35,7 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO {
     await this.locator.locator('select.e2e-component').selectOption(component);
   }
 
-  public async enterContent(content: string): Promise<void> {
+  public async enterContent(content: Translatable): Promise<void> {
     await this.locator.locator('input.e2e-content').fill(content);
   }
 
@@ -43,7 +43,7 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO {
     await this.locator.locator('input.e2e-component-input').fill(componentInput);
   }
 
-  public async enterTitle(title: string): Promise<void> {
+  public async enterTitle(title: Translatable): Promise<void> {
     await this.locator.locator('input.e2e-title').fill(title);
   }
 

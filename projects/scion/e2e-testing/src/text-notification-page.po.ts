@@ -13,7 +13,9 @@ import {NotificationPO} from './notification.po';
 import {WorkbenchNotificationPagePO} from './workbench/page-object/workbench-notification-page.po';
 
 /**
- * Page object to interact with {@link TextNotificationComponent}.
+ * Page object to interact with the built-in workbench notification displaying a text.
+ *
+ * @see TextNotificationComponent
  */
 export class TextNotificationPagePO implements WorkbenchNotificationPagePO {
 
