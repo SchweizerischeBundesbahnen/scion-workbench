@@ -10,7 +10,7 @@
 
 import {Component, inject} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {ViewId, WorkbenchMessageBoxOptions, WorkbenchMessageBoxService, WorkbenchView} from '@scion/workbench-client';
+import {Translatable, ViewId, WorkbenchMessageBoxOptions, WorkbenchMessageBoxService, WorkbenchView} from '@scion/workbench-client';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {stringifyError} from '../common/stringify-error.util';
@@ -18,6 +18,8 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {startWith} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
+import {parseTypedString} from '../common/parse-typed-value.util';
+import {UUID} from '@scion/toolkit/uuid';
 
 @Component({
   selector: 'app-message-box-opener-page',
@@ -54,6 +56,7 @@ export default class MessageBoxOpenerPageComponent {
   protected isEmptyQualifier = true;
   protected openError: string | undefined;
   protected closeAction: string | undefined;
+  protected readonly nullList = `autocomplete-null-${UUID.randomUUID()}`;
 
   constructor() {
     inject(WorkbenchView).signalReady();
@@ -72,7 +75,7 @@ export default class MessageBoxOpenerPageComponent {
         .catch((error: unknown) => this.openError = stringifyError(error));
     }
     else {
-      const message = this.form.controls.message.value.replace(/\\n/g, '\n'); // restore line breaks as sanitized by the user agent;
+      const message = parseTypedString<Translatable>(this.restoreLineBreaks(this.form.controls.message.value)) ?? null;
       this._messageBoxService.open(message, this.readOptions())
         .then(closeAction => this.closeAction = closeAction)
         .catch((error: unknown) => this.openError = stringifyError(error));
@@ -127,5 +130,12 @@ export default class MessageBoxOpenerPageComponent {
       .subscribe(qualifier => {
         this.isEmptyQualifier = !qualifier.length;
       });
+  }
+
+  /**
+   * Restores line breaks as sanitized by the user agent.
+   */
+  private restoreLineBreaks(value: string): string {
+    return value.replace(/\\n/g, '\n');
   }
 }

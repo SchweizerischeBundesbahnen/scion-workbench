@@ -16,6 +16,7 @@ import {WorkbenchDialogPagePO} from '../../workbench/page-object/workbench-dialo
 import {DialogPO} from '../../dialog.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {DomRect, fromRect} from '../../helper/testing.util';
+import {Translatable} from '@scion/workbench-client';
 
 /**
  * Page object to interact with {@link HostDialogPageComponent}.
@@ -31,7 +32,7 @@ export class HostDialogPagePO implements WorkbenchDialogPagePO {
     this.locator = this.dialog.locator.locator('app-host-dialog-page');
   }
 
-  public async enterTitle(title: string): Promise<void> {
+  public async enterTitle(title: Translatable): Promise<void> {
     await this.locator.locator('input.e2e-title').fill(title);
   }
 

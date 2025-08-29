@@ -14,7 +14,7 @@ import {MessageBoxPO} from './message-box.po';
 import {DomRect, fromRect} from './helper/testing.util';
 
 /**
- * Page object to interact with the default workbench message box displaying a text.
+ * Page object to interact with the built-in workbench message box displaying a text.
  */
 export class TextMessageBoxPagePO implements WorkbenchMessageBoxPagePO {
 

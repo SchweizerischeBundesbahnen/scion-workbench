@@ -10,7 +10,7 @@
 
     @if (!isUseComponent()) {
       <sci-form-field label="Message">
-        <input [formControl]="form.controls.message" class="e2e-message">
+        <input [formControl]="form.controls.message" [attr.list]="nullList" class="e2e-message">
       </sci-form-field>
     }
 
@@ -72,3 +72,7 @@
     {{messageBoxError}}
   </output>
 }
+
+<datalist [attr.id]="nullList">
+  <option value="<null>"></option>
+</datalist>

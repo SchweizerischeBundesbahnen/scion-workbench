@@ -10,11 +10,13 @@
 
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
-import {WorkbenchDialogCapability, WorkbenchViewCapability} from './page-object/register-workbench-capability-page.po';
+import {WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchViewCapability} from './page-object/register-workbench-capability-page.po';
 import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
 import {TextTestPagePO} from './page-object/test-pages/text-test-page.po';
 import {TextTestPagePO as HostTextTestPagePO} from '../workbench/page-object/test-pages/text-test-page.po';
+import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
+import {TextMessageBoxPagePO} from '../text-message-box-page.po';
 
 test.describe('Text Provider', () => {
 
@@ -1135,6 +1137,310 @@ test.describe('Text Provider', () => {
       await test.step('Provide `undefined`', async () => {
         await testPage.provideText('dialog_title', '<undefined>');
         await expect(testPage.dialog.title).toHaveText('dialog_title');
+      });
+    });
+  });
+
+  test.describe('Workbench Messagebox', () => {
+
+    test('should display non-localized messagebox', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register test message box.
+      await microfrontendNavigator.registerCapability<WorkbenchMessageBoxCapability>('app1', {
+        type: 'messagebox',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-message-box',
+        },
+      });
+
+      // Open test message box.
+      const messageBoxOpener = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
+      await messageBoxOpener.open({component: 'testee'}, {cssClass: 'testee', title: 'Title', actions: {yes: 'Yes', no: 'No'}});
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+
+      // Expect message box texts as specified.
+      await expect(messageBox.title).toHaveText('Title');
+      await expect.poll(() => messageBox.getActions()).toEqual({yes: 'Yes', no: 'No'});
+    });
+
+    test('should display localized messagebox', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register message box in app 2.
+      await microfrontendNavigator.registerCapability<WorkbenchMessageBoxCapability>('app2', {
+        type: 'messagebox',
+        qualifier: {component: 'testee', app: 'app2'},
+        private: false,
+        properties: {
+          path: 'test-message-box',
+        },
+      });
+
+      // Register text view in app 1.
+      await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+        type: 'view',
+        qualifier: {component: 'text', app: 'app1'},
+        properties: {
+          path: 'test-pages/text-test-page',
+        },
+      });
+
+      // Register intention to open message box from app 1.
+      await microfrontendNavigator.registerIntention('app1', {
+        type: 'messagebox',
+        qualifier: {component: 'testee', app: 'app2'},
+      });
+
+      // Create perspective with test view.
+      await microfrontendNavigator.createPerspective('app1', {
+        type: 'perspective',
+        qualifier: {perspective: 'testee'},
+        properties: {
+          layout: [
+            {
+              id: 'part.left',
+              views: [
+                {qualifier: {component: 'text', app: 'app1'}, cssClass: 'text-app1'},
+              ],
+            },
+            {
+              id: 'part.right',
+              align: 'right',
+              views: [
+                {qualifier: {component: 'messagebox', app: 'app1'}, cssClass: 'messagebox-opener-app1'},
+              ],
+            },
+          ],
+        },
+      });
+
+      const textPageApp1 = TextTestPagePO.newViewPO(appPO, {cssClass: 'text-app1'});
+      const messageBoxOpenerApp1 = new MessageBoxOpenerPagePO(appPO, {cssClass: 'messagebox-opener-app1'});
+
+      // Open test message box from app 1.
+      await messageBoxOpenerApp1.open({component: 'testee', app: 'app2'}, {cssClass: 'testee', title: '%message.title', actions: {yes: '%yes.action', no: '%no.action'}});
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+
+      // Provide text.
+      await test.step('Provide text', async () => {
+        await textPageApp1.provideText('message.title', 'Title 1');
+        await textPageApp1.provideText('yes.action', 'Yes 1');
+        await textPageApp1.provideText('no.action', 'No 1');
+        await expect(messageBox.title).toHaveText('Title 1');
+        await expect.poll(() => messageBox.getActions()).toEqual({yes: 'Yes 1', no: 'No 1'});
+      });
+
+      // Provide different text.
+      await test.step('Provide different text', async () => {
+        await textPageApp1.provideText('message.title', 'Title 2');
+        await textPageApp1.provideText('yes.action', 'Yes 2');
+        await textPageApp1.provideText('no.action', 'No 2');
+        await expect(messageBox.title).toHaveText('Title 2');
+        await expect.poll(() => messageBox.getActions()).toEqual({yes: 'Yes 2', no: 'No 2'});
+      });
+
+      // Provide `undefined` as text.
+      await test.step('Provide `undefined`', async () => {
+        await textPageApp1.provideText('message.title', '<undefined>');
+        await textPageApp1.provideText('yes.action', '<undefined>');
+        await textPageApp1.provideText('no.action', '<undefined>');
+        await expect(messageBox.title).toHaveText('message.title');
+        await expect.poll(() => messageBox.getActions()).toEqual({yes: 'yes.action', no: 'no.action'});
+      });
+    });
+  });
+
+  test.describe('Workbench Host Messagebox', () => {
+
+    test('should display non-localized messagebox', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // TODO [#271]: Register host messagebox capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
+      await microfrontendNavigator.registerIntention('app1', {type: 'messagebox', qualifier: {component: 'host-messagebox'}});
+
+      // Open test message box.
+      const messageBoxOpener = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
+      await messageBoxOpener.open({component: 'host-messagebox'}, {cssClass: 'testee', title: 'Title', actions: {yes: 'Yes', no: 'No'}});
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+
+      // Expect message box texts as specified.
+      await expect(messageBox.title).toHaveText('Title');
+      await expect.poll(() => messageBox.getActions()).toEqual({yes: 'Yes', no: 'No'});
+    });
+
+    test('should display localized messagebox', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // TODO [#271]: Register host messagebox capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
+      await microfrontendNavigator.registerIntention('app1', {type: 'messagebox', qualifier: {component: 'host-messagebox'}});
+
+      // Register text view in app 1.
+      await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+        type: 'view',
+        qualifier: {component: 'text', app: 'app1'},
+        properties: {
+          path: 'test-pages/text-test-page',
+        },
+      });
+
+      // Create perspective with text view and messagebox opener.
+      await microfrontendNavigator.createPerspective('app1', {
+        type: 'perspective',
+        qualifier: {perspective: 'testee'},
+        properties: {
+          layout: [
+            {
+              id: 'part.left',
+              views: [
+                {qualifier: {component: 'text', app: 'app1'}, cssClass: 'text-app1'},
+              ],
+            },
+            {
+              id: 'part.right',
+              align: 'right',
+              views: [
+                {qualifier: {component: 'messagebox', app: 'app1'}, cssClass: 'messagebox-opener-app1'},
+              ],
+            },
+          ],
+        },
+      });
+
+      const textPageApp1 = TextTestPagePO.newViewPO(appPO, {cssClass: 'text-app1'});
+      const messageBoxOpenerApp1 = new MessageBoxOpenerPagePO(appPO, {cssClass: 'messagebox-opener-app1'});
+
+      // Open test message box.
+      await messageBoxOpenerApp1.open({component: 'host-messagebox'}, {cssClass: 'testee', title: '%message.title', actions: {yes: '%yes.action', no: '%no.action'}});
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+
+      // Provide text.
+      await test.step('Provide text', async () => {
+        await textPageApp1.provideText('message.title', 'Title 1');
+        await textPageApp1.provideText('yes.action', 'Yes 1');
+        await textPageApp1.provideText('no.action', 'No 1');
+        await expect(messageBox.title).toHaveText('Title 1');
+        await expect.poll(() => messageBox.getActions()).toEqual({yes: 'Yes 1', no: 'No 1'});
+      });
+
+      // Provide different text.
+      await test.step('Provide different text', async () => {
+        await textPageApp1.provideText('message.title', 'Title 2');
+        await textPageApp1.provideText('yes.action', 'Yes 2');
+        await textPageApp1.provideText('no.action', 'No 2');
+        await expect(messageBox.title).toHaveText('Title 2');
+        await expect.poll(() => messageBox.getActions()).toEqual({yes: 'Yes 2', no: 'No 2'});
+      });
+
+      // Provide `undefined` as text.
+      await test.step('Provide `undefined`', async () => {
+        await textPageApp1.provideText('message.title', '<undefined>');
+        await textPageApp1.provideText('yes.action', '<undefined>');
+        await textPageApp1.provideText('no.action', '<undefined>');
+        await expect(messageBox.title).toHaveText('message.title');
+        await expect.poll(() => messageBox.getActions()).toEqual({yes: 'yes.action', no: 'no.action'});
+      });
+    });
+  });
+
+  test.describe('Workbench Host Messagebox (built-in text message)', () => {
+
+    test('should display non-localized messagebox', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register intention.
+      await microfrontendNavigator.registerIntention('app1', {type: 'messagebox'});
+
+      // Open test message box.
+      const messageBoxOpener = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
+      await messageBoxOpener.open('Message', {cssClass: 'testee', title: 'Title', actions: {yes: 'Yes', no: 'No'}});
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const textMessageBoxPage = new TextMessageBoxPagePO(messageBox);
+
+      // Expect message box texts as specified.
+      await expect(messageBox.title).toHaveText('Title');
+      await expect(textMessageBoxPage.text).toHaveText('Message');
+      await expect.poll(() => messageBox.getActions()).toEqual({yes: 'Yes', no: 'No'});
+    });
+
+    test('should display localized messagebox', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register intention.
+      await microfrontendNavigator.registerIntention('app1', {type: 'messagebox'});
+
+      // Register text view in app 1.
+      await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+        type: 'view',
+        qualifier: {component: 'text', app: 'app1'},
+        properties: {
+          path: 'test-pages/text-test-page',
+        },
+      });
+
+      // Create perspective with text view and messagebox opener.
+      await microfrontendNavigator.createPerspective('app1', {
+        type: 'perspective',
+        qualifier: {perspective: 'testee'},
+        properties: {
+          layout: [
+            {
+              id: 'part.left',
+              views: [
+                {qualifier: {component: 'text', app: 'app1'}, cssClass: 'text-app1'},
+              ],
+            },
+            {
+              id: 'part.right',
+              align: 'right',
+              views: [
+                {qualifier: {component: 'messagebox', app: 'app1'}, cssClass: 'messagebox-opener-app1'},
+              ],
+            },
+          ],
+        },
+      });
+
+      const textPageApp1 = TextTestPagePO.newViewPO(appPO, {cssClass: 'text-app1'});
+      const messageBoxOpenerApp1 = new MessageBoxOpenerPagePO(appPO, {cssClass: 'messagebox-opener-app1'});
+
+      // Open test message box.
+      await messageBoxOpenerApp1.open('%message.message', {cssClass: 'testee', title: '%message.title', actions: {yes: '%yes.action', no: '%no.action'}});
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const textMessageBoxPage = new TextMessageBoxPagePO(messageBox);
+
+      // Provide text.
+      await test.step('Provide text', async () => {
+        await textPageApp1.provideText('message.message', 'Message 1');
+        await textPageApp1.provideText('message.title', 'Title 1');
+        await textPageApp1.provideText('yes.action', 'Yes 1');
+        await textPageApp1.provideText('no.action', 'No 1');
+        await expect(messageBox.title).toHaveText('Title 1');
+        await expect(textMessageBoxPage.text).toHaveText('Message 1');
+        await expect.poll(() => messageBox.getActions()).toEqual({yes: 'Yes 1', no: 'No 1'});
+      });
+
+      // Provide different text.
+      await test.step('Provide different text', async () => {
+        await textPageApp1.provideText('message.message', 'Message 2');
+        await textPageApp1.provideText('message.title', 'Title 2');
+        await textPageApp1.provideText('yes.action', 'Yes 2');
+        await textPageApp1.provideText('no.action', 'No 2');
+        await expect(messageBox.title).toHaveText('Title 2');
+        await expect(textMessageBoxPage.text).toHaveText('Message 2');
+        await expect.poll(() => messageBox.getActions()).toEqual({yes: 'Yes 2', no: 'No 2'});
+      });
+
+      // Provide `undefined` as text.
+      await test.step('Provide `undefined`', async () => {
+        await textPageApp1.provideText('message.message', '<undefined>');
+        await textPageApp1.provideText('message.title', '<undefined>');
+        await textPageApp1.provideText('yes.action', '<undefined>');
+        await textPageApp1.provideText('no.action', '<undefined>');
+        await expect(messageBox.title).toHaveText('message.title');
+        await expect(textMessageBoxPage.text).toHaveText('message.message');
+        await expect.poll(() => messageBox.getActions()).toEqual({yes: 'yes.action', no: 'no.action'});
       });
     });
   });

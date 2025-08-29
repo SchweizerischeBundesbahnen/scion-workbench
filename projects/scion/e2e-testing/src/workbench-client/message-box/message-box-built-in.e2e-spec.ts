@@ -71,17 +71,20 @@ test.describe('Workbench Message Box Built-in Capability', () => {
       await expect.poll(() => textMessagePage.isTextSelectable()).toBe(true);
     });
 
-    test('should not have height if the message is empty', async ({appPO, microfrontendNavigator}) => {
+    test('should open message box with empty message', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       await microfrontendNavigator.registerIntention('app1', {type: 'messagebox'});
 
       // Open the message box.
       const messageBoxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
-      await messageBoxOpenerPage.open('', {cssClass: 'testee'});
+      await messageBoxOpenerPage.open(null, {cssClass: 'testee'});
 
       const messageBox = appPO.messagebox({cssClass: 'testee'});
       const textMessagePage = new TextMessagePO(messageBox);
+
+      // Expect text not to be displayed.
+      await expect(textMessagePage.text).toBeEmpty();
 
       // Expect the text message box page to display without height.
       await expect.poll(() => textMessagePage.getBoundingBox()).toEqual(expect.objectContaining({

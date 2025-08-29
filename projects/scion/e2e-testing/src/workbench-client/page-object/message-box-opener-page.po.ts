@@ -17,7 +17,7 @@ import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {ViewPO} from '../../view.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
-import {ViewId, WorkbenchMessageBoxOptions} from '@scion/workbench-client';
+import {Translatable, ViewId, WorkbenchMessageBoxOptions} from '@scion/workbench-client';
 
 /**
  * Page object to interact with {@link MessageBoxOpenerPageComponent}.
@@ -36,10 +36,13 @@ export class MessageBoxOpenerPagePO implements MicrofrontendViewPagePO {
     this.closeAction = this.locator.locator('output.e2e-close-action');
   }
 
-  public async open(message: string, options?: WorkbenchMessageBoxOptions): Promise<void>;
+  public async open(message: Translatable | null, options?: WorkbenchMessageBoxOptions): Promise<void>;
   public async open(qualifier: Qualifier, options?: WorkbenchMessageBoxOptions): Promise<void>;
-  public async open(content: string | Qualifier, options?: WorkbenchMessageBoxOptions): Promise<void> {
-    if (typeof content === 'string') {
+  public async open(content: Translatable | null | Qualifier, options?: WorkbenchMessageBoxOptions): Promise<void> {
+    if (content === null) {
+      await this.locator.locator('input.e2e-message').fill('<null>');
+    }
+    else if (typeof content === 'string') {
       await this.locator.locator('input.e2e-message').fill(content);
     }
     else {

@@ -13,6 +13,7 @@ import {SciAccordionPO} from './@scion/components.internal/accordion.po';
 import {SciCheckboxPO} from './@scion/components.internal/checkbox.po';
 import {DialogPO} from './dialog.po';
 import {WorkbenchDialogPagePO} from './workbench/page-object/workbench-dialog-page.po';
+import {Translatable} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link DialogPageComponent}.
@@ -31,7 +32,7 @@ export class DialogPagePO implements WorkbenchDialogPagePO {
     return this.locator.locator('input.e2e-component-instance-id').inputValue();
   }
 
-  public async enterTitle(title: string): Promise<void> {
+  public async enterTitle(title: Translatable): Promise<void> {
     await this.locator.locator('input.e2e-title').fill(title);
   }
 

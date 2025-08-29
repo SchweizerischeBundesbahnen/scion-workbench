@@ -17,6 +17,7 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {catchError, firstValueFrom, throwError} from 'rxjs';
 import {eMESSAGE_BOX_MESSAGE_PARAM} from './workbench-message-box-capability';
 import {WorkbenchMessageBoxService} from './workbench-message-box-service';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * @ignore
@@ -25,10 +26,10 @@ import {WorkbenchMessageBoxService} from './workbench-message-box-service';
 export class ɵWorkbenchMessageBoxService implements WorkbenchMessageBoxService {
 
   /** @inheritDoc */
-  public open(message: string | Qualifier, options?: WorkbenchMessageBoxOptions): Promise<string> {
+  public open(message: Translatable | null | Qualifier, options?: WorkbenchMessageBoxOptions): Promise<string> {
     const intent = ((): Intent => {
-      if (typeof message === 'string') {
-        return {type: WorkbenchCapabilities.MessageBox, qualifier: {}, params: new Map().set(eMESSAGE_BOX_MESSAGE_PARAM, message)};
+      if (typeof message === 'string' || message === null) {
+        return {type: WorkbenchCapabilities.MessageBox, qualifier: {}, params: new Map().set(eMESSAGE_BOX_MESSAGE_PARAM, message ?? undefined)};
       }
       else {
         return {type: WorkbenchCapabilities.MessageBox, qualifier: message, params: Maps.coerce(options?.params)};

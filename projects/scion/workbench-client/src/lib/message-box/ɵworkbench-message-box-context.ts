@@ -23,6 +23,15 @@ export interface ɵMessageBoxContext {
   dialogId: DialogId;
   capability: WorkbenchMessageBoxCapability;
   params: Map<string, unknown>;
+  /**
+   * Provides information about where the message box was opened.
+   */
+  referrer: {
+    /**
+     * Symbolic name of the application that opened the messagebox.
+     */
+    appSymbolicName: string;
+  };
 }
 
 /**
