@@ -17,6 +17,8 @@ import {TextTestPagePO} from './page-object/test-pages/text-test-page.po';
 import {TextTestPagePO as HostTextTestPagePO} from '../workbench/page-object/test-pages/text-test-page.po';
 import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
 import {TextMessageBoxPagePO} from '../text-message-box-page.po';
+import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
+import {TextNotificationPagePO} from '../text-notification-page.po';
 
 test.describe('Text Provider', () => {
 
@@ -1441,6 +1443,103 @@ test.describe('Text Provider', () => {
         await expect(messageBox.title).toHaveText('message.title');
         await expect(textMessageBoxPage.text).toHaveText('message.message');
         await expect.poll(() => messageBox.getActions()).toEqual({yes: 'yes.action', no: 'no.action'});
+      });
+    });
+  });
+
+  test.describe('Workbench Host Notification (built-in text notification)', () => {
+
+    test('should display non-localized notification', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register intention.
+      await microfrontendNavigator.registerIntention('app1', {type: 'notification'});
+
+      // Open test notification.
+      const notificationOpener = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+      await notificationOpener.enterTitle('Title');
+      await notificationOpener.enterContent('Notification');
+      await notificationOpener.enterCssClass('testee');
+      await notificationOpener.open();
+      const notification = appPO.notification({cssClass: 'testee'});
+      const textNotificationBoxPage = new TextNotificationPagePO(notification);
+
+      // Expect notification texts as specified.
+      await expect(notification.title).toHaveText('Title');
+      await expect(textNotificationBoxPage.text).toHaveText('Notification');
+    });
+
+    test('should display localized notification', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register intention.
+      await microfrontendNavigator.registerIntention('app1', {type: 'notification'});
+
+      // Register text view in app 1.
+      await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+        type: 'view',
+        qualifier: {component: 'text', app: 'app1'},
+        properties: {
+          path: 'test-pages/text-test-page',
+        },
+      });
+
+      // Create perspective with text view and notification opener.
+      await microfrontendNavigator.createPerspective('app1', {
+        type: 'perspective',
+        qualifier: {perspective: 'testee'},
+        properties: {
+          layout: [
+            {
+              id: 'part.left',
+              views: [
+                {qualifier: {component: 'text', app: 'app1'}, cssClass: 'text-app1'},
+              ],
+            },
+            {
+              id: 'part.right',
+              align: 'right',
+              views: [
+                {qualifier: {component: 'notification', app: 'app1'}, cssClass: 'notification-opener-app1'},
+              ],
+            },
+          ],
+        },
+      });
+
+      const textPageApp1 = TextTestPagePO.newViewPO(appPO, {cssClass: 'text-app1'});
+      const notificationOpenerApp1 = new NotificationOpenerPagePO(appPO, {cssClass: 'notification-opener-app1'});
+
+      // Open test notification.
+      await notificationOpenerApp1.enterTitle('%notification.title');
+      await notificationOpenerApp1.enterContent('%notification.message');
+      await notificationOpenerApp1.enterCssClass('testee');
+      await notificationOpenerApp1.open();
+      const notification = appPO.notification({cssClass: 'testee'});
+      const textNotificationPage = new TextNotificationPagePO(notification);
+
+      // Provide text.
+      await test.step('Provide text', async () => {
+        await textPageApp1.provideText('notification.title', 'Title 1');
+        await textPageApp1.provideText('notification.message', 'Notification 1');
+        await expect(notification.title).toHaveText('Title 1');
+        await expect(textNotificationPage.text).toHaveText('Notification 1');
+      });
+
+      // Provide different text.
+      await test.step('Provide different text', async () => {
+        await textPageApp1.provideText('notification.title', 'Title 2');
+        await textPageApp1.provideText('notification.message', 'Notification 2');
+        await expect(notification.title).toHaveText('Title 2');
+        await expect(textNotificationPage.text).toHaveText('Notification 2');
+      });
+
+      // Provide `undefined` as text.
+      await test.step('Provide `undefined`', async () => {
+        await textPageApp1.provideText('notification.title', '<undefined>');
+        await textPageApp1.provideText('notification.message', '<undefined>');
+        await expect(notification.title).toHaveText('notification.title');
+        await expect(textNotificationPage.text).toHaveText('notification.message');
       });
     });
   });

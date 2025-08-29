@@ -12,6 +12,7 @@ import {NotificationPO} from './notification.po';
 import {coerceArray} from './helper/testing.util';
 import {Locator} from '@playwright/test';
 import {WorkbenchNotificationPagePO} from './workbench/page-object/workbench-notification-page.po';
+import {Translatable} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link NotificationPageComponent}.
@@ -49,7 +50,7 @@ export class NotificationPagePO implements WorkbenchNotificationPagePO {
     return dictionary;
   }
 
-  public async enterTitle(title: string): Promise<void> {
+  public async enterTitle(title: Translatable): Promise<void> {
     await this.locator.locator('input.e2e-title').fill(title);
   }
 

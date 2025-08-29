@@ -19,7 +19,7 @@ import {Translatable} from '../text/workbench-text-provider.model';
 export class ɵNotification implements Notification {
 
   public readonly input: unknown;
-  public readonly title$: BehaviorSubject<Translatable | undefined | Observable<string>>;
+  public readonly title$: BehaviorSubject<Translatable | undefined | Observable<Translatable | undefined>>;
   public readonly severity$: BehaviorSubject<'info' | 'warn' | 'error'>;
   public readonly duration$: BehaviorSubject<'short' | 'medium' | 'long' | 'infinite' | number>;
   public readonly cssClass$: BehaviorSubject<string[]>;
@@ -40,7 +40,7 @@ export class ɵNotification implements Notification {
     }
   }
 
-  public setTitle(title: Translatable | undefined | Observable<string>): void {
+  public setTitle(title: Translatable | undefined | Observable<Translatable | undefined>): void {
     this.title$.next(title);
   }
 

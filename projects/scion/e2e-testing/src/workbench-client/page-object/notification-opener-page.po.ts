@@ -16,7 +16,7 @@ import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../view.po';
-import {ViewId} from '@scion/workbench-client';
+import {Translatable, ViewId} from '@scion/workbench-client';
 
 /**
  * Page object to interact with {@link NotificationOpenerPageComponent}.
@@ -47,11 +47,11 @@ export class NotificationOpenerPagePO implements MicrofrontendViewPagePO {
     await keyValueField.addEntries(params);
   }
 
-  public async enterTitle(title: string): Promise<void> {
+  public async enterTitle(title: Translatable): Promise<void> {
     await this.locator.locator('input.e2e-title').fill(title);
   }
 
-  public async enterContent(content: string): Promise<void> {
+  public async enterContent(content: Translatable): Promise<void> {
     await this.locator.locator('input.e2e-content').fill(content);
   }
 

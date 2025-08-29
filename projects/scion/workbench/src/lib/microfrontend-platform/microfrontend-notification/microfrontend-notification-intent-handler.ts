@@ -9,11 +9,12 @@
  */
 
 import {EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
-import {IntentClient} from '@scion/microfrontend-platform';
-import {WorkbenchCapabilities, WorkbenchNotificationConfig} from '@scion/workbench-client';
+import {IntentClient, MessageHeaders} from '@scion/microfrontend-platform';
+import {Translatable, WorkbenchCapabilities, WorkbenchNotificationConfig} from '@scion/workbench-client';
 import {Logger, LoggerNames} from '../../logging';
 import {NotificationService} from '../../notification/notification.service';
 import {provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer.provider';
+import {createRemoteTranslatable} from '../text/remote-text-provider';
 
 /**
  * Installs an intent handler to show text notifications.
@@ -23,11 +24,14 @@ function installNotificationIntentHandler(): void {
   const notificationService = inject(NotificationService);
   const logger = inject(Logger);
 
-  intentClient.onIntent<WorkbenchNotificationConfig, void>({type: WorkbenchCapabilities.Notification, qualifier: {}}, ({body: config}) => {
+  intentClient.onIntent<WorkbenchNotificationConfig, void>({type: WorkbenchCapabilities.Notification, qualifier: {}}, message => {
+    const config = message.body;
+    const referrer = message.headers.get(MessageHeaders.AppSymbolicName) as string;
+
     logger.debug(() => 'Showing notification', LoggerNames.MICROFRONTEND, config);
     notificationService.notify({
-      title: config?.title,
-      content: config?.content ? config.content as string : '',
+      title: createRemoteTranslatable(config?.title, {appSymbolicName: referrer}),
+      content: createRemoteTranslatable(config?.content as Translatable | undefined, {appSymbolicName: referrer}) ?? '',
       severity: config?.severity,
       duration: config?.duration,
       group: config?.group,

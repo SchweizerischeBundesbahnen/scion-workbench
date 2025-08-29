@@ -9,6 +9,7 @@
  */
 
 import {Dictionary} from '@scion/toolkit/util';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * Configures the content and appearance of a notification presented to the user.
@@ -25,16 +26,18 @@ export interface WorkbenchNotificationConfig {
 
   /**
    * Specifies the title of the notification.
+   *
+   * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    */
-  title?: string;
+  title?: Translatable;
 
   /**
    * Specifies the content to be displayed in the notification.
    *
    * The content may differ per notification provider, as determined by the qualifier. For example, the built-in notification expects a
-   * text message in form of a string literal. Refer to the documentation of the notification capability provider for more information.
+   * text message in form of a {@link Translatable}. Refer to the documentation of the notification capability provider for more information.
    */
-  content?: unknown;
+  content?: Translatable | unknown;
 
   /**
    * Passes data to the notification.
