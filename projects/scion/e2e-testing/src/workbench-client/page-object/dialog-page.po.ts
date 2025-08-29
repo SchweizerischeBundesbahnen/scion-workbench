@@ -9,7 +9,7 @@
  */
 
 import {Params} from '@angular/router';
-import {WorkbenchDialogCapability} from '@scion/workbench-client';
+import {Translatable, WorkbenchDialogCapability} from '@scion/workbench-client';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Locator} from '@playwright/test';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
@@ -37,7 +37,7 @@ export class DialogPagePO implements MicrofrontendDialogPagePO {
     this._hasFocusLocator = this.outlet.frameLocator.locator('app-root').locator('.e2e-has-focus');
   }
 
-  public async enterTitle(title: string): Promise<void> {
+  public async enterTitle(title: Translatable): Promise<void> {
     await this.locator.locator('input.e2e-title').fill(title);
   }
 

@@ -40,6 +40,17 @@ export abstract class WorkbenchMessageBox {
   public abstract readonly params: Map<string, unknown>;
 
   /**
+   * Provides information about where the message box was opened.
+   */
+  public abstract readonly referrer: {
+
+    /**
+     * Symbolic name of the application that opened the messagebox.
+     */
+    readonly appSymbolicName: string;
+  };
+
+  /**
    * Indicates whether this message box has the focus.
    */
   public abstract readonly focused$: Observable<boolean>;

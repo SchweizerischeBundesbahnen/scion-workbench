@@ -40,6 +40,7 @@ export class MicrofrontendMessageBoxComponent {
 
   public readonly capability = input.required<WorkbenchMessageBoxCapability>();
   public readonly params = input.required<Map<string, unknown>>();
+  public readonly referrer = input.required<string>();
 
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _outletRouter = inject(OutletRouter);
@@ -110,6 +111,9 @@ export class MicrofrontendMessageBoxComponent {
         dialogId: this.dialog.id,
         capability: this.capability(),
         params: this.params(),
+        referrer: {
+          appSymbolicName: this.referrer(),
+        },
       };
       const routerOutletElement = this._routerOutletElement().nativeElement;
 
@@ -134,10 +138,10 @@ export class MicrofrontendMessageBoxComponent {
 
       untracked(() => {
         setStyle(routerOutletElement, {
-          'width': properties.size?.width ?? '0', // allow content size to go bellow the default iframe size when reporting preferred size
+          'width': properties.size?.width ?? '0', // allow content size to go below the default iframe size when reporting preferred size
           'min-width': properties.size?.minWidth ?? null,
           'max-width': properties.size?.maxWidth ?? null,
-          'height': properties.size?.height ?? '0', // allow content size to go bellow the default iframe size when reporting preferred size
+          'height': properties.size?.height ?? '0', // allow content size to go below the default iframe size when reporting preferred size
           'min-height': properties.size?.minHeight ?? null,
           'max-height': properties.size?.maxHeight ?? null,
         });

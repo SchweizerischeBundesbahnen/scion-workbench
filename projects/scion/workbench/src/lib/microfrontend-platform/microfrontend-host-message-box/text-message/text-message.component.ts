@@ -11,6 +11,9 @@
 import {Component, inject} from '@angular/core';
 import {eMESSAGE_BOX_MESSAGE_PARAM, WorkbenchMessageBox} from '@scion/workbench-client';
 import {UUID} from '@scion/toolkit/uuid';
+import {Translatable} from '../../../text/workbench-text-provider.model';
+import {TextPipe} from '../../../text/text.pipe';
+import {createRemoteTranslatable} from '../../text/remote-text-provider';
 
 /**
  * Displays the text message for the built-in message box capability.
@@ -21,10 +24,19 @@ import {UUID} from '@scion/toolkit/uuid';
   selector: 'wb-text-message',
   styleUrls: ['./text-message.component.scss'],
   templateUrl: './text-message.component.html',
+  imports: [
+    TextPipe,
+  ],
 })
 export default class TextMessageComponent {
 
-  protected message = inject(WorkbenchMessageBox).params.get(eMESSAGE_BOX_MESSAGE_PARAM) as string;
+  protected message: Translatable | undefined;
+
+  constructor() {
+    const messageBox = inject(WorkbenchMessageBox);
+    const translatable = messageBox.params.get(eMESSAGE_BOX_MESSAGE_PARAM) as Translatable | undefined;
+    this.message = createRemoteTranslatable(translatable, {appSymbolicName: messageBox.referrer.appSymbolicName});
+  }
 }
 
 /**

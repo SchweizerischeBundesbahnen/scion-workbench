@@ -18,6 +18,9 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {MessageBoxPageComponent} from '../message-box-page/message-box-page.component';
 import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
+import {UUID} from '@scion/toolkit/uuid';
+import {parseTypedString} from '../common/parse-typed-value.util';
+import {Translatable} from '@scion/workbench-client';
 
 @Component({
   selector: 'app-message-box-opener-page',
@@ -35,6 +38,7 @@ export default class MessageBoxOpenerPageComponent {
 
   private readonly _formBuilder = inject(NonNullableFormBuilder);
   private readonly _messageBoxService = inject(WorkbenchMessageBoxService);
+  protected readonly nullList = `autocomplete-null-${UUID.randomUUID()}`;
 
   protected readonly form = this._formBuilder.group({
     component: this._formBuilder.control(''),
@@ -77,7 +81,8 @@ export default class MessageBoxOpenerPageComponent {
       return this._messageBoxService.open(this.parseComponentFromUI(), options);
     }
     else {
-      return this._messageBoxService.open(this.restoreLineBreaks(this.form.controls.message.value), options);
+      const message = parseTypedString<Translatable>(this.restoreLineBreaks(this.form.controls.message.value)) ?? null;
+      return this._messageBoxService.open(message, options);
     }
   }
 

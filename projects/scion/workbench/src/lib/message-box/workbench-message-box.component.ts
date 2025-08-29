@@ -92,6 +92,6 @@ export class WorkbenchMessageBoxComponent {
   }
 }
 
-function nullIfEmptyMessage(message: Translatable | ComponentType<unknown>): Translatable | ComponentType<unknown> | null {
-  return message || null;
+function nullIfEmptyMessage(message: Translatable | null | ComponentType<unknown>): Translatable | ComponentType<unknown> | null {
+  return message !== '' ? message : null;
 }

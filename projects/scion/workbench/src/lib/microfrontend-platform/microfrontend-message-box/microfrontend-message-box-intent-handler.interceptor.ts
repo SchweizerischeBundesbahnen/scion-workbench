@@ -18,6 +18,7 @@ import {WorkbenchMessageBoxService} from '../../message-box/workbench-message-bo
 import {Arrays} from '@scion/toolkit/util';
 import {MicrofrontendHostMessageBoxComponent} from '../microfrontend-host-message-box/microfrontend-host-message-box.component';
 import {MicrofrontendMessageBoxComponent} from './microfrontend-message-box.component';
+import {createRemoteTranslatable} from '../text/remote-text-provider';
 
 /**
  * Handles messagebox intents, instructing the workbench to open a message box with the microfrontend declared on the resolved capability.
@@ -71,13 +72,14 @@ export class MicrofrontendMessageBoxIntentHandler implements IntentInterceptor {
     const options = message.body ?? {};
     const capability = message.capability as WorkbenchMessageBoxCapability;
     const params = message.intent.params ?? new Map();
+    const referrer = message.headers.get(MessageHeaders.AppSymbolicName) as string;
     const isHostProvider = capability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
 
     this._logger.debug(() => 'Handling microfrontend messagebox intent', LoggerNames.MICROFRONTEND, options);
     return this._messageBoxService.open(isHostProvider ? MicrofrontendHostMessageBoxComponent : MicrofrontendMessageBoxComponent, {
-      inputs: {capability, params},
-      title: options.title,
-      actions: options.actions,
+      inputs: {capability, params, referrer},
+      title: createRemoteTranslatable(options.title, {appSymbolicName: referrer}),
+      actions: options.actions && Object.fromEntries(Object.entries(options.actions).map(([key, label]) => [key, createRemoteTranslatable(label, {appSymbolicName: referrer})!])),
       severity: options.severity,
       modality: options.modality,
       contentSelectable: options.contentSelectable,

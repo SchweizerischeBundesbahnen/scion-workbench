@@ -10,6 +10,7 @@
 
 import {Qualifier} from '@scion/microfrontend-platform';
 import {WorkbenchMessageBoxOptions} from './workbench-message-box.options';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * Displays a microfrontend in a message box.
@@ -41,12 +42,13 @@ export abstract class WorkbenchMessageBoxService {
    *
    * **This API requires the following intention: `{"type": "messagebox"}`**
    *
-   * @param message - Specifies the text to display.
+   * @param message - Specifies the text to display, if any.
+   *                  Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    * @param options - Controls the appearance and behavior of the message box.
    * @returns Promise that resolves to the key of the action button that the user clicked to close the message box,
    *          or that rejects if the message box couldn't be opened, e.g., because of missing the intention.
    */
-  public abstract open(message: string, options?: WorkbenchMessageBoxOptions): Promise<string>;
+  public abstract open(message: Translatable | null, options?: WorkbenchMessageBoxOptions): Promise<string>;
 
   /**
    * Opens the microfrontend of a `messagebox` capability in a workbench message box based on the given qualifier and options.

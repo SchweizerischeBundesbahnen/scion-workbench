@@ -9,7 +9,7 @@
  */
 
 import {Component, inject} from '@angular/core';
-import {WorkbenchDialog} from '@scion/workbench-client';
+import {Translatable, WorkbenchDialog} from '@scion/workbench-client';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {Subject} from 'rxjs';
 
@@ -31,7 +31,7 @@ export default class DialogPropertiesTestPageComponent {
     this._dialog.setTitle(this._titleObservable1$);
   }
 
-  protected onTitleObservable1Emit(title: string): void {
+  protected onTitleObservable1Emit(title: Translatable): void {
     this._titleObservable1$.next(title);
   }
 
@@ -39,7 +39,7 @@ export default class DialogPropertiesTestPageComponent {
     this._dialog.setTitle(this._titleObservable2$);
   }
 
-  protected onTitleObservable2Emit(title: string): void {
+  protected onTitleObservable2Emit(title: Translatable): void {
     this._titleObservable2$.next(title);
   }
 }

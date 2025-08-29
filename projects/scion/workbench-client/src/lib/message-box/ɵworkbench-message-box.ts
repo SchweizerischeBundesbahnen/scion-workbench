@@ -28,12 +28,14 @@ export class ɵWorkbenchMessageBox implements WorkbenchMessageBox {
   public readonly id: DialogId;
   public readonly capability: WorkbenchMessageBoxCapability;
   public readonly params: Map<string, unknown>;
+  public readonly referrer: WorkbenchMessageBox['referrer'];
   public readonly focused$: Observable<boolean>;
 
   constructor(private _context: ɵMessageBoxContext) {
     this.id = this._context.dialogId;
     this.capability = this._context.capability;
     this.params = this._context.params;
+    this.referrer = this._context.referrer;
     this.focused$ = Beans.get(MessageClient).observe$<boolean>(ɵWorkbenchCommands.dialogFocusedTopic(this.id))
       .pipe(
         mapToBody(),

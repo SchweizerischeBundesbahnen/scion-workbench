@@ -9,7 +9,7 @@
  */
 
 import {Component, computed, DestroyRef, effect, ElementRef, inject, Injector, input, runInInjectionContext, Signal, StaticProvider, untracked} from '@angular/core';
-import {WorkbenchMessageBox, WorkbenchMessageBoxCapability} from '@scion/workbench-client';
+import {WorkbenchMessageBox, WorkbenchMessageBoxCapability, ɵMessageBoxContext} from '@scion/workbench-client';
 import {Routing} from '../../routing/routing.util';
 import {Commands} from '../../routing/routing.model';
 import {Router, RouterOutlet} from '@angular/router';
@@ -41,6 +41,7 @@ export class MicrofrontendHostMessageBoxComponent {
 
   public readonly capability = input.required<WorkbenchMessageBoxCapability>();
   public readonly params = input.required<Map<string, unknown>>();
+  public readonly referrer = input.required<string>();
 
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _injector = inject(Injector);
@@ -88,12 +89,18 @@ export class MicrofrontendHostMessageBoxComponent {
     const injector = inject(Injector);
 
     return computed(() => {
-      const capability = this.capability();
-      const params = this.params();
+      const context: ɵMessageBoxContext = {
+        capability: this.capability(),
+        params: this.params(),
+        dialogId: this.dialog.id,
+        referrer: {
+          appSymbolicName: this.referrer(),
+        },
+      };
 
       return untracked(() => Injector.create({
         parent: injector,
-        providers: [provideWorkbenchClientMessageBoxHandle(capability, params)],
+        providers: [provideWorkbenchClientMessageBoxHandle(context)],
       }));
     });
   }
@@ -119,15 +126,16 @@ export class MicrofrontendHostMessageBoxComponent {
 /**
  * Provides the {WorkbenchMessageBox} handle to the routed component.
  */
-export function provideWorkbenchClientMessageBoxHandle(capability: WorkbenchMessageBoxCapability, params: Map<string, unknown>): StaticProvider {
+function provideWorkbenchClientMessageBoxHandle(context: ɵMessageBoxContext): StaticProvider {
   return {
     provide: WorkbenchMessageBox,
     useFactory: (): WorkbenchMessageBox => {
       const dialog = inject(ɵWorkbenchDialog);
 
       return new class implements WorkbenchMessageBox {
-        public readonly capability = capability;
-        public readonly params = params;
+        public readonly capability = context.capability;
+        public readonly params = context.params;
+        public readonly referrer = context.referrer;
         public readonly id = dialog.id;
         public readonly focused$ = toObservable(dialog.focused, {injector: dialog.injector});
 

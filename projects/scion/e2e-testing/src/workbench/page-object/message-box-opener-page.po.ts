@@ -14,7 +14,7 @@ import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {Locator} from '@playwright/test';
 import {ViewPO} from '../../view.po';
-import {ViewId, WorkbenchMessageBoxOptions} from '@scion/workbench';
+import {Translatable, ViewId, WorkbenchMessageBoxOptions} from '@scion/workbench';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
 
 /**
@@ -36,9 +36,9 @@ export class MessageBoxOpenerPagePO implements WorkbenchViewPagePO {
     this.openButton = this.locator.locator('button.e2e-open');
   }
 
-  public async open(message: string, options?: WorkbenchMessageBoxOptions): Promise<void>;
+  public async open(message: Translatable | null, options?: WorkbenchMessageBoxOptions): Promise<void>;
   public async open(component: 'component:message-box-page' | 'component:focus-test-page', options?: WorkbenchMessageBoxOptions): Promise<void>;
-  public async open(content: string | 'component:message-box-page' | 'component:focus-test-page', options?: WorkbenchMessageBoxOptions): Promise<void> {
+  public async open(content: Translatable | null | 'component:message-box-page' | 'component:focus-test-page', options?: WorkbenchMessageBoxOptions): Promise<void> {
     if (options?.injector) {
       throw Error('[PageObjectError] PageObject does not support the option `injector`.');
     }
@@ -46,12 +46,12 @@ export class MessageBoxOpenerPagePO implements WorkbenchViewPagePO {
       throw Error('[PageObjectError] PageObject does not support the option `context`.');
     }
 
-    const componentMatch = /^component:(?<component>.+)$/.exec(content);
+    const componentMatch = content && /^component:(?<component>.+)$/.exec(content);
     if (componentMatch) {
       await this.locator.locator('select.e2e-component').selectOption(componentMatch.groups!.component!);
     }
     else {
-      await this.locator.locator('input.e2e-message').fill(content);
+      await this.locator.locator('input.e2e-message').fill(content ?? '<null>');
     }
 
     if (options?.inputs) {
