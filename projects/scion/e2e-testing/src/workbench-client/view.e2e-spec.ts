@@ -1393,37 +1393,76 @@ test.describe('Workbench View', () => {
       },
     });
 
+    // Register main area part.
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {part: 'main-area'},
+    });
+
+    // Register left part.
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {part: 'left'},
+      properties: {
+        views: [
+          {qualifier: {view: 'input-test-page'}, cssClass: 'testee'},
+        ],
+      },
+    });
+
+    // Register bottom part.
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {part: 'bottom'},
+      properties: {
+        views: [
+          {qualifier: {view: 'view-1'}, cssClass: 'testee-1'},
+        ],
+      },
+    });
+
+    // Register right part.
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {part: 'right'},
+      properties: {
+        views: [
+          {qualifier: {view: 'view-2'}, cssClass: 'testee-2'},
+        ],
+      },
+    });
+
     // Register perspective.
     const perspective = await microfrontendNavigator.registerCapability('app1', {
       type: 'perspective',
       qualifier: {perspective: 'app-1'},
       properties: {
-        layout: [
+        parts: [
           {
             id: MAIN_AREA,
+            qualifier: {part: 'main-area'},
           },
           {
             id: 'part.left',
-            align: 'left',
-            views: [
-              {qualifier: {view: 'input-test-page'}, cssClass: 'testee'},
-            ],
+            qualifier: {part: 'left'},
+            position: {
+              align: 'left',
+            },
           },
           {
             id: 'part.bottom',
-            align: 'bottom',
-            views: [
-              {qualifier: {view: 'view-1'}, cssClass: 'testee-1'},
-            ],
+            qualifier: {part: 'bottom'},
+            position: {
+              align: 'bottom',
+            },
           },
           {
             id: 'part.right',
-            align: 'right',
-            views: [
-              {qualifier: {view: 'view-2'}, cssClass: 'testee-2'},
-            ],
+            qualifier: {part: 'right'},
+            position: {
+              align: 'right',
+            },
           },
-
         ],
       },
     });
@@ -1597,19 +1636,28 @@ test.describe('Workbench View', () => {
         },
       });
 
+      // Register part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'main'},
+        properties: {
+          views: [
+            {qualifier: {component: 'testee-1'}, cssClass: 'testee-1'},
+            {qualifier: {component: 'testee-2'}, cssClass: 'testee-2'},
+            {qualifier: {component: 'testee-3'}, cssClass: 'testee-3'},
+          ],
+        },
+      });
+
       // Create perspective with test view.
       await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
-          layout: [
+          parts: [
             {
               id: 'part.main',
-              views: [
-                {qualifier: {component: 'testee-1'}, cssClass: 'testee-1'},
-                {qualifier: {component: 'testee-2'}, cssClass: 'testee-2'},
-                {qualifier: {component: 'testee-3'}, cssClass: 'testee-3'},
-              ],
+              qualifier: {part: 'main'},
             },
           ],
         },
@@ -2020,19 +2068,28 @@ test.describe('Workbench View', () => {
         },
       });
 
+      // Register part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'main'},
+        properties: {
+          views: [
+            {qualifier: {component: 'testee-1'}, cssClass: 'testee-1'},
+            {qualifier: {component: 'testee-2'}, cssClass: 'testee-2'},
+            {qualifier: {component: 'testee-3'}, cssClass: 'testee-3'},
+          ],
+        },
+      });
+
       // Create perspective with test view.
       await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
-          layout: [
+          parts: [
             {
               id: 'part.main',
-              views: [
-                {qualifier: {component: 'testee-1'}, cssClass: 'testee-1'},
-                {qualifier: {component: 'testee-2'}, cssClass: 'testee-2'},
-                {qualifier: {component: 'testee-3'}, cssClass: 'testee-3'},
-              ],
+              qualifier: {part: 'main'},
             },
           ],
         },

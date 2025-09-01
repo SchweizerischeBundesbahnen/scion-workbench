@@ -11,7 +11,7 @@
 export {WorkbenchClient} from './workbench-client';
 export {WorkbenchCapabilities} from './workbench-capabilities.enum';
 export {ɵWorkbenchCommands} from './ɵworkbench-commands';
-export {type ViewId, type PartId, type DialogId, type PopupId} from './workbench.identifiers';
+export {type ViewId, type PartId, type DialogId, type PopupId, type ActivityId} from './workbench.identifiers';
 
 export * from './common/public_api';
 export * from './dialog/public_api';
@@ -23,3 +23,4 @@ export * from './routing/public_api';
 export * from './text/public_api';
 export * from './theme/public_api';
 export * from './view/public_api';
+export * from './part/public_api';

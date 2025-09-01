@@ -25,22 +25,36 @@ export class MicrofrontendPopupCapabilityValidator implements CapabilityIntercep
     }
 
     const popupCapability = capability as Partial<WorkbenchPopupCapability>;
-    // Assert the popup capability to have a qualifier set.
+    // Assert the popup capability to have a qualifier.
     if (!Object.keys(popupCapability.qualifier ?? {}).length) {
-      throw Error(`[NullQualifierError] Popup capability requires a qualifier [capability=${JSON.stringify(popupCapability)}]`);
+      throw Error(`[PopupDefinitionError] Popup capability requires a qualifier [app=${app(popupCapability)}, popup=${qualifier(popupCapability)}]`);
     }
 
-    // Assert the popup capability to have a "properties" section.
+    // Assert the popup capability to have properties.
     if (!popupCapability.properties) {
-      throw Error(`[NullPropertiesError] Popup capability requires a "properties" section [application="${popupCapability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(popupCapability.qualifier)}"]`);
+      throw Error(`[PopupDefinitionError] Popup capability requires properties [app=${app(popupCapability)}, popup=${qualifier(popupCapability)}]`);
     }
 
-    // Assert the popup capability to have a path set.
+    // Assert the popup capability to have a path.
     const path = popupCapability.properties.path as unknown;
     if (path === undefined || path === null) {
-      throw Error(`[NullPathError] Popup capability requires a path to the microfrontend in its properties [application="${popupCapability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(popupCapability.qualifier)}"]`);
+      throw Error(`[PopupDefinitionError] Popup capability requires the 'path' property [app=${app(popupCapability)}, popup=${qualifier(popupCapability)}]`);
     }
 
     return capability;
   }
+}
+
+/**
+ * Returns the qualifier as string.
+ */
+function qualifier(capability: Partial<Capability>): string {
+  return Objects.toMatrixNotation(capability.qualifier);
+}
+
+/**
+ * Returns the app symbolic name.
+ */
+function app(capability: Partial<Capability>): string {
+  return capability.metadata!.appSymbolicName;
 }

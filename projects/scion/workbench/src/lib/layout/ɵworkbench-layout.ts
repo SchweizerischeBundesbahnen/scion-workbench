@@ -86,16 +86,12 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return this.activities().length > 0;
   }
 
-  /**
-   * Tests if given part is contained in the specified grid.
-   */
+  /** @inheritDoc */
   public hasPart(id: string, options?: {grid?: keyof WorkbenchGrids}): boolean {
     return this.parts({id, grid: options?.grid}).length > 0;
   }
 
-  /**
-   * Tests if given view is contained in the specified grid.
-   */
+  /** @inheritDoc */
   public hasView(id: string, options?: {grid?: keyof WorkbenchGrids}): boolean {
     return this.views({id, grid: options?.grid}).length > 0;
   }

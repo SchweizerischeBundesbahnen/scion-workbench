@@ -228,6 +228,16 @@ export interface WorkbenchLayout {
   activatePart(id: string): WorkbenchLayout;
 
   /**
+   * Tests if given part is contained in the layout.
+   */
+  hasPart(id: string): boolean;
+
+  /**
+   * Tests if given view is contained in the layout.
+   */
+  hasView(id: string): boolean;
+
+  /**
    * Applies a modification function to this layout, enabling conditional changes while maintaining method chaining.
    *
    * @param modifyFn - A function that takes the current layout and returns a modified layout.

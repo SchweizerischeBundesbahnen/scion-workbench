@@ -1,0 +1,18 @@
+:host {
+  display: grid;
+}
+
+// TODO [activity] Extra div still required for parts? We do not support a glasspane so far.
+// Extra DIV required because the glass pane cannot be installed on the router outlet as the outlet uses its content as splash.
+div.microfrontend-part {
+  display: grid;
+
+  // Disable pointer events during workbench drag operation for the workbench to consume drag events.
+  &.workbench-drag {
+    pointer-events: none;
+  }
+
+  > sci-router-outlet::part(splash) {
+    display: grid;
+  }
+}

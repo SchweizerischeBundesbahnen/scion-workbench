@@ -150,6 +150,14 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     throw Error('[PageObjectError] Operation `WorkbenchLayout.moveView` is not supported.');
   }
 
+  public hasPart(id: string): boolean {
+    return this.parts.some(part => part.id === id);
+  }
+
+  public hasView(id: string): boolean {
+    return this.views.some(view => view.id === id);
+  }
+
   public modify(modifyFn: (layout: WorkbenchLayout) => WorkbenchLayout): WorkbenchLayout {
     return modifyFn(this);
   }

@@ -13,12 +13,9 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
- * Represents a microfrontend for display in a workbench view.
+ * A view is a visual element of the workbench layout for displaying content stacked or side-by-side.
  *
- * A view is a visual workbench element for displaying content stacked or side-by-side.
- *
- * The microfrontend can inject the {@link WorkbenchView} handle to interact with the view, such as setting the title, reading
- * parameters, or closing it.
+ * The microfrontend can inject the {@link WorkbenchView} handle to interact with the view.
  *
  * @category View
  * @see WorkbenchView
