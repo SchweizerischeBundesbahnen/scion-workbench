@@ -9,3 +9,4 @@
  */
 
 export {type WorkbenchPerspectiveCapability, type WorkbenchPerspectivePart, type WorkbenchPerspectiveView, MAIN_AREA} from './workbench-perspective-capability';
+export {type WorkbenchPerspectiveCapabilityV2, type WorkbenchPartRef, type DockingArea, type RelativeTo} from './workbench-perspective-capability-v2';

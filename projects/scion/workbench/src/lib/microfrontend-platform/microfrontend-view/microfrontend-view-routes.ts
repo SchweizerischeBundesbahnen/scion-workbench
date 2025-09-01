@@ -17,6 +17,7 @@ import {isViewOutlet} from '../../workbench.identifiers';
 import {WorkbenchRouteData} from '../../routing/workbench-route-data';
 import {MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
+import {canMatchWorkbenchView} from '../../routing/workbench-route-guards';
 
 /**
  * Provides functions and constants specific to microfrontend routes.
@@ -128,7 +129,11 @@ export const MicrofrontendViewRoutes = {
   /**
    * Matches the route if target of a view capability (microfrontend) and the capability exists.
    */
-  canMatchViewCapability: ((_route: Route, segments: UrlSegment[]): boolean => {
+  canMatchViewCapability: ((route: Route, segments: UrlSegment[]): boolean => {
+    if (!canMatchWorkbenchView(true)(route, segments)) {
+      return false;
+    }
+
     const microfrontendURL = MicrofrontendViewRoutes.parseMicrofrontendURL(segments);
     if (!microfrontendURL) {
       return false;

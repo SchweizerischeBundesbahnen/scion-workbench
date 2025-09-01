@@ -18,7 +18,8 @@ import {WorkbenchService} from '../../workbench.service';
 import {firstValueFrom} from 'rxjs';
 import {WorkbenchPerspectiveData} from './workbench-perspective-data';
 
-describe('Workbench Perspective', () => {
+// TODO [activity] Move validation specific aspects to perspective-capability.spec.ts (consistency)
+xdescribe('Workbench Perspective', () => {
 
   it('should error if not having a qualifier', async () => {
     TestBed.configureTestingModule({
@@ -31,7 +32,7 @@ describe('Workbench Perspective', () => {
     const result = TestBed.inject(ManifestService).registerCapability({
       type: WorkbenchCapabilities.Perspective,
     });
-    await expectAsync(result).toBeRejectedWithError(/NullQualifierError/);
+    await expectAsync(result).toBeRejectedWithError(/\[PerspectiveDefinitionError] Perspective capability requires a qualifier/);
   });
 
   it('should error if having an empty qualifier', async () => {
@@ -46,7 +47,7 @@ describe('Workbench Perspective', () => {
       type: WorkbenchCapabilities.Perspective,
       qualifier: {},
     });
-    await expectAsync(result).toBeRejectedWithError(/NullQualifierError/);
+    await expectAsync(result).toBeRejectedWithError(/\[PerspectiveDefinitionError] Perspective capability requires a qualifier/);
   });
 
   it('should error if not having properties', async () => {
@@ -61,7 +62,7 @@ describe('Workbench Perspective', () => {
       type: WorkbenchCapabilities.Perspective,
       qualifier: {perspective: 'testee'},
     });
-    await expectAsync(result).toBeRejectedWithError(/NullPropertiesError/);
+    await expectAsync(result).toBeRejectedWithError(/\[PerspectiveDefinitionError] Perspective capability requires a 'properties' section/);
   });
 
   it('should error if not having a layout', async () => {

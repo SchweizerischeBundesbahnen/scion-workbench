@@ -187,9 +187,9 @@ export interface WorkbenchPerspectiveView {
  * The main area is a special part that can be added to the layout. The main area is where the workbench opens new views by default.
  * It is shared between perspectives and its layout is not reset when resetting perspectives.
  */
-export const MAIN_AREA: MAIN_AREA = 'part.main-area';
+export const MAIN_AREA: MAIN_AREA = 'main-area';
 
 /**
  * Represents the type of the {@link MAIN_AREA} constant.
  */
-export type MAIN_AREA = 'part.main-area';
+export type MAIN_AREA = 'main-area';

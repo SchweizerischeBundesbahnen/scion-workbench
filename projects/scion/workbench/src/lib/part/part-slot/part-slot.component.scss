@@ -2,6 +2,11 @@
   display: flex;
   flex-direction: column;
 
+  // TODO [activity] required?
+  &.view-drag {
+    pointer-events: none;
+  }
+
   > sci-viewport {
     flex: 1 1 0; // set flex-basis to 0 to not exceed available vertical space
 

@@ -15,6 +15,7 @@ import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {OnAttach, OnDetach} from '../../portal/wb-component-portal';
 import {FocusTrackerRef, trackFocus} from '../../focus/workbench-focus-tracker.service';
+import {ViewDragService} from '../../view-dnd/view-drag.service';
 
 /**
  * Acts as a placeholder for a part's content that Angular fills based on the current router state of the associated part outlet.
@@ -28,10 +29,14 @@ import {FocusTrackerRef, trackFocus} from '../../focus/workbench-focus-tracker.s
     RouterOutletRootContextDirective,
     SciViewportComponent,
   ],
+  host: {
+    '[class.view-drag]': 'viewDragService.dragging()', // TODO [activity] required?
+  },
 })
 export class PartSlotComponent implements OnAttach, OnDetach {
 
   protected readonly part = inject(ɵWorkbenchPart);
+  protected readonly viewDragService = inject(ViewDragService);
 
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _document = inject(DOCUMENT);

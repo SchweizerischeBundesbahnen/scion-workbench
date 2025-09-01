@@ -72,6 +72,18 @@ export const routes: Routes = [
     loadChildren: () => import('./test-pages/routes'),
   },
   {
+    path: 'perspective-pages',
+    children: [
+      {path: 'bookmarks', loadComponent: () => import('./perspective-pages/bookmarks.component')},
+      {path: 'main-area', loadComponent: () => import('./perspective-pages/main-area.component')},
+      {path: 'projects', loadComponent: () => import('./perspective-pages/projects.component')},
+      {path: 'find', loadComponent: () => import('./perspective-pages/find.component')},
+      {path: 'structure', loadComponent: () => import('./perspective-pages/structure.component')},
+      {path: 'terminal', loadComponent: () => import('./perspective-pages/terminal.component')},
+      {path: 'problems', loadComponent: () => import('./perspective-pages/problems.component')},
+    ],
+  },
+  {
     path: '', // empty-path route is used to test opening a microfrontend with an empty-path (view/popup/dialog)
     pathMatch: 'full',
     loadComponent: () => import('./test-pages/microfrontend-test-page/microfrontend-test-page.component'),
