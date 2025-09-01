@@ -30,6 +30,8 @@ import {MicrofrontendMessageBoxCapabilityValidator} from '../microfrontend-messa
 import {MicrofrontendPerspectiveCapabilityValidator} from '../microfrontend-perspective/microfrontend-perspective-capability-validator.interceptor';
 import {MicrofrontendPerspectiveIntentHandler} from '../microfrontend-perspective/microfrontend-perspective-intent-handler.interceptor';
 import {ViewCapabilityPreloadCapabilityInterceptor} from './view-capability-preload-capability-interceptor.service';
+import {MicrofrontendPartCapabilityValidator} from '../microfrontend-part/microfrontend-part-capability-validator.interceptor';
+import {MicrofrontendPerspectiveCapabilityValidatorV2} from '../microfrontend-perspective/microfrontend-perspective-capability-validator-v2.interceptor';
 
 /**
  * Initializes and starts the SCION Microfrontend Platform in host mode.
@@ -46,7 +48,9 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
   private readonly _dialogIntentHandler = inject(MicrofrontendDialogIntentHandler);
   private readonly _messageBoxIntentHandler = inject(MicrofrontendMessageBoxIntentHandler);
   private readonly _viewCapabilityValidator = inject(MicrofrontendViewCapabilityValidator);
+  private readonly _partCapabilityValidator = inject(MicrofrontendPartCapabilityValidator);
   private readonly _perspectiveCapabilityValidator = inject(MicrofrontendPerspectiveCapabilityValidator);
+  private readonly _perspectiveCapabilityValidatorV2 = inject(MicrofrontendPerspectiveCapabilityValidatorV2);
   private readonly _popupCapabilityValidator = inject(MicrofrontendPopupCapabilityValidator);
   private readonly _dialogCapabilityValidator = inject(MicrofrontendDialogCapabilityValidator);
   private readonly _messageBoxCapabilityValidator = inject(MicrofrontendMessageBoxCapabilityValidator);
@@ -104,6 +108,12 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
 
     // Register perspective capability interceptor to assert required perspective capability properties.
     Beans.register(CapabilityInterceptor, {useValue: this._perspectiveCapabilityValidator, multi: true});
+
+    // Register perspective capability interceptor to assert required perspective capability properties.
+    Beans.register(CapabilityInterceptor, {useValue: this._perspectiveCapabilityValidatorV2, multi: true});
+
+    // Register part capability interceptor to assert required part capability properties.
+    Beans.register(CapabilityInterceptor, {useValue: this._partCapabilityValidator, multi: true});
 
     // Register view capability interceptor to assert required view capability properties.
     Beans.register(CapabilityInterceptor, {useValue: this._viewCapabilityValidator, multi: true});

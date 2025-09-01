@@ -1,0 +1,17 @@
+@let capability = navigationContext()?.capability;
+
+<wb-content-as-overlay [config]="overlayConfig">
+  <div class="microfrontend-part"
+       [class.workbench-drag]="workbenchLayoutService.dragging()"
+       [attr.data-partid]="part.id">
+    <sci-router-outlet #router_outlet
+                       [name]="part.id"
+                       [attr.data-capabilityid]="capability?.metadata!.id"
+                       [attr.data-app]="capability?.metadata!.appSymbolicName"
+                       [ngClass]="part.classList.asList()"
+                       (focuswithin)="onFocusWithin($event)"
+                       [keystrokes]="keystrokesToBubble()">
+      <ng-container *ngComponentOutlet="splash"/>
+    </sci-router-outlet>
+  </div>
+</wb-content-as-overlay>

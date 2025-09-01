@@ -15,6 +15,8 @@ export class WorkbenchHostManifestInterceptor implements HostManifestInterceptor
     hostManifest.intentions = [
       ...hostManifest.intentions ?? [],
       providePerspectiveIntention(),
+      providePerspectiveIntentionV2(),
+      providePartIntention(),
       provideViewIntention(),
       provideTextProviderIntention(),
     ];
@@ -32,6 +34,26 @@ export class WorkbenchHostManifestInterceptor implements HostManifestInterceptor
 function providePerspectiveIntention(): Intention {
   return {
     type: WorkbenchCapabilities.Perspective,
+    qualifier: {'*': '*'},
+  };
+}
+
+/**
+ * Provides a wildcard intention for the workbench to read perspective capabilities.
+ */
+function providePerspectiveIntentionV2(): Intention {
+  return {
+    type: WorkbenchCapabilities.PerspectiveV2,
+    qualifier: {'*': '*'},
+  };
+}
+
+/**
+ * Provides a wildcard part intention for the workbench to read part capabilities.
+ */
+function providePartIntention(): Intention {
+  return {
+    type: WorkbenchCapabilities.Part,
     qualifier: {'*': '*'},
   };
 }

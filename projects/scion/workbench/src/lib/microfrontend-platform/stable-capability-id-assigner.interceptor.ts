@@ -21,6 +21,8 @@ export class StableCapabilityIdAssigner implements CapabilityInterceptor {
 
   private readonly _types = new Set<string>()
     .add(WorkbenchCapabilities.Perspective)
+    .add(WorkbenchCapabilities.PerspectiveV2)
+    .add(WorkbenchCapabilities.Part)
     .add(WorkbenchCapabilities.View);
 
   public async intercept(capability: Capability): Promise<Capability> {

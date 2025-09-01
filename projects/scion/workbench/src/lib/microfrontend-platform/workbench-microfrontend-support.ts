@@ -13,7 +13,7 @@ import {EnvironmentProviders, inject, Injectable, makeEnvironmentProviders} from
 import {MicrofrontendPlatformInitializer} from './initialization/microfrontend-platform-initializer.service';
 import {IntentClient, ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, PlatformPropertyService} from '@scion/microfrontend-platform';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {WorkbenchTextService, WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter} from '@scion/workbench-client';
+import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter, WorkbenchTextService} from '@scion/workbench-client';
 import {NgZoneObservableDecorator} from './initialization/ng-zone-observable-decorator';
 import {WorkbenchConfig} from '../workbench-config';
 import {provideViewCommandHandlers} from './microfrontend-view/microfrontend-view-command-handler.service';
@@ -31,7 +31,7 @@ import {MicrofrontendDialogIntentHandler} from './microfrontend-dialog/microfron
 import {MicrofrontendDialogCapabilityValidator} from './microfrontend-dialog/microfrontend-dialog-capability-validator.interceptor';
 import {MicrofrontendMessageBoxIntentHandler} from './microfrontend-message-box/microfrontend-message-box-intent-handler.interceptor';
 import {MicrofrontendMessageBoxCapabilityValidator} from './microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
-import {canMatchWorkbenchDialog, canMatchWorkbenchView} from '../routing/workbench-route-guards';
+import {canMatchWorkbenchDialog} from '../routing/workbench-route-guards';
 import {TEXT_MESSAGE_BOX_CAPABILITY_ROUTE} from './microfrontend-host-message-box/text-message/text-message.component';
 import {MicrofrontendPerspectiveCapabilityValidator} from './microfrontend-perspective/microfrontend-perspective-capability-validator.interceptor';
 import {providePerspectiveInstaller} from './microfrontend-perspective/microfrontend-perspective-installer.service';
@@ -44,6 +44,10 @@ import {WORKBENCH_ROUTE} from '../workbench.constants';
 import {provideRemoteTextProvider} from './text/remote-text-provider';
 import {provideHostTextProvider} from './text/host-text-provider';
 import {ViewCapabilityPreloadCapabilityInterceptor} from './initialization/view-capability-preload-capability-interceptor.service';
+import {providePerspectiveInstallerV2} from './microfrontend-perspective/microfrontend-perspective-installer-v2.service';
+import {provideMicrofrontendPartRoute} from './microfrontend-part/microfrontend-part-routes';
+import {MicrofrontendPartCapabilityValidator} from './microfrontend-part/microfrontend-part-capability-validator.interceptor';
+import {MicrofrontendPerspectiveCapabilityValidatorV2} from './microfrontend-perspective/microfrontend-perspective-capability-validator-v2.interceptor';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -59,6 +63,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     provideViewCommandHandlers(),
     provideNotificationIntentHandler(),
     providePerspectiveInstaller(),
+    providePerspectiveInstallerV2(),
     provideManifestObjectCache(),
     MicrofrontendPerspectiveIntentHandler,
     MicrofrontendViewIntentHandler,
@@ -66,6 +71,8 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     MicrofrontendDialogIntentHandler,
     MicrofrontendMessageBoxIntentHandler,
     MicrofrontendPerspectiveCapabilityValidator,
+    MicrofrontendPerspectiveCapabilityValidatorV2,
+    MicrofrontendPartCapabilityValidator,
     MicrofrontendViewCapabilityValidator,
     MicrofrontendPopupCapabilityValidator,
     MicrofrontendDialogCapabilityValidator,
@@ -75,6 +82,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     NgZoneObservableDecorator,
     WorkbenchHostManifestInterceptor,
     provideBuiltInTextMessageBoxCapabilityRoute(),
+    provideMicrofrontendPartRoute(),
     provideMicrofrontendViewRoute(),
     provideMicrofrontendPlatformBeans(),
     provideWorkbenchClientBeans(),
@@ -147,7 +155,7 @@ function provideMicrofrontendViewRoute(): EnvironmentProviders {
       useFactory: (): Route => ({
         matcher: MicrofrontendViewRoutes.provideMicrofrontendRouteMatcher(),
         component: MicrofrontendViewComponent,
-        canMatch: [canMatchWorkbenchView(true), MicrofrontendViewRoutes.canMatchViewCapability],
+        canMatch: [MicrofrontendViewRoutes.canMatchViewCapability],
       }),
     },
   ]);

@@ -25,7 +25,7 @@ export class MicrofrontendViewCapabilityValidator implements CapabilityIntercept
     }
 
     const viewCapability = capability as Partial<WorkbenchViewCapability>;
-    // Assert the view capability to have a qualifier set.
+    // Assert the view capability to have a qualifier.
     if (!Object.keys(viewCapability.qualifier ?? {}).length) {
       throw Error(`[NullQualifierError] View capability requires a qualifier [capability=${JSON.stringify(viewCapability)}]`);
     }

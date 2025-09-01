@@ -192,4 +192,4 @@ export const MAIN_AREA: MAIN_AREA = 'part.main-area';
 /**
  * Represents the type of the {@link MAIN_AREA} constant.
  */
-export type MAIN_AREA = 'part.main-area';
+export type MAIN_AREA = 'part.main-area'; // TODO [activity] WHY NOT ALTERNATIVE NAME?

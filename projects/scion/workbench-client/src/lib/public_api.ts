@@ -23,3 +23,4 @@ export * from './routing/public_api';
 export * from './text/public_api';
 export * from './theme/public_api';
 export * from './view/public_api';
+export * from './part/public_api';
