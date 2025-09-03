@@ -29,6 +29,7 @@ import {StableCapabilityIdAssigner} from '../stable-capability-id-assigner.inter
 import {MicrofrontendMessageBoxCapabilityValidator} from '../microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
 import {MicrofrontendPerspectiveCapabilityValidator} from '../microfrontend-perspective/microfrontend-perspective-capability-validator.interceptor';
 import {MicrofrontendPerspectiveIntentHandler} from '../microfrontend-perspective/microfrontend-perspective-intent-handler.interceptor';
+import {ViewCapabilityPreloadCapabilityInterceptor} from './view-capability-preload-capability-interceptor.service';
 
 /**
  * Initializes and starts the SCION Microfrontend Platform in host mode.
@@ -50,6 +51,7 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
   private readonly _dialogCapabilityValidator = inject(MicrofrontendDialogCapabilityValidator);
   private readonly _messageBoxCapabilityValidator = inject(MicrofrontendMessageBoxCapabilityValidator);
   private readonly _stableCapabilityIdAssigner = inject(StableCapabilityIdAssigner);
+  private readonly _viewCapabilityPreloadCapabilityInterceptor = inject(ViewCapabilityPreloadCapabilityInterceptor);
   private readonly _injector = inject(Injector);
   private readonly _zone = inject(NgZone);
   private readonly _logger = inject(Logger);
@@ -117,6 +119,11 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
 
     // Register capability interceptor to assign perspective and view capabilities a stable identifier.
     Beans.register(CapabilityInterceptor, {useValue: this._stableCapabilityIdAssigner, multi: true});
+
+    // Register view capability interceptor to preload inactive microfrontend views not defining the `lazy` property to maintain compatibility with applications setting view titles and headings in view microfrontends.
+    if (this.config.preloadInactiveViews) {
+      Beans.register(CapabilityInterceptor, {useValue: this._viewCapabilityPreloadCapabilityInterceptor, multi: true});
+    }
 
     // Inject services registered under {MICROFRONTEND_PLATFORM_POST_STARTUP} DI token;
     // must be done in runlevel 2, i.e., before activator microfrontends are installed.

@@ -40,10 +40,6 @@ export default class ActivatorModule {
       },
       params: [
         {
-          name: 'initialTitle',
-          required: false,
-        },
-        {
           name: 'transientParam',
           required: false,
           transient: true,

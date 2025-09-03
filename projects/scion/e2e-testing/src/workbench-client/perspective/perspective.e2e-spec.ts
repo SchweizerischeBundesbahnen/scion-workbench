@@ -118,11 +118,11 @@ test.describe('Workbench Perspective', () => {
 
     // Assert views of the left part.
     await expectView(viewPage1).toBeActive();
-    await expectView(viewPage2).toBeInactive();
+    await expectView(viewPage2).toBeInactive({loaded: false});
 
     // Assert views of the right part.
     await expectView(viewPage3).toBeActive();
-    await expectView(viewPage4).toBeInactive();
+    await expectView(viewPage4).toBeInactive({loaded: false});
 
     // Assert correct capability to be resolved.
     await viewPage1.view.tab.click();
@@ -298,8 +298,8 @@ test.describe('Workbench Perspective', () => {
 
     // Expect first view to be active.
     await expectView(viewPage1).toBeActive();
-    await expectView(viewPage2).toBeInactive();
-    await expectView(viewPage3).toBeInactive();
+    await expectView(viewPage2).toBeInactive({loaded: false});
+    await expectView(viewPage3).toBeInactive({loaded: false});
   });
 
   test('should activate specified view', async ({appPO, microfrontendNavigator}) => {
@@ -339,9 +339,9 @@ test.describe('Workbench Perspective', () => {
     const viewPage3 = new ViewPagePO(appPO, {cssClass: 'testee-3'});
 
     // Expect view 2 to be active.
-    await expectView(viewPage1).toBeInactive();
+    await expectView(viewPage1).toBeInactive({loaded: false});
     await expectView(viewPage2).toBeActive();
-    await expectView(viewPage3).toBeInactive();
+    await expectView(viewPage3).toBeInactive({loaded: false});
   });
 
   test('should switch perspective', async ({appPO, microfrontendNavigator}) => {
@@ -619,7 +619,7 @@ test.describe('Workbench Perspective', () => {
     });
 
     await expectView(testViewPage1).toBeActive();
-    await expectView(testViewPage2).toBeInactive();
+    await expectView(testViewPage2).toBeInactive({loaded: false});
   });
 
   test('should display view after correcting qualifier and reloading the application', async ({appPO, microfrontendNavigator, page, consoleLogs, browser}) => {

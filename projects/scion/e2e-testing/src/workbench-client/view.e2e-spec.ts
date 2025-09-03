@@ -23,6 +23,11 @@ import {MAIN_AREA} from '../workbench.model';
 import {SciRouterOutletPO} from './page-object/sci-router-outlet.po';
 import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
 import {waitForCondition} from '../helper/testing.util';
+import {MicrofrontendTestPage1PO} from './page-object/microfrontend-test-page-1.po';
+import {MicrofrontendTestPage2PO} from './page-object/microfrontend-test-page-2.po';
+import {MicrofrontendTestPage3PO} from './page-object/microfrontend-test-page-3.po';
+import {WorkbenchViewCapability} from './page-object/register-workbench-capability-page.po';
+import {TextTestPagePO} from './page-object/test-pages/text-test-page.po';
 
 test.describe('Workbench View', () => {
 
@@ -1468,6 +1473,640 @@ test.describe('Workbench View', () => {
 
       // Expect component state to be preserved.
       await expect(testeeViewPage.input).toHaveValue('A');
+    });
+  });
+
+  test.describe('Workbench View Loading', () => {
+
+    test('should load view lazy by default', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register test view.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-pages/microfrontend-test-page-1',
+          title: 'Test View',
+          lazy: undefined, // default
+        },
+      });
+
+      // Open test view without activating it.
+      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPage.navigate({component: 'testee'}, {target: 'view.1', activate: false});
+      const testPage = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+
+      // Expect microfrontend not to be loaded.
+      await expectView(testPage).toBeInactive({loaded: false});
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([]);
+
+      // Activate view.
+      await testPage.view.tab.click();
+      await expectView(testPage).toBeActive();
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([
+        '[MicrofrontendTestPage1Component#construct]',
+      ]);
+    });
+
+    test('should not load view lazy by default if compat mode is enabled', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+      await appPO.navigateTo({microfrontendSupport: true, preloadInactiveMicrofrontendViews: true});
+
+      // Register test view without defining the `lazy` property.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-pages/microfrontend-test-page-1',
+          title: 'Test View',
+          lazy: undefined, // default
+        },
+      });
+
+      // Open test view without activating it.
+      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPage.navigate({component: 'testee'}, {target: 'view.1', activate: false});
+      const testPage = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+
+      // Expect microfrontend to be loaded.
+      await expectView(testPage).toBeInactive({loaded: true});
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([
+        '[MicrofrontendTestPage1Component#construct]',
+      ]);
+    });
+
+    test('should load lazy view when opened in new active view', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register test view.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-pages/microfrontend-test-page-1',
+          title: 'Test View',
+          lazy: true,
+        },
+      });
+
+      // Open test view.
+      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPage.navigate({component: 'testee'}, {target: 'view.1'});
+      const testPage = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+
+      // Expect microfrontend to be loaded.
+      await expectView(testPage).toBeActive();
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([
+        '[MicrofrontendTestPage1Component#construct]',
+      ]);
+    });
+
+    test('should load lazy view when activating it', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register test view 1.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee-1'},
+        properties: {
+          path: 'test-pages/microfrontend-test-page-1',
+          title: 'Test View 1',
+          lazy: true,
+        },
+      });
+
+      // Register test view 2.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee-2'},
+        properties: {
+          path: 'test-pages/microfrontend-test-page-2',
+          title: 'Test View 2',
+          lazy: true,
+        },
+      });
+
+      // Register test view 3.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee-3'},
+        properties: {
+          path: 'test-pages/microfrontend-test-page-3',
+          title: 'Test View 3',
+          lazy: true,
+        },
+      });
+
+      // Create perspective with test view.
+      await microfrontendNavigator.createPerspective('app1', {
+        type: 'perspective',
+        qualifier: {perspective: 'testee'},
+        properties: {
+          layout: [
+            {
+              id: 'part.main',
+              views: [
+                {qualifier: {component: 'testee-1'}, cssClass: 'testee-1'},
+                {qualifier: {component: 'testee-2'}, cssClass: 'testee-2'},
+                {qualifier: {component: 'testee-3'}, cssClass: 'testee-3'},
+              ],
+            },
+          ],
+        },
+      });
+
+      const testPage1 = new MicrofrontendTestPage1PO(appPO, {cssClass: 'testee-1'});
+      const testPage2 = new MicrofrontendTestPage2PO(appPO, {cssClass: 'testee-2'});
+      const testPage3 = new MicrofrontendTestPage3PO(appPO, {cssClass: 'testee-3'});
+
+      // Expect microfrontend of view 1 to be loaded.
+      await expectView(testPage1).toBeActive();
+      await expectView(testPage2).toBeInactive({loaded: false});
+      await expectView(testPage3).toBeInactive({loaded: false});
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([
+        '[MicrofrontendTestPage1Component#construct]',
+      ]);
+      consoleLogs.clear();
+
+      // Activate view 2.
+      await testPage2.view.tab.click();
+
+      // Expect microfrontend of view 2 to be loaded.
+      await expectView(testPage1).toBeInactive({loaded: true});
+      await expectView(testPage2).toBeActive();
+      await expectView(testPage3).toBeInactive({loaded: false});
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([
+        '[MicrofrontendTestPage2Component#construct]',
+      ]);
+      consoleLogs.clear();
+
+      // Activate view 3.
+      await testPage3.view.tab.click();
+
+      // Expect microfrontend of view 3 to be loaded.
+      await expectView(testPage1).toBeInactive({loaded: true});
+      await expectView(testPage2).toBeInactive({loaded: true});
+      await expectView(testPage3).toBeActive();
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([
+        '[MicrofrontendTestPage3Component#construct]',
+      ]);
+      consoleLogs.clear();
+
+      // Activate view 2.
+      await testPage2.view.tab.click();
+      await expectView(testPage1).toBeInactive({loaded: true});
+      await expectView(testPage2).toBeActive();
+      await expectView(testPage3).toBeInactive({loaded: true});
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([]);
+
+      // Activate view 1.
+      await testPage1.view.tab.click();
+      await expectView(testPage1).toBeActive();
+      await expectView(testPage2).toBeInactive({loaded: true});
+      await expectView(testPage3).toBeInactive({loaded: true});
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([]);
+    });
+
+    test('should load lazy view on first activation only', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+      await appPO.navigateTo({microfrontendSupport: true, logLevel: 'debug'});
+
+      // Register test view.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-pages/microfrontend-test-page-1',
+          title: 'Test View',
+          lazy: true,
+        },
+      });
+
+      // Open test view.
+      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPage.navigate({component: 'testee'}, {target: 'view.1'});
+      const testPage = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+      await expectView(testPage).toBeActive();
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([
+        '[MicrofrontendTestPage1Component#construct]',
+      ]);
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /Loading microfrontend into "view\.1"/})).toEqual([
+        expect.stringMatching(/path=test-pages\/microfrontend-test-page-1/),
+      ]);
+      consoleLogs.clear();
+
+      // Activate router view.
+      await routerPage.view.tab.click();
+      await expectView(testPage).toBeInactive({loaded: true});
+
+      // Activate test view again.
+      await testPage.view.tab.click();
+
+      // Expect no new navigation.
+      await expectView(testPage).toBeActive();
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([]);
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /Loading microfrontend into "view\.1"/})).toEqual([]);
+    });
+
+    test('should not load lazy view when opened in new inactive view', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register test view.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-pages/microfrontend-test-page-1',
+          title: 'Test View',
+          lazy: true,
+        },
+      });
+
+      // Open test view without activating it.
+      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPage.navigate({component: 'testee'}, {target: 'view.1', activate: false});
+      const testPage = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+
+      // Expect microfrontend not to be loaded.
+      await expectView(testPage).toBeInactive({loaded: false});
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([]);
+
+      // Activate view tab.
+      await appPO.view({viewId: 'view.1'}).tab.click();
+      await expectView(testPage).toBeActive();
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([
+        '[MicrofrontendTestPage1Component#construct]',
+      ]);
+    });
+
+    test('should not load lazy view when loaded into inactive lazy view that has already been loaded yet', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+      await appPO.navigateTo({microfrontendSupport: true, logLevel: 'debug'});
+
+      // Register test view 1.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee-1'},
+        properties: {
+          path: 'test-pages/microfrontend-test-page-1',
+          title: 'Test View 1',
+          lazy: true,
+        },
+      });
+
+      // Register test view 2.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee-2'},
+        properties: {
+          path: 'test-pages/microfrontend-test-page-2',
+          title: 'Test View 2',
+          lazy: true,
+        },
+      });
+
+      // Open test view 1.
+      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPage.navigate({component: 'testee-1'}, {target: 'view.1'});
+      const testPage1 = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+      await expectView(testPage1).toBeActive();
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([
+        '[MicrofrontendTestPage1Component#construct]',
+      ]);
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /Loading microfrontend into "view\.1"/})).toEqual([
+        expect.stringMatching(/path=test-pages\/microfrontend-test-page-1/),
+      ]);
+      consoleLogs.clear();
+
+      // Activate router view.
+      await routerPage.view.tab.click();
+      await expectView(testPage1).toBeInactive({loaded: true});
+
+      // Navigate inactive "view.1" to other lazy view.
+      await routerPage.navigate({component: 'testee-2'}, {target: 'view.1', activate: false});
+      const testPage2 = new MicrofrontendTestPage2PO(appPO, {viewId: 'view.1'});
+
+      // Expect no navigation.
+      await expectView(testPage2).toBeInactive({loaded: false});
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([]);
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /Loading microfrontend into "view\.1"/})).toEqual([]);
+
+      // Activate test view 2.
+      await testPage2.view.tab.click();
+
+      // Expect navigation.
+      await expectView(testPage2).toBeActive();
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([
+        '[MicrofrontendTestPage2Component#construct]',
+      ]);
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /Loading microfrontend into "view\.1"/})).toEqual([
+        expect.stringMatching(/path=test-pages\/microfrontend-test-page-2/),
+      ]);
+    });
+
+    test('should not load lazy view when loaded into inactive lazy view that has not been loaded yet', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register test view 1.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee-1'},
+        properties: {
+          path: 'test-pages/microfrontend-test-page-1',
+          title: 'Test View 1',
+          lazy: true,
+        },
+      });
+
+      // Register test view 2.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee-2'},
+        properties: {
+          path: 'test-pages/microfrontend-test-page-2',
+          title: 'Test View 2',
+          lazy: true,
+        },
+      });
+
+      // Open inactive view.
+      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPage.navigate({component: 'testee-1'}, {target: 'view.1', activate: false});
+      const testPage1 = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+      await expectView(testPage1).toBeInactive({loaded: false});
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([]);
+
+      // Navigate inactive view.
+      await routerPage.navigate({component: 'testee-2'}, {target: 'view.1', activate: false});
+      const testPage2 = new MicrofrontendTestPage2PO(appPO, {viewId: 'view.1'});
+      await expectView(testPage2).toBeInactive({loaded: false});
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([]);
+
+      // Activate view tab.
+      await appPO.view({viewId: 'view.1'}).tab.click();
+      await expectView(testPage2).toBeActive();
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([
+        '[MicrofrontendTestPage2Component#construct]',
+      ]);
+    });
+
+    test('should cancel stale navigation when navigating inactive view', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+      await appPO.navigateTo({microfrontendSupport: true, logLevel: 'debug'});
+
+      // Register test view 1.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee-1'},
+        properties: {
+          path: 'test-pages/microfrontend-test-page-1',
+          title: 'Test View 1',
+          lazy: true,
+        },
+      });
+
+      // Register test view 2.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee-2'},
+        properties: {
+          path: 'test-pages/microfrontend-test-page-2',
+          title: 'Test View 2',
+          lazy: true,
+        },
+      });
+
+      // Register test view 3.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee-3'},
+        properties: {
+          path: 'test-pages/microfrontend-test-page-3',
+          title: 'Test View 3',
+          lazy: true,
+        },
+      });
+
+      // Open inactive view with test page 1.
+      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPage.navigate({component: 'testee-1'}, {target: 'view.1', activate: false});
+      const testPage1 = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+      await expectView(testPage1).toBeInactive({loaded: false});
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([]);
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /Loading microfrontend into "view\.1"/})).toEqual([]);
+
+      // Navigate inactive view to test page 2.
+      await routerPage.navigate({component: 'testee-2'}, {target: 'view.1', activate: false});
+      const testPage2 = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+      await expectView(testPage2).toBeInactive({loaded: false});
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([]);
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /Loading microfrontend into "view\.1"/})).toEqual([]);
+
+      // Navigate inactive view to test page 3.
+      await routerPage.navigate({component: 'testee-3'}, {target: 'view.1', activate: true});
+      const testPage3 = new MicrofrontendTestPage3PO(appPO, {viewId: 'view.1'});
+      await expectView(testPage3).toBeActive();
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([
+        '[MicrofrontendTestPage3Component#construct]',
+      ]);
+      // Expect most recent navigation only.
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /Loading microfrontend into "view\.1"/})).toEqual([
+        expect.stringMatching(/path=test-pages\/microfrontend-test-page-3/),
+      ]);
+    });
+
+    test('should display title of lazy view if not loaded yet', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+      await appPO.navigateTo({microfrontendSupport: true, logLevel: 'debug'});
+
+      // Register test view.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-pages/microfrontend-test-page-1',
+          title: 'Test View',
+          lazy: true,
+        },
+      });
+
+      // Open test view without activating it.
+      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPage.navigate({component: 'testee'}, {target: 'view.1', activate: false});
+      const testPage = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+
+      // Expect title to display and microfrontend not to be loaded.
+      await expectView(testPage).toBeInactive({loaded: false});
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([]);
+      await expect(testPage.view.tab.title).toHaveText('Test View');
+    });
+
+    test('should display translatable title of lazy view if not loaded yet', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+      await appPO.navigateTo({microfrontendSupport: true, logLevel: 'debug'});
+
+      // Register text view.
+      await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+        type: 'view',
+        qualifier: {component: 'text'},
+        properties: {
+          path: 'test-pages/text-test-page',
+          title: 'Text Page',
+        },
+      });
+
+      // Register test view.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee'},
+        params: [{name: 'id', required: true}],
+        properties: {
+          path: 'test-pages/microfrontend-test-page-1',
+          title: '%view.title;id=:id;name=:name',
+          resolve: {
+            name: 'textprovider/workbench-client-testing-app1/values/123',
+          },
+          lazy: true,
+        },
+      });
+
+      // Prepare title and resolved value.
+      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPage.navigate({component: 'text'}, {target: 'view.1'});
+
+      const textPage = TextTestPagePO.newViewPO(appPO, {viewId: 'view.1'});
+      await textPage.provideText('view.title', 'Test View {{id}} - {{name}}');
+      await textPage.provideValue('123', 'RESOLVED');
+
+      // Open test view without activating it.
+      await routerPage.view.tab.click();
+      await routerPage.navigate({component: 'testee'}, {params: {id: '123'}, target: 'view.1', activate: false});
+      const testPage = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+
+      // Expect title to display and microfrontend not to be loaded.
+      await expectView(testPage).toBeInactive({loaded: false});
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([]);
+      await expect(testPage.view.tab.title).toHaveText('Test View 123 - RESOLVED');
+    });
+
+    test('should load inactive non-lazy views', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register test view 1.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee-1'},
+        properties: {
+          path: 'test-pages/microfrontend-test-page-1',
+          title: 'Test View 1',
+          lazy: false,
+        },
+      });
+
+      // Register test view 2.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee-2'},
+        properties: {
+          path: 'test-pages/microfrontend-test-page-2',
+          title: 'Test View 2',
+          lazy: false,
+        },
+      });
+
+      // Register test view 3.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee-3'},
+        properties: {
+          path: 'test-pages/microfrontend-test-page-3',
+          title: 'Test View 3',
+          lazy: false,
+        },
+      });
+
+      // Create perspective with test view.
+      await microfrontendNavigator.createPerspective('app1', {
+        type: 'perspective',
+        qualifier: {perspective: 'testee'},
+        properties: {
+          layout: [
+            {
+              id: 'part.main',
+              views: [
+                {qualifier: {component: 'testee-1'}, cssClass: 'testee-1'},
+                {qualifier: {component: 'testee-2'}, cssClass: 'testee-2'},
+                {qualifier: {component: 'testee-3'}, cssClass: 'testee-3'},
+              ],
+            },
+          ],
+        },
+      });
+
+      const testPage1 = new MicrofrontendTestPage1PO(appPO, {cssClass: 'testee-1'});
+      const testPage2 = new MicrofrontendTestPage2PO(appPO, {cssClass: 'testee-2'});
+      const testPage3 = new MicrofrontendTestPage3PO(appPO, {cssClass: 'testee-3'});
+
+      // Expect microfrontends to be loaded.
+      await expectView(testPage1).toBeActive();
+      await expectView(testPage2).toBeInactive({loaded: true});
+      await expectView(testPage3).toBeInactive({loaded: true});
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqualIgnoreOrder([
+        '[MicrofrontendTestPage1Component#construct]',
+        '[MicrofrontendTestPage2Component#construct]',
+        '[MicrofrontendTestPage3Component#construct]',
+      ]);
+      consoleLogs.clear();
+
+      // Activate test view 2.
+      await testPage2.view.tab.click();
+      await expectView(testPage1).toBeInactive({loaded: true});
+      await expectView(testPage2).toBeActive();
+      await expectView(testPage3).toBeInactive({loaded: true});
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([]);
+
+      // Activate test view 3.
+      await testPage3.view.tab.click();
+      await expectView(testPage1).toBeInactive({loaded: true});
+      await expectView(testPage2).toBeInactive({loaded: true});
+      await expectView(testPage3).toBeActive();
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([]);
+    });
+
+    test('should load non-lazy view when loaded into inactive view that has not been loaded yet', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register test view 1 (lazy).
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee-1'},
+        properties: {
+          path: 'test-pages/microfrontend-test-page-1',
+          title: 'Test View 1',
+          lazy: true,
+        },
+      });
+
+      // Register test view 2.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee-2'},
+        properties: {
+          path: 'test-pages/microfrontend-test-page-2',
+          title: 'Test View 2',
+          lazy: false,
+        },
+      });
+
+      // Open test view without activating it.
+      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPage.navigate({component: 'testee-1'}, {target: 'view.1', activate: false});
+      const testPage1 = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([]);
+      await expectView(testPage1).toBeInactive({loaded: false});
+
+      // Navigate test view to non-lazy view.
+      await routerPage.navigate({component: 'testee-2'}, {target: 'view.1', activate: false});
+      const testPage2 = new MicrofrontendTestPage2PO(appPO, {viewId: 'view.1'});
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([
+        '[MicrofrontendTestPage2Component#construct]',
+      ]);
+      await expectView(testPage2).toBeInactive({loaded: true});
     });
   });
 });

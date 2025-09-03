@@ -67,11 +67,19 @@ export interface WorkbenchViewCapability extends Capability {
      */
     path: string;
     /**
+     * Controls if to load the microfrontend only when activating the view tab.
+     *
+     * Requires configuration of {@link title} and {@link heading} in the manifest.
+     *
+     * Defaults to `true`.
+     */
+    lazy?: boolean;
+    /**
      * Specifies the title displayed in the view tab.
      *
      * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
      *
-     * Interpolation parameters can reference capability parameters or resolvers using the colon syntax. Resolvers resolve data based on capability parameters.
+     * Interpolation parameters can reference capability parameters and resolvers using the colon syntax. Resolvers resolve data based on capability parameters.
      * See {@link resolve} for defining resolvers.
      *
      * ```json
@@ -94,7 +102,7 @@ export interface WorkbenchViewCapability extends Capability {
      *
      * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
      *
-     * Interpolation parameters can reference capability parameters or resolvers using the colon syntax. Resolvers resolve data based on capability parameters.
+     * Interpolation parameters can reference capability parameters and resolvers using the colon syntax. Resolvers resolve data based on capability parameters.
      * See {@link resolve} for defining resolvers.
      *
      * ```json

@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Injector, Provider, Signal, untracked, viewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Injector, Provider, signal, Signal, untracked, viewChild} from '@angular/core';
 import {ActivatedRoute, Params} from '@angular/router';
-import {firstValueFrom, Observable, Subject, switchMap} from 'rxjs';
-import {first, map, takeUntil} from 'rxjs/operators';
+import {asyncScheduler, firstValueFrom, MonoTypeOperatorFunction, Observable, OperatorFunction, Subject, switchMap} from 'rxjs';
+import {filter, first, map, subscribeOn, take, takeUntil} from 'rxjs/operators';
 import {ManifestService, mapToBody, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
@@ -35,7 +35,7 @@ import {MicrofrontendWorkbenchView} from './microfrontend-workbench-view.model';
 import {Microfrontends} from '../common/microfrontend.util';
 import {Objects} from '../../common/objects.util';
 import {WorkbenchView} from '../../view/workbench-view.model';
-import {rootEffect} from '../../common/root-effect';
+import {rootEffect, toRootObservable} from '../../common/rxjs-interop.util';
 import {createRemoteTranslatable} from '../text/remote-text-provider';
 
 /**
@@ -89,7 +89,7 @@ export class MicrofrontendViewComponent {
     visible: this.view.slot.portal.attached,
   };
 
-  protected capability: WorkbenchViewCapability | null = null;
+  protected readonly capability = signal<WorkbenchViewCapability | null>(null);
 
   constructor() {
     this._logger.debug(() => `Constructing MicrofrontendViewComponent. [viewId=${this.view.id}]`, LoggerNames.MICROFRONTEND_ROUTING);
@@ -110,7 +110,11 @@ export class MicrofrontendViewComponent {
     this._route.params
       .pipe(
         switchMap(params => this.fetchCapability$(params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID] as string).pipe(map(capability => ({capability, params})))),
-        serializeExecution(({capability, params}) => this.onNavigate(this.capability, capability, params)),
+        executeOnCapabilityChange(context => this.onCapabilityChange(context)),
+        filterNullCapability(),
+        delayIfLazy(),
+        serializeExecution(context => this.onNavigate(context)),
+        subscribeOn(asyncScheduler), // subscribe asynchronously to prevent manual change detection in `onCapabilityChange` during component construction.
         takeUntilDestroyed(),
       )
       .subscribe();
@@ -127,25 +131,44 @@ export class MicrofrontendViewComponent {
     });
   }
 
-  private async onNavigate(prevCapability: WorkbenchViewCapability | null, capability: WorkbenchViewCapability | null, params: Params): Promise<void> {
+  /**
+   * Method invoked each time when navigating to a different capability.
+   */
+  private onCapabilityChange(context: NavigationContext<WorkbenchViewCapability | null>): void {
+    const {capability, prevCapability, params} = context;
+    this.capability.set(capability);
+
+    // Signal the currently loaded application to unload.
+    if (prevCapability && prevCapability.metadata!.appSymbolicName !== capability?.metadata!.appSymbolicName) {
+      void this._messageClient.publish(ɵWorkbenchCommands.viewUnloadingTopic(this.view.id));
+    }
+
+    // Update view properties.
+    this.setViewProperties(context);
+
+    // Inactive views are not checked for changes since detached from the Angular component tree.
+    // So, we manually trigger change detection to update attributes on the `sci-router-outlet`.
+    if (!this.view.active()) {
+      this._changeDetectorRef.detectChanges();
+    }
+
+    // Unload microfrontend if capability is not found.
     if (!capability) {
       this._logger.warn(() => `[NullCapabilityError] No application found to provide a view capability of id '${params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID]}'. Maybe, the requested view is not public API or the providing application not available.`, LoggerNames.MICROFRONTEND_ROUTING);
       this.unload();
-      return;
     }
+  }
 
-    this.capability = capability;
+  /**
+   * Method invoked to perform a navigation.
+   */
+  private async onNavigate(context: NavigationContext): Promise<void> {
+    const {capability, prevCapability, params} = context;
     this.view.registerAdapter(MicrofrontendWorkbenchView, new MicrofrontendWorkbenchView(capability, params));
 
-    // Check if navigating to a new microfrontend.
+    // Check if navigating to a different microfrontend.
     if (!prevCapability || prevCapability.metadata!.id !== capability.metadata!.id) {
-      this.setViewProperties(capability, params);
       this.installParamsUpdater(capability);
-    }
-
-    // Signal the currently loaded application to unload.
-    if (prevCapability && prevCapability.metadata!.appSymbolicName !== capability.metadata!.appSymbolicName) {
-      await this._messageClient.publish(ɵWorkbenchCommands.viewUnloadingTopic(this.view.id));
     }
 
     // Pass parameters to the microfrontend.
@@ -166,7 +189,7 @@ export class MicrofrontendViewComponent {
 
     // Navigate to the microfrontend.
     const application = this._manifestService.getApplication(capability.metadata!.appSymbolicName);
-    this._logger.debug(() => `Loading microfrontend into workbench view [viewId=${this.view.id}, app=${capability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${(capability.properties.path)}].`, LoggerNames.MICROFRONTEND_ROUTING, params, capability);
+    this._logger.debug(() => `Loading microfrontend into "${this.view.id}" [app=${capability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${(capability.properties.path)}].`, LoggerNames.MICROFRONTEND_ROUTING, params, capability);
     await this._outletRouter.navigate(capability.properties.path, {
       outlet: this.view.id,
       relativeTo: application.baseUrl,
@@ -175,12 +198,6 @@ export class MicrofrontendViewComponent {
       showSplash: capability.properties.showSplash,
       ɵcapabilityId: capability.metadata!.id,
     });
-
-    // Inactive views are not checked for changes since detached from the Angular component tree.
-    // So, we manually trigger change detection to update attributes on the `sci-router-outlet`.
-    if (!this.view.active()) {
-      this._changeDetectorRef.detectChanges();
-    }
   }
 
   private fetchCapability$(capabilityId: string): Observable<WorkbenchViewCapability | null> {
@@ -231,11 +248,12 @@ export class MicrofrontendViewComponent {
   /**
    * Updates the properties of this view, such as the view title, as defined by the capability.
    */
-  private setViewProperties(viewCapability: WorkbenchViewCapability, params: Params): void {
-    this.view.title = createRemoteTranslatable(viewCapability.properties.title, {appSymbolicName: viewCapability.metadata!.appSymbolicName, valueParams: params, topicParams: viewCapability.properties.resolve}) ?? null;
-    this.view.heading = createRemoteTranslatable(viewCapability.properties.heading, {appSymbolicName: viewCapability.metadata!.appSymbolicName, valueParams: params, topicParams: viewCapability.properties.resolve}) ?? null;
-    this.view.classList.application = viewCapability.properties.cssClass;
-    this.view.closable = viewCapability.properties.closable ?? true;
+  private setViewProperties(context: NavigationContext<WorkbenchViewCapability | null>): void {
+    const {capability, params} = context;
+    this.view.title = (capability && createRemoteTranslatable(capability.properties.title, {appSymbolicName: capability.metadata!.appSymbolicName, valueParams: params, topicParams: capability.properties.resolve})) ?? null;
+    this.view.heading = (capability && createRemoteTranslatable(capability.properties.heading, {appSymbolicName: capability.metadata!.appSymbolicName, valueParams: params, topicParams: capability.properties.resolve})) ?? null;
+    this.view.classList.application = capability?.properties.cssClass;
+    this.view.closable = capability?.properties.closable ?? true;
     this.view.dirty = false;
   }
 
@@ -367,4 +385,51 @@ function configureMicrofrontendGlassPane(): Provider[] {
       useFactory: () => ({attributes: {'data-viewid': inject(WorkbenchView).id}}) satisfies GlassPaneOptions,
     },
   ];
+}
+
+/**
+ * Executes passed function each time when the source emits a different capability.
+ */
+function executeOnCapabilityChange(onCapabilityChange: (context: NavigationContext<WorkbenchViewCapability | null>) => void): OperatorFunction<{capability: WorkbenchViewCapability | null; params: Params}, NavigationContext<WorkbenchViewCapability | null>> {
+  let prevCapability: WorkbenchViewCapability | null = null;
+  return map(({capability, params}) => {
+    const context = {capability, prevCapability, params};
+    if (prevCapability?.metadata!.id !== capability?.metadata!.id) {
+      onCapabilityChange(context);
+      prevCapability = capability;
+    }
+    return context;
+  });
+}
+
+/**
+ * Continues the execution chain only if the capability is not `null`.
+ */
+function filterNullCapability(): OperatorFunction<NavigationContext<WorkbenchViewCapability | null>, NavigationContext> {
+  return filter((context): context is NavigationContext => !!context.capability);
+}
+
+/**
+ * Mirrors the source if the view is active or non-lazy. Otherwise, emission is delayed until the view is activated.
+ *
+ * Cancels any previous delayed emission when the source emits again.
+ */
+function delayIfLazy(): MonoTypeOperatorFunction<NavigationContext> {
+  // Use a root effect to continue emitting even if the component is detached from change detection.
+  const active$ = toRootObservable(inject(ɵWorkbenchView).active);
+
+  return switchMap(context => {
+    const lazy = context.capability.properties.lazy ?? true;
+    return active$.pipe(
+      filter(active => active || !lazy),
+      map(() => context),
+      take(1),
+    );
+  });
+}
+
+interface NavigationContext<T extends WorkbenchViewCapability | null = WorkbenchViewCapability> {
+  capability: T;
+  prevCapability: WorkbenchViewCapability | null;
+  params: Params;
 }

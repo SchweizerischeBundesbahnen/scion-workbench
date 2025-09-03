@@ -21,7 +21,10 @@ export const workbenchConfig: WorkbenchConfig = {
   startup: {
     launcher: WorkbenchStartupQueryParams.launcher(),
   },
-  microfrontendPlatform: WorkbenchStartupQueryParams.standalone() ? undefined : environment.microfrontendPlatformConfig,
+  microfrontendPlatform: WorkbenchStartupQueryParams.standalone() ? undefined : {
+    ...environment.microfrontendPlatformConfig, // eslint-disable-line  @typescript-eslint/no-misused-spread
+    preloadInactiveViews: WorkbenchStartupQueryParams.preloadInactiveMicrofrontendViews() ?? environment.microfrontendPlatformConfig.preloadInactiveViews,
+  },
   layout: {
     perspectives: Perspectives.definitions,
     initialPerspective: Perspectives.initialPerspective,
@@ -30,4 +33,7 @@ export const workbenchConfig: WorkbenchConfig = {
     modalityScope: WorkbenchStartupQueryParams.dialogModalityScope(),
   },
   textProvider: provideTextFromStorage,
+  logging: {
+    logLevel: WorkbenchStartupQueryParams.logLevel(),
+  },
 };

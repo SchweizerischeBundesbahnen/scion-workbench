@@ -11,7 +11,7 @@
 import {Component, computed, effect, ElementRef, inject, input, signal, Signal, TemplateRef, untracked, viewChild, ViewContainerRef} from '@angular/core';
 import {setStyle} from '../common/dom.util';
 import {boundingClientRect} from '@scion/components/dimension';
-import {rootEffect} from '../common/root-effect';
+import {rootEffect} from '../common/rxjs-interop.util';
 
 /**
  * Projects `ng-content` to a top-level DOM element and aligns it with this component's bounding box.

@@ -717,10 +717,10 @@ test.describe('Workbench Router', () => {
     await expect(async () => {
       if (i++ % 2) {
         await expectView(testee1ViewPage).toBeActive();
-        await expectView(testee2ViewPage).toBeInactive();
+        await expectView(testee2ViewPage).toBeInactive({loaded: false});
       }
       else {
-        await expectView(testee1ViewPage).toBeInactive();
+        await expectView(testee1ViewPage).toBeInactive({loaded: false});
         await expectView(testee2ViewPage).toBeActive();
       }
     }).toPass();
@@ -881,11 +881,11 @@ test.describe('Workbench Router', () => {
 
     // expect the views to be present
     await expect(appPO.views()).toHaveCount(2);
-    await expectView(viewPage1).toBeInactive();
+    await expectView(viewPage1).toBeInactive({loaded: false});
     await expectView(viewPage2).toBeActive();
   });
 
-  test('should load microfrontends of inactive views on initial navigation', async ({appPO, microfrontendNavigator}) => {
+  test('should not load microfrontends of inactive views on initial navigation', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // navigate to the view
@@ -893,34 +893,29 @@ test.describe('Workbench Router', () => {
     await routerPage.navigate({component: 'view', app: 'app1'}, {
       target: 'view.101',
       activate: false,
-      params: {initialTitle: 'INITIAL TITLE 1'},
     });
 
     // navigate to the view
     await routerPage.navigate({component: 'view', app: 'app1'}, {
       target: 'view.102',
       activate: true,
-      params: {initialTitle: 'INITIAL TITLE 2'},
     });
 
     const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
     const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
 
-    // wait for views to be opened before reloading the application
-    await expect(appPO.views()).toHaveCount(3);
+    await expectView(routerPage).toBeInactive({loaded: true});
+    await expectView(testee1ViewPage).toBeInactive({loaded: false});
+    await expectView(testee2ViewPage).toBeActive();
 
     // reload the app
     await appPO.reload();
 
     // expect views to be present
     await expect(appPO.views()).toHaveCount(3);
-    await expectView(routerPage).toBeInactive();
-    await expectView(testee1ViewPage).toBeInactive();
+    await expectView(routerPage).toBeInactive({loaded: false});
+    await expectView(testee1ViewPage).toBeInactive({loaded: false});
     await expectView(testee2ViewPage).toBeActive();
-
-    // expect view microfrontends to have set their initial title
-    await expect(testee1ViewPage.view.tab.title).toHaveText('INITIAL TITLE 1');
-    await expect(testee2ViewPage.view.tab.title).toHaveText('INITIAL TITLE 2');
   });
 
   test('should set view properties upon initial view tab navigation', async ({appPO, microfrontendNavigator}) => {

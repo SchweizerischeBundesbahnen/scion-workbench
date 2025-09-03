@@ -571,21 +571,19 @@ test.describe('Workbench Router', () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'view', app: 'app1'}, {
         target: 'view.100',
-        params: {initialTitle: 'TITLE', transientParam: 'TRANSIENT PARAM'},
+        params: {transientParam: 'TRANSIENT PARAM'},
       });
 
       const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
 
       // expect transient param to be contained in view params
       await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
-        initialTitle: 'TITLE',
         transientParam: 'TRANSIENT PARAM',
       });
 
       // expect transient param to be removed from view params after page reload
       await appPO.reload();
-      await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({initialTitle: 'TITLE'});
-      await expect.poll(() => testeeViewPage.getViewParams()).not.toMatchObject({transientParam: expect.stringMatching('TRANSIENT PARAM')});
+      await expect.poll(() => testeeViewPage.getViewParams()).not.toMatchObject({transientParam: 'TRANSIENT PARAM'});
     });
 
     test('should merge params on self-navigation', async ({appPO, microfrontendNavigator}) => {
