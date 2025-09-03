@@ -85,7 +85,7 @@ export interface WorkbenchDialogCapability extends Capability {
      *
      * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
      *
-     * Interpolation parameters can reference capability parameters or resolvers using the colon syntax. Resolvers resolve data based on capability parameters.
+     * Interpolation parameters can reference capability parameters and resolvers using the colon syntax. Resolvers resolve data based on capability parameters.
      * See {@link resolve} for defining resolvers.
      *
      * ```json

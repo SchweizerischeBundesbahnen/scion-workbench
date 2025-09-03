@@ -15,7 +15,7 @@ import {WorkbenchService} from '../../workbench.service';
 import {Crypto} from '@scion/toolkit/crypto';
 import {coerceElement} from '@angular/cdk/coercion';
 import {first} from 'rxjs/operators';
-import {rootEffect} from '../../common/root-effect';
+import {rootEffect} from '../../common/rxjs-interop.util';
 
 /**
  * Provides functions related to workbench themes.

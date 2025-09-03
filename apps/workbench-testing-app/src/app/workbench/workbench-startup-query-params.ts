@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {PartId} from '@scion/workbench';
+import {LogLevel, PartId} from '@scion/workbench';
 import {booleanAttribute} from '@angular/core';
 
 /**
@@ -82,6 +82,16 @@ export const WorkbenchStartupQueryParams = {
   DESKTOP: 'desktop',
 
   /**
+   * Query param to control the log level of the SCION Workbench.
+   */
+  LOG_LEVEL: 'logLevel',
+
+  /**
+   * Query param to control whether to preload inactive microfrontend views not defining the `lazy` property.
+   */
+  PRELOAD_INACTIVE_MICROFRONTEND_VIEWS: 'preloadInactiveMicrofrontendViews',
+
+  /**
    * Reads the query param to bootstrap the app with a specific app config.
    *
    * Params can be passed in the form of matrix params: "app-with-guard;forbidden=true"
@@ -138,5 +148,20 @@ export const WorkbenchStartupQueryParams = {
    */
   mainAreaInitialPartId: (): PartId | undefined => {
     return new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.MAIN_AREA_INITIAL_PART_ID) as PartId | null ?? undefined;
+  },
+
+  /**
+   * Reads the query param to control the log level of the SCION Workbench.
+   */
+  logLevel: (): LogLevel | undefined => {
+    const logLevel = new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.LOG_LEVEL) as 'debug' | 'info' | 'warn' | 'error' | null ?? undefined;
+    return logLevel ? LogLevel[logLevel.toUpperCase() as keyof typeof LogLevel] as LogLevel | undefined : undefined;
+  },
+
+  /**
+   * Reads the query param to control whether to preload inactive microfrontend views not defining the `lazy` property.
+   */
+  preloadInactiveMicrofrontendViews: (): true | undefined => {
+    return booleanAttribute(new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.PRELOAD_INACTIVE_MICROFRONTEND_VIEWS)) || undefined;
   },
 } as const;

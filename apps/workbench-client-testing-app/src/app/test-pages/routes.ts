@@ -40,6 +40,18 @@ const routes: Routes = [
     loadComponent: () => import('./microfrontend-test-page/microfrontend-test-page.component'),
   },
   {
+    path: 'microfrontend-test-page-1',
+    loadComponent: () => import('./microfrontend-test-page/microfrontend-test-page-1.component'),
+  },
+  {
+    path: 'microfrontend-test-page-2',
+    loadComponent: () => import('./microfrontend-test-page/microfrontend-test-page-2.component'),
+  },
+  {
+    path: 'microfrontend-test-page-3',
+    loadComponent: () => import('./microfrontend-test-page/microfrontend-test-page-3.component'),
+  },
+  {
     path: 'signal-ready-test-page',
     loadComponent: () => import('./signal-ready-test-page/signal-ready-test-page.component'),
   },

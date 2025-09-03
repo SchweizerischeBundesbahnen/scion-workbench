@@ -82,7 +82,6 @@ export default class ViewPageComponent {
     this.installCanCloseGuard();
     this.installViewActiveStateLogger();
     this.installObservableCompletionLogger();
-    this.setInitialTitleFromParams();
     this.view.signalReady();
 
     this.view.capability$
@@ -148,18 +147,6 @@ export default class ViewPageComponent {
           canCloseRef?.dispose();
         }
       });
-  }
-
-  /**
-   * Sets the view's initial title if contained in its params.
-   */
-  private setInitialTitleFromParams(): void {
-    const params = this.view.snapshot.params;
-    if (params.has('initialTitle')) {
-      this.view.setTitle(params.get('initialTitle') as string);
-      // Restore title observer
-      this.view.setTitle(this.form.controls.title.valueChanges);
-    }
   }
 
   private installViewActiveStateLogger(): void {

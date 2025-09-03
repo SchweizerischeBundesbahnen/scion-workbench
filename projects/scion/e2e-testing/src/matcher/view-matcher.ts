@@ -32,7 +32,11 @@ function expectWorkbenchView(viewPage: WorkbenchViewPagePO): ViewMatcher {
       await expect(viewPage.view.locator).toBeVisible();
       await expect(viewPage.locator).toBeVisible();
     },
-    toBeInactive: async (): Promise<void> => {
+    toBeInactive: async (options?: {loaded?: boolean}): Promise<void> => {
+      if (options?.loaded !== undefined) {
+        throw Error(`[PageObjectError] Unsupported option: 'loaded'}`);
+      }
+
       await expect(viewPage.view.tab.locator).toBeVisible();
       await expect(viewPage.view.tab.locator).not.toHaveAttribute('data-active');
       await expect(viewPage.view.locator).not.toBeAttached();
@@ -60,13 +64,13 @@ function expectMicrofrontendView(viewPage: MicrofrontendViewPagePO): ViewMatcher
       await expect(viewPage.outlet.locator).toBeVisible();
       await expect(viewPage.locator).toBeVisible();
     },
-    toBeInactive: async (): Promise<void> => {
+    toBeInactive: async (options?: {loaded?: boolean}): Promise<void> => {
       await expect(viewPage.view.tab.locator).toBeVisible();
       await expect(viewPage.view.tab.locator).not.toHaveAttribute('data-active');
       await expect(viewPage.view.locator).not.toBeAttached();
       await expect(viewPage.outlet.locator).toBeAttached();
       await expect(viewPage.outlet.locator).not.toBeVisible();
-      await expect(viewPage.locator).toBeVisible(); // iframe content is always visible, but not displayed because the outlet is hidden
+      await expect(viewPage.locator).toBeVisible({visible: options?.loaded ?? true}); // if loaded, iframe content is always visible, but not displayed because the outlet is hidden
       await expect.poll(() => viewPage.outlet.locator.boundingBox()).not.toBeNull(); //  assert to use `visibility: hidden` and not `display: none` to preserve the dimension of the view.
     },
     not: {
@@ -91,8 +95,11 @@ export interface ViewMatcher {
 
   /**
    * Expects the view to be in the DOM but not active, i.e., another view is the active view in its part.
+   *
+   * @param options - Options to control the expectation.
+   * @param options.loaded - Specifies if the microfrontend should be loaded. Defaults to `true`. Option not supported for non-microfrontend views.
    */
-  toBeInactive(): Promise<void>;
+  toBeInactive(options?: {loaded?: boolean}): Promise<void>;
 
   not: {
     /**

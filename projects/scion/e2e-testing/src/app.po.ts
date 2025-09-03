@@ -130,6 +130,12 @@ export class AppPO {
     if (options?.mainAreaInitialPartId) {
       this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.MAIN_AREA_INITIAL_PART_ID, options.mainAreaInitialPartId);
     }
+    if (options?.preloadInactiveMicrofrontendViews) {
+      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.PRELOAD_INACTIVE_MICROFRONTEND_VIEWS, String(true));
+    }
+    if (options?.logLevel) {
+      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.LOG_LEVEL, options.logLevel);
+    }
 
     const featureQueryParams = new URLSearchParams();
     if (options?.stickyViewTab) {
@@ -590,6 +596,16 @@ export interface Options {
    * Wait until the workbench completed startup.
    */
   waitUntilWorkbenchStarted?: false;
+  /**
+   * Sets the log level of the SCION Workbench. Defaults to `info`.
+   */
+  logLevel?: 'debug' | 'info' | 'warn' | 'error';
+  /**
+   * Controls whether to preload inactive microfrontend views not defining the `lazy` property to maintain compatibility with applications setting view titles and headings in view microfrontends. Defaults to `false`.
+   *
+   * @deprecated since version 20.0.0-beta.6. Introduced in 20.0.0-beta.6 to maintain compatibility with applications setting view titles and headings in view microfrontends. API will be removed in version 22.
+   */
+  preloadInactiveMicrofrontendViews?: true;
 }
 
 /**
@@ -631,11 +647,6 @@ export enum WorkbenchStartupQueryParams {
   SIMULATE_SLOW_CAPABILITY_LOOKUP = 'simulateSlowCapabilityLookup',
 
   /**
-   * Query param to register perspectives. Multiple perspectives are separated by semicolon.
-   */
-  PERSPECTIVES = 'perspectives',
-
-  /**
    * Query param to provide design tokens to the application.
    */
   DESIGN_TOKENS = 'designTokens',
@@ -646,7 +657,7 @@ export enum WorkbenchStartupQueryParams {
   DIALOG_MODALITY_SCOPE = 'dialogModalityScope',
 
   /**
-   * Specifies the component to display as desktop.
+   * Query param to set the component to display as desktop.
    */
   DESKTOP = 'desktop',
 
@@ -654,6 +665,16 @@ export enum WorkbenchStartupQueryParams {
    * Query param to control the identity of the initial part in the main area.
    */
   MAIN_AREA_INITIAL_PART_ID = 'mainAreaInitialPartId',
+
+  /**
+   * Query param to set the log level of the SCION Workbench.
+   */
+  LOG_LEVEL = 'logLevel',
+
+  /**
+   * Query param to control whether to preload inactive microfrontend views not defining the `lazy` property.
+   */
+  PRELOAD_INACTIVE_MICROFRONTEND_VIEWS = 'preloadInactiveMicrofrontendViews',
 }
 
 /**

@@ -43,6 +43,7 @@ import {Defined} from '@scion/toolkit/util';
 import {WORKBENCH_ROUTE} from '../workbench.constants';
 import {provideRemoteTextProvider} from './text/remote-text-provider';
 import {provideHostTextProvider} from './text/host-text-provider';
+import {ViewCapabilityPreloadCapabilityInterceptor} from './initialization/view-capability-preload-capability-interceptor.service';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -70,6 +71,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     MicrofrontendDialogCapabilityValidator,
     MicrofrontendMessageBoxCapabilityValidator,
     StableCapabilityIdAssigner,
+    ViewCapabilityPreloadCapabilityInterceptor,
     NgZoneObservableDecorator,
     WorkbenchHostManifestInterceptor,
     provideBuiltInTextMessageBoxCapabilityRoute(),

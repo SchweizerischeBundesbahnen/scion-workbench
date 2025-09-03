@@ -24,7 +24,7 @@ import {provideViewContext} from '../../view/view-context-provider';
 import {Arrays} from '@scion/toolkit/util';
 import {TextComponent} from './text/text.component';
 import {coerceElement} from '@angular/cdk/coercion';
-import {rootEffect} from '../../common/root-effect';
+import {rootEffect} from '../../common/rxjs-interop.util';
 
 /**
  * Shows menu items of a {@link WorkbenchView} in a menu.

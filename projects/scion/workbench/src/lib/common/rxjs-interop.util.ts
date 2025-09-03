@@ -8,7 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationRef, CreateEffectOptions, DestroyRef, effect, EffectCleanupRegisterFn, EffectRef, inject, Injector} from '@angular/core';
+import {ApplicationRef, CreateEffectOptions, createEnvironmentInjector, DestroyRef, effect, EffectCleanupRegisterFn, EffectRef, inject, Injector, Signal} from '@angular/core';
+import {Observable} from 'rxjs';
+import {toObservable, ToObservableOptions} from '@angular/core/rxjs-interop';
 
 /**
  * Registers an effect outside Angular's component context, not disabling the effect if the component is detached from the change detector tree.
@@ -43,4 +45,19 @@ export function rootEffect(effectFn: (onCleanup: EffectCleanupRegisterFn) => voi
   }
 
   return effectRef;
+}
+
+/**
+ * Like {@link toObservable}, but uses a root effect to continue emitting even if the "contextual" component is detached from the change detector tree.
+ *
+ * @see rootEffect
+ */
+export function toRootObservable<T>(source: Signal<T>, options?: ToObservableOptions): Observable<T> {
+  const injector = options?.injector ?? inject(Injector);
+  const rootInjector = injector.get(ApplicationRef).injector;
+
+  const observableInjector = createEnvironmentInjector([], rootInjector);
+  injector.get(DestroyRef).onDestroy(() => observableInjector.destroy());
+
+  return toObservable(source, {injector: observableInjector});
 }

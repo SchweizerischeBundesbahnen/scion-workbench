@@ -28,5 +28,12 @@ declare module '@scion/microfrontend-platform' {
      * @see WorkbenchPopupCapability.properties.showSplash
      */
     splash?: ComponentType<unknown>;
+
+    /**
+     * Controls whether to preload inactive microfrontend views not defining the `lazy` property to maintain compatibility with applications setting view titles and headings in view microfrontends. Defaults to `false`.
+     *
+     * @deprecated since version 20.0.0-beta.6. Introduced in 20.0.0-beta.6 to maintain compatibility with applications setting view titles and headings in view microfrontends. View capabilities can now define localized titles with optional interpolation parameters using resolvers. Applications should migrate to lazy view capabilities by setting 'lazy' in capability properties and define titles in the manifest. API will be removed in version 22.
+     */
+    preloadInactiveViews?: true;
   }
 }
