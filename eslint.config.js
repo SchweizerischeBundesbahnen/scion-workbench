@@ -20,7 +20,7 @@ module.exports = tseslint.config(
       },
       tseslint.configs.stylisticTypeChecked,
       angular.configs.tsRecommended, // https://github.com/angular-eslint/angular-eslint/blob/main/packages/angular-eslint/src/configs/README.md
-      stylistic.configs['recommended-flat'], // https://eslint.style/guide/config-presets#static-configurations
+      stylistic.configs['recommended'], // https://eslint.style/guide/config-presets#static-configurations
       rxjs.configs.recommended, // https://github.com/DaveMBush/eslint-plugin-rxjs?tab=readme-ov-file#rules
     ],
     processor: angular.processInlineTemplates, // https://github.com/angular-eslint/angular-eslint/blob/main/docs/CONFIGURING_FLAT_CONFIG.md#notes-on-eslint-configuration
