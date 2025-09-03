@@ -23,12 +23,12 @@ import {Dictionaries} from '@scion/toolkit/util';
  * If the key matches the format of a remote key, text is requested via intent from the respective 'text-provider' capability.
  * If not, the key is ignored and `undefined` is returned.
  *
- * Remote key format: "workbench.~<APP_SYMBOLIC_NAME>~.<TEXT_KEY>".
+ * Remote key format: "workbench.external.~<APP_SYMBOLIC_NAME>~.<TEXT_KEY>".
  *
  * @see createRemoteTranslatable
  */
 export function provideRemoteTextProvider(): EnvironmentProviders {
-  const REMOTE_KEY = /^workbench\.~(?<provider>[^\\~]+)~\.(?<key>.+)$/;
+  const REMOTE_KEY = /^workbench\.external\.~(?<provider>[^\\~]+)~\.(?<key>.+)$/;
   return makeEnvironmentProviders([
     {
       provide: WORKBENCH_TEXT_PROVIDER,
@@ -37,7 +37,7 @@ export function provideRemoteTextProvider(): EnvironmentProviders {
     },
   ]);
 
-  function remoteTextProvider(remoteKey: string | `workbench.~${string}~.${string}`, params: {[name: string]: string | `topic://${string}`}): Signal<string> | undefined {
+  function remoteTextProvider(remoteKey: string | `workbench.external.~${string}~.${string}`, params: {[name: string]: string | `topic://${string}`}): Signal<string> | undefined {
     // Test if the key matches a remote key.
     const match = REMOTE_KEY.exec(remoteKey);
     if (!match) {
@@ -98,7 +98,7 @@ export function createRemoteTranslatable(translatable: Translatable | undefined,
     return translatable;
   }
 
-  const remoteTranslatable = `%workbench.~${config.appSymbolicName}~.${translatable.substring(1)}`;
+  const remoteTranslatable = `%workbench.external.~${config.appSymbolicName}~.${translatable.substring(1)}`;
   const valueParams = Dictionaries.coerce(config.valueParams);
   const topicParams = Object.fromEntries(Object.entries(Dictionaries.coerce(config.topicParams))
     // Replace named params in topic segments.

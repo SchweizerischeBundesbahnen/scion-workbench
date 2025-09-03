@@ -508,6 +508,30 @@ describe('Workbench Text Provider', () => {
     const text2 = text('%workbench.close.action', {injector: TestBed.inject(Injector)});
     expect(text2()).toEqual('Close');
   });
+
+  it('should not pass external keys to application text provider', () => {
+    const appTextProviderFn = jasmine.createSpy<WorkbenchTextProviderFn>('app-text-provider');
+
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          textProvider: appTextProviderFn,
+        }),
+      ],
+    });
+
+    text('%text', {injector: TestBed.inject(Injector)})();
+    expect(appTextProviderFn).toHaveBeenCalledWith('text', {});
+    appTextProviderFn.calls.reset();
+
+    text('%workbench.text', {injector: TestBed.inject(Injector)})();
+    expect(appTextProviderFn).toHaveBeenCalledWith('workbench.text', {});
+    appTextProviderFn.calls.reset();
+
+    text('%workbench.external.text', {injector: TestBed.inject(Injector)})();
+    expect(appTextProviderFn).not.toHaveBeenCalled();
+    appTextProviderFn.calls.reset();
+  });
 });
 
 function provideTextProvider(...textProviders: WorkbenchTextProviderFn[]): EnvironmentProviders {
