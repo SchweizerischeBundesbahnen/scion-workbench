@@ -1,13 +1,29 @@
-# [20.0.0-beta.5](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/20.0.0-beta.4...20.0.0-beta.5) (2025-07-25)
+# [20.0.0-beta.6](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/20.0.0-beta.5...20.0.0-beta.6) (2025-09-04)
 
 
-### Features
+### Performance Improvements
 
-* **workbench:** provide active workbench element ([e94ea0c](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/e94ea0caa9b67aaabfd3829095ebd629c84195b7)), closes [#550](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/550)
-* **workbench:** highlight focused workbench element ([445a3a4](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/445a3a49604398ec574f23f96decfc71dc9389fd))
-* **workbench/desktop:** preserve content of desktop when detached ([88f92eb](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/88f92eb6b97fc9fa80156339afffb00debc1e627))
-* **workbench/main-area:** preserve content of main area part when detached ([5a0acf9](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/5a0acf902102ba27fe254ba3dbd10b7b444bd5fe))
+* **workbench/view:** enable lazy loading of inactive microfrontend views ([5a334a4](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/5a334a433a320987366ca52475a244347761b817)), closes [#681](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/681)
 
 ### Dependencies
 
-* **workbench:** SCION Workbench requires `@scion/workbench-client` version `1.0.0-beta.30` or later.
+* **workbench:** SCION Workbench requires `@scion/workbench-client` version `1.0.0-beta.31` or later.
+
+### BREAKING CHANGES
+
+* **workbench/view:** Microfrontend views require titles and headings set in the manifest due to lazy loading. Previously, these may have been set in the microfrontends.
+
+  To migrate, set the view titles and headings in the manifest. Otherwise, inactive views would not have a title and heading. See [changelog](https://github.com/SchweizerischeBundesbahnen/scion-workbench/blob/master/CHANGELOG_WORKBENCH_CLIENT.md#100-beta31-2025-09-04) of `@scion/workbench-client` for details. Alternatively, enable compat mode as follows:
+
+  ```ts
+  import {provideWorkbench} from '@scion/workbench';
+  
+  provideWorkbench({
+    microfrontendPlatform: {
+      preloadInactiveViews: true,
+      // ... other config skipped
+    },
+  });
+  ```
+
+This will continue eager loading microfrontend views and log a deprecation warning, giving micro applications time to migrate to capability-based titles and headings. Note that this flag will be removed in version 22.
