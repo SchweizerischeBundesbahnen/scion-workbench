@@ -21,7 +21,7 @@ export interface WorkbenchMessageBoxOptions {
   /**
    * Specifies the title of the message box.
    *
-   * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    */
   title?: Translatable;
 
@@ -29,7 +29,7 @@ export interface WorkbenchMessageBoxOptions {
    * Defines buttons of the message box. If not set, an OK button is displayed by default.
    *
    * Each property in the object literal represents a button, with the property value used as the button label.
-   * The label can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   * The label can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    *
    * Clicking a button closes the message box and returns the property key to the message box opener.
    *

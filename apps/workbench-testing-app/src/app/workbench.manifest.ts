@@ -166,24 +166,7 @@ export const workbenchManifest: Manifest = {
       description: 'Represents a dialog provided by the host app that displays the text test page and has a translatable parameterized title.',
       properties: {
         path: 'test-pages/text-test-page',
-        title: '%dialog_title;id=:id',
-      },
-    } satisfies WorkbenchDialogCapability,
-    // TODO [#271]: Remove this dialog capability when implemented the issue #271
-    {
-      type: WorkbenchCapabilities.Dialog,
-      qualifier: {
-        component: 'host-dialog',
-        variant: 'text-page::translatable-resolved-title',
-      },
-      params: [
-        {name: 'id', required: true},
-      ],
-      private: false,
-      description: 'Represents a dialog provided by the host app that displays the text test page and has a translatable parameterized title with resolved values.',
-      properties: {
-        path: 'test-pages/text-test-page',
-        title: '%dialog_title;id=:id;name=:name',
+        title: '%dialog_title;id=:id;name=:name;undefined=:undefined',
         resolve: {
           name: 'textprovider/workbench-host-app/values/:id',
         },
@@ -194,13 +177,39 @@ export const workbenchManifest: Manifest = {
       type: WorkbenchCapabilities.Dialog,
       qualifier: {
         component: 'host-dialog',
-        variant: 'text-page::translatable-parameterized-title::unkown-param',
+        variant: 'text-page::parameterized-title',
       },
+      params: [
+        {name: 'id', required: true},
+      ],
       private: false,
-      description: 'Represents a dialog provided by the host app that has a translatable title referencing an unkown params.',
+      description: 'Represents a dialog provided by the host app that displays the text test page and has a parameterized title.',
       properties: {
         path: 'test-pages/text-test-page',
-        title: '%dialog_title;id=:id',
+        title: 'Title - :id - :name - :undefined',
+        resolve: {
+          name: 'textprovider/workbench-host-app/values/:id',
+        },
+      },
+    } satisfies WorkbenchDialogCapability,
+    // TODO [#271]: Remove this dialog capability when implemented the issue #271
+    {
+      type: WorkbenchCapabilities.Dialog,
+      qualifier: {
+        component: 'host-dialog',
+        variant: 'text-page::parameterized-title-with-semicolon',
+      },
+      params: [
+        {name: 'id', required: true},
+      ],
+      private: false,
+      description: 'Represents a dialog provided by the host app that displays the text test page and has a parameterized title with a semicolon.',
+      properties: {
+        path: 'test-pages/text-test-page',
+        title: 'Dialog;Title - :id - :name',
+        resolve: {
+          name: 'textprovider/workbench-host-app/values/:id',
+        },
       },
     } satisfies WorkbenchDialogCapability,
     // TODO [#271]: Remove this messagebox capability when implemented the issue #271

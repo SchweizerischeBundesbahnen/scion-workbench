@@ -105,23 +105,23 @@ function parseMatrixParams(matrixParams: string | undefined): Record<string, str
   }
 
   const params: Record<string, string> = {};
-  for (const match of escapeSemicolon(matrixParams).matchAll(/(?<paramName>[^=;]+)=(?<paramValue>[^;]*)/g)) {
-    const {paramName, paramValue} = match.groups!;
-    params[unescapeSemicolon(paramName!)] = unescapeSemicolon(paramValue!);
+  for (const match of encodeEscapedSemicolons(matrixParams).matchAll(/(?<paramName>[^=;]+)=(?<paramValue>[^;]*)/g)) {
+    const {paramName, paramValue} = match.groups as {paramName: string; paramValue: string};
+    params[paramName] = decodeSemicolons(paramValue);
   }
   return params;
 
   /**
-   * Replaces escaped semicolons (`\;`) with the placeholder (`ɵ`) to prevent interpretation as key-value separators.
+   * Encodes escaped semicolons (`\\;`) as `&#x3b` (Unicode) to prevent interpretation as interpolation parameter separators.
    */
-  function escapeSemicolon(value: string): string {
-    return value.replaceAll('\\;', 'ɵ');
+  function encodeEscapedSemicolons(value: string): string {
+    return value.replaceAll('\\;', '&#x3b');
   }
 
   /**
-   * Restores escaped semicolons by replacing the placeholder (`ɵ`) back to semicolons (`;`).
+   * Decodes encoded semicolons (`&#x3b`) back to semicolons (`;`).
    */
-  function unescapeSemicolon(value: string): string {
-    return value.replaceAll('ɵ', ';');
+  function decodeSemicolons(value: string): string {
+    return value.replaceAll('&#x3b', ';');
   }
 }

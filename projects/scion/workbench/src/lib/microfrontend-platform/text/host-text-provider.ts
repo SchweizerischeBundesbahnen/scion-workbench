@@ -25,7 +25,7 @@ export function provideHostTextProvider(): EnvironmentProviders {
       const injector = inject(Injector);
 
       WorkbenchClient.registerTextProvider((key, params) => {
-        const translatable = Object.entries(params).reduce((translatable, [name, value]) => `${translatable};${name}=${value}`, `%${key}`);
+        const translatable = Object.entries(params).reduce((translatable, [name, value]) => `${translatable};${name}=${encodeSemicolons(value)}`, `%${key}`);
         const environmentInjector = createEnvironmentInjector([], injector.get(EnvironmentInjector));
 
         return toObservable(text(translatable, {injector: environmentInjector}), {injector: environmentInjector})
@@ -36,4 +36,13 @@ export function provideHostTextProvider(): EnvironmentProviders {
       });
     }),
   ]);
+}
+
+/**
+ * Encodes semicolons (`;`) as `\\;` to prevent interpretation as interpolation parameter separators.
+ *
+ * @see Translatable
+ */
+function encodeSemicolons(value: string): string {
+  return value.replaceAll(';', '\\;');
 }

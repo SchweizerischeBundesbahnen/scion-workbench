@@ -502,643 +502,981 @@ test.describe('Text Provider', () => {
         expect.stringContaining('[NullTextError][workbench-client-testing-app1] Failed to get text \'%%key\' from application \'workbench-client-testing-app1\''),
       ]);
     });
+
+    test('should parse key with multiple params', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register test view.
+      await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+        type: 'view',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-pages/text-test-page',
+        },
+      });
+
+      // Open test view.
+      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+      const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+
+      // Provide text.
+      await testPage.provideText('key', 'TEXT - {{param1}} - {{param2}}');
+
+      // Observe text.
+      await testPage.text1.observe('%key;param1=value1;param2=value2', {app: 'workbench-client-testing-app1'});
+      await expect(testPage.text1.text).toHaveText('TEXT - value1 - value2');
+    });
+
+    test('should support escaped semicolon character in parameter value', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register test view.
+      await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+        type: 'view',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-pages/text-test-page',
+        },
+      });
+
+      // Open test view.
+      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+      const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+
+      // Provide text.
+      await testPage.provideText('key', 'TEXT - {{param1}} - {{param2}}');
+
+      // Observe text.
+      await testPage.text1.observe('%key;param1=v\\;al=ue1;param2=va\\;lue2', {app: 'workbench-client-testing-app1'});
+      await expect(testPage.text1.text).toHaveText('TEXT - v;al=ue1 - va;lue2');
+    });
   });
 
   test.describe('Workbench View', () => {
 
-    test('should display non-localized title/heading', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
+    test.describe('Localized View', () => {
 
-      // Register test view.
-      await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
-        type: 'view',
-        qualifier: {component: 'testee'},
-        properties: {
-          path: 'test-view',
-          title: 'View Title',
-          heading: 'View Heading',
-        },
-      });
+      test('should display localized title and heading', async ({appPO, microfrontendNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
 
-      // Open test view.
-      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-      const testView = appPO.view({cssClass: 'testee'});
-
-      // Expect view title and heading as specified.
-      await expect(testView.tab.title).toHaveText('View Title');
-      await expect(testView.tab.heading).toHaveText('View Heading');
-    });
-
-    test('should display localized title/heading', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // Register test view.
-      await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
-        type: 'view',
-        qualifier: {component: 'testee'},
-        properties: {
-          path: 'test-pages/text-test-page',
-          title: '%view_title',
-          heading: '%view_heading',
-        },
-      });
-
-      // Open test view.
-      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-      const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
-
-      // Provide text.
-      await test.step('Provide text', async () => {
-        await testPage.provideText('view_title', 'Title 1');
-        await expect(testPage.view.tab.title).toHaveText('Title 1');
-
-        await testPage.provideText('view_heading', 'Heading 1');
-        await expect(testPage.view.tab.heading).toHaveText('Heading 1');
-      });
-
-      // Provide different text.
-      await test.step('Provide different text', async () => {
-        await testPage.provideText('view_title', 'Title 2');
-        await expect(testPage.view.tab.title).toHaveText('Title 2');
-
-        await testPage.provideText('view_heading', 'Heading 2');
-        await expect(testPage.view.tab.heading).toHaveText('Heading 2');
-      });
-
-      // Provide `undefined` as text.
-      await test.step('Provide `undefined`', async () => {
-        await testPage.provideText('view_title', '<undefined>');
-        await expect(testPage.view.tab.title).toHaveText('view_title');
-
-        await testPage.provideText('view_heading', '<undefined>');
-        await expect(testPage.view.tab.heading).toHaveText('view_heading');
-      });
-    });
-
-    test('should display localized title/heading with named parameters replaced by view params', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // Register test view.
-      await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
-        type: 'view',
-        qualifier: {component: 'testee'},
-        params: [
-          {name: 'id', required: true},
-        ],
-        properties: {
-          path: 'test-pages/text-test-page',
-          title: '%view_title;id=:id',
-          heading: '%view_heading;id=:id',
-        },
-      });
-
-      // Open test view.
-      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.navigate({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
-      const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
-
-      // Provide text.
-      await test.step('Provide text', async () => {
-        await testPage.provideText('view_title', 'Title 1 - {{id}}');
-        await expect(testPage.view.tab.title).toHaveText('Title 1 - 123');
-
-        await testPage.provideText('view_heading', 'Heading 1 - {{id}}');
-        await expect(testPage.view.tab.heading).toHaveText('Heading 1 - 123');
-      });
-
-      // Provide different text.
-      await test.step('Provide different text', async () => {
-        await testPage.provideText('view_title', 'Title 2 - {{id}}');
-        await expect(testPage.view.tab.title).toHaveText('Title 2 - 123');
-
-        await testPage.provideText('view_heading', 'Heading 2 - {{id}}');
-        await expect(testPage.view.tab.heading).toHaveText('Heading 2 - 123');
-      });
-    });
-
-    test('should display localized title/heading with named parameters replaced by resolved values', async ({appPO, microfrontendNavigator, page}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // Register test view.
-      await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
-        type: 'view',
-        qualifier: {component: 'testee'},
-        params: [
-          {name: 'id', required: true},
-        ],
-        properties: {
-          path: 'test-pages/text-test-page',
-          title: '%view_title;id=:id;name=:name',
-          heading: '%view_heading;id=:id;name=:name',
-          resolve: {
-            name: 'textprovider/workbench-client-testing-app1/values/:id',
+        // Register test view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'testee'},
+          properties: {
+            path: 'test-pages/text-test-page',
+            title: '%view_title',
+            heading: '%view_heading',
           },
-        },
+        });
+
+        // Open test view.
+        const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+        await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+        const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+
+        // Provide text.
+        await test.step('Provide text', async () => {
+          await testPage.provideText('view_title', 'Title 1');
+          await expect(testPage.view.tab.title).toHaveText('Title 1');
+
+          await testPage.provideText('view_heading', 'Heading 1');
+          await expect(testPage.view.tab.heading).toHaveText('Heading 1');
+        });
+
+        // Provide different text.
+        await test.step('Provide different text', async () => {
+          await testPage.provideText('view_title', 'Title 2');
+          await expect(testPage.view.tab.title).toHaveText('Title 2');
+
+          await testPage.provideText('view_heading', 'Heading 2');
+          await expect(testPage.view.tab.heading).toHaveText('Heading 2');
+        });
+
+        // Provide `undefined` as text.
+        await test.step('Provide `undefined`', async () => {
+          await testPage.provideText('view_title', '<undefined>');
+          await expect(testPage.view.tab.title).toHaveText('view_title');
+
+          await testPage.provideText('view_heading', '<undefined>');
+          await expect(testPage.view.tab.heading).toHaveText('view_heading');
+        });
       });
 
-      // Open test view.
-      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.navigate({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
-      const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+      test('should substitute parameters and resolvers', async ({appPO, microfrontendNavigator, page}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
 
-      // Provide text.
-      await testPage.provideText('view_title', 'Title - {{id}} - {{name}}');
-      await testPage.provideText('view_heading', 'Heading - {{id}} - {{name}}');
+        // Register test view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'testee'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-pages/text-test-page',
+            title: '%view_title;id=:id;name=:name;undefined=:undefined',
+            heading: '%view_heading;id=:id;name=:name;undefined=:undefined',
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+          },
+        });
 
-      // No resolved value yet.
-      await test.step('No resolved value yet', async () => {
-        // Wait some time.
-        await page.waitForTimeout(1000);
-        await expect(testPage.view.tab.title).toHaveText('');
-        await expect(testPage.view.tab.heading).toHaveText('');
+        // Open test view.
+        const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+        await routerPage.navigate({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
+        const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+
+        // Provide text.
+        await testPage.provideText('view_title', 'Title - {{id}} - {{name}} - {{undefined}}');
+        await testPage.provideText('view_heading', 'Heading - {{id}} - {{name}} - {{undefined}}');
+
+        // No resolved value yet.
+        await test.step('No resolved value yet', async () => {
+          // Wait some time.
+          await page.waitForTimeout(1000);
+          await expect(testPage.view.tab.title).toHaveText('');
+          await expect(testPage.view.tab.heading).toHaveText('');
+        });
+
+        // Resolve value.
+        await test.step('Resolve Value', async () => {
+          await testPage.provideValue('123', 'RESOLVED 1');
+          await expect(testPage.view.tab.title).toHaveText('Title - 123 - RESOLVED 1 - :undefined');
+          await expect(testPage.view.tab.heading).toHaveText('Heading - 123 - RESOLVED 1 - :undefined');
+        });
+
+        // Resolve to a different value.
+        await test.step('Resolve to a different value', async () => {
+          await testPage.provideValue('123', 'RESOLVED 2');
+          await expect(testPage.view.tab.title).toHaveText('Title - 123 - RESOLVED 2 - :undefined');
+          await expect(testPage.view.tab.heading).toHaveText('Heading - 123 - RESOLVED 2 - :undefined');
+        });
+
+        // Resolve to translatable.
+        await test.step('Resolve to translatable', async () => {
+          await testPage.provideValue('123', '%resolved_text');
+          await testPage.provideText('resolved_text', 'RESOLVED TEXT');
+          await expect(testPage.view.tab.title).toHaveText('Title - 123 - RESOLVED TEXT - :undefined');
+          await expect(testPage.view.tab.heading).toHaveText('Heading - 123 - RESOLVED TEXT - :undefined');
+        });
+
+        // Resolve to translatable with parameter.
+        await test.step('Resolve to translatable with parameter', async () => {
+          await testPage.provideValue('123', '%resolved_text;param=ABC');
+          await testPage.provideText('resolved_text', 'RESOLVED TEXT {{param}}');
+          await expect(testPage.view.tab.title).toHaveText('Title - 123 - RESOLVED TEXT ABC - :undefined');
+          await expect(testPage.view.tab.heading).toHaveText('Heading - 123 - RESOLVED TEXT ABC - :undefined');
+        });
+
+        // Resolve to translatable with escaped semicolon in parameter.
+        await test.step('Resolve to translatable with semicolon in parameter', async () => {
+          await testPage.provideValue('123', '%resolved_text;param=A\\;B');
+          await testPage.provideText('resolved_text', 'RESOLVED TEXT {{param}}');
+          await expect(testPage.view.tab.title).toHaveText('Title - 123 - RESOLVED TEXT A;B - :undefined');
+          await expect(testPage.view.tab.heading).toHaveText('Heading - 123 - RESOLVED TEXT A;B - :undefined');
+        });
+
+        // Resolve to `undefined`.
+        await test.step('Resolve to `undefined`', async () => {
+          await testPage.provideValue('123', '<undefined>');
+          await expect(testPage.view.tab.title).toHaveText('Title - 123 -  - :undefined');
+          await expect(testPage.view.tab.heading).toHaveText('Heading - 123 -  - :undefined');
+        });
       });
 
-      // Resolve value.
-      await test.step('Resolve Value', async () => {
-        await testPage.provideValue('123', 'RESOLVED 1');
-        await expect(testPage.view.tab.title).toHaveText('Title - 123 - RESOLVED 1');
-        await expect(testPage.view.tab.heading).toHaveText('Heading - 123 - RESOLVED 1');
+      test('should support semicolon in parameter and resolver', async ({appPO, microfrontendNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // Register test view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'testee'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-pages/text-test-page',
+            title: '%view_title;id=:id;name=:name',
+            heading: '%view_heading;id=:id;name=:name',
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+          },
+        });
+
+        // Open test view.
+        const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+        await routerPage.navigate({component: 'testee'}, {params: {id: '123;456'}, cssClass: 'testee'});
+        const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+
+        await testPage.provideText('view_title', 'Title - {{id}} - {{name}}');
+        await testPage.provideText('view_heading', 'Heading - {{id}} - {{name}}');
+        await testPage.provideValue('123;456', 'A;B');
+
+        await expect(testPage.view.tab.title).toHaveText('Title - 123;456 - A;B');
+        await expect(testPage.view.tab.heading).toHaveText('Heading - 123;456 - A;B');
       });
 
-      // Resolve to a different value.
-      await test.step('Resolve to a different value', async () => {
-        await testPage.provideValue('123', 'RESOLVED 2');
-        await expect(testPage.view.tab.title).toHaveText('Title - 123 - RESOLVED 2');
-        await expect(testPage.view.tab.heading).toHaveText('Heading - 123 - RESOLVED 2');
-      });
+      test('should display localized title and heading set via handle', async ({appPO, microfrontendNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
 
-      // Resolve to `undefined`.
-      await test.step('Resolve to `undefined`', async () => {
-        await testPage.provideValue('123', '<undefined>');
-        await expect(testPage.view.tab.title).toHaveText('Title - 123 -');
-        await expect(testPage.view.tab.heading).toHaveText('Heading - 123 -');
+        // Register test view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'testee'},
+          properties: {
+            path: 'test-pages/text-test-page',
+          },
+        });
+
+        // Open test view.
+        const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+        await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+        const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+
+        // Set title and heading via view handle.
+        await testPage.setViewTitle('%view_title');
+        await testPage.setViewHeading('%view_heading');
+
+        // Provide text.
+        await test.step('Provide text', async () => {
+          await testPage.provideText('view_title', 'Title 1');
+          await expect(testPage.view.tab.title).toHaveText('Title 1');
+
+          await testPage.provideText('view_heading', 'Heading 1');
+          await expect(testPage.view.tab.heading).toHaveText('Heading 1');
+        });
+
+        // Provide different text.
+        await test.step('Provide different text', async () => {
+          await testPage.provideText('view_title', 'Title 2');
+          await expect(testPage.view.tab.title).toHaveText('Title 2');
+
+          await testPage.provideText('view_heading', 'Heading 2');
+          await expect(testPage.view.tab.heading).toHaveText('Heading 2');
+        });
+
+        // Provide `undefined` as text.
+        await test.step('Provide `undefined`', async () => {
+          await testPage.provideText('view_title', '<undefined>');
+          await expect(testPage.view.tab.title).toHaveText('view_title');
+
+          await testPage.provideText('view_heading', '<undefined>');
+          await expect(testPage.view.tab.heading).toHaveText('view_heading');
+        });
       });
     });
 
-    test('should not replace unkown named parameter', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
+    test.describe('Non-Localized View', () => {
 
-      // Register test view.
-      await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
-        type: 'view',
-        qualifier: {component: 'testee'},
-        properties: {
-          path: 'test-pages/text-test-page',
-          title: '%view_title;id=:id',
-          heading: '%view_heading;id=:id',
-        },
+      test('should display non-localized title and heading', async ({appPO, microfrontendNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // Register test view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'testee'},
+          properties: {
+            path: 'test-view',
+            title: 'View Title',
+            heading: 'View Heading',
+          },
+        });
+
+        // Open test view.
+        const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+        await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+        const testView = appPO.view({cssClass: 'testee'});
+
+        // Expect view title and heading as specified.
+        await expect(testView.tab.title).toHaveText('View Title');
+        await expect(testView.tab.heading).toHaveText('View Heading');
       });
 
-      // Open test view.
-      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-      const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+      test('should substitute parameters and resolvers', async ({appPO, microfrontendNavigator, page}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
 
-      await testPage.provideText('view_title', 'Title - {{id}}');
-      await expect(testPage.view.tab.title).toHaveText('Title - :id');
-      await testPage.provideText('view_heading', 'Heading - {{id}}');
-      await expect(testPage.view.tab.heading).toHaveText('Heading - :id');
-    });
+        // Register test view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'testee'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-pages/text-test-page',
+            title: 'Title - :id - :name - :undefined',
+            heading: 'Heading - :id - :name - :undefined',
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+          },
+        });
 
-    test('should set localized title/heading via handle', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
+        // Open test view.
+        const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+        await routerPage.navigate({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
+        const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
 
-      // Register test view.
-      await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
-        type: 'view',
-        qualifier: {component: 'testee'},
-        properties: {
-          path: 'test-pages/text-test-page',
-        },
+        // No resolved value yet.
+        await test.step('No resolved value yet', async () => {
+          // Wait some time.
+          await page.waitForTimeout(1000);
+          await expect(testPage.view.tab.title).toHaveText('');
+          await expect(testPage.view.tab.heading).toHaveText('');
+        });
+
+        // Resolve value.
+        await test.step('Resolve Value', async () => {
+          await testPage.provideValue('123', 'RESOLVED 1');
+          await expect(testPage.view.tab.title).toHaveText('Title - 123 - RESOLVED 1 - :undefined');
+          await expect(testPage.view.tab.heading).toHaveText('Heading - 123 - RESOLVED 1 - :undefined');
+        });
+
+        // Resolve to a different value.
+        await test.step('Resolve to a different value', async () => {
+          await testPage.provideValue('123', 'RESOLVED 2');
+          await expect(testPage.view.tab.title).toHaveText('Title - 123 - RESOLVED 2 - :undefined');
+          await expect(testPage.view.tab.heading).toHaveText('Heading - 123 - RESOLVED 2 - :undefined');
+        });
+
+        // Resolve to translatable.
+        await test.step('Resolve to translatable', async () => {
+          await testPage.provideValue('123', '%resolved_text');
+          await testPage.provideText('resolved_text', 'RESOLVED TEXT');
+          await expect(testPage.view.tab.title).toHaveText('Title - 123 - RESOLVED TEXT - :undefined');
+          await expect(testPage.view.tab.heading).toHaveText('Heading - 123 - RESOLVED TEXT - :undefined');
+        });
+
+        // Resolve to translatable with parameter.
+        await test.step('Resolve to translatable with parameter', async () => {
+          await testPage.provideValue('123', '%resolved_text;param=ABC');
+          await testPage.provideText('resolved_text', 'RESOLVED TEXT {{param}}');
+          await expect(testPage.view.tab.title).toHaveText('Title - 123 - RESOLVED TEXT ABC - :undefined');
+          await expect(testPage.view.tab.heading).toHaveText('Heading - 123 - RESOLVED TEXT ABC - :undefined');
+        });
+
+        // Resolve to translatable with escaped semicolon in parameter.
+        await test.step('Resolve to translatable with semicolon in parameter', async () => {
+          await testPage.provideValue('123', '%resolved_text;param=A\\;B');
+          await testPage.provideText('resolved_text', 'RESOLVED TEXT {{param}}');
+          await expect(testPage.view.tab.title).toHaveText('Title - 123 - RESOLVED TEXT A;B - :undefined');
+          await expect(testPage.view.tab.heading).toHaveText('Heading - 123 - RESOLVED TEXT A;B - :undefined');
+        });
+
+        // Resolve to `undefined`.
+        await test.step('Resolve to `undefined`', async () => {
+          await testPage.provideValue('123', '<undefined>');
+          await expect(testPage.view.tab.title).toHaveText('Title - 123 -  - :undefined');
+          await expect(testPage.view.tab.heading).toHaveText('Heading - 123 -  - :undefined');
+        });
       });
 
-      // Open test view.
-      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-      const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+      test('should support semicolon in text, parameter and resolver', async ({appPO, microfrontendNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
 
-      // Set title and heading via view handle.
-      await testPage.setViewTitle('%view_title');
-      await testPage.setViewHeading('%view_heading');
+        // Register test view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'testee'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-pages/text-test-page',
+            title: 'View;Title - :id - :name',
+            heading: 'View;Heading - :id - :name',
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+          },
+        });
 
-      // Provide text.
-      await test.step('Provide text', async () => {
-        await testPage.provideText('view_title', 'Title 1');
-        await expect(testPage.view.tab.title).toHaveText('Title 1');
+        // Open test view.
+        const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+        await routerPage.navigate({component: 'testee'}, {params: {id: '123;456'}, cssClass: 'testee'});
+        const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
 
-        await testPage.provideText('view_heading', 'Heading 1');
-        await expect(testPage.view.tab.heading).toHaveText('Heading 1');
-      });
+        await testPage.provideValue('123;456', 'A;B');
 
-      // Provide different text.
-      await test.step('Provide different text', async () => {
-        await testPage.provideText('view_title', 'Title 2');
-        await expect(testPage.view.tab.title).toHaveText('Title 2');
-
-        await testPage.provideText('view_heading', 'Heading 2');
-        await expect(testPage.view.tab.heading).toHaveText('Heading 2');
-      });
-
-      // Provide `undefined` as text.
-      await test.step('Provide `undefined`', async () => {
-        await testPage.provideText('view_title', '<undefined>');
-        await expect(testPage.view.tab.title).toHaveText('view_title');
-
-        await testPage.provideText('view_heading', '<undefined>');
-        await expect(testPage.view.tab.heading).toHaveText('view_heading');
+        await expect(testPage.view.tab.title).toHaveText('View;Title - 123;456 - A;B');
+        await expect(testPage.view.tab.heading).toHaveText('View;Heading - 123;456 - A;B');
       });
     });
   });
 
   test.describe('Workbench Dialog', () => {
 
-    test('should display non-localized title', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
+    test.describe('Localized Dialog', () => {
 
-      // Register test dialog.
-      await microfrontendNavigator.registerCapability<WorkbenchDialogCapability>('app1', {
-        type: 'dialog',
-        qualifier: {component: 'testee'},
-        properties: {
-          path: 'test-dialog',
-          title: 'Dialog Title',
-          size: {
-            width: '800px',
-            height: '800px',
+      test('should display localized title', async ({appPO, microfrontendNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // Register test dialog.
+        await microfrontendNavigator.registerCapability<WorkbenchDialogCapability>('app1', {
+          type: 'dialog',
+          qualifier: {component: 'testee'},
+          properties: {
+            path: 'test-pages/text-test-page',
+            title: '%dialog_title',
+            size: {
+              width: '800px',
+              height: '800px',
+            },
           },
-        },
+        });
+
+        // Open test dialog.
+        const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+        await dialogOpener.open({component: 'testee'}, {cssClass: 'testee'});
+        const testPage = TextTestPagePO.newDialogPO(appPO, {cssClass: 'testee'});
+
+        // Provide text.
+        await test.step('Provide text', async () => {
+          await testPage.provideText('dialog_title', 'Title 1');
+          await expect(testPage.dialog.title).toHaveText('Title 1');
+        });
+
+        // Provide different text.
+        await test.step('Provide different text', async () => {
+          await testPage.provideText('dialog_title', 'Title 2');
+          await expect(testPage.dialog.title).toHaveText('Title 2');
+        });
+
+        // Provide `undefined` as text.
+        await test.step('Provide `undefined`', async () => {
+          await testPage.provideText('dialog_title', '<undefined>');
+          await expect(testPage.dialog.title).toHaveText('dialog_title');
+        });
       });
 
-      // Open test dialog.
-      const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
-      await dialogOpener.open({component: 'testee'}, {cssClass: 'testee'});
-      const dialog = appPO.dialog({cssClass: 'testee'});
+      test('should substitute parameters and resolvers', async ({appPO, microfrontendNavigator, page}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
 
-      // Expect dialog title as specified.
-      await expect(dialog.title).toHaveText('Dialog Title');
+        // Register test dialog.
+        await microfrontendNavigator.registerCapability<WorkbenchDialogCapability>('app1', {
+          type: 'dialog',
+          qualifier: {component: 'testee'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-pages/text-test-page',
+            title: '%dialog_title;id=:id;name=:name;undefined=:undefined',
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+            size: {
+              width: '800px',
+              height: '800px',
+            },
+          },
+        });
+
+        // Open test dialog.
+        const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+        await dialogOpener.open({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
+        const testPage = TextTestPagePO.newDialogPO(appPO, {cssClass: 'testee'});
+
+        // Provide text.
+        await testPage.provideText('dialog_title', 'Title - {{id}} - {{name}} - {{undefined}}');
+
+        // No resolved value yet.
+        await test.step('No resolved value yet', async () => {
+          // Wait some time.
+          await page.waitForTimeout(1000);
+          await expect(testPage.dialog.title).toHaveText('');
+        });
+
+        // Resolve value.
+        await test.step('Resolve Value', async () => {
+          await testPage.provideValue('123', 'RESOLVED 1');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED 1 - :undefined');
+        });
+
+        // Resolve to a different value.
+        await test.step('Resolve to a different value', async () => {
+          await testPage.provideValue('123', 'RESOLVED 2');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED 2 - :undefined');
+        });
+
+        // Resolve to translatable.
+        await test.step('Resolve to translatable', async () => {
+          await testPage.provideValue('123', '%resolved_text');
+          await testPage.provideText('resolved_text', 'RESOLVED TEXT');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED TEXT - :undefined');
+        });
+
+        // Resolve to translatable with parameter.
+        await test.step('Resolve to translatable with parameter', async () => {
+          await testPage.provideValue('123', '%resolved_text;param=ABC');
+          await testPage.provideText('resolved_text', 'RESOLVED TEXT {{param}}');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED TEXT ABC - :undefined');
+        });
+
+        // Resolve to translatable with escaped semicolon in parameter.
+        await test.step('Resolve to translatable with semicolon in parameter', async () => {
+          await testPage.provideValue('123', '%resolved_text;param=A\\;B');
+          await testPage.provideText('resolved_text', 'RESOLVED TEXT {{param}}');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED TEXT A;B - :undefined');
+        });
+
+        // Resolve to `undefined`.
+        await test.step('Resolve to `undefined`', async () => {
+          await testPage.provideValue('123', '<undefined>');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 -  - :undefined');
+        });
+      });
+
+      test('should support semicolon in parameter and resolver', async ({appPO, microfrontendNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // Register test dialog.
+        await microfrontendNavigator.registerCapability<WorkbenchDialogCapability>('app1', {
+          type: 'dialog',
+          qualifier: {component: 'testee'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-pages/text-test-page',
+            title: '%dialog_title;id=:id;name=:name',
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+            size: {
+              width: '800px',
+              height: '800px',
+            },
+          },
+        });
+
+        // Open test dialog.
+        const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+        await dialogOpener.open({component: 'testee'}, {params: {id: '123;456'}, cssClass: 'testee'});
+        const testPage = TextTestPagePO.newDialogPO(appPO, {cssClass: 'testee'});
+
+        await testPage.provideText('dialog_title', 'Title - {{id}} - {{name}}');
+        await testPage.provideValue('123;456', 'A;B');
+        await expect(testPage.dialog.title).toHaveText('Title - 123;456 - A;B');
+      });
+
+      test('should display localized title set via handle', async ({appPO, microfrontendNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // Register test dialog.
+        await microfrontendNavigator.registerCapability<WorkbenchDialogCapability>('app1', {
+          type: 'dialog',
+          qualifier: {component: 'testee'},
+          properties: {
+            path: 'test-pages/text-test-page',
+            size: {height: '800px', width: '800px'},
+          },
+        });
+
+        // Open test dialog.
+        const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+        await dialogOpener.open({component: 'testee'}, {cssClass: 'testee'});
+        const testPage = TextTestPagePO.newDialogPO(appPO, {cssClass: 'testee'});
+
+        // Set dialog title via dialog handle.
+        await testPage.setDialogTitle('%dialog_title');
+
+        // Provide text.
+        await test.step('Provide text', async () => {
+          await testPage.provideText('dialog_title', 'Title 1');
+          await expect(testPage.dialog.title).toHaveText('Title 1');
+        });
+
+        // Provide different text.
+        await test.step('Provide different text', async () => {
+          await testPage.provideText('dialog_title', 'Title 2');
+          await expect(testPage.dialog.title).toHaveText('Title 2');
+        });
+
+        // Provide `undefined` as text.
+        await test.step('Provide `undefined`', async () => {
+          await testPage.provideText('dialog_title', '<undefined>');
+          await expect(testPage.dialog.title).toHaveText('dialog_title');
+        });
+      });
     });
 
-    test('should display localized title', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
+    test.describe('Non-Localized Dialog', () => {
 
-      // Register test dialog.
-      await microfrontendNavigator.registerCapability<WorkbenchDialogCapability>('app1', {
-        type: 'dialog',
-        qualifier: {component: 'testee'},
-        properties: {
-          path: 'test-pages/text-test-page',
-          title: '%dialog_title',
-          size: {
-            width: '800px',
-            height: '800px',
+      test('should display non-localized title', async ({appPO, microfrontendNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // Register test dialog.
+        await microfrontendNavigator.registerCapability<WorkbenchDialogCapability>('app1', {
+          type: 'dialog',
+          qualifier: {component: 'testee'},
+          properties: {
+            path: 'test-dialog',
+            title: 'Dialog Title',
+            size: {
+              width: '800px',
+              height: '800px',
+            },
           },
-        },
+        });
+
+        // Open test dialog.
+        const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+        await dialogOpener.open({component: 'testee'}, {cssClass: 'testee'});
+        const dialog = appPO.dialog({cssClass: 'testee'});
+
+        // Expect dialog title as specified.
+        await expect(dialog.title).toHaveText('Dialog Title');
       });
 
-      // Open test dialog.
-      const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
-      await dialogOpener.open({component: 'testee'}, {cssClass: 'testee'});
-      const testPage = TextTestPagePO.newDialogPO(appPO, {cssClass: 'testee'});
+      test('should substitute parameters and resolvers', async ({appPO, microfrontendNavigator, page}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
 
-      // Provide text.
-      await test.step('Provide text', async () => {
-        await testPage.provideText('dialog_title', 'Title 1');
-        await expect(testPage.dialog.title).toHaveText('Title 1');
-      });
-
-      // Provide different text.
-      await test.step('Provide different text', async () => {
-        await testPage.provideText('dialog_title', 'Title 2');
-        await expect(testPage.dialog.title).toHaveText('Title 2');
-      });
-
-      // Provide `undefined` as text.
-      await test.step('Provide `undefined`', async () => {
-        await testPage.provideText('dialog_title', '<undefined>');
-        await expect(testPage.dialog.title).toHaveText('dialog_title');
-      });
-    });
-
-    test('should display localized title with named parameters replaced by dialog params', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // Register test dialog.
-      await microfrontendNavigator.registerCapability<WorkbenchDialogCapability>('app1', {
-        type: 'dialog',
-        qualifier: {component: 'testee'},
-        params: [
-          {name: 'id', required: true},
-        ],
-        properties: {
-          path: 'test-pages/text-test-page',
-          title: '%dialog_title;id=:id',
-          size: {
-            width: '800px',
-            height: '800px',
+        // Register test dialog.
+        await microfrontendNavigator.registerCapability<WorkbenchDialogCapability>('app1', {
+          type: 'dialog',
+          qualifier: {component: 'testee'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-pages/text-test-page',
+            title: 'Title - :id - :name - :undefined',
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+            size: {
+              width: '800px',
+              height: '800px',
+            },
           },
-        },
+        });
+
+        // Open test dialog.
+        const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+        await dialogOpener.open({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
+        const testPage = TextTestPagePO.newDialogPO(appPO, {cssClass: 'testee'});
+
+        // No resolved value yet.
+        await test.step('No resolved value yet', async () => {
+          // Wait some time.
+          await page.waitForTimeout(1000);
+          await expect(testPage.dialog.title).toHaveText('');
+        });
+
+        // Resolve value.
+        await test.step('Resolve Value', async () => {
+          await testPage.provideValue('123', 'RESOLVED 1');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED 1 - :undefined');
+        });
+
+        // Resolve to a different value.
+        await test.step('Resolve to a different value', async () => {
+          await testPage.provideValue('123', 'RESOLVED 2');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED 2 - :undefined');
+        });
+
+        // Resolve to translatable.
+        await test.step('Resolve to translatable', async () => {
+          await testPage.provideValue('123', '%resolved_text');
+          await testPage.provideText('resolved_text', 'RESOLVED TEXT');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED TEXT - :undefined');
+        });
+
+        // Resolve to translatable with parameter.
+        await test.step('Resolve to translatable with parameter', async () => {
+          await testPage.provideValue('123', '%resolved_text;param=ABC');
+          await testPage.provideText('resolved_text', 'RESOLVED TEXT {{param}}');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED TEXT ABC - :undefined');
+        });
+
+        // Resolve to translatable with escaped semicolon in parameter.
+        await test.step('Resolve to translatable with semicolon in parameter', async () => {
+          await testPage.provideValue('123', '%resolved_text;param=A\\;B');
+          await testPage.provideText('resolved_text', 'RESOLVED TEXT {{param}}');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED TEXT A;B - :undefined');
+        });
+
+        // Resolve to `undefined`.
+        await test.step('Resolve to `undefined`', async () => {
+          await testPage.provideValue('123', '<undefined>');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 -  - :undefined');
+        });
       });
 
-      // Open test dialog.
-      const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
-      await dialogOpener.open({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
-      const testPage = TextTestPagePO.newDialogPO(appPO, {cssClass: 'testee'});
+      test('should support semicolon in text, parameter and resolver', async ({appPO, microfrontendNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
 
-      // Provide text.
-      await test.step('Provide text', async () => {
-        await testPage.provideText('dialog_title', 'Title 1 - {{id}}');
-        await expect(testPage.dialog.title).toHaveText('Title 1 - 123');
-      });
-
-      // Provide different text.
-      await test.step('Provide different text', async () => {
-        await testPage.provideText('dialog_title', 'Title 2 - {{id}}');
-        await expect(testPage.dialog.title).toHaveText('Title 2 - 123');
-      });
-    });
-
-    test('should display localized title with named parameters replaced by resolved values', async ({appPO, microfrontendNavigator, page}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // Register test dialog.
-      await microfrontendNavigator.registerCapability<WorkbenchDialogCapability>('app1', {
-        type: 'dialog',
-        qualifier: {component: 'testee'},
-        params: [
-          {name: 'id', required: true},
-        ],
-        properties: {
-          path: 'test-pages/text-test-page',
-          title: '%dialog_title;id=:id;name=:name',
-          resolve: {
-            name: 'textprovider/workbench-client-testing-app1/values/:id',
+        // Register test dialog.
+        await microfrontendNavigator.registerCapability<WorkbenchDialogCapability>('app1', {
+          type: 'dialog',
+          qualifier: {component: 'testee'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-pages/text-test-page',
+            title: 'Dialog;Title - :id - :name',
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+            size: {
+              width: '800px',
+              height: '800px',
+            },
           },
-          size: {
-            width: '800px',
-            height: '800px',
-          },
-        },
-      });
+        });
 
-      // Open test dialog.
-      const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
-      await dialogOpener.open({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
-      const testPage = TextTestPagePO.newDialogPO(appPO, {cssClass: 'testee'});
+        // Open test dialog.
+        const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+        await dialogOpener.open({component: 'testee'}, {params: {id: '123;456'}, cssClass: 'testee'});
+        const testPage = TextTestPagePO.newDialogPO(appPO, {cssClass: 'testee'});
 
-      // Provide text.
-      await testPage.provideText('dialog_title', 'Title - {{id}} - {{name}}');
+        await testPage.provideValue('123;456', 'A;B');
 
-      // No resolved value yet.
-      await test.step('No resolved value yet', async () => {
-        // Wait some time.
-        await page.waitForTimeout(1000);
-        await expect(testPage.dialog.title).toHaveText('');
-      });
-
-      // Resolve value.
-      await test.step('Resolve Value', async () => {
-        await testPage.provideValue('123', 'RESOLVED 1');
-        await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED 1');
-      });
-
-      // Resolve to a different value.
-      await test.step('Resolve to a different value', async () => {
-        await testPage.provideValue('123', 'RESOLVED 2');
-        await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED 2');
-      });
-
-      // Resolve to `undefined`.
-      await test.step('Resolve to `undefined`', async () => {
-        await testPage.provideValue('123', '<undefined>');
-        await expect(testPage.dialog.title).toHaveText('Title - 123 -');
-      });
-    });
-
-    test('should not replace unkown named parameter', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // Register test dialog.
-      await microfrontendNavigator.registerCapability<WorkbenchDialogCapability>('app1', {
-        type: 'dialog',
-        qualifier: {component: 'testee'},
-        properties: {
-          path: 'test-pages/text-test-page',
-          title: '%dialog_title;id=:id',
-          size: {
-            width: '800px',
-            height: '800px',
-          },
-        },
-      });
-
-      // Open test dialog.
-      const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
-      await dialogOpener.open({component: 'testee'}, {cssClass: 'testee'});
-      const testPage = TextTestPagePO.newDialogPO(appPO, {cssClass: 'testee'});
-
-      await testPage.provideText('dialog_title', 'Title - {{id}}');
-      await expect(testPage.dialog.title).toHaveText('Title - :id');
-    });
-
-    test('should set localized title via handle', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // Register test dialog.
-      await microfrontendNavigator.registerCapability<WorkbenchDialogCapability>('app1', {
-        type: 'dialog',
-        qualifier: {component: 'testee'},
-        properties: {
-          path: 'test-pages/text-test-page',
-          size: {height: '800px', width: '800px'},
-        },
-      });
-
-      // Open test dialog.
-      const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
-      await dialogOpener.open({component: 'testee'}, {cssClass: 'testee'});
-      const testPage = TextTestPagePO.newDialogPO(appPO, {cssClass: 'testee'});
-
-      // Set dialog title via dialog handle.
-      await testPage.setDialogTitle('%dialog_title');
-
-      // Provide text.
-      await test.step('Provide text', async () => {
-        await testPage.provideText('dialog_title', 'Title 1');
-        await expect(testPage.dialog.title).toHaveText('Title 1');
-      });
-
-      // Provide different text.
-      await test.step('Provide different text', async () => {
-        await testPage.provideText('dialog_title', 'Title 2');
-        await expect(testPage.dialog.title).toHaveText('Title 2');
-      });
-
-      // Provide `undefined` as text.
-      await test.step('Provide `undefined`', async () => {
-        await testPage.provideText('dialog_title', '<undefined>');
-        await expect(testPage.dialog.title).toHaveText('dialog_title');
+        await expect(testPage.dialog.title).toHaveText('Dialog;Title - 123;456 - A;B');
       });
     });
   });
 
   test.describe('Workbench Host Dialog', () => {
 
-    test('should display non-localized title', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
+    test.describe('Localized Dialog', () => {
 
-      // TODO [#271]: Register host dialog capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
-      await microfrontendNavigator.registerIntention('app1', {type: 'dialog', qualifier: {component: 'host-dialog', variant: 'text-page'}});
+      test('should display localized title', async ({appPO, microfrontendNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
 
-      // Open test dialog.
-      const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
-      await dialogOpener.open({component: 'host-dialog', variant: 'text-page'}, {cssClass: 'testee'});
-      const dialog = appPO.dialog({cssClass: 'testee'});
+        // TODO [#271]: Register host dialog capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
+        await microfrontendNavigator.registerIntention('app1', {type: 'dialog', qualifier: {component: 'host-dialog', variant: 'text-page::translatable-title'}});
 
-      // Expect dialog title as specified.
-      await expect(dialog.title).toHaveText('Dialog Title');
+        // Open test dialog.
+        const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+        await dialogOpener.open({component: 'host-dialog', variant: 'text-page::translatable-title'}, {cssClass: 'testee'});
+        const testPage = new HostTextTestPagePO(appPO.dialog({cssClass: 'testee'}));
+
+        // Provide text.
+        await test.step('Provide text', async () => {
+          await testPage.provideText('dialog_title', 'Title 1');
+          await expect(testPage.dialog.title).toHaveText('Title 1');
+        });
+
+        // Provide different text.
+        await test.step('Provide different text', async () => {
+          await testPage.provideText('dialog_title', 'Title 2');
+          await expect(testPage.dialog.title).toHaveText('Title 2');
+        });
+
+        // Provide `undefined` as text.
+        await test.step('Provide `undefined`', async () => {
+          await testPage.provideText('dialog_title', '<undefined>');
+          await expect(testPage.dialog.title).toHaveText('dialog_title');
+        });
+      });
+
+      test('should substitute parameters and resolvers', async ({appPO, microfrontendNavigator, page}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // TODO [#271]: Register host dialog capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
+        await microfrontendNavigator.registerIntention('app1', {type: 'dialog', qualifier: {component: 'host-dialog', variant: 'text-page::translatable-parameterized-title'}});
+
+        // Open test dialog.
+        const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+        await dialogOpener.open({component: 'host-dialog', variant: 'text-page::translatable-parameterized-title'}, {params: {id: '123'}, cssClass: 'testee'});
+        const testPage = new HostTextTestPagePO(appPO.dialog({cssClass: 'testee'}));
+
+        // Provide text.
+        await testPage.provideText('dialog_title', 'Title - {{id}} - {{name}} - {{undefined}}');
+
+        // No resolved value yet.
+        await test.step('No resolved value yet', async () => {
+          // Wait some time.
+          await page.waitForTimeout(1000);
+          await expect(testPage.dialog.title).toHaveText('');
+        });
+
+        // Resolve value.
+        await test.step('Resolve Value', async () => {
+          await testPage.provideValue('123', 'RESOLVED 1');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED 1 - :undefined');
+        });
+
+        // Resolve to a different value.
+        await test.step('Resolve to a different value', async () => {
+          await testPage.provideValue('123', 'RESOLVED 2');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED 2 - :undefined');
+        });
+
+        // Resolve to translatable.
+        await test.step('Resolve to translatable', async () => {
+          await testPage.provideValue('123', '%resolved_text');
+          await testPage.provideText('resolved_text', 'RESOLVED TEXT');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED TEXT - :undefined');
+        });
+
+        // Resolve to translatable with parameter.
+        await test.step('Resolve to translatable with parameter', async () => {
+          await testPage.provideValue('123', '%resolved_text;param=ABC');
+          await testPage.provideText('resolved_text', 'RESOLVED TEXT {{param}}');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED TEXT ABC - :undefined');
+        });
+
+        // Resolve to translatable with escaped semicolon in parameter.
+        await test.step('Resolve to translatable with semicolon in parameter', async () => {
+          await testPage.provideValue('123', '%resolved_text;param=A\\;B');
+          await testPage.provideText('resolved_text', 'RESOLVED TEXT {{param}}');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED TEXT A;B - :undefined');
+        });
+
+        // Resolve to `undefined`.
+        await test.step('Resolve to `undefined`', async () => {
+          await testPage.provideValue('123', '<undefined>');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 -  - :undefined');
+        });
+      });
+
+      test('should support semicolon in parameter and resolver', async ({appPO, microfrontendNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // TODO [#271]: Register host dialog capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
+        await microfrontendNavigator.registerIntention('app1', {type: 'dialog', qualifier: {component: 'host-dialog', variant: 'text-page::translatable-parameterized-title'}});
+
+        // Open test dialog.
+        const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+        await dialogOpener.open({component: 'host-dialog', variant: 'text-page::translatable-parameterized-title'}, {params: {id: '123;456'}, cssClass: 'testee'});
+        const testPage = new HostTextTestPagePO(appPO.dialog({cssClass: 'testee'}));
+
+        await testPage.provideText('dialog_title', 'Title - {{id}} - {{name}}');
+        await testPage.provideValue('123;456', 'A;B');
+        await expect(testPage.dialog.title).toHaveText('Title - 123;456 - A;B');
+      });
+
+      test('should display localized title set via handle', async ({appPO, microfrontendNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // TODO [#271]: Register host dialog capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
+        await microfrontendNavigator.registerIntention('app1', {type: 'dialog', qualifier: {component: 'host-dialog', variant: 'text-page'}});
+
+        // Open test dialog.
+        const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+        await dialogOpener.open({component: 'host-dialog', variant: 'text-page'}, {cssClass: 'testee'});
+        const testPage = new HostTextTestPagePO(appPO.dialog({cssClass: 'testee'}));
+
+        // Set dialog title via dialog handle.
+        await testPage.setDialogTitle('%dialog_title');
+
+        // Provide text.
+        await test.step('Provide text', async () => {
+          await testPage.provideText('dialog_title', 'Title 1');
+          await expect(testPage.dialog.title).toHaveText('Title 1');
+        });
+
+        // Provide different text.
+        await test.step('Provide different text', async () => {
+          await testPage.provideText('dialog_title', 'Title 2');
+          await expect(testPage.dialog.title).toHaveText('Title 2');
+        });
+
+        // Provide `undefined` as text.
+        await test.step('Provide `undefined`', async () => {
+          await testPage.provideText('dialog_title', '<undefined>');
+          await expect(testPage.dialog.title).toHaveText('dialog_title');
+        });
+      });
     });
 
-    test('should display localized title', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
+    test.describe('Non-Localized Dialog', () => {
 
-      // TODO [#271]: Register host dialog capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
-      await microfrontendNavigator.registerIntention('app1', {type: 'dialog', qualifier: {component: 'host-dialog', variant: 'text-page::translatable-title'}});
+      test('should display non-localized title', async ({appPO, microfrontendNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
 
-      // Open test dialog.
-      const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
-      await dialogOpener.open({component: 'host-dialog', variant: 'text-page::translatable-title'}, {cssClass: 'testee'});
-      const testPage = new HostTextTestPagePO(appPO.dialog({cssClass: 'testee'}));
+        // TODO [#271]: Register host dialog capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
+        await microfrontendNavigator.registerIntention('app1', {type: 'dialog', qualifier: {component: 'host-dialog', variant: 'text-page'}});
 
-      // Provide text.
-      await test.step('Provide text', async () => {
-        await testPage.provideText('dialog_title', 'Title 1');
-        await expect(testPage.dialog.title).toHaveText('Title 1');
+        // Open test dialog.
+        const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+        await dialogOpener.open({component: 'host-dialog', variant: 'text-page'}, {cssClass: 'testee'});
+        const dialog = appPO.dialog({cssClass: 'testee'});
+
+        // Expect dialog title as specified.
+        await expect(dialog.title).toHaveText('Dialog Title');
       });
 
-      // Provide different text.
-      await test.step('Provide different text', async () => {
-        await testPage.provideText('dialog_title', 'Title 2');
-        await expect(testPage.dialog.title).toHaveText('Title 2');
+      test('should substitute parameters and resolvers', async ({appPO, microfrontendNavigator, page}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // TODO [#271]: Register host dialog capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
+        await microfrontendNavigator.registerIntention('app1', {type: 'dialog', qualifier: {component: 'host-dialog', variant: 'text-page::parameterized-title'}});
+
+        // Open test dialog.
+        const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+        await dialogOpener.open({component: 'host-dialog', variant: 'text-page::parameterized-title'}, {params: {id: '123'}, cssClass: 'testee'});
+        const testPage = new HostTextTestPagePO(appPO.dialog({cssClass: 'testee'}));
+
+        // No resolved value yet.
+        await test.step('No resolved value yet', async () => {
+          // Wait some time.
+          await page.waitForTimeout(1000);
+          await expect(testPage.dialog.title).toHaveText('');
+        });
+
+        // Resolve value.
+        await test.step('Resolve Value', async () => {
+          await testPage.provideValue('123', 'RESOLVED 1');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED 1 - :undefined');
+        });
+
+        // Resolve to a different value.
+        await test.step('Resolve to a different value', async () => {
+          await testPage.provideValue('123', 'RESOLVED 2');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED 2 - :undefined');
+        });
+
+        // Resolve to translatable.
+        await test.step('Resolve to translatable', async () => {
+          await testPage.provideValue('123', '%resolved_text');
+          await testPage.provideText('resolved_text', 'RESOLVED TEXT');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED TEXT - :undefined');
+        });
+
+        // Resolve to translatable with parameter.
+        await test.step('Resolve to translatable with parameter', async () => {
+          await testPage.provideValue('123', '%resolved_text;param=ABC');
+          await testPage.provideText('resolved_text', 'RESOLVED TEXT {{param}}');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED TEXT ABC - :undefined');
+        });
+
+        // Resolve to translatable with escaped semicolon in parameter.
+        await test.step('Resolve to translatable with semicolon in parameter', async () => {
+          await testPage.provideValue('123', '%resolved_text;param=A\\;B');
+          await testPage.provideText('resolved_text', 'RESOLVED TEXT {{param}}');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED TEXT A;B - :undefined');
+        });
+
+        // Resolve to `undefined`.
+        await test.step('Resolve to `undefined`', async () => {
+          await testPage.provideValue('123', '<undefined>');
+          await expect(testPage.dialog.title).toHaveText('Title - 123 -  - :undefined');
+        });
       });
 
-      // Provide `undefined` as text.
-      await test.step('Provide `undefined`', async () => {
-        await testPage.provideText('dialog_title', '<undefined>');
-        await expect(testPage.dialog.title).toHaveText('dialog_title');
-      });
-    });
+      test('should support semicolon in text, parameter and resolver', async ({appPO, microfrontendNavigator, page}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
 
-    test('should display localized title with named parameters replaced by dialog params', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
+        // TODO [#271]: Register host dialog capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
+        await microfrontendNavigator.registerIntention('app1', {type: 'dialog', qualifier: {component: 'host-dialog', variant: 'text-page::parameterized-title-with-semicolon'}});
 
-      // TODO [#271]: Register host dialog capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
-      await microfrontendNavigator.registerIntention('app1', {type: 'dialog', qualifier: {component: 'host-dialog', variant: 'text-page::translatable-parameterized-title'}});
+        // Open test dialog.
+        const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+        await dialogOpener.open({component: 'host-dialog', variant: 'text-page::parameterized-title-with-semicolon'}, {params: {id: '123;456'}, cssClass: 'testee'});
+        const testPage = new HostTextTestPagePO(appPO.dialog({cssClass: 'testee'}));
 
-      // Open test dialog.
-      const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
-      await dialogOpener.open({component: 'host-dialog', variant: 'text-page::translatable-parameterized-title'}, {params: {id: '123'}, cssClass: 'testee'});
-      const testPage = new HostTextTestPagePO(appPO.dialog({cssClass: 'testee'}));
-
-      // Provide text.
-      await test.step('Provide text', async () => {
-        await testPage.provideText('dialog_title', 'Title 1 - {{id}}');
-        await expect(testPage.dialog.title).toHaveText('Title 1 - 123');
-      });
-
-      // Provide different text.
-      await test.step('Provide different text', async () => {
-        await testPage.provideText('dialog_title', 'Title 2 - {{id}}');
-        await expect(testPage.dialog.title).toHaveText('Title 2 - 123');
-      });
-    });
-
-    test('should display localized title with named parameters replaced by resolved values', async ({appPO, microfrontendNavigator, page}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // TODO [#271]: Register host dialog capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
-      await microfrontendNavigator.registerIntention('app1', {type: 'dialog', qualifier: {component: 'host-dialog', variant: 'text-page::translatable-resolved-title'}});
-
-      // Open test dialog.
-      const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
-      await dialogOpener.open({component: 'host-dialog', variant: 'text-page::translatable-resolved-title'}, {params: {id: '123'}, cssClass: 'testee'});
-      const testPage = new HostTextTestPagePO(appPO.dialog({cssClass: 'testee'}));
-
-      // Provide text.
-      await testPage.provideText('dialog_title', 'Title - {{id}} - {{name}}');
-
-      // No resolved value yet.
-      await test.step('No resolved value yet', async () => {
-        // Wait some time.
-        await page.waitForTimeout(1000);
-        await expect(testPage.dialog.title).toHaveText('');
-      });
-
-      // Resolve value.
-      await test.step('Resolve Value', async () => {
-        await testPage.provideValue('123', 'RESOLVED 1');
-        await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED 1');
-      });
-
-      // Resolve to a different value.
-      await test.step('Resolve to a different value', async () => {
-        await testPage.provideValue('123', 'RESOLVED 2');
-        await expect(testPage.dialog.title).toHaveText('Title - 123 - RESOLVED 2');
-      });
-
-      // Resolve to `undefined`.
-      await test.step('Resolve to `undefined`', async () => {
-        await testPage.provideValue('123', '<undefined>');
-        await expect(testPage.dialog.title).toHaveText('Title - 123 -');
-      });
-    });
-
-    test('should not replace unkown named parameter', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // TODO [#271]: Register host dialog capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
-      await microfrontendNavigator.registerIntention('app1', {type: 'dialog', qualifier: {component: 'host-dialog', variant: 'text-page::translatable-parameterized-title::unkown-param'}});
-
-      // Open test dialog.
-      const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
-      await dialogOpener.open({component: 'host-dialog', variant: 'text-page::translatable-parameterized-title::unkown-param'}, {cssClass: 'testee'});
-      const testPage = new HostTextTestPagePO(appPO.dialog({cssClass: 'testee'}));
-
-      await testPage.provideText('dialog_title', 'Title - {{id}}');
-      await expect(testPage.dialog.title).toHaveText('Title - :id');
-    });
-
-    test('should set localized title/heading via handle', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // TODO [#271]: Register host dialog capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
-      await microfrontendNavigator.registerIntention('app1', {type: 'dialog', qualifier: {component: 'host-dialog', variant: 'text-page'}});
-
-      // Open test dialog.
-      const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
-      await dialogOpener.open({component: 'host-dialog', variant: 'text-page'}, {cssClass: 'testee'});
-      const testPage = new HostTextTestPagePO(appPO.dialog({cssClass: 'testee'}));
-
-      // Set dialog title via dialog handle.
-      await testPage.setDialogTitle('%dialog_title');
-
-      // Provide text.
-      await test.step('Provide text', async () => {
-        await testPage.provideText('dialog_title', 'Title 1');
-        await expect(testPage.dialog.title).toHaveText('Title 1');
-      });
-
-      // Provide different text.
-      await test.step('Provide different text', async () => {
-        await testPage.provideText('dialog_title', 'Title 2');
-        await expect(testPage.dialog.title).toHaveText('Title 2');
-      });
-
-      // Provide `undefined` as text.
-      await test.step('Provide `undefined`', async () => {
-        await testPage.provideText('dialog_title', '<undefined>');
-        await expect(testPage.dialog.title).toHaveText('dialog_title');
+        await testPage.provideValue('123;456', 'A;B');
+        await expect(testPage.dialog.title).toHaveText('Dialog;Title - 123;456 - A;B');
       });
     });
   });

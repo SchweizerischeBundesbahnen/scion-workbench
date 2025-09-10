@@ -137,9 +137,9 @@ describe('Text Provider', () => {
       ],
     });
 
-    text('%key;param1=v\\;al=ue1;param2=va\\;lue2;pa\\;ram3=val=ue3', {injector: TestBed.inject(Injector)})();
+    text('%key;param1=v\\;al=ue1;param2=va\\;lue2', {injector: TestBed.inject(Injector)})();
     expect(capture.key).toEqual('key');
-    expect(capture.params).toEqual({'param1': 'v;al=ue1', param2: 'va;lue2', 'pa;ram3': 'val=ue3'});
+    expect(capture.params).toEqual({'param1': 'v;al=ue1', param2: 'va;lue2'});
   });
 
   it('should support regex character in parameter value', () => {

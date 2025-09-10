@@ -34,6 +34,8 @@ export type WorkbenchTextProviderFn = (key: string, params: {[name: string]: str
  * A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
  * Key and parameters are passed to {@link WorkbenchConfig.textProvider} for translation.
  *
+ * Semicolons in interpolation parameters must be escaped with two backslashes (`\\;`).
+ *
  * Examples:
  * - `%key`: translation key
  * - `%key;param=value`: translation key with a single interpolation parameter

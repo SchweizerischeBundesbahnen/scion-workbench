@@ -58,6 +58,8 @@ export interface WorkbenchTextProviderCapability extends Capability {
  * Key and parameters are passed to the registered text provider for translation. Applications can register a text provider
  * using {@link WorkbenchClient.registerTextProvider}.
  *
+ * Semicolons in interpolation parameters must be escaped with two backslashes (`\\;`).
+ *
  * Examples:
  * - `%key`: translation key
  * - `%key;param=value`: translation key with a single interpolation parameter
