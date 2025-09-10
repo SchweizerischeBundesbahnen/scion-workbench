@@ -62,7 +62,7 @@ export abstract class WorkbenchMessageBoxService {
    * ```
    *
    * @param  message - Specifies the text to display, if any.
-   *                   Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   *                   Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    * @param options - Controls the appearance and behavior of the message box.
    * @return Promise that resolves to the key of the action button that the user clicked to close the message box.
    */

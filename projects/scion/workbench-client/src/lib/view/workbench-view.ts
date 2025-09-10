@@ -92,7 +92,7 @@ export abstract class WorkbenchView {
   /**
    * Sets the title to be displayed in the view tab.
    *
-   * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    */
   public abstract setTitle(title: Translatable): void;
 
@@ -106,7 +106,7 @@ export abstract class WorkbenchView {
   /**
    * Sets the subtitle to be displayed in the view tab.
    *
-   * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    */
   public abstract setHeading(heading: Translatable): void;
 

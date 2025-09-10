@@ -27,7 +27,7 @@ export interface WorkbenchNotificationConfig {
   /**
    * Specifies the title of the notification.
    *
-   * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    */
   title?: Translatable;
 

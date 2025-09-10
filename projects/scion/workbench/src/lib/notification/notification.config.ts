@@ -27,7 +27,7 @@ export interface NotificationConfig {
   /**
    * Optional title of the notification.
    *
-   * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    *
    * TODO [Angular 21] Passing an Observable is deprecated. To migrate, pass a translatable and provide the text using a text provider registered in `WorkbenchClient.registerTextProvider`. API will be removed in version 21.
    */

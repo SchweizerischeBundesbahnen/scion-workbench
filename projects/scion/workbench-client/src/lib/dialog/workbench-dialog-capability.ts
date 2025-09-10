@@ -83,15 +83,32 @@ export interface WorkbenchDialogCapability extends Capability {
     /**
      * Specifies the title of this dialog.
      *
-     * Can be a text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+     * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
      *
-     * Interpolation parameters can reference capability parameters and resolvers using the colon syntax. Resolvers resolve data based on capability parameters.
-     * See {@link resolve} for defining resolvers.
+     * Text and interpolation parameters can reference capability parameters and resolvers using the colon syntax. See {@link resolve} for defining resolvers.
+     *
+     * @example - Title referencing a resolver
      *
      * ```json
      * {
      *   "params": [
-     *     {"name": "id", "required":  true}
+     *     {"name": "id", "required": true}
+     *   ],
+     *   "properties": {
+     *     "title": ":productName", // `:productName` references a resolver
+     *     "resolve": {
+     *       "productName": "products/:id/name" // `:id` references a capability parameter
+     *     }
+     *   }
+     * }
+     * ```
+     *
+     * @example - Translatable title referencing a resolver in its interpolation parameters
+     *
+     * ```json
+     * {
+     *   "params": [
+     *     {"name": "id", "required": true}
      *   ],
      *   "properties": {
      *     "title": "%product.title;name=:productName", // `:productName` references a resolver
@@ -104,26 +121,25 @@ export interface WorkbenchDialogCapability extends Capability {
      */
     title?: Translatable;
     /**
-     * Specifies data resolvers for use in the dialog title.
+     * Defines resolvers for use in the dialog title.
      *
-     * A resolver defines a topic where a request is sent to resolve data. Topic segments can reference capability parameters using the colon syntax.
-     * Resolvers can be referenced in interpolation parameters of {@link title} using the colon syntax.
+     * A resolver defines a topic where a request is sent to resolve text or a translation key, typically based on capability parameters. Topic segments can reference capability parameters using the colon syntax.
      *
-     * ```json
-     * {
-     *   "params": [
-     *     {"name": "id", "required":  true}
-     *   ],
-     *   "properties": {
-     *     "title": "%product.title;name=:productName", // `:productName` references a resolver
-     *     "resolve": {
-     *       "productName": "products/:id/name" // `:id` references a capability parameter
-     *     }
-     *   }
-     * }
+     * The application can respond to resolve requests by installing a message listener in the activator. Refer to {@link ActivatorCapability} for registering an activator.
+     *
+     * @example - Message listener replying to resolve requests
+     *
+     * ```ts
+     * import {Beans} from '@scion/toolkit/bean-manager';
+     * import {MessageClient} from '@scion/microfrontend-platform';
+     *
+     * Beans.get(MessageClient).onMessage('products/:id/name', message => {
+     *   const id = message.params.get('id');
+     *   return `Product ${id}`;
+     * });
      * ```
      */
-    resolve?: {[key: string]: string};
+    resolve?: {[key: string]: Translatable};
     /**
      * Specifies if to display a close button in the dialog header. Defaults to `true`.
      */
