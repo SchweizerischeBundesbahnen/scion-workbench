@@ -173,8 +173,10 @@ jobs:
     needs: [ build-libs, build-apps ]
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        shard: [ 1/20, 2/20, 3/20, 4/20, 5/20, 6/20, 7/20, 8/20, 9/20, 10/20, 11/20, 12/20, 13/20, 14/20, 15/20, 16/20, 17/20, 18/20, 19/20, 20/20]
+        shardIndex: [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 ]
+        shardTotal: [ 20 ]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -215,7 +217,15 @@ jobs:
         with:
           path: ./node_modules
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-      - run: npm run e2e:headless -- --shard=${{ matrix.shard }}
+      - name: Run shard ${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+        run: npm run e2e:headless -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+      - name: Upload Playwright results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results-${{ matrix.shardIndex }}
+          path: test-results/
+          retention-days: 7
   workbench-release-guard:
     name: 'Should release @scion/workbench?'
     if: github.ref == 'refs/heads/master'
