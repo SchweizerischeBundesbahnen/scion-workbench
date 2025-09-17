@@ -139,7 +139,7 @@ export interface WorkbenchDialogCapability extends Capability {
      * });
      * ```
      */
-    resolve?: {[key: string]: Translatable};
+    resolve?: {[name: string]: string};
     /**
      * Specifies if to display a close button in the dialog header. Defaults to `true`.
      */

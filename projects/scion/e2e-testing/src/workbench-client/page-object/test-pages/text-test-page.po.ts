@@ -107,11 +107,15 @@ export class TextObservePO {
     this.text = this.locator.locator('output.e2e-text');
   }
 
-  public async observe(translatable: string, options: {app: 'workbench-client-testing-app1' | 'workbench-client-testing-app2'; timeout?: number}): Promise<void> {
+  public async observe(translatable: string, options: {app: 'workbench-client-testing-app1' | 'workbench-client-testing-app2'; ttl?: number}): Promise<void> {
     await this.locator.locator(`input.e2e-translatable`).fill(translatable);
     await this.locator.locator('input.e2e-app').fill(options.app);
-    await this.locator.locator('input.e2e-timeout').fill(`${options.timeout ?? ''}`);
+    await this.locator.locator('input.e2e-ttl').fill(`${options.ttl ?? ''}`);
     await this.locator.locator('button.e2e-observe').click();
+  }
+
+  public async state(): Promise<undefined | 'completed' | 'errored'> {
+    return (await this.locator.getAttribute('data-state') as null | 'completed' | 'errored') ?? undefined;
   }
 
   public async cancel(): Promise<void> {

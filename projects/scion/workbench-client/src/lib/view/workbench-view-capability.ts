@@ -173,7 +173,7 @@ export interface WorkbenchViewCapability extends Capability {
      * });
      * ```
      */
-    resolve?: {[key: string]: Translatable};
+    resolve?: {[name: string]: string};
     /**
      * Controls if to display a close button in the view tab. Defaults to `true`.
      */

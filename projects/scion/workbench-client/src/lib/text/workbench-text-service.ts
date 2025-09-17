@@ -45,10 +45,10 @@ export abstract class WorkbenchTextService {
    * @param translatable - Specifies the translatable.
    * @param options - Options for requesting the text.
    * @param options.provider - The application that provides the text.
-   * @param options.timeout - Maximum time in milliseconds to wait for the text. Defaults to `30s`.
-   * @return Observable emitting the text or `undefined` if not found. Localized texts are emitted
-   *         in the current language, and each time when the language changes. If an error occurs,
-   *         emits the key and logs the error.
+   * @param options.ttl - Time to retain texts in the cache after the last subscriber unsubscribes, in milliseconds. Defaults to the next animation frame.
+   * @return Observable emitting the requested text or `undefined` if not found.
+   *         Localized texts are emitted in the current language, and each time when the language changes.
+   *         If an error occurs, the observable emits the passed translation key and then completes. The error is not propagated.
    */
-  public abstract text$(translatable: Translatable, options: {provider: string; timeout?: number}): Observable<string | undefined>;
+  public abstract text$(translatable: Translatable, options: {provider: string; ttl?: number}): Observable<string | undefined>;
 }
