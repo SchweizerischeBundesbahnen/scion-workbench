@@ -55,8 +55,9 @@ export default defineConfig({
       // Therefore, we instruct Playwright to ignore this default. Refer to https://github.com/microsoft/playwright/issues/5778#issuecomment-796264504 for more details.
       ignoreDefaultArgs: ['--hide-scrollbars'],
     },
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
   },
-  maxFailures: runInCI ? 1 : undefined,
   testMatch: /.*\.e2e-spec\.ts/,
 });
 
