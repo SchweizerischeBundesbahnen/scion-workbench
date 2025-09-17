@@ -9,16 +9,16 @@
  */
 
 import {computed, Directive, effect, ElementRef, inject, input, NgZone, output, untracked} from '@angular/core';
-import {createElement, nextAnimationFrame$, positionElement, setAttribute, setStyle} from '../common/dom.util';
+import {createElement, positionElement, setAttribute, setStyle} from '../common/dom.util';
 import {ViewDragData, ViewDragService} from './view-drag.service';
 import {ViewDropPlaceholderRenderer} from './view-drop-placeholder-renderer.service';
 import {Disposable} from '../common/disposable';
 import {boundingClientRect} from '@scion/components/dimension';
 import {UUID} from '@scion/toolkit/uuid';
-import {audit, BehaviorSubject, delay, identity, Observable, of, share, SubjectLike, switchMap} from 'rxjs';
+import {BehaviorSubject, delay, identity, of, switchMap} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {finalize, tap} from 'rxjs/operators';
+import {distinctUntilChanged, finalize} from 'rxjs/operators';
 
 /**
  * Makes the host element a drop zone for views.
@@ -63,7 +63,7 @@ export class ViewDropZoneDirective {
   private readonly _zone = inject(NgZone);
   private readonly _id = UUID.randomUUID();
   private readonly _boundingClientRect = boundingClientRect(inject(ElementRef));
-  private readonly _dropRegion$ = createDropRegionObservable();
+  private readonly _dropRegion$ = new BehaviorSubject<Region | null>(null);
 
   private readonly _dropRegionSize = computed(() => ({
     maxHeight: coercePixelValue(this.dropRegionSize(), {containerSize: this._boundingClientRect().height}),
@@ -156,10 +156,12 @@ export class ViewDropZoneDirective {
 
     // Enable drop zone based on dragging over an allowed drop region.
     // If enabled, drag events are not received by nested drop zones.
-    const dropZoneActivator = this._dropRegion$.subscribe(dropRegion => {
-      setStyle(dropZoneElement, {'pointer-events': dropRegion ? null : 'none'});
-      setAttribute(dropZoneElement, {'data-region': dropRegion});
-    });
+    const dropZoneActivator = this._dropRegion$
+      .pipe(distinctUntilChanged())
+      .subscribe(dropRegion => {
+        setStyle(dropZoneElement, {'pointer-events': dropRegion ? null : 'none'});
+        setAttribute(dropZoneElement, {'data-region': dropRegion});
+      });
 
     return {
       dispose: () => {
@@ -186,6 +188,7 @@ export class ViewDropZoneDirective {
     const dragging = this._viewDragService.dragging;
     this._dropRegion$
       .pipe(
+        distinctUntilChanged(),
         // When leaving the drop zone (no drop region) but continue dragging, remove the drop zone asynchronously
         // to animate transition of the placeholder to another drop zone. If ended dragging, remove the placeholder
         // immediately.
@@ -323,32 +326,3 @@ export interface DropZoneRegion {
  * Represents a drop region.
  */
 type Region = 'north' | 'east' | 'south' | 'west' | 'center';
-
-/**
- * Creates a subject-like observable to observe and set the drop region,
- * multicasting the drop zone to many observers while throttling emission
- * to the latest drop region per animation frame.
- */
-function createDropRegionObservable(): Observable<Region | null> & Pick<SubjectLike<Region | null>, 'next'> {
-  const zone = inject(NgZone);
-  const region$ = new BehaviorSubject<Region | null>(null);
-
-  const observe$ = region$
-    .pipe(
-      subscribeIn(fn => zone.runOutsideAngular(fn)),
-      // Ensure not to be in Angular.
-      tap(() => NgZone.assertNotInAngularZone()),
-      // Throttle emission to a single event per animation frame.
-      audit(() => nextAnimationFrame$()),
-      share(),
-    ) as Observable<Region | null> & Pick<SubjectLike<Region | null>, 'next'>;
-
-  // Add notifier function.
-  observe$.next = (region: Region | null): void => {
-    if (region$.value !== region) {
-      zone.runOutsideAngular(() => region$.next(region));
-    }
-  };
-
-  return observe$;
-}

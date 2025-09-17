@@ -482,33 +482,34 @@ test.describe('View Drag Main Area', () => {
     });
 
     /**
-     * +--------------------+
-     * |      INITIAL       |
-     * | [view.1, view.101] |
-     * +--------------------+
-     * |     BOTTOM         |
-     * |    [view.102]      |
-     * +--------------------+
+     * +------------------+
+     * |      INITIAL     |
+     * | [view.1, view.2] |
+     * +------------------+
+     * |     BOTTOM       |
+     * |    [view.3]      |
+     * +------------------+
      */
     test('should disable drop zone when dragging a view into the tabbar', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
-      await workbenchNavigator.openInNewTab(ViewPagePO);
-
       await workbenchNavigator.modifyLayout(layout => layout
         .addPart('part.activity', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity'}) // add activity to disable drop zones near main grid edges
         .addPart('part.bottom', {relativeTo: 'part.initial', align: 'bottom', ratio: .25})
-        .addView('view.101', {partId: 'part.initial'})
-        .addView('view.102', {partId: 'part.bottom', activateView: true}),
+        .addView('view.1', {partId: 'part.initial'})
+        .addView('view.2', {partId: 'part.initial'})
+        .addView('view.3', {partId: 'part.bottom'})
+        .activateView('view.1')
+        .activateView('view.3'),
       );
 
       // Get bounding box of the tabbar of the 'bottom' part.
       const bottomTabbarBounds = fromRect(await appPO.part({partId: 'part.bottom'}).bar.getBoundingBox());
 
       // Open view in the initial part.
-      const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
+      const view1 = appPO.view({viewId: 'view.1'});
 
-      const dragHandle = await viewPage2.view.tab.startDrag();
+      const dragHandle = await view1.tab.startDrag();
 
       // Drag to the center of the bottom tabbar.
       await dragHandle.dragTo({x: bottomTabbarBounds.hcenter, y: bottomTabbarBounds.vcenter});
