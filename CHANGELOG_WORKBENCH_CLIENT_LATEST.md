@@ -1,9 +1,9 @@
-# [1.0.0-beta.32](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.31...workbench-client-1.0.0-beta.32) (2025-09-11)
+# [1.0.0-beta.33](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.32...workbench-client-1.0.0-beta.33) (2025-09-17)
 
 
-### Features
+### Bug Fixes
 
-* **workbench-client:** support placeholders in non-localized manifest texts ([1fc40a8](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/1fc40a8c58d04deeebc7621e634f05204e5dc049)), closes [#255](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/255)
+* **workbench-client:** prevent flickering of translated texts on re-layout ([5818435](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/58184358a0c5a3d832e1db51bbdff1a7390dec3e)), closes [#255](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/255)
 
 
 
