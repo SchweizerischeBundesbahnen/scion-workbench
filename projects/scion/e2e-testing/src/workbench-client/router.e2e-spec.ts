@@ -888,37 +888,37 @@ test.describe('Workbench Router', () => {
   test('should not load microfrontends of inactive views on initial navigation', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    // navigate to the view
+    // Open test view.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'view', app: 'app1'}, {
-      target: 'view.101',
+      target: 'view.1',
       activate: false,
     });
 
-    // navigate to the view
+    // Open test view.
     await routerPage.navigate({component: 'view', app: 'app1'}, {
-      target: 'view.102',
+      target: 'view.2',
       activate: true,
     });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
-    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.1'});
+    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.2'});
 
     await expectView(routerPage).toBeInactive({loaded: true});
     await expectView(testee1ViewPage).toBeInactive({loaded: false});
     await expectView(testee2ViewPage).toBeActive();
 
-    // reload the app
+    // Reload the app.
     await appPO.reload();
 
-    // expect views to be present
+    // Expect views to be present.
     await expect(appPO.views()).toHaveCount(3);
     await expectView(routerPage).toBeInactive({loaded: false});
     await expectView(testee1ViewPage).toBeInactive({loaded: false});
     await expectView(testee2ViewPage).toBeActive();
   });
 
-  test('should set view properties upon initial view tab navigation', async ({appPO, microfrontendNavigator}) => {
+  test('should set view properties from capability when opening microfrontend', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
     await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
@@ -927,26 +927,26 @@ test.describe('Workbench Router', () => {
       qualifier: {component: 'testee'},
       properties: {
         path: 'test-view',
-        title: 'VIEW TITLE',
-        heading: 'VIEW HEADING',
+        title: 'Title',
+        heading: 'Heading',
         cssClass: ['class-1', 'class-2'],
       },
     });
 
-    // navigate to the testee view
+    // Open test view.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {
-      target: 'view.100',
+      target: 'view.1',
     });
 
-    // expect view properties to be set
-    const testeeView = appPO.view({viewId: 'view.100'});
-    await expect(testeeView.tab.title).toHaveText('VIEW TITLE');
-    await expect(testeeView.tab.heading).toHaveText('VIEW HEADING');
+    // Expect view properties to be set from capability.
+    const testeeView = appPO.view({viewId: 'view.1'});
+    await expect(testeeView.tab.title).toHaveText('Title');
+    await expect(testeeView.tab.heading).toHaveText('Heading');
     await expect.poll(() => testeeView.tab.getCssClasses()).toEqual(expect.arrayContaining(['class-1', 'class-2']));
   });
 
-  test('should set view properties upon initial view tab navigation when replacing an existing workbench view', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+  test('should set view properties from capability when navigating non-microfrontend view to microfrontend', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
     await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
@@ -955,32 +955,32 @@ test.describe('Workbench Router', () => {
       qualifier: {component: 'testee'},
       properties: {
         path: 'test-view',
-        title: 'VIEW TITLE',
-        heading: 'VIEW HEADING',
+        title: 'Title',
+        heading: 'Heading',
         cssClass: ['class-1', 'class-2'],
       },
     });
 
-    // open workbench view
+    // Open test view and set title.
     const viewPage = await workbenchNavigator.openInNewTab(WorkbenchViewPagePO);
     await viewPage.enterTitle('WORKBENCH VIEW TITLE');
     await expect(viewPage.view.tab.title).toHaveText('WORKBENCH VIEW TITLE');
 
-    // navigate to the testee view
+    // Navigate view.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {
       target: await viewPage.view.getViewId(),
       cssClass: 'testee',
     });
 
-    // expect view properties to be set
+    // Expect view properties to be set from capability.
     const testeeView = appPO.view({cssClass: 'testee'});
-    await expect(testeeView.tab.title).toHaveText('VIEW TITLE');
-    await expect(testeeView.tab.heading).toHaveText('VIEW HEADING');
+    await expect(testeeView.tab.title).toHaveText('Title');
+    await expect(testeeView.tab.heading).toHaveText('Heading');
     await expect.poll(() => testeeView.tab.getCssClasses()).toEqual(expect.arrayContaining(['class-1', 'class-2']));
   });
 
-  test('should set view properties when navigating in the current view tab', async ({appPO, microfrontendNavigator}) => {
+  test('should set view properties from capability when navigating microfrontend view to different microfrontend', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
     await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
@@ -989,8 +989,8 @@ test.describe('Workbench Router', () => {
       qualifier: {component: 'testee-1'},
       properties: {
         path: 'test-view',
-        title: 'VIEW TITLE 1',
-        heading: 'VIEW HEADING 1',
+        title: 'Title 1',
+        heading: 'Heading 1',
         closable: true,
         cssClass: ['class-1'],
       },
@@ -1001,42 +1001,42 @@ test.describe('Workbench Router', () => {
       qualifier: {component: 'testee-2'},
       properties: {
         path: 'test-view',
-        title: 'VIEW TITLE 2',
-        heading: 'VIEW HEADING 2',
+        title: 'Title 2',
+        heading: 'Heading 2',
         closable: false,
         cssClass: ['class-2'],
       },
     });
 
-    // navigate to the testee-1 view
+    // Open test view.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee-1'}, {
-      target: 'view.100',
+      target: 'view.1',
     });
 
-    const testeeView = appPO.view({viewId: 'view.100'});
+    const testeeView = appPO.view({viewId: 'view.1'});
 
-    // expect view properties to be set
-    await expect(testeeView.tab.title).toHaveText('VIEW TITLE 1');
-    await expect(testeeView.tab.heading).toHaveText('VIEW HEADING 1');
+    // Expect view properties to be set.
+    await expect(testeeView.tab.title).toHaveText('Title 1');
+    await expect(testeeView.tab.heading).toHaveText('Heading 1');
     await expect.poll(() => testeeView.tab.getCssClasses()).toEqual(expect.arrayContaining(['class-1']));
     await expect(testeeView.tab.closeButton).toBeVisible();
 
-    // navigate to the testee-2 view
+    // Navigate view to other microfrontend.
     await routerPage.view.tab.click();
     await routerPage.navigate({component: 'testee-2'}, {
-      target: 'view.100',
+      target: 'view.1',
     });
 
-    // expect view properties to be set
+    // Expect view properties to be set.
     await testeeView.tab.click();
-    await expect(testeeView.tab.title).toHaveText('VIEW TITLE 2');
-    await expect(testeeView.tab.heading).toHaveText('VIEW HEADING 2');
+    await expect(testeeView.tab.title).toHaveText('Title 2');
+    await expect(testeeView.tab.heading).toHaveText('Heading 2');
     await expect.poll(() => testeeView.tab.getCssClasses()).toEqual(expect.arrayContaining(['class-2']));
     await expect(testeeView.tab.closeButton).not.toBeVisible();
   });
 
-  test('should not set view properties when performing self navigation, e.g., when updating view params', async ({appPO, microfrontendNavigator}) => {
+  test('should set title and heading from capability when navigating view to same microfrontend', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
     await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
@@ -1044,56 +1044,110 @@ test.describe('Workbench Router', () => {
       type: 'view',
       qualifier: {component: 'testee'},
       params: [
-        {name: 'param1', required: false},
+        {name: 'id', required: true},
       ],
       properties: {
         path: 'test-view',
-        title: 'VIEW TITLE',
-        heading: 'VIEW HEADING',
-        cssClass: ['class'],
+        title: 'Title - :id',
+        heading: 'Heading - :id',
+        cssClass: ['class-1', 'class-2'],
       },
     });
 
-    // navigate to the testee view
+    // Open test view.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {
-      target: 'view.100',
+      target: 'view.1',
+      params: {id: '1'},
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.1'});
 
-    // expect view properties to be set
-    await expect(testeeViewPage.view.tab.title).toHaveText('VIEW TITLE');
-    await expect(testeeViewPage.view.tab.heading).toHaveText('VIEW HEADING');
-    await expect.poll(() => testeeViewPage.view.tab.getCssClasses()).toEqual(expect.arrayContaining(['class']));
+    // Expect view properties to be set.
+    await expect(testeeViewPage.view.tab.title).toHaveText('Title - 1');
+    await expect(testeeViewPage.view.tab.heading).toHaveText('Heading - 1');
+    await expect.poll(() => testeeViewPage.view.tab.getCssClasses()).toEqual(expect.arrayContaining(['class-1', 'class-2']));
+    await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({id: '1'});
 
-    // update view properties
-    await testeeViewPage.enterTitle('UPDATED VIEW TITLE');
-    await testeeViewPage.enterHeading('UPDATED VIEW HEADING');
+    // Set title and heading.
+    await testeeViewPage.enterTitle('Updated Title');
+    await testeeViewPage.enterHeading('Updated Heading');
+    await expect(testeeViewPage.view.tab.title).toHaveText('Updated Title');
+    await expect(testeeViewPage.view.tab.heading).toHaveText('Updated Heading');
 
-    // perform self navigation by setting view params
+    // Navigate view with changed params.
     await routerPage.view.tab.click();
     await routerPage.navigate({component: 'testee'}, {
-      target: 'view.100',
-      params: {param1: 'PARAM 1'},
+      target: 'view.1',
+      params: {id: '2'},
     });
 
-    // expect view properties not be updated
+    // Expect title and heading to be set from capability.
     await testeeViewPage.view.tab.click();
-    await expect(testeeViewPage.view.tab.title).toHaveText('UPDATED VIEW TITLE');
-    await expect(testeeViewPage.view.tab.heading).toHaveText('UPDATED VIEW HEADING');
-    await expect.poll(() => testeeViewPage.view.tab.getCssClasses()).toEqual(expect.arrayContaining(['class']));
-    await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({param1: 'PARAM 1'});
+    await expect(testeeViewPage.view.tab.title).toHaveText('Title - 2');
+    await expect(testeeViewPage.view.tab.heading).toHaveText('Heading - 2');
+    await expect.poll(() => testeeViewPage.view.tab.getCssClasses()).toEqual(expect.arrayContaining(['class-1', 'class-2']));
+    await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({id: '2'});
   });
 
-  test('should not unset the dirty state when performing self navigation, e.g., when updating view params', async ({appPO, microfrontendNavigator}) => {
+  test('should not unset title and heading when navigating view to same microfrontend if capability has no title and heading', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+    await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      params: [
+        {name: 'id', required: true},
+      ],
+      properties: {
+        path: 'test-view',
+        cssClass: ['class-1', 'class-2'],
+      },
+    });
+
+    // Open test view.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {
+      target: 'view.1',
+      params: {id: '1'},
+    });
+
+    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.1'});
+
+    // Expect view properties to be set.
+    await expect(testeeViewPage.view.tab.title).toBeEmpty();
+    await expect(testeeViewPage.view.tab.heading).not.toBeAttached();
+    await expect.poll(() => testeeViewPage.view.tab.getCssClasses()).toEqual(expect.arrayContaining(['class-1', 'class-2']));
+    await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({id: '1'});
+
+    // Set title and heading.
+    await testeeViewPage.enterTitle('Title');
+    await testeeViewPage.enterHeading('Heading');
+
+    // Navigate view with changed params.
+    await routerPage.view.tab.click();
+    await routerPage.navigate({component: 'testee'}, {
+      target: 'view.1',
+      params: {id: '2'},
+    });
+
+    // Expect title and heading not to be unset
+    await testeeViewPage.view.tab.click();
+    await expect(testeeViewPage.view.tab.title).toHaveText('Title');
+    await expect(testeeViewPage.view.tab.heading).toHaveText('Heading');
+    await expect.poll(() => testeeViewPage.view.tab.getCssClasses()).toEqual(expect.arrayContaining(['class-1', 'class-2']));
+    await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({id: '2'});
+  });
+
+  test('should not unset dirty state when navigating view to same microfrontend', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
       qualifier: {component: 'testee'},
       params: [
-        {name: 'param1', required: false},
+        {name: 'id', required: true},
       ],
       properties: {
         path: 'test-view',
@@ -1101,30 +1155,31 @@ test.describe('Workbench Router', () => {
       },
     });
 
-    // navigate to the testee view
+    // Open test view.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {
-      target: 'view.100',
+      target: 'view.1',
+      params: {id: '1'},
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.1'});
 
-    // mark the view dirty
+    // Mark view dirty.
     await testeeViewPage.markDirty();
 
-    // perform self navigation by setting view params
+    // Navigate view with changed params.
     await routerPage.view.tab.click();
     await routerPage.navigate({component: 'testee'}, {
-      target: await testeeViewPage.view.getViewId(),
-      params: {param1: 'PARAM 1'},
+      target: 'view.1',
+      params: {id: '2'},
     });
 
-    // expect the view to still be dirty
+    // Expect dirty state not to be unset.
     await testeeViewPage.view.tab.click();
     await expect(testeeViewPage.view.tab.state('dirty')).toBeVisible();
   });
 
-  test('should make the view pristine when navigating to another view in the current view tab', async ({appPO, microfrontendNavigator}) => {
+  test('should unset dirty state when navigating view to different microfrontend', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     await microfrontendNavigator.registerCapability('app1', {
@@ -1145,25 +1200,25 @@ test.describe('Workbench Router', () => {
       },
     });
 
-    // navigate to the testee-1 view
+    // Open test view.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee-1'}, {
-      target: 'view.99',
+      target: 'view.1',
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.99'});
+    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.1'});
 
-    // mark the view dirty
+    // Mark view dirty.
     await testeeViewPage.markDirty();
     await expect(testeeViewPage.view.tab.state('dirty')).toBeVisible();
 
-    // navigate to another view in the testee view tab
+    // Navigate view to different microfrontend.
     await routerPage.view.tab.click();
     await routerPage.navigate({component: 'testee-2'}, {
-      target: 'view.99',
+      target: 'view.1',
     });
 
-    // expect the view to be pristine
+    // Expect dirty state to be unset.
     await testeeViewPage.view.tab.click();
     await expect(testeeViewPage.view.tab.state('dirty')).not.toBeVisible();
   });
