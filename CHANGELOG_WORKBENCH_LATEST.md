@@ -1,11 +1,13 @@
-# [20.0.0-beta.7](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/20.0.0-beta.6...20.0.0-beta.7) (2025-09-11)
+# [20.0.0-beta.8](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/20.0.0-beta.7...20.0.0-beta.8) (2025-09-17)
 
 
-### Features
+### Bug Fixes
 
-* **workbench:** support placeholders in non-localized manifest texts ([1fc40a8](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/1fc40a8c58d04deeebc7621e634f05204e5dc049)), closes [#255](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/255)
+* **workbench/view:** prevent stale view title after navigation ([11f3226](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/11f322602fb71da95bb245ba6c0fcad080d1be45))
+* **workbench:** prevent flickering of translated texts on re-layout ([e4fdc4b](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/e4fdc4b2ca1edcb230b44f4c31e13c641f8e97dc)), closes [#255](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/255)
 
 
 ### Dependencies
 
-* **workbench:** SCION Workbench requires `@scion/workbench-client` version `1.0.0-beta.32` or later.
+* **workbench:** SCION Workbench requires `@scion/workbench-client` version `1.0.0-beta.33` or later.
+
