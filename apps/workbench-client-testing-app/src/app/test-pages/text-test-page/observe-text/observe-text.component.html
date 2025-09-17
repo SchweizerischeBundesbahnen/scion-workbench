@@ -4,13 +4,13 @@
 <sci-form-field label="App" direction="column">
   <input [formControl]="formGroup.controls.app" [attr.list]="appList" class="e2e-app">
 </sci-form-field>
-<sci-form-field label="Timeout" direction="column">
-  <input [formControl]="formGroup.controls.timeout" type="number" class="e2e-timeout">
+<sci-form-field label="TTL" direction="column">
+  <input [formControl]="formGroup.controls.ttl" type="number" [attr.list]="undefinedList" class="e2e-ttl">
 </sci-form-field>
 
-@if (text$) {
+@if (subscription) {
   <button (click)="onCancel()" class="e2e-cancel">Cancel</button>
-  @if (text$ | async; as text) {
+  @if (text(); as text) {
     <output class="e2e-text">{{text}}</output>
   }
 } @else {
@@ -21,4 +21,8 @@
   <option value="workbench-host-app">workbench-host-app</option>
   <option value="workbench-client-testing-app1">workbench-client-testing-app1</option>
   <option value="workbench-client-testing-app2">workbench-client-testing-app2</option>
+</datalist>
+
+<datalist [attr.id]="undefinedList">
+  <option value="0">&lt;undefined&gt;</option>
 </datalist>

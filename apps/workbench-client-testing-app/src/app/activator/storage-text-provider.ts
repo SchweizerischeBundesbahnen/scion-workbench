@@ -14,6 +14,7 @@ import {MessageClient} from '@scion/microfrontend-platform';
 import {inject} from '@angular/core';
 import {APP_SYMBOLIC_NAME} from '../workbench-client/workbench-client.provider';
 import {SESSION_STORAGE} from '../session.storage';
+import {take} from 'rxjs/operators';
 
 /**
  * Provides texts from session storage.
@@ -28,7 +29,16 @@ export function provideTextFromStorage(): void {
   const textProviderFn: WorkbenchTextProviderFn = (key, params) => {
     const translatable = Object.entries(params).reduce((translatable, [name, value]) => `${translatable};${name}=${value}`, `%${key}`);
     console.debug(`[TextProvider][${appSymbolicName}] Requesting text: ${translatable}`);
-    return sessionStorage.observe$<string | undefined>(`textprovider.texts.${key}`).pipe(substituteParams(params));
+    if (params['options.complete']) {
+      return sessionStorage.observe$<string | undefined>(`textprovider.texts.${key}`, {emitIfAbsent: false})
+        .pipe(
+          substituteParams(params),
+          take(1),
+        );
+    }
+    else {
+      return sessionStorage.observe$<string | undefined>(`textprovider.texts.${key}`).pipe(substituteParams(params));
+    }
   };
 
   // Register text provider that reads texts from session storage.
@@ -59,7 +69,16 @@ export function provideValueFromStorage(): void {
 
   // Register message listener that replies with values from session storage.
   inject(MessageClient).onMessage(`textprovider/${appSymbolicName}/values/:id`, request => {
-    return sessionStorage.observe$<string | undefined>(`textprovider.values.${request.params!.get('id')}`);
+    const id = request.params!.get('id');
+    console.debug(`[TextProvider][${appSymbolicName}] Requesting value: ${id}`);
+    return sessionStorage.observe$(`textprovider.values.${id}`);
+  });
+
+  // Register message listener that replies with values from session storage, completing requests after responding.
+  inject(MessageClient).onMessage(`textprovider/${appSymbolicName}/values/:id/complete`, request => {
+    const id = request.params!.get('id');
+    console.debug(`[TextProvider][${appSymbolicName}] Requesting value: ${id}`);
+    return sessionStorage.observe$(`textprovider.values.${id}`, {emitIfAbsent: false}).pipe(take(1));
   });
 }
 

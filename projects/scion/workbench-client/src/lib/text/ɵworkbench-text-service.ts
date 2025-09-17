@@ -9,7 +9,7 @@
  */
 
 import {WorkbenchTextService} from './workbench-text-service';
-import {catchError, first, MonoTypeOperatorFunction, Observable, of, ReplaySubject, share, switchMap, timeout} from 'rxjs';
+import {animationFrameScheduler, catchError, concatWith, first, MonoTypeOperatorFunction, NEVER, Observable, of, ReplaySubject, share, switchMap, timeout, timer} from 'rxjs';
 import {APP_IDENTITY, Intent, IntentClient, ManifestService, mapToBody} from '@scion/microfrontend-platform';
 import {Beans, PreDestroy} from '@scion/toolkit/bean-manager';
 import {finalize} from 'rxjs/operators';
@@ -22,12 +22,12 @@ export class ɵWorkbenchTextService implements WorkbenchTextService, PreDestroy 
   private readonly _cache = new Map<Translatable, Observable<string | undefined>>();
 
   /** @inheritDoc */
-  public text$(translatable: Translatable | undefined, options: {provider: string; timeout?: number}): Observable<string | undefined> {
+  public text$(translatable: Translatable | undefined, options: {provider: string; ttl?: number}): Observable<string | undefined> {
     if (!translatable?.startsWith('%') || translatable === '%') {
       return of(translatable);
     }
 
-    const cacheKey = `${translatable}@${options.provider}`;
+    const cacheKey = `${translatable}@${options.provider};ttl=${options.ttl ?? 0}`;
     if (this._cache.has(cacheKey)) {
       return this._cache.get(cacheKey)!;
     }
@@ -43,16 +43,23 @@ export class ɵWorkbenchTextService implements WorkbenchTextService, PreDestroy 
 
     const text$ = Beans.get(IntentClient).request$<string | undefined>(translateIntent, undefined, {retain: true})
       .pipe(
+        // Ensure the observable to never complete independent of text provider request completion, providing consistent
+        // behavior to consumers and simplifying cache cleanup as finalize is only called when the last subscriber unsubscribes,
+        // after the specified TTL.
+        concatWith(NEVER),
         mapToBody(),
-        waitUntilRegisteredTextProvider(options.provider),
-        timeout({first: options.timeout ?? 30_000}),
+        waitUntilRegisteredTextProvider(options.provider, {timeout: 60_000}),
         catchError((error: unknown) => {
           // Prefix the key with an additional `%` character to escape the leading `%` character. See console formatting rules: https://developer.mozilla.org/en-US/docs/Web/API/console
           console.error(`[NullTextError][${Beans.get(APP_IDENTITY)}] Failed to get text '%${translatable}' from application '${options.provider}'. Caused by: `, error);
-          return of(key);
+          return of(`%${key}`);
         }),
+        // Remove cached text when an error occurs, or when the subscriber count drops to zero, after the specified TTL.
         finalize(() => this._cache.delete(cacheKey)),
-        share({connector: () => new ReplaySubject(1), resetOnRefCountZero: true, resetOnComplete: true, resetOnError: true}),
+        share({
+          connector: () => new ReplaySubject(1),
+          resetOnRefCountZero: () => timer(options.ttl ?? 0, animationFrameScheduler), // reset asynchronously to prevent flickering of translated texts on re-layout
+        }),
       );
     this._cache.set(cacheKey, text$);
 
@@ -65,15 +72,16 @@ export class ɵWorkbenchTextService implements WorkbenchTextService, PreDestroy 
 }
 
 /**
- * Waits until registered specified text provider.
+ * Waits until registered specified text provider, or errors when the specified timeout elapses, if any.
  */
-function waitUntilRegisteredTextProvider<T>(provider: string): MonoTypeOperatorFunction<T> {
+function waitUntilRegisteredTextProvider<T>(provider: string, options?: {timeout?: number}): MonoTypeOperatorFunction<T> {
   return catchError((error, caught) => {
     if (error instanceof Error && error.message.includes('NullProviderError')) {
       // Wait until registered the text provider.
       return Beans.get(ManifestService).lookupCapabilities$({type: WorkbenchCapabilities.TextProvider, qualifier: {provider: provider}})
         .pipe(
           first(capabilities => capabilities.length > 0),
+          timeout({first: options?.timeout}),
           switchMap(() => caught),
         );
     }

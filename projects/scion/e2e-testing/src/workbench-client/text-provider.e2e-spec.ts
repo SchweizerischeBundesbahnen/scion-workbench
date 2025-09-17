@@ -131,10 +131,42 @@ test.describe('Text Provider', () => {
       await testPage.text1.observe('%key', {app: 'workbench-client-testing-app2'});
 
       // Expect key to be returned.
-      await expect(testPage.text1.text).toHaveText('key');
+      await expect(testPage.text1.text).toHaveText('%key');
+      await expect.poll(() => testPage.text1.state()).toEqual('completed');
 
       // Expect error to be logged.
       await expect.poll(() => consoleLogs.get({severity: 'error', message: /NotQualifiedError/})).toHaveLength(1);
+    });
+
+    test('should not complete observable', async ({appPO, microfrontendNavigator, page}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register test view.
+      await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+        type: 'view',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-pages/text-test-page',
+        },
+      });
+
+      // Open test view.
+      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+      const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+
+      // Provide text.
+      await testPage.provideText('key', 'TEXT');
+
+      // Observe text (provider does not complete request).
+      await testPage.text1.observe('%key', {app: 'workbench-client-testing-app1'});
+      await expect(testPage.text1.text).toHaveText('TEXT');
+      await expect.poll(() => testPage.text1.state()).toBeUndefined();
+
+      // Observe text (provider completes request).
+      await testPage.text2.observe('%key;options.complete=true', {app: 'workbench-client-testing-app1'});
+      await expect(testPage.text2.text).toHaveText('TEXT');
+      await expect.poll(() => testPage.text2.state()).toBeUndefined();
     });
 
     test('should observe text from another app', async ({appPO, microfrontendNavigator}) => {
@@ -358,6 +390,107 @@ test.describe('Text Provider', () => {
       consoleLogs.clear();
     });
 
+    test('should cache texts if provider completes request', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register test view for app 1.
+      await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+        type: 'view',
+        qualifier: {component: 'testee', app: 'app1'},
+        properties: {
+          path: 'test-pages/text-test-page',
+        },
+      });
+
+      // Register test view for app 2.
+      await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app2', {
+        type: 'view',
+        qualifier: {component: 'testee', app: 'app2'},
+        private: false,
+        properties: {
+          path: 'test-pages/text-test-page',
+        },
+      });
+
+      // Register intention to open test view from app 1.
+      await microfrontendNavigator.registerIntention('app1', {
+        type: 'view',
+        qualifier: {component: 'testee', app: 'app2'},
+      });
+
+      // Create perspective with test view.
+      await microfrontendNavigator.createPerspective('app1', {
+        type: 'perspective',
+        qualifier: {perspective: 'testee'},
+        properties: {
+          layout: [
+            {
+              id: 'part.left',
+              views: [
+                {qualifier: {component: 'testee', app: 'app1'}, cssClass: 'testee-app1'},
+              ],
+            },
+            {
+              id: 'part.right',
+              align: 'right',
+              views: [
+                {qualifier: {component: 'testee', app: 'app2'}, cssClass: 'testee-app2'},
+              ],
+            },
+          ],
+        },
+      });
+
+      // Provide text.
+      const textProviderApp1Page = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee-app1'});
+      await textProviderApp1Page.provideText('key', 'TEXT (app1)');
+
+      const textProviderApp2Page = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee-app2'});
+      await textProviderApp2Page.provideText('key', 'TEXT (app2)');
+
+      // Observe text.
+      await textProviderApp1Page.text1.observe('%key;options.complete=true', {app: 'workbench-client-testing-app1'});
+      await expect(textProviderApp1Page.text1.text).toHaveText('TEXT (app1)');
+
+      // Expect request to the text provider.
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([
+        '[TextProvider][workbench-client-testing-app1] Requesting text: %key;options.complete=true',
+      ]);
+      consoleLogs.clear();
+
+      // Observe text again.
+      await textProviderApp1Page.text2.observe('%key;options.complete=true', {app: 'workbench-client-testing-app1'});
+      await expect(textProviderApp1Page.text2.text).toHaveText('TEXT (app1)');
+
+      // Expect no request to the text provider.
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([]);
+      consoleLogs.clear();
+
+      // Register intention to get texts from app 2.
+      await microfrontendNavigator.registerIntention('app1', {
+        type: 'text-provider',
+        qualifier: {provider: 'workbench-client-testing-app2'},
+      });
+
+      // Observe text of other app.
+      await textProviderApp1Page.text3.observe('%key;options.complete=true', {app: 'workbench-client-testing-app2'});
+      await expect(textProviderApp1Page.text3.text).toHaveText('TEXT (app2)');
+
+      // Expect request to the text provider of app 2.
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([
+        '[TextProvider][workbench-client-testing-app2] Requesting text: %key;options.complete=true',
+      ]);
+      consoleLogs.clear();
+
+      // Observe text again.
+      await textProviderApp1Page.text4.observe('%key;options.complete=true', {app: 'workbench-client-testing-app2'});
+      await expect(textProviderApp1Page.text4.text).toHaveText('TEXT (app2)');
+
+      // Expect no request to the text provider.
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([]);
+      consoleLogs.clear();
+    });
+
     test('should cache texts (text with params)', async ({appPO, microfrontendNavigator, consoleLogs}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
@@ -406,7 +539,7 @@ test.describe('Text Provider', () => {
       ]);
     });
 
-    test('should stop observing text when canceling last subscription', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+    test('should stop observing text when unsubscribing from last subscription', async ({appPO, microfrontendNavigator, consoleLogs}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // Register test view.
@@ -476,7 +609,7 @@ test.describe('Text Provider', () => {
       ]);
     });
 
-    test('should time out if text is not provided', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+    test('should share subscription by TTL', async ({appPO, microfrontendNavigator, consoleLogs, page}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // Register test view.
@@ -493,14 +626,98 @@ test.describe('Text Provider', () => {
       await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
       const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
 
-      // Observe text.
-      await testPage.text1.observe('%key', {app: 'workbench-client-testing-app1', timeout: 1000});
-      await expect(testPage.text1.text).toHaveText('key');
+      // Provide text.
+      await testPage.provideText('key', 'TEXT');
 
-      // Expect error to be logged.
-      await expect.poll(() => consoleLogs.get({severity: 'error', message: /NullTextError/})).toEqual([
-        expect.stringContaining('[NullTextError][workbench-client-testing-app1] Failed to get text \'%%key\' from application \'workbench-client-testing-app1\''),
-      ]);
+      // Observe text with no TTL
+      await test.step('Observe text with no TTL', async () => {
+        await testPage.text1.observe('%key', {app: 'workbench-client-testing-app1'});
+        await expect(testPage.text1.text).toHaveText('TEXT');
+
+        // Expect request to the text provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([
+          '[TextProvider][workbench-client-testing-app1] Requesting text: %key',
+        ]);
+        consoleLogs.clear();
+      });
+
+      // Observe text with TTL 2000.
+      await test.step('Observe text with TTL 2000', async () => {
+        await testPage.text2.observe('%key', {app: 'workbench-client-testing-app1', ttl: 2000});
+        await expect(testPage.text2.text).toHaveText('TEXT');
+
+        // Expect request to the text provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([
+          '[TextProvider][workbench-client-testing-app1] Requesting text: %key',
+        ]);
+        consoleLogs.clear();
+      });
+
+      // Observe text with TTL 2000.
+      await test.step('Observe text with TTL 2000', async () => {
+        await testPage.text3.observe('%key', {app: 'workbench-client-testing-app1', ttl: 2000});
+        await expect(testPage.text3.text).toHaveText('TEXT');
+
+        // Expect no request to the text provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([]);
+      });
+
+      // Unsubscribe.
+      await testPage.text1.cancel();
+      await testPage.text2.cancel();
+      await testPage.text3.cancel();
+
+      // Observe text with TTL 2000.
+      await test.step('Observe text with TTL 2000', async () => {
+        await testPage.text1.observe('%key', {app: 'workbench-client-testing-app1', ttl: 2000});
+        await expect(testPage.text1.text).toHaveText('TEXT');
+
+        // Expect no request to the text provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([]);
+        await testPage.text1.cancel();
+      });
+
+      // Observe text with no TTL
+      await test.step('Observe text with no TTL', async () => {
+        await testPage.text2.observe('%key', {app: 'workbench-client-testing-app1'});
+        await expect(testPage.text2.text).toHaveText('TEXT');
+
+        // Expect request to the text provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([
+          '[TextProvider][workbench-client-testing-app1] Requesting text: %key',
+        ]);
+        consoleLogs.clear();
+        await testPage.text2.cancel();
+      });
+
+      // Observe text with TTL 1000.
+      await test.step('Observe text with TTL 1000', async () => {
+        await testPage.text3.observe('%key', {app: 'workbench-client-testing-app1', ttl: 1000});
+        await expect(testPage.text3.text).toHaveText('TEXT');
+
+        // Expect request to the text provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([
+          '[TextProvider][workbench-client-testing-app1] Requesting text: %key',
+        ]);
+        consoleLogs.clear();
+        await testPage.text3.cancel();
+      });
+
+      // Wait 2000s.
+      await page.waitForTimeout(2000);
+
+      // Observe text with TTL 2000.
+      await test.step('Observe text with TTL 2000', async () => {
+        await testPage.text4.observe('%key', {app: 'workbench-client-testing-app1', ttl: 2000});
+        await expect(testPage.text4.text).toHaveText('TEXT');
+
+        // Expect request to the text provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([
+          '[TextProvider][workbench-client-testing-app1] Requesting text: %key',
+        ]);
+        consoleLogs.clear();
+        await testPage.text4.cancel();
+      });
     });
 
     test('should parse key with multiple params', async ({appPO, microfrontendNavigator}) => {
