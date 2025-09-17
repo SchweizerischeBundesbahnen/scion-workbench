@@ -110,7 +110,10 @@ export class MicrofrontendViewComponent {
     this._route.params
       .pipe(
         switchMap(params => this.fetchCapability$(params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID] as string).pipe(map(capability => ({capability, params})))),
-        executeOnCapabilityChange(context => this.onCapabilityChange(context)),
+        executeOn({
+          onEach: context => this.setViewTitleAndHeading(context),
+          onCapabilityChange: context => this.onCapabilityChange(context),
+        }),
         filterNullCapability(),
         delayIfLazy(),
         serializeExecution(context => this.onNavigate(context)),
@@ -246,12 +249,23 @@ export class MicrofrontendViewComponent {
   }
 
   /**
+   * Sets view title and heading as defined on the capability.
+   */
+  private setViewTitleAndHeading(context: NavigationContext<WorkbenchViewCapability | null>): void {
+    const {capability, params} = context;
+    if (capability?.properties.title) {
+      this.view.title = createRemoteTranslatable(capability.properties.title, {appSymbolicName: capability.metadata!.appSymbolicName, valueParams: params, topicParams: capability.properties.resolve})!;
+    }
+    if (capability?.properties.heading) {
+      this.view.heading = createRemoteTranslatable(capability.properties.heading, {appSymbolicName: capability.metadata!.appSymbolicName, valueParams: params, topicParams: capability.properties.resolve})!;
+    }
+  }
+
+  /**
    * Updates the properties of this view, such as the view title, as defined by the capability.
    */
   private setViewProperties(context: NavigationContext<WorkbenchViewCapability | null>): void {
-    const {capability, params} = context;
-    this.view.title = (capability && createRemoteTranslatable(capability.properties.title, {appSymbolicName: capability.metadata!.appSymbolicName, valueParams: params, topicParams: capability.properties.resolve})) ?? null;
-    this.view.heading = (capability && createRemoteTranslatable(capability.properties.heading, {appSymbolicName: capability.metadata!.appSymbolicName, valueParams: params, topicParams: capability.properties.resolve})) ?? null;
+    const {capability} = context;
     this.view.classList.application = capability?.properties.cssClass;
     this.view.closable = capability?.properties.closable ?? true;
     this.view.dirty = false;
@@ -388,14 +402,19 @@ function configureMicrofrontendGlassPane(): Provider[] {
 }
 
 /**
- * Executes passed function each time when the source emits a different capability.
+ * Executes passed functions based on the current state.
  */
-function executeOnCapabilityChange(onCapabilityChange: (context: NavigationContext<WorkbenchViewCapability | null>) => void): OperatorFunction<{capability: WorkbenchViewCapability | null; params: Params}, NavigationContext<WorkbenchViewCapability | null>> {
+function executeOn(executeOn: ExecuteOn): OperatorFunction<{capability: WorkbenchViewCapability | null; params: Params}, NavigationContext<WorkbenchViewCapability | null>> {
+  const {onEach, onCapabilityChange} = executeOn;
   let prevCapability: WorkbenchViewCapability | null = null;
   return map(({capability, params}) => {
     const context = {capability, prevCapability, params};
+
+    onEach?.(context);
+
+    // Test if the capability has changed.
     if (prevCapability?.metadata!.id !== capability?.metadata!.id) {
-      onCapabilityChange(context);
+      onCapabilityChange?.(context);
       prevCapability = capability;
     }
     return context;
@@ -428,8 +447,25 @@ function delayIfLazy(): MonoTypeOperatorFunction<NavigationContext> {
   });
 }
 
+/**
+ * Context available during a navigation.
+ */
 interface NavigationContext<T extends WorkbenchViewCapability | null = WorkbenchViewCapability> {
   capability: T;
   prevCapability: WorkbenchViewCapability | null;
   params: Params;
+}
+
+/**
+ * Defines callbacks executed based on the current state.
+ */
+interface ExecuteOn {
+  /**
+   * Method invoked each time when the source emits.
+   */
+  onEach?: (context: NavigationContext<WorkbenchViewCapability | null>) => void;
+  /**
+   * Method invoked on capability change.
+   */
+  onCapabilityChange?: (context: NavigationContext<WorkbenchViewCapability | null>) => void;
 }
