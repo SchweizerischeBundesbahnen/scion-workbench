@@ -815,10 +815,10 @@ test.describe('Text Provider', () => {
         // Provide `undefined` as text.
         await test.step('Provide `undefined`', async () => {
           await testPage.provideText('view_title', '<undefined>');
-          await expect(testPage.view.tab.title).toHaveText('view_title');
+          await expect(testPage.view.tab.title).toHaveText('%view_title');
 
           await testPage.provideText('view_heading', '<undefined>');
-          await expect(testPage.view.tab.heading).toHaveText('view_heading');
+          await expect(testPage.view.tab.heading).toHaveText('%view_heading');
         });
       });
 
@@ -980,11 +980,121 @@ test.describe('Text Provider', () => {
         // Provide `undefined` as text.
         await test.step('Provide `undefined`', async () => {
           await testPage.provideText('view_title', '<undefined>');
-          await expect(testPage.view.tab.title).toHaveText('view_title');
+          await expect(testPage.view.tab.title).toHaveText('%view_title');
 
           await testPage.provideText('view_heading', '<undefined>');
-          await expect(testPage.view.tab.heading).toHaveText('view_heading');
+          await expect(testPage.view.tab.heading).toHaveText('%view_heading');
         });
+      });
+
+      test('should cache texts on re-layout', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+        await appPO.navigateTo({microfrontendSupport: true, mainAreaInitialPartId: 'part.initial', logLevel: 'debug'});
+
+        // Register test view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'testee'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-pages/text-test-page',
+            title: '%view_title;id=:id;name=:name',
+            heading: '%view_heading;id=:id;name=:name',
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+          },
+        });
+
+        // Open test view.
+        const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+        await routerPage.navigate({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
+        const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+
+        // Provide text and value.
+        await testPage.provideText('view_title', 'Title - {{id}} - {{name}}');
+        await testPage.provideText('view_heading', 'Heading - {{id}} - {{name}}');
+        await testPage.provideValue('123', 'RESOLVED');
+
+        await expect(testPage.view.tab.title).toHaveText('Title - 123 - RESOLVED');
+        await expect(testPage.view.tab.heading).toHaveText('Heading - 123 - RESOLVED');
+
+        // Expect request to the text and value provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqualIgnoreOrder([
+          '[TextProvider][workbench-client-testing-app1] Requesting value: 123', // Title
+          '[TextProvider][workbench-client-testing-app1] Requesting value: 123', // Heading
+          '[TextProvider][workbench-client-testing-app1] Requesting text: %view_title;id=123;name=RESOLVED', // Title
+          '[TextProvider][workbench-client-testing-app1] Requesting text: %view_heading;id=123;name=RESOLVED', // Heading
+        ]);
+        consoleLogs.clear();
+
+        // Change layout by moving router view to the left.
+        const dragHandle = await routerPage.view.tab.startDrag();
+        await dragHandle.dragToPart('part.initial', {region: 'west'});
+        await dragHandle.drop();
+
+        await expect(testPage.view.tab.title).toHaveText('Title - 123 - RESOLVED');
+        await expect(testPage.view.tab.heading).toHaveText('Heading - 123 - RESOLVED');
+
+        // Expect no request to the value provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([]);
+        consoleLogs.clear();
+      });
+
+      test('should cache texts on re-layout if provider completes request', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+        await appPO.navigateTo({microfrontendSupport: true, mainAreaInitialPartId: 'part.initial', logLevel: 'debug'});
+
+        // Register test view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'testee'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-pages/text-test-page',
+            title: '%view_title;id=:id;name=:name;options.complete=true', // instruct provider to complete
+            heading: '%view_heading;id=:id;name=:name;options.complete=true', // instruct provider to complete
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id/complete', // instruct provider to complete
+            },
+          },
+        });
+
+        // Open test view.
+        const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+        await routerPage.navigate({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
+        const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+
+        // Provide text and value.
+        await testPage.provideText('view_title', 'Title - {{id}} - {{name}}');
+        await testPage.provideText('view_heading', 'Heading - {{id}} - {{name}}');
+        await testPage.provideValue('123', 'RESOLVED');
+
+        await expect(testPage.view.tab.title).toHaveText('Title - 123 - RESOLVED');
+        await expect(testPage.view.tab.heading).toHaveText('Heading - 123 - RESOLVED');
+
+        // Expect request to the text and value provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqualIgnoreOrder([
+          '[TextProvider][workbench-client-testing-app1] Requesting value: 123', // Title
+          '[TextProvider][workbench-client-testing-app1] Requesting value: 123', // Heading
+          '[TextProvider][workbench-client-testing-app1] Requesting text: %view_title;id=123;name=RESOLVED;options.complete=true', // Title
+          '[TextProvider][workbench-client-testing-app1] Requesting text: %view_heading;id=123;name=RESOLVED;options.complete=true', // Heading
+        ]);
+        consoleLogs.clear();
+
+        // Change layout by moving router view to the left.
+        const dragHandle = await routerPage.view.tab.startDrag();
+        await dragHandle.dragToPart('part.initial', {region: 'west'});
+        await dragHandle.drop();
+
+        await expect(testPage.view.tab.title).toHaveText('Title - 123 - RESOLVED');
+        await expect(testPage.view.tab.heading).toHaveText('Heading - 123 - RESOLVED');
+
+        // Expect no request to the value provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([]);
+        consoleLogs.clear();
       });
     });
 
@@ -1123,6 +1233,108 @@ test.describe('Text Provider', () => {
         await expect(testPage.view.tab.title).toHaveText('View;Title - 123;456 - A;B');
         await expect(testPage.view.tab.heading).toHaveText('View;Heading - 123;456 - A;B');
       });
+
+      test('should cache texts on re-layout', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+        await appPO.navigateTo({microfrontendSupport: true, mainAreaInitialPartId: 'part.initial', logLevel: 'debug'});
+
+        // Register test view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'testee'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-pages/text-test-page',
+            title: 'Title - :id - :name',
+            heading: 'Heading - :id - :name',
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+          },
+        });
+
+        // Open test view.
+        const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+        await routerPage.navigate({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
+        const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+
+        // Provide value.
+        await testPage.provideValue('123', 'RESOLVED');
+
+        await expect(testPage.view.tab.title).toHaveText('Title - 123 - RESOLVED');
+        await expect(testPage.view.tab.heading).toHaveText('Heading - 123 - RESOLVED');
+
+        // Expect request to the value provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([
+          '[TextProvider][workbench-client-testing-app1] Requesting value: 123', // Title
+          '[TextProvider][workbench-client-testing-app1] Requesting value: 123', // Heading
+        ]);
+        consoleLogs.clear();
+
+        // Change layout by moving router view to the left.
+        const dragHandle = await routerPage.view.tab.startDrag();
+        await dragHandle.dragToPart('part.initial', {region: 'west'});
+        await dragHandle.drop();
+
+        await expect(testPage.view.tab.title).toHaveText('Title - 123 - RESOLVED');
+        await expect(testPage.view.tab.heading).toHaveText('Heading - 123 - RESOLVED');
+
+        // Expect no request to the value provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([]);
+        consoleLogs.clear();
+      });
+
+      test('should cache texts on re-layout if provider completes request', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+        await appPO.navigateTo({microfrontendSupport: true, mainAreaInitialPartId: 'part.initial', logLevel: 'debug'});
+
+        // Register test view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'testee'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-pages/text-test-page',
+            title: 'Title - :id - :name',
+            heading: 'Heading - :id - :name',
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id/complete', // instruct provider to complete
+            },
+          },
+        });
+
+        // Open test view.
+        const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+        await routerPage.navigate({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
+        const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+
+        // Provide value.
+        await testPage.provideValue('123', 'RESOLVED');
+
+        await expect(testPage.view.tab.title).toHaveText('Title - 123 - RESOLVED');
+        await expect(testPage.view.tab.heading).toHaveText('Heading - 123 - RESOLVED');
+
+        // Expect request to the value provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([
+          '[TextProvider][workbench-client-testing-app1] Requesting value: 123', // Title
+          '[TextProvider][workbench-client-testing-app1] Requesting value: 123', // Heading
+        ]);
+        consoleLogs.clear();
+
+        // Change layout by moving router view to the left.
+        const dragHandle = await routerPage.view.tab.startDrag();
+        await dragHandle.dragToPart('part.initial', {region: 'west'});
+        await dragHandle.drop();
+
+        await expect(testPage.view.tab.title).toHaveText('Title - 123 - RESOLVED');
+        await expect(testPage.view.tab.heading).toHaveText('Heading - 123 - RESOLVED');
+
+        // Expect no request to the value provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([]);
+        consoleLogs.clear();
+      });
     });
   });
 
@@ -1167,7 +1379,7 @@ test.describe('Text Provider', () => {
         // Provide `undefined` as text.
         await test.step('Provide `undefined`', async () => {
           await testPage.provideText('dialog_title', '<undefined>');
-          await expect(testPage.dialog.title).toHaveText('dialog_title');
+          await expect(testPage.dialog.title).toHaveText('%dialog_title');
         });
       });
 
@@ -1318,7 +1530,7 @@ test.describe('Text Provider', () => {
         // Provide `undefined` as text.
         await test.step('Provide `undefined`', async () => {
           await testPage.provideText('dialog_title', '<undefined>');
-          await expect(testPage.dialog.title).toHaveText('dialog_title');
+          await expect(testPage.dialog.title).toHaveText('%dialog_title');
         });
       });
     });
@@ -1491,7 +1703,7 @@ test.describe('Text Provider', () => {
         // Provide `undefined` as text.
         await test.step('Provide `undefined`', async () => {
           await testPage.provideText('dialog_title', '<undefined>');
-          await expect(testPage.dialog.title).toHaveText('dialog_title');
+          await expect(testPage.dialog.title).toHaveText('%dialog_title');
         });
       });
 
@@ -1601,7 +1813,7 @@ test.describe('Text Provider', () => {
         // Provide `undefined` as text.
         await test.step('Provide `undefined`', async () => {
           await testPage.provideText('dialog_title', '<undefined>');
-          await expect(testPage.dialog.title).toHaveText('dialog_title');
+          await expect(testPage.dialog.title).toHaveText('%dialog_title');
         });
       });
     });
@@ -1803,8 +2015,8 @@ test.describe('Text Provider', () => {
         await textPageApp1.provideText('message.title', '<undefined>');
         await textPageApp1.provideText('yes.action', '<undefined>');
         await textPageApp1.provideText('no.action', '<undefined>');
-        await expect(messageBox.title).toHaveText('message.title');
-        await expect.poll(() => messageBox.getActions()).toEqual({yes: 'yes.action', no: 'no.action'});
+        await expect(messageBox.title).toHaveText('%message.title');
+        await expect.poll(() => messageBox.getActions()).toEqual({yes: '%yes.action', no: '%no.action'});
       });
     });
   });
@@ -1895,8 +2107,8 @@ test.describe('Text Provider', () => {
         await textPageApp1.provideText('message.title', '<undefined>');
         await textPageApp1.provideText('yes.action', '<undefined>');
         await textPageApp1.provideText('no.action', '<undefined>');
-        await expect(messageBox.title).toHaveText('message.title');
-        await expect.poll(() => messageBox.getActions()).toEqual({yes: 'yes.action', no: 'no.action'});
+        await expect(messageBox.title).toHaveText('%message.title');
+        await expect.poll(() => messageBox.getActions()).toEqual({yes: '%yes.action', no: '%no.action'});
       });
     });
   });
@@ -1995,9 +2207,9 @@ test.describe('Text Provider', () => {
         await textPageApp1.provideText('message.title', '<undefined>');
         await textPageApp1.provideText('yes.action', '<undefined>');
         await textPageApp1.provideText('no.action', '<undefined>');
-        await expect(messageBox.title).toHaveText('message.title');
-        await expect(textMessageBoxPage.text).toHaveText('message.message');
-        await expect.poll(() => messageBox.getActions()).toEqual({yes: 'yes.action', no: 'no.action'});
+        await expect(messageBox.title).toHaveText('%message.title');
+        await expect(textMessageBoxPage.text).toHaveText('%message.message');
+        await expect.poll(() => messageBox.getActions()).toEqual({yes: '%yes.action', no: '%no.action'});
       });
     });
   });
@@ -2093,8 +2305,8 @@ test.describe('Text Provider', () => {
       await test.step('Provide `undefined`', async () => {
         await textPageApp1.provideText('notification.title', '<undefined>');
         await textPageApp1.provideText('notification.message', '<undefined>');
-        await expect(notification.title).toHaveText('notification.title');
-        await expect(textNotificationPage.text).toHaveText('notification.message');
+        await expect(notification.title).toHaveText('%notification.title');
+        await expect(textNotificationPage.text).toHaveText('%notification.message');
       });
     });
   });

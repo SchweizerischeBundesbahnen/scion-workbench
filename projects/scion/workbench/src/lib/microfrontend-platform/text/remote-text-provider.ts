@@ -11,11 +11,12 @@
 import {Translatable, WORKBENCH_TEXT_PROVIDER, WorkbenchTextProviderFn} from '../../text/workbench-text-provider.model';
 import {EnvironmentProviders, makeEnvironmentProviders, Signal} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {combineLatest, map, Observable, of, switchMap} from 'rxjs';
+import {animationFrameScheduler, combineLatest, concatWith, map, NEVER, Observable, of, ReplaySubject, share, switchMap, timer} from 'rxjs';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {mapToBody, MessageClient} from '@scion/microfrontend-platform';
 import {WorkbenchTextService} from '@scion/workbench-client';
 import {Dictionaries} from '@scion/toolkit/util';
+import {finalize} from 'rxjs/operators';
 
 /**
  * Registers a text provider for the SCION Workbench to get texts from micro apps.
@@ -27,6 +28,7 @@ import {Dictionaries} from '@scion/toolkit/util';
 export function provideRemoteTextProvider(): EnvironmentProviders {
   const REMOTE_TRANSLATION_KEY = /^workbench\.external\.scion-workbench-client\.(?<provider>[^\\.]+)\.%(?<key>.+)$/;
   const REMOTE_TEXT = /^workbench\.external\.scion-workbench-client\.(?<provider>[^\\.]+)\.(?<text>[^%].+)$/;
+  const cache = new Map<string, Observable<string>>();
 
   return makeEnvironmentProviders([
     {
@@ -54,13 +56,30 @@ export function provideRemoteTextProvider(): EnvironmentProviders {
     // Parse key and provider from the remote translation key.
     const {key, provider} = match.groups as {key: string; provider: string};
 
+    // Return cached text if cached.
+    const cacheKey = createCacheKey(translationKey, params, provider);
+    if (cache.has(cacheKey)) {
+      return toSignal(cache.get(cacheKey)!, {initialValue: ''});
+    }
+
     // Request the text by intent. Parameters starting with the topic protocol 'topic://' are resolved via messaging.
     const text$ = observeParams$(params, {provider})
       .pipe(
+        // Ensure the observable to never complete independent of text provider request completion, simplifying cache cleanup as
+        // finalize is only called when the last subscriber unsubscribes, after the specified TTL.
+        concatWith(NEVER),
         map(params => params.reduce((translatable, [param, value]) => `${translatable};${param}=${encodeSemicolons(value)}`, `%${key}`)),
         switchMap(translatable => Beans.get(WorkbenchTextService).text$(translatable, {provider})),
-        map(text => text ?? key),
+        map(text => text ?? `%${key}`),
+        // Remove cached text when an error occurs, or when the subscriber count drops to zero, after the specified TTL.
+        finalize(() => cache.delete(cacheKey)),
+        share({
+          connector: () => new ReplaySubject(1),
+          resetOnRefCountZero: () => timer(0, animationFrameScheduler), // reset asynchronously to prevent flickering of translated texts on re-layout
+        }),
       );
+    cache.set(cacheKey, text$);
+
     return toSignal(text$, {initialValue: ''});
   }
 
@@ -77,9 +96,27 @@ export function provideRemoteTextProvider(): EnvironmentProviders {
     // Parse text and provider from the remote text.
     const {text, provider} = match.groups as {text: string; provider: string};
 
+    // Return cached text if cached.
+    const cacheKey = createCacheKey(translationKey, params, provider);
+    if (cache.has(cacheKey)) {
+      return toSignal(cache.get(cacheKey)!, {initialValue: ''});
+    }
+
     // Substitute params. Parameters starting with the topic protocol 'topic://' are resolved via messaging.
     const text$ = observeParams$(params, {provider})
-      .pipe(map(params => params.reduce((text, [param, value]) => text.replaceAll(`:${param}`, value), decodeSemicolons(text))));
+      .pipe(
+        // Never complete the observable, simplifying cache cleanup as `finalize` is only called when the last subscriber unsubscribes, after the specified TTL.
+        concatWith(NEVER),
+        map(params => params.reduce((text, [param, value]) => text.replaceAll(`:${param}`, value), decodeSemicolons(text))),
+        // Remove cached text when an error occurs, or when the subscriber count drops to zero, after the specified TTL.
+        finalize(() => cache.delete(cacheKey)),
+        share({
+          connector: () => new ReplaySubject(1),
+          resetOnRefCountZero: () => timer(0, animationFrameScheduler), // reset asynchronously to prevent flickering of translated texts on re-layout
+        }),
+      );
+    cache.set(cacheKey, text$);
+
     return toSignal(text$, {initialValue: ''});
   }
 
@@ -105,6 +142,14 @@ export function provideRemoteTextProvider(): EnvironmentProviders {
     });
 
     return observableParams.length ? combineLatest(observableParams) : of([]);
+  }
+
+  /**
+   * Creates the cache key for specified translatable.
+   */
+  function createCacheKey(key: string, params: {[name: string]: string}, provider: string): string {
+    const translatable = Object.entries(params).reduce((translatable, [param, value]) => `${translatable};${param}=${value}`, `%${key}`);
+    return `${translatable}@${provider}`;
   }
 }
 
