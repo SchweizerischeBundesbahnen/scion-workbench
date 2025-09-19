@@ -48,6 +48,7 @@ import {providePerspectiveInstallerV2} from './microfrontend-perspective/microfr
 import {provideMicrofrontendPartRoute} from './microfrontend-part/microfrontend-part-routes';
 import {MicrofrontendPartCapabilityValidator} from './microfrontend-part/microfrontend-part-capability-validator.interceptor';
 import {MicrofrontendPerspectiveCapabilityValidatorV2} from './microfrontend-perspective/microfrontend-perspective-capability-validator-v2.interceptor';
+import {MicrofrontendPartTransferOwnershipInterceptor, MicrofrontendPerspectiveCapabilityMigrator} from './microfrontend-perspective/microfrontend-perspective-capability-migrator.interceptor';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -70,6 +71,8 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     MicrofrontendPopupIntentHandler,
     MicrofrontendDialogIntentHandler,
     MicrofrontendMessageBoxIntentHandler,
+    MicrofrontendPerspectiveCapabilityMigrator,
+    MicrofrontendPartTransferOwnershipInterceptor,
     MicrofrontendPerspectiveCapabilityValidator,
     MicrofrontendPerspectiveCapabilityValidatorV2,
     MicrofrontendPartCapabilityValidator,

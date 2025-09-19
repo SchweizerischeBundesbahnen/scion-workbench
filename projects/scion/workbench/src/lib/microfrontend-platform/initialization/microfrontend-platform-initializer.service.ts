@@ -20,7 +20,7 @@ import {MicrofrontendViewIntentHandler} from '../microfrontend-view/microfronten
 import {WorkbenchHostManifestInterceptor} from './workbench-host-manifest-interceptor.service';
 import {MicrofrontendPopupIntentHandler} from '../microfrontend-popup/microfrontend-popup-intent-handler.interceptor';
 import {MicrofrontendPopupCapabilityValidator} from '../microfrontend-popup/microfrontend-popup-capability-validator.interceptor';
-import {WorkbenchTextService, WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter, ɵWorkbenchTextService, ɵWorkbenchDialogService, ɵWorkbenchMessageBoxService} from '@scion/workbench-client';
+import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter, WorkbenchTextService, ɵWorkbenchDialogService, ɵWorkbenchMessageBoxService, ɵWorkbenchTextService} from '@scion/workbench-client';
 import {MicrofrontendMessageBoxIntentHandler} from '../microfrontend-message-box/microfrontend-message-box-intent-handler.interceptor';
 import {MicrofrontendDialogIntentHandler} from '../microfrontend-dialog/microfrontend-dialog-intent-handler.interceptor';
 import {MicrofrontendDialogCapabilityValidator} from '../microfrontend-dialog/microfrontend-dialog-capability-validator.interceptor';
@@ -32,6 +32,7 @@ import {MicrofrontendPerspectiveIntentHandler} from '../microfrontend-perspectiv
 import {ViewCapabilityPreloadCapabilityInterceptor} from './view-capability-preload-capability-interceptor.service';
 import {MicrofrontendPartCapabilityValidator} from '../microfrontend-part/microfrontend-part-capability-validator.interceptor';
 import {MicrofrontendPerspectiveCapabilityValidatorV2} from '../microfrontend-perspective/microfrontend-perspective-capability-validator-v2.interceptor';
+import {MicrofrontendPartTransferOwnershipInterceptor, MicrofrontendPerspectiveCapabilityMigrator} from '../microfrontend-perspective/microfrontend-perspective-capability-migrator.interceptor';
 
 /**
  * Initializes and starts the SCION Microfrontend Platform in host mode.
@@ -51,6 +52,8 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
   private readonly _partCapabilityValidator = inject(MicrofrontendPartCapabilityValidator);
   private readonly _perspectiveCapabilityValidator = inject(MicrofrontendPerspectiveCapabilityValidator);
   private readonly _perspectiveCapabilityValidatorV2 = inject(MicrofrontendPerspectiveCapabilityValidatorV2);
+  private readonly _perspectiveCapabilityMigrator = inject(MicrofrontendPerspectiveCapabilityMigrator);
+  private readonly _partTransferOwnershipInterceptor = inject(MicrofrontendPartTransferOwnershipInterceptor);
   private readonly _popupCapabilityValidator = inject(MicrofrontendPopupCapabilityValidator);
   private readonly _dialogCapabilityValidator = inject(MicrofrontendDialogCapabilityValidator);
   private readonly _messageBoxCapabilityValidator = inject(MicrofrontendMessageBoxCapabilityValidator);
@@ -108,6 +111,12 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
 
     // Register perspective capability interceptor to assert required perspective capability properties.
     Beans.register(CapabilityInterceptor, {useValue: this._perspectiveCapabilityValidator, multi: true});
+
+    // Register perspective capability migrator to migrate to the new perspective capability model.
+    Beans.register(CapabilityInterceptor, {useValue: this._perspectiveCapabilityMigrator, multi: true});
+
+    // Register interceptor to transfer ownership of parts of migrated perspectives.
+    Beans.register(CapabilityInterceptor, {useValue: this._partTransferOwnershipInterceptor, multi: true});
 
     // Register perspective capability interceptor to assert required perspective capability properties.
     Beans.register(CapabilityInterceptor, {useValue: this._perspectiveCapabilityValidatorV2, multi: true});
