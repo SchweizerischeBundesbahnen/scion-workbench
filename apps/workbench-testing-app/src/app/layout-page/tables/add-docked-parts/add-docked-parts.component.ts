@@ -17,6 +17,7 @@ import {MultiValueInputComponent} from '../../../multi-value-input/multi-value-i
 import {ActivityId, Translatable} from '@scion/workbench';
 import {parseTypedString} from '../../../common/parse-typed-value.util';
 import {UUID} from '@scion/toolkit/uuid';
+import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 
 @Component({
   selector: 'app-add-docked-parts',
@@ -26,6 +27,7 @@ import {UUID} from '@scion/toolkit/uuid';
     ReactiveFormsModule,
     SciMaterialIconDirective,
     MultiValueInputComponent,
+    SciCheckboxComponent,
   ],
   providers: [
     {provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => AddDockedPartsComponent)},
@@ -53,6 +55,7 @@ export class AddDockedPartsComponent implements ControlValueAccessor, Validator 
         tooltip: FormControl<Translatable | undefined>;
         title: FormControl<Translatable | undefined>;
         cssClass: FormControl<string | string[] | undefined>;
+        activate: FormControl<boolean | undefined>;
         activityId: FormControl<ActivityId | undefined>;
       }>;
     }>>([]),
@@ -73,6 +76,7 @@ export class AddDockedPartsComponent implements ControlValueAccessor, Validator 
             tooltip: dockedPartFormGroup.controls.extras.controls.tooltip.value,
             title: parseTypedString(dockedPartFormGroup.controls.extras.controls.title.value)!,
             cssClass: dockedPartFormGroup.controls.extras.controls.cssClass.value,
+            activate: dockedPartFormGroup.controls.extras.controls.activate.value,
             ɵactivityId: dockedPartFormGroup.controls.extras.controls.activityId.value,
           },
         })));
@@ -110,6 +114,7 @@ export class AddDockedPartsComponent implements ControlValueAccessor, Validator 
           tooltip: this._formBuilder.control<Translatable | undefined>(dockedPart.extras.tooltip),
           title: this._formBuilder.control<Translatable | undefined>(dockedPart.extras.title === false ? '<boolean>false</boolean>' : dockedPart.extras.title),
           cssClass: this._formBuilder.control<string | string[] | undefined>(dockedPart.extras.cssClass),
+          activate: this._formBuilder.control<boolean | undefined>(dockedPart.extras.activate),
           activityId: this._formBuilder.control<ActivityId | undefined>(dockedPart.extras.ɵactivityId, activityIdFormatValidator()),
         }),
       }), {emitEvent: options?.emitEvent ?? true});
@@ -160,6 +165,7 @@ export interface DockedPartDescriptor {
     tooltip?: Translatable;
     title?: Translatable | false;
     cssClass?: string | string[];
+    activate?: boolean;
     ɵactivityId?: ActivityId;
   };
 }

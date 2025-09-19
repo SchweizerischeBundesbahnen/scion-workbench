@@ -136,6 +136,7 @@ export default class CreatePerspectivePageComponent {
           tooltip: dockedPart.extras.tooltip,
           title: dockedPart.extras.title,
           cssClass: dockedPart.extras.cssClass,
+          activate: dockedPart.extras.activate,
           ɵactivityId: dockedPart.extras.ɵactivityId,
         });
       }

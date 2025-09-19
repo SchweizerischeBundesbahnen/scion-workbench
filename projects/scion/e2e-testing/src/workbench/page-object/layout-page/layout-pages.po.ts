@@ -29,6 +29,7 @@ export const LayoutPages = {
       await locator.locator('input.e2e-title').nth(i).fill(dockedPart.title === false ? '<boolean>false</boolean>' : (dockedPart.title ?? ''));
       await locator.locator('app-multi-value-input.e2e-class input').nth(i).fill(coerceArray(dockedPart.cssClass).join(' '));
       await locator.locator('input.e2e-activity-id').nth(i).fill(dockedPart.ɵactivityId ?? '');
+      await new SciCheckboxPO(locator.locator('sci-checkbox.e2e-activate').nth(i)).toggle(dockedPart.activate === true);
     }
   },
   /**

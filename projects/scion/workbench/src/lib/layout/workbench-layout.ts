@@ -324,6 +324,10 @@ export interface DockedPartExtras {
    */
   cssClass?: string | string[];
   /**
+   * Controls whether to activate the docked part. Defaults to `false`.
+   */
+  activate?: boolean;
+  /**
    * Internal identifier for the docked part.
    *
    * @docs-private Not public API, intended for internal use only.
