@@ -24,6 +24,10 @@ export const routes: Routes = [
     loadComponent: () => import('./view-page/view-page.component'),
   },
   {
+    path: 'test-part',
+    loadComponent: () => import('./part-page/part-page.component'),
+  },
+  {
     path: 'test-popup-opener',
     loadComponent: () => import('./popup-opener-page/popup-opener-page.component'),
   },

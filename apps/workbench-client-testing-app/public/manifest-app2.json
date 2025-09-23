@@ -90,5 +90,11 @@
     }
   ],
   "intentions": [
+    {
+      "type": "perspective",
+      "qualifier": {
+        "*": "*"
+      }
+    }
   ]
 }

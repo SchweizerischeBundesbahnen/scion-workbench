@@ -28,7 +28,7 @@ export class WorkbenchHostManifestInterceptor implements HostManifestInterceptor
 }
 
 /**
- * Provides a wildcard perspective intention for the workbench to register perspective capabilities as workbench perspectives.
+ * Provides a wildcard intention for the workbench to read perspective capabilities.
  */
 function providePerspectiveIntention(): Intention {
   return {

@@ -111,13 +111,13 @@ export class MicrofrontendPartComponent {
 
     // Navigate to the microfrontend.
     const application = this._manifestService.getApplication(capability.metadata!.appSymbolicName);
-    this._logger.debug(() => `Loading microfrontend into workbench part [partId=${this.part.id}, app=${capability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${(capability.properties.path)}].`, LoggerNames.MICROFRONTEND_ROUTING, params, capability);
-    await this._outletRouter.navigate(capability.properties.path!, {
+    this._logger.debug(() => `Loading microfrontend into workbench part [partId=${this.part.id}, app=${capability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${(capability.properties!.path)}].`, LoggerNames.MICROFRONTEND_ROUTING, params, capability);
+    await this._outletRouter.navigate(capability.properties!.path!, {
       outlet: this.part.id,
       relativeTo: application.baseUrl,
       params: params,
       pushStateToSessionHistoryStack: false,
-      showSplash: capability.properties.showSplash,
+      showSplash: capability.properties!.showSplash,
     });
   }
 

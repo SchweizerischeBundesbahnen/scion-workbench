@@ -11,6 +11,7 @@
 import {Capability, Qualifier} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {MAIN_AREA} from './workbench-perspective-capability';
+import {ActivityId} from '../workbench.identifiers';
 
 export interface WorkbenchPerspectiveCapabilityV2 extends Capability {
   type: WorkbenchCapabilities.Perspective;
@@ -47,11 +48,17 @@ export interface WorkbenchPartRef {
   /**
    * Controls whether to activate the part.
    */
-  active?: true;
+  active?: boolean;
   /**
    * Specifies CSS class(es) to add to the part, e.g., to locate the part in tests.
    */
   cssClass?: string | string[];
+  /**
+   * Internal identifier for the docked part.
+   *
+   * @docs-private Not public API, intended for internal use only.
+   */
+  ɵactivityId?: ActivityId;
 }
 
 export type DockingArea = 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'bottom-left' | 'bottom-right';

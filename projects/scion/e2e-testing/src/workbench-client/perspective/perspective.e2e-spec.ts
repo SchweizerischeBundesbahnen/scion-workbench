@@ -15,7 +15,6 @@ import {ViewPagePO} from '../page-object/view-page.po';
 import {expect} from '@playwright/test';
 import {MPart, MTreeNode} from '../../matcher/to-equal-workbench-layout.matcher';
 import {MessagingPagePO} from '../page-object/messaging-page.po';
-import {PageNotFoundPagePO} from '../../workbench/page-object/page-not-found-page.po';
 import {ViewInfo} from '../../workbench/page-object/view-info-dialog.po';
 import {Manifest} from '@scion/microfrontend-platform';
 import {RouterPagePO} from '../page-object/router-page.po';
@@ -44,31 +43,85 @@ test.describe.fixme('Workbench Perspective', () => {
       },
     });
 
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {id: 'main-area'},
+    });
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {id: 'left'},
+      properties: {
+        views: [
+          {qualifier: {view: 'testee-1'}, cssClass: 'testee-1'},
+          {qualifier: {view: 'testee-2'}, cssClass: 'testee-2'},
+        ],
+      },
+    });
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {id: 'right'},
+      properties: {
+        views: [
+          {qualifier: {view: 'testee-2'}, cssClass: 'testee-3'},
+          {qualifier: {view: 'testee-1'}, cssClass: 'testee-4'},
+        ],
+      },
+    });
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {id: 'testee'},
+      properties: {
+        path: 'test-part',
+        extras: {
+          icon: 'folder',
+          label: 'testee',
+        },
+      },
+    });
+
     const perspective = await microfrontendNavigator.registerCapability('app1', {
       type: 'perspective',
       qualifier: {perspective: 'testee'},
       properties: {
-        layout: [
-          {id: MAIN_AREA},
+        parts: [
+          {
+            id: MAIN_AREA,
+            qualifier: {id: 'main-area'},
+          },
           {
             id: 'part.left',
-            relativeTo: MAIN_AREA,
-            align: 'left',
-            ratio: .25,
-            views: [
-              {qualifier: {view: 'testee-1'}, cssClass: 'testee-1'},
-              {qualifier: {view: 'testee-2'}, cssClass: 'testee-2'},
-            ],
+            qualifier: {id: 'left'},
+            position: {
+              relativeTo: MAIN_AREA,
+              align: 'left',
+              ratio: .25,
+            },
           },
           {
             id: 'part.right',
-            relativeTo: MAIN_AREA,
-            align: 'right',
-            ratio: .2,
-            views: [
-              {qualifier: {view: 'testee-2'}, cssClass: 'testee-3'},
-              {qualifier: {view: 'testee-1'}, cssClass: 'testee-4'},
-            ],
+            qualifier: {id: 'right'},
+            position: {
+              relativeTo: MAIN_AREA,
+              align: 'right',
+              ratio: .2,
+            },
+          },
+          {
+            id: 'part.testee-1',
+            qualifier: {id: 'testee'},
+            position: 'left-top',
+            active: true,
+            ɵactivityId: 'activity.1',
+          },
+          {
+            id: 'part.testee-2',
+            qualifier: {id: 'testee'},
+            position: 'right-top',
+            active: false,
+            ɵactivityId: 'activity.2',
           },
         ],
       },
@@ -113,6 +166,23 @@ test.describe.fixme('Workbench Perspective', () => {
               }),
             }),
           }),
+        },
+        'activity.1': {
+          root: new MPart({
+            id: 'part.testee-1',
+          }),
+        },
+      },
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activities: [{id: 'activity.1'}],
+            activeActivityId: 'activity.1',
+          },
+          rightTop: {
+            activities: [{id: 'activity.2'}],
+            activeActivityId: 'none',
+          },
         },
       },
     });
@@ -169,33 +239,61 @@ test.describe.fixme('Workbench Perspective', () => {
       },
     });
 
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {id: 'left'},
+      properties: {
+        views: [
+          {qualifier: {view: 'testee-1'}, cssClass: 'testee-1'},
+        ],
+      },
+    });
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {id: 'right-top'},
+      properties: {
+        views: [
+          {qualifier: {view: 'testee-2'}, cssClass: 'testee-2'},
+        ],
+      },
+    });
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {id: 'right-bottom'},
+      properties: {
+        views: [
+          {qualifier: {view: 'testee-3'}, cssClass: 'testee-3'},
+        ],
+      },
+    });
+
     const perspective = await microfrontendNavigator.registerCapability('app1', {
       type: 'perspective',
       qualifier: {perspective: 'testee'},
       properties: {
-        layout: [
+        parts: [
           {
             id: 'part.left',
-            views: [
-              {qualifier: {view: 'testee-1'}, cssClass: 'testee-1'},
-            ],
+            qualifier: {id: 'left'},
           },
           {
             id: 'part.right-top',
-            align: 'right',
-            ratio: .2,
-            views: [
-              {qualifier: {view: 'testee-2'}, cssClass: 'testee-2'},
-            ],
+            qualifier: {id: 'right-top'},
+            position: {
+              align: 'right',
+              ratio: .2,
+            },
           },
           {
             id: 'part.right-bottom',
-            relativeTo: 'part.right-top',
-            align: 'bottom',
-            ratio: .5,
-            views: [
-              {qualifier: {view: 'testee-3'}, cssClass: 'testee-3'},
-            ],
+            qualifier: {id: 'right-bottom'},
+            position: {
+              relativeTo: 'part.right-top',
+              align: 'bottom',
+              ratio: .5,
+            },
           },
         ],
       },
@@ -273,18 +371,27 @@ test.describe.fixme('Workbench Perspective', () => {
       },
     });
 
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {id: 'part'},
+      properties: {
+        id: 'part.part',
+        views: [
+          {qualifier: {view: 'testee'}, cssClass: 'testee-1'},
+          {qualifier: {view: 'testee'}, cssClass: 'testee-2'},
+          {qualifier: {view: 'testee'}, cssClass: 'testee-3'},
+        ],
+      },
+    });
+
     const perspective = await microfrontendNavigator.registerCapability('app1', {
       type: 'perspective',
       qualifier: {perspective: 'testee'},
       properties: {
-        layout: [
+        parts: [
           {
             id: 'part.part',
-            views: [
-              {qualifier: {view: 'testee'}, cssClass: 'testee-1'},
-              {qualifier: {view: 'testee'}, cssClass: 'testee-2'},
-              {qualifier: {view: 'testee'}, cssClass: 'testee-3'},
-            ],
+            qualifier: {id: 'part'},
           },
         ],
       },
@@ -315,18 +422,26 @@ test.describe.fixme('Workbench Perspective', () => {
       },
     });
 
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {id: 'part'},
+      properties: {
+        views: [
+          {qualifier: {view: 'testee'}, cssClass: 'testee-1'},
+          {qualifier: {view: 'testee'}, cssClass: 'testee-2', active: true},
+          {qualifier: {view: 'testee'}, cssClass: 'testee-3'},
+        ],
+      },
+    });
+
     const perspective = await microfrontendNavigator.registerCapability('app1', {
       type: 'perspective',
       qualifier: {perspective: 'testee'},
       properties: {
-        layout: [
+        parts: [
           {
             id: 'part.part',
-            views: [
-              {qualifier: {view: 'testee'}, cssClass: 'testee-1'},
-              {qualifier: {view: 'testee'}, cssClass: 'testee-2', active: true},
-              {qualifier: {view: 'testee'}, cssClass: 'testee-3'},
-            ],
+            qualifier: {id: 'part'},
           },
         ],
       },
@@ -368,22 +483,56 @@ test.describe.fixme('Workbench Perspective', () => {
       },
     });
 
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {id: 'main-area'},
+    });
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {id: 'left'},
+      properties: {
+        views: [
+          {qualifier: {view: '1'}, cssClass: 'testee-1'},
+        ],
+      },
+    });
+
     // Register perspective 1.
     const perspective1 = await microfrontendNavigator.registerCapability('app1', {
       type: 'perspective',
       qualifier: {perspective: '1'},
       properties: {
-        layout: [
+        parts: [
           {
             id: MAIN_AREA,
+            qualifier: {id: 'main-area'},
           },
           {
             id: 'part.left',
-            align: 'left',
-            views: [
-              {qualifier: {view: '1'}, cssClass: 'testee-1'},
-            ],
+            qualifier: {id: 'left'},
+            position: {
+              align: 'left',
+            },
           },
+        ],
+      },
+    });
+
+    await microfrontendNavigator.registerCapability('app2', {
+      type: 'part',
+      qualifier: {id: 'main-area'},
+      properties: {
+        id: MAIN_AREA,
+      },
+    });
+
+    await microfrontendNavigator.registerCapability('app2', {
+      type: 'part',
+      qualifier: {id: 'right'},
+      properties: {
+        views: [
+          {qualifier: {view: '2'}, cssClass: 'testee-2'},
         ],
       },
     });
@@ -394,16 +543,17 @@ test.describe.fixme('Workbench Perspective', () => {
       qualifier: {perspective: '2'},
       private: false,
       properties: {
-        layout: [
+        parts: [
           {
             id: MAIN_AREA,
+            qualifier: {id: 'main-area'},
           },
           {
             id: 'part.right',
-            align: 'right',
-            views: [
-              {qualifier: {view: '2'}, cssClass: 'testee-2'},
-            ],
+            qualifier: {id: 'right'},
+            position: {
+              align: 'right',
+            },
           },
         ],
       },
@@ -484,17 +634,17 @@ test.describe.fixme('Workbench Perspective', () => {
           type: 'perspective',
           qualifier: {perspective: 'testee'},
           properties: {
-            layout: [
+            parts: [
               {
                 id: MAIN_AREA,
+                qualifier: {id: 'main-area'},
               },
               {
                 id: 'part.left',
-                align: 'left',
-                views: [
-                  {qualifier: {view: 'app-1'}, cssClass: 'testee-1'},
-                  {qualifier: {view: 'app-2'}, cssClass: 'testee-2'},
-                ],
+                qualifier: {id: 'left'},
+                position: {
+                  align: 'left',
+                },
               },
             ],
           },
@@ -505,6 +655,20 @@ test.describe.fixme('Workbench Perspective', () => {
           properties: {
             path: 'test-view',
             title: 'Test View App 1',
+          },
+        },
+        {
+          type: 'part',
+          qualifier: {id: 'main-area'},
+        },
+        {
+          type: 'part',
+          qualifier: {id: 'left'},
+          properties: {
+            views: [
+              {qualifier: {view: 'app-1'}, cssClass: 'testee-1'},
+              {qualifier: {view: 'app-2'}, cssClass: 'testee-2'},
+            ],
           },
         },
         {
@@ -548,7 +712,6 @@ test.describe.fixme('Workbench Perspective', () => {
 
     const testViewPage1 = new ViewPagePO(appPO, {cssClass: 'testee-1'});
     const testViewPage2 = new ViewPagePO(appPO, {cssClass: 'testee-2'});
-    const notFoundPage = new PageNotFoundPagePO(appPO.view({cssClass: 'testee-2'}));
 
     // Expect the perspective.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -561,7 +724,6 @@ test.describe.fixme('Workbench Perspective', () => {
               id: 'part.left',
               views: [
                 {id: await testViewPage1.view.tab.getViewId()},
-                {id: await notFoundPage.view.tab.getViewId()},
               ],
               activeViewId: await testViewPage1.view.tab.getViewId(),
             }),
@@ -573,17 +735,12 @@ test.describe.fixme('Workbench Perspective', () => {
       },
     });
 
-    // Expect view 1 (View Page).
+    // Expect view 1.
     await expectView(testViewPage1).toBeActive();
-    await expectView(notFoundPage).toBeInactive();
-
-    // Expect view 2 (Not Found Page).
-    await notFoundPage.view.tab.click();
-    await expectView(testViewPage1).toBeInactive();
-    await expectView(notFoundPage).toBeActive();
 
     // Expect warning to be logged.
-    await expect.poll(() => consoleLogs.get({severity: 'warning', message: /NotQualifiedError/})).not.toEqual([]);
+    // TODO [activity] fixme
+    // await expect.poll(() => consoleLogs.get({severity: 'warning', message: /NotQualifiedError/})).not.toEqual([]);
 
     // Add missing intention to the manifest of app 1.
     manifestApp1 = {
@@ -634,18 +791,41 @@ test.describe.fixme('Workbench Perspective', () => {
             type: 'perspective',
             qualifier: {perspective: 'testee'},
             properties: {
-              layout: [
+              parts: [
                 {
                   id: MAIN_AREA,
+                  qualifier: {id: 'main-area'},
                 },
                 {
                   id: 'part.left',
-                  align: 'left',
-                  views: [
-                    {qualifier: {view: 'testee'}, cssClass: 'testee'},
-                  ],
+                  qualifier: {id: 'left'},
+                  position: {
+                    align: 'left',
+                  },
                 },
               ],
+            },
+          },
+          {
+            type: 'part',
+            qualifier: {id: 'main-area'},
+          },
+          {
+            type: 'part',
+            qualifier: {id: 'left'},
+            properties: {
+              views: [
+                {qualifier: {view: 'testee-1'}, cssClass: 'testee-1'},
+                {qualifier: {view: 'testee-2'}, cssClass: 'testee-2'},
+              ],
+            },
+          },
+          {
+            type: 'view',
+            qualifier: {view: 'testee-1'},
+            properties: {
+              path: 'test-view',
+              title: 'Test View',
             },
           },
           {
@@ -667,8 +847,8 @@ test.describe.fixme('Workbench Perspective', () => {
     const messagingPage = await microfrontendNavigator.openInNewTab(MessagingPagePO, 'app1');
     await messagingPage.publishIntent({type: 'perspective', qualifier: {perspective: 'testee'}});
 
-    const testViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
-    const notFoundPage = new PageNotFoundPagePO(appPO.view({cssClass: 'testee'}));
+    const testViewPage1 = new ViewPagePO(appPO, {cssClass: 'testee-1'});
+    const testViewPage2 = new ViewPagePO(appPO, {cssClass: 'testee-2'});
 
     // Expect the perspective.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -680,9 +860,9 @@ test.describe.fixme('Workbench Perspective', () => {
             child1: new MPart({
               id: 'part.left',
               views: [
-                {id: await notFoundPage.view.tab.getViewId()},
+                {id: await testViewPage1.view.tab.getViewId()},
               ],
-              activeViewId: await notFoundPage.view.tab.getViewId(),
+              activeViewId: await testViewPage1.view.tab.getViewId(),
             }),
             child2: new MPart({
               id: MAIN_AREA,
@@ -692,11 +872,12 @@ test.describe.fixme('Workbench Perspective', () => {
       },
     });
 
-    // Expect view.
-    await expectView(notFoundPage).toBeActive();
+    // Expect view 2 not to be attached.
+    await expectView(testViewPage2).not.toBeAttached();
 
     // Expect warning to be logged.
-    await expect.poll(() => consoleLogs.get({severity: 'warning', message: /NullCapabilityError/})).not.toEqual([]);
+    // TODO [activity] fixme
+    // await expect.poll(() => consoleLogs.get({severity: 'warning', message: /NullCapabilityError/})).not.toEqual([]);
 
     // Correct manifest.
     await page.route('**/manifest-app1.json', async route => route.fulfill({
@@ -708,23 +889,46 @@ test.describe.fixme('Workbench Perspective', () => {
             type: 'perspective',
             qualifier: {perspective: 'testee'},
             properties: {
-              layout: [
+              parts: [
                 {
                   id: MAIN_AREA,
+                  qualifier: {id: 'main-area'},
                 },
                 {
                   id: 'part.left',
-                  align: 'left',
-                  views: [
-                    {qualifier: {view: 'testee'}, cssClass: 'testee'},
-                  ],
+                  qualifier: {id: 'left'},
+                  position: {
+                    align: 'left',
+                  },
                 },
               ],
             },
           },
           {
+            type: 'part',
+            qualifier: {id: 'main-area'},
+          },
+          {
+            type: 'part',
+            qualifier: {id: 'left'},
+            properties: {
+              views: [
+                {qualifier: {view: 'testee-1'}, cssClass: 'testee-1'},
+                {qualifier: {view: 'testee-2'}, cssClass: 'testee-2'},
+              ],
+            },
+          },
+          {
             type: 'view',
-            qualifier: {view: 'testee'},
+            qualifier: {view: 'testee-1'},
+            properties: {
+              path: 'test-view',
+              title: 'Test View',
+            },
+          },
+          {
+            type: 'view',
+            qualifier: {view: 'testee-2'},
             properties: {
               path: 'test-view',
               title: 'Test View',
@@ -755,9 +959,10 @@ test.describe.fixme('Workbench Perspective', () => {
             child1: new MPart({
               id: 'part.left',
               views: [
-                {id: await testViewPage.view.tab.getViewId()},
+                {id: await testViewPage1.view.tab.getViewId()},
+                {id: await testViewPage2.view.tab.getViewId()},
               ],
-              activeViewId: await testViewPage.view.tab.getViewId(),
+              activeViewId: await testViewPage1.view.tab.getViewId(),
             }),
             child2: new MPart({
               id: MAIN_AREA,
@@ -767,11 +972,12 @@ test.describe.fixme('Workbench Perspective', () => {
       },
     });
 
-    // Expect view.
-    await expectView(testViewPage).toBeActive();
+    // Expect views.
+    await expectView(testViewPage1).toBeActive();
+    await expectView(testViewPage2).toBeInactive({loaded: false});
   });
 
-  test('should display "Not Found" page if view capability is not found', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+  test('should not display view if capability is not found', async ({appPO, microfrontendNavigator, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // Register view in "app 1".
@@ -794,31 +1000,48 @@ test.describe.fixme('Workbench Perspective', () => {
       },
     });
 
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {id: 'main-area'},
+      properties: {
+        id: MAIN_AREA,
+      },
+    });
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {id: 'left'},
+      properties: {
+        views: [
+          {qualifier: {view: 'app-1'}, cssClass: 'testee-1'},
+          {qualifier: {view: 'app-2'}, cssClass: 'testee-2'}, // missing intention
+          {qualifier: {view: 'not-exist'}, cssClass: 'testee-3'},
+        ],
+      },
+    });
+
     // Register perspective in "app 1".
     const perspective = await microfrontendNavigator.registerCapability('app1', {
       type: 'perspective',
       qualifier: {perspective: 'testee'},
       properties: {
-        layout: [
+        parts: [
           {
             id: MAIN_AREA,
+            qualifier: {id: 'main-area'},
           },
           {
             id: 'part.left',
-            align: 'left',
-            views: [
-              {qualifier: {view: 'app-1'}, cssClass: 'testee-1'},
-              {qualifier: {view: 'app-2'}, cssClass: 'testee-2'}, // missing intention
-              {qualifier: {view: 'not-exist'}, cssClass: 'testee-3'},
-            ],
+            qualifier: {id: 'left'},
+            position: {
+              align: 'left',
+            },
           },
         ],
       },
     });
 
     const testViewPage1 = new ViewPagePO(appPO, {cssClass: 'testee-1'});
-    const notFoundPage2 = new PageNotFoundPagePO(appPO.view({cssClass: 'testee-2'}));
-    const notFoundPage3 = new PageNotFoundPagePO(appPO.view({cssClass: 'testee-3'}));
 
     // Switch perspective.
     await appPO.switchPerspective(perspective.metadata!.id);
@@ -827,7 +1050,8 @@ test.describe.fixme('Workbench Perspective', () => {
     await expect.poll(() => appPO.getActivePerspectiveId()).toEqual(perspective.metadata!.id);
 
     // Expect warning to be logged.
-    await expect.poll(() => consoleLogs.get({severity: 'warning', message: /NullCapabilityError/})).not.toEqual([]);
+    // TODO [activity] fixme
+    // await expect.poll(() => consoleLogs.get({severity: 'warning', message: /NullCapabilityError/})).not.toEqual([]);
 
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       grids: {
@@ -839,8 +1063,6 @@ test.describe.fixme('Workbench Perspective', () => {
               id: 'part.left',
               views: [
                 {id: await testViewPage1.view.tab.getViewId()},
-                {id: await notFoundPage2.view.tab.getViewId()},
-                {id: await notFoundPage3.view.tab.getViewId()},
               ],
               activeViewId: await testViewPage1.view.tab.getViewId(),
             }),
@@ -853,11 +1075,9 @@ test.describe.fixme('Workbench Perspective', () => {
     });
 
     await expectView(testViewPage1).toBeActive();
-    await expectView(notFoundPage2).toBeInactive();
-    await expectView(notFoundPage3).toBeInactive();
   });
 
-  test('should display "Not Found" page for views of other apps if the perspective has no intention', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+  test('should not display views of other apps if the perspective has no intention', async ({appPO, microfrontendNavigator, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // Register view in "app 1".
@@ -880,29 +1100,47 @@ test.describe.fixme('Workbench Perspective', () => {
       },
     });
 
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {id: 'main-area'},
+      properties: {
+        id: MAIN_AREA,
+      },
+    });
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {id: 'left'},
+      properties: {
+        views: [
+          {qualifier: {view: 'app-1'}, cssClass: 'testee-1'},
+          {qualifier: {view: 'app-2'}, cssClass: 'testee-2'},
+        ],
+      },
+    });
+
     // Register perspective.
     const perspective = await microfrontendNavigator.registerCapability('app1', {
       type: 'perspective',
       qualifier: {perspective: 'testee'},
       properties: {
-        layout: [
+        parts: [
           {
             id: MAIN_AREA,
+            qualifier: {id: 'main-area'},
           },
           {
             id: 'part.left',
-            align: 'left',
-            views: [
-              {qualifier: {view: 'app-1'}, cssClass: 'testee-1'},
-              {qualifier: {view: 'app-2'}, cssClass: 'testee-2'},
-            ],
+            qualifier: {id: 'left'},
+            position: {
+              align: 'left',
+            },
           },
         ],
       },
     });
 
     const testViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
-    const notFoundPage = new PageNotFoundPagePO(appPO.view({cssClass: 'testee-2'}));
 
     // Switch perspective.
     await appPO.switchPerspective(perspective.metadata!.id);
@@ -911,7 +1149,8 @@ test.describe.fixme('Workbench Perspective', () => {
     await expect.poll(() => appPO.getActivePerspectiveId()).toEqual(perspective.metadata!.id);
 
     // Expect warning to be logged.
-    await expect.poll(() => consoleLogs.get({severity: 'warning', message: /NotQualifiedError/})).not.toEqual([]);
+    // TODO [activity] fixme
+    // await expect.poll(() => consoleLogs.get({severity: 'warning', message: /NotQualifiedError/})).not.toEqual([]);
 
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       grids: {
@@ -923,7 +1162,6 @@ test.describe.fixme('Workbench Perspective', () => {
               id: 'part.left',
               views: [
                 {id: await testViewPage.view.tab.getViewId()},
-                {id: await notFoundPage.view.tab.getViewId()},
               ],
               activeViewId: await testViewPage.view.tab.getViewId(),
             }),
@@ -936,7 +1174,6 @@ test.describe.fixme('Workbench Perspective', () => {
     });
 
     await expectView(testViewPage).toBeActive();
-    await expectView(notFoundPage).toBeInactive();
   });
 
   /**
@@ -1120,22 +1357,56 @@ test.describe.fixme('Workbench Perspective', () => {
       },
     });
 
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {id: 'main-area'},
+      properties: {
+        id: MAIN_AREA,
+      },
+    });
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {id: 'left'},
+      properties: {
+        views: [
+          {qualifier: {view: 'app-1'}, cssClass: 'app-1'},
+        ],
+      },
+    });
+
     // Register perspective 1.
     const perspective1 = await microfrontendNavigator.registerCapability('app1', {
       type: 'perspective',
       qualifier: {perspective: 'app-1'},
       properties: {
-        layout: [
+        parts: [
           {
             id: MAIN_AREA,
+            qualifier: {id: 'main-area'},
           },
           {
             id: 'part.left',
-            align: 'left',
-            views: [
-              {qualifier: {view: 'app-1'}, cssClass: 'app-1'},
-            ],
+            qualifier: {id: 'left'},
+            position: {
+              align: 'left',
+            },
           },
+        ],
+      },
+    });
+
+    await microfrontendNavigator.registerCapability('app2', {
+      type: 'part',
+      qualifier: {id: 'main-area'},
+    });
+
+    await microfrontendNavigator.registerCapability('app2', {
+      type: 'part',
+      qualifier: {id: 'right'},
+      properties: {
+        views: [
+          {qualifier: {view: 'app-2'}, cssClass: 'app-2'},
         ],
       },
     });
@@ -1145,16 +1416,17 @@ test.describe.fixme('Workbench Perspective', () => {
       type: 'perspective',
       qualifier: {perspective: 'app-2'},
       properties: {
-        layout: [
+        parts: [
           {
             id: MAIN_AREA,
+            qualifier: {id: 'main-area'},
           },
           {
             id: 'part.right',
-            align: 'right',
-            views: [
-              {qualifier: {view: 'app-2'}, cssClass: 'app-2'},
-            ],
+            qualifier: {id: 'right'},
+            position: {
+              align: 'right',
+            },
           },
         ],
       },

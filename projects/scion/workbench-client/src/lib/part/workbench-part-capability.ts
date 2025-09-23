@@ -43,7 +43,7 @@ export interface WorkbenchPartCapability extends Capability {
   /**
    * @inheritDoc
    */
-  properties: {
+  properties?: {
     /**
      * Specifies the path to the microfrontend.
      *

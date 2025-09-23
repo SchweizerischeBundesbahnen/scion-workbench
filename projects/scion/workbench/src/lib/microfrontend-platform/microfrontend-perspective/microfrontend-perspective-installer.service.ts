@@ -105,8 +105,8 @@ export class MicrofrontendPerspectiveInstaller {
 
     // Add the initial part to the layout.
     let layout = layoutFactory.addPart(partRef.id, {
-      title: createCapabilityRemoteTranslatable(partCapability.properties.title || undefined, partCapability, partRef.params),
-      cssClass: [...Arrays.coerce(partCapability.properties.cssClass), ...Arrays.coerce(partRef.cssClass)],
+      title: createCapabilityRemoteTranslatable(partCapability.properties?.title || undefined, partCapability, partRef.params),
+      cssClass: [...Arrays.coerce(partCapability.properties?.cssClass), ...Arrays.coerce(partRef.cssClass)],
       activate: partRef.active,
     });
 
@@ -114,7 +114,7 @@ export class MicrofrontendPerspectiveInstaller {
     layout = this.navigatePart(partRef, partCapability, layout);
 
     // Add views to the initial part.
-    for (const viewRef of partCapability.properties.views ?? []) {
+    for (const viewRef of partCapability.properties?.views ?? []) {
       layout = await this.addView(viewRef, partRef, partCapability, layout);
     }
     return layout;
@@ -140,14 +140,15 @@ export class MicrofrontendPerspectiveInstaller {
       partRef.params = params;
 
       if (typeof partRef.position === 'string') { // docked part
-        const dockedPartExtras = partCapability.properties.extras!;
+        const dockedPartExtras = partCapability.properties!.extras!; // docked parts have been validated to have extras
         layout = layout.addPart(partRef.id, {dockTo: partRef.position}, {
           icon: dockedPartExtras.icon,
           label: createCapabilityRemoteTranslatable(dockedPartExtras.label, partCapability, partRef.params),
-          title: partCapability.properties.title === false ? false : createCapabilityRemoteTranslatable(partCapability.properties.title, partCapability, partRef.params),
+          title: partCapability.properties!.title === false ? false : createCapabilityRemoteTranslatable(partCapability.properties!.title, partCapability, partRef.params),
           tooltip: createCapabilityRemoteTranslatable(dockedPartExtras.tooltip, partCapability, partRef.params),
-          cssClass: [...Arrays.coerce(partCapability.properties.cssClass), ...Arrays.coerce(partRef.cssClass)],
+          cssClass: [...Arrays.coerce(partCapability.properties!.cssClass), ...Arrays.coerce(partRef.cssClass)],
           activate: partRef.active,
+          ɵactivityId: partRef.ɵactivityId,
         });
       }
       else if (!partRef.position.relativeTo || layout.hasPart(partRef.position.relativeTo)) {
@@ -156,8 +157,8 @@ export class MicrofrontendPerspectiveInstaller {
           align: partRef.position.align,
           ratio: partRef.position.ratio,
         }, {
-          title: createCapabilityRemoteTranslatable(partCapability.properties.title || undefined, partCapability, partRef.params),
-          cssClass: [...Arrays.coerce(partCapability.properties.cssClass), ...Arrays.coerce(partRef.cssClass)],
+          title: createCapabilityRemoteTranslatable(partCapability.properties?.title || undefined, partCapability, partRef.params),
+          cssClass: [...Arrays.coerce(partCapability.properties?.cssClass), ...Arrays.coerce(partRef.cssClass)],
           activate: partRef.active,
         });
       }
@@ -170,7 +171,7 @@ export class MicrofrontendPerspectiveInstaller {
       layout = this.navigatePart(partRef, partCapability, layout);
 
       // Add views to the part.
-      for (const viewRef of partCapability.properties.views ?? []) {
+      for (const viewRef of partCapability.properties?.views ?? []) {
         layout = await this.addView(viewRef, partRef, partCapability, layout);
       }
     }
@@ -182,7 +183,7 @@ export class MicrofrontendPerspectiveInstaller {
    * Navigates specified part if declaring a path.
    */
   private navigatePart(partRef: Omit<WorkbenchPartRef, 'position'> | WorkbenchPartRef, partCapability: WorkbenchPartCapability, layout: WorkbenchLayout): WorkbenchLayout {
-    if (partCapability.properties.path) {
+    if (partCapability.properties?.path) {
       layout = layout.navigatePart(partRef.id, [], {
         hint: MICROFRONTEND_PART_NAVIGATION_HINT,
         data: {
@@ -257,14 +258,14 @@ export class MicrofrontendPerspectiveInstaller {
   private validatePartCapability(partCapability: WorkbenchPartCapability, partRef: WorkbenchPartRef | Omit<WorkbenchPartRef, 'position'>, context: {perspectiveCapability: WorkbenchPerspectiveCapabilityV2}): boolean {
     // Validate main area part not to have views.
     const isMainAreaPart = partRef.id === MAIN_AREA || partRef.id === MAIN_AREA_ALTERNATIVE_ID;
-    if (isMainAreaPart && partCapability.properties.views?.length) {
+    if (isMainAreaPart && partCapability.properties?.views?.length) {
       this._logger.error(`[PartDefinitionError] Views not allowed in the main area part: The part capability '${qualifier(partCapability)}' of app '${app(partCapability)}' is used as main area part in the perspective '${qualifier(context.perspectiveCapability)}' and must not have views.`, LoggerNames.MICROFRONTEND);
       return false;
     }
 
     // Validate extras of docked part.
     if ('position' in partRef && typeof partRef.position === 'string') {
-      const dockedPartExtras = partCapability.properties.extras;
+      const dockedPartExtras = partCapability.properties?.extras;
       if (!dockedPartExtras?.label || !dockedPartExtras.icon) {
         this._logger.error(`[PartDefinitionError] Part capability requires the 'extras' property with 'label' and 'icon': The part capability '${qualifier(partCapability)}' of app '${app(partCapability)}' requires a label and icon as it is used as docked part in the perspective '${qualifier(context.perspectiveCapability)}.`, LoggerNames.MICROFRONTEND);
         return false;
@@ -284,7 +285,7 @@ function createCapabilityRemoteTranslatable(translatable: Translatable | undefin
   return createRemoteTranslatable(translatable, {
     appSymbolicName: capability.metadata!.appSymbolicName,
     valueParams: params,
-    topicParams: capability.properties.resolve,
+    topicParams: capability.properties?.resolve,
   });
 }
 

@@ -9,106 +9,121 @@
     flex-direction: column;
     gap: 1em;
 
-    section.layout {
+    section.parts {
       display: grid;
       grid-template-columns:
-        // === Part Subgrid ===
-        10em // Part ID
-        10em // Relative To
-        10em // Align
-        10em // Ratio
-          // === Views Subgrid ===
-          1fr // Qualifier
-          1fr // Params
-          .75fr // CSS class(es)
-          auto // Active
-          min-content // Remove View
+        1fr // Part ID
+        1fr // Qualifier
+        1fr // Relative To
+        1fr // Align
+        1fr // Ratio
+        min-content // Active
+        1fr // Css Class
         min-content; // Remove Part
       align-items: start;
       gap: 1em;
 
-      > section.part.fieldset::after {
-        content: 'Part'; // do not include fieldset mixin to reduce file size
-      }
-
-      > section.part {
+      > div.legend {
         display: grid;
-        grid-column: 1/-1;
-        grid-template-columns: subgrid;
-        align-items: start;
-
-        > div.part-id.legend::after {
-          content: 'Part ID'; // do not include legend mixin to reduce file size
-        }
-
-        > div.relative-to.legend::after {
-          content: 'Relative To'; // do not include legend mixin to reduce file size
-        }
-
-        > div.align.legend::after {
-          content: 'Align'; // do not include legend mixin to reduce file size
-        }
-
-        > div.ratio.legend::after {
-          content: 'Ratio'; // do not include legend mixin to reduce file size
-        }
-
-        > section.views.fieldset::after {
-          content: 'Views'; // do not include fieldset mixin to reduce file size
-        }
-
-        > section.views {
-          display: grid;
-          grid-column: 5/10;
-          grid-template-columns: subgrid;
-          gap: 1em;
-          align-items: start;
-
-          > app-record.qualifier.legend::after {
-            content: 'Qualifier'; // do not include legend mixin to reduce file size
-          }
-
-          > app-record.params.legend::after {
-            content: 'Params'; // do not include legend mixin to reduce file size
-          }
-
-          > app-app-multi-value-input.css-class.legend::after {
-            content: 'CSS Class(es)'; // do not include legend mixin to reduce file size
-          }
-
-          > div.active.legend::after {
-            content: 'Active'; // do not include legend mixin to reduce file size
-            left: 0;
-            top: -.25em;
-          }
-
-          > div.active {
-            display: inline-grid;
-            align-self: stretch;
-            width: 3em;
-            place-content: center;
-          }
-
-          > button.add-view {
-            grid-column: 1/-2;
-          }
-        }
-
-        > button.add-view {
-          grid-column: 5/10;
-        }
       }
 
-      > button.add-part {
+      > div.part-id.legend::after {
+        content: 'Part ID'; // do not include legend mixin to reduce file size
+      }
+
+      > div.relative-to.legend::after {
+        content: 'Relative To'; // do not include legend mixin to reduce file size
+      }
+
+      > div.align.legend::after {
+        content: 'Align'; // do not include legend mixin to reduce file size
+      }
+
+      > div.ratio.legend::after {
+        content: 'Ratio'; // do not include legend mixin to reduce file size
+      }
+
+      > div.qualifier.legend::after {
+        content: 'Qualifier'; // do not include legend mixin to reduce file size
+      }
+
+      > div.active.legend::after {
+        content: 'Active'; // do not include legend mixin to reduce file size
+        left: 0;
+        top: -.25em;
+      }
+
+      > div.active {
+        display: inline-grid;
+        align-self: stretch;
+        width: 3em;
+        place-content: center;
+      }
+
+      > app-multi-value-input.css-class.legend::after {
+        content: 'CSS Class(es)'; // do not include legend mixin to reduce file size
+      }
+
+      button.add-part {
         grid-column: 1/-1;
       }
     }
-  }
+
+    section.docked-parts {
+      display: grid;
+      grid-template-columns:
+        1fr // Part ID
+        1fr // Qualifier
+        1fr // Dock to
+        min-content // Active
+        1fr // ActivityId
+        1fr // Css Class
+        min-content; // Remove Part
+      align-items: start;
+      gap: 1em;
+
+      > div.legend {
+        display: grid;
+      }
 
 
-  // include fieldset mixin once to reduce file size
-  .fieldset {
-    @include fieldset.fieldset(null);
+      > div.part-id.legend::after {
+        content: 'Part ID'; // do not include legend mixin to reduce file size
+      }
+
+      > div.qualifier.legend::after {
+        content: 'Qualifier'; // do not include legend mixin to reduce file size
+      }
+
+      > div.dock-to.legend::after {
+        content: 'Dock To'; // do not include legend mixin to reduce file size
+      }
+
+      > div.active.legend::after {
+        content: 'Active'; // do not include legend mixin to reduce file size
+        left: 0;
+        top: -.25em;
+      }
+
+      > div.active {
+        display: inline-grid;
+        align-self: stretch;
+        width: 3em;
+        place-content: center;
+      }
+
+      > div.activity-id.legend::after {
+        content: 'Activity Id'; // do not include legend mixin to reduce file size
+      }
+
+      > app-multi-value-input.css-class.legend::after {
+        content: 'CSS Class(es)'; // do not include legend mixin to reduce file size
+      }
+
+      button.add-part {
+        grid-column: 1/-1;
+      }
+    }
   }
 
   // include legend mixin once to reduce file size
