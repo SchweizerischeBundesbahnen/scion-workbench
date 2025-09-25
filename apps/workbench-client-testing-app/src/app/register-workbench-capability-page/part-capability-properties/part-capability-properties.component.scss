@@ -1,5 +1,4 @@
 @use '@scion/components.internal/design' as sci-design;
-@use '../../common/fieldset.mixin';
 
 :host {
   display: grid;
@@ -9,10 +8,6 @@
     flex-direction: column;
     gap: 1em;
 
-    > section.views.fieldset::after {
-      content: 'Views'; // do not include fieldset mixin to reduce file size
-    }
-
     > sci-form-field {
 
       section.views {
@@ -20,47 +15,13 @@
         grid-template-columns:
         1fr // Qualifier
         1fr // Params
-        .75fr // CSS class(es)
-        auto // Active
-        min-content; // Remove View
-        align-items: start;
+        min-content // Active
+        1fr // CSS class(es)
+        min-content; // Add / Remove View
+        align-items: center;
         gap: 1em;
-
-        > div.qualifier.legend::after {
-          content: 'Qualifier'; // do not include legend mixin to reduce file size
-        }
-
-        > div.params.legend::after {
-          content: 'Params'; // do not include legend mixin to reduce file size
-        }
-
-        > div.active.legend::after {
-          content: 'Active'; // do not include legend mixin to reduce file size
-          left: 0;
-          top: -.25em;
-        }
-
-        > div.active {
-          display: inline-grid;
-          align-self: stretch;
-          width: 3em;
-          place-content: center;
-        }
-
-        > app-multi-value-input.css-class.legend::after {
-          content: 'CSS Class(es)'; // do not include legend mixin to reduce file size
-        }
-
-        > button.add-view {
-          grid-column: 1/-2;
-        }
       }
     }
-  }
-
-  // include legend mixin once to reduce file size
-  .legend {
-    @include fieldset.legend(null);
   }
 
   input, select {

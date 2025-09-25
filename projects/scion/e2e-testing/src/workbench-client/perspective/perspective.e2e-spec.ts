@@ -20,7 +20,7 @@ import {Manifest} from '@scion/microfrontend-platform';
 import {RouterPagePO} from '../page-object/router-page.po';
 
 // TODO [activity] Migrate tests to new perspective capability model
-test.describe.fixme('Workbench Perspective', () => {
+test.describe('Workbench Perspective', () => {
 
   test('should contribute perspective with main area', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
@@ -45,12 +45,12 @@ test.describe.fixme('Workbench Perspective', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'part',
-      qualifier: {id: 'main-area'},
+      qualifier: {part: 'main-area'},
     });
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'part',
-      qualifier: {id: 'left'},
+      qualifier: {part: 'left'},
       properties: {
         views: [
           {qualifier: {view: 'testee-1'}, cssClass: 'testee-1'},
@@ -61,24 +61,12 @@ test.describe.fixme('Workbench Perspective', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'part',
-      qualifier: {id: 'right'},
+      qualifier: {part: 'right'},
       properties: {
         views: [
           {qualifier: {view: 'testee-2'}, cssClass: 'testee-3'},
           {qualifier: {view: 'testee-1'}, cssClass: 'testee-4'},
         ],
-      },
-    });
-
-    await microfrontendNavigator.registerCapability('app1', {
-      type: 'part',
-      qualifier: {id: 'testee'},
-      properties: {
-        path: 'test-part',
-        extras: {
-          icon: 'folder',
-          label: 'testee',
-        },
       },
     });
 
@@ -89,11 +77,11 @@ test.describe.fixme('Workbench Perspective', () => {
         parts: [
           {
             id: MAIN_AREA,
-            qualifier: {id: 'main-area'},
+            qualifier: {part: 'main-area'},
           },
           {
             id: 'part.left',
-            qualifier: {id: 'left'},
+            qualifier: {part: 'left'},
             position: {
               relativeTo: MAIN_AREA,
               align: 'left',
@@ -102,26 +90,12 @@ test.describe.fixme('Workbench Perspective', () => {
           },
           {
             id: 'part.right',
-            qualifier: {id: 'right'},
+            qualifier: {part: 'right'},
             position: {
               relativeTo: MAIN_AREA,
               align: 'right',
               ratio: .2,
             },
-          },
-          {
-            id: 'part.testee-1',
-            qualifier: {id: 'testee'},
-            position: 'left-top',
-            active: true,
-            ɵactivityId: 'activity.1',
-          },
-          {
-            id: 'part.testee-2',
-            qualifier: {id: 'testee'},
-            position: 'right-top',
-            active: false,
-            ɵactivityId: 'activity.2',
           },
         ],
       },
@@ -166,23 +140,6 @@ test.describe.fixme('Workbench Perspective', () => {
               }),
             }),
           }),
-        },
-        'activity.1': {
-          root: new MPart({
-            id: 'part.testee-1',
-          }),
-        },
-      },
-      activityLayout: {
-        toolbars: {
-          leftTop: {
-            activities: [{id: 'activity.1'}],
-            activeActivityId: 'activity.1',
-          },
-          rightTop: {
-            activities: [{id: 'activity.2'}],
-            activeActivityId: 'none',
-          },
         },
       },
     });
@@ -241,7 +198,7 @@ test.describe.fixme('Workbench Perspective', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'part',
-      qualifier: {id: 'left'},
+      qualifier: {part: 'left'},
       properties: {
         views: [
           {qualifier: {view: 'testee-1'}, cssClass: 'testee-1'},
@@ -251,7 +208,7 @@ test.describe.fixme('Workbench Perspective', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'part',
-      qualifier: {id: 'right-top'},
+      qualifier: {part: 'right-top'},
       properties: {
         views: [
           {qualifier: {view: 'testee-2'}, cssClass: 'testee-2'},
@@ -261,7 +218,7 @@ test.describe.fixme('Workbench Perspective', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'part',
-      qualifier: {id: 'right-bottom'},
+      qualifier: {part: 'right-bottom'},
       properties: {
         views: [
           {qualifier: {view: 'testee-3'}, cssClass: 'testee-3'},
@@ -276,11 +233,11 @@ test.describe.fixme('Workbench Perspective', () => {
         parts: [
           {
             id: 'part.left',
-            qualifier: {id: 'left'},
+            qualifier: {part: 'left'},
           },
           {
             id: 'part.right-top',
-            qualifier: {id: 'right-top'},
+            qualifier: {part: 'right-top'},
             position: {
               align: 'right',
               ratio: .2,
@@ -288,7 +245,7 @@ test.describe.fixme('Workbench Perspective', () => {
           },
           {
             id: 'part.right-bottom',
-            qualifier: {id: 'right-bottom'},
+            qualifier: {part: 'right-bottom'},
             position: {
               relativeTo: 'part.right-top',
               align: 'bottom',
@@ -359,6 +316,117 @@ test.describe.fixme('Workbench Perspective', () => {
     await expect.poll(() => viewPage3.getRouteParams()).toMatchObject({capability: 'testee-3'});
   });
 
+  test('should contribute perspective with docked parts', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {view: 'testee-1'},
+      properties: {
+        path: 'test-view;capability=testee-1',
+        title: 'Test View 1',
+      },
+    });
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {view: 'testee-2'},
+      properties: {
+        path: 'test-view;capability=testee-2',
+        title: 'Test View 2',
+      },
+    });
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {part: 'main-area'},
+    });
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {part: 'right'},
+      properties: {
+        views: [
+          {qualifier: {view: 'testee-2'}, cssClass: 'testee-3'},
+          {qualifier: {view: 'testee-1'}, cssClass: 'testee-4'},
+        ],
+      },
+    });
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {part: 'testee'},
+      properties: {
+        path: 'test-part',
+        extras: {
+          icon: 'folder',
+          label: 'testee',
+        },
+      },
+    });
+
+    const perspective = await microfrontendNavigator.registerCapability('app1', {
+      type: 'perspective',
+      qualifier: {perspective: 'testee'},
+      properties: {
+        parts: [
+          {
+            id: MAIN_AREA,
+            qualifier: {part: 'main-area'},
+          },
+          {
+            id: 'part.testee-1',
+            qualifier: {part: 'testee'},
+            position: 'left-top',
+            active: true,
+            ɵactivityId: 'activity.1',
+          },
+          {
+            id: 'part.testee-2',
+            qualifier: {part: 'testee'},
+            position: 'right-top',
+            active: false,
+            ɵactivityId: 'activity.2',
+          },
+        ],
+      },
+    });
+
+    // Switch perspective.
+    await appPO.switchPerspective(perspective.metadata!.id);
+
+    // Expect layout of the perspective.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      grids: {
+        main: {
+          root: new MPart({
+            id: MAIN_AREA,
+          }),
+        },
+        'activity.1': {
+          root: new MPart({
+            id: 'part.testee-1',
+          }),
+        },
+      },
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activities: [{id: 'activity.1'}],
+            activeActivityId: 'activity.1',
+          },
+          rightTop: {
+            activities: [{id: 'activity.2'}],
+            activeActivityId: 'none',
+          },
+        },
+      },
+    });
+
+    // Assert part of left-top activity.
+    // await expectPart(appPO.part({partId: 'part.testee-1'})).toDisplayComponent('app-part-page'); // TODO [activity]
+  });
+
   test('should activate first view if not specified', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
@@ -373,7 +441,7 @@ test.describe.fixme('Workbench Perspective', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'part',
-      qualifier: {id: 'part'},
+      qualifier: {part: 'part'},
       properties: {
         id: 'part.part',
         views: [
@@ -391,7 +459,7 @@ test.describe.fixme('Workbench Perspective', () => {
         parts: [
           {
             id: 'part.part',
-            qualifier: {id: 'part'},
+            qualifier: {part: 'part'},
           },
         ],
       },
@@ -424,7 +492,7 @@ test.describe.fixme('Workbench Perspective', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'part',
-      qualifier: {id: 'part'},
+      qualifier: {part: 'part'},
       properties: {
         views: [
           {qualifier: {view: 'testee'}, cssClass: 'testee-1'},
@@ -441,7 +509,7 @@ test.describe.fixme('Workbench Perspective', () => {
         parts: [
           {
             id: 'part.part',
-            qualifier: {id: 'part'},
+            qualifier: {part: 'part'},
           },
         ],
       },
@@ -485,12 +553,12 @@ test.describe.fixme('Workbench Perspective', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'part',
-      qualifier: {id: 'main-area'},
+      qualifier: {part: 'main-area'},
     });
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'part',
-      qualifier: {id: 'left'},
+      qualifier: {part: 'left'},
       properties: {
         views: [
           {qualifier: {view: '1'}, cssClass: 'testee-1'},
@@ -506,11 +574,11 @@ test.describe.fixme('Workbench Perspective', () => {
         parts: [
           {
             id: MAIN_AREA,
-            qualifier: {id: 'main-area'},
+            qualifier: {part: 'main-area'},
           },
           {
             id: 'part.left',
-            qualifier: {id: 'left'},
+            qualifier: {part: 'left'},
             position: {
               align: 'left',
             },
@@ -521,7 +589,7 @@ test.describe.fixme('Workbench Perspective', () => {
 
     await microfrontendNavigator.registerCapability('app2', {
       type: 'part',
-      qualifier: {id: 'main-area'},
+      qualifier: {part: 'main-area'},
       properties: {
         id: MAIN_AREA,
       },
@@ -529,7 +597,7 @@ test.describe.fixme('Workbench Perspective', () => {
 
     await microfrontendNavigator.registerCapability('app2', {
       type: 'part',
-      qualifier: {id: 'right'},
+      qualifier: {part: 'right'},
       properties: {
         views: [
           {qualifier: {view: '2'}, cssClass: 'testee-2'},
@@ -546,11 +614,11 @@ test.describe.fixme('Workbench Perspective', () => {
         parts: [
           {
             id: MAIN_AREA,
-            qualifier: {id: 'main-area'},
+            qualifier: {part: 'main-area'},
           },
           {
             id: 'part.right',
-            qualifier: {id: 'right'},
+            qualifier: {part: 'right'},
             position: {
               align: 'right',
             },
@@ -637,11 +705,11 @@ test.describe.fixme('Workbench Perspective', () => {
             parts: [
               {
                 id: MAIN_AREA,
-                qualifier: {id: 'main-area'},
+                qualifier: {part: 'main-area'},
               },
               {
                 id: 'part.left',
-                qualifier: {id: 'left'},
+                qualifier: {part: 'left'},
                 position: {
                   align: 'left',
                 },
@@ -659,11 +727,11 @@ test.describe.fixme('Workbench Perspective', () => {
         },
         {
           type: 'part',
-          qualifier: {id: 'main-area'},
+          qualifier: {part: 'main-area'},
         },
         {
           type: 'part',
-          qualifier: {id: 'left'},
+          qualifier: {part: 'left'},
           properties: {
             views: [
               {qualifier: {view: 'app-1'}, cssClass: 'testee-1'},
@@ -794,11 +862,11 @@ test.describe.fixme('Workbench Perspective', () => {
               parts: [
                 {
                   id: MAIN_AREA,
-                  qualifier: {id: 'main-area'},
+                  qualifier: {part: 'main-area'},
                 },
                 {
                   id: 'part.left',
-                  qualifier: {id: 'left'},
+                  qualifier: {part: 'left'},
                   position: {
                     align: 'left',
                   },
@@ -808,11 +876,11 @@ test.describe.fixme('Workbench Perspective', () => {
           },
           {
             type: 'part',
-            qualifier: {id: 'main-area'},
+            qualifier: {part: 'main-area'},
           },
           {
             type: 'part',
-            qualifier: {id: 'left'},
+            qualifier: {part: 'left'},
             properties: {
               views: [
                 {qualifier: {view: 'testee-1'}, cssClass: 'testee-1'},
@@ -892,11 +960,11 @@ test.describe.fixme('Workbench Perspective', () => {
               parts: [
                 {
                   id: MAIN_AREA,
-                  qualifier: {id: 'main-area'},
+                  qualifier: {part: 'main-area'},
                 },
                 {
                   id: 'part.left',
-                  qualifier: {id: 'left'},
+                  qualifier: {part: 'left'},
                   position: {
                     align: 'left',
                   },
@@ -906,11 +974,11 @@ test.describe.fixme('Workbench Perspective', () => {
           },
           {
             type: 'part',
-            qualifier: {id: 'main-area'},
+            qualifier: {part: 'main-area'},
           },
           {
             type: 'part',
-            qualifier: {id: 'left'},
+            qualifier: {part: 'left'},
             properties: {
               views: [
                 {qualifier: {view: 'testee-1'}, cssClass: 'testee-1'},
@@ -1002,7 +1070,7 @@ test.describe.fixme('Workbench Perspective', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'part',
-      qualifier: {id: 'main-area'},
+      qualifier: {part: 'main-area'},
       properties: {
         id: MAIN_AREA,
       },
@@ -1010,7 +1078,7 @@ test.describe.fixme('Workbench Perspective', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'part',
-      qualifier: {id: 'left'},
+      qualifier: {part: 'left'},
       properties: {
         views: [
           {qualifier: {view: 'app-1'}, cssClass: 'testee-1'},
@@ -1028,11 +1096,11 @@ test.describe.fixme('Workbench Perspective', () => {
         parts: [
           {
             id: MAIN_AREA,
-            qualifier: {id: 'main-area'},
+            qualifier: {part: 'main-area'},
           },
           {
             id: 'part.left',
-            qualifier: {id: 'left'},
+            qualifier: {part: 'left'},
             position: {
               align: 'left',
             },
@@ -1102,7 +1170,7 @@ test.describe.fixme('Workbench Perspective', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'part',
-      qualifier: {id: 'main-area'},
+      qualifier: {part: 'main-area'},
       properties: {
         id: MAIN_AREA,
       },
@@ -1110,7 +1178,7 @@ test.describe.fixme('Workbench Perspective', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'part',
-      qualifier: {id: 'left'},
+      qualifier: {part: 'left'},
       properties: {
         views: [
           {qualifier: {view: 'app-1'}, cssClass: 'testee-1'},
@@ -1127,11 +1195,11 @@ test.describe.fixme('Workbench Perspective', () => {
         parts: [
           {
             id: MAIN_AREA,
-            qualifier: {id: 'main-area'},
+            qualifier: {part: 'main-area'},
           },
           {
             id: 'part.left',
-            qualifier: {id: 'left'},
+            qualifier: {part: 'left'},
             position: {
               align: 'left',
             },
@@ -1359,7 +1427,7 @@ test.describe.fixme('Workbench Perspective', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'part',
-      qualifier: {id: 'main-area'},
+      qualifier: {part: 'main-area'},
       properties: {
         id: MAIN_AREA,
       },
@@ -1367,7 +1435,7 @@ test.describe.fixme('Workbench Perspective', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'part',
-      qualifier: {id: 'left'},
+      qualifier: {part: 'left'},
       properties: {
         views: [
           {qualifier: {view: 'app-1'}, cssClass: 'app-1'},
@@ -1383,11 +1451,11 @@ test.describe.fixme('Workbench Perspective', () => {
         parts: [
           {
             id: MAIN_AREA,
-            qualifier: {id: 'main-area'},
+            qualifier: {part: 'main-area'},
           },
           {
             id: 'part.left',
-            qualifier: {id: 'left'},
+            qualifier: {part: 'left'},
             position: {
               align: 'left',
             },
@@ -1398,12 +1466,12 @@ test.describe.fixme('Workbench Perspective', () => {
 
     await microfrontendNavigator.registerCapability('app2', {
       type: 'part',
-      qualifier: {id: 'main-area'},
+      qualifier: {part: 'main-area'},
     });
 
     await microfrontendNavigator.registerCapability('app2', {
       type: 'part',
-      qualifier: {id: 'right'},
+      qualifier: {part: 'right'},
       properties: {
         views: [
           {qualifier: {view: 'app-2'}, cssClass: 'app-2'},
@@ -1419,11 +1487,11 @@ test.describe.fixme('Workbench Perspective', () => {
         parts: [
           {
             id: MAIN_AREA,
-            qualifier: {id: 'main-area'},
+            qualifier: {part: 'main-area'},
           },
           {
             id: 'part.right',
-            qualifier: {id: 'right'},
+            qualifier: {part: 'right'},
             position: {
               align: 'right',
             },

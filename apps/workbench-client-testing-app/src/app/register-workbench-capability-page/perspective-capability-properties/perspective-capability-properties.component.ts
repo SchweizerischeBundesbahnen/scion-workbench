@@ -64,27 +64,30 @@ export class PerspectiveCapabilityPropertiesComponent implements ControlValueAcc
     this.form.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => {
-        const initialPartFormGroup = this.form.controls.parts.controls.at(0)!;
-        const initialPart: Omit<WorkbenchPartRef, 'position'> = {
-          id: initialPartFormGroup.controls.id.value!,
-          qualifier: initialPartFormGroup.controls.qualifier.value,
-          active: initialPartFormGroup.controls.active.value!,
-          cssClass: initialPartFormGroup.controls.cssClass.value,
-        };
+        const parts: Array<Omit<WorkbenchPartRef, 'position'> | WorkbenchPartRef> = this.form.controls.parts.controls.map((partFormGroup, index) => {
+          if (index === 0) {
+            return {
+              id: partFormGroup.controls.id.value!,
+              qualifier: partFormGroup.controls.qualifier.value,
+              active: partFormGroup.controls.active.value,
+              cssClass: partFormGroup.controls.cssClass.value,
+            };
+          }
 
-        const parts: WorkbenchPartRef[] = this.form.controls.parts.controls.slice(1).map((partFormGroup: FormGroup<PartFormGroup>): WorkbenchPartRef => ({
-          id: partFormGroup.controls.id.value!,
-          position: {
-            relativeTo: partFormGroup.controls.relativeTo.value,
-            align: partFormGroup.controls.align.value!,
-            ratio: partFormGroup.controls.ratio.value!,
-          },
-          qualifier: partFormGroup.controls.qualifier.value,
-          active: partFormGroup.controls.active.value!,
-          cssClass: partFormGroup.controls.cssClass.value,
-        }));
+          return {
+            id: partFormGroup.controls.id.value!,
+            position: {
+              relativeTo: partFormGroup.controls.relativeTo.value,
+              align: partFormGroup.controls.align.value!,
+              ratio: partFormGroup.controls.ratio.value,
+            },
+            qualifier: partFormGroup.controls.qualifier.value,
+            active: partFormGroup.controls.active.value,
+            cssClass: partFormGroup.controls.cssClass.value,
+          };
+        });
 
-        const dockedParts: WorkbenchPartRef[] = this.form.controls.dockedParts.controls.map((partFormGroup: FormGroup<DockedPartFormGroup>): WorkbenchPartRef => ({
+        const dockedParts = this.form.controls.dockedParts.controls.map((partFormGroup: FormGroup<DockedPartFormGroup>): WorkbenchPartRef => ({
           id: partFormGroup.controls.id.value!,
           position: partFormGroup.controls.dockTo.value!,
           qualifier: partFormGroup.controls.qualifier.value,
@@ -95,9 +98,8 @@ export class PerspectiveCapabilityPropertiesComponent implements ControlValueAcc
 
         this._cvaChangeFn({
           parts: [
-            initialPart,
-            ...new Array<WorkbenchPartRef>().concat(dockedParts).concat(parts),
-          ],
+            ...new Array<Omit<WorkbenchPartRef, 'position'> | WorkbenchPartRef>().concat(parts).concat(dockedParts),
+          ] as [Omit<WorkbenchPartRef, 'position'>, ...WorkbenchPartRef[]],
           data: SciKeyValueFieldComponent.toDictionary(this.form.controls.data) ?? undefined,
         });
         this._cvaTouchedFn();
@@ -113,6 +115,7 @@ export class PerspectiveCapabilityPropertiesComponent implements ControlValueAcc
   protected onAddPart(): void {
     const partFormGroup = this.createPartFormGroup();
     this.form.controls.parts.push(partFormGroup);
+    this.updatePartFields();
   }
 
   protected onAddDockedPart(): void {

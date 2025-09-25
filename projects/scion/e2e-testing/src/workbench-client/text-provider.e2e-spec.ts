@@ -197,24 +197,44 @@ test.describe('Text Provider', () => {
         qualifier: {component: 'testee', app: 'app2'},
       });
 
+      // Register left part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'left'},
+        properties: {
+          views: [
+            {qualifier: {component: 'testee', app: 'app1'}, cssClass: 'testee-app1'},
+          ],
+        },
+      });
+
+      // Register right part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'right'},
+        properties: {
+          views: [
+            {qualifier: {component: 'testee', app: 'app2'}, cssClass: 'testee-app2'},
+          ],
+        },
+      });
+
       // Create perspective with test view.
       await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
-          layout: [
+          parts: [
             {
               id: 'part.left',
-              views: [
-                {qualifier: {component: 'testee', app: 'app1'}, cssClass: 'testee-app1'},
-              ],
+              qualifier: {part: 'left'},
             },
             {
               id: 'part.right',
-              align: 'right',
-              views: [
-                {qualifier: {component: 'testee', app: 'app2'}, cssClass: 'testee-app2'},
-              ],
+              qualifier: {part: 'right'},
+              position: {
+                align: 'right',
+              },
             },
           ],
         },
@@ -317,24 +337,44 @@ test.describe('Text Provider', () => {
         qualifier: {component: 'testee', app: 'app2'},
       });
 
+      // Register left part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'left'},
+        properties: {
+          views: [
+            {qualifier: {component: 'testee', app: 'app1'}, cssClass: 'testee-app1'},
+          ],
+        },
+      });
+
+      // Register right part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'right'},
+        properties: {
+          views: [
+            {qualifier: {component: 'testee', app: 'app2'}, cssClass: 'testee-app2'},
+          ],
+        },
+      });
+
       // Create perspective with test view.
       await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
-          layout: [
+          parts: [
             {
               id: 'part.left',
-              views: [
-                {qualifier: {component: 'testee', app: 'app1'}, cssClass: 'testee-app1'},
-              ],
+              qualifier: {part: 'left'},
             },
             {
               id: 'part.right',
-              align: 'right',
-              views: [
-                {qualifier: {component: 'testee', app: 'app2'}, cssClass: 'testee-app2'},
-              ],
+              qualifier: {part: 'right'},
+              position: {
+                align: 'right',
+              },
             },
           ],
         },
@@ -418,24 +458,44 @@ test.describe('Text Provider', () => {
         qualifier: {component: 'testee', app: 'app2'},
       });
 
+      // Register left part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'left'},
+        properties: {
+          views: [
+            {qualifier: {component: 'testee', app: 'app1'}, cssClass: 'testee-app1'},
+          ],
+        },
+      });
+
+      // Register right part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'right'},
+        properties: {
+          views: [
+            {qualifier: {component: 'testee', app: 'app2'}, cssClass: 'testee-app2'},
+          ],
+        },
+      });
+
       // Create perspective with test view.
       await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
-          layout: [
+          parts: [
             {
               id: 'part.left',
-              views: [
-                {qualifier: {component: 'testee', app: 'app1'}, cssClass: 'testee-app1'},
-              ],
+              qualifier: {part: 'left'},
             },
             {
               id: 'part.right',
-              align: 'right',
-              views: [
-                {qualifier: {component: 'testee', app: 'app2'}, cssClass: 'testee-app2'},
-              ],
+              qualifier: {part: 'right'},
+              position: {
+                align: 'right',
+              },
             },
           ],
         },
@@ -1962,24 +2022,44 @@ test.describe('Text Provider', () => {
         qualifier: {component: 'testee', app: 'app2'},
       });
 
+      // Register left part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'left'},
+        properties: {
+          views: [
+            {qualifier: {component: 'text', app: 'app1'}, cssClass: 'text-app1'},
+          ],
+        },
+      });
+
+      // Register right part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'right'},
+        properties: {
+          views: [
+            {qualifier: {component: 'messagebox', app: 'app1'}, cssClass: 'messagebox-opener-app1'},
+          ],
+        },
+      });
+
       // Create perspective with test view.
       await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
-          layout: [
+          parts: [
             {
               id: 'part.left',
-              views: [
-                {qualifier: {component: 'text', app: 'app1'}, cssClass: 'text-app1'},
-              ],
+              qualifier: {part: 'left'},
             },
             {
               id: 'part.right',
-              align: 'right',
-              views: [
-                {qualifier: {component: 'messagebox', app: 'app1'}, cssClass: 'messagebox-opener-app1'},
-              ],
+              qualifier: {part: 'right'},
+              position: {
+                align: 'right',
+              },
             },
           ],
         },
@@ -2054,24 +2134,44 @@ test.describe('Text Provider', () => {
         },
       });
 
+      // Register left part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'left'},
+        properties: {
+          views: [
+            {qualifier: {component: 'text', app: 'app1'}, cssClass: 'text-app1'},
+          ],
+        },
+      });
+
+      // Register right part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'right'},
+        properties: {
+          views: [
+            {qualifier: {component: 'messagebox', app: 'app1'}, cssClass: 'messagebox-opener-app1'},
+          ],
+        },
+      });
+
       // Create perspective with text view and messagebox opener.
       await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
-          layout: [
+          parts: [
             {
               id: 'part.left',
-              views: [
-                {qualifier: {component: 'text', app: 'app1'}, cssClass: 'text-app1'},
-              ],
+              qualifier: {part: 'left'},
             },
             {
               id: 'part.right',
-              align: 'right',
-              views: [
-                {qualifier: {component: 'messagebox', app: 'app1'}, cssClass: 'messagebox-opener-app1'},
-              ],
+              qualifier: {part: 'right'},
+              position: {
+                align: 'right',
+              },
             },
           ],
         },
@@ -2148,24 +2248,44 @@ test.describe('Text Provider', () => {
         },
       });
 
+      // Register left part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'left'},
+        properties: {
+          views: [
+            {qualifier: {component: 'text', app: 'app1'}, cssClass: 'text-app1'},
+          ],
+        },
+      });
+
+      // Register right part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'right'},
+        properties: {
+          views: [
+            {qualifier: {component: 'messagebox', app: 'app1'}, cssClass: 'messagebox-opener-app1'},
+          ],
+        },
+      });
+
       // Create perspective with text view and messagebox opener.
       await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
-          layout: [
+          parts: [
             {
               id: 'part.left',
-              views: [
-                {qualifier: {component: 'text', app: 'app1'}, cssClass: 'text-app1'},
-              ],
+              qualifier: {part: 'left'},
             },
             {
               id: 'part.right',
-              align: 'right',
-              views: [
-                {qualifier: {component: 'messagebox', app: 'app1'}, cssClass: 'messagebox-opener-app1'},
-              ],
+              qualifier: {part: 'right'},
+              position: {
+                align: 'right',
+              },
             },
           ],
         },
@@ -2251,24 +2371,44 @@ test.describe('Text Provider', () => {
         },
       });
 
+      // Register left part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'left'},
+        properties: {
+          views: [
+            {qualifier: {component: 'text', app: 'app1'}, cssClass: 'text-app1'},
+          ],
+        },
+      });
+
+      // Register right part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'right'},
+        properties: {
+          views: [
+            {qualifier: {component: 'notification', app: 'app1'}, cssClass: 'notification-opener-app1'},
+          ],
+        },
+      });
+
       // Create perspective with text view and notification opener.
       await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
-          layout: [
+          parts: [
             {
               id: 'part.left',
-              views: [
-                {qualifier: {component: 'text', app: 'app1'}, cssClass: 'text-app1'},
-              ],
+              qualifier: {part: 'left'},
             },
             {
               id: 'part.right',
-              align: 'right',
-              views: [
-                {qualifier: {component: 'notification', app: 'app1'}, cssClass: 'notification-opener-app1'},
-              ],
+              qualifier: {part: 'right'},
+              position: {
+                align: 'right',
+              },
             },
           ],
         },

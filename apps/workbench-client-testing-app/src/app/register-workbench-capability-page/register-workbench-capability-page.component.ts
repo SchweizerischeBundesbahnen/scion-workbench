@@ -17,6 +17,7 @@ import {firstValueFrom} from 'rxjs';
 import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {JsonPipe} from '@angular/common';
+import {stringifyError} from '../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {parseTypedString} from '../common/parse-typed-value.util';
@@ -154,7 +155,8 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         this.capability = (await firstValueFrom(this._manifestService.lookupCapabilities$({id})))[0];
         this.form.reset();
         this.form.setControl('qualifier', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
-      });
+      })
+      .catch((error: unknown) => this.registerError = stringifyError(error));
   }
 
   private readPerspectiveCapabilityFromUI(): WorkbenchPerspectiveCapabilityV2 {

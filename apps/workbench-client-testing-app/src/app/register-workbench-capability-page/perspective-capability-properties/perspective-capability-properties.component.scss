@@ -1,5 +1,4 @@
 @use '@scion/components.internal/design' as sci-design;
-@use '../../common/fieldset.mixin';
 
 :host {
   display: grid;
@@ -9,9 +8,11 @@
     flex-direction: column;
     gap: 1em;
 
-    section.parts {
-      display: grid;
-      grid-template-columns:
+    > sci-form-field {
+
+      section.parts {
+        display: grid;
+        grid-template-columns:
         1fr // Part ID
         1fr // Qualifier
         1fr // Relative To
@@ -19,116 +20,25 @@
         1fr // Ratio
         min-content // Active
         1fr // Css Class
-        min-content; // Remove Part
-      align-items: start;
-      gap: 1em;
+        min-content; // Add / Remove Part
+        align-items: center;
+        gap: 1em;
+      }
 
-      > div.legend {
+      section.docked-parts {
         display: grid;
-      }
-
-      > div.part-id.legend::after {
-        content: 'Part ID'; // do not include legend mixin to reduce file size
-      }
-
-      > div.relative-to.legend::after {
-        content: 'Relative To'; // do not include legend mixin to reduce file size
-      }
-
-      > div.align.legend::after {
-        content: 'Align'; // do not include legend mixin to reduce file size
-      }
-
-      > div.ratio.legend::after {
-        content: 'Ratio'; // do not include legend mixin to reduce file size
-      }
-
-      > div.qualifier.legend::after {
-        content: 'Qualifier'; // do not include legend mixin to reduce file size
-      }
-
-      > div.active.legend::after {
-        content: 'Active'; // do not include legend mixin to reduce file size
-        left: 0;
-        top: -.25em;
-      }
-
-      > div.active {
-        display: inline-grid;
-        align-self: stretch;
-        width: 3em;
-        place-content: center;
-      }
-
-      > app-multi-value-input.css-class.legend::after {
-        content: 'CSS Class(es)'; // do not include legend mixin to reduce file size
-      }
-
-      button.add-part {
-        grid-column: 1/-1;
-      }
-    }
-
-    section.docked-parts {
-      display: grid;
-      grid-template-columns:
+        grid-template-columns:
         1fr // Part ID
         1fr // Qualifier
-        1fr // Dock to
+        1fr // Dock To
         min-content // Active
-        1fr // ActivityId
         1fr // Css Class
-        min-content; // Remove Part
-      align-items: start;
-      gap: 1em;
-
-      > div.legend {
-        display: grid;
-      }
-
-
-      > div.part-id.legend::after {
-        content: 'Part ID'; // do not include legend mixin to reduce file size
-      }
-
-      > div.qualifier.legend::after {
-        content: 'Qualifier'; // do not include legend mixin to reduce file size
-      }
-
-      > div.dock-to.legend::after {
-        content: 'Dock To'; // do not include legend mixin to reduce file size
-      }
-
-      > div.active.legend::after {
-        content: 'Active'; // do not include legend mixin to reduce file size
-        left: 0;
-        top: -.25em;
-      }
-
-      > div.active {
-        display: inline-grid;
-        align-self: stretch;
-        width: 3em;
-        place-content: center;
-      }
-
-      > div.activity-id.legend::after {
-        content: 'Activity Id'; // do not include legend mixin to reduce file size
-      }
-
-      > app-multi-value-input.css-class.legend::after {
-        content: 'CSS Class(es)'; // do not include legend mixin to reduce file size
-      }
-
-      button.add-part {
-        grid-column: 1/-1;
+        1fr // Activity Id
+        min-content; // Add / Remove Part
+        align-items: center;
+        gap: 1em;
       }
     }
-  }
-
-  // include legend mixin once to reduce file size
-  .legend {
-    @include fieldset.legend(null);
   }
 
   input, select {
