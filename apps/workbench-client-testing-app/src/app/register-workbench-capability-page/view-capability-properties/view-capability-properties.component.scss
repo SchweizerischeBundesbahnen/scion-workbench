@@ -1,0 +1,15 @@
+@use '@scion/components.internal/design' as sci-design;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: .5em;
+  border: 1px solid var(--sci-color-border);
+  border-radius: var(--sci-corner);
+  padding: 1em;
+
+  > header {
+    margin-bottom: 1em;
+    font-weight: bold;
+  }
+}
