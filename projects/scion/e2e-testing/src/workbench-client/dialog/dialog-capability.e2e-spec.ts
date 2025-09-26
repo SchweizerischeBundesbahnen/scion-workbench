@@ -94,7 +94,7 @@ test.describe('Workbench Dialog Capability', () => {
       type: 'dialog',
       qualifier: {component: 'testee-1'},
       properties: {
-        path: '',
+        path: '<string></string>',
         size: {height: '475px', width: '300px'},
       },
     });

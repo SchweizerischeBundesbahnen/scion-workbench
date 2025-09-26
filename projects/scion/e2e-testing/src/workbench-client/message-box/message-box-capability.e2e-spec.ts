@@ -46,7 +46,7 @@ test.describe('Workbench Message Box Capability', () => {
       type: 'messagebox',
       qualifier: {component: 'testee'},
       properties: {
-        path: '',
+        path: '<string></string>',
       },
     });
 

@@ -1,0 +1,37 @@
+<header>Properties</header>
+
+<sci-form-field label="Path">
+  <input [formControl]="form.controls.path" class="e2e-path">
+</sci-form-field>
+
+<sci-form-field label="Title">
+  <input [formControl]="form.controls.title" class="e2e-title">
+</sci-form-field>
+
+<sci-form-field label="Heading">
+  <input [formControl]="form.controls.heading" class="e2e-heading">
+</sci-form-field>
+
+<sci-form-field label="Resolve">
+  <app-record [formControl]="form.controls.resolve" class="e2e-resolve"/>
+</sci-form-field>
+
+<sci-form-field label="Lazy">
+  <sci-checkbox [formControl]="form.controls.lazy" class="e2e-lazy"/>
+</sci-form-field>
+
+<sci-form-field label="Closable">
+  <sci-checkbox [formControl]="form.controls.closable" class="e2e-closable"/>
+</sci-form-field>
+
+<sci-form-field label="Show Splash">
+  <sci-checkbox [formControl]="form.controls.showSplash" class="e2e-show-splash"/>
+</sci-form-field>
+
+<sci-form-field label="CSS Class(es)">
+  <app-multi-value-input [formControl]="form.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
+</sci-form-field>
+
+<sci-form-field label="Pin to Desktop">
+  <sci-checkbox [formControl]="form.controls.pinToDesktop" class="e2e-pin-to-desktop"/>
+</sci-form-field>

@@ -79,7 +79,7 @@ test.describe('Workbench View Capability', () => {
       type: 'view',
       qualifier: {component: 'testee-1'},
       properties: {
-        path: '',
+        path: '<string></string>',
       },
     });
     expect(capability.properties.path).toEqual('');
