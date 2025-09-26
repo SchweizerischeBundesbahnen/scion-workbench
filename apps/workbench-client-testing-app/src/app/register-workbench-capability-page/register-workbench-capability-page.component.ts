@@ -78,36 +78,37 @@ export default class RegisterWorkbenchCapabilityPageComponent {
     const requiredParams: ParamDefinition[] = this.form.controls.requiredParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
     const optionalParams: ParamDefinition[] = this.form.controls.optionalParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
     const transientParams: ViewParamDefinition[] = this.form.controls.transientParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false, transient: true}));
-    const capability: Capability = {
+    const capability: Partial<Capability> = { // Partial to test capability validation
       type: this.form.controls.type.value,
-      qualifier: SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!,
+      qualifier: SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier) ?? undefined,
       params: [
         ...requiredParams,
         ...optionalParams,
         ...(this.form.controls.type.value === WorkbenchCapabilities.View ? transientParams : []),
       ],
+      private: this.form.controls.private.value,
       properties: (() => {
         switch (this.form.controls.type.value) {
           case WorkbenchCapabilities.Perspective:
-            return this.form.controls.perspectiveProperties.value!;
+            return this.form.controls.perspectiveProperties.value;
           case WorkbenchCapabilities.View:
-            return this.form.controls.viewProperties.value!;
+            return this.form.controls.viewProperties.value;
           case WorkbenchCapabilities.Popup:
-            return this.form.controls.popupProperties.value!;
+            return this.form.controls.popupProperties.value;
           case WorkbenchCapabilities.Dialog:
-            return this.form.controls.dialogProperties.value!;
+            return this.form.controls.dialogProperties.value;
           case WorkbenchCapabilities.MessageBox:
-            return this.form.controls.messageBoxProperties.value!;
+            return this.form.controls.messageBoxProperties.value;
           default:
             throw Error('Capability expected to be a workbench capability, but was not.');
         }
-      })(),
+      })() ?? undefined,
     };
 
     this.capability = undefined;
     this.registerError = undefined;
 
-    await this._manifestService.registerCapability(capability)
+    await this._manifestService.registerCapability(capability as Capability)
       .then(async id => {
         this.capability = (await firstValueFrom(this._manifestService.lookupCapabilities$({id})))[0];
         this.form.reset();

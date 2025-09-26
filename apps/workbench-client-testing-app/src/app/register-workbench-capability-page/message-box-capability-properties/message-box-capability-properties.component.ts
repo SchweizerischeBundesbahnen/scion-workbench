@@ -60,7 +60,7 @@ export class MessageBoxCapabilityPropertiesComponent implements ControlValueAcce
       .pipe(takeUntilDestroyed())
       .subscribe(() => {
         this._cvaChangeFn({
-          path: parseTypedString(this.form.controls.path.value)!,
+          path: parseTypedString(this.form.controls.path.value)!, // allow `undefined` to test capability validation
           size: undefinedIfEmpty<WorkbenchMessageBoxSize>({
             width: this.form.controls.size.controls.width.value || undefined,
             height: this.form.controls.size.controls.height.value || undefined,
@@ -69,8 +69,8 @@ export class MessageBoxCapabilityPropertiesComponent implements ControlValueAcce
             minHeight: this.form.controls.size.controls.minHeight.value || undefined,
             maxHeight: this.form.controls.size.controls.maxHeight.value || undefined,
           }),
-          showSplash: this.form.controls.showSplash.value,
-          cssClass: this.form.controls.cssClass.value,
+          showSplash: this.form.controls.showSplash.value ?? undefined,
+          cssClass: this.form.controls.cssClass.value ?? undefined,
         });
         this._cvaTouchedFn();
       });
