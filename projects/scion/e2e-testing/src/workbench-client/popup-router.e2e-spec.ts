@@ -228,7 +228,7 @@ test.describe('Popup Router', () => {
       type: 'popup',
       qualifier: {component: 'testee', path: 'empty'},
       properties: {
-        path: '',
+        path: '<string></string>',
       },
     });
 

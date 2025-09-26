@@ -3,6 +3,9 @@
 
 :host {
   display: grid;
+  border: 1px solid var(--sci-color-border);
+  border-radius: var(--sci-corner);
+  padding: 1em;
 
   > form {
     display: flex;
