@@ -27,6 +27,11 @@ export class MicrofrontendMessageBoxCapabilityValidator implements CapabilityInt
 
     const messageBoxCapability = capability as Partial<WorkbenchMessageBoxCapability>;
 
+    // Assert capability other than the built-in text messsage box capability to have a qualifier.
+    if (!isBuiltInTextMessageBoxCapability(messageBoxCapability) && !Object.keys(messageBoxCapability.qualifier ?? {}).length) {
+      throw Error(`[NullQualifierError] MessageBox capability requires a qualifier [capability=${JSON.stringify(messageBoxCapability)}]`);
+    }
+
     // Assert capability to have a "properties" section.
     if (!messageBoxCapability.properties) {
       throw Error(`[NullPropertiesError] MessageBox capability requires a "properties" section [application="${messageBoxCapability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(messageBoxCapability.qualifier)}"]`);
@@ -36,11 +41,6 @@ export class MicrofrontendMessageBoxCapabilityValidator implements CapabilityInt
     const path = messageBoxCapability.properties.path as unknown;
     if (path === undefined || path === null) {
       throw Error(`[NullPathError] MessageBox capability requires a path to the microfrontend in its properties [application="${messageBoxCapability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(messageBoxCapability.qualifier)}"]`);
-    }
-
-    // Assert capability other than the built-in text messsage box capability to have a qualifier.
-    if (!isBuiltInTextMessageBoxCapability(messageBoxCapability) && !Object.keys(messageBoxCapability.qualifier ?? {}).length) {
-      throw Error(`[NullQualifierError] MessageBox capability requires a qualifier [capability=${JSON.stringify(messageBoxCapability)}]`);
     }
 
     return capability;
