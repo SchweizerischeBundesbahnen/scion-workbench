@@ -1,0 +1,57 @@
+<header>Properties</header>
+
+<sci-form-field label="Path">
+  <input [formControl]="form.controls.path" class="e2e-path">
+</sci-form-field>
+
+<sci-form-field label="Min Height">
+  <input [formControl]="form.controls.size.controls.minHeight" class="e2e-min-height">
+</sci-form-field>
+
+<sci-form-field label="Height">
+  <input [formControl]="form.controls.size.controls.height" class="e2e-height">
+</sci-form-field>
+
+<sci-form-field label="Max Height">
+  <input [formControl]="form.controls.size.controls.maxHeight" class="e2e-max-height">
+</sci-form-field>
+
+<sci-form-field label="Min Width">
+  <input [formControl]="form.controls.size.controls.minWidth" class="e2e-min-width">
+</sci-form-field>
+
+<sci-form-field label="Width">
+  <input [formControl]="form.controls.size.controls.width" class="e2e-width">
+</sci-form-field>
+
+<sci-form-field label="Max Width">
+  <input [formControl]="form.controls.size.controls.maxWidth" class="e2e-max-width">
+</sci-form-field>
+
+<sci-form-field label="Title">
+  <input [formControl]="form.controls.title" class="e2e-title">
+</sci-form-field>
+
+<sci-form-field label="Resolve">
+  <app-record [formControl]="form.controls.resolve" class="e2e-resolve"/>
+</sci-form-field>
+
+<sci-form-field label="Closable">
+  <sci-checkbox [formControl]="form.controls.closable" class="e2e-closable"/>
+</sci-form-field>
+
+<sci-form-field label="Resizable">
+  <sci-checkbox [formControl]="form.controls.resizable" class="e2e-resizable"/>
+</sci-form-field>
+
+<sci-form-field label="Padding">
+  <sci-checkbox [formControl]="form.controls.padding" class="e2e-padding"/>
+</sci-form-field>
+
+<sci-form-field label="Show Splash">
+  <sci-checkbox [formControl]="form.controls.showSplash" class="e2e-show-splash"/>
+</sci-form-field>
+
+<sci-form-field label="CSS Class(es)">
+  <app-multi-value-input [formControl]="form.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
+</sci-form-field>

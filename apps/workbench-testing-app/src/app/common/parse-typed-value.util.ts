@@ -29,7 +29,7 @@ export function parseTypedString<T = unknown>(value: string | undefined | null):
   else if (value === '<null>' || value === null) {
     return null;
   }
-  const paramMatch = /<(?<type>.+)>(?<value>.+)<\/\k<type>>/.exec(value);
+  const paramMatch = /<(?<type>.+)>(?<value>.*)<\/\k<type>>/.exec(value);
   switch (paramMatch?.groups!['type']) {
     case 'number': {
       return numberAttribute(paramMatch.groups['value']) as T;
