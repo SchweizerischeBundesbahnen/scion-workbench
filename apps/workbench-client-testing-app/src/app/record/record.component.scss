@@ -1,11 +1,15 @@
 @use '@scion/components.internal/design' as sci-design;
 
 :host {
+  @include sci-design.style-input-field();
   display: inline-grid;
 
   > input {
-    @include sci-design.style-input-field();
     min-width: 0;
+    border: none;
+    outline: none;
+    padding: unset;
+    background-color: unset;
 
     &::placeholder {
       color: var(--sci-color-gray-400);
