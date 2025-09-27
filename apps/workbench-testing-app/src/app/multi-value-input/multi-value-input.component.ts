@@ -29,6 +29,7 @@ import {Arrays} from '@scion/toolkit/util';
 export class MultiValueInputComponent implements ControlValueAccessor {
 
   public readonly placeholder = input.required<string>();
+  public readonly cssClass = input<string>(undefined, {alias: 'class'});
 
   private _cvaChangeFn: (values: string[] | undefined) => void = noop;
   private _cvaTouchedFn: () => void = noop;
