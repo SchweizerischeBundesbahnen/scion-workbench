@@ -43,6 +43,10 @@ export class MultiValueInputComponent implements ControlValueAccessor {
       });
   }
 
+  protected onBlur(): void {
+    this._cvaTouchedFn();
+  }
+
   /**
    * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
    * @docs-private
