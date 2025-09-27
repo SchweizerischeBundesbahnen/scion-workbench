@@ -12,7 +12,6 @@ import {Component, forwardRef, inject, input} from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {NgClass} from '@angular/common';
 
 @Component({
   selector: 'app-record',
@@ -20,7 +19,6 @@ import {NgClass} from '@angular/common';
   styleUrls: ['./record.component.scss'],
   imports: [
     ReactiveFormsModule,
-    NgClass,
   ],
   providers: [
     {provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => RecordComponent)},
@@ -42,6 +40,10 @@ export class RecordComponent implements ControlValueAccessor {
         this._cvaChangeFn(this.parse(this.formControl.value));
         this._cvaTouchedFn();
       });
+  }
+
+  protected onBlur(): void {
+    this._cvaTouchedFn();
   }
 
   private parse(stringified: string): Record<string, string> | undefined {
