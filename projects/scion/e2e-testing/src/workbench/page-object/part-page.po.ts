@@ -97,7 +97,7 @@ export class PartPagePO {
   }
 
   public async enterCssClass(cssClass: string | string[]): Promise<void> {
-    await this.locator.locator('app-multi-value-input.e2e-class input').fill(coerceArray(cssClass).join(' '));
+    await this.locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
   }
 
   public async registerPartActions(partAction: WorkbenchPartActionDescriptor | WorkbenchPartActionDescriptor[]): Promise<void> {
