@@ -64,7 +64,7 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO {
   }
 
   public async enterCssClass(cssClass: string | string[]): Promise<void> {
-    await this.locator.locator('app-multi-value-input.e2e-class input').fill(coerceArray(cssClass).join(' '));
+    await this.locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
   }
 
   public async open(): Promise<void> {
@@ -78,7 +78,7 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO {
   }
 
   private async waitUntilNotificationAttached(): Promise<void> {
-    const cssClass = (await this.locator.locator('app-multi-value-input.e2e-class input').inputValue()).split(/\s+/).filter(Boolean);
+    const cssClass = (await this.locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
     const notification = this._appPO.notification({cssClass});
     await notification.locator.waitFor({state: 'visible'});
   }
