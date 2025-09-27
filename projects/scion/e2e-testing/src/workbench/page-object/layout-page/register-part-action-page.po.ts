@@ -23,7 +23,7 @@ export class RegisterPartActionPagePO {
   public async registerPartAction(content: string, options?: {align?: 'start' | 'end'; viewId?: ViewId | ViewId[]; partId?: PartId | PartId[]; grid?: 'main' | 'mainArea'; cssClass?: string | string[]}): Promise<void> {
     await this.locator.locator('input.e2e-content').fill(content);
     await this.locator.locator('select.e2e-align').selectOption(options?.align ?? '');
-    await this.locator.locator('app-multi-value-input.e2e-class input').fill(coerceArray(options?.cssClass).join(' '));
+    await this.locator.locator('input.e2e-class').fill(coerceArray(options?.cssClass).join(' '));
     await this.locator.locator('input.e2e-view-id').fill(coerceArray(options?.viewId).join(' '));
     await this.locator.locator('input.e2e-part-id').fill(coerceArray(options?.partId).join(' '));
     await this.locator.locator('input.e2e-grid').fill(options?.grid ?? '');
