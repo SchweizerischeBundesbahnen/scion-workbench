@@ -27,7 +27,7 @@
           {
             "id": "main-area",
             "qualifier": {
-              "part": "main-area"
+              "part": "_main-area"
             }
           },
           {
@@ -98,7 +98,7 @@
     {
       "type": "part",
       "qualifier": {
-        "part": "main-area"
+        "part": "_main-area"
       },
       "private": true,
       "properties": {

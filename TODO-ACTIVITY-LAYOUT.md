@@ -4,6 +4,7 @@
    [] Test that "Not Found" page is displayed instantly when removing capability (also for views)
    [] Test that workbench startup does not fail if initial perspective errors
    [] Part Tests Focus and Translatable
+[] Close view if capability not found
 
 ## TODO PHASE 2
 [] Host Part

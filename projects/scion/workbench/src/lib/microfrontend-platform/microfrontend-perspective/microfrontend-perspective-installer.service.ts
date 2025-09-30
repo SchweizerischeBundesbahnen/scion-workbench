@@ -126,13 +126,24 @@ export class MicrofrontendPerspectiveInstaller {
    * Adds given part to the layout.
    *
    * - If multiple part capabilities are found, logs an error and uses the first.
-   * - If no part capability is found, ignores the part. No error is logged to support conditional parts, unless there are parts not visible to the perspective provider.
+   * - If no part capability is found, ignores the part if it's a docked part, otherwise creates an empty part. No error is logged to support conditional parts, unless there are parts not visible to the perspective provider.
    * - A part is navigated only if the capability specifies a path.
    */
   private async addPart(partRef: WorkbenchPartRef, perspectiveCapability: WorkbenchPerspectiveCapability, layout: WorkbenchLayout): Promise<WorkbenchLayout> {
     const partCapability = await this.lookupCapability<WorkbenchPartCapability>(WorkbenchCapabilities.Part, partRef.qualifier, {requester: perspectiveCapability, logLevelIfEmpty: 'debug'});
     if (!partCapability) {
-      return layout;
+      if (typeof partRef.position === 'string') {
+        // Ignore docked part if capability not found.
+        return layout;
+      }
+      return layout.addPart(partRef.id, {
+        relativeTo: partRef.position.relativeTo,
+        align: partRef.position.align,
+        ratio: partRef.position.ratio,
+      }, {
+        activate: partRef.active,
+        cssClass: [...Arrays.coerce(partRef.cssClass)],
+      });
     }
 
     // Validate part capability.
@@ -245,7 +256,7 @@ export class MicrofrontendPerspectiveInstaller {
     }
 
     if (visibleCapabilities.length > 1) {
-      this._logger.error(`[PerspectiveDefinitionError] Multiple ${type} capabilities found for qualifier '${Objects.toMatrixNotation(qualifier)}' in ${requester.type} '${Objects.toMatrixNotation(requester.qualifier)}' of app '${app(requester)}'. Defaulting to first. Ensure views to have a unique qualifier.`, LoggerNames.MICROFRONTEND);
+      this._logger.error(`[PerspectiveDefinitionError] Multiple ${type} capabilities found for qualifier '${Objects.toMatrixNotation(qualifier)}' in ${requester.type} '${Objects.toMatrixNotation(requester.qualifier)}' of app '${app(requester)}'. Defaulting to first. Ensure ${type} capabilities to have a unique qualifier.`, LoggerNames.MICROFRONTEND);
     }
     else if (!visibleCapabilities.length && capabilities.length) {
       this._logger.error(`[PerspectiveDefinitionError] Application '${app(requester)}' is not qualified to use ${type} capability '${Objects.toMatrixNotation(qualifier)}' in ${requester.type} '${Objects.toMatrixNotation(requester.qualifier)}'. Ensure to have declared an intention and the capability is not private.`, LoggerNames.MICROFRONTEND);

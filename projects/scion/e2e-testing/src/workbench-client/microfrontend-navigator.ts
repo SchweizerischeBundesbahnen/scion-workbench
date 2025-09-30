@@ -141,7 +141,7 @@ export class MicrofrontendNavigator {
   /**
    * Use to register a workbench intention.
    */
-  public async registerIntention(app: 'app1' | 'app2', intention: Intention & {type: 'perspective' | 'view' | 'dialog' | 'popup' | 'messagebox' | 'notification' | 'text-provider'}): Promise<string> {
+  public async registerIntention(app: 'app1' | 'app2', intention: Intention & {type: 'perspective' | 'part' | 'view' | 'dialog' | 'popup' | 'messagebox' | 'notification' | 'text-provider'}): Promise<string> {
     const registerIntentionPage = await this.openInNewTab(RegisterWorkbenchIntentionPagePO, app);
     try {
       return await registerIntentionPage.registerIntention(intention);

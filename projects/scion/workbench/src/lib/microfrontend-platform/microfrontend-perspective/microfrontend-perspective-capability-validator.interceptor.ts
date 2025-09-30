@@ -42,9 +42,9 @@ export class MicrofrontendPerspectiveCapabilityValidator implements CapabilityIn
 
     // Assert parts to have an id.
     const parts = perspectiveCapability.properties.parts as Partial<WorkbenchPartRef>[];
-    parts.forEach(part => {
+    parts.forEach((part, index) => {
       if (!part.id) {
-        throw Error(`[PerspectiveDefinitionError] Missing required 'id' property in part '${part.id}' [app=${app(perspectiveCapability)}, perspective=${qualifier(perspectiveCapability)}]`);
+        throw Error(`[PerspectiveDefinitionError] Missing required 'id' property of part at index '${index}' [app=${app(perspectiveCapability)}, perspective=${qualifier(perspectiveCapability)}]`);
       }
     });
 
