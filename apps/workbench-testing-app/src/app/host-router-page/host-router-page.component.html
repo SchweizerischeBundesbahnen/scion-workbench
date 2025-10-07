@@ -1,0 +1,59 @@
+<form autocomplete="off" [formGroup]="form">
+  <section>
+    <header>View Intent</header>
+
+    <sci-form-field label="Qualifier">
+      <sci-key-value-field [keyValueFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"/>
+    </sci-form-field>
+
+    <sci-form-field label="Params">
+      <sci-key-value-field [keyValueFormArray]="form.controls.params" [addable]="true" [removable]="true" class="e2e-params"/>
+    </sci-form-field>
+  </section>
+
+  <section>
+    <header>Navigation Extras</header>
+
+    <sci-form-field label="Target">
+      <input [formControl]="form.controls.target" class="e2e-target" [attr.list]="targetList">
+      <datalist [attr.id]="targetList">
+        <option value="auto">auto</option>
+        <option value="blank">blank</option>
+      </datalist>
+    </sci-form-field>
+
+    <sci-form-field label="Part ID">
+      <input [formControl]="form.controls.partId" class="e2e-part-id">
+    </sci-form-field>
+
+    <sci-form-field label="Position">
+      <input [formControl]="form.controls.position" [attr.list]="positionList" class="e2e-position">
+      <datalist [attr.id]="positionList">
+        <option value="start">
+        <option value="end">
+        <option value="before-active-view">
+        <option value="after-active-view">
+      </datalist>
+    </sci-form-field>
+
+    <sci-form-field label="Activate">
+      <sci-checkbox [formControl]="form.controls.activate" class="e2e-activate"/>
+    </sci-form-field>
+
+    <sci-form-field label="Close">
+      <sci-checkbox [formControl]="form.controls.close" class="e2e-close"/>
+    </sci-form-field>
+
+    <sci-form-field label="CSS Class(es)">
+      <app-multi-value-input [formControl]="form.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
+    </sci-form-field>
+  </section>
+
+  <button (click)="onNavigate()" class="e2e-navigate" [disabled]="form.invalid" sci-primary>Navigate</button>
+
+  @if (navigateError) {
+    <output class="navigate-error e2e-navigate-error">
+      {{navigateError}}
+    </output>
+  }
+</form>

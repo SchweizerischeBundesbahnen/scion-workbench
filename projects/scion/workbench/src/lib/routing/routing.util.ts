@@ -13,7 +13,7 @@ import {Commands} from '../routing/routing.model';
 import {inject} from '@angular/core';
 import {EMPTY, iif, MonoTypeOperatorFunction, Observable, of, OperatorFunction, pairwise, race, switchMap} from 'rxjs';
 import {filter, map, startWith, take} from 'rxjs/operators';
-import {DialogOutlet, isDialogOutlet, isPartOutlet, isPopupOutlet, isViewOutlet, PartOutlet, PopupOutlet, ViewOutlet, WorkbenchOutlet} from '../workbench.identifiers';
+import {DialogOutlet, HostPartOutlet, HostViewOutlet, isDialogOutlet, isHostPartOutlet, isHostViewOutlet, isPartOutlet, isPopupOutlet, isViewOutlet, PartOutlet, PopupOutlet, ViewOutlet, WorkbenchOutlet} from '../workbench.identifiers';
 
 /**
  * Provides utility functions for router operations.
@@ -208,17 +208,25 @@ export const Routing = {
 } as const;
 
 function parseOutlets(url: UrlTree, selector: {view: true}): Map<ViewOutlet, UrlSegment[]>;
+function parseOutlets(url: UrlTree, selector: {hostView: true}): Map<HostViewOutlet, UrlSegment[]>;
 function parseOutlets(url: UrlTree, selector: {part: true}): Map<PartOutlet, UrlSegment[]>;
+function parseOutlets(url: UrlTree, selector: {hostPart: true}): Map<HostPartOutlet, UrlSegment[]>;
 function parseOutlets(url: UrlTree, selector: {dialog: true}): Map<DialogOutlet, UrlSegment[]>;
 function parseOutlets(url: UrlTree, selector: {popup: true}): Map<PopupOutlet, UrlSegment[]>;
-function parseOutlets(url: UrlTree, selector: {view?: true; part?: true; dialog?: true; popup?: true}): Map<WorkbenchOutlet, UrlSegment[]>;
-function parseOutlets(url: UrlTree, selector: {view?: true; part?: true; dialog?: true; popup?: true}): Map<WorkbenchOutlet, UrlSegment[]> {
+function parseOutlets(url: UrlTree, selector: {view?: true; hostView?: true; part?: true; hostPart?: true; dialog?: true; popup?: true}): Map<WorkbenchOutlet, UrlSegment[]>;
+function parseOutlets(url: UrlTree, selector: {view?: true; hostView?: true; part?: true; hostPart?: true; dialog?: true; popup?: true}): Map<WorkbenchOutlet, UrlSegment[]> {
   const outlets = new Map<WorkbenchOutlet, UrlSegment[]>();
   Object.entries(url.root.children).forEach(([outlet, segmentGroup]) => {
     if (selector.view && isViewOutlet(outlet)) {
       outlets.set(outlet, segmentGroup.segments);
     }
+    if (selector.hostView && isHostViewOutlet(outlet)) {
+      outlets.set(outlet, segmentGroup.segments);
+    }
     if (selector.part && isPartOutlet(outlet)) {
+      outlets.set(outlet, segmentGroup.segments);
+    }
+    if (selector.hostPart && isHostPartOutlet(outlet)) {
       outlets.set(outlet, segmentGroup.segments);
     }
     if (selector.dialog && isDialogOutlet(outlet)) {

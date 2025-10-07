@@ -1,0 +1,59 @@
+@use '@scion/components.internal/design' as sci-design;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: .5em;
+
+  > section {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: .5em;
+    border: 1px solid var(--sci-color-border);
+    border-radius: var(--sci-corner);
+    padding: 1em;
+
+    > header {
+      margin-bottom: 1em;
+      font-weight: bold;
+    }
+
+    > div.parts {
+      display: grid;
+      grid-template-columns:
+        minmax(5em, 10em) // Part ID
+        minmax(10em, 1fr) // Qualifier
+        minmax(10em, 1fr) // Params
+        minmax(5em, 10em) // Align
+        minmax(5em, 10em) // Relative To
+        minmax(5em, 10em) // Ratio
+        minmax(5em, 10em) // CSS Class
+        min-content // Active
+        min-content; // Add / Remove Part
+      align-items: center;
+      gap: 1em;
+    }
+
+    > div.docked-parts {
+      display: grid;
+      grid-template-columns:
+        minmax(5em, 10em) // Part ID
+        minmax(10em, 1fr) // Qualifier
+        minmax(10em, 1fr) // Params
+        minmax(5em, 21em) // Dock To
+        minmax(5em, 10em) // Activity Id
+        minmax(5em, 10em) // CSS Class
+        min-content // Active
+        min-content; // Add / Remove Part
+      align-items: center;
+      gap: 1em;
+    }
+  }
+
+  input, select {
+    @include sci-design.style-input-field();
+    height: 1.25em;
+    min-width: 0;
+  }
+}

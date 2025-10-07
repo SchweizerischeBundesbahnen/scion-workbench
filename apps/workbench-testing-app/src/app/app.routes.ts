@@ -156,6 +156,18 @@ export const routes: Routes = [
     data: {[WorkbenchRouteData.title]: 'Workbench Popup', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-popup-opener', pinToDesktop: true},
   },
   {
+    path: 'register-workbench-capability',
+    loadComponent: () => import('./register-workbench-capability-page/register-workbench-capability-page.component'),
+  },
+  {
+    path: 'test-host-view',
+    loadComponent: () => import('./host-view-page/host-view-page.component'),
+  },
+  {
+    path: 'test-host-part',
+    loadComponent: () => import('./host-part-page/host-part-page.component'),
+  },
+  {
     path: 'test-host-popup',
     loadComponent: () => import('./host-popup-page/host-popup-page.component'),
   },
@@ -166,6 +178,10 @@ export const routes: Routes = [
   {
     path: 'test-host-message-box',
     loadComponent: () => import('./host-message-box-page/host-message-box-page.component'),
+  },
+  {
+    path: 'test-host-router',
+    loadComponent: () => import('./host-router-page/host-router-page.component'),
   },
   {
     path: '',

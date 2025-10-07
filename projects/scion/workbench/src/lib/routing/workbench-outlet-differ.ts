@@ -12,7 +12,8 @@ import {inject, Injectable, IterableChanges, IterableDiffers} from '@angular/cor
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {UrlTree} from '@angular/router';
 import {Routing} from './routing.util';
-import {DialogOutlet, PartOutlet, PopupOutlet, ViewOutlet} from '../workbench.identifiers';
+import {DialogOutlet, HostPartOutlet, HostViewOutlet, PartOutlet, PopupOutlet, ViewOutlet} from '../workbench.identifiers';
+import {MicrofrontendPartNavigationData} from '../microfrontend-platform/microfrontend-part/microfrontend-part-navigation-data';
 
 /**
  * Stateful differ to compute added and removed outlets.
@@ -23,7 +24,9 @@ import {DialogOutlet, PartOutlet, PopupOutlet, ViewOutlet} from '../workbench.id
 export class WorkbenchOutletDiffer {
 
   private readonly _viewsDiffer = inject(IterableDiffers).find([]).create<ViewOutlet>();
+  private readonly _hostViewsDiffer = inject(IterableDiffers).find([]).create<HostViewOutlet>();
   private readonly _partsDiffer = inject(IterableDiffers).find([]).create<PartOutlet>();
+  private readonly _hostPartsDiffer = inject(IterableDiffers).find([]).create<HostPartOutlet>();
   private readonly _popupsDiffer = inject(IterableDiffers).find([]).create<PopupOutlet>();
   private readonly _dialogsDiffer = inject(IterableDiffers).find([]).create<DialogOutlet>();
 
@@ -36,8 +39,19 @@ export class WorkbenchOutletDiffer {
     // the URL does not contain outlets for empty-path navigations.
     const viewOutlets = new Set([
       ...Routing.parseOutlets(urlTree, {view: true}).keys(),
-      ...workbenchLayout?.views().map(view => view.id) ?? [],
+      ...workbenchLayout?.views()?.map(view => view.id) ?? [],
     ]);
+    const hostViewOutlets = new Set([
+      ...Routing.parseOutlets(urlTree, {hostView: true}).keys(),
+      ...workbenchLayout?.views().map(view => `host-${view.id}` as HostViewOutlet) ?? [],
+    ]);
+    // const hostViewOutlets = new Set([
+    //   ...Routing.parseOutlets(urlTree, {hostView: true}).keys(),
+    //   ...workbenchLayout?.views().filter(view => {
+    //     const data = view.navigation?.data as unknown as MicrofrontendViewNavigationData | undefined;
+    //     return data?.isHostProvider;
+    //   }).map(view => `host-${view.id}` as HostViewOutlet) ?? [],
+    // ]);
     // Combine part outlets from the URL and the layout, using a `Set` to remove duplicate entries.
     // We require both sources because the layout is not available during initial navigation, and
     // the URL does not contain outlets for empty-path navigations.
@@ -46,12 +60,22 @@ export class WorkbenchOutletDiffer {
       ...workbenchLayout?.parts().map(part => part.id) ?? [],
     ]);
 
+    const hostPartOutlets = new Set([
+      ...Routing.parseOutlets(urlTree, {hostPart: true}).keys(),
+      ...workbenchLayout?.parts().filter(part => {
+        const data = part.navigation?.data as unknown as MicrofrontendPartNavigationData | undefined;
+        return data?.isHostProvider;
+      }).map(part => `host-${part.id}` as HostPartOutlet) ?? [],
+    ]);
+
     const popupOutlets = Routing.parseOutlets(urlTree, {popup: true}).keys();
     const dialogOutlets = Routing.parseOutlets(urlTree, {dialog: true}).keys();
 
     return new WorkbenchOutletDiff({
       views: this._viewsDiffer.diff(viewOutlets),
+      hostViews: this._hostViewsDiffer.diff(hostViewOutlets),
       parts: this._partsDiffer.diff(partOutlets),
+      hostParts: this._hostPartsDiffer.diff(hostPartOutlets),
       popups: this._popupsDiffer.diff(popupOutlets),
       dialogs: this._dialogsDiffer.diff(dialogOutlets),
     });
@@ -66,8 +90,14 @@ export class WorkbenchOutletDiff {
   public readonly addedViewOutlets = new Array<ViewOutlet>();
   public readonly removedViewOutlets = new Array<ViewOutlet>();
 
+  public readonly addedHostViewOutlets = new Array<HostViewOutlet>();
+  public readonly removedHostViewOutlets = new Array<HostViewOutlet>();
+
   public readonly addedPartOutlets = new Array<PartOutlet>();
   public readonly removedPartOutlets = new Array<PartOutlet>();
+
+  public readonly addedHostPartOutlets = new Array<HostPartOutlet>();
+  public readonly removedHostPartOutlets = new Array<HostPartOutlet>();
 
   public readonly addedPopupOutlets = new Array<PopupOutlet>();
   public readonly removedPopupOutlets = new Array<PopupOutlet>();
@@ -79,8 +109,14 @@ export class WorkbenchOutletDiff {
     changes.views?.forEachAddedItem(({item}) => this.addedViewOutlets.push(item));
     changes.views?.forEachRemovedItem(({item}) => this.removedViewOutlets.push(item));
 
+    changes.hostViews?.forEachAddedItem(({item}) => this.addedHostViewOutlets.push(item));
+    changes.hostViews?.forEachRemovedItem(({item}) => this.removedHostViewOutlets.push(item));
+
     changes.parts?.forEachAddedItem(({item}) => this.addedPartOutlets.push(item));
     changes.parts?.forEachRemovedItem(({item}) => this.removedPartOutlets.push(item));
+
+    changes.hostParts?.forEachAddedItem(({item}) => this.addedHostPartOutlets.push(item));
+    changes.hostParts?.forEachRemovedItem(({item}) => this.removedHostPartOutlets.push(item));
 
     changes.popups?.forEachAddedItem(({item}) => this.addedPopupOutlets.push(item));
     changes.popups?.forEachRemovedItem(({item}) => this.removedPopupOutlets.push(item));
@@ -94,8 +130,14 @@ export class WorkbenchOutletDiff {
       .concat(this.addedViewOutlets.length ? `addedViewOutlets=[${this.addedViewOutlets}]` : [])
       .concat(this.removedViewOutlets.length ? `removedViewOutlets=[${this.removedViewOutlets}]` : [])
 
+      .concat(this.addedHostViewOutlets.length ? `addedHostViewOutlets=[${this.addedHostViewOutlets}]` : [])
+      .concat(this.removedHostViewOutlets.length ? `removedHostViewOutlets=[${this.removedHostViewOutlets}]` : [])
+
       .concat(this.addedPartOutlets.length ? `addedPartOutlets=[${this.addedPartOutlets}]` : [])
       .concat(this.removedPartOutlets.length ? `removedPartOutlets=[${this.removedPartOutlets}]` : [])
+
+      .concat(this.addedHostPartOutlets.length ? `addedHostPartOutlets=[${this.addedHostPartOutlets}]` : [])
+      .concat(this.removedHostPartOutlets.length ? `removedHostPartOutlets=[${this.removedHostPartOutlets}]` : [])
 
       .concat(this.addedPopupOutlets.length ? `addedPopupOutlets=[${this.addedPopupOutlets}]` : [])
       .concat(this.removedPopupOutlets.length ? `removedPopupOutlets=[${this.removedPopupOutlets}]` : [])
@@ -108,7 +150,9 @@ export class WorkbenchOutletDiff {
 
 interface WorkbenchOutletChanges {
   views: IterableChanges<ViewOutlet> | null;
+  hostViews: IterableChanges<HostViewOutlet> | null;
   parts: IterableChanges<PartOutlet> | null;
+  hostParts: IterableChanges<HostPartOutlet> | null;
   popups: IterableChanges<PopupOutlet> | null;
   dialogs: IterableChanges<DialogOutlet> | null;
 }

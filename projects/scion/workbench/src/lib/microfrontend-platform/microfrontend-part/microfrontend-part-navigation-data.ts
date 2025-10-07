@@ -11,4 +11,5 @@
 export interface MicrofrontendPartNavigationData {
   capabilityId: string;
   params: {[name: string]: unknown};
+  isHostProvider: boolean;
 }

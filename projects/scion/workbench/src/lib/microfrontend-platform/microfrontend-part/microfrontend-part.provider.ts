@@ -14,7 +14,7 @@ import {CapabilityInterceptor} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '@scion/workbench-client';
 import {STABLE_CAPABILITY_ID} from '../stable-capability-id-assigner.interceptor';
 import {MicrofrontendPartCapabilityValidator} from './microfrontend-part-capability-validator.interceptor';
-import {provideMicrofrontendPartRoute} from './microfrontend-part-routes';
+import {provideMicrofrontendHostPartRoute, provideMicrofrontendPartRoute} from './microfrontend-part-routes';
 import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer.provider';
 
 /**
@@ -24,6 +24,7 @@ export function provideParts(): EnvironmentProviders {
   return makeEnvironmentProviders([
     MicrofrontendPartCapabilityValidator,
     provideMicrofrontendPartRoute(),
+    provideMicrofrontendHostPartRoute(),
     {provide: STABLE_CAPABILITY_ID, useValue: WorkbenchCapabilities.Part, multi: true},
     provideMicrofrontendPlatformInitializer(onPreStartup, {phase: MicrofrontendPlatformStartupPhase.PreStartup}),
   ]);

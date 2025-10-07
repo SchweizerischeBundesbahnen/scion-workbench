@@ -36,45 +36,45 @@ export class MicrofrontendNavigator {
   /**
    * Opens the page to test the message box in a new workbench tab.
    */
-  public openInNewTab(page: Type<MessageBoxOpenerPagePO>, app: 'app1' | 'app2'): Promise<MessageBoxOpenerPagePO>;
+  public openInNewTab(page: Type<MessageBoxOpenerPagePO>, app: 'app1' | 'app2' | 'host'): Promise<MessageBoxOpenerPagePO>;
   /**
    * Opens the page to test the notification in a new workbench tab.
    */
-  public openInNewTab(page: Type<NotificationOpenerPagePO>, app: 'app1' | 'app2'): Promise<NotificationOpenerPagePO>;
+  public openInNewTab(page: Type<NotificationOpenerPagePO>, app: 'app1' | 'app2' | 'host'): Promise<NotificationOpenerPagePO>;
   /**
    * Opens the page to register intentions in a new workbench tab.
    */
-  public openInNewTab(page: Type<RegisterWorkbenchIntentionPagePO>, app: 'app1' | 'app2'): Promise<RegisterWorkbenchIntentionPagePO>;
+  public openInNewTab(page: Type<RegisterWorkbenchIntentionPagePO>, app: 'app1' | 'app2' | 'host'): Promise<RegisterWorkbenchIntentionPagePO>;
   /**
    * Opens the page to register capabilities in a new workbench tab.
    */
-  public openInNewTab(page: Type<RegisterWorkbenchCapabilityPagePO>, app: 'app1' | 'app2'): Promise<RegisterWorkbenchCapabilityPagePO>;
+  public openInNewTab(page: Type<RegisterWorkbenchCapabilityPagePO>, app: 'app1' | 'app2' | 'host'): Promise<RegisterWorkbenchCapabilityPagePO>;
   /**
    * Opens the page to unregister capabilities in a new workbench tab.
    */
-  public openInNewTab(page: Type<UnregisterWorkbenchCapabilityPagePO>, app: 'app1' | 'app2'): Promise<UnregisterWorkbenchCapabilityPagePO>;
+  public openInNewTab(page: Type<UnregisterWorkbenchCapabilityPagePO>, app: 'app1' | 'app2' | 'host'): Promise<UnregisterWorkbenchCapabilityPagePO>;
   /**
    * Opens the page to inspect view properties in a new workbench tab.
    */
-  public openInNewTab(page: Type<ViewPagePO>, app: 'app1' | 'app2'): Promise<ViewPagePO>;
+  public openInNewTab(page: Type<ViewPagePO>, app: 'app1' | 'app2' | 'host'): Promise<ViewPagePO>;
   /**
    * Opens the page to navigate to microfrontends in a new workbench tab.
    */
-  public openInNewTab(page: Type<RouterPagePO>, app: 'app1' | 'app2'): Promise<RouterPagePO>;
+  public openInNewTab(page: Type<RouterPagePO>, app: 'app1' | 'app2' | 'host'): Promise<RouterPagePO>;
   /**
    * Opens the page to open popups in a new workbench tab.
    */
-  public openInNewTab(page: Type<PopupOpenerPagePO>, app: 'app1' | 'app2'): Promise<PopupOpenerPagePO>;
+  public openInNewTab(page: Type<PopupOpenerPagePO>, app: 'app1' | 'app2' | 'host'): Promise<PopupOpenerPagePO>;
   /**
    * Opens the page to open dialog in a new workbench tab.
    */
-  public openInNewTab(page: Type<DialogOpenerPagePO>, app: 'app1' | 'app2'): Promise<DialogOpenerPagePO>;
+  public openInNewTab(page: Type<DialogOpenerPagePO>, app: 'app1' | 'app2' | 'host'): Promise<DialogOpenerPagePO>;
   /**
    * Opens the page to exchange messages in a new workbench tab.
    */
-  public openInNewTab(page: Type<MessagingPagePO>, app: 'app1' | 'app2'): Promise<MessagingPagePO>;
+  public openInNewTab(page: Type<MessagingPagePO>, app: 'app1' | 'app2' | 'host'): Promise<MessagingPagePO>;
 
-  public async openInNewTab(page: Type<any>, app: 'app1' | 'app2'): Promise<any> {
+  public async openInNewTab(page: Type<any>, app: 'app1' | 'app2' | 'host'): Promise<any> {
     const startPage = await this._appPO.openNewViewTab();
     const viewId = await startPage.view.getViewId();
 
@@ -128,7 +128,7 @@ export class MicrofrontendNavigator {
   /**
    * Use to register a workbench capability.
    */
-  public async registerCapability<T extends WorkbenchPerspectiveCapability | WorkbenchPartCapability | WorkbenchViewCapability | WorkbenchPopupCapability | WorkbenchDialogCapability | WorkbenchMessageBoxCapability>(app: 'app1' | 'app2', capability: T): Promise<T & Capability> {
+  public async registerCapability<T extends WorkbenchPerspectiveCapability | WorkbenchPartCapability | WorkbenchViewCapability | WorkbenchPopupCapability | WorkbenchDialogCapability | WorkbenchMessageBoxCapability>(app: 'app1' | 'app2' | 'host' | 'host', capability: T): Promise<T & Capability> {
     const registerCapabilityPage = await this.openInNewTab(RegisterWorkbenchCapabilityPagePO, app);
     try {
       return await registerCapabilityPage.registerCapability(capability);
@@ -141,7 +141,7 @@ export class MicrofrontendNavigator {
   /**
    * Use to register a workbench intention.
    */
-  public async registerIntention(app: 'app1' | 'app2', intention: Intention & {type: 'perspective' | 'part' | 'view' | 'dialog' | 'popup' | 'messagebox' | 'notification' | 'text-provider'}): Promise<string> {
+  public async registerIntention(app: 'app1' | 'app2' | 'host', intention: Intention & {type: 'perspective' | 'part' | 'view' | 'dialog' | 'popup' | 'messagebox' | 'notification' | 'text-provider'}): Promise<string> {
     const registerIntentionPage = await this.openInNewTab(RegisterWorkbenchIntentionPagePO, app);
     try {
       return await registerIntentionPage.registerIntention(intention);
@@ -154,7 +154,7 @@ export class MicrofrontendNavigator {
   /**
    * Use to unregister a workbench capability.
    */
-  public async unregisterCapability(app: 'app1' | 'app2', id: string): Promise<void> {
+  public async unregisterCapability(app: 'app1' | 'app2' | 'host', id: string): Promise<void> {
     const unregisterCapabilityPage = await this.openInNewTab(UnregisterWorkbenchCapabilityPagePO, app);
     try {
       await unregisterCapabilityPage.unregisterCapability(id);
@@ -167,7 +167,7 @@ export class MicrofrontendNavigator {
   /**
    * Registers the specified perspective and activates it.
    */
-  public async createPerspective(app: 'app1' | 'app2', capability: WorkbenchPerspectiveCapability, options?: PerspectiveCreateOptions): Promise<string> {
+  public async createPerspective(app: 'app1' | 'app2' | 'host', capability: WorkbenchPerspectiveCapability, options?: PerspectiveCreateOptions): Promise<string> {
     const perspectiveCapability = await this.registerCapability(app, capability);
     const perspectiveId = perspectiveCapability.metadata!.id;
     if (options?.activate ?? true) {

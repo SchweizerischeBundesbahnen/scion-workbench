@@ -1,4 +1,4 @@
-import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchPopupCapability} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchPartCapability, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
 import {Capability, Manifest} from '@scion/microfrontend-platform';
 
 /**
@@ -7,6 +7,51 @@ import {Capability, Manifest} from '@scion/microfrontend-platform';
 export const workbenchManifest: Manifest = {
   name: 'Workbench Host App',
   capabilities: [
+    {
+      type: WorkbenchCapabilities.View,
+      qualifier: {
+        component: 'host-view',
+        app: 'workbench-host-app',
+      },
+      description: 'Allows interacting with a workbench host view.',
+      private: false,
+      properties: {
+        path: 'test-host-view',
+        pinToDesktop: true,
+        title: 'Workbench View',
+        cssClass: 'e2e-test-host-view',
+      },
+    } satisfies TestingAppViewCapability,
+    {
+      type: WorkbenchCapabilities.View,
+      qualifier: {
+        component: 'register-workbench-capability',
+        app: 'workbench-host-app',
+      },
+      description: 'Allows registering workbench capabilities.',
+      private: false,
+      properties: {
+        path: 'register-workbench-capability',
+        pinToDesktop: true,
+        title: 'Register Capability',
+        cssClass: 'e2e-register-workbench-capability',
+      },
+    } satisfies TestingAppViewCapability,
+    {
+      type: WorkbenchCapabilities.View,
+      qualifier: {
+        component: 'router',
+        app: 'workbench-host-app',
+      },
+      description: 'Allows opening a microfrontend in a workbench view.',
+      private: false,
+      properties: {
+        path: 'test-host-router',
+        hostView: true,
+        title: 'Workbench Router',
+        cssClass: 'e2e-test-host-router',
+      },
+    } satisfies TestingAppViewCapability,
     {
       type: WorkbenchCapabilities.Notification,
       qualifier: {component: 'notification-page'},
@@ -17,6 +62,25 @@ export const workbenchManifest: Manifest = {
       ],
       description: 'Allows interacting with a notification.',
     } satisfies Capability,
+    // TODO [#271]: Remove this part capability when implemented the issue #271
+    {
+      type: WorkbenchCapabilities.Part,
+      qualifier: {
+        component: 'host-part',
+      },
+      private: false,
+      description: 'Represents a part provided by the host app.',
+      params: [
+        {name: 'param', required: false},
+      ],
+      properties: {
+        path: 'test-host-part;matrixParam=:param',
+        extras: {
+          label: 'projects',
+          icon: 'folder',
+        },
+      },
+    } satisfies WorkbenchPartCapability,
     // TODO [#271]: Remove this popup capability when implemented the issue #271
     {
       type: WorkbenchCapabilities.Popup,
@@ -284,3 +348,5 @@ export const workbenchManifest: Manifest = {
     {type: WorkbenchCapabilities.Popup, qualifier: {test: '*', '*': '*'}},
   ],
 };
+
+type TestingAppViewCapability = WorkbenchViewCapability & {properties: {pinToDesktop?: boolean}};

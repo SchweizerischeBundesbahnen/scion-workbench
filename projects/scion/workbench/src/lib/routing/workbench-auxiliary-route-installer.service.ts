@@ -57,7 +57,7 @@ export class WorkbenchAuxiliaryRouteInstaller {
           ...this._router.config
             // Filter primary routes.
             .filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET)
-            // Filter wildcard route as most likely not indended for workbench outlets. Otherwise, the "Not Found" and "Nothing to Show" pages would never be matched.
+            // Filter wildcard route as most likely not indented for workbench outlets. Otherwise, the "Not Found" and "Nothing to Show" pages would never be matched.
             .filter(route => route.path !== '**')
             // Only match the route if the outlet has been navigated, preventing the following issues for application having an empty-path parent route (tested in `app-with-guard.e2e-spec.ts`, `app-with-redirect.e2e-spec.ts`):
             // - Redirecting in a `CanActivate` guard on an empty-path parent route would lead to an infinite loop.

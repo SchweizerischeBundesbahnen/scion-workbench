@@ -75,7 +75,8 @@ export class StartPagePO implements WorkbenchViewPagePO {
     const viewId = await this.view.getViewId();
     const navigationId = await this._appPO.getCurrentNavigationId();
     await this._tabbar.selectTab('e2e-microfrontend-views');
-    await this._tabbarLocator.locator(`.e2e-microfrontend-view-tiles button.${cssClass}.workbench-client-testing-${app}`).click();
+    const application = app === 'host' ? 'workbench-host-app' : `workbench-client-testing-${app}`;
+    await this._tabbarLocator.locator(`.e2e-microfrontend-view-tiles button.${cssClass}.${application}`).click();
     await this._appPO.view({viewId, cssClass}).waitUntilAttached();
     // Wait for microfrontend to be loaded.
     const frameLocator = new SciRouterOutletPO(this._appPO, {name: viewId}).frameLocator;

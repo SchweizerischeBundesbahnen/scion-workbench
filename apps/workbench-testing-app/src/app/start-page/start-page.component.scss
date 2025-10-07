@@ -66,6 +66,10 @@
         &:is(.microfrontend, .test-capability).workbench-client-testing-app2 {
           @include start-page.tile-background-color(var(--workbench-client-testing-app2-color));
         }
+
+        &:is(.microfrontend, .test-capability).workbench-host-app {
+          @include start-page.tile-background-color(var(--workbench-host-app-color));
+        }
       }
     }
   }

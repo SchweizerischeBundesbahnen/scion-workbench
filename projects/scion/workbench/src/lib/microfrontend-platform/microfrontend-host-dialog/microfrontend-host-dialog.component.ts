@@ -57,7 +57,10 @@ export class MicrofrontendHostDialogComponent {
     this.setDialogProperties();
     this.navigateCapability();
 
-    inject(DestroyRef).onDestroy(() => void this.navigate(null)); // Remove the outlet from the URL
+    inject(DestroyRef).onDestroy(() => {
+      void this.navigate(null);
+      console.log('>>> destroy host dialog');
+    }); // Remove the outlet from the URL
   }
 
   private navigateCapability(): void {

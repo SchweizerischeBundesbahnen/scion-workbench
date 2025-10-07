@@ -173,11 +173,25 @@ export class WorkbenchUrlObserver {
       this._logger.debug(() => `Registered auxiliary routes for views: ${addedViewOutlets}`, LoggerNames.ROUTING, auxiliaryRoutes);
     }
 
+    // Register host view auxiliary routes.
+    const addedHostViewOutlets = navigationContext.outletDiff.addedHostViewOutlets;
+    if (addedHostViewOutlets.length) {
+      const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedHostViewOutlets, {notFoundRoute: matchesIfNavigated});
+      this._logger.debug(() => `Registered auxiliary routes for host views: ${addedHostViewOutlets}`, LoggerNames.ROUTING, auxiliaryRoutes);
+    }
+
     // Register part auxiliary routes.
     const addedPartOutlets = navigationContext.outletDiff.addedPartOutlets;
     if (addedPartOutlets.length) {
       const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedPartOutlets, {notFoundRoute: matchesIfNavigated});
       this._logger.debug(() => `Registered auxiliary routes for parts: ${addedPartOutlets}`, LoggerNames.ROUTING, auxiliaryRoutes);
+    }
+
+    // Register host part auxiliary routes.
+    const addedHostPartOutlets = navigationContext.outletDiff.addedHostPartOutlets;
+    if (addedHostPartOutlets.length) {
+      const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedHostPartOutlets, {notFoundRoute: matchesIfNavigated});
+      this._logger.debug(() => `Registered auxiliary routes for host parts: ${addedHostPartOutlets}`, LoggerNames.ROUTING, auxiliaryRoutes);
     }
 
     // Register popup auxiliary routes.
@@ -196,7 +210,7 @@ export class WorkbenchUrlObserver {
 
     // Revert registration if the navigation fails.
     navigationContext.registerUndoAction(() => {
-      const addedOutlets = [...addedViewOutlets, ...addedPartOutlets, ...addedPopupOutlets, ...addedDialogOutlets];
+      const addedOutlets = [...addedViewOutlets, ...addedHostViewOutlets, ...addedPartOutlets, ...addedHostPartOutlets, ...addedPopupOutlets, ...addedDialogOutlets] as string[];
       this._auxiliaryRouteInstaller.unregisterAuxiliaryRoutes(addedOutlets);
     });
   }
@@ -208,7 +222,9 @@ export class WorkbenchUrlObserver {
     const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
     const removedOutlets: string[] = [
       ...navigationContext.outletDiff.removedViewOutlets,
+      ...navigationContext.outletDiff.removedHostViewOutlets,
       ...navigationContext.outletDiff.removedPartOutlets,
+      ...navigationContext.outletDiff.removedHostPartOutlets,
       ...navigationContext.outletDiff.removedPopupOutlets,
       ...navigationContext.outletDiff.removedDialogOutlets,
     ];

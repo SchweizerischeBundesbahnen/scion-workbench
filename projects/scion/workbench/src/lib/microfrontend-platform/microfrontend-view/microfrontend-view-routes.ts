@@ -10,14 +10,56 @@
 
 import {CanMatchFn, Params, Route, UrlMatcher, UrlMatchResult, UrlSegment, UrlSegmentGroup} from '@angular/router';
 import {WorkbenchViewCapability, ɵMicrofrontendRouteParams} from '@scion/workbench-client';
-import {inject, Injector} from '@angular/core';
+import {EnvironmentProviders, inject, Injector, makeEnvironmentProviders} from '@angular/core';
 import {Commands} from '../../routing/routing.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
-import {isViewOutlet} from '../../workbench.identifiers';
+import {isViewOutlet, ViewId} from '../../workbench.identifiers';
 import {WorkbenchRouteData} from '../../routing/workbench-route-data';
 import {MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {canMatchWorkbenchView} from '../../routing/workbench-route-guards';
+import {WORKBENCH_ROUTE} from '../../workbench.constants';
+import {MicrofrontendHostViewComponent} from '../microfrontend-host-view/microfrontend-host-view.component';
+import {WORKBENCH_OUTLET} from '../../routing/workbench-auxiliary-route-installer.service';
+import {MicrofrontendViewNavigationData} from './microfrontend-view-navigation-data';
+
+export const MICROFRONTEND_HOST_VIEW_NAVIGATION_HINT = 'scion.workbench.microfrontend-host-view';
+
+/**
+ * Provides the route for integrating microfrontend host parts.
+ */
+export function provideMicrofrontendHostViewRoute(): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    {
+      provide: WORKBENCH_ROUTE,
+      multi: true,
+      useFactory: (): Route => ({
+        path: '',
+        component: MicrofrontendHostViewComponent,
+        canMatch: [canMatchViewCapability(MICROFRONTEND_HOST_VIEW_NAVIGATION_HINT)],
+      }),
+    },
+  ]);
+}
+
+function canMatchViewCapability(hint: string): CanMatchFn {
+  return (route, segments): boolean => {
+
+    if (!canMatchWorkbenchView(hint)(route, segments)) {
+      return false;
+    }
+
+    if (MicrofrontendPlatform.state !== PlatformState.Started) {
+      return true; // match until started the microfrontend platform to avoid flickering.
+    }
+
+    const viewId = inject(WORKBENCH_OUTLET) as ViewId;
+    const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
+    const view = layout.view({viewId});
+    const {capabilityId} = view.navigation!.data as unknown as MicrofrontendViewNavigationData;
+    return inject(ManifestObjectCache).hasCapability(capabilityId);
+  };
+}
 
 /**
  * Provides functions and constants specific to microfrontend routes.

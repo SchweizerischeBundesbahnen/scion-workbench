@@ -23,7 +23,7 @@ import {MicrofrontendPopupIntentHandler} from './microfrontend-popup/microfronte
 import {WorkbenchHostManifestInterceptor} from './initialization/workbench-host-manifest-interceptor.service';
 import {Route} from '@angular/router';
 import {MicrofrontendViewComponent} from './microfrontend-view/microfrontend-view.component';
-import {MicrofrontendViewRoutes} from './microfrontend-view/microfrontend-view-routes';
+import {MicrofrontendViewRoutes, provideMicrofrontendHostViewRoute} from './microfrontend-view/microfrontend-view-routes';
 import {MicrofrontendViewCapabilityValidator} from './microfrontend-view/microfrontend-view-capability-validator.interceptor';
 import {STABLE_CAPABILITY_ID, StableCapabilityIdAssigner} from './stable-capability-id-assigner.interceptor';
 import {MicrofrontendPopupCapabilityValidator} from './microfrontend-popup/microfrontend-popup-capability-validator.interceptor';
@@ -69,6 +69,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     MicrofrontendDialogCapabilityValidator,
     MicrofrontendMessageBoxCapabilityValidator,
     StableCapabilityIdAssigner,
+    provideMicrofrontendHostViewRoute(),
     provideStableCapabilityIds(),
     ViewCapabilityPreloadCapabilityInterceptor,
     NgZoneObservableDecorator,

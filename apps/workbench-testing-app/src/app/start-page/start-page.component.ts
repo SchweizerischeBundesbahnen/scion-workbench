@@ -57,6 +57,7 @@ export default class StartPageComponent {
   protected readonly filterControl = inject(NonNullableFormBuilder).control('');
   protected readonly workbenchViewRoutes: Routes;
   protected readonly microfrontendViewCapabilities$: Observable<WorkbenchViewCapability[]> | undefined;
+  protected readonly hostViewCapabilities$: Observable<WorkbenchViewCapability[]> | undefined;
   protected readonly testCapabilities$: Observable<Capability[]> | undefined;
 
   @HostBinding('attr.data-partid')
@@ -75,6 +76,13 @@ export default class StartPageComponent {
       this.microfrontendViewCapabilities$ = this._manifestService!.lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View})
         .pipe(
           filterArray(viewCapability => 'pinToDesktop' in viewCapability.properties && !!viewCapability.properties['pinToDesktop']),
+          filterArray(viewCapability => !isTestCapability(viewCapability)),
+          sortArray((a, b) => a.metadata!.appSymbolicName.localeCompare(b.metadata!.appSymbolicName)),
+        );
+      // Read host views to be pinned to the desktop.
+      this.hostViewCapabilities$ = this._manifestService!.lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View})
+        .pipe(
+          filterArray(viewCapability => 'hostView' in viewCapability.properties && !!viewCapability.properties['hostView']),
           filterArray(viewCapability => !isTestCapability(viewCapability)),
           sortArray((a, b) => a.metadata!.appSymbolicName.localeCompare(b.metadata!.appSymbolicName)),
         );

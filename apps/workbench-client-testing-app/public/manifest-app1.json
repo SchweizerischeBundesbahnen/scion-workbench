@@ -96,13 +96,68 @@
       }
     },
     {
+      "type": "perspective",
+      "qualifier": {
+        "perspective": "host-parts"
+      },
+      "private": false,
+      "properties": {
+        "data": {
+          "label": "Host Parts",
+          "menuItemLabel": "Host Parts"
+        },
+        "parts": [
+          {
+            "id": "main-area",
+            "qualifier": {
+              "part": "_main-area"
+            }
+          },
+          {
+            "id": "projects",
+            "position": "left-top",
+            "qualifier": {
+              "component": "host-part"
+            },
+            "active": true
+          },
+          {
+            "id": "part-with-host-views",
+            "position": "right-top",
+            "qualifier": {
+              "part": "part-with-host-views"
+            },
+            "active": true
+          }
+        ]
+      }
+    },
+    {
       "type": "part",
       "qualifier": {
         "part": "_main-area"
       },
+      "private": true
+    },
+    {
+      "type": "part",
+      "qualifier": {
+        "part": "part-with-host-views"
+      },
       "private": true,
       "properties": {
-        "path": "test-part",
+        "views": [
+          {
+            "qualifier": {
+              "component": "host-view",
+              "app": "workbench-host-app"
+            }
+          }
+        ],
+        "extras": {
+          "icon": "folder",
+          "label": "%projects.title"
+        },
         "showSplash": true
       }
     },
@@ -236,6 +291,18 @@
   "intentions": [
     {
       "type": "part",
+      "qualifier": {
+        "*": "*"
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "*": "*"
+      }
+    },
+    {
+      "type": "dialog",
       "qualifier": {
         "*": "*"
       }

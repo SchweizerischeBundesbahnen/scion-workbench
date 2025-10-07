@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
+import {APP_IDENTITY, Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {inject, Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchNavigationExtras, WorkbenchViewCapability} from '@scion/workbench-client';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
-import {MicrofrontendViewRoutes} from './microfrontend-view-routes';
+import {MICROFRONTEND_HOST_VIEW_NAVIGATION_HINT, MicrofrontendViewRoutes} from './microfrontend-view-routes';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Dictionaries} from '@scion/toolkit/util';
@@ -59,11 +59,13 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
     const targets = this.resolveTargets(message, extras);
     const commands = extras.close ? [] : MicrofrontendViewRoutes.createMicrofrontendNavigateCommands(viewCapability.metadata!.id, urlParams);
     const partId = extras.close ? undefined : extras.partId;
+    const isHostProvider = viewCapability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
 
     this._logger.debug(() => `Navigating to: ${viewCapability.properties.path}`, LoggerNames.MICROFRONTEND_ROUTING, commands, viewCapability, transientParams);
     const navigations = await Promise.all(targets.map(target => {
-      return this._workbenchRouter.navigate(commands, {
+      return this._workbenchRouter.navigate(isHostProvider ? [] : commands, {
         target,
+        hint: isHostProvider ? MICROFRONTEND_HOST_VIEW_NAVIGATION_HINT : undefined,
         partId,
         activate: extras.activate,
         close: extras.close,
@@ -72,6 +74,11 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
         state: Objects.withoutUndefinedEntries({
           [MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS]: transientParams,
         }),
+        data: {
+          capabilityId: viewCapability.metadata!.id,
+          params: viewCapability.params,
+          isHostProvider,
+        }
       });
     }));
     return navigations.every(Boolean);

@@ -73,6 +73,10 @@ export function isViewOutlet(outlet: string | undefined | null): outlet is ViewO
   return isViewId(outlet);
 }
 
+export function isHostViewOutlet(outlet: string | undefined | null): outlet is HostViewOutlet {
+  return outlet?.startsWith('host-view.') ?? false;
+}
+
 /**
  * Tests if the given id matches the format of a part identifier.
  */
@@ -85,6 +89,10 @@ export function isPartId(partId: string | undefined | null): partId is PartId {
  */
 export function isPartOutlet(outlet: string | undefined | null): outlet is PartOutlet {
   return isPartId(outlet);
+}
+
+export function isHostPartOutlet(outlet: string | undefined | null): outlet is HostPartOutlet {
+  return outlet?.startsWith('host-part.') ?? false;
 }
 
 /**
@@ -126,7 +134,7 @@ export function isActivityId(activityId: string | undefined | null): activityId 
  * Tests if the given outlet matches the format of a workbench outlet.
  */
 export function isWorkbenchOutlet(outlet: string | undefined | null): outlet is WorkbenchOutlet {
-  return isPartOutlet(outlet) || isViewOutlet(outlet) || isDialogOutlet(outlet) || isPopupOutlet(outlet);
+  return isPartOutlet(outlet) || isHostPartOutlet(outlet) || isViewOutlet(outlet) || isHostViewOutlet(outlet) || isDialogOutlet(outlet) || isPopupOutlet(outlet);
 }
 
 /**
@@ -169,10 +177,14 @@ export function computeActivityId(): ActivityId {
  */
 export type ViewOutlet = ViewId;
 
+export type HostViewOutlet = `host-${ViewOutlet}`;
+
 /**
  * Format of a part outlet name.
  */
 export type PartOutlet = PartId;
+
+export type HostPartOutlet = `host-${PartOutlet}`;
 
 /**
  * Format of a popup outlet name.
@@ -187,7 +199,7 @@ export type DialogOutlet = DialogId;
 /**
  * Union of workbench outlets.
  */
-export type WorkbenchOutlet = PartOutlet | ViewOutlet | DialogOutlet | PopupOutlet;
+export type WorkbenchOutlet = PartOutlet | HostPartOutlet | ViewOutlet | HostViewOutlet | DialogOutlet | PopupOutlet;
 
 /**
  * Represents the id prefix of views.

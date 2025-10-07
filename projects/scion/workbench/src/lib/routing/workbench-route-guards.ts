@@ -12,7 +12,7 @@ import {CanMatchFn, Route, UrlSegment} from '@angular/router';
 import {inject} from '@angular/core';
 import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 import {WORKBENCH_OUTLET} from './workbench-auxiliary-route-installer.service';
-import {isDialogOutlet, isPartOutlet, isViewOutlet, isWorkbenchOutlet} from '../workbench.identifiers';
+import {isDialogOutlet, isHostPartOutlet, isPartOutlet, isViewOutlet, isWorkbenchOutlet, PartId} from '../workbench.identifiers';
 
 /**
  * Configures a route to only match workbench views navigated with a specific hint.
@@ -107,6 +107,31 @@ export function canMatchWorkbenchPart(condition: string | boolean): CanMatchFn {
 
         const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
         const part = layout.part({partId: outlet}, {orElse: null});
+        return part?.navigation?.hint === condition;
+      }
+    }
+  };
+}
+
+export function canMatchWorkbenchHostPart(navigationHint: string): CanMatchFn;
+export function canMatchWorkbenchHostPart(canMatch: boolean): CanMatchFn;
+export function canMatchWorkbenchHostPart(condition: string | boolean): CanMatchFn {
+  return (): boolean => {
+    const outlet = inject(WORKBENCH_OUTLET, {optional: true});
+
+    switch (condition) {
+      case true:
+        return isHostPartOutlet(outlet);
+      case false:
+        return !isHostPartOutlet(outlet);
+      default: { // hint
+        if (!isHostPartOutlet(outlet)) {
+          return false;
+        }
+
+        const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
+        const partId = outlet.substring(5, outlet.length) as PartId;
+        const part = layout.part({partId}, {orElse: null});
         return part?.navigation?.hint === condition;
       }
     }

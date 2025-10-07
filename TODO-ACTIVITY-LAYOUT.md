@@ -5,6 +5,8 @@
    [] Test that workbench startup does not fail if initial perspective errors
    [] Part Tests Focus and Translatable
 [] Close view if capability not found
+[] separation commit testing-app-components before activities
+[] BUG: Reset perspective main area part loads forever
 
 ## TODO PHASE 2
 [] Host Part

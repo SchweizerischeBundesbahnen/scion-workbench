@@ -19,8 +19,10 @@ import {WORKBENCH_OUTLET} from '../../routing/workbench-auxiliary-route-installe
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {canMatchWorkbenchPart} from '../../routing/workbench-route-guards';
 import {PartId} from '../../workbench.identifiers';
+import {MicrofrontendHostPartComponent} from '../microfrontend-host-part/microfrontend-host-part.component';
 
 export const MICROFRONTEND_PART_NAVIGATION_HINT = 'scion.workbench.microfrontend-part';
+export const MICROFRONTEND_HOST_PART_NAVIGATION_HINT = 'scion.workbench.microfrontend-host-part';
 
 /**
  * Provides the route for integrating microfrontend parts.
@@ -33,7 +35,24 @@ export function provideMicrofrontendPartRoute(): EnvironmentProviders {
       useFactory: (): Route => ({
         path: '',
         component: MicrofrontendPartComponent,
-        canMatch: [canMatchPartCapability()],
+        canMatch: [canMatchPartCapability(MICROFRONTEND_PART_NAVIGATION_HINT)],
+      }),
+    },
+  ]);
+}
+
+/**
+ * Provides the route for integrating microfrontend host parts.
+ */
+export function provideMicrofrontendHostPartRoute(): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    {
+      provide: WORKBENCH_ROUTE,
+      multi: true,
+      useFactory: (): Route => ({
+        path: '',
+        component: MicrofrontendHostPartComponent,
+        canMatch: [canMatchPartCapability(MICROFRONTEND_HOST_PART_NAVIGATION_HINT)],
       }),
     },
   ]);
@@ -48,10 +67,10 @@ export function provideMicrofrontendPartRoute(): EnvironmentProviders {
  * - Prerequisite: must be part outlet and target of a microfrontend part.
  * - Mention that canMatch guards are evaluated in parallel (no sequential)
  */
-function canMatchPartCapability(): CanMatchFn {
+function canMatchPartCapability(hint: string): CanMatchFn {
   return (route, segments): boolean => {
 
-    if (!canMatchWorkbenchPart(MICROFRONTEND_PART_NAVIGATION_HINT)(route, segments)) {
+    if (!canMatchWorkbenchPart(hint)(route, segments)) {
       return false;
     }
 

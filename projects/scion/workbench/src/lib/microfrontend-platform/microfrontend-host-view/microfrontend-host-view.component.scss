@@ -1,0 +1,7 @@
+:host {
+  display: grid;
+
+  > router-outlet {
+    position: absolute; // outlet out of the document flow
+  }
+}

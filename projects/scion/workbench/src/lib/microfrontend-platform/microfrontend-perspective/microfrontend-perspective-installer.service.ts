@@ -9,14 +9,14 @@
  */
 
 import {inject, Injectable, IterableDiffers} from '@angular/core';
-import {Capability, ManifestService, Qualifier} from '@scion/microfrontend-platform';
+import {APP_IDENTITY, Capability, ManifestService, Qualifier} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchPartCapability, WorkbenchPartRef, WorkbenchPerspectiveCapability, WorkbenchViewCapability, WorkbenchViewRef} from '@scion/workbench-client';
 import {WorkbenchService} from '../../workbench.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MAIN_AREA, MAIN_AREA_ALTERNATIVE_ID, WorkbenchLayout} from '../../layout/workbench-layout';
 import {firstValueFrom} from 'rxjs';
 import {WorkbenchLayoutFactory} from '../../layout/workbench-layout.factory';
-import {MicrofrontendViewRoutes} from '../microfrontend-view/microfrontend-view-routes';
+import {MICROFRONTEND_HOST_VIEW_NAVIGATION_HINT, MicrofrontendViewRoutes} from '../microfrontend-view/microfrontend-view-routes';
 import {Logger, LoggerNames} from '../../logging';
 import {Objects} from '../../common/objects.util';
 import {WorkbenchPerspectiveData} from './workbench-perspective-data';
@@ -25,8 +25,10 @@ import {createRemoteTranslatable} from '../text/remote-text-provider';
 import {MicrofrontendPartNavigationData} from '../microfrontend-part/microfrontend-part-navigation-data';
 import {Arrays} from '@scion/toolkit/util';
 import {Translatable} from '../../text/workbench-text-provider.model';
-import {MICROFRONTEND_PART_NAVIGATION_HINT} from '../microfrontend-part/microfrontend-part-routes';
+import {MICROFRONTEND_HOST_PART_NAVIGATION_HINT, MICROFRONTEND_PART_NAVIGATION_HINT} from '../microfrontend-part/microfrontend-part-routes';
 import {Params, ParamValidator} from './param-validator';
+import {Beans} from '@scion/toolkit/bean-manager';
+import {MicrofrontendViewNavigationData} from '../microfrontend-view/microfrontend-view-navigation-data';
 
 /**
  * Registers perspectives provided as workbench perspective capabilities.
@@ -203,11 +205,14 @@ export class MicrofrontendPerspectiveInstaller {
    * Navigates specified part if declaring a path.
    */
   private navigatePart(partRef: Omit<WorkbenchPartRef, 'position'> | WorkbenchPartRef, partCapability: WorkbenchPartCapability, layout: WorkbenchLayout): WorkbenchLayout {
+    const isHostProvider = partCapability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
+
     return layout.navigatePart(partRef.id, [], {
-      hint: MICROFRONTEND_PART_NAVIGATION_HINT,
+      hint: isHostProvider ? MICROFRONTEND_HOST_PART_NAVIGATION_HINT : MICROFRONTEND_PART_NAVIGATION_HINT,
       data: {
         capabilityId: partCapability.metadata!.id,
         params: partRef.params ?? {},
+        isHostProvider,
       } satisfies MicrofrontendPartNavigationData,
     });
   }
@@ -234,9 +239,21 @@ export class MicrofrontendPerspectiveInstaller {
     const commands = MicrofrontendViewRoutes.createMicrofrontendNavigateCommands(viewCapability.metadata!.id, params);
     const viewId = computeViewId();
 
-    return layout
-      .addView(viewId, {partId: partRef.id, activateView: viewRef.active})
-      .navigateView(viewId, commands, {cssClass: [...Arrays.coerce(viewCapability.properties.cssClass), ...Arrays.coerce(viewRef.cssClass)]});
+    layout = layout
+      .addView(viewId, {partId: partRef.id, activateView: viewRef.active});
+
+    const isHostProvider = viewCapability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
+
+    return isHostProvider ?
+      layout.navigateView(viewId, [], {
+        hint: MICROFRONTEND_HOST_VIEW_NAVIGATION_HINT,
+        cssClass: [...Arrays.coerce(viewCapability.properties.cssClass), ...Arrays.coerce(viewRef.cssClass)],
+        data: {
+          capabilityId: viewCapability.metadata!.id,
+          params: viewRef.params ?? {},
+          isHostProvider,
+        } satisfies MicrofrontendViewNavigationData,
+      }) : layout.navigateView(viewId, commands, {cssClass: [...Arrays.coerce(viewCapability.properties.cssClass), ...Arrays.coerce(viewRef.cssClass)]});
   }
 
   /**
