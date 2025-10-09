@@ -17,55 +17,55 @@ export const routes: Routes = [
   },
   {
     path: 'test-router',
-    loadComponent: () => import('./router-page/router-page.component'),
+    loadComponent: () => import('workbench-testing-app-components').then(m => m.RouterPageComponent),
   },
   {
     path: 'test-view',
-    loadComponent: () => import('./view-page/view-page.component'),
+    loadComponent: () => import('workbench-testing-app-components').then(m => m.ViewPageComponent),
   },
   {
     path: 'test-popup-opener',
-    loadComponent: () => import('./popup-opener-page/popup-opener-page.component'),
+    loadComponent: () => import('workbench-testing-app-components').then(m => m.PopupOpenerPageComponent),
   },
   {
     path: 'test-popup',
-    loadComponent: () => import('./popup-page/popup-page.component'),
+    loadComponent: () => import('workbench-testing-app-components').then(m => m.PopupPageComponent),
   },
   {
     path: 'test-dialog-opener',
-    loadComponent: () => import('./dialog-opener-page/dialog-opener-page.component'),
+    loadComponent: () => import('workbench-testing-app-components').then(m => m.DialogOpenerPageComponent),
   },
   {
     path: 'test-dialog',
-    loadComponent: () => import('./dialog-page/dialog-page.component'),
+    loadComponent: () => import('workbench-testing-app-components').then(m => m.DialogPageComponent),
   },
   {
     path: 'test-message-box-opener',
-    loadComponent: () => import('./message-box-opener-page/message-box-opener-page.component'),
+    loadComponent: () => import('workbench-testing-app-components').then(m => m.MessageBoxOpenerPageComponent),
   },
   {
     path: 'test-message-box',
-    loadComponent: () => import('./message-box-page/message-box-page.component'),
+    loadComponent: () => import('workbench-testing-app-components').then(m => m.MessageBoxPageComponent),
   },
   {
     path: 'test-notification-opener',
-    loadComponent: () => import('./notification-opener-page/notification-opener-page.component'),
+    loadComponent: () => import('workbench-testing-app-components').then(m => m.NotificationOpenerPageComponent),
   },
   {
     path: 'register-workbench-capability',
-    loadComponent: () => import('./register-workbench-capability-page/register-workbench-capability-page.component'),
+    loadComponent: () => import('workbench-testing-app-components').then(m => m.RegisterWorkbenchCapabilityPageComponent),
   },
   {
     path: 'unregister-workbench-capability',
-    loadComponent: () => import('./unregister-workbench-capability-page/unregister-workbench-capability-page.component'),
+    loadComponent: () => import('workbench-testing-app-components').then(m => m.UnregisterWorkbenchCapabilityPageComponent),
   },
   {
     path: 'register-workbench-intention',
-    loadComponent: () => import('./register-workbench-intention-page/register-workbench-intention-page.component'),
+    loadComponent: () => import('workbench-testing-app-components').then(m => m.RegisterWorkbenchIntentionPageComponent),
   },
   {
     path: 'messaging',
-    loadComponent: () => import('./messaging-page/messaging-page.component'),
+    loadComponent: () => import('workbench-testing-app-components').then(m => m.MessagingPageComponent),
   },
   {
     path: 'test-pages',

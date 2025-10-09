@@ -13,11 +13,11 @@ import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {NotificationService} from '@scion/workbench';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
-import {stringifyError} from '../common/stringify-error.util';
+import {stringifyError} from 'workbench-testing-app-components';
 import {NotificationPageComponent} from '../notification-page/notification-page.component';
-import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
+import {MultiValueInputComponent} from 'workbench-testing-app-components';
 import {UUID} from '@scion/toolkit/uuid';
-import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
+import {undefinedIfEmpty} from 'workbench-testing-app-components';
 
 @Component({
   selector: 'app-notification-opener-page',

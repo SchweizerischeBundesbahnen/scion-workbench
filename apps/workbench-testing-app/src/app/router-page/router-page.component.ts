@@ -16,11 +16,11 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SettingsService} from '../settings.service';
-import {stringifyError} from '../common/stringify-error.util';
+import {stringifyError} from 'workbench-testing-app-components';
 import {RouterCommandsComponent} from '../router-commands/router-commands.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {parseTypedObject} from '../common/parse-typed-value.util';
-import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
+import {parseTypedObject} from 'workbench-testing-app-components';
+import {MultiValueInputComponent} from 'workbench-testing-app-components';
 import {UUID} from '@scion/toolkit/uuid';
 
 @Component({

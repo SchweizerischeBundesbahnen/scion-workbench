@@ -16,7 +16,7 @@ import {StringifyPipe} from '../common/stringify.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {filter} from 'rxjs/operators';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
-import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
+import {MultiValueInputComponent} from 'workbench-testing-app-components';
 import {UUID} from '@scion/toolkit/uuid';
 
 @Component({

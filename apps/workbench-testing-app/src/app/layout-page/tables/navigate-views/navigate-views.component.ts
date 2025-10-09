@@ -15,10 +15,10 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {Commands, NavigationData, NavigationState} from '@scion/workbench';
 import {RouterCommandsComponent} from '../../../router-commands/router-commands.component';
-import {MultiValueInputComponent} from '../../../multi-value-input/multi-value-input.component';
+import {MultiValueInputComponent} from 'workbench-testing-app-components';
 import {UUID} from '@scion/toolkit/uuid';
-import {RecordComponent} from '../../../record/record.component';
-import {undefinedIfEmpty} from '../../../common/undefined-if-empty.util';
+import {RecordComponent} from 'workbench-testing-app-components';
+import {undefinedIfEmpty} from 'workbench-testing-app-components';
 
 @Component({
   selector: 'app-navigate-views',

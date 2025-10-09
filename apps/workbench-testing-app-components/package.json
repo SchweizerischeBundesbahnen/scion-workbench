@@ -1,0 +1,33 @@
+{
+  "name": "workbench-testing-app-components",
+  "version": "1.0.0",
+  "description": "Components of the @scion/workbench testing application.",
+  "license": "EPL-2.0",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": {
+    "name": "SCION contributors"
+  },
+  "dependencies": {
+    "tslib": "^2.6.0"
+  },
+  "peerDependencies": {
+    "@angular/core": "^20.0.0",
+    "@angular/common": "^20.0.0",
+    "@angular/animations": "^20.0.0",
+    "@angular/cdk": "^20.0.0",
+    "@angular/forms": "^20.0.0",
+    "@angular/router": "^20.0.0",
+    "@scion/components": "^20.0.0",
+    "@scion/toolkit": "^1.6.0 || ^2.0.0",
+    "@scion/microfrontend-platform": "^1.4.0",
+    "@scion/workbench-client": "^1.0.0-beta.33",
+    "rxjs": "^7.8.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench.git"
+  }
+}

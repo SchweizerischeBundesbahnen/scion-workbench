@@ -17,17 +17,17 @@ import {map, startWith} from 'rxjs/operators';
 import {Observable} from 'rxjs';
 import BlankTestPageComponent from '../test-pages/blank-test-page/blank-test-page.component';
 import {PopupOrigin} from '@scion/workbench-client';
-import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
+import {undefinedIfEmpty} from 'workbench-testing-app-components';
 import {PopupPositionLabelPipe, Position} from './popup-position-label.pipe';
-import {stringifyError} from '../common/stringify-error.util';
+import {stringifyError} from 'workbench-testing-app-components';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import InputFieldTestPageComponent from '../test-pages/input-field-test-page/input-field-test-page.component';
 import DialogOpenerPageComponent from '../dialog-opener-page/dialog-opener-page.component';
 import {Dictionaries} from '@scion/toolkit/util';
-import {parseTypedString} from '../common/parse-typed-value.util';
-import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
+import {parseTypedString} from 'workbench-testing-app-components';
+import {MultiValueInputComponent} from 'workbench-testing-app-components';
 import SizeTestPageComponent from '../test-pages/size-test-page/size-test-page.component';
 
 @Component({

@@ -15,14 +15,14 @@ import {NavigateViewsComponent, NavigationDescriptor} from '../tables/navigate-v
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SettingsService} from '../../settings.service';
 import {WorkbenchLayout, WorkbenchLayoutFactory, WorkbenchLayoutFn, WorkbenchPart, WorkbenchService, WorkbenchView} from '@scion/workbench';
-import {stringifyError} from '../../common/stringify-error.util';
+import {stringifyError} from 'workbench-testing-app-components';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {NavigatePartsComponent} from '../tables/navigate-parts/navigate-parts.component';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {DockedPartDescriptor, AddDockedPartsComponent} from '../tables/add-docked-parts/add-docked-parts.component';
-import {MultiValueInputComponent} from '../../multi-value-input/multi-value-input.component';
+import {MultiValueInputComponent} from 'workbench-testing-app-components';
 
 @Component({
   selector: 'app-create-perspective-page',

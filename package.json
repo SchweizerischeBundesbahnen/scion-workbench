@@ -41,6 +41,9 @@
     "workbench:changelog:full": "conventional-changelog --commit-path projects/scion/workbench -k projects/scion/workbench/package.json -p angular -i CHANGELOG_WORKBENCH.md -s && markdown-include docs/site/changelog-workbench/changelog.template.json",
     "workbench:changelog:latest": "conventional-changelog --commit-path projects/scion/workbench -k projects/scion/workbench/package.json -p angular -o CHANGELOG_WORKBENCH_LATEST.md",
 
+    "workbench-testing-app-components:build": "ng build --configuration production workbench-testing-app-components",
+    "workbench-testing-app-components:lint": "ng lint workbench-testing-app-components",
+
     "workbench-getting-started-app:build": "ng build workbench-getting-started-app --configuration=production",
     "workbench-getting-started-app:lint": "ng lint workbench-getting-started-app",
     "workbench-getting-started-app:serve": "ng serve workbench-getting-started-app --port 4500",

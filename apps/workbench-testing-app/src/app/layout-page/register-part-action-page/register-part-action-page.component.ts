@@ -11,11 +11,11 @@
 import {Component, inject, input} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WorkbenchPart, WorkbenchService} from '@scion/workbench';
-import {undefinedIfEmpty} from '../../common/undefined-if-empty.util';
-import {stringifyError} from '../../common/stringify-error.util';
+import {undefinedIfEmpty} from 'workbench-testing-app-components';
+import {stringifyError} from 'workbench-testing-app-components';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SettingsService} from '../../settings.service';
-import {MultiValueInputComponent} from '../../multi-value-input/multi-value-input.component';
+import {MultiValueInputComponent} from 'workbench-testing-app-components';
 import {UUID} from '@scion/toolkit/uuid';
 import {Arrays} from '@scion/toolkit/util';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';

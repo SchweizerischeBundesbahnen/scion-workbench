@@ -98,6 +98,39 @@
         }
       }
     },
+    "workbench-testing-app-components": {
+      "projectType": "library",
+      "root": "apps/workbench-testing-app-components",
+      "sourceRoot": "apps/workbench-testing-app-components/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "options": {
+            "project": "apps/workbench-testing-app-components/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "apps/workbench-testing-app-components/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "apps/workbench-testing-app-components/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/workbench-testing-app-components/**/*.ts",
+              "apps/workbench-testing-app-components/**/*.html"
+            ],
+            "eslintConfig": "apps/workbench-testing-app-components/eslint.config.js"
+          }
+        }
+      }
+    },
     "workbench-getting-started-app": {
       "projectType": "application",
       "schematics": {

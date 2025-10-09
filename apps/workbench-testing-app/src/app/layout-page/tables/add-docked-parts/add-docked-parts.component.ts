@@ -13,9 +13,9 @@ import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDA
 import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
-import {MultiValueInputComponent} from '../../../multi-value-input/multi-value-input.component';
+import {MultiValueInputComponent} from 'workbench-testing-app-components';
 import {ActivityId, Translatable} from '@scion/workbench';
-import {parseTypedString} from '../../../common/parse-typed-value.util';
+import {parseTypedString} from 'workbench-testing-app-components';
 import {UUID} from '@scion/toolkit/uuid';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 

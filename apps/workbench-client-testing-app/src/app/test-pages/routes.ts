@@ -60,15 +60,15 @@ const routes: Routes = [
     children: [
       {
         path: 'popup1',
-        loadComponent: () => import('../popup-page/popup-page.component'),
+        loadComponent: () => import('workbench-testing-app-components').then(m => m.PopupPageComponent),
       },
       {
         path: 'popup2',
-        loadComponent: () => import('../popup-page/popup-page.component'),
+        loadComponent: () => import('workbench-testing-app-components').then(m => m.PopupPageComponent),
       },
       {
         path: ':segment1/segment2/:segment3',
-        loadComponent: () => import('../popup-page/popup-page.component'),
+        loadComponent: () => import('workbench-testing-app-components').then(m => m.PopupPageComponent),
       },
     ],
   },
@@ -77,7 +77,7 @@ const routes: Routes = [
     children: [
       {
         path: ':segment',
-        loadComponent: () => import('../dialog-page/dialog-page.component'),
+        loadComponent: () => import('workbench-testing-app-components').then(m => m.DialogPageComponent),
       },
     ],
   },
@@ -86,7 +86,7 @@ const routes: Routes = [
     children: [
       {
         path: ':segment1/segment2',
-        loadComponent: () => import('../message-box-page/message-box-page.component'),
+        loadComponent: () => import('workbench-testing-app-components').then(m => m.MessageBoxPageComponent),
       },
     ],
   },
@@ -95,23 +95,23 @@ const routes: Routes = [
     children: [
       {
         path: 'view1',
-        loadComponent: () => import('../view-page/view-page.component'),
+        loadComponent: () => import('workbench-testing-app-components').then(m => m.ViewPageComponent),
       },
       {
         path: 'view2',
-        loadComponent: () => import('../view-page/view-page.component'),
+        loadComponent: () => import('workbench-testing-app-components').then(m => m.ViewPageComponent),
       },
       {
         path: ':segment1',
-        loadComponent: () => import('../view-page/view-page.component'),
+        loadComponent: () => import('workbench-testing-app-components').then(m => m.ViewPageComponent),
       },
       {
         path: ':segment1/:segment2',
-        loadComponent: () => import('../view-page/view-page.component'),
+        loadComponent: () => import('workbench-testing-app-components').then(m => m.ViewPageComponent),
       },
       {
         path: ':segment1/segment2/:segment3',
-        loadComponent: () => import('../view-page/view-page.component'),
+        loadComponent: () => import('workbench-testing-app-components').then(m => m.ViewPageComponent),
       },
     ],
   },

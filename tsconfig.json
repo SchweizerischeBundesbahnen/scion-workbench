@@ -22,6 +22,9 @@
       ],
       "@scion/workbench-client": [
         "./dist/scion/workbench-client"
+      ],
+      "workbench-testing-app-components": [
+        "./dist/workbench-testing-app-components"
       ]
     }
     /*
@@ -46,6 +49,9 @@
     //      ],
     //      "@scion/workbench-client": [
     //        "./projects/scion/workbench-client/src/public-api"
+    //      ],
+    //      "workbench-testing-app-components": [
+    //        "./apps/workbench-testing-app-components/src/public-api"
     //      ],
     //      //      "@scion/toolkit/*": [
     //      //        "./src-lib/@scion/toolkit/*",
@@ -90,6 +96,9 @@
     },
     {
       "path": "./apps/workbench-client-testing-app/tsconfig.app.json"
+    },
+    {
+      "path": "./apps/workbench-testing-app-components/tsconfig.lib.json"
     },
     {
       "path": "./apps/workbench-getting-started-app/tsconfig.app.json"

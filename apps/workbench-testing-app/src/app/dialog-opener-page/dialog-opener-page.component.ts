@@ -13,12 +13,12 @@ import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from
 import {ViewId, WorkbenchDialogService} from '@scion/workbench';
 import {startWith} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {stringifyError} from '../common/stringify-error.util';
+import {stringifyError} from 'workbench-testing-app-components';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {DialogPageComponent} from '../dialog-page/dialog-page.component';
-import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
+import {MultiValueInputComponent} from 'workbench-testing-app-components';
 import BlankTestPageComponent from '../test-pages/blank-test-page/blank-test-page.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import PopupOpenerPageComponent from '../popup-opener-page/popup-opener-page.component';

@@ -67,6 +67,13 @@ jobs:
         with:
           name: workbench-client-api
           path: dist/workbench-client-api
+      - name: 'Building workbench-testing-app-components'
+        run: npm run workbench-testing-app-components:build
+      - name: 'Uploading dist/workbench-testing-app-components'
+        uses: actions/upload-artifact@v4
+        with:
+          name: workbench-testing-app-components
+          path: dist/workbench-testing-app-components
   lint:
     name: 'Linting'
     needs: build-libs
@@ -86,6 +93,11 @@ jobs:
         with:
           name: workbench-client-dist
           path: dist/scion/workbench-client
+      - name: 'Downloading dist/workbench-testing-app-components'
+        uses: actions/download-artifact@v4
+        with:
+          name: workbench-testing-app-components
+          path: dist/workbench-testing-app-components
       - name: 'Restoring NPM modules from cache'
         uses: actions/cache@v4
         with:
@@ -137,6 +149,11 @@ jobs:
         with:
           name: workbench-client-dist
           path: dist/scion/workbench-client
+      - name: 'Downloading dist/workbench-testing-app-components'
+        uses: actions/download-artifact@v4
+        with:
+          name: workbench-testing-app-components
+          path: dist/workbench-testing-app-components
       - name: 'Building ${{ matrix.app.name }}'
         run: ${{ matrix.app.cmd }}
       - uses: actions/upload-artifact@v4

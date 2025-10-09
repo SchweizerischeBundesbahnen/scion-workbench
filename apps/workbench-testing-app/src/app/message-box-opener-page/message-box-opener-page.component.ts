@@ -11,15 +11,15 @@
 import {Component, inject, Type} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {WorkbenchMessageBoxOptions, WorkbenchMessageBoxService} from '@scion/workbench';
-import {stringifyError} from '../common/stringify-error.util';
+import {stringifyError} from 'workbench-testing-app-components';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {MessageBoxPageComponent} from '../message-box-page/message-box-page.component';
-import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
+import {MultiValueInputComponent} from 'workbench-testing-app-components';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import {UUID} from '@scion/toolkit/uuid';
-import {parseTypedString} from '../common/parse-typed-value.util';
+import {parseTypedString} from 'workbench-testing-app-components';
 import {Translatable} from '@scion/workbench-client';
 
 @Component({
