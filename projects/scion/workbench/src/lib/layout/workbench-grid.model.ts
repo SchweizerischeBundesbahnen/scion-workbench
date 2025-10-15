@@ -89,7 +89,7 @@ export class MTreeNode {
 /**
  * Represents a part in the grid.
  *
- * A part can be a stack of views or display content.
+ * A part can display content or stack views.
  *
  * The M-prefix indicates this object is a model object that is serialized and stored, requiring migration on breaking change.
  */

@@ -23,7 +23,7 @@ import {undefinedIfEmpty} from '../../common/undefined-if-empty.util';
 @Component({
   selector: 'app-dialog-capability-properties',
   templateUrl: './dialog-capability-properties.component.html',
-  styleUrls: ['./dialog-capability-properties.component.scss'],
+  styleUrl: './dialog-capability-properties.component.scss',
   imports: [
     ReactiveFormsModule,
     MultiValueInputComponent,

@@ -86,16 +86,12 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return this.activities().length > 0;
   }
 
-  /**
-   * Tests if given part is contained in the specified grid.
-   */
+  /** @inheritDoc */
   public hasPart(id: string, options?: {grid?: keyof WorkbenchGrids}): boolean {
     return this.parts({id, grid: options?.grid}).length > 0;
   }
 
-  /**
-   * Tests if given view is contained in the specified grid.
-   */
+  /** @inheritDoc */
   public hasView(id: string, options?: {grid?: keyof WorkbenchGrids}): boolean {
     return this.views({id, grid: options?.grid}).length > 0;
   }
@@ -1655,7 +1651,7 @@ export interface ReferenceElement extends ReferencePart {
  * TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'})
  * ```
  *
- * @docs-private Not public API, intended for internal use only.
+ * @docs-private Not public API. For internal use only.
  */
 export const MAIN_AREA_INITIAL_PART_ID = new InjectionToken<PartId>('MAIN_AREA_INITIAL_PART_ID', {
   providedIn: 'root',

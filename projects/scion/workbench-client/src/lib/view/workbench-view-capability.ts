@@ -13,16 +13,14 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
- * Represents a microfrontend for display in a workbench view.
+ * A view is a visual element of the workbench layout for displaying content stacked or side-by-side.
  *
- * A view is a visual workbench element for displaying content stacked or side-by-side.
+ * A view capability can be opened via {@link WorkbenchRouter} or added to a perspective in a {@link WorkbenchPartCapability}.
  *
- * The microfrontend can inject the {@link WorkbenchView} handle to interact with the view, such as setting the title, reading
- * parameters, or closing it.
+ * The microfrontend can inject the {@link WorkbenchView} handle to interact with the view.
  *
  * @category View
  * @see WorkbenchView
- * @see WorkbenchRouter
  */
 export interface WorkbenchViewCapability extends Capability {
   /**
@@ -30,7 +28,7 @@ export interface WorkbenchViewCapability extends Capability {
    */
   type: WorkbenchCapabilities.View;
   /**
-   * Qualifies this view. The qualifier is required for views.
+   * Qualifies this view. The qualifier is required for a view.
    *
    * @inheritDoc
    */
@@ -38,7 +36,7 @@ export interface WorkbenchViewCapability extends Capability {
   /**
    * Specifies parameters required by the view.
    *
-   * Parameters are available in the path and title for placeholder substitution, or can be read in the microfrontend by injecting the {@link WorkbenchView} handle.
+   * Parameters can be read in the microfrontend by injecting the {@link WorkbenchView} handle, or referenced in path, title and resolvers using the colon syntax.
    *
    * @inheritDoc
    */
@@ -60,7 +58,7 @@ export interface WorkbenchViewCapability extends Capability {
      *     {"name": "id", "required": true}
      *   ],
      *   "properties": {
-     *     "path": "product/:id", // `:id` references a capability parameter
+     *     "path": "products/:id", // `:id` references a capability parameter
      *   }
      * }
      * ```

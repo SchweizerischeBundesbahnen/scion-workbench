@@ -27,7 +27,7 @@ export class ɵWorkbenchThemeMonitor implements WorkbenchThemeMonitor {
 /**
  * Context key to retrieve information about the current workbench theme.
  *
- * @docs-private Not public API, intended for internal use only.
+ * @docs-private Not public API. For internal use only.
  * @ignore
  * @see {@link ContextService}
  */

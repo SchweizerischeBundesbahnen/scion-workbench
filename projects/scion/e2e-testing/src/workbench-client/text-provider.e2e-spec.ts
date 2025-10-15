@@ -10,7 +10,7 @@
 
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
-import {WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchViewCapability} from './page-object/register-workbench-capability-page.po';
+import {WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchPartCapability, WorkbenchViewCapability} from './page-object/register-workbench-capability-page.po';
 import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
 import {TextTestPagePO} from './page-object/test-pages/text-test-page.po';
@@ -19,6 +19,7 @@ import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
 import {TextMessageBoxPagePO} from '../text-message-box-page.po';
 import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
 import {TextNotificationPagePO} from '../text-notification-page.po';
+import {MAIN_AREA} from '../workbench.model';
 
 test.describe('Text Provider', () => {
 
@@ -138,7 +139,7 @@ test.describe('Text Provider', () => {
       await expect.poll(() => consoleLogs.get({severity: 'error', message: /NotQualifiedError/})).toHaveLength(1);
     });
 
-    test('should not complete observable', async ({appPO, microfrontendNavigator, page}) => {
+    test('should not complete observable', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // Register test view.
@@ -197,24 +198,44 @@ test.describe('Text Provider', () => {
         qualifier: {component: 'testee', app: 'app2'},
       });
 
+      // Register left part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'left'},
+        properties: {
+          views: [
+            {qualifier: {component: 'testee', app: 'app1'}, cssClass: 'testee-app1'},
+          ],
+        },
+      });
+
+      // Register right part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'right'},
+        properties: {
+          views: [
+            {qualifier: {component: 'testee', app: 'app2'}, cssClass: 'testee-app2'},
+          ],
+        },
+      });
+
       // Create perspective with test view.
       await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
-          layout: [
+          parts: [
             {
               id: 'part.left',
-              views: [
-                {qualifier: {component: 'testee', app: 'app1'}, cssClass: 'testee-app1'},
-              ],
+              qualifier: {part: 'left'},
             },
             {
               id: 'part.right',
-              align: 'right',
-              views: [
-                {qualifier: {component: 'testee', app: 'app2'}, cssClass: 'testee-app2'},
-              ],
+              qualifier: {part: 'right'},
+              position: {
+                align: 'right',
+              },
             },
           ],
         },
@@ -317,24 +338,44 @@ test.describe('Text Provider', () => {
         qualifier: {component: 'testee', app: 'app2'},
       });
 
+      // Register left part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'left'},
+        properties: {
+          views: [
+            {qualifier: {component: 'testee', app: 'app1'}, cssClass: 'testee-app1'},
+          ],
+        },
+      });
+
+      // Register right part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'right'},
+        properties: {
+          views: [
+            {qualifier: {component: 'testee', app: 'app2'}, cssClass: 'testee-app2'},
+          ],
+        },
+      });
+
       // Create perspective with test view.
       await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
-          layout: [
+          parts: [
             {
               id: 'part.left',
-              views: [
-                {qualifier: {component: 'testee', app: 'app1'}, cssClass: 'testee-app1'},
-              ],
+              qualifier: {part: 'left'},
             },
             {
               id: 'part.right',
-              align: 'right',
-              views: [
-                {qualifier: {component: 'testee', app: 'app2'}, cssClass: 'testee-app2'},
-              ],
+              qualifier: {part: 'right'},
+              position: {
+                align: 'right',
+              },
             },
           ],
         },
@@ -418,24 +459,44 @@ test.describe('Text Provider', () => {
         qualifier: {component: 'testee', app: 'app2'},
       });
 
+      // Register left part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'left'},
+        properties: {
+          views: [
+            {qualifier: {component: 'testee', app: 'app1'}, cssClass: 'testee-app1'},
+          ],
+        },
+      });
+
+      // Register right part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'right'},
+        properties: {
+          views: [
+            {qualifier: {component: 'testee', app: 'app2'}, cssClass: 'testee-app2'},
+          ],
+        },
+      });
+
       // Create perspective with test view.
       await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
-          layout: [
+          parts: [
             {
               id: 'part.left',
-              views: [
-                {qualifier: {component: 'testee', app: 'app1'}, cssClass: 'testee-app1'},
-              ],
+              qualifier: {part: 'left'},
             },
             {
               id: 'part.right',
-              align: 'right',
-              views: [
-                {qualifier: {component: 'testee', app: 'app2'}, cssClass: 'testee-app2'},
-              ],
+              qualifier: {part: 'right'},
+              position: {
+                align: 'right',
+              },
             },
           ],
         },
@@ -768,6 +829,1069 @@ test.describe('Text Provider', () => {
       // Observe text.
       await testPage.text1.observe('%key;param1=v\\;al=ue1;param2=va\\;lue2', {app: 'workbench-client-testing-app1'});
       await expect(testPage.text1.text).toHaveText('TEXT - v;al=ue1 - va;lue2');
+    });
+  });
+
+  test.describe('Workbench Part', () => {
+
+    test.describe('Localized Part', () => {
+
+      test('should display localized texts', async ({appPO, microfrontendNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // Register text view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'text'},
+          properties: {
+            path: 'test-pages/text-test-page',
+          },
+        });
+
+        // Register docked part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'activity'},
+          properties: {
+            path: 'test-part',
+            extras: {
+              icon: 'folder',
+              label: '%part_label',
+              tooltip: '%part_tooltip',
+            },
+            cssClass: 'testee-1',
+          },
+        });
+
+        // Register part relative aligned to docked part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'bottom'},
+          properties: {
+            path: 'test-part',
+            title: '%part_title',
+            cssClass: 'testee-2',
+          },
+        });
+
+        // Register main-area part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'main-area'},
+        });
+
+        // Create perspective with a part and a docked part.
+        await microfrontendNavigator.createPerspective('app1', {
+          type: 'perspective',
+          qualifier: {perspective: 'testee'},
+          properties: {
+            parts: [
+              {
+                id: MAIN_AREA,
+                qualifier: {part: 'main-area'},
+              },
+              {
+                id: 'part.activity',
+                qualifier: {part: 'activity'},
+                position: 'left-top',
+                active: true,
+              },
+              {
+                id: 'part.bottom',
+                qualifier: {part: 'bottom'},
+                position: {
+                  relativeTo: 'part.activity',
+                  align: 'bottom',
+                },
+              },
+            ],
+          },
+        });
+
+        const activityItem = appPO.activityItem({cssClass: 'testee-1'});
+        const dockedPart = appPO.part({cssClass: 'testee-1'});
+        const nonDockedPart = appPO.part({cssClass: 'testee-2'});
+
+        // Open text view.
+        const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+        await routerPage.navigate({component: 'text'}, {cssClass: 'text'});
+        const textPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'text'});
+
+        // Provide text.
+        await test.step('Provide text', async () => {
+          await textPage.provideText('part_label', 'Label 1');
+          await expect(dockedPart.bar.title).toHaveText('Label 1');
+
+          await textPage.provideText('part_title', 'Title 1');
+          await expect(nonDockedPart.bar.title).toHaveText('Title 1');
+
+          await textPage.provideText('part_tooltip', 'Tooltip 1');
+          await expect.poll(() => activityItem.getTooltip()).toEqual('Tooltip 1');
+        });
+
+        // Provide different text.
+        await test.step('Provide different text', async () => {
+          await textPage.provideText('part_label', 'Label 2');
+          await expect(dockedPart.bar.title).toHaveText('Label 2');
+
+          await textPage.provideText('part_title', 'Title 2');
+          await expect(nonDockedPart.bar.title).toHaveText('Title 2');
+
+          await textPage.provideText('part_tooltip', 'Tooltip 2');
+          await expect.poll(() => activityItem.getTooltip()).toEqual('Tooltip 2');
+        });
+
+        // Provide `undefined` as text.
+        await test.step('Provide `undefined`', async () => {
+          await textPage.provideText('part_label', '<undefined>');
+          await expect(dockedPart.bar.title).toHaveText('%part_label');
+
+          await textPage.provideText('part_title', '<undefined>');
+          await expect(nonDockedPart.bar.title).toHaveText('%part_title');
+
+          await textPage.provideText('part_tooltip', '<undefined>');
+          await expect.poll(() => activityItem.getTooltip()).toEqual('%part_tooltip');
+        });
+      });
+
+      test('should substitute parameters and resolvers', async ({appPO, microfrontendNavigator, page}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // Register text view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'text'},
+          properties: {
+            path: 'test-pages/text-test-page',
+          },
+        });
+
+        // Register docked part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'activity'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-part',
+            extras: {
+              icon: 'folder',
+              label: '%part_label;id=:id;name=:name;undefined=:undefined',
+              tooltip: '%part_tooltip;id=:id;name=:name;undefined=:undefined',
+            },
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+            cssClass: 'testee-1',
+          },
+        });
+
+        // Register part relative aligned to docked part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'bottom'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-part',
+            title: '%part_title;id=:id;name=:name;undefined=:undefined',
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+            cssClass: 'testee-2',
+          },
+        });
+
+        // Register main-area part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'main-area'},
+        });
+
+        // Create perspective with a part and a docked part.
+        await microfrontendNavigator.createPerspective('app1', {
+          type: 'perspective',
+          qualifier: {perspective: 'testee'},
+          properties: {
+            parts: [
+              {
+                id: MAIN_AREA,
+                qualifier: {part: 'main-area'},
+              },
+              {
+                id: 'part.activity',
+                qualifier: {part: 'activity'},
+                params: {id: '123'},
+                position: 'left-top',
+                active: true,
+              },
+              {
+                id: 'part.bottom',
+                qualifier: {part: 'bottom'},
+                params: {id: '123'},
+                position: {
+                  relativeTo: 'part.activity',
+                  align: 'bottom',
+                },
+              },
+            ],
+          },
+        });
+
+        const activityItem = appPO.activityItem({cssClass: 'testee-1'});
+        const dockedPart = appPO.part({cssClass: 'testee-1'});
+        const nonDockedPart = appPO.part({cssClass: 'testee-2'});
+
+        // Open text view.
+        const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+        await routerPage.navigate({component: 'text'}, {cssClass: 'text'});
+        const textPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'text'});
+
+        // Provide text.
+        await textPage.provideText('part_label', 'Label - {{id}} - {{name}} - {{undefined}}');
+        await textPage.provideText('part_title', 'Title - {{id}} - {{name}} - {{undefined}}');
+        await textPage.provideText('part_tooltip', 'Tooltip - {{id}} - {{name}} - {{undefined}}');
+
+        // No resolved value yet.
+        await test.step('No resolved value yet', async () => {
+          // Wait some time.
+          await page.waitForTimeout(1000);
+          await expect(dockedPart.bar.title).toHaveText('');
+          await expect(nonDockedPart.bar.title).toHaveText('');
+          await expect.poll(() => activityItem.getTooltip()).toEqual('');
+        });
+
+        // Resolve value.
+        await test.step('Resolve Value', async () => {
+          await textPage.provideValue('123', 'RESOLVED 1');
+          await expect(dockedPart.bar.title).toHaveText('Label - 123 - RESOLVED 1 - :undefined');
+          await expect(nonDockedPart.bar.title).toHaveText('Title - 123 - RESOLVED 1 - :undefined');
+          await expect.poll(() => activityItem.getTooltip()).toEqual('Tooltip - 123 - RESOLVED 1 - :undefined');
+        });
+
+        // Resolve to a different value.
+        await test.step('Resolve to a different value', async () => {
+          await textPage.provideValue('123', 'RESOLVED 2');
+          await expect(dockedPart.bar.title).toHaveText('Label - 123 - RESOLVED 2 - :undefined');
+          await expect(nonDockedPart.bar.title).toHaveText('Title - 123 - RESOLVED 2 - :undefined');
+          await expect.poll(() => activityItem.getTooltip()).toEqual('Tooltip - 123 - RESOLVED 2 - :undefined');
+        });
+
+        // Resolve to translatable.
+        await test.step('Resolve to translatable', async () => {
+          await textPage.provideValue('123', '%resolved_text');
+          await textPage.provideText('resolved_text', 'RESOLVED TEXT');
+
+          await expect(dockedPart.bar.title).toHaveText('Label - 123 - RESOLVED TEXT - :undefined');
+          await expect(nonDockedPart.bar.title).toHaveText('Title - 123 - RESOLVED TEXT - :undefined');
+          await expect.poll(() => activityItem.getTooltip()).toEqual('Tooltip - 123 - RESOLVED TEXT - :undefined');
+        });
+
+        // Resolve to translatable with parameter.
+        await test.step('Resolve to translatable with parameter', async () => {
+          await textPage.provideValue('123', '%resolved_text;param=ABC');
+          await textPage.provideText('resolved_text', 'RESOLVED TEXT {{param}}');
+
+          await expect(dockedPart.bar.title).toHaveText('Label - 123 - RESOLVED TEXT ABC - :undefined');
+          await expect(nonDockedPart.bar.title).toHaveText('Title - 123 - RESOLVED TEXT ABC - :undefined');
+          await expect.poll(() => activityItem.getTooltip()).toEqual('Tooltip - 123 - RESOLVED TEXT ABC - :undefined');
+        });
+
+        // Resolve to translatable with escaped semicolon in parameter.
+        await test.step('Resolve to translatable with semicolon in parameter', async () => {
+          await textPage.provideValue('123', '%resolved_text;param=A\\;B');
+          await textPage.provideText('resolved_text', 'RESOLVED TEXT {{param}}');
+
+          await expect(dockedPart.bar.title).toHaveText('Label - 123 - RESOLVED TEXT A;B - :undefined');
+          await expect(nonDockedPart.bar.title).toHaveText('Title - 123 - RESOLVED TEXT A;B - :undefined');
+          await expect.poll(() => activityItem.getTooltip()).toEqual('Tooltip - 123 - RESOLVED TEXT A;B - :undefined');
+        });
+
+        // Resolve to `undefined`.
+        await test.step('Resolve to `undefined`', async () => {
+          await textPage.provideValue('123', '<undefined>');
+
+          await expect(dockedPart.bar.title).toHaveText('Label - 123 -  - :undefined');
+          await expect(nonDockedPart.bar.title).toHaveText('Title - 123 -  - :undefined');
+          await expect.poll(() => activityItem.getTooltip()).toEqual('Tooltip - 123 -  - :undefined');
+        });
+      });
+
+      test('should support semicolon in parameter and resolver', async ({appPO, microfrontendNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // Register text view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'text'},
+          properties: {
+            path: 'test-pages/text-test-page',
+          },
+        });
+
+        // Register docked part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'activity'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-part',
+            extras: {
+              icon: 'folder',
+              label: '%part_label;id=:id;name=:name',
+              tooltip: '%part_tooltip;id=:id;name=:name',
+            },
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+            cssClass: 'testee-1',
+          },
+        });
+
+        // Register part relative aligned to docked part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'bottom'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-part',
+            title: '%part_title;id=:id;name=:name',
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+            cssClass: 'testee-2',
+          },
+        });
+
+        // Register main-area part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'main-area'},
+        });
+
+        // Create perspective with a part and a docked part.
+        await microfrontendNavigator.createPerspective('app1', {
+          type: 'perspective',
+          qualifier: {perspective: 'testee'},
+          properties: {
+            parts: [
+              {
+                id: MAIN_AREA,
+                qualifier: {part: 'main-area'},
+              },
+              {
+                id: 'part.activity',
+                qualifier: {part: 'activity'},
+                params: {id: '123;456'},
+                position: 'left-top',
+                active: true,
+              },
+              {
+                id: 'part.bottom',
+                qualifier: {part: 'bottom'},
+                params: {id: '123;456'},
+                position: {
+                  relativeTo: 'part.activity',
+                  align: 'bottom',
+                },
+              },
+            ],
+          },
+        });
+
+        const activityItem = appPO.activityItem({cssClass: 'testee-1'});
+        const dockedPart = appPO.part({cssClass: 'testee-1'});
+        const nonDockedPart = appPO.part({cssClass: 'testee-2'});
+
+        // Open text view.
+        const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+        await routerPage.navigate({component: 'text'}, {cssClass: 'text'});
+        const textPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'text'});
+
+        // Provide text.
+        await textPage.provideText('part_label', 'Label - {{id}} - {{name}}');
+        await textPage.provideText('part_title', 'Title - {{id}} - {{name}}');
+        await textPage.provideText('part_tooltip', 'Tooltip - {{id}} - {{name}}');
+        await textPage.provideValue('123;456', 'A;B');
+
+        await expect(dockedPart.bar.title).toHaveText('Label - 123;456 - A;B');
+        await expect(nonDockedPart.bar.title).toHaveText('Title - 123;456 - A;B');
+        await expect.poll(() => activityItem.getTooltip()).toEqual('Tooltip - 123;456 - A;B');
+      });
+
+      test('should cache texts on re-layout', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+        await appPO.navigateTo({microfrontendSupport: true, mainAreaInitialPartId: 'part.initial', logLevel: 'debug'});
+
+        // Register text view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'text'},
+          properties: {
+            path: 'test-pages/text-test-page',
+          },
+        });
+
+        // Register left part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'left'},
+          properties: {
+            views: [
+              {qualifier: {component: 'text'}, cssClass: 'text'},
+            ],
+          },
+        });
+
+        // Register right part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'right'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-part',
+            title: '%part_title;id=:id;name=:name',
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+            cssClass: 'testee',
+          },
+        });
+
+        // Create perspective with a part and a docked part.
+        await microfrontendNavigator.createPerspective('app1', {
+          type: 'perspective',
+          qualifier: {perspective: 'testee'},
+          properties: {
+            parts: [
+              {
+                id: 'part.left',
+                qualifier: {part: 'left'},
+              },
+              {
+                id: 'part.right',
+                qualifier: {part: 'right'},
+                params: {id: '123'},
+                position: {
+                  align: 'right',
+                },
+              },
+            ],
+          },
+        });
+
+        const textPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'text'});
+        const testPart = appPO.part({cssClass: 'testee'});
+
+        // Provide text and value.
+        await textPage.provideText('part_title', 'Title - {{id}} - {{name}}');
+        await textPage.provideValue('123', 'RESOLVED');
+
+        await expect(testPart.bar.title).toHaveText('Title - 123 - RESOLVED');
+
+        // Expect request to the text and value provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqualIgnoreOrder([
+          '[TextProvider][workbench-client-testing-app1] Requesting value: 123',
+          '[TextProvider][workbench-client-testing-app1] Requesting text: %part_title;id=123;name=RESOLVED',
+        ]);
+        consoleLogs.clear();
+
+        // Change layout by closing text view.
+        await textPage.view.tab.close();
+
+        await expect(testPart.bar.title).toHaveText('Title - 123 - RESOLVED');
+
+        // Expect no request to the value provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([]);
+        consoleLogs.clear();
+      });
+
+      test('should cache texts on re-layout if provider completes request', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+        await appPO.navigateTo({microfrontendSupport: true, mainAreaInitialPartId: 'part.initial', logLevel: 'debug'});
+
+        // Register text view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'text'},
+          properties: {
+            path: 'test-pages/text-test-page',
+          },
+        });
+
+        // Register left part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'left'},
+          properties: {
+            views: [
+              {qualifier: {component: 'text'}, cssClass: 'text'},
+            ],
+          },
+        });
+
+        // Register right part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'right'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-part',
+            title: '%part_title;id=:id;name=:name;options.complete=true', // instruct provider to complete
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id/complete', // instruct provider to complete
+            },
+            cssClass: 'testee',
+          },
+        });
+
+        // Create perspective with a part and a docked part.
+        await microfrontendNavigator.createPerspective('app1', {
+          type: 'perspective',
+          qualifier: {perspective: 'testee'},
+          properties: {
+            parts: [
+              {
+                id: 'part.left',
+                qualifier: {part: 'left'},
+              },
+              {
+                id: 'part.right',
+                qualifier: {part: 'right'},
+                params: {id: '123'},
+                position: {
+                  align: 'right',
+                },
+              },
+            ],
+          },
+        });
+
+        const textPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'text'});
+        const testPart = appPO.part({cssClass: 'testee'});
+
+        // Provide text and value.
+        await textPage.provideText('part_title', 'Title - {{id}} - {{name}}');
+        await textPage.provideValue('123', 'RESOLVED');
+
+        await expect(testPart.bar.title).toHaveText('Title - 123 - RESOLVED');
+
+        // Expect request to the text and value provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqualIgnoreOrder([
+          '[TextProvider][workbench-client-testing-app1] Requesting value: 123',
+          '[TextProvider][workbench-client-testing-app1] Requesting text: %part_title;id=123;name=RESOLVED;options.complete=true',
+        ]);
+        consoleLogs.clear();
+
+        // Change layout by closing text view.
+        await textPage.view.tab.close();
+
+        await expect(testPart.bar.title).toHaveText('Title - 123 - RESOLVED');
+
+        // Expect no request to the value provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([]);
+        consoleLogs.clear();
+      });
+    });
+
+    test.describe('Non-Localized Part', () => {
+
+      test('should display non-localized texts', async ({appPO, microfrontendNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // Register docked part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'activity'},
+          properties: {
+            path: 'test-part',
+            extras: {
+              icon: 'folder',
+              label: 'Label',
+              tooltip: 'Tooltip',
+            },
+            cssClass: 'testee-1',
+          },
+        });
+
+        // Register part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'main'},
+          properties: {
+            path: 'test-part',
+            title: 'Title',
+            cssClass: 'testee-2',
+          },
+        });
+
+        // Create perspective with a part and a docked part.
+        await microfrontendNavigator.createPerspective('app1', {
+          type: 'perspective',
+          qualifier: {perspective: 'testee'},
+          properties: {
+            parts: [
+              {
+                id: 'part.main',
+                qualifier: {part: 'main'},
+              },
+              {
+                id: 'part.activity',
+                qualifier: {part: 'activity'},
+                position: 'left-top',
+                active: true,
+              },
+            ],
+          },
+        });
+
+        const activityItem = appPO.activityItem({cssClass: 'testee-1'});
+        const dockedPart = appPO.part({cssClass: 'testee-1'});
+        const nonDockedPart = appPO.part({cssClass: 'testee-2'});
+
+        // Expect view title and heading as specified.
+        await expect(dockedPart.bar.title).toHaveText('Label');
+        await expect(nonDockedPart.bar.title).toHaveText('Title');
+        await expect.poll(() => activityItem.getTooltip()).toEqual('Tooltip');
+      });
+
+      test('should substitute parameters and resolvers', async ({appPO, microfrontendNavigator, page}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // Register text view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'text'},
+          properties: {
+            path: 'test-pages/text-test-page',
+          },
+        });
+
+        // Register docked part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'activity'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-part',
+            extras: {
+              icon: 'folder',
+              label: 'Label - :id - :name - :undefined',
+              tooltip: 'Tooltip - :id - :name - :undefined',
+            },
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+            cssClass: 'testee-1',
+          },
+        });
+
+        // Register part relative aligned to docked part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'bottom'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-part',
+            title: 'Title - :id - :name - :undefined',
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+            cssClass: 'testee-2',
+          },
+        });
+
+        // Register main-area part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'main-area'},
+        });
+
+        // Create perspective with a part and a docked part.
+        await microfrontendNavigator.createPerspective('app1', {
+          type: 'perspective',
+          qualifier: {perspective: 'testee'},
+          properties: {
+            parts: [
+              {
+                id: MAIN_AREA,
+                qualifier: {part: 'main-area'},
+              },
+              {
+                id: 'part.activity',
+                qualifier: {part: 'activity'},
+                params: {id: '123'},
+                position: 'left-top',
+                active: true,
+              },
+              {
+                id: 'part.bottom',
+                qualifier: {part: 'bottom'},
+                params: {id: '123'},
+                position: {
+                  relativeTo: 'part.activity',
+                  align: 'bottom',
+                },
+              },
+            ],
+          },
+        });
+
+        // Open text view.
+        const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+        await routerPage.navigate({component: 'text'}, {cssClass: 'text'});
+        const textPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'text'});
+
+        const activityItem = appPO.activityItem({cssClass: 'testee-1'});
+        const dockedPart = appPO.part({cssClass: 'testee-1'});
+        const nonDockedPart = appPO.part({cssClass: 'testee-2'});
+
+        // No resolved value yet.
+        await test.step('No resolved value yet', async () => {
+          // Wait some time.
+          await page.waitForTimeout(1000);
+          await expect(dockedPart.bar.title).toHaveText('');
+          await expect(nonDockedPart.bar.title).toHaveText('');
+          await expect.poll(() => activityItem.getTooltip()).toEqual('');
+        });
+
+        // Resolve value.
+        await test.step('Resolve Value', async () => {
+          await textPage.provideValue('123', 'RESOLVED 1');
+          await expect(dockedPart.bar.title).toHaveText('Label - 123 - RESOLVED 1 - :undefined');
+          await expect(nonDockedPart.bar.title).toHaveText('Title - 123 - RESOLVED 1 - :undefined');
+          await expect.poll(() => activityItem.getTooltip()).toEqual('Tooltip - 123 - RESOLVED 1 - :undefined');
+        });
+
+        // Resolve to a different value.
+        await test.step('Resolve to a different value', async () => {
+          await textPage.provideValue('123', 'RESOLVED 2');
+          await expect(dockedPart.bar.title).toHaveText('Label - 123 - RESOLVED 2 - :undefined');
+          await expect(nonDockedPart.bar.title).toHaveText('Title - 123 - RESOLVED 2 - :undefined');
+          await expect.poll(() => activityItem.getTooltip()).toEqual('Tooltip - 123 - RESOLVED 2 - :undefined');
+        });
+
+        // Resolve to translatable.
+        await test.step('Resolve to translatable', async () => {
+          await textPage.provideValue('123', '%resolved_text');
+          await textPage.provideText('resolved_text', 'RESOLVED TEXT');
+          await expect(dockedPart.bar.title).toHaveText('Label - 123 - RESOLVED TEXT - :undefined');
+          await expect(nonDockedPart.bar.title).toHaveText('Title - 123 - RESOLVED TEXT - :undefined');
+          await expect.poll(() => activityItem.getTooltip()).toEqual('Tooltip - 123 - RESOLVED TEXT - :undefined');
+        });
+
+        // Resolve to translatable with parameter.
+        await test.step('Resolve to translatable with parameter', async () => {
+          await textPage.provideValue('123', '%resolved_text;param=ABC');
+          await textPage.provideText('resolved_text', 'RESOLVED TEXT {{param}}');
+          await expect(dockedPart.bar.title).toHaveText('Label - 123 - RESOLVED TEXT ABC - :undefined');
+          await expect(nonDockedPart.bar.title).toHaveText('Title - 123 - RESOLVED TEXT ABC - :undefined');
+          await expect.poll(() => activityItem.getTooltip()).toEqual('Tooltip - 123 - RESOLVED TEXT ABC - :undefined');
+        });
+
+        // Resolve to translatable with escaped semicolon in parameter.
+        await test.step('Resolve to translatable with semicolon in parameter', async () => {
+          await textPage.provideValue('123', '%resolved_text;param=A\\;B');
+          await textPage.provideText('resolved_text', 'RESOLVED TEXT {{param}}');
+          await expect(dockedPart.bar.title).toHaveText('Label - 123 - RESOLVED TEXT A;B - :undefined');
+          await expect(nonDockedPart.bar.title).toHaveText('Title - 123 - RESOLVED TEXT A;B - :undefined');
+          await expect.poll(() => activityItem.getTooltip()).toEqual('Tooltip - 123 - RESOLVED TEXT A;B - :undefined');
+        });
+
+        // Resolve to `undefined`.
+        await test.step('Resolve to `undefined`', async () => {
+          await textPage.provideValue('123', '<undefined>');
+          await expect(dockedPart.bar.title).toHaveText('Label - 123 -  - :undefined');
+          await expect(nonDockedPart.bar.title).toHaveText('Title - 123 -  - :undefined');
+          await expect.poll(() => activityItem.getTooltip()).toEqual('Tooltip - 123 -  - :undefined');
+        });
+      });
+
+      test('should support semicolon in text, parameter and resolver', async ({appPO, microfrontendNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // Register text view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'text'},
+          properties: {
+            path: 'test-pages/text-test-page',
+          },
+        });
+
+        // Register docked part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'activity'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-part',
+            extras: {
+              icon: 'folder',
+              label: 'Part;Label - :id - :name',
+              tooltip: 'Part;Tooltip - :id - :name',
+            },
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+            cssClass: 'testee-1',
+          },
+        });
+
+        // Register part relative aligned to docked part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'bottom'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-part',
+            title: 'Part;Title - :id - :name',
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+            cssClass: 'testee-2',
+          },
+        });
+
+        // Register main-area part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'main-area'},
+        });
+
+        // Create perspective with a part and a docked part.
+        await microfrontendNavigator.createPerspective('app1', {
+          type: 'perspective',
+          qualifier: {perspective: 'testee'},
+          properties: {
+            parts: [
+              {
+                id: MAIN_AREA,
+                qualifier: {part: 'main-area'},
+              },
+              {
+                id: 'part.activity',
+                qualifier: {part: 'activity'},
+                params: {id: '123;456'},
+                position: 'left-top',
+                active: true,
+              },
+              {
+                id: 'part.bottom',
+                qualifier: {part: 'bottom'},
+                params: {id: '123;456'},
+                position: {
+                  relativeTo: 'part.activity',
+                  align: 'bottom',
+                },
+              },
+            ],
+          },
+        });
+
+        // Open text view.
+        const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+        await routerPage.navigate({component: 'text'}, {cssClass: 'text'});
+        const textPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'text'});
+
+        const activityItem = appPO.activityItem({cssClass: 'testee-1'});
+        const dockedPart = appPO.part({cssClass: 'testee-1'});
+        const nonDockedPart = appPO.part({cssClass: 'testee-2'});
+
+        await textPage.provideValue('123;456', 'A;B');
+
+        await expect(dockedPart.bar.title).toHaveText('Part;Label - 123;456 - A;B');
+        await expect(nonDockedPart.bar.title).toHaveText('Part;Title - 123;456 - A;B');
+        await expect.poll(() => activityItem.getTooltip()).toEqual('Part;Tooltip - 123;456 - A;B');
+      });
+
+      test('should cache texts on re-layout', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+        await appPO.navigateTo({microfrontendSupport: true, mainAreaInitialPartId: 'part.initial', logLevel: 'debug'});
+
+        // Register text view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'text'},
+          properties: {
+            path: 'test-pages/text-test-page',
+          },
+        });
+
+        // Register left part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'left'},
+          properties: {
+            views: [
+              {qualifier: {component: 'text'}, cssClass: 'text'},
+            ],
+          },
+        });
+
+        // Register right part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'right'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-part',
+            title: 'Title - :id - :name',
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+            cssClass: 'testee',
+          },
+        });
+
+        // Create perspective with a part and a docked part.
+        await microfrontendNavigator.createPerspective('app1', {
+          type: 'perspective',
+          qualifier: {perspective: 'testee'},
+          properties: {
+            parts: [
+              {
+                id: 'part.left',
+                qualifier: {part: 'left'},
+              },
+              {
+                id: 'part.right',
+                qualifier: {part: 'right'},
+                params: {id: '123'},
+                position: {
+                  align: 'right',
+                },
+              },
+            ],
+          },
+        });
+
+        const textPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'text'});
+        const testPart = appPO.part({cssClass: 'testee'});
+
+        // Provide value.
+        await textPage.provideValue('123', 'RESOLVED');
+
+        await expect(testPart.bar.title).toHaveText('Title - 123 - RESOLVED');
+
+        // Expect request to the text and value provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqualIgnoreOrder([
+          '[TextProvider][workbench-client-testing-app1] Requesting value: 123',
+        ]);
+        consoleLogs.clear();
+
+        // Change layout by closing text view.
+        await textPage.view.tab.close();
+
+        await expect(testPart.bar.title).toHaveText('Title - 123 - RESOLVED');
+
+        // Expect no request to the value provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([]);
+        consoleLogs.clear();
+      });
+
+      test('should cache texts on re-layout if provider completes request', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+        await appPO.navigateTo({microfrontendSupport: true, mainAreaInitialPartId: 'part.initial', logLevel: 'debug'});
+
+        // Register text view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'text'},
+          properties: {
+            path: 'test-pages/text-test-page',
+          },
+        });
+
+        // Register left part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'left'},
+          properties: {
+            views: [
+              {qualifier: {component: 'text'}, cssClass: 'text'},
+            ],
+          },
+        });
+
+        // Register right part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'right'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-part',
+            title: 'Title - :id - :name',
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id/complete', // instruct provider to complete
+            },
+            cssClass: 'testee',
+          },
+        });
+
+        // Create perspective with a part and a docked part.
+        await microfrontendNavigator.createPerspective('app1', {
+          type: 'perspective',
+          qualifier: {perspective: 'testee'},
+          properties: {
+            parts: [
+              {
+                id: 'part.left',
+                qualifier: {part: 'left'},
+              },
+              {
+                id: 'part.right',
+                qualifier: {part: 'right'},
+                params: {id: '123'},
+                position: {
+                  align: 'right',
+                },
+              },
+            ],
+          },
+        });
+
+        const textPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'text'});
+        const testPart = appPO.part({cssClass: 'testee'});
+
+        // Provide value.
+        await textPage.provideValue('123', 'RESOLVED');
+
+        await expect(testPart.bar.title).toHaveText('Title - 123 - RESOLVED');
+
+        // Expect request to the text and value provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqualIgnoreOrder([
+          '[TextProvider][workbench-client-testing-app1] Requesting value: 123',
+        ]);
+        consoleLogs.clear();
+
+        // Change layout by closing text view.
+        await textPage.view.tab.close();
+
+        await expect(testPart.bar.title).toHaveText('Title - 123 - RESOLVED');
+
+        // Expect no request to the value provider.
+        await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([]);
+        consoleLogs.clear();
+      });
     });
   });
 
@@ -1962,24 +3086,44 @@ test.describe('Text Provider', () => {
         qualifier: {component: 'testee', app: 'app2'},
       });
 
+      // Register left part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'left'},
+        properties: {
+          views: [
+            {qualifier: {component: 'text', app: 'app1'}, cssClass: 'text-app1'},
+          ],
+        },
+      });
+
+      // Register right part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'right'},
+        properties: {
+          views: [
+            {qualifier: {component: 'messagebox', app: 'app1'}, cssClass: 'messagebox-opener-app1'},
+          ],
+        },
+      });
+
       // Create perspective with test view.
       await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
-          layout: [
+          parts: [
             {
               id: 'part.left',
-              views: [
-                {qualifier: {component: 'text', app: 'app1'}, cssClass: 'text-app1'},
-              ],
+              qualifier: {part: 'left'},
             },
             {
               id: 'part.right',
-              align: 'right',
-              views: [
-                {qualifier: {component: 'messagebox', app: 'app1'}, cssClass: 'messagebox-opener-app1'},
-              ],
+              qualifier: {part: 'right'},
+              position: {
+                align: 'right',
+              },
             },
           ],
         },
@@ -2054,24 +3198,44 @@ test.describe('Text Provider', () => {
         },
       });
 
+      // Register left part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'left'},
+        properties: {
+          views: [
+            {qualifier: {component: 'text', app: 'app1'}, cssClass: 'text-app1'},
+          ],
+        },
+      });
+
+      // Register right part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'right'},
+        properties: {
+          views: [
+            {qualifier: {component: 'messagebox', app: 'app1'}, cssClass: 'messagebox-opener-app1'},
+          ],
+        },
+      });
+
       // Create perspective with text view and messagebox opener.
       await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
-          layout: [
+          parts: [
             {
               id: 'part.left',
-              views: [
-                {qualifier: {component: 'text', app: 'app1'}, cssClass: 'text-app1'},
-              ],
+              qualifier: {part: 'left'},
             },
             {
               id: 'part.right',
-              align: 'right',
-              views: [
-                {qualifier: {component: 'messagebox', app: 'app1'}, cssClass: 'messagebox-opener-app1'},
-              ],
+              qualifier: {part: 'right'},
+              position: {
+                align: 'right',
+              },
             },
           ],
         },
@@ -2148,24 +3312,44 @@ test.describe('Text Provider', () => {
         },
       });
 
+      // Register left part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'left'},
+        properties: {
+          views: [
+            {qualifier: {component: 'text', app: 'app1'}, cssClass: 'text-app1'},
+          ],
+        },
+      });
+
+      // Register right part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'right'},
+        properties: {
+          views: [
+            {qualifier: {component: 'messagebox', app: 'app1'}, cssClass: 'messagebox-opener-app1'},
+          ],
+        },
+      });
+
       // Create perspective with text view and messagebox opener.
       await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
-          layout: [
+          parts: [
             {
               id: 'part.left',
-              views: [
-                {qualifier: {component: 'text', app: 'app1'}, cssClass: 'text-app1'},
-              ],
+              qualifier: {part: 'left'},
             },
             {
               id: 'part.right',
-              align: 'right',
-              views: [
-                {qualifier: {component: 'messagebox', app: 'app1'}, cssClass: 'messagebox-opener-app1'},
-              ],
+              qualifier: {part: 'right'},
+              position: {
+                align: 'right',
+              },
             },
           ],
         },
@@ -2251,24 +3435,44 @@ test.describe('Text Provider', () => {
         },
       });
 
+      // Register left part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'left'},
+        properties: {
+          views: [
+            {qualifier: {component: 'text', app: 'app1'}, cssClass: 'text-app1'},
+          ],
+        },
+      });
+
+      // Register right part.
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'right'},
+        properties: {
+          views: [
+            {qualifier: {component: 'notification', app: 'app1'}, cssClass: 'notification-opener-app1'},
+          ],
+        },
+      });
+
       // Create perspective with text view and notification opener.
       await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
-          layout: [
+          parts: [
             {
               id: 'part.left',
-              views: [
-                {qualifier: {component: 'text', app: 'app1'}, cssClass: 'text-app1'},
-              ],
+              qualifier: {part: 'left'},
             },
             {
               id: 'part.right',
-              align: 'right',
-              views: [
-                {qualifier: {component: 'notification', app: 'app1'}, cssClass: 'notification-opener-app1'},
-              ],
+              qualifier: {part: 'right'},
+              position: {
+                align: 'right',
+              },
             },
           ],
         },

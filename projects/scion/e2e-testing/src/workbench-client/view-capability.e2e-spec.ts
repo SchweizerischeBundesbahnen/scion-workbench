@@ -43,7 +43,7 @@ test.describe('Workbench View Capability', () => {
         path: 'test-pages/microfrontend-test-page',
       },
     });
-    await expect(capability).rejects.toThrow(/NullQualifierError/);
+    await expect(capability).rejects.toThrow(/\[ViewDefinitionError] View capability requires a qualifier/);
   });
 
   test('should error if path is `undefined`', async ({appPO, microfrontendNavigator}) => {
@@ -56,7 +56,7 @@ test.describe('Workbench View Capability', () => {
         path: '<undefined>',
       },
     });
-    await expect(capability).rejects.toThrow(/NullPathError/);
+    await expect(capability).rejects.toThrow(/\[ViewDefinitionError] View capability requires the 'path' property/);
   });
 
   test('should error if path is `null`', async ({appPO, microfrontendNavigator}) => {
@@ -69,7 +69,7 @@ test.describe('Workbench View Capability', () => {
         path: '<null>',
       },
     });
-    await expect(capability).rejects.toThrow(/NullPathError/);
+    await expect(capability).rejects.toThrow(/\[ViewDefinitionError] View capability requires the 'path' property/);
   });
 
   test('should not error if path is empty', async ({appPO, microfrontendNavigator}) => {

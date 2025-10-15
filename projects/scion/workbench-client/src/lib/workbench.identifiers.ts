@@ -37,6 +37,12 @@ export type DialogId = `dialog.${string}`;
  * @category Popup
  */
 export type PopupId = `popup.${string}`;
+/**
+ * Format of an activity identifier.
+ *
+ * @docs-private Not public API. For internal use only.
+ */
+export type ActivityId = `activity.${string}`;
 
 /**
  * Computes a unique popup id.

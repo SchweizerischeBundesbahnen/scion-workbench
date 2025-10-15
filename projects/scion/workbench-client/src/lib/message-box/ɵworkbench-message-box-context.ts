@@ -16,7 +16,7 @@ import {DialogId} from '../workbench.identifiers';
  *
  * This object can be obtained from the {@link ContextService} using the name {@link ɵMESSAGE_BOX_CONTEXT}.
  *
- * @docs-private Not public API, intended for internal use only.
+ * @docs-private Not public API. For internal use only.
  * @ignore
  */
 export interface ɵMessageBoxContext {
@@ -39,7 +39,7 @@ export interface ɵMessageBoxContext {
  *
  * The message box context is only available to microfrontends loaded in a workbench message box.
  *
- * @docs-private Not public API, intended for internal use only.
+ * @docs-private Not public API. For internal use only.
  * @ignore
  * @see {@link ContextService}
  * @see {@link ɵMessageBoxContext}

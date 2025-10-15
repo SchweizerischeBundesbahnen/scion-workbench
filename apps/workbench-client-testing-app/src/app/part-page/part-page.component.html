@@ -1,0 +1,80 @@
+<section>
+  <sci-form-field label="Part ID">
+    <span class="e2e-part-id">{{part.id}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="App Instance" title="Unique identifier of this app instance">
+    <span class="e2e-app-instance-id">{{appInstanceId}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="Component Instance" title="Unique identifier of this component instance">
+    <span class="e2e-component-instance-id">{{uuid}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="Path">
+    <span class="e2e-path">{{location.path()}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="Focused">
+    <input [ngModel]="focused()" disabled>
+  </sci-form-field>
+
+  <sci-form-field label="Active">
+    <input [ngModel]="active()" disabled>
+  </sci-form-field>
+</section>
+
+<sci-accordion class="part-capability e2e-part-capability" variant="solid">
+  <ng-template sciAccordionItem [panel]="panel_capability">
+    <header>Part Capability</header>
+  </ng-template>
+  <ng-template #panel_capability>
+    <sci-viewport>
+      <div class="e2e-part-capability capability">{{part.capability | json}}</div>
+    </sci-viewport>
+  </ng-template>
+</sci-accordion>
+
+@if (part.params | appNullIfEmpty; as params) {
+  <sci-accordion class="e2e-part-params" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_part_params">
+      <header>Part Params</header>
+    </ng-template>
+    <ng-template #panel_part_params>
+      <sci-key-value [object]="params | appAppendParamDataType" class="e2e-part-params"/>
+    </ng-template>
+  </sci-accordion>
+}
+
+@if (route.snapshot.params | appNullIfEmpty; as params) {
+  <sci-accordion variant="solid" class="e2e-route-params">
+    <ng-template sciAccordionItem [panel]="panel_route_params">
+      <header>Route Params</header>
+    </ng-template>
+    <ng-template #panel_route_params>
+      <sci-key-value [object]="params" class="e2e-route-params"/>
+    </ng-template>
+  </sci-accordion>
+}
+
+@if (route.snapshot.queryParams | appNullIfEmpty; as params) {
+  <sci-accordion class="e2e-route-query-params" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_query_params">
+      <header>Route Query Params</header>
+    </ng-template>
+    <ng-template #panel_query_params>
+      <sci-key-value [object]="params" class="e2e-route-query-params"/>
+    </ng-template>
+  </sci-accordion>
+}
+
+@if (route.snapshot.fragment | appNullIfEmpty; as fragment) {
+  <sci-accordion class="e2e-route-fragment" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_route_fragment">
+      <header>Route Fragment</header>
+    </ng-template>
+    <ng-template #panel_route_fragment>
+      <span class="e2e-route-fragment">{{fragment}}</span>
+    </ng-template>
+  </sci-accordion>
+}

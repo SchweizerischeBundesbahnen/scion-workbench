@@ -19,7 +19,7 @@
  *
  * Refer to this part to align parts relative to the main area.
  *
- * The main area is a special part that can be added to the layout. The main area is where the workbench opens new views by default.
+ * The main area is a special part that can be added to the layout. The main area is where the workbench opens views by default.
  * It is shared between perspectives and its layout is not reset when resetting perspectives.
  */
 export const MAIN_AREA: MAIN_AREA = 'part.main-area';

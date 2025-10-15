@@ -18,7 +18,7 @@ import {WorkbenchLayoutFactory} from './workbench-layout.factory';
  * The workbench layout is an arrangement of parts and views. Parts can be docked to the side or positioned relative to each other.
  * Views are stacked in parts and can be dragged to other parts. Content can be displayed in both parts and views.
  *
- * A typical workbench application has a main area part and other parts docked to the side, providing navigation and context-sensitive assistance to
+ * A typical workbench application has a main area part and parts docked to the side, providing navigation and context-sensitive assistance to
  * support the user's workflow.
  *
  * Multiple layouts, called perspectives, can be created. Users can switch between perspectives. Perspectives share the same main area, if any.
@@ -228,6 +228,16 @@ export interface WorkbenchLayout {
   activatePart(id: string): WorkbenchLayout;
 
   /**
+   * Tests if given part is contained in the layout.
+   */
+  hasPart(id: string): boolean;
+
+  /**
+   * Tests if given view is contained in the layout.
+   */
+  hasView(id: string): boolean;
+
+  /**
    * Applies a modification function to this layout, enabling conditional changes while maintaining method chaining.
    *
    * @param modifyFn - A function that takes the current layout and returns a modified layout.
@@ -277,15 +287,16 @@ export interface PartExtras {
 }
 
 /**
- * Controls the appearance and behavior of a docked part.
+ * Controls the appearance of a docked part and its toggle button.
  *
  * A docked part is a part that is docked to the left, right, or bottom side of the workbench.
+ *
  * Docked parts can be minimized to create more space for the main content. Users cannot drag
  * views into or out of docked parts.
  */
 export interface DockedPartExtras {
   /**
-   * Icon (key) of the toggle button in the sidebar, used to open or close the docked part.
+   * Icon (key) displayed in the toggle button.
    *
    * The actual icon is resolved through an {@link WorkbenchIconProviderFn} registered in {@link WorkbenchConfig.iconProvider}.
    *
@@ -300,13 +311,13 @@ export interface DockedPartExtras {
    */
   icon: string;
   /**
-   * Label of the toggle button in the sidebar.
+   * Label displayed in the toggle button.
    *
    * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    */
   label: Translatable;
   /**
-   * Tooltip displayed when hovering over the toggle button in the sidebar.
+   * Tooltip displayed when hovering over the toggle button.
    *
    * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    */
@@ -330,7 +341,7 @@ export interface DockedPartExtras {
   /**
    * Internal identifier for the docked part.
    *
-   * @docs-private Not public API, intended for internal use only.
+   * @docs-private Not public API. For internal use only.
    */
   ɵactivityId?: ActivityId;
 }
@@ -360,7 +371,7 @@ export interface DockingArea {
  *
  * Refer to this part to align parts relative to the main area.
  *
- * The main area is a special part that can be added to the layout. The main area is where the workbench opens new views by default.
+ * The main area is a special part that can be added to the layout. The main area is where the workbench opens views by default.
  * It is shared between perspectives and its layout is not reset when resetting perspectives.
  */
 export const MAIN_AREA: MAIN_AREA = 'part.main-area';
@@ -440,8 +451,8 @@ export interface MWorkbenchLayout {
  * The workbench layout is an arrangement of parts and views. Parts can be docked to the side or positioned relative to each other.
  * Views are stacked in parts and can be dragged to other parts. Content can be displayed in both parts and views.
  *
- * The layout typically has a main area part and other parts docked to the side, providing navigation and context-sensitive assistance to support
- * the user's workflow. Initially empty or displaying a welcome page, the main area is where the workbench opens new views by default.
+ * The layout typically has a main area part and parts docked to the side, providing navigation and context-sensitive assistance to support
+ * the user's workflow. Initially empty or displaying a welcome page, the main area is where the workbench opens views by default.
  * Unlike any other part, the main area is shared between perspectives, and its layout is not reset when resetting perspectives.
 
  * ## Steps to create the layout

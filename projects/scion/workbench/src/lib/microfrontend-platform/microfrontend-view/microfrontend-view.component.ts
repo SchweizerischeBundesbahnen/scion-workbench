@@ -9,8 +9,8 @@
  */
 
 import {ChangeDetectorRef, Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Injector, Provider, signal, Signal, untracked, viewChild} from '@angular/core';
-import {ActivatedRoute, Params} from '@angular/router';
-import {asyncScheduler, firstValueFrom, MonoTypeOperatorFunction, Observable, OperatorFunction, Subject, switchMap} from 'rxjs';
+import {ActivatedRoute, Params, Router} from '@angular/router';
+import {asyncScheduler, firstValueFrom, MonoTypeOperatorFunction, OperatorFunction, Subject, switchMap, tap} from 'rxjs';
 import {filter, first, map, subscribeOn, take, takeUntil} from 'rxjs/operators';
 import {ManifestService, mapToBody, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
@@ -25,7 +25,7 @@ import {ViewMenuService} from '../../part/view-context-menu/view-menu.service';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {stringifyError} from '../../common/stringify-error.util';
 import {MicrofrontendViewRoutes} from './microfrontend-view-routes';
-import {NgClass, NgComponentOutlet} from '@angular/common';
+import {NgComponentOutlet} from '@angular/common';
 import {ContentAsOverlayComponent, ContentAsOverlayConfig} from '../../content-projection/content-as-overlay.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
@@ -46,7 +46,6 @@ import {createRemoteTranslatable} from '../text/remote-text-provider';
   styleUrls: ['./microfrontend-view.component.scss'],
   templateUrl: './microfrontend-view.component.html',
   imports: [
-    NgClass,
     ContentAsOverlayComponent,
     NgComponentOutlet,
     GlassPaneDirective,
@@ -60,9 +59,9 @@ export class MicrofrontendViewComponent {
 
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _route = inject(ActivatedRoute);
+  private readonly _router = inject(Router);
   private readonly _outletRouter = inject(OutletRouter);
   private readonly _manifestService = inject(ManifestService);
-  private readonly _manifestObjectCache = inject(ManifestObjectCache);
   private readonly _messageClient = inject(MessageClient);
   private readonly _logger = inject(Logger);
   private readonly _workbenchRouter = inject(WorkbenchRouter);
@@ -82,7 +81,7 @@ export class MicrofrontendViewComponent {
   /** Splash to display until the microfrontend signals readiness. */
   protected readonly splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
   /** Keystrokes which to bubble across iframe boundaries from embedded content. */
-  protected readonly keystrokesToBubble: Signal<string[]>;
+  protected readonly keystrokesToBubble = this.computeKeyStrokesToBubble();
   /** Configures iframe projection. */
   protected readonly overlayConfig: ContentAsOverlayConfig = {
     location: inject(IFRAME_OVERLAY_HOST),
@@ -93,7 +92,6 @@ export class MicrofrontendViewComponent {
 
   constructor() {
     this._logger.debug(() => `Constructing MicrofrontendViewComponent. [viewId=${this.view.id}]`, LoggerNames.MICROFRONTEND_ROUTING);
-    this.keystrokesToBubble = this.computeKeyStrokesToBubble();
     this.installViewActivePublisher();
     this.installViewFocusedPublisher();
     this.installPartIdPublisher();
@@ -109,7 +107,7 @@ export class MicrofrontendViewComponent {
   private installNavigator(): void {
     this._route.params
       .pipe(
-        switchMap(params => this.fetchCapability$(params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID] as string).pipe(map(capability => ({capability, params})))),
+        createNavigationContext(),
         executeOn({
           onEach: context => this.setViewTitleAndHeading(context),
           onCapabilityChange: context => this.onCapabilityChange(context),
@@ -117,7 +115,7 @@ export class MicrofrontendViewComponent {
         filterNullCapability(),
         delayIfLazy(),
         serializeExecution(context => this.onNavigate(context)),
-        subscribeOn(asyncScheduler), // subscribe asynchronously to prevent manual change detection in `onCapabilityChange` during component construction.
+        subscribeOn(asyncScheduler), // subscribe asynchronously because `onCapabilityChange` triggers a manual change detection cycle for inactive views; would error if called during component construction otherwise.
         takeUntilDestroyed(),
       )
       .subscribe();
@@ -138,7 +136,7 @@ export class MicrofrontendViewComponent {
    * Method invoked each time when navigating to a different capability.
    */
   private onCapabilityChange(context: NavigationContext<WorkbenchViewCapability | null>): void {
-    const {capability, prevCapability, params} = context;
+    const {capability, prevCapability} = context;
     this.capability.set(capability);
 
     // Signal the currently loaded application to unload.
@@ -157,8 +155,10 @@ export class MicrofrontendViewComponent {
 
     // Unload microfrontend if capability is not found.
     if (!capability) {
-      this._logger.warn(() => `[NullCapabilityError] No application found to provide a view capability of id '${params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID]}'. Maybe, the requested view is not public API or the providing application not available.`, LoggerNames.MICROFRONTEND_ROUTING);
+      this._logger.warn(() => `[NullCapabilityError] No application found to provide a view capability of id '${context.capabilityId}'. Maybe, the requested view is not public API or the providing application not available.`, LoggerNames.MICROFRONTEND_ROUTING);
       this.unload();
+      // Perform navigation for Angular to evaluate `CanMatch` guards to display "Not Found" page.
+      void this._router.navigate([{outlets: {}}], {skipLocationChange: true});
     }
   }
 
@@ -198,13 +198,8 @@ export class MicrofrontendViewComponent {
       relativeTo: application.baseUrl,
       params: params,
       pushStateToSessionHistoryStack: false,
-      showSplash: capability.properties.showSplash,
-      ɵcapabilityId: capability.metadata!.id,
+      showSplash: capability.metadata!.id !== prevCapability?.metadata?.id ? capability.properties.showSplash : false,
     });
-  }
-
-  private fetchCapability$(capabilityId: string): Observable<WorkbenchViewCapability | null> {
-    return this._manifestObjectCache.observeCapability$(capabilityId);
   }
 
   private installMenuAccelerators(): void {
@@ -402,20 +397,32 @@ function configureMicrofrontendGlassPane(): Provider[] {
 }
 
 /**
+ * Computes the current navigation of this microfrontend view.
+ */
+function createNavigationContext(): OperatorFunction<Params, NavigationContext<WorkbenchViewCapability | null>> {
+  const manifestObjectCache = inject(ManifestObjectCache);
+  let prevCapability: WorkbenchViewCapability | null = null;
+
+  return switchMap(params => {
+    const capabilityId = params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID] as string;
+
+    return manifestObjectCache.observeCapability$<WorkbenchViewCapability>(capabilityId).pipe(map(capability => {
+      const context = {capability, prevCapability, params, capabilityId};
+      prevCapability = capability;
+      return context;
+    }));
+  });
+}
+
+/**
  * Executes passed functions based on the current state.
  */
-function executeOn(executeOn: ExecuteOn): OperatorFunction<{capability: WorkbenchViewCapability | null; params: Params}, NavigationContext<WorkbenchViewCapability | null>> {
+function executeOn(executeOn: ExecuteOn): MonoTypeOperatorFunction<NavigationContext<WorkbenchViewCapability | null>> {
   const {onEach, onCapabilityChange} = executeOn;
-  let prevCapability: WorkbenchViewCapability | null = null;
-  return map(({capability, params}) => {
-    const context = {capability, prevCapability, params};
-
+  return tap(context => {
     onEach?.(context);
-
-    // Test if the capability has changed.
-    if (prevCapability?.metadata!.id !== capability?.metadata!.id) {
+    if (context.prevCapability?.metadata!.id !== context.capability?.metadata!.id) {
       onCapabilityChange?.(context);
-      prevCapability = capability;
     }
     return context;
   });
@@ -451,6 +458,7 @@ function delayIfLazy(): MonoTypeOperatorFunction<NavigationContext> {
  * Context available during a navigation.
  */
 interface NavigationContext<T extends WorkbenchViewCapability | null = WorkbenchViewCapability> {
+  capabilityId: string;
   capability: T;
   prevCapability: WorkbenchViewCapability | null;
   params: Params;

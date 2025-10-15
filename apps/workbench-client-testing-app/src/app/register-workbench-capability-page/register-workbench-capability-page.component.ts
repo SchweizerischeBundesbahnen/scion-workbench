@@ -20,6 +20,7 @@ import {stringifyError} from '../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {PerspectiveCapabilityPropertiesComponent, WorkbenchPerspectiveCapabilityProperties} from './perspective-capability-properties/perspective-capability-properties.component';
+import {PartCapabilityPropertiesComponent, WorkbenchPartCapabilityProperties} from './part-capability-properties/part-capability-properties.component';
 import {ViewCapabilityPropertiesComponent, WorkbenchViewCapabilityProperties} from './view-capability-properties/view-capability-properties.component';
 import {DialogCapabilityPropertiesComponent, WorkbenchDialogCapabilityProperties} from './dialog-capability-properties/dialog-capability-properties.component';
 import {PopupCapabilityPropertiesComponent, WorkbenchPopupCapabilityProperties} from './popup-capability-properties/popup-capability-properties.component';
@@ -31,7 +32,7 @@ import {MessageBoxCapabilityPropertiesComponent, WorkbenchMessageBoxCapabilityPr
 @Component({
   selector: 'app-register-workbench-capability-page',
   templateUrl: './register-workbench-capability-page.component.html',
-  styleUrls: ['./register-workbench-capability-page.component.scss'],
+  styleUrl: './register-workbench-capability-page.component.scss',
   imports: [
     JsonPipe,
     ReactiveFormsModule,
@@ -40,6 +41,7 @@ import {MessageBoxCapabilityPropertiesComponent, WorkbenchMessageBoxCapabilityPr
     SciCheckboxComponent,
     SciViewportComponent,
     PerspectiveCapabilityPropertiesComponent,
+    PartCapabilityPropertiesComponent,
     ViewCapabilityPropertiesComponent,
     DialogCapabilityPropertiesComponent,
     PopupCapabilityPropertiesComponent,
@@ -59,6 +61,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
     transientParams: this._formBuilder.control(''),
     private: this._formBuilder.control(true),
     perspectiveProperties: this._formBuilder.control<WorkbenchPerspectiveCapabilityProperties | undefined>(undefined),
+    partProperties: this._formBuilder.control<WorkbenchPartCapabilityProperties | undefined>(undefined),
     viewProperties: this._formBuilder.control<WorkbenchViewCapabilityProperties | undefined>(undefined),
     popupProperties: this._formBuilder.control<WorkbenchPopupCapabilityProperties | undefined>(undefined),
     dialogProperties: this._formBuilder.control<WorkbenchDialogCapabilityProperties | undefined>(undefined),
@@ -91,6 +94,8 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         switch (this.form.controls.type.value) {
           case WorkbenchCapabilities.Perspective:
             return this.form.controls.perspectiveProperties.value;
+          case WorkbenchCapabilities.Part:
+            return this.form.controls.partProperties.value;
           case WorkbenchCapabilities.View:
             return this.form.controls.viewProperties.value;
           case WorkbenchCapabilities.Popup:
