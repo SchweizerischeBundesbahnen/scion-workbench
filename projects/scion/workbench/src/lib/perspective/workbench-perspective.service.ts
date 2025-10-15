@@ -16,6 +16,7 @@ import {MAIN_AREA} from '../layout/workbench-layout';
 import {WorkbenchConfig} from '../workbench-config';
 import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
 import {WORKBENCH_PERSPECTIVE_REGISTRY} from './workbench-perspective.registry';
+import {Logger} from '../logging';
 
 /**
  * Enables registration and activation of perspectives.
@@ -28,6 +29,7 @@ export class WorkbenchPerspectiveService {
   private readonly _environmentInjector = inject(EnvironmentInjector);
   private readonly _applicationInitStatus = inject(ApplicationInitStatus);
   private readonly _layoutStorageService = inject(WorkbenchLayoutStorageService);
+  public readonly _logger = inject(Logger);
 
   private readonly _switchingPerspective = signal(false);
   private readonly _resettingPerspective = signal(false);
@@ -35,9 +37,15 @@ export class WorkbenchPerspectiveService {
   public readonly activePerspective = inject(ACTIVE_PERSPECTIVE);
 
   public async init(): Promise<void> {
-    await this.registerPerspectivesFromConfig();
-    await this.registerAnonymousPerspectiveFromWindowName();
-    await this.activateInitialPerspective();
+    try {
+      await this.registerPerspectivesFromConfig();
+      await this.registerAnonymousPerspectiveFromWindowName();
+      await this.activateInitialPerspective();
+    }
+    catch (error) {
+      // Catch error to not abort workbench startup.
+      this._logger.error('Failed to load workbench perspective. Caused by:', error);
+    }
   }
 
   /**

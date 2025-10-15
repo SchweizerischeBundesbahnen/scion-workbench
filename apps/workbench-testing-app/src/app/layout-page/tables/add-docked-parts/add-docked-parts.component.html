@@ -12,9 +12,9 @@
 
   @for (dockedPartFormGroup of form.controls.dockedParts.controls; track $index) {
     <!-- ID -->
-    <input [formControl]="dockedPartFormGroup.controls.id" [class]="'e2e-part-id'">
+    <input [formControl]="dockedPartFormGroup.controls.id" class="e2e-part-id">
     <!-- DockTo -->
-    <select [formControl]="dockedPartFormGroup.controls.dockTo.controls.dockTo" [class]="'e2e-dock-to'">
+    <select [formControl]="dockedPartFormGroup.controls.dockTo.controls.dockTo" class="e2e-dock-to">
       <option value="left-top">left-top</option>
       <option value="left-bottom">left-bottom</option>
       <option value="right-top">right-top</option>
@@ -23,19 +23,19 @@
       <option value="bottom-right">bottom-right</option>
     </select>
     <!-- Icon -->
-    <input [formControl]="dockedPartFormGroup.controls.extras.controls.icon" [class]="'e2e-icon'">
+    <input [formControl]="dockedPartFormGroup.controls.extras.controls.icon" class="e2e-icon">
     <!-- Label -->
-    <input [formControl]="dockedPartFormGroup.controls.extras.controls.label" [class]="'e2e-label'">
+    <input [formControl]="dockedPartFormGroup.controls.extras.controls.label" class="e2e-label">
     <!-- Tooltip -->
-    <input [formControl]="dockedPartFormGroup.controls.extras.controls.tooltip" [class]="'e2e-tooltip'">
+    <input [formControl]="dockedPartFormGroup.controls.extras.controls.tooltip" class="e2e-tooltip">
     <!-- Title -->
-    <input [formControl]="dockedPartFormGroup.controls.extras.controls.title" [class]="'e2e-title'" [attr.list]="titleList">
+    <input [formControl]="dockedPartFormGroup.controls.extras.controls.title" class="e2e-title" [attr.list]="titleList">
     <!-- CSS class -->
     <app-multi-value-input [formControl]="dockedPartFormGroup.controls.extras.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
     <!-- Activity Id -->
-    <input [formControl]="dockedPartFormGroup.controls.extras.controls.activityId" [class]="'e2e-activity-id'">
+    <input [formControl]="dockedPartFormGroup.controls.extras.controls.activityId" class="e2e-activity-id">
     <!-- Activate -->
-    <sci-checkbox [formControl]="dockedPartFormGroup.controls.extras.controls.activate" [class]="'e2e-activate'"/>
+    <sci-checkbox [formControl]="dockedPartFormGroup.controls.extras.controls.activate" class="e2e-activate"/>
     <button class="e2e-remove" (click)="onRemoveDockedPart($index)" title="Remove docked part" sciMaterialIcon>remove</button>
   }
 </form>

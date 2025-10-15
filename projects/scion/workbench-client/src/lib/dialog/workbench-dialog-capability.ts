@@ -40,7 +40,7 @@ export interface WorkbenchDialogCapability extends Capability {
    */
   type: WorkbenchCapabilities.Dialog;
   /**
-   * Qualifies this dialog. The qualifier is required for dialogs.
+   * Qualifies this dialog. The qualifier is required for a dialog.
    *
    * @inheritDoc
    */
@@ -48,7 +48,7 @@ export interface WorkbenchDialogCapability extends Capability {
   /**
    * Specifies parameters required by the dialog.
    *
-   * Parameters are available in the path and title for placeholder substitution, or can be read in the microfrontend by injecting the {@link WorkbenchDialog} handle.
+   * Parameters can be read in the microfrontend by injecting the {@link WorkbenchDialog} handle, or referenced in path, title and resolvers using the colon syntax.
    *
    * @inheritDoc
    */
@@ -70,7 +70,7 @@ export interface WorkbenchDialogCapability extends Capability {
      *     {"name": "id", "required": true}
      *   ],
      *   "properties": {
-     *     "path": "product/:id", // `:id` references a capability parameter
+     *     "path": "products/:id", // `:id` references a capability parameter
      *   }
      * }
      * ```

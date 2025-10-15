@@ -19,7 +19,7 @@ import {WorkbenchDialogService} from './workbench-dialog-service';
 
 /**
  * @ignore
- * @docs-private Not public API, intended for internal use only.
+ * @docs-private Not public API. For internal use only.
  */
 export class ɵWorkbenchDialogService implements WorkbenchDialogService {
 

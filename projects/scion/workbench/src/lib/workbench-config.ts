@@ -31,8 +31,8 @@ export abstract class WorkbenchConfig {
    * Parts can be docked to the side or positioned relative to each other. Views are stacked in parts and can be dragged to other parts.
    * Content can be displayed in both parts and views.
    *
-   * A perspective typically has a main area part and other parts docked to the side, providing navigation and context-sensitive assistance to support
-   * the user's workflow. Initially empty or displaying a welcome page, the main area is where the workbench opens new views by default.
+   * A perspective typically has a main area part and parts docked to the side, providing navigation and context-sensitive assistance to support
+   * the user's workflow. Initially empty or displaying a welcome page, the main area is where the workbench opens views by default.
    * Unlike any other part, the main area is shared between perspectives, and its layout is not reset when resetting perspectives.
    *
    * See {@link WorkbenchLayoutFn} for more information and an example.

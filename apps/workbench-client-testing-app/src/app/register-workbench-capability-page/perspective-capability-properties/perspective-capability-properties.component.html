@@ -1,66 +1,98 @@
-<form [formGroup]="form">
+<section>
+  <header>Properties</header>
+
   <sci-form-field label="Data">
     <sci-key-value-field [keyValueFormArray]="form.controls.data" [addable]="true" [removable]="true" class="e2e-data"/>
   </sci-form-field>
+</section>
 
-  <sci-form-field label="Layout">
-    <section class="layout e2e-layout">
-      @for (partFormGroup of form.controls.parts.controls; track partIndex; let partIndex = $index) {
-        <section class="part fieldset e2e-part">
-          <!-- Part ID -->
-          <div class="legend part-id">
-            <input [formControl]="partFormGroup.controls.id" class="e2e-part-id" [attr.list]="partIdList">
-          </div>
-          <!-- RelativeTo -->
-          <div class="legend relative-to">
-            <input [formControl]="partFormGroup.controls.relativeTo" class="e2e-relative-to" [attr.list]="relativeToList">
-          </div>
-          <!-- Align -->
-          <div class="legend align">
-            <select [formControl]="partFormGroup.controls.align" class="e2e-align">
-              <option value="left">left</option>
-              <option value="right">right</option>
-              <option value="top">top</option>
-              <option value="bottom">bottom</option>
-            </select>
-          </div>
-          <!-- Ratio -->
-          <div class="legend ratio">
-            <input [formControl]="partFormGroup.controls.ratio" type="number" class="e2e-ratio">
-          </div>
-          <!-- Views -->
-          @if (partFormGroup.controls.views.controls.length) {
-            <section class="e2e-views fieldset views">
-              @for (viewFormGroup of partFormGroup.controls.views.controls; track viewIndex; let viewIndex = $index) {
-                <app-record [formControl]="viewFormGroup.controls.qualifier" class="e2e-qualifier legend qualifier"/>
-                <app-record [formControl]="viewFormGroup.controls.params" class="e2e-params legend params"/>
-                <app-multi-value-input [formControl]="viewFormGroup.controls.cssClass" [placeholder]="'class-1 class-2'" class="legend css-class e2e-class"/>
-                <div class="active legend">
-                  <sci-checkbox [formControl]="viewFormGroup.controls.active" class="e2e-active"/>
-                </div>
-                <button (click)="onRemoveView(partFormGroup, viewIndex)" title="Remove View" sciMaterialIcon>clear</button>
-              }
-              <button class="e2e-add-view add-view" (click)="onAddView(partFormGroup)" [disabled]="partFormGroup.controls.id.value === MAIN_AREA">Add View</button>
-            </section>
-          } @else {
-            <button class="e2e-add-view add-view" (click)="onAddView(partFormGroup)" [disabled]="partFormGroup.controls.id.value === MAIN_AREA">Add View</button>
-          }
+<section class="e2e-parts">
+  <header>Parts</header>
+  <div class="parts">
+    <span>Part ID</span>
+    <span>Qualifier</span>
+    <span>Params</span>
+    <span>Align</span>
+    <span>Relative To</span>
+    <span>Ratio</span>
+    <span>CSS Class(es)</span>
+    <span class="checkbox">Active</span>
+    <button (click)="onAddPart()" class="e2e-add-part" title="Add part" sciMaterialIcon>add</button>
 
-          <!-- Remove Part button -->
-          <button (click)="onRemovePart(partIndex)" title="Remove Part" sciMaterialIcon>clear</button>
-        </section>
-      }
-      <button class="e2e-add-part add-part" (click)="onAddPart()">Add Part</button>
-    </section>
-  </sci-form-field>
-</form>
+    @for (partFormGroup of form.controls.parts.controls; track $index) {
+      <!-- Part ID -->
+      <input [formControl]="partFormGroup.controls.id" class="e2e-part-id" [attr.list]="partIdList">
+      <!-- Qualifier -->
+      <app-record [formControl]="partFormGroup.controls.qualifier" class="e2e-qualifier"/>
+      <!-- Params -->
+      <app-record [formControl]="partFormGroup.controls.params" class="e2e-params"/>
+      <!-- Align -->
+      <select [formControl]="partFormGroup.controls.position.controls.align" class="e2e-align">
+        <option value="left">left</option>
+        <option value="right">right</option>
+        <option value="top">top</option>
+        <option value="bottom">bottom</option>
+      </select>
+      <!-- RelativeTo -->
+      <input [formControl]="partFormGroup.controls.position.controls.relativeTo" class="e2e-relative-to" [attr.list]="relativeToList">
+      <!-- Ratio -->
+      <input [formControl]="partFormGroup.controls.position.controls.ratio" type="number" class="e2e-ratio">
+      <!-- CSS class -->
+      <app-multi-value-input [formControl]="partFormGroup.controls.cssClass" [placeholder]="'class-1 class-2'" class="css-class e2e-class"/>
+      <!-- Active -->
+      <sci-checkbox [formControl]="partFormGroup.controls.active" class="e2e-activate-part"/>
+      <!-- Remove button -->
+      <button (click)="onRemovePart($index)" title="Remove Part" sciMaterialIcon>clear</button>
+    }
+  </div>
+</section>
+
+<section class="e2e-docked-parts">
+  <header>Docked Parts</header>
+  <div class="docked-parts">
+    <span>Part ID</span>
+    <span>Qualifier</span>
+    <span>Params</span>
+    <span>Dock To</span>
+    <span>Activity Id</span>
+    <span>CSS Class(es)</span>
+    <span class="checkbox">Active</span>
+    <button (click)="onAddDockedPart()" class="e2e-add-docked-part" title="Add Docked Part" sciMaterialIcon>add</button>
+
+    @for (partFormGroup of form.controls.dockedParts.controls; track $index) {
+      <!-- Part ID -->
+      <input [formControl]="partFormGroup.controls.id" class="e2e-part-id">
+      <!-- Qualifier -->
+      <app-record [formControl]="partFormGroup.controls.qualifier" class="e2e-qualifier"/>
+      <!-- Params -->
+      <app-record [formControl]="partFormGroup.controls.params" class="e2e-params"/>
+      <!-- DockTo -->
+      <select [formControl]="partFormGroup.controls.position" class="e2e-dock-to">
+        <option value="left-top">left-top</option>
+        <option value="left-bottom">left-bottom</option>
+        <option value="right-top">right-top</option>
+        <option value="right-bottom">right-bottom</option>
+        <option value="bottom-left">bottom-left</option>
+        <option value="bottom-right">bottom-right</option>
+      </select>
+      <!-- Activity Id -->
+      <input [formControl]="partFormGroup.controls.activityId" class="e2e-activity-id">
+      <!-- CSS class -->
+      <app-multi-value-input [formControl]="partFormGroup.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
+      <!-- Active -->
+      <sci-checkbox [formControl]="partFormGroup.controls.active" class="e2e-activate-part"/>
+      <!-- Remove button -->
+      <button (click)="onRemoveDockedPart($index)" title="Remove Part" sciMaterialIcon>clear</button>
+    }
+  </div>
+</section>
 
 <datalist [attr.id]="partIdList">
   <option [value]="MAIN_AREA">{{MAIN_AREA}}</option>
 </datalist>
 
 <datalist [attr.id]="relativeToList">
-  @for (part of partProposals$ | async; track part) {
+  @for (part of partProposals(); track part) {
     <option [value]="part">{{part}}</option>
   }
 </datalist>

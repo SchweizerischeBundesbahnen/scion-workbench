@@ -21,7 +21,7 @@ import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * @ignore
- * @docs-private Not public API, intended for internal use only.
+ * @docs-private Not public API. For internal use only.
  */
 export class ɵWorkbenchMessageBoxService implements WorkbenchMessageBoxService {
 

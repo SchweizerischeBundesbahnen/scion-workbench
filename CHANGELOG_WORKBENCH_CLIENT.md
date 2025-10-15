@@ -74,7 +74,7 @@
     return translate(key, params); // `translate` is illustrative and not part of the Workbench API
   });
   ```
-  Translation keys may include parameters for text interpolation. Interpolation parameters can reference capability parameters and resolvers. See documentation for details: https://workbench-client-api.scion.vercel.app/interfaces/WorkbenchViewCapability.html`.
+  Translation keys may include parameters for text interpolation. Interpolation parameters can reference capability parameters and resolvers. See documentation for details: https://workbench-client-api.scion.vercel.app/interfaces/WorkbenchViewCapability.html.
   
   ```json
   {

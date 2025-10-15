@@ -173,6 +173,9 @@ export function provideRemoteTextProvider(): EnvironmentProviders {
  *
  * @see provideRemoteTextProvider
  */
+export function createRemoteTranslatable(translatable: undefined, config: {appSymbolicName: string; valueParams?: {[name: string]: unknown} | Map<string, unknown>; topicParams?: {[name: string]: string} | Map<string, string>}): undefined;
+export function createRemoteTranslatable(translatable: Translatable, config: {appSymbolicName: string; valueParams?: {[name: string]: unknown} | Map<string, unknown>; topicParams?: {[name: string]: string} | Map<string, string>}): Translatable;
+export function createRemoteTranslatable(translatable: Translatable | undefined, config: {appSymbolicName: string; valueParams?: {[name: string]: unknown} | Map<string, unknown>; topicParams?: {[name: string]: string} | Map<string, string>}): Translatable | undefined;
 export function createRemoteTranslatable(translatable: Translatable | undefined, config: {appSymbolicName: string; valueParams?: {[name: string]: unknown} | Map<string, unknown>; topicParams?: {[name: string]: string} | Map<string, string>}): Translatable | undefined {
   if (!translatable) {
     return translatable;

@@ -172,7 +172,7 @@ export class ɵWorkbenchPopup implements WorkbenchPopup {
 /**
  * Message headers to interact with the workbench popup.
  *
- * @docs-private Not public API, intended for internal use only.
+ * @docs-private Not public API. For internal use only.
  * @ignore
  */
 export enum ɵWorkbenchPopupMessageHeaders {

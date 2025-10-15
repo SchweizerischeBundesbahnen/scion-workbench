@@ -22,7 +22,7 @@ import {parseTypedString} from '../../common/parse-typed-value.util';
 @Component({
   selector: 'app-view-capability-properties',
   templateUrl: './view-capability-properties.component.html',
-  styleUrls: ['./view-capability-properties.component.scss'],
+  styleUrl: './view-capability-properties.component.scss',
   imports: [
     ReactiveFormsModule,
     MultiValueInputComponent,

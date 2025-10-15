@@ -116,6 +116,15 @@ const routes: Routes = [
     ],
   },
   {
+    path: 'part-test-page',
+    children: [
+      {
+        path: ':segment1/:segment2',
+        loadComponent: () => import('../part-page/part-page.component'),
+      },
+    ],
+  },
+  {
     path: 'workbench-theme-test-page',
     loadComponent: (): any => import('./workbench-theme-test-page/workbench-theme-test-page.component'),
   },

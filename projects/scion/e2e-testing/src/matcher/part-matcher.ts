@@ -45,7 +45,7 @@ export interface PartMatcher {
 
   not: {
     /**
-     * Expects the part not to display any component.
+     * Expects the part not to display a component, but a view.
      */
     toDisplayComponent(): Promise<void>;
     /**

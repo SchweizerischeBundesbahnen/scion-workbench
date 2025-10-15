@@ -9,7 +9,7 @@ SCION Workbench enables the creation of layouts, called perspectives, for displa
 
 A perspective defines an arrangement of parts and views. Parts can be docked to the side or positioned relative to each other. Views are stacked in parts and can be dragged to other parts. Content can be displayed in both parts and views.
 
-A perspective typically has a main area part and other parts docked to the side, providing navigation and context-sensitive assistance to support the user's workflow.
+A perspective typically has a main area part and parts docked to the side, providing navigation and context-sensitive assistance to support the user's workflow.
 
 For an overview of the workbench layout, see the chapter [Overview][link-overview]. 
 
@@ -78,7 +78,7 @@ The code snippet above creates the following layout.
 [<img src="/docs/site/images/workbench-layout-docked-parts.drawio.svg" height="300" alt="Layout with Parts Docked to the Side">](https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/docs/site/images/workbench-layout-docked-parts.drawio.svg)
 
 > [!NOTE]
-> The main area is where the workbench opens new views by default and is optional. The layout function cannot add views to the main area but display a welcome page.
+> The main area is where the workbench opens views by default and is optional. The layout function cannot add views to the main area but display a welcome page.
 
 > [!TIP]
 > - The layout function can call `inject` to get any required dependencies.

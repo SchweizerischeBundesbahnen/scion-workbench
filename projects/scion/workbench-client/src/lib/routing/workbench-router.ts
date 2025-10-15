@@ -168,7 +168,7 @@ export interface WorkbenchNavigationExtras {
 /**
  * Command object for instructing the Workbench Router to update view params in self-navigation.
  *
- * @docs-private Not public API, intended for internal use only.
+ * @docs-private Not public API. For internal use only.
  * @ignore
  */
 export interface ɵViewParamsUpdateCommand {
@@ -185,7 +185,7 @@ export interface ɵViewParamsUpdateCommand {
 /**
  * Named parameters used in microfrontend routes.
  *
- * @docs-private Not public API, intended for internal use only.
+ * @docs-private Not public API. For internal use only.
  * @ignore
  */
 export enum ɵMicrofrontendRouteParams {

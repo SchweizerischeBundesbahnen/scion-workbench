@@ -9,13 +9,13 @@ SCION Workbench enables the creation of Angular web applications that require a 
 
 An application can have multiple layouts, called perspectives. A perspective defines an arrangement of parts and views. Parts can be docked to the side or positioned relative to each other. Views are stacked in parts and can be dragged to other parts. Content can be displayed in both parts and views.
 
-Users can personalize the layout of a perspective and switch between perspectives. The workbench remembers the last layout of each perspective, restoring it the next time it is activated.
+Users can personalize the layout of a perspective and switch between perspectives. The workbench remembers the layout of a perspective, restoring it the next time it is activated.
 
-A perspective typically has a main area part and other parts docked to the side, providing navigation and context-sensitive assistance to support the user's workflow.
+A perspective typically has a main area part and parts docked to the side, providing navigation and context-sensitive assistance to support the user's workflow.
 
 [<img src="/docs/site/images/workbench-layout-1.drawio.svg">](https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/docs/site/images/workbench-layout-1.drawio.svg)
 
-Initially empty or displaying a welcome page, the main area is where the workbench opens new views by default.
+Initially empty or displaying a welcome page, the main area is where the workbench opens views by default.
 
 [<img src="/docs/site/images/workbench-layout-2.drawio.svg">](https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/docs/site/images/workbench-layout-2.drawio.svg)
 

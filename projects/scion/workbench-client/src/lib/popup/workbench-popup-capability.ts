@@ -27,7 +27,7 @@ export interface WorkbenchPopupCapability extends Capability {
   type: WorkbenchCapabilities.Popup;
 
   /**
-   * Qualifies this popup. The qualifier is required for popups.
+   * Qualifies this popup. The qualifier is required for a popup.
    *
    * @inheritDoc
    */
@@ -49,7 +49,7 @@ export interface WorkbenchPopupCapability extends Capability {
      *     {"name": "id", "required": true}
      *   ],
      *   "properties": {
-     *     "path": "product/:id", // `:id` references a capability parameter
+     *     "path": "products/:id", // `:id` references a capability parameter
      *   }
      * }
      * ```
