@@ -23,7 +23,7 @@ test.describe('Workbench Message Box Capability', () => {
         path: '<undefined>',
       },
     });
-    await expect(registeredCapability).rejects.toThrow(/NullPathError/);
+    await expect(registeredCapability).rejects.toThrow(/\[MessageBoxDefinitionError] MessageBox capability requires the 'path' property/);
   });
 
   test('should error if path is `null`', async ({appPO, microfrontendNavigator}) => {
@@ -36,7 +36,7 @@ test.describe('Workbench Message Box Capability', () => {
         path: '<null>',
       },
     });
-    await expect(registeredCapability).rejects.toThrow(/NullPathError/);
+    await expect(registeredCapability).rejects.toThrow(/\[MessageBoxDefinitionError] MessageBox capability requires the 'path' property/);
   });
 
   test('should not error if path is empty', async ({appPO, microfrontendNavigator}) => {
@@ -63,6 +63,6 @@ test.describe('Workbench Message Box Capability', () => {
         path: '',
       },
     });
-    await expect(registeredCapability).rejects.toThrow(/NullQualifierError/);
+    await expect(registeredCapability).rejects.toThrow(/\[MessageBoxDefinitionError] MessageBox capability requires a qualifier/);
   });
 });
