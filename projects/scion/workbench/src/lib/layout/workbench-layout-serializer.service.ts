@@ -67,7 +67,7 @@ export class WorkbenchLayoutSerializer {
    */
   public serialize(data: MWorkbenchLayout): string {
     const json = JSON.stringify(data);
-    return window.btoa(`${json}${VERSION_SEPARATOR}${WORKBENCH_LAYOUT_VERSION}`);
+    return window.btoa(appendVersion(json, WORKBENCH_LAYOUT_VERSION));
   }
 
   /**
@@ -78,9 +78,8 @@ export class WorkbenchLayoutSerializer {
       return null;
     }
 
-    const [json, version] = window.atob(serialized).split(VERSION_SEPARATOR, 2);
-    const serializedVersion = Number.isNaN(Number(version)) ? 1 : Number(version);
-    const migrated = this._workbenchLayoutMigrator.migrate(json!, {from: serializedVersion, to: WORKBENCH_LAYOUT_VERSION});
+    const {json, version} = parseVersion(window.atob(serialized));
+    const migrated = this._workbenchLayoutMigrator.migrate(json, {from: version, to: WORKBENCH_LAYOUT_VERSION});
     return JSON.parse(migrated) as MWorkbenchLayout;
   }
 
@@ -104,7 +103,7 @@ export class WorkbenchLayoutSerializer {
         .concat(flags?.excludePartActivationInstant ? ({path: '**/activationInstant', predicate: context => context.at(-1) instanceof MPart}) : []),
       sort: flags?.sort,
     });
-    return window.btoa(`${json}${VERSION_SEPARATOR}${WORKBENCH_GRID_VERSION}`);
+    return window.btoa(appendVersion(json, WORKBENCH_GRID_VERSION));
   }
 
   /**
@@ -124,9 +123,8 @@ export class WorkbenchLayoutSerializer {
    * Deserializes the given base64-serialized grid, applying necessary migrations if the serialized grid is outdated.
    */
   public deserializeGrid(serialized: string): ɵMPartGrid {
-    const [jsonGrid, jsonGridVersion] = window.atob(serialized).split(VERSION_SEPARATOR, 2);
-    const gridVersion = Number.isNaN(Number(jsonGridVersion)) ? 1 : Number(jsonGridVersion);
-    const migratedJsonGrid = this._workbenchGridMigrator.migrate(jsonGrid!, {from: gridVersion, to: WORKBENCH_GRID_VERSION});
+    const {json, version} = parseVersion(window.atob(serialized));
+    const migratedJsonGrid = this._workbenchGridMigrator.migrate(json, {from: version, to: WORKBENCH_GRID_VERSION});
 
     // Parse the JSON.
     const grid = JSON.parse(migratedJsonGrid, (key: string, value: unknown) => {
@@ -170,7 +168,7 @@ export class WorkbenchLayoutSerializer {
       }
     }
 
-    return (gridVersion < WORKBENCH_GRID_VERSION) ? {...grid, migrated: true} : grid;
+    return (version < WORKBENCH_GRID_VERSION) ? {...grid, migrated: true} : grid;
   }
 
   /**
@@ -189,16 +187,15 @@ export class WorkbenchLayoutSerializer {
     const json = stringify(layout, {
       sort: flags?.sort,
     });
-    return window.btoa(`${json}${VERSION_SEPARATOR}${WORKBENCH_ACTIVITY_LAYOUT_VERSION}`);
+    return window.btoa(appendVersion(json, WORKBENCH_ACTIVITY_LAYOUT_VERSION));
   }
 
   /**
    * Deserializes the given base64-serialized activity layout, applying necessary migrations if the serialized layout is outdated.
    */
   public deserializeActivityLayout(serialized: string): MActivityLayout {
-    const [jsonLayout, jsonLayoutVersion] = window.atob(serialized).split(VERSION_SEPARATOR, 2);
-    const layoutVersion = Number.isNaN(Number(jsonLayoutVersion)) ? 1 : Number(jsonLayoutVersion);
-    const migratedJsonLayout = this._workbenchActivityLayoutMigrator.migrate(jsonLayout!, {from: layoutVersion, to: WORKBENCH_ACTIVITY_LAYOUT_VERSION});
+    const {json, version} = parseVersion(window.atob(serialized));
+    const migratedJsonLayout = this._workbenchActivityLayoutMigrator.migrate(json, {from: version, to: WORKBENCH_ACTIVITY_LAYOUT_VERSION});
     return JSON.parse(migratedJsonLayout) as MActivityLayout;
   }
 
@@ -232,7 +229,7 @@ export class WorkbenchLayoutSerializer {
  *
  * @see WorkbenchMigrator
  */
-export const WORKBENCH_LAYOUT_VERSION = 6;
+const WORKBENCH_LAYOUT_VERSION = 6;
 
 /**
  * Represents the current version of the workbench grid model.
@@ -251,13 +248,6 @@ const WORKBENCH_GRID_VERSION = 7;
  * @see WorkbenchMigrator
  */
 const WORKBENCH_ACTIVITY_LAYOUT_VERSION = 1;
-
-/**
- * Separates the serialized JSON model and its version in the base64-encoded string.
- *
- * Format: <json>//<version>
- */
-const VERSION_SEPARATOR = '//';
 
 /**
  * Represents a segment in the URL.
@@ -321,4 +311,32 @@ export interface LayoutSerializationFlags {
    * Stable sort order may be required to compare two layouts for equality.
    */
   sort?: true;
+}
+
+/**
+ * Separator between serialized data and its version.
+ */
+const VERSION_SEPARATOR = '//';
+
+/**
+ * Regex to extract JSON and version from a versioned string.
+ */
+const VERSION_REGEX = /(?<json>.+)(\/\/(?<version>\d+)?)$/;
+
+/**
+ * Adds specified version to the JSON string.
+ */
+function appendVersion(json: string, version: number): string {
+  return `${json}${VERSION_SEPARATOR}${version}`;
+}
+
+/**
+ * Extracts JSON and version from a versioned string.
+ */
+function parseVersion(versioned: string): {json: string; version: number} {
+  const match = VERSION_REGEX.exec(versioned);
+  if (match) {
+    return {json: match.groups!['json']!, version: +match.groups!['version']!};
+  }
+  return {json: versioned, version: 1}; // not versioned yet
 }

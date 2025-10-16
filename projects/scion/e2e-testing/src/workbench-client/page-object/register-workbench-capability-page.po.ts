@@ -145,7 +145,6 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
         await partsLocator.locator('input.e2e-relative-to').nth(partIndex).fill(part.position.relativeTo ?? '');
         await partsLocator.locator('select.e2e-align').nth(partIndex).selectOption(part.position.align);
         await partsLocator.locator('input.e2e-ratio').nth(partIndex).fill(`${part.position.ratio ?? ''}`);
-
       }
     }
   }
@@ -175,6 +174,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     await this.locator.locator('input.e2e-icon').fill(capability.properties?.extras?.icon ?? '');
     await this.locator.locator('input.e2e-label').fill(capability.properties?.extras?.label ?? '');
     await this.locator.locator('input.e2e-tooltip').fill(capability.properties?.extras?.tooltip ?? '');
+    await this.locator.locator('input.e2e-resolve').fill(toMatrixNotation(capability.properties?.resolve));
     await this.locator.locator('input.e2e-class').fill(coerceArray(capability.properties?.cssClass).join(' '));
 
     if (capability.properties?.showSplash !== undefined) {

@@ -51,6 +51,7 @@ export class PartCapabilityPropertiesComponent implements ControlValueAccessor, 
       label: this._formBuilder.control(''),
       tooltip: this._formBuilder.control(''),
     }),
+    resolve: this._formBuilder.control<Record<string, string> | undefined>(undefined),
     views: this._formBuilder.array<FormGroup<ViewFormGroup>>([]),
     showSplash: this._formBuilder.control<boolean | undefined>(undefined),
     cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
@@ -74,12 +75,13 @@ export class PartCapabilityPropertiesComponent implements ControlValueAccessor, 
             active: viewFormGroup.controls.active.value,
             cssClass: viewFormGroup.controls.cssClass.value,
           })),
-          title: parseTypedString(this.form.controls.title.value) ?? undefined,
+          title: parseTypedString(this.form.controls.title.value) || undefined,
           extras: undefinedIfEmpty({
             icon: parseTypedString(this.form.controls.extras.controls.icon.value) || undefined!,
             label: parseTypedString(this.form.controls.extras.controls.label.value) || undefined!,
             tooltip: parseTypedString(this.form.controls.extras.controls.tooltip.value) || undefined,
           }),
+          resolve: this.form.controls.resolve.value ?? undefined,
           showSplash: this.form.controls.showSplash.value ?? undefined,
           cssClass: this.form.controls.cssClass.value ?? undefined,
         });
@@ -116,6 +118,7 @@ export class PartCapabilityPropertiesComponent implements ControlValueAccessor, 
     this.form.controls.extras.controls.icon.setValue(properties?.extras?.icon ?? '');
     this.form.controls.extras.controls.label.setValue(properties?.extras?.label ?? '');
     this.form.controls.extras.controls.tooltip.setValue(properties?.extras?.tooltip ?? '');
+    this.form.controls.resolve.setValue(properties?.resolve);
 
     // Views
     this.form.controls.views.clear({emitEvent: false});

@@ -9,6 +9,10 @@
     <input [formControl]="form.controls.title" class="e2e-title" [attr.list]="titleList">
   </sci-form-field>
 
+  <sci-form-field label="Resolve">
+    <app-record [formControl]="form.controls.resolve" class="e2e-resolve"/>
+  </sci-form-field>
+
   <sci-form-field label="Show Splash">
     <sci-checkbox [formControl]="form.controls.showSplash" class="e2e-show-splash"/>
   </sci-form-field>
