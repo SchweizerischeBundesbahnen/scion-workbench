@@ -3190,4 +3190,154 @@ test.describe('Workbench Perspective', () => {
     });
   });
 
+  // test.describe('Part Params', () => {
+  //
+  //   test('should add part with params', async ({appPO, microfrontendNavigator}) => {
+  //     await appPO.navigateTo({microfrontendSupport: true});
+  //
+  //     await microfrontendNavigator.registerCapability('app1', {
+  //       type: 'part',
+  //       qualifier: {part: 'initial'},
+  //       params: [
+  //         {name: 'param1', required: true},
+  //         {name: 'param2', required: false},
+  //         {name: 'param3', required: false, deprecated: {message: 'Message', useInstead: 'param4'}},
+  //         {name: 'param4', required: false},
+  //         {name: 'param5', required: false},
+  //       ],
+  //       properties: {
+  //         path: 'test-part',
+  //       },
+  //     });
+  //
+  //     await microfrontendNavigator.registerCapability('app1', {
+  //       type: 'part',
+  //       qualifier: {part: 'aligned'},
+  //       params: [
+  //         {name: 'param1', required: true},
+  //         {name: 'param2', required: false},
+  //         {name: 'param3', required: false, deprecated: {message: 'Message', useInstead: 'param4'}},
+  //         {name: 'param4', required: false},
+  //         {name: 'param5', required: false},
+  //       ],
+  //       properties: {
+  //         path: 'test-part',
+  //       },
+  //     });
+  //
+  //     await microfrontendNavigator.registerCapability('app1', {
+  //       type: 'part',
+  //       qualifier: {part: 'docked'},
+  //       params: [
+  //         {name: 'param1', required: true},
+  //         {name: 'param2', required: false},
+  //         {name: 'param3', required: false, deprecated: {message: 'Message', useInstead: 'param4'}},
+  //         {name: 'param4', required: false},
+  //         {name: 'param5', required: false},
+  //       ],
+  //       properties: {
+  //         path: 'test-part',
+  //         extras: {
+  //           icon: 'folder',
+  //           label: 'Activity',
+  //         },
+  //       },
+  //     });
+  //
+  //     const perspective = await microfrontendNavigator.registerCapability('app1', {
+  //       type: 'perspective',
+  //       qualifier: {perspective: 'testee'},
+  //       properties: {
+  //         parts: [
+  //           {
+  //             id: 'part.initial',
+  //             qualifier: {part: 'initial'},
+  //             params: {
+  //               param1: 'value1',
+  //               param2: 'value2',
+  //               param3: 'value3',
+  //             },
+  //           },
+  //           {
+  //             id: 'part.aligned',
+  //             qualifier: {part: 'aligned'},
+  //             position: {align: 'left'},
+  //             params: {
+  //               param1: 'value1',
+  //               param2: 'value2',
+  //               param3: 'value3',
+  //             },
+  //           },
+  //           {
+  //             id: 'part.docked',
+  //             qualifier: {part: 'docked'},
+  //             position: 'left-top',
+  //             params: {
+  //               param1: 'value1',
+  //               param2: 'value2',
+  //               param3: 'value3',
+  //             },
+  //             ɵactivityId: 'activity.1',
+  //             active: true,
+  //           },
+  //         ],
+  //       },
+  //     });
+  //
+  //     // Switch perspective.
+  //     await appPO.switchPerspective(perspective.metadata!.id);
+  //
+  //     // Expect layout.
+  //     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+  //       grids: {
+  //         main: {
+  //           root: new MTreeNode({
+  //             direction: 'row',
+  //             ratio: .5,
+  //             child1: new MPart({
+  //               id: 'part.aligned',
+  //             }),
+  //             child2: new MPart({
+  //               id: 'part.initial',
+  //             }),
+  //           }),
+  //         },
+  //       },
+  //       activityLayout: {
+  //         toolbars: {
+  //           leftTop: {
+  //             activities: [{id: 'activity.1'}],
+  //             activeActivityId: 'activity.1',
+  //           },
+  //         },
+  //       },
+  //     });
+  //
+  //     const initialPartPage = new PartPagePO(appPO, {partId: 'part.initial'});
+  //     const alignedPartPage = new PartPagePO(appPO, {partId: 'part.aligned'});
+  //     const dockedPartPage = new PartPagePO(appPO, {partId: 'part.docked'});
+  //
+  //     // Expect parts.
+  //     await expectPart(initialPartPage.part).toDisplayComponent(PartPagePO.selector);
+  //     await expectPart(alignedPartPage.part).toDisplayComponent(PartPagePO.selector);
+  //     await expectPart(dockedPartPage.part).toDisplayComponent(PartPagePO.selector);
+  //
+  //     // Expect passed params.
+  //     await expect.poll(() => initialPartPage.getPartParams()).toMatchObject({
+  //       param1: 'value1',
+  //       param2: 'value2',
+  //       param4: 'value3',
+  //     });
+  //     await expect.poll(() => alignedPartPage.getPartParams()).toMatchObject({
+  //       param1: 'value1',
+  //       param2: 'value2',
+  //       param4: 'value3',
+  //     });
+  //     await expect.poll(() => dockedPartPage.getPartParams()).toMatchObject({
+  //       param1: 'value1',
+  //       param2: 'value2',
+  //       param4: 'value3',
+  //     });
+  //   });
+  // });
 });
