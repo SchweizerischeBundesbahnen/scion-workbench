@@ -13,6 +13,8 @@ import {expect} from '@playwright/test';
 import {MessagingPagePO} from './page-object/messaging-page.po';
 import {MAIN_AREA} from '../workbench.model';
 import {PartPagePO} from './page-object/part-page.po';
+import {WorkbenchPartCapability, WorkbenchPerspectiveCapability} from './page-object/register-workbench-capability-page.po';
+import {Manifest} from '@scion/microfrontend-platform';
 
 test.describe('Workbench Part', () => {
 
@@ -260,12 +262,76 @@ test.describe('Workbench Part', () => {
    *
    * This test uses a perspective defined in the manifest to be available after page reload.
    */
-  test('should dispose splash when resetting perspective', async ({appPO, microfrontendNavigator}) => {
+  test('should dispose splash when resetting perspective', async ({appPO, microfrontendNavigator, page}) => {
+    const perspectiveCapability: WorkbenchPerspectiveCapability = {
+      type: 'perspective',
+      qualifier: {perspective: 'testee'},
+      properties: {
+        parts: [
+          {
+            id: MAIN_AREA,
+            qualifier: {part: 'testee-1'},
+            cssClass: 'testee-1',
+          },
+          {
+            id: 'testee-2',
+            qualifier: {part: 'testee-2'},
+            position: {
+              align: 'left',
+            },
+            cssClass: 'testee-2',
+          },
+        ],
+      },
+    };
+
+    const testee1Capability: WorkbenchPartCapability = {
+      type: 'part',
+      qualifier: {part: 'testee-1'},
+      properties: {
+        path: 'test-part',
+        showSplash: true,
+      },
+    };
+
+    const testee2Capability: WorkbenchPartCapability = {
+      type: 'part',
+      qualifier: {part: 'testee-2'},
+      properties: {
+        path: 'test-part',
+        showSplash: true,
+      },
+    };
+
+    // Provide manifest.
+    const manifest: Manifest = {
+      name: 'Workbench Client Testing App 1',
+      baseUrl: '#',
+      capabilities: [
+        perspectiveCapability,
+        testee1Capability,
+        testee2Capability,
+        {
+          type: 'activator',
+          private: false,
+          properties: {
+            path: 'activator',
+            readinessTopics: 'activator-ready',
+          },
+        },
+      ],
+    };
+
+    await page.route('**/manifest-app1.json', async route => route.fulfill({
+      json: manifest,
+    }));
+
+    // Open application.
     await appPO.navigateTo({microfrontendSupport: true});
 
-    // Activate perspective defined in the manifest.
+    // Switch perspective.
     const messagingPage = await microfrontendNavigator.openInNewTab(MessagingPagePO, 'app1');
-    await messagingPage.publishIntent({type: 'perspective', qualifier: {perspective: 'e2e-part-splash', file: 'part-splash.e2e-spec.ts'}});
+    await messagingPage.publishIntent({type: 'perspective', qualifier: {perspective: 'testee'}});
     await messagingPage.view.tab.close();
 
     const testee1 = new PartPagePO(appPO, {cssClass: 'testee-1'}); // Part with stable id (part.main-area); configured with showSplash=true.

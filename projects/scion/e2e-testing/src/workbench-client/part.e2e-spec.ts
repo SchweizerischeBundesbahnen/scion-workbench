@@ -329,20 +329,22 @@ test.describe('Workbench Part', () => {
     // Expect part microfrontend to have focus.
     await expect(partTestPage.input).toBeFocused();
 
-    // Press Ctrl+Shift+F12 to maximize layout.
-    await page.keyboard.press('Control+Shift+F12');
+    // Press Ctrl+Shift+F12 to maximize layout, retrying since the installation of keystrokes may take some time.
+    await expect(async () => {
+      await page.keyboard.press('Control+Shift+F12');
 
-    // Expect layout to be maximized.
-    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      activityLayout: {
-        toolbars: {
-          leftTop: {
-            activities: [{id: 'activity.1'}],
-            activeActivityId: 'none',
+      // Expect layout to be maximized.
+      await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [{id: 'activity.1'}],
+              activeActivityId: 'none',
+            },
           },
         },
-      },
-    });
+      });
+    }).toPass();
   });
 
   test('should bubble Escape keystroke across iframe boundaries', async ({appPO, page, microfrontendNavigator, workbenchNavigator}) => {
@@ -405,11 +407,14 @@ test.describe('Workbench Part', () => {
     // Expect part microfrontend to have focus.
     await expect(partTestPage.input).toBeFocused();
 
-    // Press Escape to close notification.
-    await page.keyboard.press('Escape');
+    // Press Escape to close notification, retrying since the installation of keystrokes may take some time.
+    await expect(async () => {
+      // Press Escape to close notification.
+      await page.keyboard.press('Escape');
 
-    // Expect notification to be closed.
-    await expect(notification.locator).not.toBeAttached();
+      // Expect notification to be closed.
+      await expect(notification.locator).not.toBeAttached();
+    }).toPass();
   });
 
   test('should provide part id', async ({appPO, microfrontendNavigator}) => {

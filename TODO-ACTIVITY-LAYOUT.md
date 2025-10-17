@@ -1,21 +1,23 @@
 ## TODO PHASE 1
-[] Consider switching to initial perspective if perspective cannot be loaded. (WorkbenchPerspectiveService)
 [] Tests:
-   [] Test that "Not Found" page is displayed instantly when removing capability (also for views)
+   [x] Test that "Not Found" page is displayed instantly when removing capability (also for views)
    [x] Test that workbench startup does not fail if initial perspective errors
-   [] Part Tests Focus and Translatable
-   [] Part Handle Zone tests
+   [x] Part Tests Translatable
+   [x] Part Tests Focus
+   [x] Part Handle Zone tests
    [x] Add test that escape and maximize layout keystrokes bubble in part microfrontend
    [x] Add conditional tests
       [x] Test that no error is logged if part is relative aligend to docked part that is not available
-   [] Close view if capability not found
    [x] BUG: Reset perspective main area part loads forever -> Test
-   [ ] Test that part handle (part id, capability, params, ...)
-   [ ] Test that part is not disposed when opening/closing activity, on-relayout.
+   [x] Test that part handle (part id, capability, params, ...)
+   [x] Test that part is not disposed when opening/closing activity, on-relayout.
+   [x] Playwright manifest fake remove from manifest file
 
 ## TODO PHASE 2
 [] Host Part
 [] Host View
+   [] When to migrate to hint-based view navigation? May be with Host Views?
+[] Consider switching to initial perspective if perspective cannot be loaded. (WorkbenchPerspectiveService)
 
 ## TODO PHASE 3
 [] Provide handler and interceptors via provide function (requires only a single registration in the support, not in initializer anymore)
@@ -23,16 +25,18 @@
    -> standalone: no addition required? Example: notificationIcon -> Custom icon component for `notificationIcon` which accesses the NotificatonService
    -> mfp: analog texts with matrix params and resolvers. How?
 
+## Before Angular 21
+[] Deprecate transient params
+
 ## Bugs
 Microfrontend overlaps right activity bar when shrinking page viewport
 
 ################################################################################################################################
 
 ## NOT-RELATED (FUTURE)
-[] When to migrate to hint-based view navigation?
+[] When to migrate to hint-based view navigation? May be with Host Views?
 [] Consider passing navigation data via UrlMatcher so that data can be read via input or activated route
 [] Remove outlets of hidden activities (maybe not for minimized parts to not reload on reopen, crucial for microfrontend preformance)
-[] When to deprecate transient params
 [] Consider compat mode for show splash where showSplash is true by default (similar to lazy compat mode)
 [] Hide Activities & menu to show activities
 [] Show Labels toolbars: {showLabels: boolean};
@@ -46,15 +50,13 @@ Microfrontend overlaps right activity bar when shrinking page viewport
 [] Change expectView to expectView(ViewPO).toBeActive(selector), expectView(ViewPO).toBeInactive(), expectView(ViewPO).not.toBePresent()
 [] Open view in active part of activity if reference part not visible anymore
    -> workbench should open view in currently active part of that activity
-[] Display actions and minimize button only on hover or when part has focus unless part is in main area (always visible)
-[] Part modal dialogs 
+[] Display actions and minimize button only on hover or when part has focus unless part is in main area (always visible, configurable via part menu)
+[] Part modal dialogs? Dialogs should still open in the center of the workbench. 
 
 ## Thinktank Part Actions
-- Part actions belong to a part and should be modeled on the part capability -> no need to contribute parts via API
+- Part actions belong to a part and should possibly be modeled on the part capability -> no need to contribute parts via API
+  -> maybe not a good idea due to complexity because action handler, disablement, visiblity must still be done via handle (single point of definition).
+     also, dynamic memus would require something like a context expression language (out of workbench scope)   
 - (View) Part actions belong to a view and should be modeled on the view capability -> no need to contribute parts via API
-
-## Thinktank Adding View to Part
-- you have to know the part id (alternative part id) as assigned by the perspective provider (as-is)
-- Idea: part capability can define its own "alternative id" in the capability definition. This id will also be added to the part as alternative part id.
-       Then, the part contributor does not have to know the assigned id of the perspective provider.
-       -> prerequisite: workbench parts can have multiple alternative part ids (also views for symmetry) 
+-   -> maybe not a good idea due to complexity because action handler, disablement, visiblity must still be done via handle (single point of definition).
+    also, dynamic memus would require something like a context expression language (out of workbench scope)

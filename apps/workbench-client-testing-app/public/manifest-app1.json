@@ -411,69 +411,6 @@
           }
         ]
       }
-    },
-    {
-      "type": "perspective",
-      "qualifier": {
-        "perspective": "e2e-part-splash",
-        "file": "part-splash.e2e-spec.ts"
-      },
-      "description": "Perspective used in E2E test; defined in manifest to be available after page reload.",
-      "private": false,
-      "properties": {
-        "data": {
-          "visible": false
-        },
-        "parts": [
-          {
-            "id": "main-area",
-            "qualifier": {
-              "part": "testee-1",
-              "perspective": "e2e-part-splash",
-              "file": "part-splash.e2e-spec.ts"
-            },
-            "cssClass": "testee-1"
-          },
-          {
-            "id": "testee-2",
-            "qualifier": {
-              "part": "testee-2",
-              "perspective": "e2e-part-splash",
-              "file": "part-splash.e2e-spec.ts"
-            },
-            "position": {
-              "align": "left"
-            },
-            "cssClass": "testee-2"
-          }
-        ]
-      }
-    },
-    {
-      "type": "part",
-      "qualifier": {
-        "part": "testee-1",
-        "perspective": "e2e-part-splash",
-        "file": "part-splash.e2e-spec.ts"
-      },
-      "description": "Part used in E2E test; defined in manifest to be available after page reload.",
-      "properties": {
-        "path": "test-part",
-        "showSplash": true
-      }
-    },
-    {
-      "type": "part",
-      "qualifier": {
-        "part": "testee-2",
-        "perspective": "e2e-part-splash",
-        "file": "part-splash.e2e-spec.ts"
-      },
-      "description": "Part used in E2E test; defined in manifest to be available after page reload.",
-      "properties": {
-        "path": "test-part",
-        "showSplash": true
-      }
     }
   ],
   "intentions": [
