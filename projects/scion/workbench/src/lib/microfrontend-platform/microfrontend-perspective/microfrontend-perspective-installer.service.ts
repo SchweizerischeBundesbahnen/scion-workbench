@@ -138,7 +138,7 @@ export class MicrofrontendPerspectiveInstaller {
     // If a relative aligned part and the reference part cannot be found, ignore the part.
     // Do not log an error to support conditional parts, i.e., if aligned relative to a conditional docked part.
     if (typeof partRef.position === 'object' && partRef.position.relativeTo && !layout.hasPart(partRef.position.relativeTo)) {
-      this._logger.debug(`[PerspectiveDefinitionError] Perspective '${qualifier(perspectiveCapability)}' of app '${app(perspectiveCapability)}' aligns part '${partRef.id}' relative to missing part '${partRef.position.relativeTo}'. The reference part may not be available. Ignoring part.`, LoggerNames.MICROFRONTEND);
+      this._logger.debug(`[PerspectiveDefinitionInfo] Perspective '${qualifier(perspectiveCapability)}' of app '${app(perspectiveCapability)}' aligns part '${partRef.id}' relative to missing part '${partRef.position.relativeTo}'. The reference part may not be available. Ignoring part.`, LoggerNames.MICROFRONTEND);
       return layout;
     }
 
@@ -274,7 +274,7 @@ export class MicrofrontendPerspectiveInstaller {
         this._logger.error(`[PerspectiveDefinitionError] ${message}`, LoggerNames.MICROFRONTEND);
       }
       else {
-        this._logger.debug(message, LoggerNames.MICROFRONTEND);
+        this._logger.debug(`[PerspectiveDefinitionInfo] ${message}`, LoggerNames.MICROFRONTEND);
       }
     }
 
@@ -300,7 +300,7 @@ export class MicrofrontendPerspectiveInstaller {
     if ('position' in partRef && typeof partRef.position === 'string') {
       const dockedPartExtras = partCapability.properties?.extras;
       if (!dockedPartExtras?.label || !dockedPartExtras.icon) {
-        this._logger.error(`[PerspectiveDefinitionError] Part '${qualifier(partCapability)}' of app '${app(partCapability)}' is used as a docked part in perspective '${qualifier(context.perspectiveCapability)}' but does not define an icon and label. A docked part must define both an icon and a label in its properties: { extras: { icon: '<icon-name>', label: '<text>' } }. Ignoring part.`, LoggerNames.MICROFRONTEND);
+        this._logger.error(`[PerspectiveDefinitionError] Part '${qualifier(partCapability)}' of app '${app(partCapability)}' is used as a docked part in perspective '${qualifier(context.perspectiveCapability)}' but does not define an icon and label. A docked part must define both an icon and a label: { properties: { extras: { icon: '<icon-name>', label: '<text>' } } }. Ignoring part.`, LoggerNames.MICROFRONTEND);
         return false;
       }
     }

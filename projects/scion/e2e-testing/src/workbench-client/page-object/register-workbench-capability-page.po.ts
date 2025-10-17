@@ -14,7 +14,7 @@ import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-fie
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {DockingArea, RelativeTo, ViewId, WorkbenchDialogCapability as _WorkbenchDialogCapability, WorkbenchMessageBoxCapability as _WorkbenchMessageBoxCapability, WorkbenchPartCapability as _WorkbenchPartCapability, WorkbenchPartRef, WorkbenchPerspectiveCapability as _WorkbenchPerspectiveCapability, WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability} from '@scion/workbench-client';
-import {Capability} from '@scion/microfrontend-platform';
+import {ActivatorCapability as _ActivatorCapability, Capability} from '@scion/microfrontend-platform';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../view.po';
@@ -32,6 +32,7 @@ export type WorkbenchViewCapability = Omit<_WorkbenchViewCapability, 'type'> & {
 export type WorkbenchPopupCapability = Omit<_WorkbenchPopupCapability, 'type'> & {type: 'popup'; properties: {pinToDesktop?: boolean}};
 export type WorkbenchDialogCapability = Omit<_WorkbenchDialogCapability, 'type'> & {type: 'dialog'};
 export type WorkbenchMessageBoxCapability = Omit<_WorkbenchMessageBoxCapability, 'type'> & {type: 'messagebox'};
+export type ActivatorCapability = Omit<_ActivatorCapability, 'type'> & {type: 'activator'};
 
 /**
  * Page object to interact with {@link RegisterWorkbenchCapabilityPageComponent}.
