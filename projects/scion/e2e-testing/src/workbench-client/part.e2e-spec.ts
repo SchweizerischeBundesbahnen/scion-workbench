@@ -213,7 +213,7 @@ test.describe('Workbench Part', () => {
     await expect.poll(() => partPage.getComponentInstanceId()).toEqual(componentInstanceId);
   });
 
-  test.only('should substitute named URL segments in part', async ({appPO, microfrontendNavigator}) => {
+  test('should substitute named URL segments in part', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     await microfrontendNavigator.registerCapability('app1', {

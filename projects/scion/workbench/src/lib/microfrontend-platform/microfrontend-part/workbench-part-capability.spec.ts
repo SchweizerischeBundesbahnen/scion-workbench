@@ -14,7 +14,7 @@ import {WorkbenchLauncher} from '../../startup/workbench-launcher.service';
 import {WorkbenchCapabilities} from '@scion/workbench-client';
 import {ManifestService} from '@scion/microfrontend-platform';
 
-fdescribe('Workbench Part Capability', () => {
+describe('Workbench Part Capability', () => {
 
   it('should error if part capability has no qualifier', async () => {
     TestBed.configureTestingModule({

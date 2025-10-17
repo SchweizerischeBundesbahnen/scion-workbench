@@ -35,14 +35,16 @@
   </ng-template>
 </sci-accordion>
 
-<sci-accordion class="e2e-part-params" variant="solid">
-  <ng-template sciAccordionItem [panel]="panel_part_params">
-    <header>Part Params</header>
-  </ng-template>
-  <ng-template #panel_part_params>
-    <sci-key-value [object]="part.params | appAppendParamDataType" class="e2e-part-params"/>
-  </ng-template>
-</sci-accordion>
+@if (part.params | appNullIfEmpty; as params) {
+  <sci-accordion class="e2e-part-params" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_part_params">
+      <header>Part Params</header>
+    </ng-template>
+    <ng-template #panel_part_params>
+      <sci-key-value [object]="params | appAppendParamDataType" class="e2e-part-params"/>
+    </ng-template>
+  </sci-accordion>
+}
 
 @if (route.snapshot.params | appNullIfEmpty; as params) {
   <sci-accordion variant="solid" class="e2e-route-params">
