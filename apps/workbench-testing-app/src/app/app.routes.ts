@@ -11,7 +11,7 @@
 import {Routes} from '@angular/router';
 import {WorkbenchComponent} from './workbench/workbench.component';
 import {topLevelTestPageRoutes} from './test-pages/routes';
-import {canMatchWorkbenchOutlet, canMatchWorkbenchPart, canMatchWorkbenchView, WorkbenchRouteData} from '@scion/workbench';
+import {canMatchMicrofrontendDialog, canMatchMicrofrontendPart, canMatchWorkbenchOutlet, canMatchWorkbenchPart, canMatchWorkbenchView, WorkbenchRouteData} from '@scion/workbench';
 import {Perspectives} from './workbench.perspectives';
 
 export const routes: Routes = [
@@ -131,6 +131,16 @@ export const routes: Routes = [
     },
   },
   {
+    path: '',
+    loadComponent: () => import('./host-part-page/host-part-page.component'),
+    canMatch: [canMatchMicrofrontendPart({component: 'host-part-1'})],
+  },
+  {
+    path: '',
+    loadComponent: () => import('./host-part-page-2/host-part-page-2.component'),
+    canMatch: [canMatchMicrofrontendPart({component: 'host-part-2'})],
+  },
+  {
     path: 'test-layout',
     loadComponent: () => import('./layout-page/layout-page.component'),
     data: {[WorkbenchRouteData.title]: 'Workbench Layout', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-layout', pinToDesktop: true},
@@ -160,7 +170,8 @@ export const routes: Routes = [
     loadComponent: () => import('./host-popup-page/host-popup-page.component'),
   },
   {
-    path: 'test-host-dialog',
+    path: '', // test-host-dialog
+    canMatch: [canMatchMicrofrontendDialog({component: 'host-dialog'})],
     loadComponent: () => import('./host-dialog-page/host-dialog-page.component'),
   },
   {

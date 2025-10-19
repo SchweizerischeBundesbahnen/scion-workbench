@@ -9,7 +9,7 @@
  */
 import {afterRenderEffect, assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, TemplateRef, untracked, WritableSignal} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
-import {WorkbenchPartAction, WorkbenchPartActionFn} from '../workbench.model';
+import {WORKBENCH_ELEMENT, WorkbenchPartAction, WorkbenchPartActionFn} from '../workbench.model';
 import {WorkbenchPart, WorkbenchPartNavigation} from './workbench-part.model';
 import {PartId} from '../workbench.identifiers';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
@@ -93,6 +93,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
       providers: [
         {provide: ɵWorkbenchPart, useValue: this},
         {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
+        {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchPart},
       ],
     });
   }

@@ -37,6 +37,7 @@ import {boundingClientRect} from '@scion/components/dimension';
 import {Translatable} from '../text/workbench-text-provider.model';
 import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
 import {DialogId} from '../workbench.identifiers';
+import {WORKBENCH_ELEMENT} from '../workbench.model';
 
 /** @inheritDoc */
 export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Blockable, Blocking {
@@ -261,6 +262,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
         provideViewContext(this.context.view),
         {provide: ɵWorkbenchDialog, useValue: this},
         {provide: WorkbenchDialog, useExisting: ɵWorkbenchDialog},
+        {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchDialog},
       ],
     }));
   }

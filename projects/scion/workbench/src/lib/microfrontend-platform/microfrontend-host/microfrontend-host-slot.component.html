@@ -1,0 +1,9 @@
+{{outlet()?.name}}
+
+@if (outlet(); as outlet) {
+  <ng-container *ngTemplateOutlet="router_outlet; injector: outlet.injector"/>
+
+  <ng-template #router_outlet>
+    <router-outlet [name]="outlet.name" wbRouterOutletRootContext/>
+  </ng-template>
+}

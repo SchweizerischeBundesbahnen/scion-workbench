@@ -81,6 +81,8 @@ export class WorkbenchUrlObserver {
     this.migrateURL();
     this._workbenchRouter.getCurrentNavigationContext().runPostNavigationActions();
     this._workbenchRouter.setCurrentNavigationContext(null);
+
+    console.log('>>> routes', this._router.config);
   }
 
   /** Invoked when cancelled the navigation, e.g., in a guard */

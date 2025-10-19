@@ -8,7 +8,7 @@
 * SPDX-License-Identifier: EPL-2.0
 */
 
-import {inject, Injectable, InjectionToken} from '@angular/core';
+import {EnvironmentProviders, inject, Injectable, InjectionToken, Provider, StaticProvider} from '@angular/core';
 import {CanMatchFn, PRIMARY_OUTLET, Route, Router, Routes} from '@angular/router';
 import {WorkbenchConfig} from '../workbench-config';
 import PageNotFoundComponent from '../page-not-found/page-not-found.component';
@@ -37,13 +37,13 @@ export class WorkbenchAuxiliaryRouteInstaller {
    * @param outlets - Specifies outlets for which to create auxiliary routes.
    * @param config - Specifies the config of the auxiliary routes.
    */
-  public registerAuxiliaryRoutes(outlets: WorkbenchOutlet[], config: AuxiliaryRouteConfig = {}): Routes {
+  public registerAuxiliaryRoutes(outlets: Array<WorkbenchOutlet | string>, config: AuxiliaryRouteConfig = {}): Routes {
     if (!outlets.length) {
       return [];
     }
 
     const registeredRoutes = outlets
-      .map((outlet: WorkbenchOutlet): Route => ({
+      .map((outlet: WorkbenchOutlet | string): Route => ({
         path: '',
         outlet,
         providers: [{provide: WORKBENCH_OUTLET, useValue: outlet}],
@@ -88,8 +88,8 @@ export class WorkbenchAuxiliaryRouteInstaller {
   /**
    * Unregisters auxiliary routes for the given outlet.
    */
-  public unregisterAuxiliaryRoutes(outlets: string[]): void {
-    const outletsToRemove = new Set<string>(outlets);
+  public unregisterAuxiliaryRoutes(outlets: Array<WorkbenchOutlet | string>): void {
+    const outletsToRemove = new Set<WorkbenchOutlet | string>(outlets);
 
     function shouldRemoveRoute(route: Route): boolean {
       return !!route.outlet && outletsToRemove.has(route.outlet);

@@ -10,10 +10,11 @@
 
 import {ActivatedRoute, ActivatedRouteSnapshot, ActivationEnd, ActivationStart, ChildrenOutletContexts, Event, NavigationStart, OutletContext, PRIMARY_OUTLET, Router, RouterEvent, UrlSegment, UrlSegmentGroup, UrlTree} from '@angular/router';
 import {Commands} from '../routing/routing.model';
-import {inject} from '@angular/core';
+import {inject, Injector} from '@angular/core';
 import {EMPTY, iif, MonoTypeOperatorFunction, Observable, of, OperatorFunction, pairwise, race, switchMap} from 'rxjs';
 import {filter, map, startWith, take} from 'rxjs/operators';
 import {DialogOutlet, isDialogOutlet, isPartOutlet, isPopupOutlet, isViewOutlet, PartOutlet, PopupOutlet, ViewOutlet, WorkbenchOutlet} from '../workbench.identifiers';
+import {ANGULAR_ROUTER_MUTEX} from '../executor/single-task-executor';
 
 /**
  * Provides utility functions for router operations.
@@ -107,7 +108,7 @@ export const Routing = {
   /**
    * Tests if given route has an empty path from root.
    */
-  hasEmptyPathFromRoot(route: ActivatedRoute): boolean {
+  hasEmptyPathFromRoot: (route: ActivatedRoute): boolean => {
     return route.snapshot.pathFromRoot.flatMap(route => route.url).filter(segment => segment.path.length).length === 0;
   },
 
@@ -130,7 +131,7 @@ export const Routing = {
    * @param options - Controls when to emit the observable.
    * @return An observable emitting a tuple of the previous and current route snapshots.
    */
-  activatedRoute$(outlet: string, options: {emitOn: 'routeChange' | 'routeOrParamChange' | 'always'}): Observable<[ActivatedRouteSnapshot | null, ActivatedRouteSnapshot]> {
+  activatedRoute$: (outlet: string, options: {emitOn: 'routeChange' | 'routeOrParamChange' | 'always'}): Observable<[ActivatedRouteSnapshot | null, ActivatedRouteSnapshot]> => {
     const router = inject(Router);
     const childrenOutletContexts = inject(ChildrenOutletContexts);
 
@@ -204,6 +205,13 @@ export const Routing = {
     function filterByOutlet<T extends ActivationStart | ActivationEnd>(outlet: string): MonoTypeOperatorFunction<T> {
       return filter(event => event.snapshot.pathFromRoot[1]?.outlet === outlet);
     }
+  },
+  /**
+   * Performs an "empty" navigation for Angular to evaluate `CanMatch` guards, e.g., to display "Not Found" page or activate a route based on a changed condition.
+   */
+  evaluateCanMatchGuards: async (options?: {injector?: Injector}): Promise<void> => {
+    const injector = options?.injector ?? inject(Injector);
+    await injector.get(ANGULAR_ROUTER_MUTEX).submit(() => injector.get(Router).navigate([{outlets: {}}], {skipLocationChange: true, queryParamsHandling: 'preserve', preserveFragment: true}));
   },
 } as const;
 

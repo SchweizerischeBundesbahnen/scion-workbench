@@ -13,6 +13,7 @@ import {inject} from '@angular/core';
 import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 import {WORKBENCH_OUTLET} from './workbench-auxiliary-route-installer.service';
 import {isDialogOutlet, isPartOutlet, isViewOutlet, isWorkbenchOutlet} from '../workbench.identifiers';
+import {isMicrofrontendHostOutlet} from '../microfrontend-platform/microfrontend-host/microfrontend-host-route-guards';
 
 /**
  * Configures a route to only match workbench views navigated with a specific hint.
@@ -206,6 +207,9 @@ export const matchesIfNavigated: CanMatchFn = (_route: Route, segments: UrlSegme
     const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
     const part = layout.part({partId: outlet}, {orElse: null});
     return !!part?.navigation;
+  }
+  if (isMicrofrontendHostOutlet(outlet)) {
+    return true;
   }
   return segments.length > 0;
 };

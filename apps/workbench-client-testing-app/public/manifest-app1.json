@@ -35,8 +35,7 @@
           {
             "id": "projects",
             "qualifier": {
-              "part": "projects",
-              "perspective": "sample-perspective-1"
+              "component": "host-part-1"
             },
             "position": "left-top",
             "active": true
@@ -44,16 +43,14 @@
           {
             "id": "inbox",
             "qualifier": {
-              "part": "inbox",
-              "perspective": "sample-perspective-1"
+              "component": "host-part-1"
             },
             "position": "left-top"
           },
           {
             "id": "bookmarks",
             "qualifier": {
-              "part": "bookmarks",
-              "perspective": "sample-perspective-1"
+              "component": "host-part-2"
             },
             "position": "left-bottom"
           },
@@ -416,6 +413,12 @@
   "intentions": [
     {
       "type": "part",
+      "qualifier": {
+        "*": "*"
+      }
+    },
+    {
+      "type": "dialog",
       "qualifier": {
         "*": "*"
       }

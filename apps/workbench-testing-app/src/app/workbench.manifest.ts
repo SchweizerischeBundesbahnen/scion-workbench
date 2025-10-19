@@ -1,5 +1,6 @@
 import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchPopupCapability} from '@scion/workbench-client';
 import {Capability, Manifest} from '@scion/microfrontend-platform';
+import HostPartPageComponent from './host-part-page/host-part-page.component';
 
 /**
  * Represents the manifest of the Workbench Host App.
@@ -7,6 +8,30 @@ import {Capability, Manifest} from '@scion/microfrontend-platform';
 export const workbenchManifest: Manifest = {
   name: 'Workbench Host App',
   capabilities: [
+    {
+      type: WorkbenchCapabilities.Part,
+      qualifier: {component: 'host-part-1'},
+      private: false,
+      properties: {
+        path: '',
+        extras: {
+          icon: 'train',
+          label: 'Host Part 1',
+        },
+      },
+    } satisfies Capability,
+    {
+      type: WorkbenchCapabilities.Part,
+      qualifier: {component: 'host-part-2'},
+      private: false,
+      properties: {
+        path: '',
+        extras: {
+          icon: 'home',
+          label: 'Host Part 2',
+        },
+      },
+    } satisfies Capability,
     {
       type: WorkbenchCapabilities.Notification,
       qualifier: {component: 'notification-page'},
@@ -70,7 +95,12 @@ export const workbenchManifest: Manifest = {
         {name: 'param', required: false},
       ],
       properties: {
-        path: 'test-host-dialog;matrixParam=:param',
+        path: '',
+        // title: 'WTF',
+        // size: {
+        //   height: '800px'
+        // }
+        // path: 'test-host-dialog;matrixParam=:param',
       },
     } satisfies WorkbenchDialogCapability,
     // TODO [#271]: Remove this dialog capability when implemented the issue #271

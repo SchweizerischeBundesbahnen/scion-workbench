@@ -29,6 +29,7 @@ import {clamp} from '../common/math.util';
 import {coerceElement} from '@angular/cdk/coercion';
 import {WORKBENCH_POPUP_REGISTRY} from './workbench-popup.registry';
 import {computePopupId} from '../workbench.identifiers';
+import {WORKBENCH_ELEMENT} from '../workbench.model';
 
 const NORTH: ConnectedPosition = {originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom', panelClass: 'wb-north'};
 const SOUTH: ConnectedPosition = {originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top', panelClass: 'wb-south'};
@@ -123,6 +124,7 @@ export class PopupService {
       providers: [
         {provide: ɵPopup, useValue: popup},
         {provide: Popup, useExisting: ɵPopup},
+        {provide: WORKBENCH_ELEMENT, useExisting: ɵPopup},
         provideViewContext(contextualView),
         ...[config.componentConstructOptions?.providers ?? []],
       ],

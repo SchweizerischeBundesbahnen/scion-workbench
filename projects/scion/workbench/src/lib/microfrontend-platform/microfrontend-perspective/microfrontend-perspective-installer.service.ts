@@ -9,7 +9,7 @@
  */
 
 import {inject, Injectable, IterableDiffers} from '@angular/core';
-import {Capability, ManifestService, Qualifier} from '@scion/microfrontend-platform';
+import {APP_IDENTITY, Capability, ManifestService, Qualifier} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchPartCapability, WorkbenchPartRef, WorkbenchPerspectiveCapability, WorkbenchViewCapability, WorkbenchViewRef} from '@scion/workbench-client';
 import {WorkbenchService} from '../../workbench.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -27,6 +27,7 @@ import {Arrays} from '@scion/toolkit/util';
 import {Translatable} from '../../text/workbench-text-provider.model';
 import {MICROFRONTEND_PART_NAVIGATION_HINT} from '../microfrontend-part/microfrontend-part-routes';
 import {Params, ParamValidator} from './param-validator';
+import {Beans} from '@scion/toolkit/bean-manager';
 
 /**
  * Registers perspectives provided as workbench perspective capabilities.
@@ -112,7 +113,7 @@ export class MicrofrontendPerspectiveInstaller {
     });
 
     // Navigate the initial part.
-    if (partCapability.properties?.path) {
+    if (partCapability.properties?.path || partCapability.metadata?.appSymbolicName === Beans.get(APP_IDENTITY)) {
       layout = this.navigatePart(partRef, partCapability, layout);
     }
 
@@ -194,7 +195,7 @@ export class MicrofrontendPerspectiveInstaller {
     }
 
     // Navigate the part.
-    if (partCapability.properties?.path) {
+    if (partCapability.properties?.path || partCapability.metadata?.appSymbolicName === Beans.get(APP_IDENTITY)) {
       layout = this.navigatePart(partRef, partCapability, layout);
     }
 
@@ -210,6 +211,7 @@ export class MicrofrontendPerspectiveInstaller {
    * Navigates specified part.
    */
   private navigatePart(partRef: Omit<WorkbenchPartRef, 'position'> | WorkbenchPartRef, partCapability: WorkbenchPartCapability, layout: WorkbenchLayout): WorkbenchLayout {
+    console.log('>>> navigate part', partRef.id);
     return layout.navigatePart(partRef.id, [], {
       hint: MICROFRONTEND_PART_NAVIGATION_HINT,
       data: {

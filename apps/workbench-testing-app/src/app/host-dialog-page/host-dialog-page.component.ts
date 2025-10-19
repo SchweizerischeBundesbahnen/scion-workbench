@@ -9,7 +9,6 @@
  */
 
 import {Component, HostBinding, inject} from '@angular/core';
-import {WorkbenchDialog} from '@scion/workbench-client';
 import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
@@ -21,7 +20,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {WorkbenchDialogActionDirective} from '@scion/workbench';
+import {ActivatedMicrofrontend, WorkbenchDialog, WorkbenchDialogActionDirective} from '@scion/workbench';
 
 /**
  * Dialog test component provided by the workbench host application.
@@ -50,7 +49,8 @@ export default class HostDialogPageComponent {
   private readonly _formBuilder = inject(NonNullableFormBuilder);
 
   protected readonly route = inject(ActivatedRoute);
-  protected readonly dialog = inject(WorkbenchDialog) as WorkbenchDialog<string>;
+  protected readonly dialog = inject(WorkbenchDialog);
+  protected readonly activatedMicrofrontend = inject(ActivatedMicrofrontend);
   protected readonly uuid = UUID.randomUUID();
 
   protected readonly form = this._formBuilder.group({
@@ -72,9 +72,9 @@ export default class HostDialogPageComponent {
   }
 
   constructor() {
-    this.form.controls.title.valueChanges
+    this.form.controls.title.valueChanges // TODO remove as not required to test handle
       .pipe(takeUntilDestroyed())
-      .subscribe(title => this.dialog.setTitle(title));
+      .subscribe(title => this.dialog.title = title);
   }
 
   protected onClose(): void {

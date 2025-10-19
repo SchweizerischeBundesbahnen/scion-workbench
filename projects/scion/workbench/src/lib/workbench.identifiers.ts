@@ -11,6 +11,7 @@
 import {InjectionToken} from '@angular/core';
 import {UUID} from '@scion/toolkit/uuid';
 import {UID} from './common/uid.util';
+import {isMicrofrontendHostOutlet} from './microfrontend-platform/microfrontend-host/microfrontend-host-route-guards';
 
 /**
  * DI token to get a unique id of the workbench.
@@ -126,7 +127,7 @@ export function isActivityId(activityId: string | undefined | null): activityId 
  * Tests if the given outlet matches the format of a workbench outlet.
  */
 export function isWorkbenchOutlet(outlet: string | undefined | null): outlet is WorkbenchOutlet {
-  return isPartOutlet(outlet) || isViewOutlet(outlet) || isDialogOutlet(outlet) || isPopupOutlet(outlet);
+  return isPartOutlet(outlet) || isViewOutlet(outlet) || isDialogOutlet(outlet) || isPopupOutlet(outlet) || isMicrofrontendHostOutlet(outlet);
 }
 
 /**
