@@ -1,0 +1,8 @@
+@let injector = outletInjector();
+@if (injector) {
+  <ng-container *ngTemplateOutlet="router_outlet; injector: injector"/>
+
+  <ng-template #router_outlet>
+    <router-outlet/>
+  </ng-template>
+}

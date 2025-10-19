@@ -116,7 +116,18 @@ function provideMicrofrontendPlatformBeans(): EnvironmentProviders {
     {provide: MessageClient, useFactory: () => Beans.get(MessageClient)},
     {provide: IntentClient, useFactory: () => Beans.get(IntentClient)},
     {provide: OutletRouter, useFactory: () => Beans.get(OutletRouter)},
-    {provide: ManifestService, useFactory: () => Beans.get(ManifestService)},
+    {
+      provide: ManifestService, useFactory: () => {
+        try {
+          return Beans.get(ManifestService)
+        }
+        catch (error) {
+          debugger
+          console.error(error);
+          throw error;
+        }
+      },
+    },
     {provide: PlatformPropertyService, useFactory: () => Beans.get(PlatformPropertyService)},
   ]);
 }

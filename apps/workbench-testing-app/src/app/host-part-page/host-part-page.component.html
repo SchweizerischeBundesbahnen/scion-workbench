@@ -1,0 +1,32 @@
+HOST PAGE 1
+<section>
+  <sci-form-field label="Part ID">
+    <span class="e2e-part-id">{{part.id}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="Component Instance" title="Unique identifier of this component instance">
+    <span class="e2e-component-instance-id">{{uuid}}</span>
+  </sci-form-field>
+</section>
+
+<sci-accordion class="part-capability e2e-part-capability" variant="solid">
+  <ng-template sciAccordionItem [panel]="panel_capability">
+    <header>Part Capability</header>
+  </ng-template>
+  <ng-template #panel_capability>
+    <sci-viewport>
+      <div class="e2e-part-capability capability">{{activatedMicrofrontend.capability | json}}</div>
+    </sci-viewport>
+  </ng-template>
+</sci-accordion>
+
+@if (activatedMicrofrontend.params | appNullIfEmpty; as params) {
+  <sci-accordion class="e2e-part-params" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_part_params">
+      <header>Part Params</header>
+    </ng-template>
+    <ng-template #panel_part_params>
+      <sci-key-value [object]="params | appAppendParamDataType" class="e2e-part-params"/>
+    </ng-template>
+  </sci-accordion>
+}

@@ -8,17 +8,19 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {CanMatchFn, Route} from '@angular/router';
+import {CanMatchFn, PRIMARY_OUTLET, Route, Router} from '@angular/router';
 import {EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
-import {MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
+import {APP_IDENTITY, MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
 import {MicrofrontendPartNavigationData} from './microfrontend-part-navigation-data';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {WORKBENCH_ROUTE} from '../../workbench.constants';
 import {MicrofrontendPartComponent} from './microfrontend-part.component';
 import {WORKBENCH_OUTLET} from '../../routing/workbench-auxiliary-route-installer.service';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
-import {canMatchWorkbenchPart} from '../../routing/workbench-route-guards';
+import {canMatchWorkbenchPart, matchesIfNavigated} from '../../routing/workbench-route-guards';
 import {PartId} from '../../workbench.identifiers';
+import {Beans} from '@scion/toolkit/bean-manager';
+import MicrofrontendHostPartComponent from './microfrontend-host-part.component';
 
 /**
  * Hint passed to the navigation when navigating a part microfrontend.
@@ -36,7 +38,23 @@ export function provideMicrofrontendPartRoute(): EnvironmentProviders {
       useFactory: (): Route => ({
         path: '',
         component: MicrofrontendPartComponent,
-        canMatch: [canMatchMicrofrontendPart()], // use a single matcher because Angular evaluates matchers in parallel
+        canMatch: [canMatchMicrofrontendPart({host: false})], // use a single matcher because Angular evaluates matchers in parallel
+      }),
+    },
+    {
+      provide: WORKBENCH_ROUTE,
+      multi: true,
+      useFactory: (): Route => ({
+        path: '',
+        component: MicrofrontendHostPartComponent,
+        canMatch: [canMatchMicrofrontendPart({host: true})], // use a single matcher because Angular evaluates matchers in parallel
+        children: [
+          ...inject(Router).config
+            // Filter primary routes.
+            .filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET)
+            // Filter wildcard route as most likely not indended for workbench outlets. Otherwise, the "Not Found" and "Nothing to Show" pages would never be matched.
+            .filter(route => route.path !== '**'),
+        ],
       }),
     },
   ]);
@@ -46,7 +64,7 @@ export function provideMicrofrontendPartRoute(): EnvironmentProviders {
  * Matches the route if target of a workbench part navigated to a part microfrontend, but only
  * if the part capability exists.
  */
-function canMatchMicrofrontendPart(): CanMatchFn {
+function canMatchMicrofrontendPart(filter: {host: boolean}): CanMatchFn {
   return (route, segments): boolean => {
 
     if (!canMatchWorkbenchPart(MICROFRONTEND_PART_NAVIGATION_HINT)(route, segments)) {
@@ -61,6 +79,17 @@ function canMatchMicrofrontendPart(): CanMatchFn {
     const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
     const part = layout.part({partId});
     const {capabilityId} = part.navigation!.data as unknown as MicrofrontendPartNavigationData;
-    return inject(ManifestObjectCache).hasCapability(capabilityId);
+    const capability = inject(ManifestObjectCache).getCapability(capabilityId);
+    if (!capability) {
+      return false;
+    }
+
+    const isHostProvider = capability.metadata?.appSymbolicName === Beans.get(APP_IDENTITY);
+    if (filter.host) {
+      return isHostProvider;
+    }
+    else {
+      return !isHostProvider;
+    }
   };
 }

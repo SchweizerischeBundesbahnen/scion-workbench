@@ -11,7 +11,7 @@
 import {Routes} from '@angular/router';
 import {WorkbenchComponent} from './workbench/workbench.component';
 import {topLevelTestPageRoutes} from './test-pages/routes';
-import {canMatchWorkbenchOutlet, canMatchWorkbenchPart, canMatchWorkbenchView, WorkbenchRouteData} from '@scion/workbench';
+import {canMatchWorkbenchHostPart, canMatchWorkbenchOutlet, canMatchWorkbenchPart, canMatchWorkbenchView, WorkbenchRouteData} from '@scion/workbench';
 import {Perspectives} from './workbench.perspectives';
 
 export const routes: Routes = [
@@ -129,6 +129,16 @@ export const routes: Routes = [
       path: 'test-part',
       navigationHint: '',
     },
+  },
+  {
+    path: '',
+    loadComponent: () => import('./host-part-page-2/host-part-page-2.component'),
+    canMatch: [canMatchWorkbenchHostPart({component: 'host-part-2'})],
+  },
+  {
+    path: '',
+    loadComponent: () => import('./host-part-page/host-part-page.component'),
+    canMatch: [canMatchWorkbenchHostPart({component: 'host-part-1'})],
   },
   {
     path: 'test-layout',

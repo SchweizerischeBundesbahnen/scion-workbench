@@ -12,7 +12,12 @@ import {CanMatchFn, Route, UrlSegment} from '@angular/router';
 import {inject} from '@angular/core';
 import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 import {WORKBENCH_OUTLET} from './workbench-auxiliary-route-installer.service';
-import {isDialogOutlet, isPartOutlet, isViewOutlet, isWorkbenchOutlet} from '../workbench.identifiers';
+import {isDialogOutlet, isPartOutlet, isViewOutlet, isWorkbenchOutlet, PartId} from '../workbench.identifiers';
+import {APP_IDENTITY, MicrofrontendPlatform, PlatformState, Qualifier, QualifierMatcher} from '@scion/microfrontend-platform';
+import {MicrofrontendPartNavigationData} from '../microfrontend-platform/microfrontend-part/microfrontend-part-navigation-data';
+import {ManifestObjectCache} from '../microfrontend-platform/manifest-object-cache.service';
+import {Beans} from '@scion/toolkit/bean-manager';
+import {MICROFRONTEND_PART_NAVIGATION_HINT} from '../microfrontend-platform/microfrontend-part/microfrontend-part-routes';
 
 /**
  * Configures a route to only match workbench views navigated with a specific hint.
@@ -110,6 +115,48 @@ export function canMatchWorkbenchPart(condition: string | boolean): CanMatchFn {
         return part?.navigation?.hint === condition;
       }
     }
+  };
+}
+
+export function canMatchWorkbenchHostPart(qualifier: Qualifier): CanMatchFn {
+  return (route, segments): boolean => {
+
+    const outlet = inject(WORKBENCH_OUTLET, {optional: true});
+
+    const layout1 = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
+    const part1 = layout1.part({partId: outlet as PartId}, {orElse: null});
+    console.log('>>> hint', part1?.navigation?.hint);
+
+    console.log('>>> wtf');
+    if (!canMatchWorkbenchPart(MICROFRONTEND_PART_NAVIGATION_HINT)(route, segments)) {
+      return false;
+    }
+
+    console.log('>>> a');
+
+    if (MicrofrontendPlatform.state !== PlatformState.Started) {
+      return true; // match until started the microfrontend platform to avoid flickering.
+    }
+    console.log('>>> b');
+    console.log('>>> eval');
+
+    const partId = inject(WORKBENCH_OUTLET) as PartId;
+    const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
+    const part = layout.part({partId});
+    const {capabilityId} = part.navigation!.data as unknown as MicrofrontendPartNavigationData;
+    const capability = inject(ManifestObjectCache).getCapability(capabilityId);
+    if (!capability) {
+      console.log('>>> no 1');
+      return false;
+    }
+
+    const isHostProvider = capability.metadata?.appSymbolicName === Beans.get(APP_IDENTITY);
+    if (!isHostProvider) {
+      console.log('>>> no 2');
+      return false;
+    }
+    console.log('>>> yes');
+    return new QualifierMatcher(capability.qualifier).matches(qualifier);
   };
 }
 

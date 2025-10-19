@@ -69,6 +69,7 @@ export interface WorkbenchPartCapability extends Capability {
      * If the part contains views, the microfrontend is displayed only if the view stack is empty.
      */
     path?: string;
+    component?: unknown;
     /**
      * Specifies views to stack in the part.
      *

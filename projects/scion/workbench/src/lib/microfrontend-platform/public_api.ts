@@ -14,3 +14,4 @@ export {provideMicrofrontendPlatformInitializer, type MicrofrontendPlatformIniti
 // TODO [Angular 21] Remove from Public API.
 export {MICROFRONTEND_PLATFORM_PRE_STARTUP, MICROFRONTEND_PLATFORM_POST_STARTUP} from './microfrontend-platform-initializer.provider';
 export * from './microfrontend-platform.config';
+export {ActivatedMicrofrontend} from './microfrontend-part/microfrontend-host-part.component';
