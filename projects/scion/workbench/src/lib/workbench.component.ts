@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, DestroyRef, DOCUMENT, effect, ElementRef, inject, NgZone, Provider, viewChild, ViewContainerRef} from '@angular/core';
+import {ChangeDetectorRef, Component, DestroyRef, DOCUMENT, effect, ElementRef, inject, Injector, NgZone, Provider, viewChild, ViewContainerRef} from '@angular/core';
 import {IFRAME_OVERLAY_HOST, VIEW_DROP_ZONE_OVERLAY_HOST, WORKBENCH_ELEMENT_REF} from './workbench-element-references';
 import {WorkbenchLauncher} from './startup/workbench-launcher.service';
 import {WorkbenchStartup} from './startup/workbench-startup.service';
@@ -29,6 +29,7 @@ import {fromEvent} from 'rxjs';
 import {ɵWorkbenchRouter} from './routing/ɵworkbench-router.service';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {filter} from 'rxjs/operators';
+import {Routing} from './routing/routing.util';
 
 /**
  * Main entry point component of the SCION Workbench.
@@ -68,6 +69,63 @@ export class WorkbenchComponent {
     this.disableChangeDetectionDuringNavigation();
     this.provideWorkbenchElementReferences();
     this.installMaximizeShortcutListener();
+    // if (1 + 1 === 3) {
+      this.evaluateCanMatchGuards();
+    // }
+
+
+    // Perform navigation for Angular to evaluate `CanMatch` guards to display the microfrontend.
+    // The issues are caused because Angular always attempts to match empty-path auxiliary routes if the outlet is not included in the URL, regardless
+    // of whether the outlet has been navigated to the empty-path route or not.
+  }
+
+  /**
+   * Instructs Angular to evaluate any `CanMatch` guard registered on routes, required for guards based on
+   * data not available at the time the initial navigation is performed, such as capabilities.
+   *
+   * Use if to evaluate guards which cannot block for data to be availabe because blocking workbench startup
+   * otherwise, thus causing a deadlock.
+   *
+   *
+   *
+   *
+   * It may be no option for the guard to block since that would also block startup and cause a deadlock.
+   *
+   *
+   * i.e, because the workbench
+   * has not completed startup yet.
+   *
+   *
+   *
+   *
+   *
+   * conditions not available during initial navigation when the workbench is starting. For example,
+   * guards cannot access SCION Microfrontend Platform
+   *
+   * Guards based on data not available at the time the initial navigation is performedw
+   *
+   *
+   *
+   * Depending on when the initial Navigation is performed,
+   *
+   * the workbench may not have completed startup
+   * preventing ev
+   *
+   *
+   *
+   *
+   *
+   * based
+   * on conditions available after initial navigation.
+   *
+   * Otherwise,
+   *
+   * to display "Not Found" page or activate a route based on a changed condition.
+   * @private
+   */
+  private evaluateCanMatchGuards(): void {
+    const injector = inject(Injector);
+    void inject(WorkbenchStartup).whenDone.then(() => Routing.runCanMatchGuards({injector}));
   }
 
   /**

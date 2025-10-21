@@ -43,15 +43,14 @@
           {
             "id": "inbox",
             "qualifier": {
-              "part": "inbox",
-              "perspective": "sample-perspective-1"
+              "component": "host-part-1"
             },
             "position": "left-top"
           },
           {
             "id": "bookmarks",
             "qualifier": {
-              "component": "host-part-2"
+              "component": "host-part-1"
             },
             "position": "left-bottom"
           },

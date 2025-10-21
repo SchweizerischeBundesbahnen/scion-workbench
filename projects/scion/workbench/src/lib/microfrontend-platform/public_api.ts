@@ -15,3 +15,4 @@ export {provideMicrofrontendPlatformInitializer, type MicrofrontendPlatformIniti
 export {MICROFRONTEND_PLATFORM_PRE_STARTUP, MICROFRONTEND_PLATFORM_POST_STARTUP} from './microfrontend-platform-initializer.provider';
 export * from './microfrontend-platform.config';
 export {ActivatedMicrofrontend} from './microfrontend-part/microfrontend-host-part.component';
+export {canMatchMicrofrontendPart} from './microfrontend-host/microfrontend-host-route-guards';

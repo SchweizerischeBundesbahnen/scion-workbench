@@ -374,6 +374,7 @@ function createNavigationExtras(layouts: {newLayout: ɵWorkbenchLayout; currentL
     // Merge with existing query params unless specified an explicit strategy, e.g., for migrating an outdated layout URL.
     // Note that `null` is a valid strategy for clearing existing query params, so do not use the nullish coalescing operator (??).
     queryParamsHandling: Defined.orElse(extras?.queryParamsHandling, 'merge'),
+    preserveFragment: true,
   };
 }
 

@@ -2,7 +2,6 @@ import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchMessageBoxCap
 import {Capability, Manifest} from '@scion/microfrontend-platform';
 import HostPartPageComponent from './host-part-page/host-part-page.component';
 
-
 /**
  * Represents the manifest of the Workbench Host App.
  */
@@ -14,10 +13,11 @@ export const workbenchManifest: Manifest = {
       qualifier: {component: 'host-part-1'},
       private: false,
       properties: {
+        path: '',
         extras: {
           icon: 'train',
-          label: 'Host Part 1'
-        }
+          label: 'Host Part 1',
+        },
       },
     } satisfies Capability,
     {
@@ -25,10 +25,11 @@ export const workbenchManifest: Manifest = {
       qualifier: {component: 'host-part-2'},
       private: false,
       properties: {
+        path: '',
         extras: {
           icon: 'home',
-          label: 'Host Part 2'
-        }
+          label: 'Host Part 2',
+        },
       },
     } satisfies Capability,
     {

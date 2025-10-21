@@ -1,8 +1,8 @@
-@let injector = outletInjector();
-@if (injector) {
-  <ng-container *ngTemplateOutlet="router_outlet; injector: injector"/>
+Microfrontend Host Part:  {{navigationContext()?.outlet}}
+@if (navigationContext(); as context) {
+  <ng-container *ngTemplateOutlet="router_outlet; injector: context.injector"/>
 
   <ng-template #router_outlet>
-    <router-outlet/>
+    <router-outlet [name]="context.outlet" wbRouterOutletRootContext/>
   </ng-template>
 }

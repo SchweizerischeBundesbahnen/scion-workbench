@@ -198,9 +198,6 @@ export class MicrofrontendPerspectiveInstaller {
     if (partCapability.properties?.path || partCapability.metadata?.appSymbolicName === Beans.get(APP_IDENTITY)) {
       layout = this.navigatePart(partRef, partCapability, layout);
     }
-    else {
-      console.log(`>>> not navigating part ${partRef.id}`, partCapability);
-    }
 
     // Add views to the part.
     for (const viewRef of partCapability.properties?.views ?? []) {
