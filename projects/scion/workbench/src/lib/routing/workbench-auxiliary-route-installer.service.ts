@@ -8,7 +8,7 @@
 * SPDX-License-Identifier: EPL-2.0
 */
 
-import {inject, Injectable, InjectionToken} from '@angular/core';
+import {EnvironmentProviders, inject, Injectable, InjectionToken, Provider, StaticProvider} from '@angular/core';
 import {CanMatchFn, PRIMARY_OUTLET, Route, Router, Routes} from '@angular/router';
 import {WorkbenchConfig} from '../workbench-config';
 import PageNotFoundComponent from '../page-not-found/page-not-found.component';

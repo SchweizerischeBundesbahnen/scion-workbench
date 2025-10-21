@@ -11,7 +11,7 @@
 import {Observable} from 'rxjs';
 import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchView} from './view/workbench-view.model';
-import {Injector, TemplateRef} from '@angular/core';
+import {InjectionToken, Injector, TemplateRef} from '@angular/core';
 import {WorkbenchPart} from './part/workbench-part.model';
 import {WorkbenchDialog} from './dialog/workbench-dialog';
 import {Popup} from './popup/popup.config';
@@ -211,3 +211,8 @@ export interface WorkbenchTheme {
  * Union of workbench elements.
  */
 export type WorkbenchElement = WorkbenchPart | WorkbenchView | WorkbenchDialog | Popup;
+
+/**
+ * DI token to inject the workbench element available in the current context.
+ */
+export const WORKBENCH_ELEMENT = new InjectionToken<WorkbenchElement>('WORKBENCH_ELEMENT');

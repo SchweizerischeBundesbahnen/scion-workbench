@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, Injectable} from '@angular/core';
+import {inject, Injectable, Injector, signal, StaticProvider} from '@angular/core';
 import {APP_IDENTITY, Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchDialogOptions} from '@scion/workbench-client';
 import {Logger, LoggerNames} from '../../logging';
@@ -17,12 +17,15 @@ import {stringifyError} from '../../common/stringify-error.util';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchDialogService} from '../../dialog/workbench-dialog.service';
 import {MicrofrontendDialogComponent} from './microfrontend-dialog.component';
-import {MicrofrontendHostDialogComponent} from '../microfrontend-host-dialog/microfrontend-host-dialog.component';
+import {MicrofrontendHostContext} from '../microfrontend-host/microfrontend-host-context';
+import {MicrofrontendHostComponent} from '../microfrontend-host/microfrontend-host.component';
+import {createRemoteTranslatable} from '../text/remote-text-provider';
+import { WorkbenchDialog } from '../../dialog/workbench-dialog';
 
 /**
  * Handles dialog intents, instructing the workbench to open a dialog with the microfrontend declared on the resolved capability.
  *
- * Microfrontends of the host are displayed in {@link MicrofrontendHostDialogComponent}, microfrontends of other applications in {@link MicrofrontendDialogComponent}.
+ * Microfrontends of the host are displayed in {@link MicrofrontendHostComponent}, microfrontends of other applications in {@link MicrofrontendDialogComponent}.
  *
  * Dialog intents are handled in this interceptor and are not transported to the providing application, enabling support for applications
  * that are not connected to the SCION Workbench.
@@ -74,12 +77,42 @@ export class MicrofrontendDialogIntentHandler implements IntentInterceptor {
     const isHostProvider = capability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
     this._logger.debug(() => 'Handling microfrontend dialog intent', LoggerNames.MICROFRONTEND, options);
 
-    return this._dialogService.open(isHostProvider ? MicrofrontendHostDialogComponent : MicrofrontendDialogComponent, {
-      inputs: {capability, params},
+    return this._dialogService.open(isHostProvider ? MicrofrontendHostComponent : MicrofrontendDialogComponent, {
+      inputs: isHostProvider ? {} : {capability, params},
+      injector: isHostProvider ? Injector.create({providers: [provideMicrofrontendDialogContext(capability, params)]}) : undefined,
       modality: options.modality,
       context: options.context,
       animate: options.animate,
       cssClass: Arrays.coerce(capability.properties.cssClass).concat(Arrays.coerce(options.cssClass)),
     });
   }
+}
+
+function provideMicrofrontendDialogContext(capability: WorkbenchDialogCapability, params: Map<string, unknown>): StaticProvider {
+  return [
+    {
+      provide: MicrofrontendHostContext,
+      useValue: {
+        capabilityId: signal(capability.metadata!.id),
+        params: signal(params),
+        init: () => {
+          const dialog = inject(WorkbenchDialog);
+          const properties = capability.properties;
+          const appSymbolicName = capability.metadata!.appSymbolicName;
+
+          dialog.size.width = properties.size?.width;
+          dialog.size.height = properties.size?.height;
+          dialog.size.minWidth = properties.size?.minWidth;
+          dialog.size.maxWidth = properties.size?.maxWidth;
+          dialog.size.minHeight = properties.size?.minHeight;
+          dialog.size.maxHeight = properties.size?.maxHeight;
+
+          dialog.title = createRemoteTranslatable(properties.title, {appSymbolicName, valueParams: params, topicParams: properties.resolve});
+          dialog.closable = properties.closable ?? true;
+          dialog.resizable = properties.resizable ?? true;
+          dialog.padding = properties.padding ?? true;
+        },
+      } satisfies MicrofrontendHostContext,
+    },
+  ];
 }

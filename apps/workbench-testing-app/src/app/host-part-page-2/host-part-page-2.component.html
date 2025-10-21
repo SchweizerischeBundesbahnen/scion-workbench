@@ -20,7 +20,7 @@ HOST PAGE 2
   </ng-template>
 </sci-accordion>
 
-@if (activatedMicrofrontend.params | appNullIfEmpty; as params) {
+@if (activatedMicrofrontend.params() | appNullIfEmpty; as params) {
   <sci-accordion class="e2e-part-params" variant="solid">
     <ng-template sciAccordionItem [panel]="panel_part_params">
       <header>Part Params</header>

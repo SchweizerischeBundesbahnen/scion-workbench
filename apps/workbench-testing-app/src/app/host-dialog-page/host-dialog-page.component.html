@@ -28,12 +28,12 @@
     </ng-template>
     <ng-template #panel_capability>
       <sci-viewport>
-        <div class="capability e2e-dialog-capability">{{dialog.capability | json}}</div>
+        <div class="capability e2e-dialog-capability">{{activatedMicrofrontend.capability | json}}</div>
       </sci-viewport>
     </ng-template>
   </sci-accordion>
 
-  @if (dialog.params | appNullIfEmpty; as params) {
+  @if (activatedMicrofrontend.params() | appNullIfEmpty; as params) {
     <sci-accordion class="e2e-dialog-params" variant="solid">
       <ng-template sciAccordionItem [panel]="panel_dialog_params">
         <header>Dialog Params</header>

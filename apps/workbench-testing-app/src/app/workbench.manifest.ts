@@ -95,7 +95,8 @@ export const workbenchManifest: Manifest = {
         {name: 'param', required: false},
       ],
       properties: {
-        path: 'test-host-dialog;matrixParam=:param',
+        path: '',
+        // path: 'test-host-dialog;matrixParam=:param',
       },
     } satisfies WorkbenchDialogCapability,
     // TODO [#271]: Remove this dialog capability when implemented the issue #271

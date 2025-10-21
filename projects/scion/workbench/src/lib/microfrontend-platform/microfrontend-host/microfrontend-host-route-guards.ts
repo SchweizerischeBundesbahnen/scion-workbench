@@ -19,6 +19,10 @@ export function canMatchMicrofrontendPart(qualifier: Qualifier): CanMatchFn {
   return canMatchMicrofrontend('part', qualifier)
 }
 
+export function canMatchMicrofrontendDialog(qualifier: Qualifier): CanMatchFn {
+  return canMatchMicrofrontend('dialog', qualifier)
+}
+
 function canMatchMicrofrontend(type: 'part' | 'view' | 'dialog' | 'popup', qualifier: Qualifier): CanMatchFn {
   return (): boolean => {
     const outlet = inject(WORKBENCH_OUTLET, {optional: true});

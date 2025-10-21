@@ -9,7 +9,7 @@
  */
 
 import {CanMatchFn, Route} from '@angular/router';
-import {EnvironmentProviders, inject, Injector, makeEnvironmentProviders} from '@angular/core';
+import {computed, EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
 import {APP_IDENTITY, MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
 import {MicrofrontendPartNavigationData} from './microfrontend-part-navigation-data';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
@@ -20,8 +20,11 @@ import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {canMatchWorkbenchPart} from '../../routing/workbench-route-guards';
 import {PartId} from '../../workbench.identifiers';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {MicrofrontendHostPartComponent} from './microfrontend-host-part.component';
 import {firstValueFrom} from 'rxjs';
+import {MicrofrontendHostComponent} from '../microfrontend-host/microfrontend-host.component';
+import {Maps} from '@scion/toolkit/util';
+import {WORKBENCH_PART_REGISTRY} from '../../part/workbench-part.registry';
+import {createMicrofrontendHostContext, MicrofrontendHostContext} from '../microfrontend-host/microfrontend-host-context';
 
 /**
  * Hint passed to the navigation when navigating a part microfrontend.
@@ -49,8 +52,9 @@ export function provideMicrofrontendPartRoute(): EnvironmentProviders {
       multi: true,
       useFactory: (): Route => ({
         path: '',
-        component: MicrofrontendHostPartComponent,
+        component: MicrofrontendHostComponent,
         canMatch: [canMatchMicrofrontendPart({host: true})], // use a single matcher because Angular evaluates matchers in parallel
+        providers: [provideMicrofrontendHostPartContext()],
       }),
     },
   ]);
@@ -66,9 +70,6 @@ function canMatchMicrofrontendPart(filter: {host: boolean}): CanMatchFn {
       return false;
     }
 
-    const partId = inject(WORKBENCH_OUTLET) as PartId;
-    const injector = inject(Injector);
-
     if (MicrofrontendPlatform.state !== PlatformState.Started) {
       return false; // match until started the microfrontend platform to avoid flickering.
     }
@@ -79,16 +80,14 @@ function canMatchMicrofrontendPart(filter: {host: boolean}): CanMatchFn {
     // await MicrofrontendPlatform.whenState(PlatformState.Started);
 
     // return runInInjectionContext(injector, () => {
+    const partId = inject(WORKBENCH_OUTLET) as PartId;
     const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
     const part = layout.part({partId: partId});
     const {capabilityId} = part.navigation!.data as unknown as MicrofrontendPartNavigationData;
     const capability = await firstValueFrom(inject(ManifestObjectCache).observeCapability$(capabilityId));
     if (!capability) {
-      console.log('>>> false', partId);
       return false;
     }
-    console.log('>>> true', partId);
-
     const isHostProvider = capability.metadata?.appSymbolicName === Beans.get(APP_IDENTITY);
     if (filter.host) {
       return isHostProvider;
@@ -96,6 +95,23 @@ function canMatchMicrofrontendPart(filter: {host: boolean}): CanMatchFn {
     else {
       return !isHostProvider;
     }
-    // });
   };
+}
+
+function provideMicrofrontendHostPartContext(): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    {
+      provide: MicrofrontendHostContext,
+      useFactory: (): MicrofrontendHostContext => {
+        const partId = inject(WORKBENCH_OUTLET) as PartId;
+        const part = inject(WORKBENCH_PART_REGISTRY).get(partId);
+        const partNavigationData = computed(() => part.navigation()!.data as unknown as MicrofrontendPartNavigationData);
+        return createMicrofrontendHostContext(computed(() => partNavigationData().capabilityId), computed(() => Maps.coerce(partNavigationData().params)))
+        // return {
+        //   capabilityId: computed(() => partNavigationData().capabilityId),
+        //   params: computed(() => Maps.coerce(partNavigationData().params)),
+        // }
+      },
+    },
+  ]);
 }
