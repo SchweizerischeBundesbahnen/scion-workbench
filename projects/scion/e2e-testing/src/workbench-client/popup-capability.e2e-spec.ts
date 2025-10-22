@@ -55,7 +55,7 @@ test.describe('Workbench Popup Capability', () => {
         path: 'test-pages/microfrontend-test-page',
       },
     });
-    await expect(registeredCapability).rejects.toThrow(/NullQualifierError/);
+    await expect(registeredCapability).rejects.toThrow(/\[PopupDefinitionError] Popup capability requires a qualifier/);
   });
 
   test('should error if path is `undefined`', async ({appPO, microfrontendNavigator}) => {
@@ -68,7 +68,7 @@ test.describe('Workbench Popup Capability', () => {
         path: '<undefined>',
       },
     });
-    await expect(registeredCapability).rejects.toThrow(/NullPathError/);
+    await expect(registeredCapability).rejects.toThrow(/\[PopupDefinitionError] Popup capability requires the 'path' property/);
   });
 
   test('should error if path is `null`', async ({appPO, microfrontendNavigator}) => {
@@ -81,7 +81,7 @@ test.describe('Workbench Popup Capability', () => {
         path: '<null>',
       },
     });
-    await expect(registeredCapability).rejects.toThrow(/NullPathError/);
+    await expect(registeredCapability).rejects.toThrow(/\[PopupDefinitionError] Popup capability requires the 'path' property/);
   });
 
   test('should not error if path is empty', async ({appPO, microfrontendNavigator}) => {

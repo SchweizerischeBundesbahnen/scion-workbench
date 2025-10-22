@@ -25,22 +25,36 @@ export class MicrofrontendViewCapabilityValidator implements CapabilityIntercept
     }
 
     const viewCapability = capability as Partial<WorkbenchViewCapability>;
-    // Assert the view capability to have a qualifier set.
+    // Assert the view capability to have a qualifier.
     if (!Object.keys(viewCapability.qualifier ?? {}).length) {
-      throw Error(`[NullQualifierError] View capability requires a qualifier [capability=${JSON.stringify(viewCapability)}]`);
+      throw Error(`[ViewDefinitionError] View capability requires a qualifier [app=${app(viewCapability)}, view=${qualifier(viewCapability)}]`);
     }
 
-    // Assert the view capability to have a "properties" section.
+    // Assert the view capability to have properties.
     if (!viewCapability.properties) {
-      throw Error(`[NullPropertiesError] View capability requires a "properties" section [application="${viewCapability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(viewCapability.qualifier)}"]`);
+      throw Error(`[ViewDefinitionError] View capability requires properties [app=${app(viewCapability)}, view=${qualifier(viewCapability)}]`);
     }
 
     // Assert the view capability to have a path set.
     const path = viewCapability.properties.path as unknown;
     if (path === undefined || path === null) {
-      throw Error(`[NullPathError] View capability requires a path to the microfrontend in its properties [application="${viewCapability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(viewCapability.qualifier)}"]`);
+      throw Error(`[ViewDefinitionError] View capability requires the 'path' property [app=${app(viewCapability)}, view=${qualifier(viewCapability)}]`);
     }
 
     return capability;
   }
+}
+
+/**
+ * Returns the qualifier as string.
+ */
+function qualifier(capability: Partial<Capability>): string {
+  return Objects.toMatrixNotation(capability.qualifier);
+}
+
+/**
+ * Returns the app symbolic name.
+ */
+function app(capability: Partial<Capability>): string {
+  return capability.metadata!.appSymbolicName;
 }

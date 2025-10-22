@@ -74,6 +74,10 @@ export interface MenuAction {
    * The function can call `inject` to get any required dependencies.
    */
   onAction: () => unknown | Promise<unknown>;
+  /**
+   * Specifies CSS class(es) to add to the menu action, e.g., to locate the menu action in tests.
+   */
+  cssClass?: string | string[];
 }
 
 /**

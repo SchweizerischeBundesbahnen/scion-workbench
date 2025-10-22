@@ -25,8 +25,14 @@ export class AngularZoneTestPagePO implements MicrofrontendViewPagePO {
   public readonly outlet: SciRouterOutletPO;
 
   public readonly workbenchView: {
+    partIdPanel: PanelPO;
     capabilityPanel: PanelPO;
     paramsPanel: PanelPO;
+    activePanel: PanelPO;
+    focusedPanel: PanelPO;
+  };
+
+  public readonly workbenchPart: {
     activePanel: PanelPO;
     focusedPanel: PanelPO;
   };
@@ -37,10 +43,16 @@ export class AngularZoneTestPagePO implements MicrofrontendViewPagePO {
     this.locator = this.outlet.frameLocator.locator('app-angular-zone-test-page');
 
     this.workbenchView = {
+      partIdPanel: new PanelPO(this.locator.locator('sci-accordion'), 'e2e-workbench-view.e2e-partid'),
       capabilityPanel: new PanelPO(this.locator.locator('sci-accordion'), 'e2e-workbench-view.e2e-capability'),
       paramsPanel: new PanelPO(this.locator.locator('sci-accordion'), 'e2e-workbench-view.e2e-params'),
       activePanel: new PanelPO(this.locator.locator('sci-accordion'), 'e2e-workbench-view.e2e-active'),
       focusedPanel: new PanelPO(this.locator.locator('sci-accordion'), 'e2e-workbench-view.e2e-focused'),
+    };
+
+    this.workbenchPart = {
+      activePanel: new PanelPO(this.locator.locator('sci-accordion'), 'e2e-workbench-part.e2e-active'),
+      focusedPanel: new PanelPO(this.locator.locator('sci-accordion'), 'e2e-workbench-part.e2e-focused'),
     };
   }
 

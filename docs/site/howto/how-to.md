@@ -49,7 +49,7 @@ This section provides documentation and instructions for developing applications
 #### Miscellaneous
 - [How to theme the SCION Workbench](how-to-theme-workbench.md)
 - [How to localize the SCION Workbench](how-to-localize.md)
-- [How to change icons in the SCION Workbench](how-to-icons.md)
+- [How to provide icons to the SCION Workbench](how-to-icons.md)
 
 ***
 

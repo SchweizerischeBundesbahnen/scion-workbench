@@ -1,38 +1,65 @@
 <sci-accordion [variant]="'solid'">
-  <!-- WorkbenchView#capability$ -->
-  <ng-template sciAccordionItem [panel]="panel1" cssClass="e2e-workbench-view e2e-capability">
-    <header>WorkbenchView#capability$</header>
+  <!-- WorkbenchView#partId$ -->
+  <ng-template sciAccordionItem [panel]="panel1" cssClass="e2e-workbench-view e2e-partid">
+    <header>WorkbenchView#partId$</header>
   </ng-template>
 
   <ng-template #panel1>
+    <ng-container *ngTemplateOutlet="test_template; context: {$implicit: tests.workbenchView.partId}"/>
+  </ng-template>
+
+  <!-- WorkbenchView#capability$ -->
+  <ng-template sciAccordionItem [panel]="panel2" cssClass="e2e-workbench-view e2e-capability">
+    <header>WorkbenchView#capability$</header>
+  </ng-template>
+
+  <ng-template #panel2>
     <ng-container *ngTemplateOutlet="test_template; context: {$implicit: tests.workbenchView.capability}"/>
   </ng-template>
 
   <!-- WorkbenchView#params$ -->
-  <ng-template sciAccordionItem [panel]="panel2" cssClass="e2e-workbench-view e2e-params">
+  <ng-template sciAccordionItem [panel]="panel3" cssClass="e2e-workbench-view e2e-params">
     <header>WorkbenchView#params$</header>
   </ng-template>
 
-  <ng-template #panel2>
+  <ng-template #panel3>
     <ng-container *ngTemplateOutlet="test_template; context: {$implicit: tests.workbenchView.params}"/>
   </ng-template>
 
   <!-- WorkbenchView#active$ -->
-  <ng-template sciAccordionItem [panel]="panel3" cssClass="e2e-workbench-view e2e-active">
+  <ng-template sciAccordionItem [panel]="panel4" cssClass="e2e-workbench-view e2e-active">
     <header>WorkbenchView#active$</header>
   </ng-template>
 
-  <ng-template #panel3>
+  <ng-template #panel4>
     <ng-container *ngTemplateOutlet="test_template; context: {$implicit: tests.workbenchView.active}"/>
   </ng-template>
 
   <!-- WorkbenchView#focused$ -->
-  <ng-template sciAccordionItem [panel]="panel4" cssClass="e2e-workbench-view e2e-focused">
+  <ng-template sciAccordionItem [panel]="panel5" cssClass="e2e-workbench-view e2e-focused">
     <header>WorkbenchView#focused$</header>
   </ng-template>
 
-  <ng-template #panel4>
+  <ng-template #panel5>
     <ng-container *ngTemplateOutlet="test_template; context: {$implicit: tests.workbenchView.focused}"/>
+  </ng-template>
+
+  <!-- WorkbenchPart#active$ -->
+  <ng-template sciAccordionItem [panel]="panel6" cssClass="e2e-workbench-part e2e-active">
+    <header>WorkbenchPart#active$</header>
+  </ng-template>
+
+  <ng-template #panel6>
+    <ng-container *ngTemplateOutlet="test_template; context: {$implicit: tests.workbenchPart.active}"/>
+  </ng-template>
+
+  <!-- WorkbenchPart#focused$ -->
+  <ng-template sciAccordionItem [panel]="panel7" cssClass="e2e-workbench-part e2e-focused">
+    <header>WorkbenchPart#focused$</header>
+  </ng-template>
+
+  <ng-template #panel7>
+    <ng-container *ngTemplateOutlet="test_template; context: {$implicit: tests.workbenchPart.focused}"/>
   </ng-template>
 </sci-accordion>
 

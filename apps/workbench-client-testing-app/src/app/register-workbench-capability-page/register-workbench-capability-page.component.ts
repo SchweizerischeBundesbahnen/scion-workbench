@@ -12,7 +12,7 @@ import {Component, inject} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {Capability, ManifestService, ParamDefinition} from '@scion/microfrontend-platform';
-import {ViewParamDefinition, WorkbenchCapabilities, WorkbenchView} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchView} from '@scion/workbench-client';
 import {firstValueFrom} from 'rxjs';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {JsonPipe} from '@angular/common';
@@ -20,10 +20,12 @@ import {stringifyError} from '../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {PerspectiveCapabilityPropertiesComponent, WorkbenchPerspectiveCapabilityProperties} from './perspective-capability-properties/perspective-capability-properties.component';
+import {PartCapabilityPropertiesComponent, WorkbenchPartCapabilityProperties} from './part-capability-properties/part-capability-properties.component';
 import {ViewCapabilityPropertiesComponent, WorkbenchViewCapabilityProperties} from './view-capability-properties/view-capability-properties.component';
 import {DialogCapabilityPropertiesComponent, WorkbenchDialogCapabilityProperties} from './dialog-capability-properties/dialog-capability-properties.component';
 import {PopupCapabilityPropertiesComponent, WorkbenchPopupCapabilityProperties} from './popup-capability-properties/popup-capability-properties.component';
 import {MessageBoxCapabilityPropertiesComponent, WorkbenchMessageBoxCapabilityProperties} from './message-box-capability-properties/message-box-capability-properties.component';
+import {CapabilityParamsComponent} from './capability-params/capability-params.component';
 
 /**
  * Allows registering workbench capabilities.
@@ -31,7 +33,7 @@ import {MessageBoxCapabilityPropertiesComponent, WorkbenchMessageBoxCapabilityPr
 @Component({
   selector: 'app-register-workbench-capability-page',
   templateUrl: './register-workbench-capability-page.component.html',
-  styleUrls: ['./register-workbench-capability-page.component.scss'],
+  styleUrl: './register-workbench-capability-page.component.scss',
   imports: [
     JsonPipe,
     ReactiveFormsModule,
@@ -40,10 +42,12 @@ import {MessageBoxCapabilityPropertiesComponent, WorkbenchMessageBoxCapabilityPr
     SciCheckboxComponent,
     SciViewportComponent,
     PerspectiveCapabilityPropertiesComponent,
+    PartCapabilityPropertiesComponent,
     ViewCapabilityPropertiesComponent,
     DialogCapabilityPropertiesComponent,
     PopupCapabilityPropertiesComponent,
     MessageBoxCapabilityPropertiesComponent,
+    CapabilityParamsComponent,
   ],
 })
 export default class RegisterWorkbenchCapabilityPageComponent {
@@ -54,11 +58,10 @@ export default class RegisterWorkbenchCapabilityPageComponent {
   protected readonly form = this._formBuilder.group({
     type: this._formBuilder.control<WorkbenchCapabilities | ''>('', Validators.required),
     qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
-    requiredParams: this._formBuilder.control(''),
-    optionalParams: this._formBuilder.control(''),
-    transientParams: this._formBuilder.control(''),
+    params: this._formBuilder.control<ParamDefinition[] | undefined>(undefined),
     private: this._formBuilder.control(true),
     perspectiveProperties: this._formBuilder.control<WorkbenchPerspectiveCapabilityProperties | undefined>(undefined),
+    partProperties: this._formBuilder.control<WorkbenchPartCapabilityProperties | undefined>(undefined),
     viewProperties: this._formBuilder.control<WorkbenchViewCapabilityProperties | undefined>(undefined),
     popupProperties: this._formBuilder.control<WorkbenchPopupCapabilityProperties | undefined>(undefined),
     dialogProperties: this._formBuilder.control<WorkbenchDialogCapabilityProperties | undefined>(undefined),
@@ -75,22 +78,17 @@ export default class RegisterWorkbenchCapabilityPageComponent {
   }
 
   public async onRegister(): Promise<void> {
-    const requiredParams: ParamDefinition[] = this.form.controls.requiredParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
-    const optionalParams: ParamDefinition[] = this.form.controls.optionalParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
-    const transientParams: ViewParamDefinition[] = this.form.controls.transientParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false, transient: true}));
     const capability: Partial<Capability> = { // Partial to test capability validation
       type: this.form.controls.type.value,
       qualifier: SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier) ?? undefined,
-      params: [
-        ...requiredParams,
-        ...optionalParams,
-        ...(this.form.controls.type.value === WorkbenchCapabilities.View ? transientParams : []),
-      ],
+      params: this.form.controls.params.value,
       private: this.form.controls.private.value,
       properties: (() => {
         switch (this.form.controls.type.value) {
           case WorkbenchCapabilities.Perspective:
             return this.form.controls.perspectiveProperties.value;
+          case WorkbenchCapabilities.Part:
+            return this.form.controls.partProperties.value;
           case WorkbenchCapabilities.View:
             return this.form.controls.viewProperties.value;
           case WorkbenchCapabilities.Popup:

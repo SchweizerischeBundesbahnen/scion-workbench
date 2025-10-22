@@ -16,13 +16,16 @@ import {PopupPO} from '../../../popup.po';
 import {PopupOpenerPagePO} from '../popup-opener-page.po';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../../workbench/page-object/workbench-view-page.po';
+import {PartId} from '@scion/workbench-client';
+import {PartPO} from '../../../part.po';
+import {MicrofrontendPopupPagePO} from '../../../workbench/page-object/workbench-popup-page.po';
 
-export class InputFieldTestPagePO implements MicrofrontendViewPagePO {
+export class InputFieldTestPagePO implements MicrofrontendViewPagePO, MicrofrontendPopupPagePO {
 
   public readonly locator: Locator;
   public readonly input: Locator;
 
-  constructor(public outlet: SciRouterOutletPO, private _locateBy: ViewPO | PopupPO) {
+  constructor(public outlet: SciRouterOutletPO, private _locateBy: PartPO | ViewPO | PopupPO) {
     this.locator = this.outlet.frameLocator.locator('app-input-field-test-page');
     this.input = this.locator.locator('input.e2e-input');
   }
@@ -100,5 +103,11 @@ export class InputFieldTestPagePO implements MicrofrontendViewPagePO {
 
     const outlet = new SciRouterOutletPO(appPO, {cssClass: ['e2e-popup', 'test-input-field']});
     return new InputFieldTestPagePO(outlet, popup);
+  }
+
+  public static newPartPO(appPO: AppPO, locateBy: {partId?: PartId; cssClass?: string}): InputFieldTestPagePO {
+    const part = appPO.part({partId: locateBy.partId, cssClass: locateBy.cssClass});
+    const outlet = new SciRouterOutletPO(appPO, {name: locateBy.partId, cssClass: locateBy.cssClass});
+    return new InputFieldTestPagePO(outlet, part);
   }
 }

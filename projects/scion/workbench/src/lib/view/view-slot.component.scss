@@ -8,6 +8,11 @@
     background-color: var(--sci-workbench-view-peripheral-background-color);
   }
 
+  // Disable pointer events during view drag to not mess up internal dragenter/dragleave counter of `ViewDragService`
+  // in the view's drop zone where the drag operation started.
+  // Otherwise, when start dragging a view tab over its view (A) before its adjacent view (B) has been activated,
+  // view content of (A) would trigger a 'dragenter' event but no subsequent 'dragleave' event because view (A)
+  // will be removed from the DOM when view (B) gets activated.
   &.view-drag {
     pointer-events: none;
   }

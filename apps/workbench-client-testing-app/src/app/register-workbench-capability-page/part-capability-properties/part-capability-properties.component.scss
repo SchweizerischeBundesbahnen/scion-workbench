@@ -1,0 +1,44 @@
+@use '@scion/components.internal/design' as sci-design;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: .5em;
+
+  > section {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: .5em;
+    border: 1px solid var(--sci-color-border);
+    border-radius: var(--sci-corner);
+    padding: 1em;
+
+    > header {
+      margin-bottom: 1em;
+      font-weight: bold;
+    }
+
+    div.views {
+      display: grid;
+      grid-template-columns:
+        1fr // Qualifier
+        1fr // Params
+        1fr // CSS class(es)
+        min-content // Active
+        min-content; // Add / Remove View
+      align-items: center;
+      gap: 1em;
+
+      > sci-checkbox {
+        justify-self: center;
+      }
+    }
+  }
+
+  input, select {
+    @include sci-design.style-input-field();
+    height: 1.25em;
+    min-width: 0;
+  }
+}

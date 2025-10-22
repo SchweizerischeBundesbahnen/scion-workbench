@@ -79,7 +79,7 @@ export class MicrofrontendMessageBoxIntentHandler implements IntentInterceptor {
     return this._messageBoxService.open(isHostProvider ? MicrofrontendHostMessageBoxComponent : MicrofrontendMessageBoxComponent, {
       inputs: {capability, params, referrer},
       title: createRemoteTranslatable(options.title, {appSymbolicName: referrer}),
-      actions: options.actions && Object.fromEntries(Object.entries(options.actions).map(([key, label]) => [key, createRemoteTranslatable(label, {appSymbolicName: referrer})!])),
+      actions: options.actions && Object.fromEntries(Object.entries(options.actions).map(([key, label]) => [key, createRemoteTranslatable(label, {appSymbolicName: referrer})])),
       severity: options.severity,
       modality: options.modality,
       contentSelectable: options.contentSelectable,

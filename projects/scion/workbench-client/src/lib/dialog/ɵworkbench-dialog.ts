@@ -23,7 +23,7 @@ import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * @ignore
- * @docs-private Not public API, intended for internal use only.
+ * @docs-private Not public API. For internal use only.
  */
 export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog {
 
@@ -83,7 +83,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog {
 /**
  * Message headers to interact with the workbench dialog.
  *
- * @docs-private Not public API, intended for internal use only.
+ * @docs-private Not public API. For internal use only.
  * @ignore
  */
 export enum ɵWorkbenchDialogMessageHeaders {

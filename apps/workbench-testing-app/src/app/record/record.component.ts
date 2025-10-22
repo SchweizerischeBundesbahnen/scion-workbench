@@ -51,9 +51,9 @@ export class RecordComponent implements ControlValueAccessor {
       return undefined;
     }
     const record: Record<string, string> = {};
-    for (const match of stringified.matchAll(/(?<key>[^=;]+)=(?<value>[^;]+)/g)) {
+    for (const match of encodeEscapedSemicolons(stringified).matchAll(/(?<key>[^=;]+)=(?<value>[^;]+)/g)) {
       const {key, value} = match.groups!;
-      record[key!] = value!;
+      record[key!] = decodeSemicolons(value!);
     }
     return record;
   }
@@ -85,4 +85,18 @@ export class RecordComponent implements ControlValueAccessor {
   public registerOnTouched(fn: () => void): void {
     this._cvaTouchedFn = fn;
   }
+}
+
+/**
+ * Encodes escaped semicolons (`\\;`) as `&#x3b` (Unicode) to prevent interpretation as parameter separators.
+ */
+function encodeEscapedSemicolons(value: string): string {
+  return value.replaceAll('\\;', '&#x3b');
+}
+
+/**
+ * Decodes encoded semicolons (`&#x3b`) back to semicolons (`;`).
+ */
+function decodeSemicolons(value: string): string {
+  return value.replaceAll('&#x3b', ';');
 }

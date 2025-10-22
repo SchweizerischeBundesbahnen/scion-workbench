@@ -8,4 +8,4 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {type WorkbenchPerspectiveCapability, type WorkbenchPerspectivePart, type WorkbenchPerspectiveView, MAIN_AREA} from './workbench-perspective-capability';
+export {type WorkbenchPerspectiveCapability, type WorkbenchPartRef, type DockingArea, type RelativeTo, MAIN_AREA} from './workbench-perspective-capability';

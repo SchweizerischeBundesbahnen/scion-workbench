@@ -1,7 +1,7 @@
 @for (menuItem of menuItems; track menuItem; let index = $index) {
   @if (menuItem | appInstanceof:MenuItem; as menuItem) {
     <button class="menu-item e2e-menu-item"
-            [ngClass]="menuItem.cssClass"
+            [class]="menuItem.cssClass"
             [appAttributes]="menuItem.attributes"
             [class.disabled]="menuItem.disabled"
             [class.checked]="menuItem.checked"
@@ -12,7 +12,7 @@
       @if (menuItem.actions?.length) {
         <div class="actions">
           @for (action of menuItem.actions; track action) {
-            <button (click)="onMenuItemActionClick(action, $event)" [title]="action.tooltip" sciMaterialIcon>
+            <button (click)="onMenuItemActionClick(action, $event)" [title]="action.tooltip" class="e2e-menu-action" [class]="action.cssClass" sciMaterialIcon>
               {{action.icon}}
             </button>
           }

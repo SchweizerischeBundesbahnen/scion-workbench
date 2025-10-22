@@ -9,17 +9,17 @@
 
   @for (viewFormGroup of form.controls.views.controls; track $index) {
     <!-- ID -->
-    <input [formControl]="viewFormGroup.controls.id" [class]="'e2e-view-id'">
+    <input [formControl]="viewFormGroup.controls.id" class="e2e-view-id">
     <!-- Part ID -->
-    <input [formControl]="viewFormGroup.controls.options.controls.partId" [class]="'e2e-part-id'" [attr.list]="partList">
+    <input [formControl]="viewFormGroup.controls.options.controls.partId" class="e2e-part-id" [attr.list]="partList">
     <!-- Position -->
-    <input [formControl]="viewFormGroup.controls.options.controls.position" type="number" [class]="'e2e-position'">
+    <input [formControl]="viewFormGroup.controls.options.controls.position" type="number" class="e2e-position">
     <!-- CSS class -->
     <app-multi-value-input [formControl]="viewFormGroup.controls.options.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
     <!-- Activate View -->
-    <sci-checkbox [formControl]="viewFormGroup.controls.options.controls.activateView" [class]="'e2e-activate-view'"/>
+    <sci-checkbox [formControl]="viewFormGroup.controls.options.controls.activateView" class="e2e-activate-view"/>
     <!-- Activate Part -->
-    <sci-checkbox [formControl]="viewFormGroup.controls.options.controls.activatePart" [class]="'e2e-activate-part'"/>
+    <sci-checkbox [formControl]="viewFormGroup.controls.options.controls.activatePart" class="e2e-activate-part"/>
     <!-- Remove button -->
     <button class="e2e-remove" (click)="onRemoveView($index)" title="Remove view" sciMaterialIcon>remove</button>
   }

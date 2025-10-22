@@ -268,8 +268,8 @@ export class HeaderComponent {
 
   private findPerspectiveSwitcherMenuItems(): Array<MenuItem | MenuItemSeparator> {
     const groupLabels = new Map<string, string>()
-      .set('docked-parts-layout', 'Layout with Parts Docked to the Side')
-      .set('peripheral-part-layout', 'Layout with Parts Around the Main Area')
+      .set('docked-part-layout', 'Layout with Docked Parts')
+      .set('aligned-part-layout', 'Layout with Aligned Parts')
       .set('test-perspectives', 'Test Perspectives');
     const menuItems = new Array<MenuItem | MenuItemSeparator>();
 

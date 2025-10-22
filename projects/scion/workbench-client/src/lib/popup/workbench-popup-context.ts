@@ -17,7 +17,7 @@ import {PopupId} from '../workbench.identifiers';
  *
  * This object can be obtained from the {@link ContextService} using the name {@link ɵPOPUP_CONTEXT}.
  *
- * @docs-private Not public API, intended for internal use only.
+ * @docs-private Not public API. For internal use only.
  * @ignore
  */
 export interface ɵPopupContext {
@@ -33,7 +33,7 @@ export interface ɵPopupContext {
  *
  * The popup context is only available to microfrontends loaded in a workbench popup.
  *
- * @docs-private Not public API, intended for internal use only.
+ * @docs-private Not public API. For internal use only.
  * @ignore
  * @see {@link ContextService}
  * @see {@link ɵPopupContext}

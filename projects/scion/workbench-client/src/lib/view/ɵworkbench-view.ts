@@ -105,7 +105,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
     this.active$
       .pipe(takeUntil(this._destroy$))
       .subscribe(active => this.snapshot.active = active);
-    // Update active snapshot when the active state changes.
+    // Update active snapshot when the focus state changes.
     this.focused$
       .pipe(takeUntil(this._destroy$))
       .subscribe(focused => this.snapshot.focused = focused);
@@ -212,7 +212,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
 /**
  * Context key to retrieve the view ID for microfrontends embedded in the context of a workbench view.
  *
- * @docs-private Not public API, intended for internal use only.
+ * @docs-private Not public API. For internal use only.
  * @ignore
  * @see {@link ContextService}
  */
