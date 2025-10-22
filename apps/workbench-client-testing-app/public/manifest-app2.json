@@ -1,7 +1,7 @@
 {
   "name": "Workbench Client Testing App 2",
   "baseUrl": "#",
-  "IMPORTANT NOTE:": "CAPABILITIES ARE REGISTERED IN THE ACTIVATOR TO NOT NEED TO DUPLICATE THEM FOR BOTH TESTING APPS.",
+  "NOTE": "CAPABILITIES ARE REGISTERED IN THE ACTIVATOR TO NOT NEED TO DUPLICATE THEM FOR BOTH TESTING APPS.",
   "capabilities": [
     {
       "type": "activator",
@@ -14,78 +14,529 @@
     {
       "type": "perspective",
       "qualifier": {
-        "perspective": "app2"
+        "perspective": "sample-perspective-1",
+        "layout": "docked-parts"
       },
       "private": false,
       "properties": {
         "data": {
-          "label": "Sample Layout 4 - Micro App 2 (Peripheral Parts)",
-          "menuItemLabel": "Sample Layout 4 - Micro App 2",
-          "menuGroup": "peripheral-part-layout"
+          "label": "Sample Microfrontend Layout App 2 (Docked Parts)",
+          "menuItemLabel": "Sample Microfrontend Layout App 2",
+          "menuGroup": "docked-part-layout"
         },
-        "layout": [
+        "parts": [
           {
-            "id": "main-area"
+            "id": "main-area",
+            "qualifier": {
+              "part": "main-area",
+              "perspective": "sample-perspective-1"
+            }
           },
           {
-            "id": "left-top",
-            "align": "left",
-            "ratio": 0.25,
-            "views": [
-              {
-                "qualifier": {
-                  "component": "view",
-                  "app": "app2"
-                }
-              },
-              {
-                "qualifier": {
-                  "component": "view",
-                  "app": "app2"
-                }
-              }
-            ]
+            "id": "projects",
+            "qualifier": {
+              "part": "projects",
+              "perspective": "sample-perspective-1"
+            },
+            "position": "left-top",
+            "active": true
           },
           {
-            "id": "left-bottom",
-            "align": "bottom",
-            "relativeTo": "left-top",
-            "ratio": 0.5,
-            "views": [
-              {
-                "qualifier": {
-                  "component": "view",
-                  "app": "app2"
-                }
-              }
-            ]
+            "id": "bookmarks",
+            "qualifier": {
+              "part": "bookmarks",
+              "perspective": "sample-perspective-1"
+            },
+            "position": "left-top"
           },
           {
-            "id": "bottom",
-            "align": "bottom",
-            "ratio": 0.25,
-            "views": [
-              {
-                "qualifier": {
-                  "component": "view",
-                  "app": "app2"
-                }
-              },
-              {
-                "qualifier": {
-                  "component": "view",
-                  "app": "app2"
-                }
-              },
-              {
-                "qualifier": {
-                  "component": "view",
-                  "app": "app2"
-                }
-              }
-            ]
+            "id": "repositories",
+            "qualifier": {
+              "part": "repositories",
+              "perspective": "sample-perspective-1"
+            },
+            "position": "left-bottom"
+          },
+          {
+            "id": "terminal",
+            "qualifier": {
+              "part": "terminal",
+              "perspective": "sample-perspective-1"
+            },
+            "position": "bottom-left",
+            "active": true
+          },
+          {
+            "id": "find",
+            "qualifier": {
+              "part": "find",
+              "perspective": "sample-perspective-1"
+            },
+            "position": "bottom-left"
+          },
+          {
+            "id": "commits",
+            "qualifier": {
+              "part": "commits",
+              "perspective": "sample-perspective-1"
+            },
+            "position": "bottom-left"
+          },
+          {
+            "id": "structure",
+            "position": "right-top",
+            "qualifier": {
+              "part": "structure",
+              "perspective": "sample-perspective-1"
+            }
+          },
+          {
+            "id": "servers",
+            "qualifier": {
+              "part": "servers",
+              "perspective": "sample-perspective-1"
+            },
+            "position": "right-top"
+          },
+          {
+            "id": "problems",
+            "qualifier": {
+              "part": "problems",
+              "perspective": "sample-perspective-1"
+            },
+            "position": "right-bottom"
+          },
+          {
+            "id": "databases",
+            "qualifier": {
+              "part": "databases",
+              "perspective": "sample-perspective-1"
+            },
+            "position": "right-top",
+            "active": true
+          },
+          {
+            "id": "connections",
+            "qualifier": {
+              "part": "connections",
+              "perspective": "sample-perspective-1"
+            },
+            "position": {
+              "relativeTo": "databases",
+              "align": "bottom",
+              "ratio": 0.5
+            }
+          },
+          {
+            "id": "progress",
+            "qualifier": {
+              "part": "progress",
+              "perspective": "sample-perspective-1"
+            },
+            "position": "bottom-right"
           }
         ]
+      }
+    },
+    {
+      "type": "part",
+      "qualifier": {
+        "part": "main-area",
+        "perspective": "sample-perspective-1"
+      },
+      "properties": {
+        "showSplash": true
+      }
+    },
+    {
+      "type": "part",
+      "qualifier": {
+        "part": "projects",
+        "perspective": "sample-perspective-1"
+      },
+      "properties": {
+        "path": "test-part",
+        "extras": {
+          "icon": "folder",
+          "label": "Projects"
+        },
+        "showSplash": true
+      }
+    },
+    {
+      "type": "part",
+      "qualifier": {
+        "part": "bookmarks",
+        "perspective": "sample-perspective-1"
+      },
+      "properties": {
+        "path": "test-part",
+        "extras": {
+          "icon": "bookmark",
+          "label": "Bookmarks"
+        },
+        "showSplash": true
+      }
+    },
+    {
+      "type": "part",
+      "qualifier": {
+        "part": "repositories",
+        "perspective": "sample-perspective-1"
+      },
+      "properties": {
+        "path": "test-part",
+        "extras": {
+          "icon": "cloud",
+          "label": "Repositories"
+        },
+        "showSplash": true
+      }
+    },
+    {
+      "type": "part",
+      "qualifier": {
+        "part": "terminal",
+        "perspective": "sample-perspective-1"
+      },
+      "properties": {
+        "views": [
+          {
+            "qualifier": {
+              "component": "view",
+              "app": "app2"
+            }
+          },
+          {
+            "qualifier": {
+              "component": "view",
+              "app": "app2"
+            }
+          },
+          {
+            "qualifier": {
+              "component": "view",
+              "app": "app2"
+            },
+            "active": true
+          },
+          {
+            "qualifier": {
+              "component": "view",
+              "app": "app2"
+            }
+          }
+        ],
+        "extras": {
+          "icon": "terminal",
+          "label": "Terminal"
+        },
+        "showSplash": true
+      }
+    },
+    {
+      "type": "part",
+      "qualifier": {
+        "part": "find",
+        "perspective": "sample-perspective-1"
+      },
+      "properties": {
+        "views": [
+          {
+            "qualifier": {
+              "component": "view",
+              "app": "app2"
+            }
+          },
+          {
+            "qualifier": {
+              "component": "view",
+              "app": "app2"
+            }
+          },
+          {
+            "qualifier": {
+              "component": "view",
+              "app": "app2"
+            }
+          }
+        ],
+        "extras": {
+          "icon": "search",
+          "label": "Find"
+        },
+        "showSplash": true
+      }
+    },
+    {
+      "type": "part",
+      "qualifier": {
+        "part": "commits",
+        "perspective": "sample-perspective-1"
+      },
+      "properties": {
+        "path": "test-part",
+        "extras": {
+          "icon": "graph_1",
+          "label": "Commits"
+        },
+        "showSplash": true
+      }
+    },
+    {
+      "type": "part",
+      "qualifier": {
+        "part": "structure",
+        "perspective": "sample-perspective-1"
+      },
+      "properties": {
+        "path": "test-part",
+        "extras": {
+          "icon": "category",
+          "label": "Structure"
+        },
+        "showSplash": true
+      }
+    },
+    {
+      "type": "part",
+      "qualifier": {
+        "part": "servers",
+        "perspective": "sample-perspective-1"
+      },
+      "properties": {
+        "path": "test-part",
+        "extras": {
+          "icon": "storage",
+          "label": "Servers"
+        },
+        "showSplash": true
+      }
+    },
+    {
+      "type": "part",
+      "qualifier": {
+        "part": "problems",
+        "perspective": "sample-perspective-1"
+      },
+      "properties": {
+        "path": "test-part",
+        "extras": {
+          "icon": "error",
+          "label": "Problems"
+        },
+        "showSplash": true
+      }
+    },
+    {
+      "type": "part",
+      "qualifier": {
+        "part": "databases",
+        "perspective": "sample-perspective-1"
+      },
+      "properties": {
+        "path": "test-part",
+        "extras": {
+          "icon": "database",
+          "label": "Databases"
+        },
+        "showSplash": true
+      }
+    },
+    {
+      "type": "part",
+      "qualifier": {
+        "part": "connections",
+        "perspective": "sample-perspective-1"
+      },
+      "properties": {
+        "path": "test-part",
+        "title": "Connections",
+        "showSplash": true
+      }
+    },
+    {
+      "type": "part",
+      "qualifier": {
+        "part": "progress",
+        "perspective": "sample-perspective-1"
+      },
+      "properties": {
+        "path": "test-part",
+        "extras": {
+          "icon": "overview",
+          "label": "Progress"
+        },
+        "showSplash": true
+      }
+    },
+    {
+      "type": "perspective",
+      "qualifier": {
+        "perspective": "sample-perspective-2",
+        "layout": "aligned-parts"
+      },
+      "private": false,
+      "properties": {
+        "data": {
+          "label": "Sample Microfrontend Layout App 2 (Aligned Parts)",
+          "menuItemLabel": "Sample Microfrontend Layout App 2",
+          "menuGroup": "aligned-part-layout"
+        },
+        "parts": [
+          {
+            "id": "main-area",
+            "qualifier": {
+              "part": "main-area",
+              "perspective": "sample-perspective-2"
+            }
+          },
+          {
+            "id": "projects",
+            "position": {
+              "relativeTo": "main-area",
+              "align": "left",
+              "ratio": 0.175
+            },
+            "qualifier": {
+              "part": "projects",
+              "perspective": "sample-perspective-2"
+            }
+          },
+          {
+            "id": "databases",
+            "position": {
+              "relativeTo": "main-area",
+              "align": "right",
+              "ratio": 0.2
+            },
+            "qualifier": {
+              "part": "databases",
+              "perspective": "sample-perspective-2"
+            }
+          },
+          {
+            "id": "connections",
+            "position": {
+              "relativeTo": "databases",
+              "align": "bottom",
+              "ratio": 0.5
+            },
+            "qualifier": {
+              "part": "connections",
+              "perspective": "sample-perspective-2"
+            }
+          },
+          {
+            "id": "terminal",
+            "position": {
+              "align": "bottom",
+              "ratio": 0.2
+            },
+            "qualifier": {
+              "part": "terminal",
+              "perspective": "sample-perspective-2"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "part",
+      "qualifier": {
+        "part": "main-area",
+        "perspective": "sample-perspective-2"
+      },
+      "properties": {
+        "showSplash": true
+      }
+    },
+    {
+      "type": "part",
+      "qualifier": {
+        "part": "projects",
+        "perspective": "sample-perspective-2"
+      },
+      "properties": {
+        "path": "test-part",
+        "title": "Projects",
+        "showSplash": true
+      }
+    },
+    {
+      "type": "part",
+      "qualifier": {
+        "part": "databases",
+        "perspective": "sample-perspective-2"
+      },
+      "properties": {
+        "path": "test-part",
+        "title": "Databases",
+        "showSplash": true
+      }
+    },
+    {
+      "type": "part",
+      "qualifier": {
+        "part": "connections",
+        "perspective": "sample-perspective-2"
+      },
+      "properties": {
+        "path": "test-part",
+        "title": "Connections",
+        "views": [
+          {
+            "qualifier": {
+              "component": "view",
+              "app": "app2"
+            }
+          },
+          {
+            "qualifier": {
+              "component": "view",
+              "app": "app2"
+            }
+          }
+        ],
+        "showSplash": true
+      }
+    },
+    {
+      "type": "part",
+      "qualifier": {
+        "part": "terminal",
+        "perspective": "sample-perspective-2"
+      },
+      "properties": {
+        "title": "Terminal",
+        "views": [
+          {
+            "qualifier": {
+              "component": "view",
+              "app": "app2"
+            }
+          },
+          {
+            "qualifier": {
+              "component": "view",
+              "app": "app2"
+            }
+          },
+          {
+            "qualifier": {
+              "component": "view",
+              "app": "app2"
+            },
+            "active": true
+          },
+          {
+            "qualifier": {
+              "component": "view",
+              "app": "app2"
+            }
+          }
+        ],
+        "showSplash": true
       }
     }
   ],

@@ -22,7 +22,7 @@ import {undefinedIfEmpty} from '../../common/undefined-if-empty.util';
 @Component({
   selector: 'app-message-box-capability-properties',
   templateUrl: './message-box-capability-properties.component.html',
-  styleUrls: ['./message-box-capability-properties.component.scss'],
+  styleUrl: './message-box-capability-properties.component.scss',
   imports: [
     ReactiveFormsModule,
     MultiValueInputComponent,

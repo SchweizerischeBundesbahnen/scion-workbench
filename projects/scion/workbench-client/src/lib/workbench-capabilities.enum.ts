@@ -13,15 +13,22 @@
  */
 export enum WorkbenchCapabilities {
   /**
-   * Contributes a microfrontend for display in workbench view.
+   * Contributes a workbench part.
    *
-   * A view is a visual workbench element for displaying content stacked or side-by-side.
+   * A part is a visual element of the workbench layout. Parts can be docked to the side or
+   * positioned relative to each other. A part can display content or stack views.
+   */
+  Part = 'part',
+  /**
+   * Contributes a workbench view.
+   *
+   * A view is a visual element of the workbench layout for displaying content stacked or side-by-side.
    */
   View = 'view',
   /**
-   * Contributes a perspective to the workbench.
+   * Contributes a workbench perspective.
    *
-   * A perspective is a named arrangement of views. Different perspectives provide a different perspective on the application.
+   * A perspective defines an arrangement of parts and views. Users can switch between perspectives. Perspectives share the same main area, if any.
    */
   Perspective = 'perspective',
   /**

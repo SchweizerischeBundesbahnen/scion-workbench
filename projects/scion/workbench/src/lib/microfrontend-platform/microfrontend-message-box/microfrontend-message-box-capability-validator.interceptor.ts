@@ -29,18 +29,18 @@ export class MicrofrontendMessageBoxCapabilityValidator implements CapabilityInt
 
     // Assert capability other than the built-in text messsage box capability to have a qualifier.
     if (!isBuiltInTextMessageBoxCapability(messageBoxCapability) && !Object.keys(messageBoxCapability.qualifier ?? {}).length) {
-      throw Error(`[NullQualifierError] MessageBox capability requires a qualifier [capability=${JSON.stringify(messageBoxCapability)}]`);
+      throw Error(`[MessageBoxDefinitionError] MessageBox capability requires a qualifier [app=${app(messageBoxCapability)}, messagebox=${qualifier(messageBoxCapability)}]`);
     }
 
-    // Assert capability to have a "properties" section.
+    // Assert capability to have properties.
     if (!messageBoxCapability.properties) {
-      throw Error(`[NullPropertiesError] MessageBox capability requires a "properties" section [application="${messageBoxCapability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(messageBoxCapability.qualifier)}"]`);
+      throw Error(`[MessageBoxDefinitionError] MessageBox capability requires properties [app=${app(messageBoxCapability)}, messagebox=${qualifier(messageBoxCapability)}]`);
     }
 
     // Assert capability to have a path.
     const path = messageBoxCapability.properties.path as unknown;
     if (path === undefined || path === null) {
-      throw Error(`[NullPathError] MessageBox capability requires a path to the microfrontend in its properties [application="${messageBoxCapability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(messageBoxCapability.qualifier)}"]`);
+      throw Error(`[MessageBoxDefinitionError] MessageBox capability requires the 'path' property [app=${app(messageBoxCapability)}, messagebox=${qualifier(messageBoxCapability)}]`);
     }
 
     return capability;
@@ -49,4 +49,18 @@ export class MicrofrontendMessageBoxCapabilityValidator implements CapabilityInt
 
 function isBuiltInTextMessageBoxCapability(capability: Partial<WorkbenchMessageBoxCapability>): boolean {
   return capability.properties?.[TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY_PROPERTY] === TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY;
+}
+
+/**
+ * Returns the qualifier as string.
+ */
+function qualifier(capability: Partial<Capability>): string {
+  return Objects.toMatrixNotation(capability.qualifier);
+}
+
+/**
+ * Returns the app symbolic name.
+ */
+function app(capability: Partial<Capability>): string {
+  return capability.metadata!.appSymbolicName;
 }

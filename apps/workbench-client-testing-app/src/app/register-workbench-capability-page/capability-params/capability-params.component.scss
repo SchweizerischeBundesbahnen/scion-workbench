@@ -1,0 +1,42 @@
+@use '@scion/components.internal/design' as sci-design;
+
+:host {
+  display: grid;
+  grid-template-columns:
+        1fr // Name
+        min-content // Required
+        min-content // Deprecated
+        1fr // Deprecated Message
+        1fr // Deprecated Use Instead
+        min-content; // Add / Remove Param
+  align-items: center;
+  border: 1px solid var(--sci-color-border);
+  border-radius: var(--sci-corner);
+  padding: 1em;
+  gap: 1em;
+
+  &:not(.empty) > span.header {
+    visibility: hidden;
+  }
+
+  > sci-checkbox {
+    justify-self: center;
+  }
+
+  &[data-show-transient-params] {
+    grid-template-columns:
+        1fr // Name
+        min-content // Required
+        min-content // Transient
+        min-content // Deprecated
+        1fr // Deprecated Message
+        1fr // Deprecated Use Instead
+        min-content; // Add / Remove Param
+  }
+
+  input, select {
+    @include sci-design.style-input-field();
+    height: 1.25em;
+    min-width: 0;
+  }
+}

@@ -8,12 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DialogId, PopupId, ViewId} from './workbench.identifiers';
+import {DialogId, PartId, PopupId, ViewId} from './workbench.identifiers';
 
 /**
  * Defines command endpoints for the communication between SCION Workbench and SCION Workbench Client.
  *
- * @docs-private Not public API, intended for internal use only.
+ * @docs-private Not public API. For internal use only.
  */
 export const ɵWorkbenchCommands = {
 
@@ -50,11 +50,25 @@ export const ɵWorkbenchCommands = {
   viewActiveTopic: (viewId: ViewId) => `ɵworkbench/views/${viewId}/active`,
 
   /**
+   * Computes the topic to notify the active state of a part.
+   *
+   * The active state is published as a retained message.
+   */
+  partActiveTopic: (partId: PartId) => `ɵworkbench/parts/${partId}/active`,
+
+  /**
    * Computes the topic to notify the focused state of a view.
    *
    * The focused state is published as a retained message.
    */
   viewFocusedTopic: (viewId: ViewId) => `ɵworkbench/views/${viewId}/focused`,
+
+  /**
+   * Computes the topic to notify the focused state of a part.
+   *
+   * The focused state is published as a retained message.
+   */
+  partFocusedTopic: (partId: PartId) => `ɵworkbench/parts/${partId}/focused`,
 
   /**
    * Computes the topic to notify the part of a view.
@@ -85,8 +99,7 @@ export const ɵWorkbenchCommands = {
   /**
    * Computes the topic for providing params to a view microfrontend.
    *
-   * Params include the {@link ɵMicrofrontendRouteParams#ɵVIEW_CAPABILITY_ID capability id}, params as passed in {@link WorkbenchNavigationExtras.params},
-   * and the view qualifier.
+   * Params include the {@link ɵMicrofrontendRouteParams#ɵVIEW_CAPABILITY_ID capability id} and params as passed in {@link WorkbenchNavigationExtras.params}.
    *
    * Params are published as a retained message.
    */

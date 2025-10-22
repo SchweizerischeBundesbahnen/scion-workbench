@@ -11,12 +11,13 @@ import {Component, inject, NgZone} from '@angular/core';
 import {NgTemplateOutlet} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {ɵMicrofrontendRouteParams, ɵWorkbenchCommands, ɵWorkbenchView} from '@scion/workbench-client';
+import {WorkbenchPartCapability, ɵMicrofrontendRouteParams, ɵWorkbenchCommands, ɵWorkbenchPart, ɵWorkbenchView} from '@scion/workbench-client';
 import {take} from 'rxjs/operators';
 import {ManifestService, MessageClient} from '@scion/microfrontend-platform';
-import {firstValueFrom} from 'rxjs';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {firstValueFrom} from 'rxjs';
 
 @Component({
   selector: 'app-angular-zone-test-page',
@@ -32,20 +33,50 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
 })
 export default class AngularZoneTestPageComponent {
 
-  private readonly _zone = inject(NgZone);
+  private _workbenchView = new ɵWorkbenchView('view.1');
+  private _workbenchPart = new ɵWorkbenchPart({partId: 'part.1', capability: null as unknown as WorkbenchPartCapability, params: new Map()});
 
   protected readonly tests = {
     workbenchView: {
+      partId: new TestCaseModel(model => void this.testWorkbenchPartId(model)),
       capability: new TestCaseModel(model => void this.testWorkbenchViewCapability(model)),
       params: new TestCaseModel(model => void this.testWorkbenchViewParams(model)),
       active: new TestCaseModel(model => void this.testWorkbenchViewActive(model)),
       focused: new TestCaseModel(model => void this.testWorkbenchViewFocused(model)),
     },
+    workbenchPart: {
+      active: new TestCaseModel(model => void this.testWorkbenchPartActive(model)),
+      focused: new TestCaseModel(model => void this.testWorkbenchPartFocused(model)),
+    },
   };
 
-  private async testWorkbenchViewCapability(model: TestCaseModel): Promise<void> {
-    const workbenchViewTestee = this._zone.runOutsideAngular(() => new ɵWorkbenchView('view.999'));
+  constructor() {
+    // Subscribe for the ref count to not drop to zero.
+    this._workbenchView.partId$.pipe(takeUntilDestroyed()).subscribe();
+    this._workbenchView.capability$.pipe(takeUntilDestroyed()).subscribe();
+    this._workbenchView.params$.pipe(takeUntilDestroyed()).subscribe();
+    this._workbenchView.active$.pipe(takeUntilDestroyed()).subscribe();
+    this._workbenchView.focused$.pipe(takeUntilDestroyed()).subscribe();
 
+    this._workbenchPart.active$.pipe(takeUntilDestroyed()).subscribe();
+    this._workbenchPart.focused$.pipe(takeUntilDestroyed()).subscribe();
+  }
+
+  private async testWorkbenchPartId(model: TestCaseModel): Promise<void> {
+    // Subscribe to partId
+    this._workbenchView.partId$
+      .pipe(take(2))
+      .subscribe(() => model.addEmission('Received partId'));
+
+    const partIdTopic = ɵWorkbenchCommands.viewPartIdTopic('view.1');
+
+    // Simulate first emission
+    await Beans.get(MessageClient).publish(partIdTopic, 'part.1');
+    // Simulate second emission
+    await Beans.get(MessageClient).publish(partIdTopic, 'part.2');
+  }
+
+  private async testWorkbenchViewCapability(model: TestCaseModel): Promise<void> {
     // Register two view capabilities
     const viewCapabilityId1 = await Beans.get(ManifestService).registerCapability({
       type: 'view',
@@ -63,72 +94,88 @@ export default class AngularZoneTestPageComponent {
     });
 
     // Subscribe to capability
-    workbenchViewTestee.capability$
+    this._workbenchView.capability$
       .pipe(take(2))
       .subscribe(() => model.addEmission('Received capability'));
 
-    const viewParamsTopic = ɵWorkbenchCommands.viewParamsTopic(workbenchViewTestee.id);
+    const viewParamsTopic = ɵWorkbenchCommands.viewParamsTopic('view.1');
 
     // Simulate first emission
     await Beans.get(MessageClient).publish(viewParamsTopic, new Map().set(ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID, viewCapabilityId1));
     //  Wait until received first emission
-    await firstValueFrom(workbenchViewTestee.capability$);
+    await firstValueFrom(this._workbenchView.capability$);
     // Simulate second emission
     await Beans.get(MessageClient).publish(viewParamsTopic, new Map().set(ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID, viewCapabilityId2));
   }
 
   private async testWorkbenchViewParams(model: TestCaseModel): Promise<void> {
-    const workbenchViewTestee = this._zone.runOutsideAngular(() => new ɵWorkbenchView('view.999'));
-
     // Subscribe to params
-    workbenchViewTestee.params$
+    this._workbenchView.params$
       .pipe(take(2))
       .subscribe(() => model.addEmission('Received parms'));
 
-    const viewParamsTopic = ɵWorkbenchCommands.viewParamsTopic(workbenchViewTestee.id);
+    const viewParamsTopic = ɵWorkbenchCommands.viewParamsTopic('view.1');
 
-    // Simulate emission
+    // Simulate first emission
     await Beans.get(MessageClient).publish(viewParamsTopic, new Map());
-    //  Wait until received first emission
-    await firstValueFrom(workbenchViewTestee.params$);
     // Simulate second emission
     await Beans.get(MessageClient).publish(viewParamsTopic, new Map());
   }
 
   private async testWorkbenchViewActive(model: TestCaseModel): Promise<void> {
-    const workbenchViewTestee = this._zone.runOutsideAngular(() => new ɵWorkbenchView('view.999'));
-
     // Subscribe to active state
-    workbenchViewTestee.active$
+    this._workbenchView.active$
       .pipe(take(2))
       .subscribe(() => model.addEmission('Received active state'));
 
-    const viewActiveTopic = ɵWorkbenchCommands.viewActiveTopic(workbenchViewTestee.id);
+    const viewActiveTopic = ɵWorkbenchCommands.viewActiveTopic('view.1');
 
     // Simulate first emission
     await Beans.get(MessageClient).publish(viewActiveTopic, true);
-    //  Wait until received first emission
-    await firstValueFrom(workbenchViewTestee.active$);
     // Simulate second emission
     await Beans.get(MessageClient).publish(viewActiveTopic, false);
   }
 
   private async testWorkbenchViewFocused(model: TestCaseModel): Promise<void> {
-    const workbenchViewTestee = this._zone.runOutsideAngular(() => new ɵWorkbenchView('view.999'));
-
     // Subscribe to focused state
-    workbenchViewTestee.focused$
+    this._workbenchView.focused$
       .pipe(take(2))
       .subscribe(() => model.addEmission('Received focused state'));
 
-    const viewFocusedTopic = ɵWorkbenchCommands.viewFocusedTopic(workbenchViewTestee.id);
+    const viewFocusedTopic = ɵWorkbenchCommands.viewFocusedTopic('view.1');
 
     // Simulate first emission
     await Beans.get(MessageClient).publish(viewFocusedTopic, true);
-    //  Wait until received first emission
-    await firstValueFrom(workbenchViewTestee.focused$);
     // Simulate second emission
     await Beans.get(MessageClient).publish(viewFocusedTopic, false);
+  }
+
+  private async testWorkbenchPartActive(model: TestCaseModel): Promise<void> {
+    // Subscribe to active state
+    this._workbenchPart.active$
+      .pipe(take(2))
+      .subscribe(() => model.addEmission('Received active state'));
+
+    const partActiveTopic = ɵWorkbenchCommands.partActiveTopic('part.1');
+
+    // Simulate first emission
+    await Beans.get(MessageClient).publish(partActiveTopic, true);
+    // Simulate second emission
+    await Beans.get(MessageClient).publish(partActiveTopic, false);
+  }
+
+  private async testWorkbenchPartFocused(model: TestCaseModel): Promise<void> {
+    // Subscribe to focused state
+    this._workbenchPart.focused$
+      .pipe(take(2))
+      .subscribe(() => model.addEmission('Received focused state'));
+
+    const partFocusedTopic = ɵWorkbenchCommands.partFocusedTopic('part.1');
+
+    // Simulate first emission
+    await Beans.get(MessageClient).publish(partFocusedTopic, true);
+    // Simulate second emission
+    await Beans.get(MessageClient).publish(partFocusedTopic, false);
   }
 }
 

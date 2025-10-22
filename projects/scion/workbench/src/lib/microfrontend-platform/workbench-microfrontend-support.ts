@@ -13,7 +13,7 @@ import {EnvironmentProviders, inject, Injectable, makeEnvironmentProviders} from
 import {MicrofrontendPlatformInitializer} from './initialization/microfrontend-platform-initializer.service';
 import {IntentClient, ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, PlatformPropertyService} from '@scion/microfrontend-platform';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {WorkbenchTextService, WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter, WorkbenchTextService} from '@scion/workbench-client';
 import {NgZoneObservableDecorator} from './initialization/ng-zone-observable-decorator';
 import {WorkbenchConfig} from '../workbench-config';
 import {provideViewCommandHandlers} from './microfrontend-view/microfrontend-view-command-handler.service';
@@ -25,17 +25,14 @@ import {Route} from '@angular/router';
 import {MicrofrontendViewComponent} from './microfrontend-view/microfrontend-view.component';
 import {MicrofrontendViewRoutes} from './microfrontend-view/microfrontend-view-routes';
 import {MicrofrontendViewCapabilityValidator} from './microfrontend-view/microfrontend-view-capability-validator.interceptor';
-import {StableCapabilityIdAssigner} from './stable-capability-id-assigner.interceptor';
+import {STABLE_CAPABILITY_ID, StableCapabilityIdAssigner} from './stable-capability-id-assigner.interceptor';
 import {MicrofrontendPopupCapabilityValidator} from './microfrontend-popup/microfrontend-popup-capability-validator.interceptor';
 import {MicrofrontendDialogIntentHandler} from './microfrontend-dialog/microfrontend-dialog-intent-handler.interceptor';
 import {MicrofrontendDialogCapabilityValidator} from './microfrontend-dialog/microfrontend-dialog-capability-validator.interceptor';
 import {MicrofrontendMessageBoxIntentHandler} from './microfrontend-message-box/microfrontend-message-box-intent-handler.interceptor';
 import {MicrofrontendMessageBoxCapabilityValidator} from './microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
-import {canMatchWorkbenchDialog, canMatchWorkbenchView} from '../routing/workbench-route-guards';
+import {canMatchWorkbenchDialog} from '../routing/workbench-route-guards';
 import {TEXT_MESSAGE_BOX_CAPABILITY_ROUTE} from './microfrontend-host-message-box/text-message/text-message.component';
-import {MicrofrontendPerspectiveCapabilityValidator} from './microfrontend-perspective/microfrontend-perspective-capability-validator.interceptor';
-import {providePerspectiveInstaller} from './microfrontend-perspective/microfrontend-perspective-installer.service';
-import {MicrofrontendPerspectiveIntentHandler} from './microfrontend-perspective/microfrontend-perspective-intent-handler.interceptor';
 import {provideManifestObjectCache} from './manifest-object-cache.service';
 import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform-config-loader';
 import {provideWorkbenchInitializer} from '../startup/workbench-initializer';
@@ -44,6 +41,8 @@ import {WORKBENCH_ROUTE} from '../workbench.constants';
 import {provideRemoteTextProvider} from './text/remote-text-provider';
 import {provideHostTextProvider} from './text/host-text-provider';
 import {ViewCapabilityPreloadCapabilityInterceptor} from './initialization/view-capability-preload-capability-interceptor.service';
+import {provideMicrofrontendPerspective} from './microfrontend-perspective/microfrontend-perspective.provider';
+import {provideMicrofrontendPart} from './microfrontend-part/microfrontend-part.provider';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -58,19 +57,19 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     provideMicrofrontendPlatformConfig(workbenchConfig),
     provideViewCommandHandlers(),
     provideNotificationIntentHandler(),
-    providePerspectiveInstaller(),
+    provideMicrofrontendPerspective(),
+    provideMicrofrontendPart(),
     provideManifestObjectCache(),
-    MicrofrontendPerspectiveIntentHandler,
     MicrofrontendViewIntentHandler,
     MicrofrontendPopupIntentHandler,
     MicrofrontendDialogIntentHandler,
     MicrofrontendMessageBoxIntentHandler,
-    MicrofrontendPerspectiveCapabilityValidator,
     MicrofrontendViewCapabilityValidator,
     MicrofrontendPopupCapabilityValidator,
     MicrofrontendDialogCapabilityValidator,
     MicrofrontendMessageBoxCapabilityValidator,
     StableCapabilityIdAssigner,
+    provideStableCapabilityIds(),
     ViewCapabilityPreloadCapabilityInterceptor,
     NgZoneObservableDecorator,
     WorkbenchHostManifestInterceptor,
@@ -147,7 +146,7 @@ function provideMicrofrontendViewRoute(): EnvironmentProviders {
       useFactory: (): Route => ({
         matcher: MicrofrontendViewRoutes.provideMicrofrontendRouteMatcher(),
         component: MicrofrontendViewComponent,
-        canMatch: [canMatchWorkbenchView(true), MicrofrontendViewRoutes.canMatchViewCapability],
+        canMatch: [MicrofrontendViewRoutes.canMatchMicrofrontendView], // use a single matcher because Angular evaluates matchers in parallel
       }),
     },
   ]);
@@ -167,6 +166,15 @@ function provideBuiltInTextMessageBoxCapabilityRoute(): EnvironmentProviders {
         canMatch: [canMatchWorkbenchDialog(true)],
       } satisfies Route,
     },
+  ]);
+}
+
+/**
+ * Provides a set of DI providers to configure capabilities with a stable identity.
+ */
+function provideStableCapabilityIds(): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    {provide: STABLE_CAPABILITY_ID, useValue: WorkbenchCapabilities.View, multi: true},
   ]);
 }
 

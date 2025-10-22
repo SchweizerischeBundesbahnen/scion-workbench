@@ -1,0 +1,67 @@
+<section>
+  <header>Properties</header>
+
+  <sci-form-field label="Path">
+    <input [formControl]="form.controls.path" class="e2e-path">
+  </sci-form-field>
+
+  <sci-form-field label="Title">
+    <input [formControl]="form.controls.title" class="e2e-title" [attr.list]="titleList">
+  </sci-form-field>
+
+  <sci-form-field label="Resolve">
+    <app-record [formControl]="form.controls.resolve" class="e2e-resolve"/>
+  </sci-form-field>
+
+  <sci-form-field label="Show Splash">
+    <sci-checkbox [formControl]="form.controls.showSplash" class="e2e-show-splash"/>
+  </sci-form-field>
+
+  <sci-form-field label="CSS Class(es)">
+    <app-multi-value-input [formControl]="form.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
+  </sci-form-field>
+</section>
+
+<section>
+  <header>Docked Part Extras</header>
+
+  <sci-form-field label="Icon">
+    <input [formControl]="form.controls.extras.controls.icon" class="e2e-icon">
+  </sci-form-field>
+
+  <sci-form-field label="Label">
+    <input [formControl]="form.controls.extras.controls.label" class="e2e-label">
+  </sci-form-field>
+
+  <sci-form-field label="Tooltip">
+    <input [formControl]="form.controls.extras.controls.tooltip" class="e2e-tooltip">
+  </sci-form-field>
+</section>
+
+<section class="e2e-views">
+  <header>Views</header>
+  <div class="views">
+    <span>Qualifier</span>
+    <span>Params</span>
+    <span>CSS Class(es)</span>
+    <span class="checkbox">Active</span>
+    <button (click)="onAddView()" class="e2e-add-view" title="Add View" sciMaterialIcon>add</button>
+
+    @for (viewFormGroup of form.controls.views.controls; track $index) {
+      <!-- Qualifier -->
+      <app-record [formControl]="viewFormGroup.controls.qualifier" class="e2e-qualifier qualifier"/>
+      <!-- Params -->
+      <app-record [formControl]="viewFormGroup.controls.params" class="e2e-params params"/>
+      <!-- CSS class -->
+      <app-multi-value-input [formControl]="viewFormGroup.controls.cssClass" [placeholder]="'class-1 class-2'" class="css-class e2e-class"/>
+      <!-- Active -->
+      <sci-checkbox [formControl]="viewFormGroup.controls.active" class="e2e-activate-view active"/>
+      <!-- Remove button -->
+      <button (click)="onRemoveView($index)" title="Remove View" sciMaterialIcon>clear</button>
+    }
+  </div>
+</section>
+
+<datalist [attr.id]="titleList">
+  <option value="<boolean>false</boolean>">&lt;boolean&gt;false&lt;/boolean&gt;</option>
+</datalist>

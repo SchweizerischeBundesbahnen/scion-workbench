@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,12 +10,156 @@
 
 import {Capability, Qualifier} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
+import {ActivityId} from '../workbench.identifiers';
 
 /**
- * Provides a workbench perspective.
+ * Defines a perspective in the SCION Workbench.
  *
- * A perspective is a named layout. Multiple perspectives can be created. Users can switch between perspectives.
- * Perspectives share the same main area, if any.
+ * A perspective defines an arrangement of parts and views. Parts can be docked to the side or positioned relative to each other.
+ * Views are stacked in parts. Content can be displayed in both parts and views.
+ *
+ * Users can personalize the layout of a perspective and switch between perspectives. The workbench remembers the layout of a perspective,
+ * restoring it the next time it is activated.
+ *
+ * A typical perspective has a main area part and parts docked to the side, providing navigation and context-sensitive assistance to support
+ * the user's workflow. The main area part is where the workbench opens views by default and is shared between perspectives. Its layout is
+ * not reset when resetting perspectives.
+ *
+ * Each part must be assigned a unique ID. The ID is used to align parts relative to each other, open views in a specific part, and, if `main-area`,
+ * mark the part as the main area part.
+ *
+ * A part references a part capability that specifies its content, either a microfrontend, a stack of views, or both. If both, the microfrontend
+ * is displayed only if the view stack is empty. Views in a docked part cannot be dragged into or out of docked parts.
+ *
+ * Declaring an intention allows for referencing public part capabilities of other applications. If a part capability cannot be resolved, the part
+ * is omitted, allowing conditional display, for example, based on user permissions.
+ *
+ * @example - Main area with two docked parts
+ * ```json
+ * {
+ *   "type": "perspective",
+ *   "qualifier": {
+ *     "perspective": "sample-perspective"
+ *   },
+ *   "properties": {
+ *     "parts": [
+ *       {
+ *         "id": "main-area",
+ *         "qualifier": {"part": "main-area"}
+ *       },
+ *       {
+ *         "id": "navigator",
+ *         "qualifier": {"part": "navigator"},
+ *         "position": "left-top"
+ *       },
+ *       {
+ *         "id": "find",
+ *         "qualifier": {"part": "find"},
+ *         "position": "bottom-left",
+ *       }
+ *     ]
+ *   }
+ * }
+ * ```
+ *
+ * Layout of above definition:
+ *
+ * ```plain
+ * +-+------------+-----------------+
+ * |x| navigator  |    main-area    |
+ * | | (left-top) |                 |
+ * | |            |                 |
+ * | |            |                 |
+ * | |------------+-----------------|
+ * |x| find (bottom-left)           |
+ * +-+------------------------------+
+ * ```
+ *
+ * @example - Main area with a part aligned relative to a docked part
+ *
+ * ```json
+ * {
+ *   "type": "perspective",
+ *   "qualifier": {
+ *     "perspective": "sample-perspective"
+ *   },
+ *   "properties": {
+ *     "parts": [
+ *       {
+ *         "id": "main-area",
+ *         "qualifier": {"part": "main-area"}
+ *       },
+ *       {
+ *         "id": "navigator",
+ *         "qualifier": {"part": "navigator"},
+ *         "position": "left-top"
+ *       },
+ *       {
+ *         "id": "detail",
+ *         "qualifier": {"part": "detail"},
+ *         "position": {"align": "bottom", "relativeTo": "navigator"}
+ *       }
+ *     ]
+ *   }
+ * }
+ * ```
+ *
+ * Layout of above definition:
+ *
+ * ```plain
+ * +-+------------+-----------------+
+ * |x| navigator  |    main-area    |
+ * | | (left-top) |                 |
+ * | |            |                 |
+ * | |------------+                 |
+ * | | detail     |                 |
+ * | | (bottom of |                 |
+ * | | navigator) |                 |
+ * +-+------------+-----------------+
+ * ```
+ *
+ * @example - Main area with parts aligned relative to the main area
+ * ```json
+ * {
+ *   "type": "perspective",
+ *   "qualifier": {
+ *     "perspective": "sample-perspective"
+ *   },
+ *   "properties": {
+ *     "parts": [
+ *       {
+ *         "id": "main-area",
+ *         "qualifier": {"part": "main-area"}
+ *       },
+ *       {
+ *         "id": "navigator",
+ *         "qualifier": {"part": "navigator"},
+ *         "position": {"align": "left", "relativeTo": "main-area", "ratio": 0.25}
+ *       },
+ *       {
+ *         "id": "find",
+ *         "qualifier": {"part": "find"},
+ *         "position": {"align": "bottom", "relativeTo": "main-area"}
+ *       }
+ *     ]
+ *   }
+ * }
+ * ```
+ *
+ * Layout of above definition:
+ *
+ * ```plain
+ * +------------+---------------+
+ * | navigator  |   main-area   |
+ * | (left of   |               |
+ * | main-area) |               |
+ * |            |               |
+ * |            +---------------+
+ * |            |     find      |
+ * |            |  (bottom of   |
+ * |            |  main-area)   |
+ * +------------+---------------+
+ * ```
  */
 export interface WorkbenchPerspectiveCapability extends Capability {
   /**
@@ -23,7 +167,7 @@ export interface WorkbenchPerspectiveCapability extends Capability {
    */
   type: WorkbenchCapabilities.Perspective;
   /**
-   * Qualifies this perspective. The qualifier is required for perspectives.
+   * Qualifies this perspective. The qualifier is required for a perspective.
    *
    * @inheritDoc
    */
@@ -33,103 +177,93 @@ export interface WorkbenchPerspectiveCapability extends Capability {
    */
   properties: {
     /**
-     * Defines the layout of this perspective.
+     * Defines the arrangement of parts.
      *
-     * A perspective defines an arrangement of parts and views. Parts can be docked to the side or positioned relative to each other.
-     * Views are stacked in parts and can be dragged to other parts. Content can be displayed in both parts and views.
+     * Parts can be docked to the side or positioned relative to each other.
      *
-     * Users can personalize the layout of a perspective and switch between perspectives. The workbench remembers the last layout of each perspective,
-     * restoring it the next time it is activated.
-     *
-     * A perspective typically has a main area part and other parts docked to the side, providing navigation and context-sensitive assistance to support
-     * the user's workflow. Initially empty or displaying a welcome page, the main area is where the workbench opens new views by default.
-     * Unlike any other part, the main area is shared between perspectives, and its layout is not reset when resetting perspectives.
-     *
-     * ## Example
-     * The following example defines a layout with a main area and three parts:
-     *
-     * ```plain
-     * +--------+----------------+
-     * |  top   |                |
-     * |  left  |                |
-     * |--------+   main area    |
-     * | bottom |                |
-     * |  left  |                |
-     * +--------+----------------+
-     * |          bottom         |
-     * +-------------------------+
-     * ```
-     *
-     * ```json
-     * {
-     *   "layout": [
-     *     {
-     *       "id": "main-area"
-     *     },
-     *     {
-     *       "id": "topLeft",
-     *       "align": "left",
-     *       "ratio": 0.25,
-     *       "views": [
-     *         {
-     *           "qualifier": {
-     *             "view": "navigator"
-     *           }
-     *         },
-     *         {
-     *           "qualifier": {
-     *             "view": "explorer"
-     *           }
-     *         }
-     *       ]
-     *     },
-     *     {
-     *       "id": "bottomLeft",
-     *       "relativeTo": "topLeft",
-     *       "align": "bottom",
-     *       "ratio": 0.5,
-     *       "views": [
-     *         {
-     *           "qualifier": {
-     *             "view": "properties"
-     *           }
-     *         }
-     *       ]
-     *     },
-     *     {
-     *       "id": "bottom",
-     *       "align": "bottom",
-     *       "ratio": 0.25,
-     *       "views": [
-     *         {
-     *           "qualifier": {
-     *             "view": "problems"
-     *           }
-     *         }
-     *       ]
-     *     }
-     *   ]
-     * }
-     * ```
+     * The first part cannot be positioned and is typically the main area part. The main area part
+     * is a special part with `main-area` as its id. The main area is where the workbench opens views
+     * by default. It is shared between perspectives and its layout is not reset when resetting perspectives.
      */
-    layout: [Pick<WorkbenchPerspectivePart, 'id' | 'views'>, ...WorkbenchPerspectivePart[]];
+    parts: [
+      Omit<WorkbenchPartRef, 'position'>,
+      ...WorkbenchPartRef[],
+    ];
     /**
-     * Arbitrary data associated with this perspective.
+     * Associates arbitrary data with the perspective, e.g., a label, icon or tooltip.
+     *
+     * The workbench host application can read associated data plus metadata about the perspective from {@link WorkbenchPerspective.data}.
+     * See {@link WorkbenchPerspectiveData} for metadata set by the SCION Workbench.
      */
     data?: {[key: string]: unknown};
   };
 }
 
 /**
- * Represents a part in a workbench perspective.
- *
- * A part is a stack of views that can be arranged in a perspective.
+ * Describes a part referenced in the perspective.
  */
-export interface WorkbenchPerspectivePart {
+export interface WorkbenchPartRef {
   /**
-   * Identifies the part. Use {@link MAIN_AREA} to reference the main area part.
+   * Identifies the part. Use {@link MAIN_AREA} for the main area part.
    */
   id: string | MAIN_AREA;
+  /**
+   * Specifies the {@link WorkbenchPartCapability} that provides the content of the part.
+   *
+   * Declaring an intention allows for referencing public part capabilities of other applications.
+   *
+   * If the part capability cannot be resolved, the part is omitted, allowing conditional display, for example, based on user permissions.
+   */
+  qualifier: Qualifier;
+  /**
+   * Positions the part, either docked or relative to another part.
+   */
+  position: DockingArea | RelativeTo;
+  /**
+   * Defines data to pass to the part.
+   *
+   * The part can declare mandatory and optional parameters. No additional parameters are allowed. Refer to the documentation of the capability for more information.
+   */
+  params?: {[name: string]: unknown};
+  /**
+   * Controls whether to activate the part.
+   */
+  active?: boolean;
+  /**
+   * Specifies CSS class(es) to add to the part, e.g., to locate the part in tests.
+   */
+  cssClass?: string | string[];
+  /**
+   * Internal identifier for a docked part.
+   *
+   * @docs-private Not public API. For internal use only.
+   */
+  ɵactivityId?: ActivityId;
+}
+
+/**
+ * Controls where to dock a part.
+ *
+ * A part can be docked to the left, right, or bottom side of the workbench. Docked parts can be minimized to create more space for the main content.
+ *
+ * Each side has two docking areas: `left-top` and `left-bottom`, `right-top` and `right-bottom`, and `bottom-left` and `bottom-right`.
+ * Parts added to the same area are stacked, with only one part active per stack. If there is an active part in both stacks of a side,
+ * the two parts are split vertically or horizontally, depending on the side.
+ *
+ * Docking areas:
+ * - `left-top`: Dock to the top on the left side.
+ * - `left-bottom`: Dock to the bottom on the left side.
+ * - `right-top`: Dock to the top on the right side.
+ * - `right-bottom`: Dock to the bottom on the right side.
+ * - `bottom-left`: Dock to the left on the bottom side.
+ * - `bottom-right`: Dock to the right on the bottom side.
+ */
+export type DockingArea = 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'bottom-left' | 'bottom-right';
+
+/**
+ * Describes how to lay out a part relative to another part.
+ */
+export interface RelativeTo {
   /**
    * Specifies the part which to use as the reference part to lay out the part.
    * If not set, the part will be aligned relative to the root of the layout.
@@ -144,52 +278,17 @@ export interface WorkbenchPerspectivePart {
    * The ratio is the closed interval [0,1]. If not set, defaults to `0.5`.
    */
   ratio?: number;
-  /**
-   * Defines views to add to the part.
-   *
-   * Microfrontends provided as view capability can be referenced. Views are added in declaration order.
-   * Views cannot be added to the main area part.
-   */
-  views?: WorkbenchPerspectiveView[];
 }
 
 /**
- * Represents a view in a workbench perspective.
- */
-export interface WorkbenchPerspectiveView {
-  /**
-   * Identifies the view capability that provides the microfrontend to add as view.
-   *
-   * An application can reference the public view capabilities of other applications if it manifests a respective intention.
-   */
-  qualifier: Qualifier;
-  /**
-   * Passes data to the view.
-   *
-   * The view can declare mandatory and optional parameters. No additional parameters are allowed. Refer to the documentation of the capability for more information.
-   */
-  params?: {[name: string]: unknown};
-  /**
-   * Controls whether to activate the view. If not specified, activates the first view of the part.
-   */
-  active?: boolean;
-  /**
-   * Specifies CSS class(es) to add to the view, e.g., to locate the view in tests.
-   */
-  cssClass?: string | string[];
-}
-
-/**
- * Identifies the main area part in the workbench layout.
+ * Identifies the main area part.
  *
- * Refer to this part to align parts relative to the main area.
- *
- * The main area is a special part that can be added to the layout. The main area is where the workbench opens new views by default.
+ * The main area is a special part that can be added to the layout. The main area is where the workbench opens views by default.
  * It is shared between perspectives and its layout is not reset when resetting perspectives.
  */
-export const MAIN_AREA: MAIN_AREA = 'part.main-area';
+export const MAIN_AREA: MAIN_AREA = 'main-area';
 
 /**
  * Represents the type of the {@link MAIN_AREA} constant.
  */
-export type MAIN_AREA = 'part.main-area';
+export type MAIN_AREA = 'main-area';

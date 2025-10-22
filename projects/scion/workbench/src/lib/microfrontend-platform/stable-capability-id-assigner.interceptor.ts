@@ -10,18 +10,19 @@
 
 import {Capability, CapabilityInterceptor} from '@scion/microfrontend-platform';
 import {Microfrontends} from './common/microfrontend.util';
-import {WorkbenchCapabilities} from '@scion/workbench-client';
-import {Injectable} from '@angular/core';
+import {inject, InjectionToken} from '@angular/core';
 
 /**
- * Assigns perspective and view capabilities a stable identifer based on the qualifier and application.
+ * DI token to register capability types to assign a stable identity.
  */
-@Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
+export const STABLE_CAPABILITY_ID = new InjectionToken<string[]>('STABLE_ID_CAPABILITY_TYPE');
+
+/**
+ * Assigns capabilities contained in {@link STABLE_CAPABILITY_ID} DI token a stable identifer.
+ */
 export class StableCapabilityIdAssigner implements CapabilityInterceptor {
 
-  private readonly _types = new Set<string>()
-    .add(WorkbenchCapabilities.Perspective)
-    .add(WorkbenchCapabilities.View);
+  private readonly _types = new Set(inject(STABLE_CAPABILITY_ID, {optional: true}) ?? []);
 
   public async intercept(capability: Capability): Promise<Capability> {
     if (!this._types.has(capability.type)) {

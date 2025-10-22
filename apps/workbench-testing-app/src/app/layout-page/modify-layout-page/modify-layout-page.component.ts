@@ -67,21 +67,19 @@ export default class ModifyLayoutPageComponent {
       .concat(dockedParts())
       .concat(parts())
       .map(part => part.id)
-      .filter(Boolean)
-      .reduce((acc, partId) => acc.includes(partId) ? acc : acc.concat(partId), new Array<string>()),
+      .filter(Boolean),
     );
   }
 
   private computeViewProposals(): Signal<string[]> {
-    const viewsFromUI = toSignal(this.form.controls.views.valueChanges, {initialValue: []});
+    const views = toSignal(this.form.controls.views.valueChanges, {initialValue: []});
     const workbenchService = inject(WorkbenchService);
 
     return computed(() => new Array<WorkbenchView | ViewDescriptor>()
       .concat(workbenchService.views())
-      .concat(viewsFromUI())
+      .concat(views())
       .map(view => view.id)
-      .filter(Boolean)
-      .reduce((acc, viewId) => acc.includes(viewId) ? acc : acc.concat(viewId), new Array<string>()),
+      .filter(Boolean),
     );
   }
 

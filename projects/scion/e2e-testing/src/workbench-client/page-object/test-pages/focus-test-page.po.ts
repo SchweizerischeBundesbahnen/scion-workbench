@@ -10,7 +10,7 @@
 
 import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
-import {DialogId, PopupId, ViewId} from '@scion/workbench-client';
+import {DialogId, PartId, PopupId, ViewId} from '@scion/workbench-client';
 import {AppPO} from '../../../app.po';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
 
@@ -25,7 +25,7 @@ export class FocusTestPagePO {
   public middleField: Locator;
   public lastField: Locator;
 
-  constructor(appPO: AppPO, locateBy: {id?: ViewId | DialogId | PopupId}) {
+  constructor(appPO: AppPO, locateBy: {id?: PartId | ViewId | DialogId | PopupId}) {
     const outlet = new SciRouterOutletPO(appPO, {name: locateBy.id});
     this.locator = outlet.frameLocator.locator('app-focus-test-page');
     this.firstField = this.locator.locator('input.e2e-first-field');

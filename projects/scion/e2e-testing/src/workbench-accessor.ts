@@ -20,6 +20,13 @@ export class WorkbenchAccessor {
   constructor(private _page: Page) {
   }
 
+  public resetPerspective(): Promise<void> {
+    return this._page.evaluate(() => {
+      const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
+      return workbenchService.resetPerspective();
+    });
+  }
+
   public activeElement(): Promise<PartId | ViewId | DialogId | PopupId | null> {
     return this._page.evaluate(() => {
       const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;

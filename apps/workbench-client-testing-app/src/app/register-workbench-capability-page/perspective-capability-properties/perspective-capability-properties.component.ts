@@ -8,34 +8,31 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, forwardRef, inject} from '@angular/core';
-import {AbstractControl, ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator, Validators} from '@angular/forms';
-import {SciFormFieldComponent} from '@scion/components.internal/form-field';
-import {noop, Observable} from 'rxjs';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {Component, computed, forwardRef, inject, Signal} from '@angular/core';
+import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator, Validators} from '@angular/forms';
+import {noop} from 'rxjs';
+import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {UUID} from '@scion/toolkit/uuid';
-import {MAIN_AREA, WorkbenchPerspectiveCapability, WorkbenchPerspectivePart, WorkbenchPerspectiveView} from '@scion/workbench-client';
-import {RecordComponent} from '../../record/record.component';
-import {filterArray, mapArray} from '@scion/toolkit/operators';
-import {AsyncPipe} from '@angular/common';
+import {ActivityId, DockingArea, MAIN_AREA, RelativeTo, WorkbenchPartRef, WorkbenchPerspectiveCapability} from '@scion/workbench-client';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
-import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {MultiValueInputComponent} from '../../multi-value-input/multi-value-input.component';
+import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {RecordComponent} from '../../record/record.component';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 
 @Component({
   selector: 'app-perspective-capability-properties',
   templateUrl: './perspective-capability-properties.component.html',
-  styleUrls: ['./perspective-capability-properties.component.scss'],
+  styleUrl: './perspective-capability-properties.component.scss',
   imports: [
     ReactiveFormsModule,
-    SciFormFieldComponent,
     SciMaterialIconDirective,
-    RecordComponent,
-    AsyncPipe,
     SciKeyValueFieldComponent,
-    SciCheckboxComponent,
     MultiValueInputComponent,
+    SciCheckboxComponent,
+    RecordComponent,
+    SciFormFieldComponent,
   ],
   providers: [
     {provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => PerspectiveCapabilityPropertiesComponent)},
@@ -49,12 +46,13 @@ export class PerspectiveCapabilityPropertiesComponent implements ControlValueAcc
   protected readonly form = this._formBuilder.group({
     data: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     parts: this._formBuilder.array<FormGroup<PartFormGroup>>([]),
+    dockedParts: this._formBuilder.array<FormGroup<DockedPartFormGroup>>([]),
   });
 
   protected readonly MAIN_AREA = MAIN_AREA;
   protected readonly relativeToList = `relative-to-list-${UUID.randomUUID()}`;
   protected readonly partIdList = `partid-list-${UUID.randomUUID()}`;
-  protected readonly partProposals$: Observable<string[]>;
+  protected readonly partProposals = this.computePartProposals();
 
   private _cvaChangeFn: (properties: WorkbenchPerspectiveCapabilityProperties) => void = noop;
   private _cvaTouchedFn: () => void = noop;
@@ -63,31 +61,57 @@ export class PerspectiveCapabilityPropertiesComponent implements ControlValueAcc
     this.form.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => {
-        const parts: WorkbenchPerspectivePart[] = this.form.controls.parts.controls.map((partFormGroup: FormGroup<PartFormGroup>): WorkbenchPerspectivePart => ({
-          id: partFormGroup.controls.id.value!,
-          relativeTo: partFormGroup.controls.relativeTo.value,
-          align: partFormGroup.controls.align.value!,
-          ratio: partFormGroup.controls.ratio.value!,
-          views: partFormGroup.controls.views.controls.map((viewFormGroup: FormGroup<ViewFormGroup>): WorkbenchPerspectiveView => ({
-            params: viewFormGroup.controls.params.value,
-            qualifier: viewFormGroup.controls.qualifier.value,
-            active: viewFormGroup.controls.active.value,
-            cssClass: viewFormGroup.controls.cssClass.value,
-          })),
-        }));
+        const [initialPartFormGroup, ...partFormGroups] = this.form.controls.parts.controls;
 
         this._cvaChangeFn({
-          layout: parts as WorkbenchPerspectiveCapabilityLayout,
           data: SciKeyValueFieldComponent.toDictionary(this.form.controls.data) ?? undefined,
+          parts: [
+            // Add initial part.
+            ...(initialPartFormGroup ? [{
+              id: initialPartFormGroup.controls.id.value || undefined,
+              qualifier: initialPartFormGroup.controls.qualifier.value ?? undefined,
+              params: initialPartFormGroup.controls.params.value ?? undefined,
+              active: initialPartFormGroup.controls.active.value ?? undefined,
+              cssClass: initialPartFormGroup.controls.cssClass.value ?? undefined,
+            }] : []) as [Omit<WorkbenchPartRef, 'position'>],
+            // Add docked parts.
+            ...this.form.controls.dockedParts.controls.map(dockedPartFormGroup => ({
+              id: dockedPartFormGroup.controls.id.value || undefined,
+              position: dockedPartFormGroup.controls.position.value || undefined,
+              qualifier: dockedPartFormGroup.controls.qualifier.value ?? undefined,
+              params: dockedPartFormGroup.controls.params.value ?? undefined,
+              active: dockedPartFormGroup.controls.active.value ?? undefined,
+              cssClass: dockedPartFormGroup.controls.cssClass.value ?? undefined,
+              ɵactivityId: dockedPartFormGroup.controls.activityId.value ?? undefined,
+            } as WorkbenchPartRef)),
+            // Add other parts.
+            ...partFormGroups.map(partFormGroup => ({
+              id: partFormGroup.controls.id.value,
+              position: {
+                relativeTo: partFormGroup.controls.position.controls.relativeTo.value ?? undefined,
+                align: partFormGroup.controls.position.controls.align.value || undefined,
+                ratio: partFormGroup.controls.position.controls.ratio.value ?? undefined,
+              },
+              qualifier: partFormGroup.controls.qualifier.value ?? undefined,
+              params: partFormGroup.controls.params.value ?? undefined,
+              active: partFormGroup.controls.active.value ?? undefined,
+              cssClass: partFormGroup.controls.cssClass.value ?? undefined,
+            } as WorkbenchPartRef)),
+          ],
         });
         this._cvaTouchedFn();
       });
+  }
 
-    this.partProposals$ = this.form.controls.parts.valueChanges
-      .pipe(
-        mapArray(part => part.id),
-        filterArray((id: string | undefined): id is string => !!id),
-      );
+  private computePartProposals(): Signal<string[]> {
+    const parts = toSignal(this.form.controls.parts.valueChanges, {initialValue: []});
+    const dockedParts = toSignal(this.form.controls.dockedParts.valueChanges, {initialValue: []});
+
+    return computed(() => new Array<string | undefined>()
+      .concat(dockedParts().map(part => part.id))
+      .concat(parts().map(part => part.id))
+      .filter((partId: string | undefined): partId is string => !!partId),
+    );
   }
 
   protected onAddPart(): void {
@@ -96,9 +120,9 @@ export class PerspectiveCapabilityPropertiesComponent implements ControlValueAcc
     this.updatePartFields();
   }
 
-  protected onAddView(partFormGroup: FormGroup<PartFormGroup>): void {
-    const viewFormGroup = this.createViewFormGroup();
-    partFormGroup.controls.views.push(viewFormGroup);
+  protected onAddDockedPart(): void {
+    const partFormGroup = this.createDockedPartFormGroup();
+    this.form.controls.dockedParts.push(partFormGroup);
   }
 
   protected onRemovePart(index: number): void {
@@ -106,26 +130,34 @@ export class PerspectiveCapabilityPropertiesComponent implements ControlValueAcc
     this.updatePartFields();
   }
 
-  protected onRemoveView(partFormGroup: FormGroup<PartFormGroup>, index: number): void {
-    partFormGroup.controls.views.removeAt(index);
+  protected onRemoveDockedPart(index: number): void {
+    this.form.controls.dockedParts.removeAt(index);
   }
 
-  private createPartFormGroup(part?: Partial<WorkbenchPerspectivePart>): FormGroup<PartFormGroup> {
+  private createPartFormGroup(part?: Partial<WorkbenchPartRef & {position: RelativeTo}>): FormGroup<PartFormGroup> {
     return this._formBuilder.group({
-      id: this._formBuilder.control<string | undefined>(part?.id, Validators.required),
-      relativeTo: this._formBuilder.control<string | undefined>(part?.relativeTo),
-      align: this._formBuilder.control<'left' | 'right' | 'top' | 'bottom' | undefined>(part?.align),
-      ratio: this._formBuilder.control<number | undefined>(part?.ratio),
-      views: this._formBuilder.array<FormGroup<ViewFormGroup>>(part?.views?.map(view => this.createViewFormGroup(view)) ?? []),
+      id: this._formBuilder.control(part?.id, {validators: Validators.required}),
+      position: this._formBuilder.group({
+        relativeTo: this._formBuilder.control(part?.position?.relativeTo),
+        align: this._formBuilder.control(part?.position?.align, {validators: Validators.required}),
+        ratio: this._formBuilder.control(part?.position?.ratio),
+      }),
+      qualifier: this._formBuilder.control(part?.qualifier as Record<string, string> | undefined, {validators: Validators.required}),
+      params: this._formBuilder.control(part?.params as Record<string, string> | undefined),
+      active: this._formBuilder.control(part?.active),
+      cssClass: this._formBuilder.control(part?.cssClass),
     });
   }
 
-  private createViewFormGroup(view?: WorkbenchPerspectiveView): FormGroup<ViewFormGroup> {
+  private createDockedPartFormGroup(part?: Partial<WorkbenchPartRef & {position: DockingArea}>): FormGroup<DockedPartFormGroup> {
     return this._formBuilder.group({
-      qualifier: this._formBuilder.control(view?.qualifier as Record<string, string>),
-      params: this._formBuilder.control(view?.params as Record<string, string>),
-      active: this._formBuilder.control(view?.active),
-      cssClass: this._formBuilder.control(view?.cssClass),
+      id: this._formBuilder.control(part?.id, {validators: Validators.required}),
+      position: this._formBuilder.control(part?.position, {validators: Validators.required}),
+      qualifier: this._formBuilder.control(part?.qualifier as Record<string, string> | undefined, {validators: Validators.required}),
+      params: this._formBuilder.control(part?.params as Record<string, string> | undefined),
+      active: this._formBuilder.control(part?.active),
+      activityId: this._formBuilder.control(part?.ɵactivityId),
+      cssClass: this._formBuilder.control(part?.cssClass),
     });
   }
 
@@ -140,21 +172,21 @@ export class PerspectiveCapabilityPropertiesComponent implements ControlValueAcc
     this.form.controls.parts.controls.forEach((partFormGroup: FormGroup<PartFormGroup>, index) => {
       if (index === 0) {
         // Disable fields.
-        partFormGroup.controls.relativeTo.disable({emitEvent: false});
-        partFormGroup.controls.align.disable({emitEvent: false});
-        partFormGroup.controls.ratio.disable({emitEvent: false});
+        partFormGroup.controls.position.controls.relativeTo.disable({emitEvent: false});
+        partFormGroup.controls.position.controls.align.disable({emitEvent: false});
+        partFormGroup.controls.position.controls.ratio.disable({emitEvent: false});
         // Unset values.
-        partFormGroup.controls.align.reset(undefined, {emitEvent: false});
-        partFormGroup.controls.ratio.reset(undefined, {emitEvent: false});
-        partFormGroup.controls.relativeTo.reset(undefined, {emitEvent: false});
+        partFormGroup.controls.position.controls.align.reset(undefined, {emitEvent: false});
+        partFormGroup.controls.position.controls.ratio.reset(undefined, {emitEvent: false});
+        partFormGroup.controls.position.controls.relativeTo.reset(undefined, {emitEvent: false});
         // Remove validation.
-        partFormGroup.controls.align.removeValidators(Validators.required);
+        partFormGroup.controls.position.controls.align.removeValidators(Validators.required);
       }
       else {
-        partFormGroup.controls.relativeTo.enable({emitEvent: false});
-        partFormGroup.controls.align.enable({emitEvent: false});
-        partFormGroup.controls.ratio.enable({emitEvent: false});
-        partFormGroup.controls.align.setValidators(Validators.required);
+        partFormGroup.controls.position.controls.relativeTo.enable({emitEvent: false});
+        partFormGroup.controls.position.controls.align.enable({emitEvent: false});
+        partFormGroup.controls.position.controls.ratio.enable({emitEvent: false});
+        partFormGroup.controls.position.controls.align.setValidators(Validators.required);
       }
     });
   }
@@ -166,9 +198,17 @@ export class PerspectiveCapabilityPropertiesComponent implements ControlValueAcc
   public writeValue(properties: WorkbenchPerspectiveCapabilityProperties | undefined | null): void {
     // Parts
     this.form.controls.parts.clear({emitEvent: false});
-    properties?.layout
-      .map(part => this.createPartFormGroup(part))
+    properties?.parts
+      .filter(part => typeof (part as WorkbenchPartRef).position !== 'string')
+      .map(part => this.createPartFormGroup(part as Partial<WorkbenchPartRef & {position: RelativeTo}>))
       .forEach(partFormGroup => this.form.controls.parts.push(partFormGroup, {emitEvent: false}));
+
+    // Docked Parts
+    this.form.controls.dockedParts.clear({emitEvent: false});
+    properties?.parts
+      .filter(part => typeof (part as WorkbenchPartRef).position === 'string')
+      .map(part => this.createDockedPartFormGroup(part as Partial<WorkbenchPartRef & {position: DockingArea}>))
+      .forEach(dockedPartFormGroup => this.form.controls.dockedParts.push(dockedPartFormGroup, {emitEvent: false}));
 
     // Data
     this.form.controls.data.clear({emitEvent: false});
@@ -203,19 +243,26 @@ export class PerspectiveCapabilityPropertiesComponent implements ControlValueAcc
 }
 
 export type WorkbenchPerspectiveCapabilityProperties = WorkbenchPerspectiveCapability['properties'];
-export type WorkbenchPerspectiveCapabilityLayout = WorkbenchPerspectiveCapabilityProperties['layout'];
 
 interface PartFormGroup {
   id: FormControl<string | MAIN_AREA | undefined>;
-  relativeTo: FormControl<string | undefined>;
-  align: FormControl<'left' | 'right' | 'top' | 'bottom' | undefined>;
-  ratio: FormControl<number | undefined>;
-  views: FormArray<FormGroup<ViewFormGroup>>;
+  position: FormGroup<{
+    align: FormControl<'left' | 'right' | 'top' | 'bottom' | undefined>;
+    relativeTo: FormControl<string | undefined>;
+    ratio: FormControl<number | undefined>;
+  }>;
+  qualifier: FormControl<Record<string, string> | undefined>;
+  params: FormControl<Record<string, string> | undefined>;
+  active: FormControl<boolean | undefined>;
+  cssClass: FormControl<string | string[] | undefined>;
 }
 
-interface ViewFormGroup {
-  qualifier: FormControl<Record<string, string>>;
-  params: FormControl<Record<string, string>>;
+interface DockedPartFormGroup {
+  id: FormControl<string | undefined>;
+  position: FormControl<DockingArea | undefined>;
+  qualifier: FormControl<Record<string, string> | undefined>;
+  params: FormControl<Record<string, string> | undefined>;
   active: FormControl<boolean | undefined>;
+  activityId: FormControl<ActivityId | undefined>;
   cssClass: FormControl<string | string[] | undefined>;
 }

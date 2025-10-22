@@ -21,7 +21,7 @@ import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 
 /**
  * @ignore
- * @docs-private Not public API, intended for internal use only.
+ * @docs-private Not public API. For internal use only.
  */
 export class ɵWorkbenchMessageBox implements WorkbenchMessageBox {
 

@@ -148,7 +148,7 @@ export function coerceMap<V>(value: Record<string, V> | Map<string, V> | undefin
  * Stringifies given object to matrix notation: a=b;c=d;e=f
  */
 export function toMatrixNotation(object: Record<string, unknown> | null | undefined): string {
-  return Object.entries(object ?? {}).map(([key, value]) => `${key}=${value}`).join(';');
+  return Object.entries(object ?? {}).map(([key, value]) => `${key}=${encodeSemicolons(value)}`).join(';');
 }
 
 /**
@@ -215,4 +215,11 @@ export function commandsToPath(commands: Commands): string {
  */
 export function throwError(error: string): never {
   throw Error(error);
+}
+
+/**
+ * Encodes semicolons (`;`) as `\\;` to prevent interpretation as interpolation parameter separators.
+ */
+function encodeSemicolons(value: unknown): string {
+  return `${value}`.replaceAll(';', '\\;');
 }
