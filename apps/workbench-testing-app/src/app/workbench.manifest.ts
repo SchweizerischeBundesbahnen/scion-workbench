@@ -96,6 +96,10 @@ export const workbenchManifest: Manifest = {
       ],
       properties: {
         path: '',
+        // title: 'WTF',
+        // size: {
+        //   height: '800px'
+        // }
         // path: 'test-host-dialog;matrixParam=:param',
       },
     } satisfies WorkbenchDialogCapability,

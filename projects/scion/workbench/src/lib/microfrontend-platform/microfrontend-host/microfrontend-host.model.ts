@@ -11,7 +11,18 @@
 import {Capability} from '@scion/microfrontend-platform';
 import {Signal} from '@angular/core';
 
+/**
+ * Provides access to parameters and capability in a host microfrontend component.
+ *
+ * Can be injected into a host microfrontend component.
+ */
 export abstract class ActivatedMicrofrontend<T extends Capability = Capability> {
-  public abstract readonly params: Signal<Map<string, unknown>>;
+  /**
+   * Capability associated with the microfrontend.
+   */
   public abstract readonly capability: T;
+  /**
+   * Parameters passed to the microfrontend.
+   */
+  public abstract readonly params: Signal<Map<string, unknown>>;
 }

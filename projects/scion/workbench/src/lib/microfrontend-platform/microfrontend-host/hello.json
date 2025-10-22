@@ -1,0 +1,9 @@
+{
+  "type": "part",
+  "qualifier": {
+    "part": "navigator"
+  },
+  "properties": {
+    "path": ""
+  }
+}

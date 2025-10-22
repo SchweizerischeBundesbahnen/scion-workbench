@@ -17,15 +17,16 @@ import {stringifyError} from '../../common/stringify-error.util';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchDialogService} from '../../dialog/workbench-dialog.service';
 import {MicrofrontendDialogComponent} from './microfrontend-dialog.component';
-import {MicrofrontendHostContext} from '../microfrontend-host/microfrontend-host-context';
-import {MicrofrontendHostComponent} from '../microfrontend-host/microfrontend-host.component';
+import {HostSlotConfig} from '../microfrontend-host/microfrontend-host-slot.config';
+import {MicrofrontendHostSlotComponent} from '../microfrontend-host/microfrontend-host-slot.component';
 import {createRemoteTranslatable} from '../text/remote-text-provider';
-import { WorkbenchDialog } from '../../dialog/workbench-dialog';
+import {WorkbenchDialog} from '../../dialog/workbench-dialog';
+import {ActivatedMicrofrontend} from '@scion/workbench';
 
 /**
  * Handles dialog intents, instructing the workbench to open a dialog with the microfrontend declared on the resolved capability.
  *
- * Microfrontends of the host are displayed in {@link MicrofrontendHostComponent}, microfrontends of other applications in {@link MicrofrontendDialogComponent}.
+ * Microfrontends of the host are displayed in {@link MicrofrontendHostSlotComponent}, microfrontends of other applications in {@link MicrofrontendDialogComponent}.
  *
  * Dialog intents are handled in this interceptor and are not transported to the providing application, enabling support for applications
  * that are not connected to the SCION Workbench.
@@ -77,9 +78,9 @@ export class MicrofrontendDialogIntentHandler implements IntentInterceptor {
     const isHostProvider = capability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
     this._logger.debug(() => 'Handling microfrontend dialog intent', LoggerNames.MICROFRONTEND, options);
 
-    return this._dialogService.open(isHostProvider ? MicrofrontendHostComponent : MicrofrontendDialogComponent, {
+    return this._dialogService.open(isHostProvider ? MicrofrontendHostSlotComponent : MicrofrontendDialogComponent, {
       inputs: isHostProvider ? {} : {capability, params},
-      injector: isHostProvider ? Injector.create({providers: [provideMicrofrontendDialogContext(capability, params)]}) : undefined,
+      injector: isHostProvider ? Injector.create({providers: [provideHostDialogMicrofrontendSlotConfig(capability, params)]}) : undefined,
       modality: options.modality,
       context: options.context,
       animate: options.animate,
@@ -88,17 +89,18 @@ export class MicrofrontendDialogIntentHandler implements IntentInterceptor {
   }
 }
 
-function provideMicrofrontendDialogContext(capability: WorkbenchDialogCapability, params: Map<string, unknown>): StaticProvider {
+function provideHostDialogMicrofrontendSlotConfig(capability: WorkbenchDialogCapability, params: Map<string, unknown>): StaticProvider {
   return [
     {
-      provide: MicrofrontendHostContext,
-      useValue: {
+      provide: HostSlotConfig,
+      useFactory: (): HostSlotConfig => ({
         capabilityId: signal(capability.metadata!.id),
         params: signal(params),
-        init: () => {
+        onLoad: () => {
+          const am = inject(ActivatedMicrofrontend) as ActivatedMicrofrontend<WorkbenchDialogCapability>;
           const dialog = inject(WorkbenchDialog);
-          const properties = capability.properties;
-          const appSymbolicName = capability.metadata!.appSymbolicName;
+          const properties = am.capability.properties;
+          const appSymbolicName = am.capability.metadata!.appSymbolicName;
 
           dialog.size.width = properties.size?.width;
           dialog.size.height = properties.size?.height;
@@ -112,7 +114,7 @@ function provideMicrofrontendDialogContext(capability: WorkbenchDialogCapability
           dialog.resizable = properties.resizable ?? true;
           dialog.padding = properties.padding ?? true;
         },
-      } satisfies MicrofrontendHostContext,
+      }),
     },
   ];
 }

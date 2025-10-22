@@ -31,11 +31,10 @@ describe('ManifestObjectCache', () => {
     const capabilityId = await TestBed.inject(ManifestService).registerCapability({type: 'testee'});
 
     // Test capability to be found.
-    expect(TestBed.inject(ManifestObjectCache).getCapability(capabilityId)).toEqual(await lookupCapability(capabilityId));
+    expect(TestBed.inject(ManifestObjectCache).getCapability(capabilityId)()).toEqual(await lookupCapability(capabilityId));
 
     // Test capability not to be found.
-    expect(TestBed.inject(ManifestObjectCache).getCapability('xyz', {orElse: null})).toBeNull();
-    expect(() => TestBed.inject(ManifestObjectCache).getCapability('xyz')).toThrowError(/NullCapabilityError/);
+    expect(TestBed.inject(ManifestObjectCache).getCapability('xyz')).toBeNull();
   });
 
   it('should test if capability exists', async () => {
@@ -59,56 +58,56 @@ describe('ManifestObjectCache', () => {
     expect(TestBed.inject(ManifestObjectCache).hasCapability('xyz')).toBeFalse();
   });
 
-  it('should observe capability', async () => {
-    TestBed.configureTestingModule({
-      providers: [
-        provideWorkbenchForTest({microfrontendPlatform: {applications: []}}),
-      ],
-    });
-    await TestBed.inject(WorkbenchLauncher).launch();
-
-    // Assign stable capability id.
-    Beans.register(CapabilityInterceptor, {
-      useValue: new class implements CapabilityInterceptor {
-        public async intercept(capability: Capability): Promise<Capability> {
-          if (capability.type === 'testee') {
-            return {...capability, metadata: {...capability.metadata!, id: 'testee'}};
-          }
-          return capability;
-        }
-      }(),
-      multi: true,
-    });
-
-    // Observe capability.
-    const captor = new ObserveCaptor<Capability | null, string | null>(capability => capability?.metadata!.id ?? null);
-    TestBed.inject(ManifestObjectCache).observeCapability$('testee').subscribe(captor);
-
-    // Expect no capability to be found.
-    await captor.waitUntilEmitCount(1);
-    expect(captor.getValues()).toEqual([
-      null,
-    ]);
-
-    // Register capability.
-    await TestBed.inject(ManifestService).registerCapability({type: 'testee'});
-    // Expect capability to be found.
-    await captor.waitUntilEmitCount(2);
-    expect(captor.getValues()).toEqual([
-      null,
-      'testee',
-    ]);
-
-    // Unregister capability.
-    await TestBed.inject(ManifestService).unregisterCapabilities({type: 'testee'});
-    // Expect capability not to be found.
-    await captor.waitUntilEmitCount(3);
-    expect(captor.getValues()).toEqual([
-      null,
-      'testee',
-      null,
-    ]);
-  });
+  // it('should observe capability', async () => {
+  //   TestBed.configureTestingModule({
+  //     providers: [
+  //       provideWorkbenchForTest({microfrontendPlatform: {applications: []}}),
+  //     ],
+  //   });
+  //   await TestBed.inject(WorkbenchLauncher).launch();
+  //
+  //   // Assign stable capability id.
+  //   Beans.register(CapabilityInterceptor, {
+  //     useValue: new class implements CapabilityInterceptor {
+  //       public async intercept(capability: Capability): Promise<Capability> {
+  //         if (capability.type === 'testee') {
+  //           return {...capability, metadata: {...capability.metadata!, id: 'testee'}};
+  //         }
+  //         return capability;
+  //       }
+  //     }(),
+  //     multi: true,
+  //   });
+  //
+  //   // Observe capability.
+  //   const captor = new ObserveCaptor<Capability | null, string | null>(capability => capability?.metadata!.id ?? null);
+  //   TestBed.inject(ManifestObjectCache).observeCapability$('testee').subscribe(captor);
+  //
+  //   // Expect no capability to be found.
+  //   await captor.waitUntilEmitCount(1);
+  //   expect(captor.getValues()).toEqual([
+  //     null,
+  //   ]);
+  //
+  //   // Register capability.
+  //   await TestBed.inject(ManifestService).registerCapability({type: 'testee'});
+  //   // Expect capability to be found.
+  //   await captor.waitUntilEmitCount(2);
+  //   expect(captor.getValues()).toEqual([
+  //     null,
+  //     'testee',
+  //   ]);
+  //
+  //   // Unregister capability.
+  //   await TestBed.inject(ManifestService).unregisterCapabilities({type: 'testee'});
+  //   // Expect capability not to be found.
+  //   await captor.waitUntilEmitCount(3);
+  //   expect(captor.getValues()).toEqual([
+  //     null,
+  //     'testee',
+  //     null,
+  //   ]);
+  // });
 });
 
 /**

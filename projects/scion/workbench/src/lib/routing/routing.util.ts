@@ -209,9 +209,9 @@ export const Routing = {
   /**
    * Performs an "empty" navigation for Angular to evaluate `CanMatch` guards, e.g., to display "Not Found" page or activate a route based on a changed condition.
    */
-  runCanMatchGuards: async (options?: {injector?: Injector}): Promise<void> => {
+  evaluateCanMatchGuards: async (options?: {injector?: Injector}): Promise<void> => {
     const injector = options?.injector ?? inject(Injector);
-    await injector.get(ANGULAR_ROUTER_MUTEX).submit(() => injector.get(Router).navigate([], {skipLocationChange: false, queryParamsHandling: 'preserve', preserveFragment: true}));
+    await injector.get(ANGULAR_ROUTER_MUTEX).submit(() => injector.get(Router).navigate([{outlets: {}}], {skipLocationChange: true, queryParamsHandling: 'preserve', preserveFragment: true}));
   },
 } as const;
 

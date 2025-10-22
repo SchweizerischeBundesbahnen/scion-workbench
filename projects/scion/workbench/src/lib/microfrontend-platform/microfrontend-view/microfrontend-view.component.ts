@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Injector, Provider, signal, Signal, untracked, viewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Injector, Provider, Signal, untracked, viewChild} from '@angular/core';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {asyncScheduler, firstValueFrom, MonoTypeOperatorFunction, OperatorFunction, Subject, switchMap, tap} from 'rxjs';
-import {filter, first, map, subscribeOn, take, takeUntil} from 'rxjs/operators';
+import {asyncScheduler, firstValueFrom, MonoTypeOperatorFunction, OperatorFunction, pairwise, pipe, Subject, switchMap, tap} from 'rxjs';
+import {filter, first, map, startWith, subscribeOn, take, takeUntil} from 'rxjs/operators';
 import {ManifestService, mapToBody, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
@@ -27,7 +27,7 @@ import {stringifyError} from '../../common/stringify-error.util';
 import {MicrofrontendViewRoutes} from './microfrontend-view-routes';
 import {NgComponentOutlet} from '@angular/common';
 import {ContentAsOverlayComponent, ContentAsOverlayConfig} from '../../content-projection/content-as-overlay.component';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../../glass-pane/glass-pane.directive';
@@ -37,6 +37,7 @@ import {Objects} from '../../common/objects.util';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {rootEffect, toRootObservable} from '../../common/rxjs-interop.util';
 import {createRemoteTranslatable} from '../text/remote-text-provider';
+import {Routing} from '../../routing/routing.util';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -88,7 +89,7 @@ export class MicrofrontendViewComponent {
     visible: this.view.slot.portal.attached,
   };
 
-  protected readonly capability = signal<WorkbenchViewCapability | null>(null);
+  protected readonly navigationContext = computeNavigationContext();
 
   constructor() {
     this._logger.debug(() => `Constructing MicrofrontendViewComponent. [viewId=${this.view.id}]`, LoggerNames.MICROFRONTEND_ROUTING);
@@ -105,16 +106,15 @@ export class MicrofrontendViewComponent {
   }
 
   private installNavigator(): void {
-    this._route.params
+    toObservable(this.navigationContext)
       .pipe(
-        createNavigationContext(),
+        pairwiseImmediate(),
         executeOn({
           onEach: context => this.setViewTitleAndHeading(context),
-          onCapabilityChange: context => this.onCapabilityChange(context),
+          onCapabilityChange: (prevContext, context) => this.onCapabilityChange(prevContext, context),
         }),
-        filterNullCapability(),
         delayIfLazy(),
-        serializeExecution(context => this.onNavigate(context)),
+        serializeExecution(([prevContext, context]) => this.onNavigate(prevContext, context)),
         subscribeOn(asyncScheduler), // subscribe asynchronously because `onCapabilityChange` triggers a manual change detection cycle for inactive views; would error if called during component construction otherwise.
         takeUntilDestroyed(),
       )
@@ -135,12 +135,9 @@ export class MicrofrontendViewComponent {
   /**
    * Method invoked each time when navigating to a different capability.
    */
-  private onCapabilityChange(context: NavigationContext<WorkbenchViewCapability | null>): void {
-    const {capability, prevCapability} = context;
-    this.capability.set(capability);
-
+  private onCapabilityChange(prevContext: NavigationContext | undefined, context: NavigationContext): void {
     // Signal the currently loaded application to unload.
-    if (prevCapability && prevCapability.metadata!.appSymbolicName !== capability?.metadata!.appSymbolicName) {
+    if (prevContext?.capability && prevContext.capability.metadata!.appSymbolicName !== context.capability?.metadata!.appSymbolicName) {
       void this._messageClient.publish(ɵWorkbenchCommands.viewUnloadingTopic(this.view.id));
     }
 
@@ -154,19 +151,25 @@ export class MicrofrontendViewComponent {
     }
 
     // Unload microfrontend if capability is not found.
-    if (!capability) {
+    if (!context.capability) {
       this._logger.warn(() => `[NullCapabilityError] No application found to provide a view capability of id '${context.capabilityId}'. Maybe, the requested view is not public API or the providing application not available.`, LoggerNames.MICROFRONTEND_ROUTING);
       this.unload();
       // Perform navigation for Angular to evaluate `CanMatch` guards to display "Not Found" page.
-      void this._router.navigate([{outlets: {}}], {skipLocationChange: true});
+      void Routing.evaluateCanMatchGuards({injector: this._injector});
     }
   }
 
   /**
    * Method invoked to perform a navigation.
    */
-  private async onNavigate(context: NavigationContext): Promise<void> {
-    const {capability, prevCapability, params} = context;
+  private async onNavigate(prevContext: NavigationContext | undefined, context: NavigationContext): Promise<void> {
+    if (!context.capability) {
+      return;
+    }
+
+    const {capability, params} = context;
+    const prevCapability = prevContext?.capability;
+
     this.view.registerAdapter(MicrofrontendWorkbenchView, new MicrofrontendWorkbenchView(capability, params));
 
     // Check if navigating to a different microfrontend.
@@ -246,7 +249,7 @@ export class MicrofrontendViewComponent {
   /**
    * Sets view title and heading as defined on the capability.
    */
-  private setViewTitleAndHeading(context: NavigationContext<WorkbenchViewCapability | null>): void {
+  private setViewTitleAndHeading(context: NavigationContext): void {
     const {capability, params} = context;
     if (capability?.properties.title) {
       this.view.title = createRemoteTranslatable(capability.properties.title, {appSymbolicName: capability.metadata!.appSymbolicName, valueParams: params, topicParams: capability.properties.resolve})!;
@@ -259,7 +262,7 @@ export class MicrofrontendViewComponent {
   /**
    * Updates the properties of this view, such as the view title, as defined by the capability.
    */
-  private setViewProperties(context: NavigationContext<WorkbenchViewCapability | null>): void {
+  private setViewProperties(context: NavigationContext): void {
     const {capability} = context;
     this.view.classList.application = capability?.properties.cssClass;
     this.view.closable = capability?.properties.closable ?? true;
@@ -399,30 +402,29 @@ function configureMicrofrontendGlassPane(): Provider[] {
 /**
  * Computes the current navigation of this microfrontend view.
  */
-function createNavigationContext(): OperatorFunction<Params, NavigationContext<WorkbenchViewCapability | null>> {
-  const manifestObjectCache = inject(ManifestObjectCache);
-  let prevCapability: WorkbenchViewCapability | null = null;
+function computeNavigationContext(): Signal<NavigationContext> {
+  const params = toSignal(inject(ActivatedRoute).params, {requireSync: true});
+  const capabilityId = computed(() => params()[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID] as string);
+  const capability = inject(ManifestObjectCache).getCapability<WorkbenchViewCapability>(capabilityId);
 
-  return switchMap(params => {
-    const capabilityId = params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID] as string;
-
-    return manifestObjectCache.observeCapability$<WorkbenchViewCapability>(capabilityId).pipe(map(capability => {
-      const context = {capability, prevCapability, params, capabilityId};
-      prevCapability = capability;
-      return context;
-    }));
+  return computed(() => {
+    return {
+      capabilityId: capabilityId(),
+      capability: capability(),
+      params: params(),
+    };
   });
 }
 
 /**
  * Executes passed functions based on the current state.
  */
-function executeOn(executeOn: ExecuteOn): MonoTypeOperatorFunction<NavigationContext<WorkbenchViewCapability | null>> {
+function executeOn(executeOn: ExecuteOn): MonoTypeOperatorFunction<[NavigationContext | undefined, NavigationContext]> {
   const {onEach, onCapabilityChange} = executeOn;
-  return tap(context => {
+  return tap(([prevContext, context]) => {
     onEach?.(context);
-    if (context.prevCapability?.metadata!.id !== context.capability?.metadata!.id) {
-      onCapabilityChange?.(context);
+    if (prevContext?.capabilityId !== context.capabilityId) {
+      onCapabilityChange?.(prevContext, context);
     }
     return context;
   });
@@ -431,8 +433,12 @@ function executeOn(executeOn: ExecuteOn): MonoTypeOperatorFunction<NavigationCon
 /**
  * Continues the execution chain only if the capability is not `null`.
  */
-function filterNullCapability(): OperatorFunction<NavigationContext<WorkbenchViewCapability | null>, NavigationContext> {
-  return filter((context): context is NavigationContext => !!context.capability);
+function pairwiseImmediate(): OperatorFunction<NavigationContext, [NavigationContext | undefined, NavigationContext]> {
+  return pipe(
+    startWith(undefined),
+    pairwise(),
+    map(([prevContext, context]) => [prevContext, context!]),
+  );
 }
 
 /**
@@ -440,15 +446,15 @@ function filterNullCapability(): OperatorFunction<NavigationContext<WorkbenchVie
  *
  * Cancels any previous delayed emission when the source emits again.
  */
-function delayIfLazy(): MonoTypeOperatorFunction<NavigationContext> {
+function delayIfLazy(): MonoTypeOperatorFunction<[NavigationContext | undefined, NavigationContext]> {
   // Use a root effect to continue emitting even if the component is detached from change detection.
   const active$ = toRootObservable(inject(ɵWorkbenchView).active);
 
-  return switchMap(context => {
-    const lazy = context.capability.properties.lazy ?? true;
+  return switchMap(([prevContext, context]) => {
+    const lazy = context.capability?.properties.lazy ?? true;
     return active$.pipe(
       filter(active => active || !lazy),
-      map(() => context),
+      map((): [NavigationContext | undefined, NavigationContext] => [prevContext, context]),
       take(1),
     );
   });
@@ -457,10 +463,9 @@ function delayIfLazy(): MonoTypeOperatorFunction<NavigationContext> {
 /**
  * Context available during a navigation.
  */
-interface NavigationContext<T extends WorkbenchViewCapability | null = WorkbenchViewCapability> {
+interface NavigationContext {
   capabilityId: string;
-  capability: T;
-  prevCapability: WorkbenchViewCapability | null;
+  capability: WorkbenchViewCapability | undefined;
   params: Params;
 }
 
@@ -471,9 +476,9 @@ interface ExecuteOn {
   /**
    * Method invoked each time when the source emits.
    */
-  onEach?: (context: NavigationContext<WorkbenchViewCapability | null>) => void;
+  onEach?: (context: NavigationContext) => void;
   /**
    * Method invoked on capability change.
    */
-  onCapabilityChange?: (context: NavigationContext<WorkbenchViewCapability | null>) => void;
+  onCapabilityChange?: (prevContext: NavigationContext | undefined, context: NavigationContext) => void;
 }

@@ -15,6 +15,35 @@ import {WORKBENCH_OUTLET} from '../../routing/workbench-auxiliary-route-installe
 import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {DialogId, PartId, PopupId, ViewId} from '../../workbench.identifiers';
 
+/**
+ * Configures a route to only match workbench parts navigated to specified part capability.
+ *
+ * Use as a `canMatch` guard in {@link Route} config to associate a route with a part capability.
+ *
+ * Microfrontends provided by the workbench host application must all have an empty path.
+ * Configuring a route with the `canMatchMicrofrontendPart` guard enables differentiating
+ * between multiple empty-path routes, associating the route with a specific part capability.
+ *
+ * @example - Part Capability
+ * ```json
+ * {
+ *   "type": "part",
+ *   "qualifier": {
+ *     "part": "navigator"
+ *   },
+ *   "properties": {
+ *     "path": ""
+ *   }
+ * }
+ * ```
+ *
+ * @example - Route associated with above capability.
+ * ```ts
+ * const routes: Routes = [
+ *   {path: '', canMatch: [canMatchMicrofrontendPart({part: 'navigator'})], component: NavigatorComponent},
+ * ];
+ * ```
+ */
 export function canMatchMicrofrontendPart(qualifier: Qualifier): CanMatchFn {
   return canMatchMicrofrontend('part', qualifier)
 }
@@ -23,6 +52,9 @@ export function canMatchMicrofrontendDialog(qualifier: Qualifier): CanMatchFn {
   return canMatchMicrofrontend('dialog', qualifier)
 }
 
+/**
+ * Matches a route for specified capability.
+ */
 function canMatchMicrofrontend(type: 'part' | 'view' | 'dialog' | 'popup', qualifier: Qualifier): CanMatchFn {
   return (): boolean => {
     const outlet = inject(WORKBENCH_OUTLET, {optional: true});
@@ -39,7 +71,7 @@ function canMatchMicrofrontend(type: 'part' | 'view' | 'dialog' | 'popup', quali
       return false; // match until started the microfrontend platform to avoid flickering.
     }
 
-    const capability = inject(ManifestObjectCache).getCapability(match.capabilityId, {orElse: null});
+    const capability = inject(ManifestObjectCache).getCapability(match.capabilityId)();
     if (!capability) {
       return false;
     }

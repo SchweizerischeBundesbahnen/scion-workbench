@@ -125,7 +125,7 @@ export class WorkbenchComponent {
    */
   private evaluateCanMatchGuards(): void {
     const injector = inject(Injector);
-    void inject(WorkbenchStartup).whenDone.then(() => Routing.runCanMatchGuards({injector}));
+    void inject(WorkbenchStartup).whenDone.then(() => Routing.evaluateCanMatchGuards({injector}));
   }
 
   /**

@@ -9,7 +9,7 @@
  */
 
 import {CanMatchFn, Route} from '@angular/router';
-import {computed, EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
+import {computed, EnvironmentProviders, inject, makeEnvironmentProviders, StaticProvider} from '@angular/core';
 import {APP_IDENTITY, MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
 import {MicrofrontendPartNavigationData} from './microfrontend-part-navigation-data';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
@@ -20,11 +20,10 @@ import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {canMatchWorkbenchPart} from '../../routing/workbench-route-guards';
 import {PartId} from '../../workbench.identifiers';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {firstValueFrom} from 'rxjs';
-import {MicrofrontendHostComponent} from '../microfrontend-host/microfrontend-host.component';
+import {MicrofrontendHostSlotComponent} from '../microfrontend-host/microfrontend-host-slot.component';
 import {Maps} from '@scion/toolkit/util';
 import {WORKBENCH_PART_REGISTRY} from '../../part/workbench-part.registry';
-import {createMicrofrontendHostContext, MicrofrontendHostContext} from '../microfrontend-host/microfrontend-host-context';
+import {HostSlotConfig} from '../microfrontend-host/microfrontend-host-slot.config';
 
 /**
  * Hint passed to the navigation when navigating a part microfrontend.
@@ -52,9 +51,9 @@ export function provideMicrofrontendPartRoute(): EnvironmentProviders {
       multi: true,
       useFactory: (): Route => ({
         path: '',
-        component: MicrofrontendHostComponent,
+        component: MicrofrontendHostSlotComponent,
         canMatch: [canMatchMicrofrontendPart({host: true})], // use a single matcher because Angular evaluates matchers in parallel
-        providers: [provideMicrofrontendHostPartContext()],
+        providers: [provideHostPartMicrofrontendSlotConfig()],
       }),
     },
   ]);
@@ -64,7 +63,7 @@ export function provideMicrofrontendPartRoute(): EnvironmentProviders {
  * Matches the route if target of a workbench part navigated to a part microfrontend, but only
  * if the part capability exists.
  */
-function canMatchMicrofrontendPart(filter: {host: boolean}): CanMatchFn {
+function canMatchMicrofrontendPart(provider: {host: boolean}): CanMatchFn {
   return async (route, segments): Promise<boolean> => {
     if (!canMatchWorkbenchPart(MICROFRONTEND_PART_NAVIGATION_HINT)(route, segments)) {
       return false;
@@ -77,41 +76,37 @@ function canMatchMicrofrontendPart(filter: {host: boolean}): CanMatchFn {
     // Do not block to not block startup, e.g, do not wait for mpf
     // console.log('>>> canMatchMicrofrontendPart', partId, PlatformState[MicrofrontendPlatform.state]);
     // match until started the microfrontend platform to avoid flickering.
-    // await MicrofrontendPlatform.whenState(PlatformState.Started);
 
-    // return runInInjectionContext(injector, () => {
     const partId = inject(WORKBENCH_OUTLET) as PartId;
     const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
     const part = layout.part({partId: partId});
     const {capabilityId} = part.navigation!.data as unknown as MicrofrontendPartNavigationData;
-    const capability = await firstValueFrom(inject(ManifestObjectCache).observeCapability$(capabilityId));
+    const capability = inject(ManifestObjectCache).getCapability(capabilityId)()
     if (!capability) {
       return false;
     }
     const isHostProvider = capability.metadata?.appSymbolicName === Beans.get(APP_IDENTITY);
-    if (filter.host) {
-      return isHostProvider;
+    if (provider.host && isHostProvider) {
+      return true;
     }
-    else {
-      return !isHostProvider;
+    if (!provider.host && !isHostProvider) {
+      return true;
     }
+    return false;
   };
 }
 
-function provideMicrofrontendHostPartContext(): EnvironmentProviders {
-  return makeEnvironmentProviders([
-    {
-      provide: MicrofrontendHostContext,
-      useFactory: (): MicrofrontendHostContext => {
-        const partId = inject(WORKBENCH_OUTLET) as PartId;
-        const part = inject(WORKBENCH_PART_REGISTRY).get(partId);
-        const partNavigationData = computed(() => part.navigation()!.data as unknown as MicrofrontendPartNavigationData);
-        return createMicrofrontendHostContext(computed(() => partNavigationData().capabilityId), computed(() => Maps.coerce(partNavigationData().params)))
-        // return {
-        //   capabilityId: computed(() => partNavigationData().capabilityId),
-        //   params: computed(() => Maps.coerce(partNavigationData().params)),
-        // }
-      },
+function provideHostPartMicrofrontendSlotConfig(): StaticProvider {
+  return {
+    provide: HostSlotConfig,
+    useFactory: (): HostSlotConfig => {
+      const partId = inject(WORKBENCH_OUTLET) as PartId;
+      const part = inject(WORKBENCH_PART_REGISTRY).get(partId);
+      const navigationData = computed(() => part.navigation()!.data as unknown as MicrofrontendPartNavigationData);
+      return {
+        capabilityId: computed(() => navigationData().capabilityId),
+        params: computed(() => Maps.coerce(navigationData().params)),
+      };
     },
-  ]);
+  };
 }

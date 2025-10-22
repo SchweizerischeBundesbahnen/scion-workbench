@@ -50,7 +50,7 @@
           {
             "id": "bookmarks",
             "qualifier": {
-              "component": "host-part-1"
+              "component": "host-part-2"
             },
             "position": "left-bottom"
           },
