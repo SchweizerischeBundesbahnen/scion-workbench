@@ -85,7 +85,7 @@
     "@angular/router": "20.2.3",
     "@scion/components": "20.0.0",
     "@scion/components.internal": "20.0.1",
-    "@scion/microfrontend-platform": "1.4.0",
+    "@scion/microfrontend-platform": "1.6.0",
     "@scion/toolkit": "2.0.1",
     "rxjs": "7.8.2",
     "tslib": "2.8.1",

@@ -22,12 +22,11 @@ import {Translatable} from '../text/workbench-text-provider.model';
  *
  * @category View
  * @see WorkbenchViewCapability
- * @see WorkbenchRouter
  */
 export abstract class WorkbenchView {
 
   /**
-   * Represents the identity of this view.
+   * Unique identity of this view.
    */
   public abstract readonly id: ViewId;
 
@@ -41,7 +40,7 @@ export abstract class WorkbenchView {
   public abstract signalReady(): void;
 
   /**
-   * Provides the capability of the microfrontend loaded into the view.
+   * Capability of the microfrontend loaded into the view.
    *
    * Upon subscription, emits the microfrontend's capability, and then emits continuously when navigating to a different microfrontend
    * of the same application. It completes when navigating to a microfrontend of another application.
@@ -49,7 +48,7 @@ export abstract class WorkbenchView {
   public abstract readonly capability$: Observable<WorkbenchViewCapability>;
 
   /**
-   * Provides the parameters of the microfrontend loaded into the view.
+   * Parameters of the microfrontend loaded into the view.
    *
    * Upon subscription, emits the microfrontend's parameters, and then emits continuously when the parameters change.
    * The Observable completes when navigating to a microfrontend of another application, but not when navigating to a different microfrontend
@@ -81,7 +80,7 @@ export abstract class WorkbenchView {
   public abstract readonly focused$: Observable<boolean>;
 
   /**
-   * Provides the identity of the part that contains this view.
+   * Gets the identity of the part that contains this view.
    *
    * Upon subscription, emits the identity of this view's part, and then emits continuously when it changes.
    * The Observable completes when navigating to a microfrontend of another application, but not when navigating to a different microfrontend

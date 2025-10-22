@@ -68,7 +68,7 @@ export const Perspectives = {
       data: {
         [PerspectiveData.label]: 'Sample Layout 1 (Docked Parts)',
         [PerspectiveData.menuItemLabel]: 'Sample Layout 1',
-        [PerspectiveData.menuGroup]: 'docked-parts-layout',
+        [PerspectiveData.menuGroup]: 'docked-part-layout',
       },
     },
     {
@@ -77,25 +77,25 @@ export const Perspectives = {
       data: {
         [PerspectiveData.label]: 'Sample Layout 2 (Docked Parts)',
         [PerspectiveData.menuItemLabel]: 'Sample Layout 2',
-        [PerspectiveData.menuGroup]: 'docked-parts-layout',
+        [PerspectiveData.menuGroup]: 'docked-part-layout',
       },
     },
     {
       id: 'perspective-1',
       layout: providePerspectiveLayout1,
       data: {
-        [PerspectiveData.label]: 'Sample Layout 1 (Peripheral Parts)',
+        [PerspectiveData.label]: 'Sample Layout 1 (Aligned Parts)',
         [PerspectiveData.menuItemLabel]: 'Sample Layout 1',
-        [PerspectiveData.menuGroup]: 'peripheral-part-layout',
+        [PerspectiveData.menuGroup]: 'aligned-part-layout',
       },
     },
     {
       id: 'perspective-2',
       layout: providePerspectiveLayout2,
       data: {
-        [PerspectiveData.label]: 'Sample Layout 2 (Peripheral Parts)',
+        [PerspectiveData.label]: 'Sample Layout 2 (Aligned Parts)',
         [PerspectiveData.menuItemLabel]: 'Sample Layout 2',
-        [PerspectiveData.menuGroup]: 'peripheral-part-layout',
+        [PerspectiveData.menuGroup]: 'aligned-part-layout',
       },
     },
     {
@@ -146,7 +146,7 @@ function provideActivityPerspectiveLayout1(factory: WorkbenchLayoutFactory): Wor
     // Add parts to dock areas on the side.
     .addPart(MAIN_AREA)
     .addPart('projects', {dockTo: 'left-top'}, {label: 'Projects', icon: 'folder'})
-    .addPart('inbox', {dockTo: 'left-top'}, {icon: 'mail', label: 'Inbox'})
+    .addPart('inbox', {dockTo: 'left-top'}, {label: 'Inbox', icon: 'mail'})
     .addPart('bookmarks', {dockTo: 'left-bottom'}, {icon: 'bookmark', label: 'Bookmarks'})
     .addPart('find', {dockTo: 'bottom-left'}, {label: 'Find', icon: 'search'})
     .addPart('inventory', {dockTo: 'right-top'}, {label: 'Inventory', icon: 'inventory'})
@@ -195,8 +195,8 @@ function provideActivityPerspectiveLayout2(factory: WorkbenchLayoutFactory): Wor
     .addPart('structure', {dockTo: 'right-top'}, {icon: 'category', label: 'Structure'})
     .addPart('servers', {dockTo: 'right-top'}, {icon: 'storage', label: 'Servers'})
     .addPart('problems', {dockTo: 'right-bottom'}, {label: 'Problems', icon: 'error'})
-    .addPart('databases', {dockTo: 'right-top'}, {label: 'Database', icon: 'database'})
-    .addPart('connections', {relativeTo: 'databases', align: 'bottom', ratio: .25}, {title: 'Connections'})
+    .addPart('databases', {dockTo: 'right-top'}, {label: 'Databases', icon: 'database'})
+    .addPart('connections', {relativeTo: 'databases', align: 'bottom', ratio: .5}, {title: 'Connections'})
     .addPart('progress', {dockTo: 'bottom-right'}, {label: 'Progress', icon: 'overview'})
 
     // Add views to parts.
@@ -215,26 +215,26 @@ function provideActivityPerspectiveLayout2(factory: WorkbenchLayoutFactory): Wor
     .navigatePart('repositories', [], {hint: 'sample-part', data: {style: 'list'} satisfies PartSkeletonNavigationData})
     .navigatePart('commits', [], {hint: 'sample-part', data: {style: 'table'} satisfies PartSkeletonNavigationData})
     .navigatePart('structure', [], {hint: 'sample-part', data: {style: 'table'} satisfies PartSkeletonNavigationData})
-    .navigatePart('databases', [], {hint: 'sample-part', data: {style: 'table'} satisfies PartSkeletonNavigationData})
+    .navigatePart('databases', [], {hint: 'sample-part', data: {style: 'list'} satisfies PartSkeletonNavigationData})
     .navigatePart('servers', [], {hint: 'sample-part', data: {style: 'table'} satisfies PartSkeletonNavigationData})
     .navigatePart('progress', [], {hint: 'sample-part', data: {style: 'list'} satisfies PartSkeletonNavigationData})
-    .navigatePart('connections', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+    .navigatePart('connections', [], {hint: 'sample-part', data: {style: 'list'} satisfies PartSkeletonNavigationData})
 
     // Navigate views to display content.
     .navigateView('find1', [], {hint: 'sample-view', data: {style: 'list', title: `Occurrences of 'lorem'`} satisfies ViewSkeletonNavigationData})
     .navigateView('find2', [], {hint: 'sample-view', data: {style: 'list', title: `Occurrences of 'ipsum'`} satisfies ViewSkeletonNavigationData})
     .navigateView('find3', [], {hint: 'sample-view', data: {style: 'list', title: `Occurrences of 'dolor'`} satisfies ViewSkeletonNavigationData})
 
-    .navigateView('terminal1', [], {hint: 'sample-view', data: {style: 'list', title: `Terminal 1`} satisfies ViewSkeletonNavigationData})
-    .navigateView('terminal2', [], {hint: 'sample-view', data: {style: 'list', title: `Terminal 2`} satisfies ViewSkeletonNavigationData})
-    .navigateView('terminal3', [], {hint: 'sample-view', data: {style: 'list', title: `Terminal 3`} satisfies ViewSkeletonNavigationData})
-    .navigateView('terminal4', [], {hint: 'sample-view', data: {style: 'list', title: `Terminal 4`} satisfies ViewSkeletonNavigationData})
+    .navigateView('terminal1', [], {hint: 'sample-view', data: {style: 'list', title: 'Terminal 1'} satisfies ViewSkeletonNavigationData})
+    .navigateView('terminal2', [], {hint: 'sample-view', data: {style: 'list', title: 'Terminal 2'} satisfies ViewSkeletonNavigationData})
+    .navigateView('terminal3', [], {hint: 'sample-view', data: {style: 'list', title: 'Terminal 3'} satisfies ViewSkeletonNavigationData})
+    .navigateView('terminal4', [], {hint: 'sample-view', data: {style: 'list', title: 'Terminal 4'} satisfies ViewSkeletonNavigationData})
 
     // Activate parts to open docked parts.
     .activatePart('project')
-    .activatePart('find')
+    .activatePart('terminal')
     .activatePart('databases')
-    .activateView('terminal4')
+    .activateView('terminal3')
 
     // Add active workbench element log.
     .addPart('active-workbench-element-log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal'})
@@ -244,57 +244,56 @@ function provideActivityPerspectiveLayout2(factory: WorkbenchLayoutFactory): Wor
 function providePerspectiveLayout1(factory: WorkbenchLayoutFactory): WorkbenchLayout {
   return factory
     .addPart(MAIN_AREA)
-    .addPart('top-right', {align: 'right', ratio: .2})
-    .addPart('bottom-right', {relativeTo: 'top-right', align: 'bottom', ratio: .5})
-    .addPart('bottom', {align: 'bottom', ratio: .3})
-    .addPart('left', {align: 'left', ratio: .15})
-    .addView('sample-view-1', {partId: 'left'})
-    .addView('sample-view-2', {partId: 'left'})
-    .addView('sample-view-3', {partId: 'top-right'})
-    .addView('sample-view-4', {partId: 'top-right'})
-    .addView('sample-view-5', {partId: 'bottom'})
-    .addView('sample-view-6', {partId: 'bottom'})
-    .addView('sample-view-7', {partId: 'bottom'})
-    .navigatePart('top-right', [], {hint: 'sample-part', data: {style: 'list'} satisfies PartSkeletonNavigationData})
-    .navigatePart('bottom-right', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
-    .navigateView('sample-view-1', [], {hint: 'sample-view', data: {style: 'list', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
-    .navigateView('sample-view-2', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
-    .navigateView('sample-view-3', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
-    .navigateView('sample-view-4', [], {hint: 'sample-view', data: {style: 'list', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
-    .navigateView('sample-view-5', [], {hint: 'sample-view', data: {style: 'list', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
-    .navigateView('sample-view-6', [], {hint: 'sample-view', data: {style: 'form', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
-    .navigateView('sample-view-7', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
-    .activateView('sample-view-7');
+    .addPart('projects', {relativeTo: MAIN_AREA, align: 'left', ratio: .175}, {title: 'Projects'})
+    .addPart('inventory', {relativeTo: MAIN_AREA, align: 'right', ratio: .175}, {title: 'Inventory'})
+    .addPart('inbox', {relativeTo: 'inventory', align: 'bottom', ratio: .5}, {title: 'Inbox'})
+    .addPart('find', {align: 'bottom', ratio: .2}, {title: 'Find'})
+
+    .navigatePart('projects', [], {hint: 'sample-part', data: {style: 'list'} satisfies PartSkeletonNavigationData})
+    .navigatePart('inbox', [], {hint: 'sample-part', data: {style: 'table'} satisfies PartSkeletonNavigationData})
+    .navigatePart('inventory', [], {hint: 'sample-part', data: {style: 'list'} satisfies PartSkeletonNavigationData})
+
+    .addView('find1', {partId: 'find'})
+    .addView('find2', {partId: 'find'})
+    .addView('find3', {partId: 'find'})
+    .addView('inventory1', {partId: 'inventory'})
+    .addView('inventory2', {partId: 'inventory'})
+
+    .navigateView('find1', [], {hint: 'sample-view', data: {style: 'list', title: `Occurrences of 'lorem'`} satisfies ViewSkeletonNavigationData})
+    .navigateView('find2', [], {hint: 'sample-view', data: {style: 'list', title: `Occurrences of 'ipsum'`} satisfies ViewSkeletonNavigationData})
+    .navigateView('find3', [], {hint: 'sample-view', data: {style: 'list', title: `Occurrences of 'dolor'`} satisfies ViewSkeletonNavigationData})
+
+    .navigateView('inventory1', [], {hint: 'sample-view', data: {style: 'list', title: 'Inventory 1'} satisfies ViewSkeletonNavigationData})
+    .navigateView('inventory2', [], {hint: 'sample-view', data: {style: 'list', title: 'Inventory 2 '} satisfies ViewSkeletonNavigationData});
 }
 
 function providePerspectiveLayout2(factory: WorkbenchLayoutFactory): WorkbenchLayout {
   return factory
     .addPart(MAIN_AREA)
-    .addPart('top-left', {align: 'left', ratio: .181})
-    .addPart('bottom-left', {relativeTo: 'top-left', align: 'bottom', ratio: .5})
-    .addPart('right', {align: 'right', ratio: .17})
-    .addPart('bottom', {align: 'bottom', ratio: .25})
-    .addView('sample-view-1', {partId: 'top-left'})
-    .addView('sample-view-2', {partId: 'top-left'})
-    .addView('sample-view-3', {partId: 'bottom-left'})
-    .addView('sample-view-4', {partId: 'bottom-left'})
-    .addView('sample-view-5', {partId: 'right'})
-    .addView('sample-view-6', {partId: 'right'})
-    .addView('sample-view-7', {partId: 'right'})
-    .addView('sample-view-8', {partId: 'bottom'})
-    .addView('sample-view-9', {partId: 'bottom'})
-    .addView('sample-view-10', {partId: 'bottom'})
-    .navigateView('sample-view-1', [], {hint: 'sample-view', data: {style: 'list', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
-    .navigateView('sample-view-2', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
-    .navigateView('sample-view-3', [], {hint: 'sample-view', data: {style: 'form', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
-    .navigateView('sample-view-4', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
-    .navigateView('sample-view-5', [], {hint: 'sample-view', data: {style: 'list', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
-    .navigateView('sample-view-6', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
-    .navigateView('sample-view-7', [], {hint: 'sample-view', data: {style: 'form', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
-    .navigateView('sample-view-8', [], {hint: 'sample-view', data: {style: 'list', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
-    .navigateView('sample-view-9', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
-    .navigateView('sample-view-10', [], {hint: 'sample-view', data: {style: 'form', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
-    .activateView('sample-view-6');
+    .addPart('projects', {relativeTo: MAIN_AREA, align: 'left', ratio: .175}, {title: 'Projects'})
+    .addPart('databases', {relativeTo: MAIN_AREA, align: 'right', ratio: .2}, {title: 'Databases'})
+    .addPart('connections', {relativeTo: 'databases', align: 'bottom', ratio: .5}, {title: 'Connections'})
+    .addPart('terminal', {align: 'bottom', ratio: .2}, {title: 'Terminal'})
+
+    .navigatePart('projects', [], {hint: 'sample-part', data: {style: 'list'} satisfies PartSkeletonNavigationData})
+    .navigatePart('databases', [], {hint: 'sample-part', data: {style: 'list'} satisfies PartSkeletonNavigationData})
+
+    .addView('terminal1', {partId: 'terminal'})
+    .addView('terminal2', {partId: 'terminal'})
+    .addView('terminal3', {partId: 'terminal'})
+    .addView('terminal4', {partId: 'terminal'})
+    .addView('connection1', {partId: 'connections'})
+    .addView('connection2', {partId: 'connections'})
+
+    .navigateView('terminal1', [], {hint: 'sample-view', data: {style: 'list', title: 'Terminal 1'} satisfies ViewSkeletonNavigationData})
+    .navigateView('terminal2', [], {hint: 'sample-view', data: {style: 'list', title: 'Terminal 2'} satisfies ViewSkeletonNavigationData})
+    .navigateView('terminal3', [], {hint: 'sample-view', data: {style: 'list', title: 'Terminal 3'} satisfies ViewSkeletonNavigationData})
+    .navigateView('terminal4', [], {hint: 'sample-view', data: {style: 'list', title: 'Terminal 4'} satisfies ViewSkeletonNavigationData})
+
+    .navigateView('connection1', [], {hint: 'sample-view', data: {style: 'list', title: 'Connection 1'} satisfies ViewSkeletonNavigationData})
+    .navigateView('connection2', [], {hint: 'sample-view', data: {style: 'list', title: 'Connection 2'} satisfies ViewSkeletonNavigationData})
+
+    .activateView('terminal3');
 }
 
 function provideFocusTestPerspective(factory: WorkbenchLayoutFactory): WorkbenchLayout {

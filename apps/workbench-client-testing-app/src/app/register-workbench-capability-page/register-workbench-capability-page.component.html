@@ -3,6 +3,7 @@
     <sci-form-field label="Type">
       <select [formControl]="form.controls.type" class="e2e-type">
         <option [value]="WorkbenchCapabilities.Perspective">PERSPECTIVE</option>
+        <option [value]="WorkbenchCapabilities.Part">PART</option>
         <option [value]="WorkbenchCapabilities.View">VIEW</option>
         <option [value]="WorkbenchCapabilities.Dialog">DIALOG</option>
         <option [value]="WorkbenchCapabilities.MessageBox">MESSAGEBOX</option>
@@ -14,17 +15,10 @@
       <sci-key-value-field [keyValueFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"/>
     </sci-form-field>
 
-    <sci-form-field label="Required Params">
-      <input [formControl]="form.controls.requiredParams" class="e2e-required-params" placeholder="param1,param2,...">
+    <sci-form-field label="Params">
+      <app-capability-params [formControl]="form.controls.params" [showTransientParams]="form.controls.type.value === 'view'"/>
     </sci-form-field>
-    <sci-form-field label="Optional Params">
-      <input [formControl]="form.controls.optionalParams" class="e2e-optional-params" placeholder="param1,param2,...">
-    </sci-form-field>
-    @if (form.controls.type.value === WorkbenchCapabilities.View) {
-      <sci-form-field label="Transient Params">
-        <input [formControl]="form.controls.transientParams" class="e2e-transient-params" placeholder="param1,param2,...">
-      </sci-form-field>
-    }
+
     <sci-form-field label="Private">
       <sci-checkbox [formControl]="form.controls.private" class="e2e-private"/>
     </sci-form-field>
@@ -33,6 +27,9 @@
   @switch (form.controls.type.value) {
     @case (WorkbenchCapabilities.Perspective) {
       <app-perspective-capability-properties [formControl]="form.controls.perspectiveProperties"/>
+    }
+    @case (WorkbenchCapabilities.Part) {
+      <app-part-capability-properties [formControl]="form.controls.partProperties"/>
     }
     @case (WorkbenchCapabilities.View) {
       <app-view-capability-properties [formControl]="form.controls.viewProperties"/>

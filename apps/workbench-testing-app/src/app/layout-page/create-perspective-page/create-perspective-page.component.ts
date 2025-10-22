@@ -14,14 +14,14 @@ import {AddViewsComponent, ViewDescriptor} from '../tables/add-views/add-views.c
 import {NavigateViewsComponent, NavigationDescriptor} from '../tables/navigate-views/navigate-views.component';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SettingsService} from '../../settings.service';
-import {WorkbenchLayout, WorkbenchLayoutFactory, WorkbenchLayoutFn, WorkbenchPart, WorkbenchService, WorkbenchView} from '@scion/workbench';
+import {WorkbenchLayout, WorkbenchLayoutFactory, WorkbenchLayoutFn, WorkbenchService} from '@scion/workbench';
 import {stringifyError} from '../../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {NavigatePartsComponent} from '../tables/navigate-parts/navigate-parts.component';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {DockedPartDescriptor, AddDockedPartsComponent} from '../tables/add-docked-parts/add-docked-parts.component';
+import {AddDockedPartsComponent, DockedPartDescriptor} from '../tables/add-docked-parts/add-docked-parts.component';
 import {MultiValueInputComponent} from '../../multi-value-input/multi-value-input.component';
 
 @Component({
@@ -68,28 +68,22 @@ export default class CreatePerspectivePageComponent {
   private computePartProposals(): Signal<string[]> {
     const parts = toSignal(this.form.controls.parts.valueChanges, {initialValue: []});
     const dockedParts = toSignal(this.form.controls.dockedParts.valueChanges, {initialValue: []});
-    const workbenchService = inject(WorkbenchService);
 
-    return computed(() => new Array<WorkbenchPart | DockedPartDescriptor | PartDescriptor>()
-      .concat(workbenchService.parts())
+    return computed(() => new Array<DockedPartDescriptor | PartDescriptor>()
       .concat(dockedParts())
       .concat(parts())
       .map(part => part.id)
-      .filter(Boolean)
-      .reduce((acc, partId) => acc.includes(partId) ? acc : acc.concat(partId), new Array<string>()),
+      .filter(Boolean),
     );
   }
 
   private computeViewProposals(): Signal<string[]> {
-    const viewsFromUI = toSignal(this.form.controls.views.valueChanges, {initialValue: []});
-    const workbenchService = inject(WorkbenchService);
+    const views = toSignal(this.form.controls.views.valueChanges, {initialValue: []});
 
-    return computed(() => new Array<WorkbenchView | ViewDescriptor>()
-      .concat(workbenchService.views())
-      .concat(viewsFromUI())
+    return computed(() => new Array<ViewDescriptor>()
+      .concat(views())
       .map(view => view.id)
-      .filter(Boolean)
-      .reduce((acc, viewId) => acc.includes(viewId) ? acc : acc.concat(viewId), new Array<string>()),
+      .filter(Boolean),
     );
   }
 

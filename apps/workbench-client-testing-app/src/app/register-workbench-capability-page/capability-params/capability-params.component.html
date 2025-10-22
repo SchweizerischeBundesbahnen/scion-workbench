@@ -1,0 +1,34 @@
+<span class="header">Name</span>
+<span class="header checkbox">Required</span>
+@if (showTransientParams()) {
+  <span class="header checkbox">Transient</span>
+}
+<span class="header checkbox">Deprecated</span>
+<span class="header">Deprecation Message</span>
+<span class="header">Deprecation Use Instead</span>
+<button (click)="onAddParam()" class="e2e-add-param" title="Add Param" sciMaterialIcon>add</button>
+
+@for (paramFormGroup of form.controls.params.controls; track $index) {
+  <!-- Name -->
+  <input [formControl]="paramFormGroup.controls.name" class="e2e-name">
+  <!-- Required -->
+  <sci-checkbox [formControl]="paramFormGroup.controls.required" class="e2e-required"/>
+  @if (showTransientParams()) {
+    <!-- Transient -->
+    <sci-checkbox [formControl]="paramFormGroup.controls.transient" class="e2e-transient"/>
+  }
+  <!-- Deprecated -->
+  <sci-checkbox [formControl]="paramFormGroup.controls.deprecated" class="e2e-deprecated"/>
+  <!-- Deprecated Message -->
+  <input [formControl]="paramFormGroup.controls.deprecatedMessage" class="e2e-deprecated-message">
+  <!-- Deprecated Use Instead -->
+  <input [formControl]="paramFormGroup.controls.deprecatedUseInstead" class="e2e-deprecated-use-instead" [attr.list]="paramList">
+  <!-- Remove button -->
+  <button (click)="onRemoveParam($index)" title="Remove Param" sciMaterialIcon>clear</button>
+}
+
+<datalist [attr.id]="paramList">
+  @for (param of params(); track param) {
+    <option [value]="param">{{param}}</option>
+  }
+</datalist>

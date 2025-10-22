@@ -29,6 +29,7 @@ import {Disposable} from './common/disposable';
 import {WorkbenchTextProviderFn} from './text/workbench-text-provider.model';
 import {WorkbenchTextService} from './text/workbench-text-service';
 import {ɵWorkbenchTextService} from './text/ɵworkbench-text-service';
+import {WorkbenchPartInitializer} from './part/workbench-part-initializer';
 
 /**
  * **SCION Workbench Client provides core API for a web app to interact with SCION Workbench and other microfrontends.**
@@ -41,6 +42,7 @@ import {ɵWorkbenchTextService} from './text/ɵworkbench-text-service';
  *
  * - {@link WorkbenchRouter} for navigating to a microfrontend in a workbench view.
  * - {@link WorkbenchView} for the microfrontend to interact with the view.
+ * - {@link WorkbenchPart} for the microfrontend to interact with the part.
  * - {@link WorkbenchDialogService} for displaying a microfrontend in a dialog.
  * - {@link WorkbenchDialog} for the microfrontend to interact with the dialog.
  * - {@link WorkbenchPopupService} for displaying a microfrontend in a popup.
@@ -129,6 +131,7 @@ export class WorkbenchClient {
     Beans.register(WorkbenchThemeMonitor, {useClass: ɵWorkbenchThemeMonitor});
     Beans.register(WorkbenchTextService, {useClass: ɵWorkbenchTextService});
     Beans.register(StyleSheetInstaller, {eager: true});
+    Beans.registerInitializer({useClass: WorkbenchPartInitializer});
     Beans.registerInitializer({useClass: WorkbenchViewInitializer});
     Beans.registerInitializer({useClass: WorkbenchPopupInitializer});
     Beans.registerInitializer({useClass: WorkbenchDialogInitializer});

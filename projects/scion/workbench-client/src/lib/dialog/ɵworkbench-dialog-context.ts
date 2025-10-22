@@ -16,7 +16,7 @@ import {DialogId} from '../workbench.identifiers';
  *
  * This object can be obtained from the {@link ContextService} using the name {@link ɵDIALOG_CONTEXT}.
  *
- * @docs-private Not public API, intended for internal use only.
+ * @docs-private Not public API. For internal use only.
  * @ignore
  */
 export interface ɵDialogContext {
@@ -30,7 +30,7 @@ export interface ɵDialogContext {
  *
  * The dialog context is only available to microfrontends loaded in a workbench dialog.
  *
- * @docs-private Not public API, intended for internal use only.
+ * @docs-private Not public API. For internal use only.
  * @ignore
  * @see {@link ContextService}
  * @see {@link ɵDialogContext}

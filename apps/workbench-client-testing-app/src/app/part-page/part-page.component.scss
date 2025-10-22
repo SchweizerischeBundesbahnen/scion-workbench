@@ -1,0 +1,28 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  padding: 1em;
+
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: .5em;
+    border: 1px solid var(--sci-color-border);
+    border-radius: var(--sci-corner);
+    padding: 1em;
+  }
+
+  header {
+    font-weight: bold;
+  }
+
+  > sci-accordion.part-capability sci-viewport {
+    max-height: 200px;
+
+    div.capability {
+      white-space: pre;
+      font-family: monospace;
+    }
+  }
+}

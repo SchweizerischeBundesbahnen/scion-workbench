@@ -14,7 +14,7 @@ import {PopupId, ViewId} from '../workbench.identifiers';
 /**
  * Command object for instructing the Workbench to open the microfrontend of given popup capability in a popup.
  *
- * @docs-private Not public API, intended for internal use only.
+ * @docs-private Not public API. For internal use only.
  * @ignore
  */
 export interface ɵWorkbenchPopupCommand {

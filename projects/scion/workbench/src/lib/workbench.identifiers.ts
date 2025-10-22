@@ -55,7 +55,7 @@ export type PopupId = `${typeof POPUP_ID_PREFIX}${string}`;
  *
  * Each activity is assigned a unique identifier (e.g., `activity.9fdf7ab4`, `activity.c6485225`, etc.).
  *
- * @docs-private Not public API, intended for internal use only.
+ * @docs-private Not public API. For internal use only.
  */
 export type ActivityId = `${typeof ACTIVITY_ID_PREFIX}${string}`;
 

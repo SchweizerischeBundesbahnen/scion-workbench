@@ -28,18 +28,18 @@ export class MicrofrontendDialogCapabilityValidator implements CapabilityInterce
     const dialogCapability = capability as Partial<WorkbenchDialogCapability>;
     // Assert the dialog capability to have a qualifier.
     if (!Object.keys(dialogCapability.qualifier ?? {}).length) {
-      throw Error(`[NullQualifierError] Dialog capability requires a qualifier [capability=${JSON.stringify(dialogCapability)}]`);
+      throw Error(`[DialogDefinitionError] Dialog capability requires a qualifier [app=${app(dialogCapability)}, dialog=${qualifier(dialogCapability)}]`);
     }
 
-    // Assert the dialog capability to have a "properties" section.
+    // Assert the dialog capability to have properties.
     if (!dialogCapability.properties) {
-      throw Error(`[NullPropertiesError] Dialog capability requires a "properties" section [application="${dialogCapability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(dialogCapability.qualifier)}"]`);
+      throw Error(`[DialogDefinitionError] Dialog capability requires properties [app=${app(dialogCapability)}, dialog=${qualifier(dialogCapability)}]`);
     }
 
     // Assert the dialog capability to have a path.
     const path = dialogCapability.properties.path as unknown;
     if (path === undefined || path === null) {
-      throw Error(`[NullPathError] Dialog capability requires a path to the microfrontend in its properties [application="${dialogCapability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(dialogCapability.qualifier)}"]`);
+      throw Error(`[DialogDefinitionError] Dialog capability requires the 'path' property [app=${app(dialogCapability)}, dialog=${qualifier(dialogCapability)}]`);
     }
 
     // Assert the dialog capability to have a height and width, unless provided by the host application.
@@ -56,7 +56,21 @@ export class MicrofrontendDialogCapabilityValidator implements CapabilityInterce
 
     const size = capability.properties?.size as Partial<WorkbenchDialogSize> | undefined;
     if (!size?.width || !size.height) {
-      throw Error(`[NullSizeError] Dialog capability requires width and height in its size properties [application="${capability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(capability.qualifier)}"]`);
+      throw Error(`[DialogDefinitionError] Dialog capability requires the 'size' property with a width and a height [app=${app(capability)}, dialog=${qualifier(capability)}]`);
     }
   }
+}
+
+/**
+ * Returns the qualifier as string.
+ */
+function qualifier(capability: Partial<Capability>): string {
+  return Objects.toMatrixNotation(capability.qualifier);
+}
+
+/**
+ * Returns the app symbolic name.
+ */
+function app(capability: Partial<Capability>): string {
+  return capability.metadata!.appSymbolicName;
 }

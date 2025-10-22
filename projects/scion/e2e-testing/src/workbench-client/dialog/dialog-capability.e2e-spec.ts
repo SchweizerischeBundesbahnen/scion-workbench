@@ -56,7 +56,7 @@ test.describe('Workbench Dialog Capability', () => {
         size: {height: '475px', width: '300px'},
       },
     });
-    await expect(registeredCapability).rejects.toThrow(/NullQualifierError/);
+    await expect(registeredCapability).rejects.toThrow(/\[DialogDefinitionError] Dialog capability requires a qualifier/);
   });
 
   test('should error if path is `undefined`', async ({appPO, microfrontendNavigator}) => {
@@ -70,7 +70,7 @@ test.describe('Workbench Dialog Capability', () => {
         size: {height: '475px', width: '300px'},
       },
     });
-    await expect(registeredCapability).rejects.toThrow(/NullPathError/);
+    await expect(registeredCapability).rejects.toThrow(/\[DialogDefinitionError] Dialog capability requires the 'path' property/);
   });
 
   test('should error if path is `null`', async ({appPO, microfrontendNavigator}) => {
@@ -84,7 +84,7 @@ test.describe('Workbench Dialog Capability', () => {
         size: {height: '475px', width: '300px'},
       },
     });
-    await expect(registeredCapability).rejects.toThrow(/NullPathError/);
+    await expect(registeredCapability).rejects.toThrow(/\[DialogDefinitionError] Dialog capability requires the 'path' property/);
   });
 
   test('should not error if path is empty', async ({appPO, microfrontendNavigator}) => {
@@ -113,7 +113,7 @@ test.describe('Workbench Dialog Capability', () => {
         size: undefined!,
       },
     });
-    await expect(registeredCapability).rejects.toThrow(/NullSizeError/);
+    await expect(registeredCapability).rejects.toThrow(/\[DialogDefinitionError] Dialog capability requires the 'size' property with a width and a height/);
   });
 
   test('should error if height is `undefined`', async ({appPO, microfrontendNavigator}) => {
@@ -130,7 +130,7 @@ test.describe('Workbench Dialog Capability', () => {
         },
       },
     });
-    await expect(registeredCapability).rejects.toThrow(/NullSizeError/);
+    await expect(registeredCapability).rejects.toThrow(/\[DialogDefinitionError] Dialog capability requires the 'size' property with a width and a height/);
   });
 
   test('should error if width is `undefined`', async ({appPO, microfrontendNavigator}) => {
@@ -147,7 +147,7 @@ test.describe('Workbench Dialog Capability', () => {
         },
       },
     });
-    await expect(registeredCapability).rejects.toThrow(/NullSizeError/);
+    await expect(registeredCapability).rejects.toThrow(/\[DialogDefinitionError] Dialog capability requires the 'size' property with a width and a height/);
   });
 
   test('should error if height is `null`', async ({appPO, microfrontendNavigator}) => {
@@ -164,7 +164,7 @@ test.describe('Workbench Dialog Capability', () => {
         },
       },
     });
-    await expect(registeredCapability).rejects.toThrow(/NullSizeError/);
+    await expect(registeredCapability).rejects.toThrow(/\[DialogDefinitionError] Dialog capability requires the 'size' property with a width and a height/);
   });
 
   test('should error if width is `null`', async ({appPO, microfrontendNavigator}) => {
@@ -181,7 +181,7 @@ test.describe('Workbench Dialog Capability', () => {
         },
       },
     });
-    await expect(registeredCapability).rejects.toThrow(/NullSizeError/);
+    await expect(registeredCapability).rejects.toThrow(/\[DialogDefinitionError] Dialog capability requires the 'size' property with a width and a height/);
   });
 
   test('should error if height is empty', async ({appPO, microfrontendNavigator}) => {
@@ -198,7 +198,7 @@ test.describe('Workbench Dialog Capability', () => {
         },
       },
     });
-    await expect(registeredCapability).rejects.toThrow(/NullSizeError/);
+    await expect(registeredCapability).rejects.toThrow(/\[DialogDefinitionError] Dialog capability requires the 'size' property with a width and a height/);
   });
 
   test('should error if width is empty', async ({appPO, microfrontendNavigator}) => {
@@ -215,6 +215,6 @@ test.describe('Workbench Dialog Capability', () => {
         },
       },
     });
-    await expect(registeredCapability).rejects.toThrow(/NullSizeError/);
+    await expect(registeredCapability).rejects.toThrow(/\[DialogDefinitionError] Dialog capability requires the 'size' property with a width and a height/);
   });
 });

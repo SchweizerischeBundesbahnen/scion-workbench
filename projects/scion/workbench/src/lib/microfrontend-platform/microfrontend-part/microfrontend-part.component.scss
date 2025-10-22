@@ -1,0 +1,14 @@
+:host {
+  display: grid;
+}
+
+sci-router-outlet {
+  // Disable pointer events during workbench drag operation for the workbench to consume drag events.
+  &.workbench-drag {
+    pointer-events: none;
+  }
+
+  &::part(splash) {
+    display: grid;
+  }
+}

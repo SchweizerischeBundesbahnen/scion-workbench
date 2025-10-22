@@ -22,7 +22,7 @@ import {undefinedIfEmpty} from '../../common/undefined-if-empty.util';
 @Component({
   selector: 'app-popup-capability-properties',
   templateUrl: './popup-capability-properties.component.html',
-  styleUrls: ['./popup-capability-properties.component.scss'],
+  styleUrl: './popup-capability-properties.component.scss',
   imports: [
     ReactiveFormsModule,
     MultiValueInputComponent,

@@ -1,126 +1,67 @@
 @use '@scion/components.internal/design' as sci-design;
-@use '../../common/fieldset.mixin';
 
 :host {
-  display: grid;
-  border: 1px solid var(--sci-color-border);
-  border-radius: var(--sci-corner);
-  padding: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: .5em;
 
-  > form {
+  > section {
+    flex: none;
     display: flex;
     flex-direction: column;
-    gap: 1em;
+    gap: .5em;
+    border: 1px solid var(--sci-color-border);
+    border-radius: var(--sci-corner);
+    padding: 1em;
 
-    section.layout {
+    > header {
+      margin-bottom: 1em;
+      font-weight: bold;
+    }
+
+    > div.parts {
       display: grid;
       grid-template-columns:
-        // === Part Subgrid ===
-        10em // Part ID
-        10em // Relative To
-        10em // Align
-        10em // Ratio
-          // === Views Subgrid ===
-          1fr // Qualifier
-          1fr // Params
-          .75fr // CSS class(es)
-          auto // Active
-          min-content // Remove View
-        min-content; // Remove Part
-      align-items: start;
+        minmax(5em, 10em) // Part ID
+        minmax(10em, 1fr) // Qualifier
+        minmax(10em, 1fr) // Params
+        minmax(5em, 10em) // Align
+        minmax(5em, 10em) // Relative To
+        minmax(5em, 10em) // Ratio
+        minmax(5em, 10em) // CSS Class
+        min-content // Active
+        min-content; // Add / Remove Part
+      align-items: center;
       gap: 1em;
 
-      > section.part.fieldset::after {
-        content: 'Part'; // do not include fieldset mixin to reduce file size
-      }
-
-      > section.part {
-        display: grid;
-        grid-column: 1/-1;
-        grid-template-columns: subgrid;
-        align-items: start;
-
-        > div.part-id.legend::after {
-          content: 'Part ID'; // do not include legend mixin to reduce file size
-        }
-
-        > div.relative-to.legend::after {
-          content: 'Relative To'; // do not include legend mixin to reduce file size
-        }
-
-        > div.align.legend::after {
-          content: 'Align'; // do not include legend mixin to reduce file size
-        }
-
-        > div.ratio.legend::after {
-          content: 'Ratio'; // do not include legend mixin to reduce file size
-        }
-
-        > section.views.fieldset::after {
-          content: 'Views'; // do not include fieldset mixin to reduce file size
-        }
-
-        > section.views {
-          display: grid;
-          grid-column: 5/10;
-          grid-template-columns: subgrid;
-          gap: 1em;
-          align-items: start;
-
-          > app-record.qualifier.legend::after {
-            content: 'Qualifier'; // do not include legend mixin to reduce file size
-          }
-
-          > app-record.params.legend::after {
-            content: 'Params'; // do not include legend mixin to reduce file size
-          }
-
-          > app-app-multi-value-input.css-class.legend::after {
-            content: 'CSS Class(es)'; // do not include legend mixin to reduce file size
-          }
-
-          > div.active.legend::after {
-            content: 'Active'; // do not include legend mixin to reduce file size
-            left: 0;
-            top: -.25em;
-          }
-
-          > div.active {
-            display: inline-grid;
-            align-self: stretch;
-            width: 3em;
-            place-content: center;
-          }
-
-          > button.add-view {
-            grid-column: 1/-2;
-          }
-        }
-
-        > button.add-view {
-          grid-column: 5/10;
-        }
-      }
-
-      > button.add-part {
-        grid-column: 1/-1;
+      > sci-checkbox {
+        justify-self: center;
       }
     }
-  }
 
+    > div.docked-parts {
+      display: grid;
+      grid-template-columns:
+        minmax(5em, 10em) // Part ID
+        minmax(10em, 1fr) // Qualifier
+        minmax(10em, 1fr) // Params
+        minmax(5em, 21em) // Dock To
+        minmax(5em, 10em) // Activity Id
+        minmax(5em, 10em) // CSS Class
+        min-content // Active
+        min-content; // Add / Remove Part
+      align-items: center;
+      gap: 1em;
 
-  // include fieldset mixin once to reduce file size
-  .fieldset {
-    @include fieldset.fieldset(null);
-  }
-
-  // include legend mixin once to reduce file size
-  .legend {
-    @include fieldset.legend(null);
+      > sci-checkbox {
+        justify-self: center;
+      }
+    }
   }
 
   input, select {
     @include sci-design.style-input-field();
     height: 1.25em;
+    min-width: 0;
   }
 }

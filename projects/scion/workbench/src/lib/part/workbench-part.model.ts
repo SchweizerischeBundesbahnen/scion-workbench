@@ -17,8 +17,8 @@ import {PartId, ViewId} from '../workbench.identifiers';
 import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
- * A part is a visual workbench element to create the workbench layout. Parts can be docked to the side or
- * positioned relative to each other. A part can be a stack of views or display content.
+ * A part is a visual element of the workbench layout. Parts can be docked to the side or
+ * positioned relative to each other. A part can display content or stack views.
  *
  * The part component can inject this handle to interact with the part.
  *

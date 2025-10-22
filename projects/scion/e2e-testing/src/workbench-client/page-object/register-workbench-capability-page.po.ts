@@ -13,8 +13,8 @@ import {AppPO} from '../../app.po';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
-import {ViewId, WorkbenchDialogCapability as _WorkbenchDialogCapability, WorkbenchMessageBoxCapability as _WorkbenchMessageBoxCapability, WorkbenchPerspectiveCapability as _WorkbenchPerspectiveCapability, WorkbenchPerspectivePart, WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability} from '@scion/workbench-client';
-import {Capability} from '@scion/microfrontend-platform';
+import {DockingArea, RelativeTo, ViewId, ViewParamDefinition, WorkbenchDialogCapability as _WorkbenchDialogCapability, WorkbenchMessageBoxCapability as _WorkbenchMessageBoxCapability, WorkbenchPartCapability as _WorkbenchPartCapability, WorkbenchPartRef, WorkbenchPerspectiveCapability as _WorkbenchPerspectiveCapability, WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability} from '@scion/workbench-client';
+import {ActivatorCapability as _ActivatorCapability, Capability} from '@scion/microfrontend-platform';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../view.po';
@@ -27,10 +27,12 @@ import {ViewPO} from '../../view.po';
  * For that reason, we re-declare workbench capability interfaces and replace their `type` property (enum) with a string literal.
  */
 export type WorkbenchPerspectiveCapability = Omit<_WorkbenchPerspectiveCapability, 'type'> & {type: 'perspective'};
-export type WorkbenchViewCapability = Omit<_WorkbenchViewCapability, 'type'> & {type: 'view'; properties: {pinToDesktop?: boolean; path: string | '<null>' | '<undefined>'}};
-export type WorkbenchPopupCapability = Omit<_WorkbenchPopupCapability, 'type'> & {type: 'popup'; properties: {pinToDesktop?: boolean; path: string | '<null>' | '<undefined>'}};
-export type WorkbenchDialogCapability = Omit<_WorkbenchDialogCapability, 'type'> & {type: 'dialog'; properties: {path: string | '<null>' | '<undefined>'}};
-export type WorkbenchMessageBoxCapability = Omit<_WorkbenchMessageBoxCapability, 'type'> & {type: 'messagebox'; properties: {path: string | '<null>' | '<undefined>'}};
+export type WorkbenchPartCapability = Omit<_WorkbenchPartCapability, 'type'> & {type: 'part'};
+export type WorkbenchViewCapability = Omit<_WorkbenchViewCapability, 'type'> & {type: 'view'; properties: {pinToDesktop?: boolean}};
+export type WorkbenchPopupCapability = Omit<_WorkbenchPopupCapability, 'type'> & {type: 'popup'; properties: {pinToDesktop?: boolean}};
+export type WorkbenchDialogCapability = Omit<_WorkbenchDialogCapability, 'type'> & {type: 'dialog'};
+export type WorkbenchMessageBoxCapability = Omit<_WorkbenchMessageBoxCapability, 'type'> & {type: 'messagebox'};
+export type ActivatorCapability = Omit<_ActivatorCapability, 'type'> & {type: 'activator'};
 
 /**
  * Page object to interact with {@link RegisterWorkbenchCapabilityPageComponent}.
@@ -54,7 +56,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
    *
    * Returns a Promise that resolves to the registered capability upon successful registration, or that rejects on registration error.
    */
-  public async registerCapability<T extends WorkbenchPerspectiveCapability | WorkbenchViewCapability | WorkbenchPopupCapability | WorkbenchDialogCapability | WorkbenchMessageBoxCapability>(capability: T): Promise<T & Capability> {
+  public async registerCapability<T extends WorkbenchPerspectiveCapability | WorkbenchPartCapability | WorkbenchViewCapability | WorkbenchPopupCapability | WorkbenchDialogCapability | WorkbenchMessageBoxCapability>(capability: T): Promise<T & Capability> {
     // Capability Type
     await this.locator.locator('select.e2e-type').selectOption(capability.type);
 
@@ -64,26 +66,20 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     await keyValueField.addEntries(capability.qualifier);
 
     // Capability Params
-    const requiredParams = capability.params?.filter(param => param.required && !param.transient).map(param => param.name);
-    const optionalParams = capability.params?.filter(param => !param.required && !param.transient).map(param => param.name);
-    const transientParams = capability.params?.filter(param => param.transient).map(param => param.name);
-    if (requiredParams?.length) {
-      await this.locator.locator('input.e2e-required-params').fill(requiredParams.join(','));
-    }
-    if (optionalParams?.length) {
-      await this.locator.locator('input.e2e-optional-params').fill(optionalParams.join(','));
-    }
-    if (transientParams?.length) {
-      await this.locator.locator('input.e2e-transient-params').fill(transientParams.join(','));
-    }
+    await this.enterParams(capability);
+
+    // Capability Visibility
     if (capability.private !== undefined) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-private')).toggle(capability.private);
     }
 
-    // Capability Properties.
+    // Capability Properties
     switch (capability.type) {
       case 'perspective':
         await this.enterPerspectiveCapabilityProperties(capability);
+        break;
+      case 'part':
+        await this.enterPartCapabilityProperties(capability);
         break;
       case 'view':
         await this.enterViewCapabilityProperties(capability);
@@ -112,39 +108,105 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     return JSON.parse(await responseLocator.locator('div.e2e-capability').innerText()) as T & Capability;
   }
 
+  private async enterParams(capability: Capability): Promise<void> {
+    const paramsLocator = this.locator.locator('app-capability-params');
+    for (const [paramIndex, param] of (capability.params ?? []).entries()) {
+      await paramsLocator.locator('button.e2e-add-param').click();
+
+      await paramsLocator.locator('input.e2e-name').nth(paramIndex).fill(param.name);
+      await new SciCheckboxPO(paramsLocator.locator('sci-checkbox.e2e-required').nth(paramIndex)).toggle(param.required);
+
+      if (param.deprecated === true || typeof param.deprecated === 'object') {
+        await new SciCheckboxPO(paramsLocator.locator('sci-checkbox.e2e-deprecated').nth(paramIndex)).toggle(true);
+      }
+      if (typeof param.deprecated === 'object') {
+        await paramsLocator.locator('input.e2e-deprecated-message').nth(paramIndex).fill(param.deprecated.message ?? '');
+        await paramsLocator.locator('input.e2e-deprecated-use-instead').nth(paramIndex).fill(param.deprecated.useInstead ?? '');
+      }
+
+      const transient = (param as ViewParamDefinition).transient;
+      if (transient !== undefined) {
+        await new SciCheckboxPO(paramsLocator.locator('sci-checkbox.e2e-transient').nth(paramIndex)).toggle(transient);
+      }
+    }
+  }
+
   private async enterPerspectiveCapabilityProperties(capability: WorkbenchPerspectiveCapability): Promise<void> {
     // Enter perspective data.
     const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-data'));
     await keyValueField.clear();
     await keyValueField.addEntries(capability.properties.data ?? {});
 
-    const layoutLocator = this.locator.locator('section.e2e-layout');
+    await this.enterParts(capability);
+    await this.enterDockedParts(capability);
+  }
 
-    // Enter parts.
-    const parts = capability.properties.layout as WorkbenchPerspectivePart[];
+  private async enterParts(capability: WorkbenchPerspectiveCapability): Promise<void> {
+    const partsLocator = this.locator.locator('section.e2e-parts');
+    const parts = (capability.properties.parts as WorkbenchPartRef[]).filter((part): part is WorkbenchPartRef & {position: RelativeTo} => typeof part.position !== 'string');
     for (const [partIndex, part] of parts.entries()) {
-      await layoutLocator.locator('button.e2e-add-part').click();
+      await this.locator.locator('button.e2e-add-part').click();
 
-      const partLocator = layoutLocator.locator('section.e2e-part').nth(partIndex);
-      await partLocator.locator('input.e2e-part-id').fill(part.id);
+      await partsLocator.locator('input.e2e-part-id').nth(partIndex).fill(part.id);
+      await partsLocator.locator('input.e2e-qualifier').nth(partIndex).fill(toMatrixNotation(part.qualifier));
+      await partsLocator.locator('input.e2e-params').nth(partIndex).fill(toMatrixNotation(part.params));
+      await partsLocator.locator('input.e2e-class').nth(partIndex).fill(coerceArray(part.cssClass).join(' '));
 
-      if (partIndex > 0) {
-        await partLocator.locator('input.e2e-relative-to').fill(part.relativeTo ?? '');
-        await partLocator.locator('select.e2e-align').selectOption(part.align);
-        await partLocator.locator('input.e2e-ratio').fill(`${part.ratio ?? ''}`);
+      if (part.active !== undefined) {
+        await new SciCheckboxPO(partsLocator.locator('sci-checkbox.e2e-activate-part').nth(partIndex)).toggle(part.active);
       }
 
-      // Enter views.
-      for (const [viewIndex, view] of (part.views ?? []).entries()) {
-        await partLocator.locator('button.e2e-add-view').click();
+      if (partIndex > 0) {
+        await partsLocator.locator('input.e2e-relative-to').nth(partIndex).fill(part.position.relativeTo ?? '');
+        await partsLocator.locator('select.e2e-align').nth(partIndex).selectOption(part.position.align);
+        await partsLocator.locator('input.e2e-ratio').nth(partIndex).fill(`${part.position.ratio ?? ''}`);
+      }
+    }
+  }
 
-        const viewsLocator = partLocator.locator('section.e2e-views');
-        await viewsLocator.locator('input.e2e-qualifier').nth(viewIndex).fill(toMatrixNotation(view.qualifier));
-        await viewsLocator.locator('input.e2e-params').nth(viewIndex).fill(toMatrixNotation(view.params));
-        await viewsLocator.locator('input.e2e-class').nth(viewIndex).fill(coerceArray(view.cssClass).join(' '));
-        if (view.active !== undefined) {
-          await new SciCheckboxPO(viewsLocator.locator('sci-checkbox.e2e-active').nth(viewIndex)).toggle(view.active);
-        }
+  private async enterDockedParts(capability: WorkbenchPerspectiveCapability): Promise<void> {
+    const partsLocator = this.locator.locator('section.e2e-docked-parts');
+    const parts = (capability.properties.parts as WorkbenchPartRef[]).filter((part): part is WorkbenchPartRef & {position: DockingArea} => typeof part.position === 'string');
+    for (const [partIndex, part] of parts.entries()) {
+      await this.locator.locator('button.e2e-add-docked-part').click();
+
+      await partsLocator.locator('input.e2e-part-id').nth(partIndex).fill(part.id);
+      await partsLocator.locator('input.e2e-qualifier').nth(partIndex).fill(toMatrixNotation(part.qualifier));
+      await partsLocator.locator('input.e2e-params').nth(partIndex).fill(toMatrixNotation(part.params));
+      await partsLocator.locator('select.e2e-dock-to').nth(partIndex).selectOption(part.position);
+      await partsLocator.locator('input.e2e-activity-id').nth(partIndex).fill(part.ɵactivityId ?? '');
+      await partsLocator.locator('input.e2e-class').nth(partIndex).fill(coerceArray(part.cssClass).join(' '));
+
+      if (part.active !== undefined) {
+        await new SciCheckboxPO(partsLocator.locator('sci-checkbox.e2e-activate-part').nth(partIndex)).toggle(part.active);
+      }
+    }
+  }
+
+  private async enterPartCapabilityProperties(capability: WorkbenchPartCapability): Promise<void> {
+    await this.locator.locator('input.e2e-path').fill(capability.properties?.path ?? '');
+    await this.locator.locator('input.e2e-title').fill(capability.properties?.title === false ? '<boolean>false</boolean>' : capability.properties?.title ?? '');
+    await this.locator.locator('input.e2e-icon').fill(capability.properties?.extras?.icon ?? '');
+    await this.locator.locator('input.e2e-label').fill(capability.properties?.extras?.label ?? '');
+    await this.locator.locator('input.e2e-tooltip').fill(capability.properties?.extras?.tooltip ?? '');
+    await this.locator.locator('input.e2e-resolve').fill(toMatrixNotation(capability.properties?.resolve));
+    await this.locator.locator('input.e2e-class').fill(coerceArray(capability.properties?.cssClass).join(' '));
+
+    if (capability.properties?.showSplash !== undefined) {
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-show-splash')).toggle(capability.properties.showSplash);
+    }
+
+    // Enter views.
+    for (const [viewIndex, view] of (capability.properties?.views ?? []).entries()) {
+      await this.locator.locator('button.e2e-add-view').click();
+
+      const viewsLocator = this.locator.locator('section.e2e-views');
+      await viewsLocator.locator('input.e2e-qualifier').nth(viewIndex).fill(toMatrixNotation(view.qualifier));
+      await viewsLocator.locator('input.e2e-params').nth(viewIndex).fill(toMatrixNotation(view.params));
+      await viewsLocator.locator('input.e2e-class').nth(viewIndex).fill(coerceArray(view.cssClass).join(' '));
+
+      if (view.active !== undefined) {
+        await new SciCheckboxPO(viewsLocator.locator('sci-checkbox.e2e-activate-view').nth(viewIndex)).toggle(view.active);
       }
     }
   }

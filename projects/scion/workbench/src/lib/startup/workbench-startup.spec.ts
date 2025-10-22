@@ -9,7 +9,7 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {ApplicationInitStatus, inject, Injector, NgZone, provideAppInitializer, signal} from '@angular/core';
+import {ApplicationInitStatus, Component, inject, Injector, NgZone, provideAppInitializer, signal} from '@angular/core';
 import {WorkbenchLauncher} from './workbench-launcher.service';
 import {provideWorkbench} from '../workbench.provider';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
@@ -22,6 +22,9 @@ import {firstValueFrom, timer} from 'rxjs';
 import {WorkbenchStartup} from './workbench-startup.service';
 import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchService} from '../workbench.service';
+import {By} from '@angular/platform-browser';
+import {MAIN_AREA} from '../layout/workbench-layout';
+import {WorkbenchDesktopDirective} from '../desktop/desktop.directive';
 import createSpy = jasmine.createSpy;
 import Spy = jasmine.Spy;
 
@@ -471,6 +474,54 @@ describe('Workbench Startup', () => {
 
     // Expect perspective to be active.
     expect(TestBed.inject(WorkbenchService).activePerspective()!.id).toEqual('initial-perspective');
+  });
+
+  it('should not block startup if initial perspective errors', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          layout: factory => factory
+            .addPart(MAIN_AREA)
+            .addPart('part.other-part', {relativeTo: 'part.does-not-exist', align: 'left'}),
+        }),
+      ],
+    });
+
+    @Component({
+      selector: 'spec-root',
+      template: `
+        <wb-workbench>
+          <ng-template wbDesktop>
+            Desktop
+          </ng-template>
+        </wb-workbench>
+      `,
+      imports: [WorkbenchComponent, WorkbenchDesktopDirective],
+    })
+    class SpecRootComponent {
+    }
+
+    // Spy console.
+    const errors = new Array<any>();
+    spyOn(console, 'error').and.callThrough().and.callFake((args: unknown[]) => errors.push(args));
+
+    // Start workbench.
+    const fixture = styleFixture(TestBed.createComponent(SpecRootComponent));
+
+    // Expect startup to have completed.
+    await expectAsync(TestBed.inject(WorkbenchStartup).whenDone).toBeResolved();
+
+    // Expect no perspective to be active.
+    expect(TestBed.inject(WorkbenchService).activePerspective()).toBeUndefined();
+
+    // Expect splash not to display.
+    expect(fixture.debugElement.query(By.css('wb-workbench wb-splash'))).toBeNull();
+
+    // Expect desktop to display.
+    expect(fixture.debugElement.query(By.css('wb-workbench wb-desktop-slot')).nativeElement.innerText).toEqual('Desktop');
+
+    // Expect error to be logged.
+    expect(errors).toContain(jasmine.stringMatching('Failed to load workbench perspective. Caused by:'));
   });
 
   // TODO [Angular 21] Remove tests (Legacy Workbench Provider Registration)

@@ -34,7 +34,7 @@ export interface WorkbenchMessageBoxCapability extends Capability {
    */
   type: WorkbenchCapabilities.MessageBox;
   /**
-   * Qualifies this message box. The qualifier is required for message boxes.
+   * Qualifies this message box. The qualifier is required for a message box.
    *
    * @inheritDoc
    */
@@ -42,7 +42,7 @@ export interface WorkbenchMessageBoxCapability extends Capability {
   /**
    * Specifies parameters required by the message box.
    *
-   * Parameters are available in the path for placeholder substitution, or can be read in the microfrontend by injecting the {@link WorkbenchMessageBox} handle.
+   * Parameters can be read in the microfrontend by injecting the {@link WorkbenchMessageBox} handle, or referenced in the path using the colon syntax.
    *
    * @inheritDoc
    */
@@ -64,7 +64,7 @@ export interface WorkbenchMessageBoxCapability extends Capability {
      *     {"name": "id", "required": true}
      *   ],
      *   "properties": {
-     *     "path": "product/:id", // `:id` references a capability parameter
+     *     "path": "products/:id", // `:id` references a capability parameter
      *   }
      * }
      * ```

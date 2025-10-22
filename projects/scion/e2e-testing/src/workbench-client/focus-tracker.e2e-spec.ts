@@ -107,6 +107,115 @@ test.describe('Focus Tracker', () => {
     await expect.poll(() => logPart.getLog()).toEqual([viewId, 'part.right', viewId, 'part.right', viewId, routerViewId]);
   });
 
+  test('should focus part when clicking microfrontend part', async ({appPO, workbenchNavigator, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Register part capability that shows splash.
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {part: 'docked'},
+      properties: {
+        path: 'test-pages/focus-test-page',
+        extras: {
+          icon: 'folder',
+          label: 'Docked Part',
+        },
+      },
+    });
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {part: 'aligned'},
+      properties: {
+        path: 'test-pages/focus-test-page',
+        title: 'Aligned Part',
+      },
+    });
+
+    await microfrontendNavigator.createPerspective('app1', {
+      type: 'perspective',
+      qualifier: {perspective: 'testee'},
+      properties: {
+        parts: [
+          {
+            id: 'part.aligned',
+            qualifier: {part: 'aligned'},
+          },
+          {
+            id: 'part.docked',
+            qualifier: {part: 'docked'},
+            position: 'left-top',
+            active: true,
+          },
+        ],
+      },
+    });
+
+    // Add workbench element logger part.
+    await workbenchNavigator.modifyLayout(layout => layout.modify(addActiveWorkbenchElementPart('part.log')));
+    const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
+    await logPart.clearLog();
+
+    const dockedPartFocusTestPage = new FocusTestPagePO(appPO, {id: 'part.docked'});
+    const alignedPartFocusTestPage = new FocusTestPagePO(appPO, {id: 'part.aligned'});
+
+    // TEST: Focus element in 'part.docked'.
+    await dockedPartFocusTestPage.firstField.click();
+
+    // Expect 'part.docked' to have focus.
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.docked');
+    await expect.poll(() => logPart.getLog()).toEqual(['part.docked']);
+    await expect(dockedPartFocusTestPage.firstField).toBeFocused();
+    await expect.poll(() => dockedPartFocusTestPage.isFocused()).toBe(true);
+    await expect.poll(() => alignedPartFocusTestPage.isFocused()).toBe(false);
+
+    // TEST: Click part bar of 'part.docked'.
+    await appPO.part({partId: 'part.docked'}).bar.filler.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.docked');
+    await expect.poll(() => logPart.getLog()).toEqual(['part.docked']);
+    await expect(dockedPartFocusTestPage.firstField).toBeFocused();
+    await expect.poll(() => dockedPartFocusTestPage.isFocused()).toBe(true);
+    await expect.poll(() => alignedPartFocusTestPage.isFocused()).toBe(false);
+
+    // TEST: Focus element in 'part.aligned'.
+    await alignedPartFocusTestPage.firstField.click();
+
+    // Expect 'part.aligned' to have focus.
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.aligned');
+    await expect.poll(() => logPart.getLog()).toEqual(['part.docked', 'part.aligned']);
+    await expect(alignedPartFocusTestPage.firstField).toBeFocused();
+    await expect.poll(() => dockedPartFocusTestPage.isFocused()).toBe(false);
+    await expect.poll(() => alignedPartFocusTestPage.isFocused()).toBe(true);
+
+    // TEST: Click part bar of 'part.aligned'.
+    await appPO.part({partId: 'part.aligned'}).bar.filler.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.aligned');
+    await expect.poll(() => logPart.getLog()).toEqual(['part.docked', 'part.aligned']);
+    await expect(alignedPartFocusTestPage.firstField).toBeFocused();
+    await expect.poll(() => dockedPartFocusTestPage.isFocused()).toBe(false);
+    await expect.poll(() => alignedPartFocusTestPage.isFocused()).toBe(true);
+
+    // TEST: Focus part bar of 'part.docked'.
+    await appPO.part({partId: 'part.docked'}).bar.filler.click();
+
+    // Expect 'part.docked' to have focus.
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.docked');
+    await expect.poll(() => logPart.getLog()).toEqual(['part.docked', 'part.aligned', 'part.docked']);
+    await expect(appPO.part({partId: 'part.docked'}).slot.locator).toContainFocus();
+    await expect.poll(() => dockedPartFocusTestPage.isFocused()).toBe(true);
+    await expect.poll(() => alignedPartFocusTestPage.isFocused()).toBe(false);
+
+    // TEST: Focus part bar of 'part.aligned'.
+    await appPO.part({partId: 'part.aligned'}).bar.filler.click();
+
+    // Expect 'part.aligned' to have focus.
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.aligned');
+    await expect.poll(() => logPart.getLog()).toEqual(['part.docked', 'part.aligned', 'part.docked', 'part.aligned']);
+    await expect(appPO.part({partId: 'part.aligned'}).slot.locator).toContainFocus();
+    await expect.poll(() => alignedPartFocusTestPage.isFocused()).toBe(true);
+    await expect.poll(() => dockedPartFocusTestPage.isFocused()).toBe(false);
+  });
+
   test('should focus dialog when opening microfrontend dialog', async ({appPO, workbenchNavigator, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
