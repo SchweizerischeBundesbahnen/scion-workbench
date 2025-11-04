@@ -11,6 +11,15 @@
   border-left: var(--sci-workbench-notification-severity-indicator-size) solid transparent;
   position: relative; // positioning context
 
+  &.slide-in {
+    transition: opacity .2s ease-out, transform .2s ease-out;
+  }
+
+  @starting-style {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
   &.info {
     border-left-color: var(--sci-color-accent);
   }

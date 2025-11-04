@@ -10,7 +10,6 @@
   padding: $padding;
 
   > wb-notification {
-    position: relative; // for slide-in notification
     pointer-events: auto;
     max-width: calc(100% - #{2*$padding}); // fit notification to maximal viewport width
   }

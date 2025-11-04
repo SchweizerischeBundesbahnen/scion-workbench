@@ -18,6 +18,15 @@
   align-items: center;
   position: relative; // positioning context for the dialog pane
 
+  &.slide-in {
+    transition: opacity .1s ease-out, transform .1s ease-out;
+  }
+
+  @starting-style {
+    opacity: 0;
+    transform: translateY(-20%);
+  }
+
   > div.dialog {
     display: flex;
     flex-direction: column;

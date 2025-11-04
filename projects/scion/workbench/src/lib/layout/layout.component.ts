@@ -41,9 +41,6 @@ import {WorkbenchDesktop} from '../desktop/workbench-desktop.model';
     ViewDropZoneDirective,
     WorkbenchPortalOutletDirective,
   ],
-  host: {
-    '[@.disabled]': 'perspectiveService.switchingPerspective() || perspectiveService.resettingPerspective()',
-  },
 })
 export class LayoutComponent {
 
@@ -53,6 +50,8 @@ export class LayoutComponent {
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _viewDragService = inject(ViewDragService);
+  private readonly _workbenchService = inject(WorkbenchService);
+  private readonly _perspectiveService = inject(WorkbenchPerspectiveService);
   private readonly _panels = computed(() => this.layout().activityLayout.panels);
 
   protected readonly desktop = inject(WorkbenchDesktop);
@@ -66,9 +65,7 @@ export class LayoutComponent {
   protected readonly rightActivityBarVisible = computed(() => this.toolbars().rightTop.activities.length || this.toolbars().rightBottom.activities.length || this.toolbars().bottomRight.activities.length);
 
   protected readonly panelAlignment = inject(WorkbenchService).settings.panelAlignment;
-  protected readonly panelAnimation = inject(WorkbenchService).settings.panelAnimation;
-
-  protected readonly perspectiveService = inject(WorkbenchPerspectiveService);
+  protected readonly panelAnimation = computed(() => this._workbenchService.settings.panelAnimation() && !this._perspectiveService.switchingPerspective() && !this._perspectiveService.resettingPerspective());
 
   /**
    * Determines if a view can be dropped to the main grid.

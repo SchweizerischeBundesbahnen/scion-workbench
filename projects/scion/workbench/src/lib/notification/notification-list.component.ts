@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {animate, AnimationMetadata, style, transition, trigger} from '@angular/animations';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {NotificationService} from './notification.service';
 import {NotificationComponent} from './notification.component';
@@ -29,21 +28,8 @@ import {NotificationCssClassesPipe} from './notification-css-classes.pipe';
     NotificationComponent,
     NotificationCssClassesPipe,
   ],
-  animations: [trigger('notification-enter-or-leave', NotificationListComponent.provideAnimation())],
 })
 export class NotificationListComponent {
 
   protected readonly notifications$ = inject(NotificationService).notifications$;
-
-  /**
-   * Returns animation metadata to slide-in a new notification, and to fade-out upon dismiss.
-   */
-  private static provideAnimation(): AnimationMetadata[] {
-    return [
-      transition(':enter', [
-        style({opacity: 0, left: '100%'}),
-        animate('.3s ease-out', style({opacity: 1, left: 0})),
-      ]),
-    ];
-  }
 }

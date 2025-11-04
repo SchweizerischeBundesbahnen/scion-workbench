@@ -4,8 +4,6 @@
      wbMovable [wbHandle]="header" (wbMovableMove)="onMove($event)"
      (mousedown)="onDialogHeaderMouseDown()"
      wbResizable [wbResizableEnabled]="dialog.resizable()" (wbResizableResize)="onResize($event)"
-     @enter
-     [@.disabled]="!dialog.animate"
      wbGlassPane
      #dialog_element>
   <div class="dialog-box e2e-dialog-box" cdkTrapFocus>

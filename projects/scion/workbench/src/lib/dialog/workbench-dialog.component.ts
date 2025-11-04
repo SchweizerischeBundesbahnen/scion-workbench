@@ -14,7 +14,6 @@ import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {AsyncPipe, NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {animate, AnimationMetadata, style, transition, trigger} from '@angular/animations';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {MovableDirective, WbMoveEvent} from './movable.directive';
 import {ResizableDirective, WbResizeEvent} from './resizable.directive';
@@ -50,9 +49,6 @@ import {trackFocus} from '../focus/workbench-focus-tracker.service';
     DialogFooterComponent,
     GlassPaneDirective,
   ],
-  animations: [
-    trigger('enter', provideEnterAnimation()),
-  ],
   viewProviders: [
     configureDialogGlassPane(),
   ],
@@ -67,6 +63,7 @@ import {trackFocus} from '../focus/workbench-focus-tracker.service';
     '[style.--ɵdialog-min-width]': 'dialog.size.minWidth() ?? \'100px\'',
     '[style.--ɵdialog-width]': 'dialog.size.width()',
     '[style.--ɵdialog-max-width]': 'dialog.size.maxWidth()',
+    '[animate.enter]': 'dialog.animate ? "slide-in" : null',
   },
 })
 export class WorkbenchDialogComponent {
@@ -213,18 +210,6 @@ export class WorkbenchDialogComponent {
     // ensures the dialog becomes the active/focused element.
     this.focus();
   }
-}
-
-/**
- * Returns animation metadata to slide-in a new dialog.
- */
-function provideEnterAnimation(): AnimationMetadata[] {
-  return [
-    transition(':enter', [
-      style({opacity: 0, bottom: '100%', top: 'unset'}),
-      animate('.1s ease-out', style({opacity: 1, bottom: '*'})),
-    ]),
-  ];
 }
 
 /**

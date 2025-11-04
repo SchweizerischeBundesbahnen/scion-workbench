@@ -38,6 +38,7 @@ import {IconComponent} from '../icon/icon.component';
   host: {
     '(mouseenter)': 'hover.set(true)',
     '(mouseleave)': 'hover.set(false)',
+    '[animate.enter]': '"slide-in"',
   },
 })
 export class NotificationComponent {

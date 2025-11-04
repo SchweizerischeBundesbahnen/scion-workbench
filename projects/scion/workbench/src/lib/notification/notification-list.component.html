@@ -1,5 +1,4 @@
 @for (notification of notifications$ | async; track notification.config.group || notification) {
   <wb-notification [notification]="notification"
-                   [ngClass]="notification | wbNotificationCssClasses$ | async"
-                   @notification-enter-or-leave/>
+                   [ngClass]="notification | wbNotificationCssClasses$ | async"/>
 }
