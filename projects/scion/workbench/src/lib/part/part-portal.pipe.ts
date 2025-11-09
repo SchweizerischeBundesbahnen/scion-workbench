@@ -9,7 +9,7 @@
  */
 
 import {inject, Pipe, PipeTransform} from '@angular/core';
-import {WORKBENCH_PART_REGISTRY} from './workbench-part.registry';
+import {WorkbenchPartRegistry} from './workbench-part.registry';
 import type {PartComponent} from './part.component';
 import {PartId} from '../workbench.identifiers';
 import {WbComponentPortal} from '../portal/wb-component-portal';
@@ -21,7 +21,7 @@ import {MainAreaPartComponent} from './main-area-part/main-area-part.component';
 @Pipe({name: 'wbPartPortal'})
 export class PartPortalPipe implements PipeTransform {
 
-  private readonly _partRegistry = inject(WORKBENCH_PART_REGISTRY);
+  private readonly _partRegistry = inject(WorkbenchPartRegistry);
 
   public transform(partId: PartId | null): WbComponentPortal<PartComponent | MainAreaPartComponent> | null {
     if (!partId) {

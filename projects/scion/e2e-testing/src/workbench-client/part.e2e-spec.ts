@@ -10,9 +10,7 @@
 
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
-import {InputFieldTestPagePO, InputFieldTestPagePO as MicrofrontendInputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
-import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
-import {ViewPagePO} from './page-object/view-page.po';
+import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
 import {MAIN_AREA} from '../workbench.model';
 import {PartPagePO} from './page-object/part-page.po';
 import {NotificationOpenerPagePO} from '../workbench/page-object/notification-opener-page.po';
@@ -21,82 +19,87 @@ import {expectPart} from './matcher/part-matcher';
 import {expectPart as expectWorkbenchPart} from '../matcher/part-matcher';
 import {UnregisterWorkbenchCapabilityPagePO} from './page-object/unregister-workbench-capability-page.po';
 import {PageNotFoundPagePO} from '../workbench/page-object/page-not-found-page.po';
+import {RouterPagePO} from './page-object/router-page.po';
+import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 
 test.describe('Workbench Part', () => {
 
   test('should activate part when view microfrontend gains focus', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    // Open test view "left".
-    const leftTestPage = await MicrofrontendInputFieldTestPagePO.openInNewTab(appPO, microfrontendNavigator);
-    // Open test view "right".
-    const rightTestPage = await MicrofrontendInputFieldTestPagePO.openInNewTab(appPO, microfrontendNavigator);
-    // Move test view to the right
-    const dragHandle = await rightTestPage.view.tab.startDrag();
-    await dragHandle.dragToPart(await appPO.activePart({grid: 'mainArea'}).getPartId(), {region: 'east'});
-    await dragHandle.drop();
-
-    // Capture part and view identities.
-    const leftPartId = await leftTestPage.view.part.getPartId();
-    const rightPartId = await rightTestPage.view.part.getPartId();
-    const leftViewId = await leftTestPage.view.getViewId();
-    const rightViewId = await rightTestPage.view.getViewId();
-
-    // Expect right part to be activated.
-    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      grids: {
-        mainArea: {
-          root: new MTreeNode({
-            direction: 'row',
-            ratio: .5,
-            child1: new MPart({
-              id: leftPartId,
-              views: [{id: leftViewId}],
-              activeViewId: leftViewId,
-            }),
-            child2: new MPart({
-              id: rightPartId,
-              views: [{id: rightViewId}],
-              activeViewId: rightViewId,
-            }),
-          }),
-          activePartId: rightPartId,
-        },
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'input-field'},
+      properties: {
+        path: 'test-pages/input-field-test-page',
       },
     });
 
-    // When clicking left test view.
-    await leftTestPage.clickInputField();
-
-    // Expect left part to be activated.
-    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      grids: {
-        mainArea: {
-          root: new MTreeNode({
-            direction: 'row',
-            ratio: .5,
-            child1: new MPart({
-              id: leftPartId,
-              views: [{id: leftViewId}],
-              activeViewId: leftViewId,
-            }),
-            child2: new MPart({
-              id: rightPartId,
-              views: [{id: rightViewId}],
-              activeViewId: rightViewId,
-            }),
-          }),
-          activePartId: leftPartId,
-        },
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {part: 'left'},
+      properties: {
+        views: [
+          {qualifier: {component: 'input-field'}, cssClass: 'left'},
+        ],
       },
     });
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {part: 'right'},
+      properties: {
+        views: [
+          {qualifier: {component: 'input-field'}, cssClass: 'right'},
+        ],
+      },
+    });
+
+    await microfrontendNavigator.createPerspective('app1', {
+      type: 'perspective',
+      qualifier: {perspective: 'testee'},
+      properties: {
+        parts: [
+          {
+            id: 'part.left',
+            qualifier: {part: 'left'},
+          },
+          {
+            id: 'part.right',
+            qualifier: {part: 'right'},
+            position: {align: 'right'},
+          },
+        ],
+      },
+    });
+
+    // Click left view.
+    const leftViewPage = new InputFieldTestPagePO(appPO, {cssClass: 'left'});
+    await leftViewPage.clickInputField();
+    await expect(appPO.part({partId: 'part.left'}).state('active')).toBeVisible();
+    await expect(appPO.part({partId: 'part.right'}).state('active')).not.toBeAttached();
+
+    // Click right view.
+    const rightViewPage = new InputFieldTestPagePO(appPO, {cssClass: 'right'});
+    await rightViewPage.clickInputField();
+    await expect(appPO.part({partId: 'part.left'}).state('active')).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.right'}).state('active')).toBeVisible();
   });
 
   test('should close view list menu when view microfrontend gains focus', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'input-field'},
+      properties: {
+        path: 'test-pages/input-field-test-page',
+      },
+    });
+
     // Open test view.
-    const testPage = await MicrofrontendInputFieldTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'input-field'}, {cssClass: 'testee'});
+    const testPage = new InputFieldTestPagePO(appPO, {cssClass: 'testee'});
 
     // Open view list menu.
     const viewListMenu = await testPage.view.part.bar.openViewListMenu();
@@ -113,22 +116,35 @@ test.describe('Workbench Part', () => {
   test('should close view list menu when popup microfrontend gains focus', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    // Open test view.
-    const viewPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'popup',
+      qualifier: {component: 'input-field'},
+      properties: {
+        path: 'test-pages/input-field-test-page',
+      },
+    });
 
-    // Open test popup.
-    const testPage = await MicrofrontendInputFieldTestPagePO.openInPopup(appPO, microfrontendNavigator, {closeOnFocusLost: false});
+    // Open test view.
+    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+    await popupOpenerPage.enterQualifier({component: 'input-field'});
+    await popupOpenerPage.enterCssClass('testee');
+    await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+    await popupOpenerPage.open();
+
+    const popupPage = new InputFieldTestPagePO(appPO, {cssClass: 'testee'});
 
     // Open view list menu.
-    const viewListMenu = await viewPage.view.part.bar.openViewListMenu();
+    const viewListMenu = await popupOpenerPage.view.part.bar.openViewListMenu();
     await expect(viewListMenu.locator).toBeAttached();
 
-    // When focusing the popup.
-    await testPage.clickInputField();
-    // Expect the view list menu to be closed.
+    // Focus popup.
+    await popupPage.clickInputField();
+
+    // Expect view list menu to be closed.
     await expect(viewListMenu.locator).not.toBeAttached();
+
     // Expect focus to remain in the input field that caused focus loss of the menu.
-    await expect(testPage.input).toBeFocused();
+    await expect(popupPage.input).toBeFocused();
   });
 
   test('should not create new part component instance when closing and opening docked part', async ({appPO, microfrontendNavigator}) => {
@@ -323,7 +339,7 @@ test.describe('Workbench Part', () => {
     });
 
     // Focus part microfrontend.
-    const partTestPage = InputFieldTestPagePO.newPartPO(appPO, {partId: 'part.testee'});
+    const partTestPage = new InputFieldTestPagePO(appPO, {id: 'part.testee'});
     await partTestPage.clickInputField();
 
     // Expect part microfrontend to have focus.
@@ -401,7 +417,7 @@ test.describe('Workbench Part', () => {
     await expect(notification.locator).toBeVisible();
 
     // Focus part microfrontend.
-    const partTestPage = InputFieldTestPagePO.newPartPO(appPO, {partId: 'part.testee'});
+    const partTestPage = new InputFieldTestPagePO(appPO, {id: 'part.testee'});
     await partTestPage.clickInputField();
 
     // Expect part microfrontend to have focus.

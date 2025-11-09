@@ -1,0 +1,38 @@
+<form [formGroup]="form">
+  <section>
+    <!-- Path -->
+    <sci-form-field label="Path">
+      <select [formControl]="form.controls.path">
+        <option value="test-part">test-part</option>
+        <option value="test-dialog-opener">test-dialog-opener</option>
+        <option value="test-popup-opener">test-popup-opener</option>
+      </select>
+    </sci-form-field>
+
+    <!-- Dock To -->
+    <sci-form-field label="Dock To">
+      <select [formControl]="form.controls.dockTo">
+        <option value="left-top">left-top</option>
+        <option value="left-bottom">left-bottom</option>
+        <option value="right-top">right-top</option>
+        <option value="right-bottom">right-bottom</option>
+        <option value="bottom-left">bottom-left</option>
+        <option value="bottom-right">bottom-right</option>
+      </select>
+    </sci-form-field>
+
+    <!-- Icon -->
+    <sci-form-field label="Icon">
+      <input [formControl]="form.controls.icon">
+    </sci-form-field>
+
+    <!-- Label -->
+    <sci-form-field label="Label">
+      <input [formControl]="form.controls.label">
+    </sci-form-field>
+  </section>
+</form>
+
+<button (click)="onOpenPart()" [disabled]="form.invalid" sci-primary>
+  Open Part
+</button>

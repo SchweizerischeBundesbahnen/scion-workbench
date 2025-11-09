@@ -10,7 +10,7 @@
 
 import {inject, Injectable} from '@angular/core';
 import {APP_IDENTITY, Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
-import {WorkbenchCapabilities, WorkbenchMessageBoxCapability, WorkbenchMessageBoxOptions} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchMessageBoxCapability, ɵWorkbenchMessageBoxCommand} from '@scion/workbench-client';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {stringifyError} from '../../common/stringify-error.util';
@@ -39,7 +39,7 @@ export class MicrofrontendMessageBoxIntentHandler implements IntentInterceptor {
    */
   public intercept(intentMessage: IntentMessage, next: Handler<IntentMessage>): Promise<void> {
     if (intentMessage.intent.type === WorkbenchCapabilities.MessageBox) {
-      const messageBoxIntentMessage = intentMessage as IntentMessage<WorkbenchMessageBoxOptions>;
+      const messageBoxIntentMessage = intentMessage as IntentMessage<ɵWorkbenchMessageBoxCommand>;
       // Do not block the call until the message box is closed.
       // Otherwise, the caller may receive a timeout error if not closing the message box before delivery confirmation expires.
       this.consumeMessageBoxIntent(messageBoxIntentMessage).catch((error: unknown) => this._logger.error('[MessageBoxOpenError] Failed to open message box.', LoggerNames.MICROFRONTEND, intentMessage, error));
@@ -51,7 +51,7 @@ export class MicrofrontendMessageBoxIntentHandler implements IntentInterceptor {
     }
   }
 
-  private async consumeMessageBoxIntent(message: IntentMessage<WorkbenchMessageBoxOptions>): Promise<void> {
+  private async consumeMessageBoxIntent(message: IntentMessage<ɵWorkbenchMessageBoxCommand>): Promise<void> {
     const replyTo = message.headers.get(MessageHeaders.ReplyTo) as string;
 
     try {
@@ -68,23 +68,23 @@ export class MicrofrontendMessageBoxIntentHandler implements IntentInterceptor {
   /**
    * Opens the microfrontend declared by the resolved capability in a message box.
    */
-  private async openMessageBox(message: IntentMessage<WorkbenchMessageBoxOptions>): Promise<unknown> {
-    const options = message.body ?? {};
+  private async openMessageBox(message: IntentMessage<ɵWorkbenchMessageBoxCommand>): Promise<unknown> {
+    const command = message.body ?? {};
     const capability = message.capability as WorkbenchMessageBoxCapability;
     const params = message.intent.params ?? new Map();
     const referrer = message.headers.get(MessageHeaders.AppSymbolicName) as string;
     const isHostProvider = capability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
 
-    this._logger.debug(() => 'Handling microfrontend messagebox intent', LoggerNames.MICROFRONTEND, options);
+    this._logger.debug(() => 'Handling microfrontend messagebox intent', LoggerNames.MICROFRONTEND, command);
     return this._messageBoxService.open(isHostProvider ? MicrofrontendHostMessageBoxComponent : MicrofrontendMessageBoxComponent, {
       inputs: {capability, params, referrer},
-      title: createRemoteTranslatable(options.title, {appSymbolicName: referrer}),
-      actions: options.actions && Object.fromEntries(Object.entries(options.actions).map(([key, label]) => [key, createRemoteTranslatable(label, {appSymbolicName: referrer})])),
-      severity: options.severity,
-      modality: options.modality,
-      contentSelectable: options.contentSelectable,
-      cssClass: Arrays.coerce(capability.properties.cssClass).concat(Arrays.coerce(options.cssClass)),
-      context: options.context,
+      title: createRemoteTranslatable(command.title, {appSymbolicName: referrer}),
+      actions: command.actions && Object.fromEntries(Object.entries(command.actions).map(([key, label]) => [key, createRemoteTranslatable(label, {appSymbolicName: referrer})])),
+      severity: command.severity,
+      modality: command.modality,
+      contentSelectable: command.contentSelectable,
+      cssClass: Arrays.coerce(capability.properties.cssClass).concat(Arrays.coerce(command.cssClass)),
+      context: command.context,
     });
   }
 }

@@ -10,14 +10,15 @@
 
 import {Component, inject} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {ViewId, WorkbenchDialogOptions, WorkbenchDialogService, WorkbenchView} from '@scion/workbench-client';
+import {DialogId, PartId, PopupId, ViewId, WorkbenchDialogOptions, WorkbenchDialogService} from '@scion/workbench-client';
 import {stringifyError} from '../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
-import {startWith} from 'rxjs/operators';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
+import {parseTypedString} from '../common/parse-typed-value.util';
+import {UUID} from '@scion/toolkit/uuid';
+import {MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
 
 @Component({
   selector: 'app-dialog-opener-page',
@@ -49,8 +50,8 @@ export default class DialogOpenerPageComponent {
     ], Validators.required),
     options: this._formBuilder.group({
       params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
-      modality: this._formBuilder.control<'application' | 'view' | ''>(''),
-      contextualViewId: this._formBuilder.control<ViewId | ''>(''),
+      modality: this._formBuilder.control<'application' | 'view' | 'context' | ''>(''),
+      context: this._formBuilder.control<ViewId | PartId | DialogId | PopupId | '<null>' | ''>(''),
       animate: this._formBuilder.control(undefined),
       cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
     }),
@@ -59,9 +60,10 @@ export default class DialogOpenerPageComponent {
   protected dialogError: string | undefined;
   protected returnValue: string | undefined;
 
+  protected readonly nullList = `autocomplete-null-${UUID.randomUUID()}`;
+
   constructor() {
-    inject(WorkbenchView).signalReady();
-    this.installContextualViewIdEnabler();
+    MicrofrontendPlatformClient.signalReady();
   }
 
   protected async onDialogOpen(): Promise<void> {
@@ -83,30 +85,8 @@ export default class DialogOpenerPageComponent {
       params: SciKeyValueFieldComponent.toDictionary(options.params) ?? undefined,
       modality: options.modality.value || undefined,
       animate: options.animate.value,
-      context: {
-        viewId: options.contextualViewId.value || undefined,
-      },
+      context: parseTypedString(options.context.value, {undefinedIfEmpty: true}),
       cssClass: options.cssClass.value,
     };
-  }
-
-  /**
-   * Enables the field for setting a contextual view reference when choosing view modality.
-   */
-  private installContextualViewIdEnabler(): void {
-    this.form.controls.options.controls.modality.valueChanges
-      .pipe(
-        startWith(this.form.controls.options.controls.modality.value),
-        takeUntilDestroyed(),
-      )
-      .subscribe(modality => {
-        if (modality === 'view') {
-          this.form.controls.options.controls.contextualViewId.enable();
-        }
-        else {
-          this.form.controls.options.controls.contextualViewId.setValue('');
-          this.form.controls.options.controls.contextualViewId.disable();
-        }
-      });
   }
 }

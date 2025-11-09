@@ -9,7 +9,7 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {WORKBENCH_VIEW_REGISTRY} from './workbench-view.registry';
+import {WorkbenchViewRegistry} from './workbench-view.registry';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {TestComponent} from '../testing/test.component';
@@ -32,7 +32,7 @@ describe('WorkbenchViewRegistry', () => {
     // Listen to view changes (before routing).
     const captor = new Array<string[]>();
     TestBed.runInInjectionContext(() => effect(() => {
-      captor.push(TestBed.inject(WORKBENCH_VIEW_REGISTRY).objects().map(view => view.part().id));
+      captor.push(TestBed.inject(WorkbenchViewRegistry).elements().map(view => view.part().id));
     }));
     TestBed.tick(); // flush effects
     expect(captor).toEqual([[]]);

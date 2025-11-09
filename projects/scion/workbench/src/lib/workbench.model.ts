@@ -14,7 +14,7 @@ import {WorkbenchView} from './view/workbench-view.model';
 import {Injector, TemplateRef} from '@angular/core';
 import {WorkbenchPart} from './part/workbench-part.model';
 import {WorkbenchDialog} from './dialog/workbench-dialog';
-import {Popup} from './popup/popup.config';
+import {WorkbenchPopup} from './popup/workbench-popup';
 
 /**
  * The signature of a function to confirm closing a view., e.g., if dirty.
@@ -210,4 +210,4 @@ export interface WorkbenchTheme {
 /**
  * Union of workbench elements.
  */
-export type WorkbenchElement = WorkbenchPart | WorkbenchView | WorkbenchDialog | Popup;
+export type WorkbenchElement = WorkbenchPart | WorkbenchView | WorkbenchDialog | WorkbenchPopup;

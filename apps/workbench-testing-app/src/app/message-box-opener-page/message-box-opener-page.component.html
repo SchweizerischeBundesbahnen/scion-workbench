@@ -41,10 +41,15 @@
 
     <sci-form-field label="Modality">
       <select [formControl]="form.controls.options.controls.modality" class="e2e-modality">
+        <option value="context">context</option>
         <option value="application">application</option>
         <option value="view">view</option>
         <option value="">default</option>
       </select>
+    </sci-form-field>
+
+    <sci-form-field label="Context">
+      <input [formControl]="form.controls.options.controls.context" class="e2e-context" placeholder="Part ID, View ID, Dialog ID, Popup ID, or <null>" [attr.list]="nullList">
     </sci-form-field>
 
     <sci-form-field label="Content Selectable">

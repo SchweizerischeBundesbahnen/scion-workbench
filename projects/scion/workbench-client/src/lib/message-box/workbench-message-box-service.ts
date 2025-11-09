@@ -19,15 +19,23 @@ import {Translatable} from '../text/workbench-text-provider.model';
  * or for prompting the user for confirmation.
  *
  * A microfrontend provided as a `messagebox` capability can be opened in a message box. The qualifier differentiates between different
- * message box capabilities. An application can open the public message box capabilities of other applications if it manifests a respective
- * intention.
+ * message box capabilities. Declaring an intention allows for opening public message box capabilities of other applications.
  *
- * Displayed on top of other content, a message box blocks interaction with other parts of the application. Multiple message boxes are stacked,
- * and only the topmost message box in each modality stack can be interacted with.
+ * Displayed on top of other content, a message box blocks interaction with other parts of the application.
  *
- * A message box can be view-modal or application-modal. A view-modal message box blocks only a specific view, allowing the user to interact
- * with other views. An application-modal message box blocks the workbench, or the browser's viewport if configured in the workbench
- * host application.
+ * ## Modality
+ * A message box can be context-modal or application-modal. Context-modal blocks a specific part of the application, as specified by the context;
+ * application-modal blocks the workbench or browser viewport, based on global workbench settings.
+ *
+ * ## Context
+ * A message box can be bound to a context (e.g., a part or view), defaulting to the calling context.
+ * The message box is displayed only if the context is visible and closes when the context is disposed.
+ *
+ * ## Positioning
+ * A message box is opened in the center of its context, if any, unless opened from the peripheral area.
+ *
+ * ## Stacking
+ * Message boxes are stacked per modality, with only the topmost message box in each stack being interactive.
  *
  * @category MessageBox
  * @see WorkbenchMessageBoxCapability
@@ -37,10 +45,9 @@ export abstract class WorkbenchMessageBoxService {
   /**
    * Displays the specified message in a message box.
    *
-   * By default, the calling context determines the modality of the message box. If the message box is opened from a view, only this view is blocked.
-   * To open the message box with a different modality, specify the modality in {@link WorkbenchMessageBoxOptions.modality}.
+   * By default, the message box is modal to the calling context. Specify a different modality in {@link WorkbenchMessageBoxOptions.modality}.
    *
-   * **This API requires the following intention: `{"type": "messagebox"}`**
+   * @note - Calling this method requires the intention `{"type": "messagebox"}`.
    *
    * @param message - Specifies the text to display, if any.
    *                  Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
@@ -53,8 +60,7 @@ export abstract class WorkbenchMessageBoxService {
   /**
    * Opens the microfrontend of a `messagebox` capability in a workbench message box based on the given qualifier and options.
    *
-   * By default, the calling context determines the modality of the message box. If the message box is opened from a view, only this view is blocked.
-   * To open the message box with a different modality, specify the modality in {@link WorkbenchMessageBoxOptions.modality}.
+   * By default, the message box is modal to the calling context. Specify a different modality in {@link WorkbenchMessageBoxOptions.modality}.
    *
    * @param qualifier - Identifies the `messagebox` capability that provides the microfrontend to open in a message box.
    * @param options - Controls the appearance and behavior of the message box.

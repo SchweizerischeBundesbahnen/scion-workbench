@@ -3,6 +3,7 @@
                    [attr.data-capabilityid]="capability().metadata!.id"
                    [attr.data-app]="capability().metadata!.appSymbolicName"
                    keystrokes="keydown.escape"
+                   [class]="dialog.cssClass()"
                    (focuswithin)="onFocusWithin($event)">
   <ng-container *ngComponentOutlet="splash"/>
 </sci-router-outlet>

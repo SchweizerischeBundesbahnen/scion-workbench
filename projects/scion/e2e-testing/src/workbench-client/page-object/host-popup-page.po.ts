@@ -10,9 +10,8 @@
 
 import {withoutUndefinedEntries} from '../../helper/testing.util';
 import {PopupPO} from '../../popup.po';
-import {PopupSize} from '@scion/workbench';
+import {PopupSize, WorkbenchPopupCapability, WorkbenchPopupReferrer} from '@scion/workbench-client';
 import {Params} from '@angular/router';
-import {WorkbenchPopupCapability, WorkbenchPopupReferrer} from '@scion/workbench-client';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {Locator} from '@playwright/test';

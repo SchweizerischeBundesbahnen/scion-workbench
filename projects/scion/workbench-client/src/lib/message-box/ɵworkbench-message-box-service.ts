@@ -11,13 +11,14 @@
 import {Intent, IntentClient, mapToBody, Qualifier, RequestError} from '@scion/microfrontend-platform';
 import {WorkbenchMessageBoxOptions} from './workbench-message-box.options';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {Maps} from '@scion/toolkit/util';
-import {WorkbenchView} from '../view/workbench-view';
+import {Defined, Maps} from '@scion/toolkit/util';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {catchError, firstValueFrom, throwError} from 'rxjs';
 import {eMESSAGE_BOX_MESSAGE_PARAM} from './workbench-message-box-capability';
 import {WorkbenchMessageBoxService} from './workbench-message-box-service';
 import {Translatable} from '../text/workbench-text-provider.model';
+import {WorkbenchElement} from '../workbench.identifiers';
+import {ɵWorkbenchMessageBoxCommand} from './workbench-message-box-command';
 
 /**
  * @ignore
@@ -35,14 +36,21 @@ export class ɵWorkbenchMessageBoxService implements WorkbenchMessageBoxService 
         return {type: WorkbenchCapabilities.MessageBox, qualifier: message, params: Maps.coerce(options?.params)};
       }
     })();
-
-    const body: WorkbenchMessageBoxOptions = {
-      ...options,
-      context: {viewId: options?.context?.viewId ?? Beans.opt(WorkbenchView)?.id},
-      params: undefined, // passed via intent
+    const command: ɵWorkbenchMessageBoxCommand = {
+      title: options?.title,
+      actions: options?.actions,
+      severity: options?.severity,
+      modality: options?.modality,
+      contentSelectable: options?.contentSelectable,
+      cssClass: options?.cssClass,
+      context: (() => {
+        // TODO [Angular 22] Remove backward compatiblity.
+        const context = options?.context && (typeof options.context === 'object' ? options.context.viewId : options.context);
+        return Defined.orElse(context, () => Beans.opt<WorkbenchElement>(Symbol.for('WORKBENCH_ELEMENT'))?.id);
+      })(),
     };
 
-    const action$ = Beans.get(IntentClient).request$<string>(intent, body)
+    const action$ = Beans.get(IntentClient).request$<string>(intent, command)
       .pipe(
         mapToBody(),
         catchError((error: unknown) => throwError(() => error instanceof RequestError ? error.message : error)),

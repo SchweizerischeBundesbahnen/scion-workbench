@@ -13,9 +13,10 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {catchError, firstValueFrom, throwError} from 'rxjs';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
-import {Maps} from '@scion/toolkit/util';
-import {WorkbenchView} from '../view/workbench-view';
+import {Defined, Maps} from '@scion/toolkit/util';
 import {WorkbenchDialogService} from './workbench-dialog-service';
+import {WorkbenchElement} from '../workbench.identifiers';
+import {ɵWorkbenchDialogCommand} from './workbench-dialog-command';
 
 /**
  * @ignore
@@ -26,12 +27,18 @@ export class ɵWorkbenchDialogService implements WorkbenchDialogService {
   /** @inheritDoc */
   public open<R>(qualifier: Qualifier, options?: WorkbenchDialogOptions): Promise<R | undefined> {
     const intent: Intent = {type: WorkbenchCapabilities.Dialog, qualifier, params: Maps.coerce(options?.params)};
-    const body: WorkbenchDialogOptions = {
-      ...options,
-      context: {viewId: options?.context?.viewId ?? Beans.opt(WorkbenchView)?.id},
-      params: undefined, // passed via intent
+    const command: ɵWorkbenchDialogCommand = {
+      modality: options?.modality,
+      animate: options?.animate,
+      cssClass: options?.cssClass,
+      context: (() => {
+        // TODO [Angular 22] Remove backward compatiblity.
+        const context = options?.context && (typeof options.context === 'object' ? options.context.viewId : options.context);
+        return Defined.orElse(context, () => Beans.opt<WorkbenchElement>(Symbol.for('WORKBENCH_ELEMENT'))?.id);
+      })(),
     };
-    const closeResult$ = Beans.get(IntentClient).request$<R>(intent, body)
+
+    const closeResult$ = Beans.get(IntentClient).request$<R>(intent, command)
       .pipe(
         mapToBody(),
         catchError((error: unknown) => throwError(() => error instanceof RequestError ? error.message : error)),

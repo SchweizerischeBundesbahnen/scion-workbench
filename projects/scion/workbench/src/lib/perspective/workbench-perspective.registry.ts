@@ -8,17 +8,19 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {InjectionToken} from '@angular/core';
-import {WorkbenchObjectRegistry} from '../registry/workbench-object-registry';
+import {WorkbenchElementRegistry} from '../registry/workbench-element-registry';
 import {ɵWorkbenchPerspective} from './ɵworkbench-perspective.model';
+import {Injectable} from '@angular/core';
 
 /**
- * Registry for {@link ɵWorkbenchPerspective} model objects.
+ * Registry for {@link ɵWorkbenchPerspective} elements.
  */
-export const WORKBENCH_PERSPECTIVE_REGISTRY = new InjectionToken<WorkbenchObjectRegistry<string, ɵWorkbenchPerspective>>('WORKBENCH_PERSPECTIVE_REGISTRY', {
-  providedIn: 'root',
-  factory: () => new WorkbenchObjectRegistry<string, ɵWorkbenchPerspective>({
-    nullObjectErrorFn: perspectiveId => Error(`[NullPerspectiveError] Perspective '${perspectiveId}' not found.`),
-    onUnregister: perspective => perspective.destroy(),
-  }),
-});
+@Injectable({providedIn: 'root'})
+export class WorkbenchPerspectiveRegistry extends WorkbenchElementRegistry<string, ɵWorkbenchPerspective> {
+  constructor() {
+    super({
+      nullElementErrorFn: perspectiveId => Error(`[NullPerspectiveError] Perspective '${perspectiveId}' not found.`),
+      onUnregister: perspective => perspective.destroy(),
+    });
+  }
+}

@@ -10,7 +10,7 @@
 
 import {Component, inject, Type} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {WorkbenchMessageBoxOptions, WorkbenchMessageBoxService} from '@scion/workbench';
+import {DialogId, PartId, PopupId, Translatable, ViewId, WorkbenchMessageBoxOptions, WorkbenchMessageBoxService} from '@scion/workbench';
 import {stringifyError} from '../common/stringify-error.util';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
@@ -20,7 +20,6 @@ import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.c
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import {UUID} from '@scion/toolkit/uuid';
 import {parseTypedString} from '../common/parse-typed-value.util';
-import {Translatable} from '@scion/workbench-client';
 
 @Component({
   selector: 'app-message-box-opener-page',
@@ -47,7 +46,8 @@ export default class MessageBoxOpenerPageComponent {
       title: this._formBuilder.control(''),
       actions: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
       severity: this._formBuilder.control<'info' | 'warn' | 'error' | ''>(''),
-      modality: this._formBuilder.control<'application' | 'view' | ''>(''),
+      modality: this._formBuilder.control<'application' | 'view' | 'context' | ''>(''),
+      context: this._formBuilder.control<ViewId | PartId | DialogId | PopupId | '<null>' | ''>(''),
       contentSelectable: this._formBuilder.control(false),
       inputs: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
       cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
@@ -72,6 +72,7 @@ export default class MessageBoxOpenerPageComponent {
       actions: SciKeyValueFieldComponent.toDictionary(this.form.controls.options.controls.actions) ?? undefined,
       severity: this.form.controls.options.controls.severity.value || undefined,
       modality: this.form.controls.options.controls.modality.value || undefined,
+      context: parseTypedString(this.form.controls.options.controls.context.value, {undefinedIfEmpty: true}),
       contentSelectable: this.form.controls.options.controls.contentSelectable.value || undefined,
       inputs: SciKeyValueFieldComponent.toDictionary(this.form.controls.options.controls.inputs) ?? undefined,
       cssClass: this.form.controls.options.controls.cssClass.value,

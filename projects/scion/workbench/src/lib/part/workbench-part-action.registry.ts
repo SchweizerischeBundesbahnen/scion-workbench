@@ -9,13 +9,16 @@
  */
 
 import {WorkbenchPartActionFn} from '../workbench.model';
-import {InjectionToken} from '@angular/core';
-import {WorkbenchObjectRegistry} from '../registry/workbench-object-registry';
+import {Injectable} from '@angular/core';
+import {WorkbenchElementRegistry} from '../registry/workbench-element-registry';
 
 /**
  * Registry for {@link WorkbenchPartAction} factory functions.
  */
-export const WORKBENCH_PART_ACTION_REGISTRY = new InjectionToken<WorkbenchObjectRegistry<WorkbenchPartActionFn, WorkbenchPartActionFn>>('WORKBENCH_PART_ACTION_REGISTRY', {
-  providedIn: 'root',
-  factory: () => new WorkbenchObjectRegistry<WorkbenchPartActionFn, WorkbenchPartActionFn>(),
-});
+@Injectable({providedIn: 'root'})
+export class WorkbenchPartActionRegistry extends WorkbenchElementRegistry<WorkbenchPartActionFn, WorkbenchPartActionFn> {
+
+  constructor() {
+    super({}); // NG2006: Angular requires a super call
+  }
+}

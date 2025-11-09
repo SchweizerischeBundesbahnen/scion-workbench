@@ -87,6 +87,7 @@ export class MovableDirective {
       .subscribe((event: HandleMoveEvent) => {
         switch (event.type) {
           case 'mousestart': {
+            event.mouseEvent.preventDefault(); // prevent dragging user selection (e.g., by previous Ctrl+A)
             this.onMoveStart(event.mouseEvent);
             break;
           }

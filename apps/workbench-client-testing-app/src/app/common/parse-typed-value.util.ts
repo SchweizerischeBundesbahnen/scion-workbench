@@ -22,13 +22,17 @@ import {booleanAttribute, numberAttribute} from '@angular/core';
  * - '<json>{"key": "value"}</json>' => {"key": "value"}
  * - 'value' => 'value'
  */
-export function parseTypedString<T = unknown>(value: string | undefined | null): T | undefined | null {
+export function parseTypedString<T = unknown>(value: string | undefined | null, options?: {undefinedIfEmpty?: true}): T | undefined | null {
   if (value === '<undefined>' || value === undefined) {
     return undefined;
   }
   else if (value === '<null>' || value === null) {
     return null;
   }
+  else if (!value.length && options?.undefinedIfEmpty) {
+    return undefined;
+  }
+
   const paramMatch = /<(?<type>.+)>(?<value>.*)<\/\k<type>>/.exec(value);
   switch (paramMatch?.groups!['type']) {
     case 'number': {

@@ -9,12 +9,12 @@
  */
 
 import {Component, effect, ElementRef, inject, Injector, Provider, viewChild} from '@angular/core';
-import {ɵPopup} from './popup.config';
 import {CdkPortalOutlet, ComponentPortal} from '@angular/cdk/portal';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
 import {trackFocus} from '../focus/workbench-focus-tracker.service';
+import {ɵWorkbenchPopup} from './ɵworkbench-popup';
 
 /**
  * Displays the configured popup component in the popup overlay.
@@ -53,7 +53,7 @@ export class PopupComponent {
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _cdkTrapFocus = viewChild.required('focus_trap', {read: CdkTrapFocus});
 
-  protected readonly popup = inject(ɵPopup);
+  protected readonly popup = inject(ɵWorkbenchPopup);
   protected readonly portal = new ComponentPortal(this.popup.component, this.popup.viewContainerRef, inject(Injector));
 
   constructor() {
@@ -81,11 +81,11 @@ function configurePopupGlassPane(): Provider[] {
   return [
     {
       provide: GLASS_PANE_BLOCKABLE,
-      useFactory: () => inject(ɵPopup),
+      useFactory: () => inject(ɵWorkbenchPopup),
     },
     {
       provide: GLASS_PANE_OPTIONS,
-      useFactory: () => ({attributes: {'data-popupid': inject(ɵPopup).id}}) satisfies GlassPaneOptions,
+      useFactory: () => ({attributes: {'data-popupid': inject(ɵWorkbenchPopup).id}}) satisfies GlassPaneOptions,
     },
   ];
 }

@@ -8,9 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {withoutUndefinedEntries} from '../../helper/testing.util';
 import {PopupPO} from '../../popup.po';
-import {PopupSize, ViewId} from '@scion/workbench';
+import {PopupSize} from '@scion/workbench';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Locator} from '@playwright/test';
 import {WorkbenchPopupPagePO} from './workbench-popup-page.po';
@@ -63,19 +62,6 @@ export class PopupPagePO implements WorkbenchPopupPagePO {
       if (options?.apply) {
         await this.locator.locator('button.e2e-apply-return-value').click();
       }
-    }
-    finally {
-      await accordion.collapse();
-    }
-  }
-
-  public async getReferrer(): Promise<{viewId?: ViewId}> {
-    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-referrer'));
-    await accordion.expand();
-    try {
-      return withoutUndefinedEntries({
-        viewId: await accordion.itemLocator().locator('output.e2e-view-id').innerText(),
-      });
     }
     finally {
       await accordion.collapse();

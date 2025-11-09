@@ -8,6 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {PopupService} from './popup.service';
-export {Popup, PopupConfig, type CloseStrategy, type PopupSize} from './popup.config';
+export {WorkbenchPopupService} from './workbench-popup.service';
+export {WorkbenchPopupService as PopupService} from './workbench-popup.service'; // Legacy support
+export {PopupConfig, type CloseStrategy, type PopupSize} from './popup.config';
 export {type Point, type TopLeftPoint, type TopRightPoint, type BottomLeftPoint, type BottomRightPoint, type PopupOrigin} from './popup.origin';
+export {WorkbenchPopup} from './workbench-popup';
+export {WorkbenchPopup as Popup} from './workbench-popup'; // Legacy support

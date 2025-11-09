@@ -10,22 +10,33 @@
 
 import {AppPO} from '../../../app.po';
 import {Locator} from '@playwright/test';
-import {MicrofrontendNavigator} from '../../microfrontend-navigator';
 import {ViewPO} from '../../../view.po';
 import {PopupPO} from '../../../popup.po';
-import {PopupOpenerPagePO} from '../popup-opener-page.po';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../../workbench/page-object/workbench-view-page.po';
-import {PartId} from '@scion/workbench-client';
+import {DialogId, PartId, PopupId, ViewId} from '@scion/workbench-client';
 import {PartPO} from '../../../part.po';
 import {MicrofrontendPopupPagePO} from '../../../workbench/page-object/workbench-popup-page.po';
+import {DialogPO} from '../../../dialog.po';
+import {MicrofrontendDialogPagePO} from '../../../workbench/page-object/workbench-dialog-page.po';
+import {RequireOne} from '../../../helper/utility-types';
 
-export class InputFieldTestPagePO implements MicrofrontendViewPagePO, MicrofrontendPopupPagePO {
+export class InputFieldTestPagePO implements MicrofrontendViewPagePO, MicrofrontendDialogPagePO, MicrofrontendPopupPagePO {
 
   public readonly locator: Locator;
+  public readonly part: PartPO;
+  public readonly view: ViewPO;
+  public readonly dialog: DialogPO;
+  public readonly popup: PopupPO;
+  public readonly outlet: SciRouterOutletPO;
   public readonly input: Locator;
 
-  constructor(public outlet: SciRouterOutletPO, private _locateBy: PartPO | ViewPO | PopupPO) {
+  constructor(private _appPO: AppPO, locateBy: RequireOne<{id: ViewId | PartId | PopupId | DialogId; cssClass: string}>) {
+    this.part = this._appPO.part({partId: locateBy.id as PartId | undefined, cssClass: locateBy.cssClass});
+    this.view = this._appPO.view({viewId: locateBy.id as ViewId | undefined, cssClass: locateBy.cssClass});
+    this.dialog = this._appPO.dialog({dialogId: locateBy.id as DialogId | undefined, cssClass: locateBy.cssClass});
+    this.popup = this._appPO.popup({popupId: locateBy.id as PopupId | undefined, cssClass: locateBy.cssClass});
+    this.outlet = new SciRouterOutletPO(this._appPO, {name: locateBy.id, cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-input-field-test-page');
     this.input = this.locator.locator('input.e2e-input');
   }
@@ -34,80 +45,7 @@ export class InputFieldTestPagePO implements MicrofrontendViewPagePO, Microfront
     await this.input.fill(text);
   }
 
-  public get view(): ViewPO {
-    if (this._locateBy instanceof ViewPO) {
-      return this._locateBy;
-    }
-    else {
-      throw Error('[PageObjectError] Test page not opened in a view.');
-    }
-  }
-
-  public get popup(): PopupPO {
-    if (this._locateBy instanceof PopupPO) {
-      return this._locateBy;
-    }
-    else {
-      throw Error('[PageObjectError] Test page not opened in a popup.');
-    }
-  }
-
   public async clickInputField(options?: {timeout?: number}): Promise<void> {
     await this.input.click({timeout: options?.timeout});
-  }
-
-  public static async openInNewTab(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator): Promise<InputFieldTestPagePO> {
-    await microfrontendNavigator.registerCapability('app1', {
-      type: 'view',
-      qualifier: {test: 'input-field'},
-      properties: {
-        path: 'test-pages/input-field-test-page',
-        cssClass: 'test-input-field',
-        title: 'Input Field Test Page',
-        pinToDesktop: true,
-      },
-    });
-
-    // Navigate to the view.
-    const startPage = await appPO.openNewViewTab();
-    const viewId = await startPage.view.getViewId();
-    await startPage.clickTestCapability('test-input-field', 'app1');
-
-    // Create the page object.
-    const view = appPO.view({cssClass: 'test-input-field', viewId: viewId});
-    await view.waitUntilAttached();
-
-    const outlet = new SciRouterOutletPO(appPO, {name: viewId});
-    return new InputFieldTestPagePO(outlet, view);
-  }
-
-  public static async openInPopup(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator, popupOptions?: {closeOnFocusLost?: boolean}): Promise<InputFieldTestPagePO> {
-    await microfrontendNavigator.registerCapability('app1', {
-      type: 'popup',
-      qualifier: {test: 'input-field'},
-      properties: {
-        path: 'test-pages/input-field-test-page',
-        cssClass: 'test-input-field',
-      },
-    });
-
-    // Open the popup.
-    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({test: 'input-field'});
-    await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: popupOptions?.closeOnFocusLost});
-    await popupOpenerPage.open();
-
-    // Create the page object.
-    const popup = appPO.popup({cssClass: 'test-input-field'});
-    await popup.locator.waitFor({state: 'attached'});
-
-    const outlet = new SciRouterOutletPO(appPO, {cssClass: ['e2e-popup', 'test-input-field']});
-    return new InputFieldTestPagePO(outlet, popup);
-  }
-
-  public static newPartPO(appPO: AppPO, locateBy: {partId?: PartId; cssClass?: string}): InputFieldTestPagePO {
-    const part = appPO.part({partId: locateBy.partId, cssClass: locateBy.cssClass});
-    const outlet = new SciRouterOutletPO(appPO, {name: locateBy.partId, cssClass: locateBy.cssClass});
-    return new InputFieldTestPagePO(outlet, part);
   }
 }

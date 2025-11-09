@@ -22,7 +22,7 @@ import {Routing} from './routing.util';
 import {Commands, Outlets, WorkbenchNavigationContext, WorkbenchNavigationExtras} from './routing.model';
 import {UrlSegmentMatcher} from './url-segment-matcher';
 import {Objects} from '../common/objects.util';
-import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
+import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 import {MAIN_AREA} from '../layout/workbench-layout';
@@ -34,7 +34,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
 
   private readonly _router = inject(Router);
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
-  private readonly _workbenchViewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _workbenchViewRegistry = inject(WorkbenchViewRegistry);
   private readonly _injector = inject(Injector);
   private readonly _zone = inject(NgZone);
   /** Mutex to serialize Workbench Router navigation requests, preventing race conditions when modifying the active workbench layout to operate on the most-recent layout. */

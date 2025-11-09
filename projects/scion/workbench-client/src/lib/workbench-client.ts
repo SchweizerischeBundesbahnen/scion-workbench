@@ -30,6 +30,9 @@ import {WorkbenchTextProviderFn} from './text/workbench-text-provider.model';
 import {WorkbenchTextService} from './text/workbench-text-service';
 import {ɵWorkbenchTextService} from './text/ɵworkbench-text-service';
 import {WorkbenchPartInitializer} from './part/workbench-part-initializer';
+import {ɵWorkbenchPopupService} from './popup/ɵworkbench-popup-service';
+import {ɵWorkbenchRouter} from './routing/ɵworkbench-router';
+import {ɵWorkbenchNotificationService} from './notification/ɵworkbench-notification-service';
 
 /**
  * **SCION Workbench Client provides core API for a web app to interact with SCION Workbench and other microfrontends.**
@@ -123,11 +126,11 @@ export class WorkbenchClient {
    * @return A Promise that resolves once connected to the workbench, or that rejects otherwise.
    */
   public static async connect(symbolicName: string, connectOptions?: ConnectOptions): Promise<void> {
-    Beans.register(WorkbenchRouter);
-    Beans.register(WorkbenchPopupService);
-    Beans.register(WorkbenchNotificationService);
+    Beans.register(WorkbenchRouter, {useClass: ɵWorkbenchRouter});
     Beans.register(WorkbenchDialogService, {useClass: ɵWorkbenchDialogService});
     Beans.register(WorkbenchMessageBoxService, {useClass: ɵWorkbenchMessageBoxService});
+    Beans.register(WorkbenchPopupService, {useClass: ɵWorkbenchPopupService});
+    Beans.register(WorkbenchNotificationService, {useClass: ɵWorkbenchNotificationService});
     Beans.register(WorkbenchThemeMonitor, {useClass: ɵWorkbenchThemeMonitor});
     Beans.register(WorkbenchTextService, {useClass: ɵWorkbenchTextService});
     Beans.register(StyleSheetInstaller, {eager: true});

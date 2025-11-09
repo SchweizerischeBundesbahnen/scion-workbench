@@ -25,8 +25,17 @@ import {UUID} from '@scion/toolkit/uuid';
 import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {MAIN_AREA} from '../../layout/workbench-layout';
+import {provideRouter} from '@angular/router';
+import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
+import {toShowCustomMatcher} from '../../testing/jasmine/matcher/to-show.matcher';
+import {WorkbenchViewMenuItemDirective} from './view-menu-item.directive';
+import {WorkbenchDialogService} from '../../dialog/workbench-dialog.service';
 
 describe('View Menu', () => {
+
+  beforeEach(() => {
+    jasmine.addMatchers(toShowCustomMatcher);
+  });
 
   it('should retain order when updating menu items', async () => {
     TestBed.configureTestingModule({
@@ -632,9 +641,6 @@ describe('View Menu', () => {
 
       // Expect view can be injected.
       expect(menuItemComponent.injector.get(WorkbenchView)).toBe(TestBed.inject(WorkbenchService).getView('view.100'));
-
-      // Expect part can be injected.
-      expect(menuItemComponent.injector.get(WorkbenchPart)).toBe(TestBed.inject(WorkbenchService).getPart('part.part'));
     });
 
     it('should provide `WorkbenchView` as default template-local variable in template menu item', async () => {
@@ -698,7 +704,6 @@ describe('View Menu', () => {
 
       // Expect WorkbenchView can be injected.
       expect(menuItemComponent.injector.get(WorkbenchView)).toBe(TestBed.inject(WorkbenchService).getView('view.100'));
-      expect(menuItemComponent.injector.get(WorkbenchPart)).toBe(TestBed.inject(WorkbenchService).getPart('part.part'));
     });
   });
 
@@ -843,9 +848,6 @@ describe('View Menu', () => {
 
       // Expect view can be injected.
       expect(menuItemComponent.injector.get(WorkbenchView)).toBe(TestBed.inject(WorkbenchService).getView('view.100'));
-
-      // Expect part can be injected.
-      expect(menuItemComponent.injector.get(WorkbenchPart)).toBe(TestBed.inject(WorkbenchService).getPart('part.part'));
     });
 
     it('should provide `WorkbenchView` for injection in component menu item', async () => {
@@ -882,9 +884,6 @@ describe('View Menu', () => {
       // Open context menu.
       const contextMenu = await openViewContextMenu(fixture, {viewId: 'view.100'});
       const menuItemComponent = getMenuItemComponent(contextMenu, {cssClass: 'testee', component: SpecMenuItemComponent})!;
-
-      // Expect WorkbenchPart can be injected.
-      expect(menuItemComponent.injector.get(WorkbenchPart)).toBe(TestBed.inject(WorkbenchService).getPart('part.part'));
 
       // Expect WorkbenchView can be injected.
       expect(menuItemComponent.injector.get(WorkbenchView)).toBe(TestBed.inject(WorkbenchService).getView('view.100'));
@@ -1261,6 +1260,72 @@ describe('View Menu', () => {
     const view2 = TestBed.inject(WorkbenchService).getView('view.102')!;
     expect(view2.part().peripheral()).toBeFalse();
     expect(view2.menuItems()).toContain(jasmine.objectContaining({cssClass: 'e2e-move-to-new-window'}));
+  });
+
+  it('should invoke view menu action in view injection context', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          layout: factory => factory
+            .addPart('part.main')
+            .addView('view.1', {partId: 'part.main'})
+            .addView('view.2', {partId: 'part.main'})
+            .navigateView('view.1', ['path/to/view'])
+            .navigateView('view.2', ['path/to/view'])
+            .activateView('view.1'),
+        }),
+        provideRouter([
+          {path: 'path/to/view', loadComponent: () => SpecViewComponent},
+        ]),
+      ],
+    });
+
+    @Component({
+      selector: 'spec-dialog',
+      template: 'Dialog',
+    })
+    class SpecDialogComponent {
+    }
+
+    @Component({
+      selector: 'spec-view',
+      template: '<ng-template wbViewMenuItem (action)="onClick()" cssClass="menu">View Menu Item</ng-template>',
+      imports: [
+        WorkbenchViewMenuItemDirective,
+      ],
+    })
+    class SpecViewComponent {
+
+      protected onClick(): void {
+        void inject(WorkbenchDialogService).open(SpecDialogComponent);
+      }
+    }
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    const body = fixture.debugElement.parent!;
+    await waitUntilWorkbenchStarted();
+
+    // Click view menu.
+    const contextMenu = await openViewContextMenu(fixture, {viewId: 'view.1'});
+    await clickMenuItem(contextMenu, {cssClass: 'menu'});
+    await fixture.whenStable();
+
+    // Expect dialog to display.
+    expect(body).toShow(SpecDialogComponent);
+
+    // Activate view.2.
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.activateView('view.2'));
+    await fixture.whenStable();
+
+    // Expect dialog not to display.
+    expect(body).not.toShow(SpecDialogComponent);
+
+    // Activate view.1.
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.activateView('view.1'));
+    await fixture.whenStable();
+
+    // Expect dialog to display.
+    expect(body).toShow(SpecDialogComponent);
   });
 });
 

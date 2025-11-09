@@ -13,7 +13,7 @@ import {Message, MessageClient, MessageHeaders} from '@scion/microfrontend-platf
 import {Logger} from '../../logging';
 import {ViewId} from '../../workbench.identifiers';
 import {WorkbenchView} from '../../view/workbench-view.model';
-import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
+import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {Translatable, ɵWorkbenchCommands} from '@scion/workbench-client';
 import {Subscription} from 'rxjs';
 import {MicrofrontendWorkbenchView} from './microfrontend-workbench-view.model';
@@ -24,7 +24,7 @@ import {createRemoteTranslatable} from '../text/remote-text-provider';
 class MicrofrontendViewCommandHandler implements OnDestroy {
 
   private readonly _messageClient = inject(MessageClient);
-  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _viewRegistry = inject(WorkbenchViewRegistry);
   private readonly _logger = inject(Logger);
   private readonly _subscriptions = new Set<Subscription>();
 

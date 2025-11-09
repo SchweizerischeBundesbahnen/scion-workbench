@@ -13,8 +13,377 @@ import {MessageBoxOpenerPagePO} from '../page-object/message-box-opener-page.po'
 import {expectMessageBox} from '../../matcher/message-box-matcher';
 import {MessageBoxPagePO} from '../page-object/message-box-page.po';
 import {expect} from '@playwright/test';
+import {MAIN_AREA} from '../../workbench.model';
+import {DialogOpenerPagePO} from '../page-object/dialog-opener-page.po';
+import {PopupOpenerPagePO} from '../page-object/popup-opener-page.po';
 
 test.describe('Workbench Message Box Microfrontend', () => {
+
+  test.describe('Part Context', () => {
+
+    test('should open a part-modal message box', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'messagebox',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-message-box',
+        },
+      });
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'main-area'},
+      });
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'message-box-opener'},
+        properties: {
+          path: 'test-message-box-opener',
+          extras: {
+            icon: 'folder',
+            label: 'Message Box Opener',
+          },
+        },
+      });
+
+      await microfrontendNavigator.createPerspective('app1', {
+        type: 'perspective',
+        qualifier: {perspective: 'testee'},
+        properties: {
+          parts: [
+            {
+              id: MAIN_AREA,
+              qualifier: {part: 'main-area'},
+            },
+            {
+              id: 'part.message-box-opener',
+              qualifier: {part: 'message-box-opener'},
+              position: 'left-top',
+              active: true,
+            },
+          ],
+        },
+      });
+
+      // Open message box.
+      const messageBoxOpenerPage = new MessageBoxOpenerPagePO(appPO, {id: 'part.message-box-opener'});
+      await messageBoxOpenerPage.open({component: 'testee'}, {cssClass: 'testee'});
+
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const messageBoxPage = new MessageBoxPagePO(messageBox);
+
+      // Expect message box to display.
+      await expectMessageBox(messageBoxPage).toBeVisible();
+
+      // Expect glass pane of the message box.
+      await expect.poll(() => messageBox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await messageBoxOpenerPage.part.getBoundingBox('content'), // workbench part
+        await messageBoxOpenerPage.outlet.locator.boundingBox(), // router outlet
+      ]));
+    });
+
+    test('should open application-modal message box if application-modality selected', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'messagebox',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-message-box',
+        },
+      });
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'main-area'},
+      });
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'part',
+        qualifier: {part: 'message-box-opener'},
+        properties: {
+          path: 'test-message-box-opener',
+          extras: {
+            icon: 'folder',
+            label: 'Message Box Opener',
+          },
+        },
+      });
+
+      await microfrontendNavigator.createPerspective('app1', {
+        type: 'perspective',
+        qualifier: {perspective: 'testee'},
+        properties: {
+          parts: [
+            {
+              id: MAIN_AREA,
+              qualifier: {part: 'main-area'},
+            },
+            {
+              id: 'part.message-box-opener',
+              qualifier: {part: 'message-box-opener'},
+              position: 'left-top',
+              active: true,
+            },
+          ],
+        },
+      });
+
+      // Open message box.
+      const messageBoxOpenerPage = new MessageBoxOpenerPagePO(appPO, {id: 'part.message-box-opener'});
+      await messageBoxOpenerPage.open({component: 'testee'}, {modality: 'application', cssClass: 'testee'});
+
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const messageBoxPage = new MessageBoxPagePO(messageBox);
+
+      // Expect message box to display.
+      await expectMessageBox(messageBoxPage).toBeVisible();
+
+      // Expect glass pane of the message box.
+      await expect.poll(() => messageBox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await appPO.workbenchBoundingBox(), // workbench
+        await messageBoxOpenerPage.part.getBoundingBox('content'), // workbench part
+        await messageBoxOpenerPage.outlet.locator.boundingBox(), // router outlet
+      ]));
+    });
+  });
+
+  test.describe('View Context', () => {
+
+    test('should open a view-modal message box', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'messagebox',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-message-box',
+        },
+      });
+
+      // Open message box.
+      const messageBoxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
+      await messageBoxOpenerPage.open({component: 'testee'}, {cssClass: 'testee'});
+
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const messageBoxPage = new MessageBoxPagePO(messageBox);
+
+      // Expect message box to display.
+      await expectMessageBox(messageBoxPage).toBeVisible();
+
+      // Expect glass pane of the message box.
+      await expect.poll(() => messageBox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await messageBoxOpenerPage.view.getBoundingBox(), // workbench view
+        await messageBoxOpenerPage.outlet.locator.boundingBox(), // router outlet
+      ]));
+    });
+
+    test('should open application-modal message box if application-modality selected', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'messagebox',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-message-box',
+        },
+      });
+
+      // Open message box.
+      const messageBoxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
+      await messageBoxOpenerPage.open({component: 'testee'}, {modality: 'application', cssClass: 'testee'});
+
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const messageBoxPage = new MessageBoxPagePO(messageBox);
+
+      // Expect message box to display.
+      await expectMessageBox(messageBoxPage).toBeVisible();
+
+      // Expect glass pane of the message box.
+      await expect.poll(() => messageBox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await appPO.workbenchBoundingBox(), // workbench
+        await messageBoxOpenerPage.view.getBoundingBox(), // workbench view
+        await messageBoxOpenerPage.outlet.locator.boundingBox(), // router outlet
+      ]));
+    });
+  });
+
+  test.describe('Popup Context', () => {
+
+    test('should open a popup-modal message box', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'popup',
+        qualifier: {component: 'message-box-opener'},
+        properties: {
+          path: 'test-message-box-opener',
+        },
+      });
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'messagebox',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-message-box',
+        },
+      });
+
+      // Open popup.
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'message-box-opener'});
+      await popupOpenerPage.enterCssClass('message-box-opener');
+      await popupOpenerPage.open();
+
+      // Open message box from popup.
+      const messageBoxOpenerPage = new MessageBoxOpenerPagePO(appPO, {cssClass: 'message-box-opener'});
+      await messageBoxOpenerPage.open({component: 'testee'}, {cssClass: 'testee'});
+
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const messageBoxPage = new MessageBoxPagePO(messageBox);
+
+      // Expect message box to display.
+      await expectMessageBox(messageBoxPage).toBeVisible();
+
+      // Expect glass pane of the message box.
+      await expect.poll(() => messageBox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await messageBoxOpenerPage.popup.getBoundingBox({box: 'content-box'}), // workbench popup
+      ]));
+    });
+
+    test('should open application-modal message box if application-modality selected', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'popup',
+        qualifier: {component: 'message-box-opener'},
+        properties: {
+          path: 'test-message-box-opener',
+        },
+      });
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'messagebox',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-message-box',
+        },
+      });
+
+      // Open popup.
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'message-box-opener'});
+      await popupOpenerPage.enterCssClass('message-box-opener');
+      await popupOpenerPage.open();
+
+      // Open message box from popup.
+      const messageBoxOpenerPage = new MessageBoxOpenerPagePO(appPO, {cssClass: 'message-box-opener'});
+      await messageBoxOpenerPage.open({component: 'testee'}, {modality: 'application', cssClass: 'testee'});
+
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const messageBoxPage = new MessageBoxPagePO(messageBox);
+
+      // Expect message box to display.
+      await expectMessageBox(messageBoxPage).toBeVisible();
+
+      // Expect glass pane of the message box.
+      await expect.poll(() => messageBox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await appPO.workbenchBoundingBox(), // workbench
+        await messageBoxOpenerPage.popup.getBoundingBox({box: 'content-box'}), // workbench popup
+        await popupOpenerPage.outlet.getBoundingBox(), // microfrontend view
+        await popupOpenerPage.view.getBoundingBox(), // workbench view
+      ]));
+    });
+  });
+
+  test.describe('Dialog Context', () => {
+
+    test('should open a dialog-modal message box', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'dialog',
+        qualifier: {component: 'message-box-opener'},
+        properties: {
+          path: 'test-message-box-opener',
+          size: {height: '475px', width: '300px'},
+        },
+      });
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'messagebox',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-message-box',
+        },
+      });
+
+      // Open dialog.
+      const dialogOpenerPage = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+      await dialogOpenerPage.open({component: 'message-box-opener'}, {cssClass: 'message-box-opener'});
+
+      // Open message box from dialog.
+      const messageBoxOpenerPage = new MessageBoxOpenerPagePO(appPO, {cssClass: 'message-box-opener'});
+      await messageBoxOpenerPage.open({component: 'testee'}, {cssClass: 'testee'});
+
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const messageBoxPage = new MessageBoxPagePO(messageBox);
+
+      // Expect message box to display.
+      await expectMessageBox(messageBoxPage).toBeVisible();
+
+      // Expect glass pane of the message box.
+      await expect.poll(() => messageBox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await messageBoxOpenerPage.dialog.getDialogBoundingBox(), // workbench dialog
+      ]));
+    });
+
+    test('should open application-modal message box if application-modality selected', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'dialog',
+        qualifier: {component: 'message-box-opener'},
+        properties: {
+          path: 'test-message-box-opener',
+          size: {height: '475px', width: '300px'},
+        },
+      });
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'messagebox',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-message-box',
+        },
+      });
+
+      // Open dialog.
+      const dialogOpenerPage = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+      await dialogOpenerPage.open({component: 'message-box-opener'}, {cssClass: 'message-box-opener'});
+
+      // Open message box from dialog.
+      const messageBoxOpenerPage = new MessageBoxOpenerPagePO(appPO, {cssClass: 'message-box-opener'});
+      await messageBoxOpenerPage.open({component: 'testee'}, {modality: 'application', cssClass: 'testee'});
+
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const messageBoxPage = new MessageBoxPagePO(messageBox);
+
+      // Expect message box to display.
+      await expectMessageBox(messageBoxPage).toBeVisible();
+
+      // Expect glass pane of the message box.
+      await expect.poll(() => messageBox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await appPO.workbenchBoundingBox(), // workbench
+        await messageBoxOpenerPage.dialog.getDialogBoundingBox(), // workbench dialog
+        await dialogOpenerPage.outlet.getBoundingBox(), // microfrontend view
+        await dialogOpenerPage.view.getBoundingBox(), // workbench view
+      ]));
+    });
+  });
 
   test.describe('Input', () => {
 
@@ -70,7 +439,7 @@ test.describe('Workbench Message Box Microfrontend', () => {
       await expect.poll(() => messageBoxPage.getMessageBoxParams()).toEqual({id: '123'});
     });
 
-    test('should substitute named URL params with values of the params', async ({appPO, microfrontendNavigator}) => {
+    test('should substitute named URL params', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       await microfrontendNavigator.registerCapability('app1', {
@@ -105,129 +474,6 @@ test.describe('Workbench Message Box Microfrontend', () => {
       await expect.poll(() => messageBoxPage.getRouteParams()).toEqual({segment1: 'SEG1', mp1: 'MP1'});
       await expect.poll(() => messageBoxPage.getRouteQueryParams()).toEqual({qp1: 'QP1'});
       await expect.poll(() => messageBoxPage.getRouteFragment()).toEqual('FRAGMENT');
-    });
-  });
-
-  test.describe('Contextual View', () => {
-
-    test('should, by default and if in the context of a view, open a view-modal message box', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      await microfrontendNavigator.registerCapability('app1', {
-        type: 'messagebox',
-        qualifier: {component: 'testee'},
-        properties: {
-          path: 'test-message-box',
-        },
-      });
-
-      // Open the message box.
-      const messageBoxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
-      await messageBoxOpenerPage.open({component: 'testee'}, {cssClass: 'testee'});
-
-      const messageBox = appPO.messagebox({cssClass: 'testee'});
-      const messageBoxPage = new MessageBoxPagePO(messageBox);
-
-      // Expect microfrontend content to be displayed.
-      await expectMessageBox(messageBoxPage).toBeVisible();
-
-      // Expect view to be blocked.
-      await expect.poll(() => appPO.isViewBlocked(messageBoxOpenerPage.view.getViewId())).toBe(true);
-      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
-    });
-
-    test('should detach message box if contextual view is not active', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      await microfrontendNavigator.registerCapability('app1', {
-        type: 'messagebox',
-        qualifier: {component: 'testee'},
-        properties: {
-          path: 'test-message-box',
-        },
-      });
-
-      // Open the message box.
-      const messageBoxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
-      await messageBoxOpenerPage.open({component: 'testee'}, {cssClass: 'testee'});
-
-      const messageBox = appPO.messagebox({cssClass: 'testee'});
-      const messageBoxPage = new MessageBoxPagePO(messageBox);
-
-      // Expect microfrontend content to be displayed.
-      await expectMessageBox(messageBoxPage).toBeVisible();
-
-      const componentInstanceId = await messageBoxPage.getComponentInstanceId();
-
-      // Open and activate another view.
-      await appPO.openNewViewTab();
-
-      // Expect outlet and iframe of the microfrontend message box to be hidden but attached to the DOM.
-      await expectMessageBox(messageBoxPage).toBeHidden();
-
-      // Activate view of the message box.
-      await messageBoxOpenerPage.view.tab.click();
-
-      // Expect microfrontend content to be displayed.
-      await expectMessageBox(messageBoxPage).toBeVisible();
-      // Expect the component not to be constructed anew.
-      await expect.poll(() => messageBoxPage.getComponentInstanceId()).toEqual(componentInstanceId);
-    });
-
-    test('should open message box in any view', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      await microfrontendNavigator.registerCapability('app1', {
-        type: 'messagebox',
-        qualifier: {component: 'testee'},
-        properties: {
-          path: 'test-message-box',
-        },
-      });
-
-      const view1 = (await appPO.openNewViewTab()).view;
-
-      // Open the message box.
-      const messageBoxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
-      await messageBoxOpenerPage.open({component: 'testee'}, {cssClass: 'testee', modality: 'view', context: {viewId: await view1.getViewId()}});
-
-      const messageBox = appPO.messagebox({cssClass: 'testee'});
-      const messageBoxPage = new MessageBoxPagePO(messageBox);
-
-      // Expect message box not to be displayed yet.
-      await expectMessageBox(messageBoxPage).toBeHidden();
-
-      // Activate view 1.
-      await view1.tab.click();
-
-      // Expect microfrontend content to be displayed.
-      await expectMessageBox(messageBoxPage).toBeVisible();
-    });
-
-    test('should open an application-modal message box if selected', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      await microfrontendNavigator.registerCapability('app1', {
-        type: 'messagebox',
-        qualifier: {component: 'testee'},
-        properties: {
-          path: 'test-message-box',
-        },
-      });
-
-      // Open the message box.
-      const messageBoxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
-      await messageBoxOpenerPage.open({component: 'testee'}, {cssClass: 'testee', modality: 'application'});
-
-      const messageBox = appPO.messagebox({cssClass: 'testee'});
-      const messageBoxPage = new MessageBoxPagePO(messageBox);
-
-      // Expect microfrontend content to be displayed.
-      await expectMessageBox(messageBoxPage).toBeVisible();
-
-      // Expect workbench to be blocked.
-      await expect.poll(() => appPO.isViewBlocked(messageBoxOpenerPage.view.getViewId())).toBe(true);
-      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(true);
     });
   });
 

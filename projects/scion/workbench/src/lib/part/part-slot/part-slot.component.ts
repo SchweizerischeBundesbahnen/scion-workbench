@@ -8,13 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {afterRenderEffect, Component, DOCUMENT, ElementRef, inject, untracked, viewChild} from '@angular/core';
+import {afterRenderEffect, Component, DOCUMENT, ElementRef, inject, Provider, untracked, viewChild} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {RouterOutletRootContextDirective} from '../../routing/router-outlet-root-context.directive';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {OnAttach, OnDetach} from '../../portal/wb-component-portal';
 import {FocusTrackerRef, trackFocus} from '../../focus/workbench-focus-tracker.service';
+import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../../glass-pane/glass-pane.directive';
+import {WorkbenchPart} from '../workbench-part.model';
 
 /**
  * Acts as a placeholder for a part's content that Angular fills based on the current router state of the associated part outlet.
@@ -27,6 +29,12 @@ import {FocusTrackerRef, trackFocus} from '../../focus/workbench-focus-tracker.s
     RouterOutlet,
     RouterOutletRootContextDirective,
     SciViewportComponent,
+  ],
+  hostDirectives: [
+    GlassPaneDirective,
+  ],
+  providers: [
+    configurePartGlassPane(),
   ],
 })
 export class PartSlotComponent implements OnAttach, OnDetach {
@@ -93,4 +101,20 @@ export class PartSlotComponent implements OnAttach, OnDetach {
       }
     });
   }
+}
+
+/**
+ * Blocks this part when dialog(s) overlay it.
+ */
+function configurePartGlassPane(): Provider[] {
+  return [
+    {
+      provide: GLASS_PANE_BLOCKABLE,
+      useFactory: () => inject(ɵWorkbenchPart),
+    },
+    {
+      provide: GLASS_PANE_OPTIONS,
+      useFactory: () => ({attributes: {'data-partid': inject(WorkbenchPart).id}}) satisfies GlassPaneOptions,
+    },
+  ];
 }

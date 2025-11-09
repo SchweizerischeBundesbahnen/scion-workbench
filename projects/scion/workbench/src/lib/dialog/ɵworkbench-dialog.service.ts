@@ -8,29 +8,33 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertNotInReactiveContext, createEnvironmentInjector, DOCUMENT, EnvironmentInjector, inject, Injectable, NgZone, runInInjectionContext} from '@angular/core';
+import {ApplicationRef, assertNotInReactiveContext, DestroyRef, DOCUMENT, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
-import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
-import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {firstValueFrom} from 'rxjs';
 import {WorkbenchDialogRegistry} from './workbench-dialog.registry';
 import {filter} from 'rxjs/operators';
 import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchDialogService} from './workbench-dialog.service';
-import {provideViewContext} from '../view/view-context-provider';
 import {computeDialogId} from '../workbench.identifiers';
+import {createInvocationContext, WorkbenchInvocationContext} from '../invocation-context/invocation-context';
+import {WORKBENCH_ELEMENT} from '../workbench-element-references';
+import {Logger, LoggerNames} from '../logging';
+import {toObservable} from '@angular/core/rxjs-interop';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchDialogService implements WorkbenchDialogService {
 
-  private readonly _document = inject(DOCUMENT);
-  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _injector = inject(Injector);
+  private readonly _rootInjector = inject(ApplicationRef).injector;
   private readonly _dialogRegistry = inject(WorkbenchDialogRegistry);
+  private readonly _document = inject(DOCUMENT);
   private readonly _zone = inject(NgZone);
-  private readonly _environmentInjector = inject(EnvironmentInjector);
-  private readonly _view = inject(ɵWorkbenchView, {optional: true});
+
+  constructor() {
+    this.installServiceLifecycleLogger();
+  }
 
   /** @inheritDoc */
   public async open<R>(component: ComponentType<unknown>, options?: WorkbenchDialogOptions): Promise<R | undefined> {
@@ -41,29 +45,27 @@ export class ɵWorkbenchDialogService implements WorkbenchDialogService {
       return this._zone.run(() => this.open(component, options));
     }
 
-    // Resolve view that opened the dialog, if any.
-    const contextualView = this.resolveContextualView(options);
-
-    // Delay the opening of a view-modal dialog until all application-modal dialogs are closed.
-    // Otherwise, the view-modal dialog would overlap already opened application-modal dialogs.
-    if (contextualView) {
+    // Delay the opening of a context-modal dialog until all application-modal dialogs are closed.
+    // Otherwise, the context-modal dialog would overlap already opened application-modal dialogs.
+    const invocationContext = createDialogInvocationContext(options ?? {}, this._injector);
+    if (invocationContext) {
       await this.waitUntilApplicationModalDialogsClosed();
     }
 
     // Create the dialog.
-    const dialog = this.createDialog<R>(component, {...options, contextualView});
-    this._dialogRegistry.register(dialog);
+    const dialog = this.createDialog<R>(component, invocationContext, options ?? {});
+    this._dialogRegistry.register(dialog.id, dialog);
 
     // Capture focused element to restore focus when closing the dialog.
     const previouslyFocusedElement = this._document.activeElement instanceof HTMLElement ? this._document.activeElement : undefined;
     try {
-      return await dialog.open();
+      return await dialog.waitForClose();
     }
     finally {
-      this._dialogRegistry.unregister(dialog);
+      this._dialogRegistry.unregister(dialog.id);
 
       // Restore focus to previously focused element when closing the last dialog in the current context.
-      if (previouslyFocusedElement && !this._dialogRegistry.top({viewId: contextualView?.id})) {
+      if (previouslyFocusedElement && !this._dialogRegistry.top(invocationContext?.elementId)()) {
         previouslyFocusedElement.focus();
       }
     }
@@ -72,33 +74,42 @@ export class ɵWorkbenchDialogService implements WorkbenchDialogService {
   /**
    * Creates the dialog handle.
    */
-  private createDialog<R>(component: ComponentType<unknown>, options: WorkbenchDialogOptions & {contextualView: ɵWorkbenchView | null}): ɵWorkbenchDialog<R> {
+  private createDialog<R>(component: ComponentType<unknown>, invocationContext: WorkbenchInvocationContext | null, options: WorkbenchDialogOptions): ɵWorkbenchDialog<R> {
     // Construct the handle in an injection context that shares the dialog's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
     const dialogId = computeDialogId();
-    const dialogEnvironmentInjector = createEnvironmentInjector([provideViewContext(options.contextualView)], this._environmentInjector, `Workbench Dialog ${dialogId}`);
-    return runInInjectionContext(dialogEnvironmentInjector, () => new ɵWorkbenchDialog<R>(dialogId, component, options));
-  }
-
-  /**
-   * Resolves the contextual view to stick the dialog to.
-   */
-  private resolveContextualView(options?: WorkbenchDialogOptions): ɵWorkbenchView | null {
-    if (options?.modality === 'application') {
-      return null;
-    }
-    if (options?.context?.viewId) {
-      return this._viewRegistry.get(options.context.viewId);
-    }
-    else if (this._view) {
-      return this._view;
-    }
-    return null;
+    const dialogInjector = Injector.create({
+      parent: this._rootInjector, // use root injector to be independent of service construction context
+      providers: [],
+      name: `Workbench Dialog ${dialogId}`,
+    });
+    return runInInjectionContext(dialogInjector, () => new ɵWorkbenchDialog<R>(dialogId, component, invocationContext, options));
   }
 
   /**
    * Returns a Promise that resolves when all application modal-dialogs are closed. If none are opened, the Promise resolves immediately.
    */
   private async waitUntilApplicationModalDialogsClosed(): Promise<void> {
-    await firstValueFrom(this._dialogRegistry.top$().pipe(filter(top => !top)));
+    // Use root injector to be independent of service construction context.
+    const injector = Injector.create({parent: this._rootInjector, providers: []});
+    await firstValueFrom(toObservable(this._dialogRegistry.top(), {injector}).pipe(filter(top => !top)));
+    injector.destroy();
   }
+
+  private installServiceLifecycleLogger(): void {
+    const logger = inject(Logger);
+    const workbenchElement = inject(WORKBENCH_ELEMENT, {optional: true});
+    logger.debug(() => `Constructing WorkbenchDialogService [context=${workbenchElement?.id}]`, LoggerNames.LIFECYCLE);
+    inject(DestroyRef).onDestroy(() => logger.debug(() => `Destroying WorkbenchDialogService [context=${workbenchElement?.id}]'`, LoggerNames.LIFECYCLE));
+  }
+}
+
+/**
+ * Computes the dialog's invocation context based on passsed options and injection context.
+ */
+function createDialogInvocationContext(options: WorkbenchDialogOptions, injector: Injector): WorkbenchInvocationContext | null {
+  if (options.modality === 'application') {
+    return null;
+  }
+
+  return createInvocationContext(options.context && (typeof options.context === 'object' ? options.context.viewId : options.context), {injector});
 }

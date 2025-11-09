@@ -10,7 +10,7 @@
 
 import {inject, Injectable} from '@angular/core';
 import {APP_IDENTITY, Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
-import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchDialogOptions} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchDialogCapability, ɵWorkbenchDialogCommand} from '@scion/workbench-client';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {stringifyError} from '../../common/stringify-error.util';
@@ -38,7 +38,7 @@ export class MicrofrontendDialogIntentHandler implements IntentInterceptor {
    */
   public intercept(intentMessage: IntentMessage, next: Handler<IntentMessage>): Promise<void> {
     if (intentMessage.intent.type === WorkbenchCapabilities.Dialog) {
-      const dialogIntentMessage = intentMessage as IntentMessage<WorkbenchDialogOptions>;
+      const dialogIntentMessage = intentMessage as IntentMessage<ɵWorkbenchDialogCommand>;
       // Do not block the call until the dialog is closed.
       // Otherwise, the caller may receive a timeout error if not closing the dialog before delivery confirmation expires.
       this.consumeDialogIntent(dialogIntentMessage).catch((error: unknown) => this._logger.error('[DialogOpenError] Failed to open dialog.', LoggerNames.MICROFRONTEND, intentMessage, error));
@@ -50,7 +50,7 @@ export class MicrofrontendDialogIntentHandler implements IntentInterceptor {
     }
   }
 
-  private async consumeDialogIntent(message: IntentMessage<WorkbenchDialogOptions>): Promise<void> {
+  private async consumeDialogIntent(message: IntentMessage<ɵWorkbenchDialogCommand>): Promise<void> {
     const replyTo = message.headers.get(MessageHeaders.ReplyTo) as string;
 
     try {
@@ -67,19 +67,19 @@ export class MicrofrontendDialogIntentHandler implements IntentInterceptor {
   /**
    * Opens the microfrontend declared by the resolved capability in a dialog.
    */
-  private async openDialog(message: IntentMessage<WorkbenchDialogOptions>): Promise<unknown> {
-    const options = message.body ?? {};
+  private async openDialog(message: IntentMessage<ɵWorkbenchDialogCommand>): Promise<unknown> {
+    const command = message.body ?? {};
     const capability = message.capability as WorkbenchDialogCapability;
     const params = message.intent.params ?? new Map();
     const isHostProvider = capability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
-    this._logger.debug(() => 'Handling microfrontend dialog intent', LoggerNames.MICROFRONTEND, options);
+    this._logger.debug(() => 'Handling microfrontend dialog intent', LoggerNames.MICROFRONTEND, command);
 
     return this._dialogService.open(isHostProvider ? MicrofrontendHostDialogComponent : MicrofrontendDialogComponent, {
       inputs: {capability, params},
-      modality: options.modality,
-      context: options.context,
-      animate: options.animate,
-      cssClass: Arrays.coerce(capability.properties.cssClass).concat(Arrays.coerce(options.cssClass)),
+      modality: command.modality,
+      context: command.context,
+      animate: command.animate,
+      cssClass: Arrays.coerce(capability.properties.cssClass).concat(Arrays.coerce(command.cssClass)),
     });
   }
 }

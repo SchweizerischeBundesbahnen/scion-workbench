@@ -9,15 +9,16 @@
  */
 
 import {Component, DestroyRef, inject, Injector, runInInjectionContext, StaticProvider} from '@angular/core';
-import {WorkbenchPopup, ɵPopupContext} from '@scion/workbench-client';
+import {WorkbenchPopup} from '@scion/workbench-client';
 import {Routing} from '../../routing/routing.util';
 import {Commands} from '../../routing/routing.model';
 import {Router, RouterOutlet} from '@angular/router';
-import {ɵPopup} from '../../popup/popup.config';
 import {NgTemplateOutlet} from '@angular/common';
 import {Microfrontends} from '../common/microfrontend.util';
 import {ANGULAR_ROUTER_MUTEX} from '../../executor/single-task-executor';
 import {toObservable} from '@angular/core/rxjs-interop';
+import {ɵWorkbenchPopup} from '../../popup/ɵworkbench-popup';
+import {MicrofrontendPopupInput} from '../microfrontend-popup/microfrontend-popup-input';
 
 /**
  * Displays the microfrontend of a popup capability provided by the host inside a workbench popup.
@@ -41,16 +42,14 @@ export class MicrofrontendHostPopupComponent {
   /** Mutex to serialize Angular Router navigation requests, preventing the cancellation of previously initiated asynchronous navigations. */
   private readonly _angularRouterMutex = inject(ANGULAR_ROUTER_MUTEX);
 
-  protected readonly popup = inject(ɵPopup) as ɵPopup<ɵPopupContext>;
+  protected readonly popup = inject(ɵWorkbenchPopup) as ɵWorkbenchPopup<MicrofrontendPopupInput>;
   protected readonly outletInjector: Injector;
 
   constructor() {
-    const popupContext = this.popup.input!;
-    const capability = popupContext.capability;
-    const params = popupContext.params;
+    const {capability, params} = this.popup.input!;
     this.outletInjector = Injector.create({
       parent: this._injector,
-      providers: [provideWorkbenchPopupHandle(popupContext)],
+      providers: [provideWorkbenchPopupHandle(this.popup.input!)],
     });
 
     // Perform navigation in the named router outlet.
@@ -78,17 +77,17 @@ export class MicrofrontendHostPopupComponent {
 /**
  * Provides the {WorkbenchPopup} handle to the routed component.
  */
-function provideWorkbenchPopupHandle(popupContext: ɵPopupContext): StaticProvider {
+function provideWorkbenchPopupHandle(popupInput: MicrofrontendPopupInput): StaticProvider {
   return {
     provide: WorkbenchPopup,
     useFactory: (): WorkbenchPopup => {
-      const popup = inject(ɵPopup);
+      const popup = inject(ɵWorkbenchPopup);
 
       return new class implements WorkbenchPopup {
         public readonly id = popup.id;
-        public readonly capability = popupContext.capability;
-        public readonly params = popupContext.params;
-        public readonly referrer = popupContext.referrer;
+        public readonly capability = popupInput.capability;
+        public readonly params = popupInput.params;
+        public readonly referrer = popupInput.referrer;
         public readonly focused$ = toObservable(popup.focused, {injector: popup.injector});
 
         public setResult(result?: unknown): void {

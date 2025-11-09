@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ApplicationInitStatus, createEnvironmentInjector, EnvironmentInjector, inject, Injectable, runInInjectionContext, Signal, signal} from '@angular/core';
+import {ApplicationInitStatus, inject, Injectable, Injector, runInInjectionContext, Signal, signal} from '@angular/core';
 import {ACTIVE_PERSPECTIVE, ɵWorkbenchPerspective} from './ɵworkbench-perspective.model';
 import {WorkbenchPerspectiveDefinition} from './workbench-perspective.model';
 import {WorkbenchLayoutStorageService} from '../layout/workbench-layout-storage.service';
@@ -15,7 +15,7 @@ import {ANONYMOUS_PERSPECTIVE_ID_PREFIX} from '../workbench.constants';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {WorkbenchConfig} from '../workbench-config';
 import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
-import {WORKBENCH_PERSPECTIVE_REGISTRY} from './workbench-perspective.registry';
+import {WorkbenchPerspectiveRegistry} from './workbench-perspective.registry';
 import {Logger} from '../logging';
 
 /**
@@ -25,8 +25,8 @@ import {Logger} from '../logging';
 export class WorkbenchPerspectiveService {
 
   private readonly _workbenchConfig = inject(WorkbenchConfig);
-  private readonly _perspectiveRegistry = inject(WORKBENCH_PERSPECTIVE_REGISTRY);
-  private readonly _environmentInjector = inject(EnvironmentInjector);
+  private readonly _perspectiveRegistry = inject(WorkbenchPerspectiveRegistry);
+  private readonly _injector = inject(Injector);
   private readonly _applicationInitStatus = inject(ApplicationInitStatus);
   private readonly _layoutStorageService = inject(WorkbenchLayoutStorageService);
   public readonly _logger = inject(Logger);
@@ -94,7 +94,7 @@ export class WorkbenchPerspectiveService {
     if (this._perspectiveRegistry.has(perspectiveId)) {
       throw Error(`Failed to register perspective '${perspectiveId}'. Another perspective is already registered under that identity.`);
     }
-    if (definition.canActivate && !(await runInInjectionContext(this._environmentInjector, () => definition.canActivate!()))) {
+    if (definition.canActivate && !(await runInInjectionContext(this._injector, () => definition.canActivate!()))) {
       return;
     }
 
@@ -103,8 +103,8 @@ export class WorkbenchPerspectiveService {
 
   private createPerspective(definition: WorkbenchPerspectiveDefinition): ɵWorkbenchPerspective {
     // Construct the handle in an injection context that shares the perspective's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
-    const perspectiveEnvironmentInjector = createEnvironmentInjector([], this._environmentInjector, `Workbench Perspective ${definition.id}`);
-    return runInInjectionContext(perspectiveEnvironmentInjector, () => new ɵWorkbenchPerspective(definition));
+    const perspectiveInjector = Injector.create({parent: this._injector, providers: [], name: `Workbench Perspective ${definition.id}`});
+    return runInInjectionContext(perspectiveInjector, () => new ɵWorkbenchPerspective(definition));
   }
 
   /**
@@ -171,7 +171,7 @@ export class WorkbenchPerspectiveService {
       throw Error('[NullPerspectiveError] No perspective found to activate.');
     }
 
-    const perspectiveId = await this.determineInitialPerspective() ?? this._perspectiveRegistry.objects()[0]!.id;
+    const perspectiveId = await this.determineInitialPerspective() ?? this._perspectiveRegistry.elements()[0]!.id;
     const activation = this.switchPerspective(perspectiveId, {storePerspectiveAsActive: false});
 
     // Switching perspective blocks until the initial navigation has been performed. By default, Angular performs
@@ -208,7 +208,7 @@ export class WorkbenchPerspectiveService {
       return perspectiveFromConfig;
     }
     if (typeof perspectiveFromConfig === 'function') {
-      return (await runInInjectionContext(this._environmentInjector, () => perspectiveFromConfig([...this._perspectiveRegistry.objects()])));
+      return (await runInInjectionContext(this._injector, () => perspectiveFromConfig([...this._perspectiveRegistry.elements()])));
     }
     return undefined;
   }

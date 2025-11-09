@@ -85,6 +85,8 @@ export class WorkbenchDialogComponent {
   protected transformTranslateX = signal(0);
   protected transformTranslateY = signal(0);
 
+  public readonly dialogContent = viewChild.required(SciViewportComponent, {read: ElementRef<HTMLElement>});
+
   constructor() {
     this.setDialogOffset();
     this.addHostCssClasses();
@@ -110,6 +112,10 @@ export class WorkbenchDialogComponent {
    * or otherwise focuses the first focusable element.
    */
   public focus(): void {
+    if (this.dialog.blockedBy()) {
+      return;
+    }
+
     const activeElement = this._activeElement$.getValue();
     if (activeElement) {
       activeElement.focus();
@@ -199,6 +205,13 @@ export class WorkbenchDialogComponent {
 
   protected onHeaderDimensionChange(dimension: SciDimension): void {
     this.headerHeight.set(`${dimension.offsetHeight}px`);
+  }
+
+  protected onDialogHeaderMouseDown(): void {
+    // Focus the dialog on `mousedown`. The `wbMovable` directive on the header calls `preventDefault()` during `mousedown`,
+    // which prevents a `focusin` event from firing and so the workbench focus owner would not be updated. Calling `focus()`
+    // ensures the dialog becomes the active/focused element.
+    this.focus();
   }
 }
 

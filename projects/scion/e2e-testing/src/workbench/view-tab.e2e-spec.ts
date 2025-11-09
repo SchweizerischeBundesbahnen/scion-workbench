@@ -216,7 +216,7 @@ test.describe('Workbench View Tab', () => {
     await viewPage.checkClosable(true);
 
     // Block the view by opening a modal dialog.
-    await dialogOpenerPage.open('dialog-page', {modality: 'view', context: {viewId: await viewTab.getViewId()}, cssClass: 'testee'});
+    await dialogOpenerPage.open('dialog-page', {context: await viewTab.getViewId(), cssClass: 'testee'});
 
     // Expect the close button to be disabled.
     await expect(viewTab.closeButton).toBeDisabled();
@@ -291,7 +291,7 @@ test.describe('Workbench View Tab', () => {
     const viewTabBounds = await viewTab.getBoundingBox();
 
     // Block the view by opening a modal dialog.
-    await dialogOpenerPage.open('dialog-page', {modality: 'view', context: {viewId: await viewTab.getViewId()}, cssClass: 'testee'});
+    await dialogOpenerPage.open('dialog-page', {context: await viewTab.getViewId(), cssClass: 'testee'});
 
     // Expect the tab width not to change.
     await expect.poll(() => viewTab.getBoundingBox()).toEqual(viewTabBounds);

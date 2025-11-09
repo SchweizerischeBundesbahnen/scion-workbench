@@ -85,6 +85,8 @@ export class WorkbenchViewMenuItemDirective {
 
   /**
    * Emits when the menu item is clicked.
+   *
+   * The function can call `inject` to get any required dependencies.
    */
   public readonly action = output<WorkbenchView>();
 

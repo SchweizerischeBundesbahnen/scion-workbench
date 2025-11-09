@@ -15,3 +15,4 @@ export {ɵWorkbenchDialogService} from './ɵworkbench-dialog-service';
 export {type WorkbenchDialogOptions} from './workbench-dialog.options';
 export {type ɵDialogContext, ɵDIALOG_CONTEXT} from './ɵworkbench-dialog-context';
 export {ɵWorkbenchDialogMessageHeaders} from './ɵworkbench-dialog';
+export {type ɵWorkbenchDialogCommand} from './workbench-dialog-command';

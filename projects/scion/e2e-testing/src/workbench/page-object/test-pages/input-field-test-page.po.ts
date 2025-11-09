@@ -19,6 +19,7 @@ import {DialogPO} from '../../../dialog.po';
 import {WorkbenchDialogPagePO} from '../workbench-dialog-page.po';
 import {WorkbenchViewPagePO} from '../workbench-view-page.po';
 import {WorkbenchPopupPagePO} from '../workbench-popup-page.po';
+import {PartPO} from '../../../part.po';
 
 export class InputFieldTestPagePO implements WorkbenchViewPagePO, WorkbenchDialogPagePO, WorkbenchPopupPagePO {
 
@@ -26,7 +27,7 @@ export class InputFieldTestPagePO implements WorkbenchViewPagePO, WorkbenchDialo
   public readonly checkbox: Locator;
   public readonly input: Locator;
 
-  constructor(private _locateBy: ViewPO | DialogPO | PopupPO) {
+  constructor(private _locateBy: PartPO | ViewPO | DialogPO | PopupPO) {
     this.locator = this._locateBy.locator.locator('app-input-field-test-page');
     this.checkbox = this.locator.locator('input.e2e-checkbox');
     this.input = this.locator.locator('input.e2e-input');

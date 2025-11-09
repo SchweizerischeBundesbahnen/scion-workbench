@@ -42,9 +42,6 @@ export class MessageBoxOpenerPagePO implements WorkbenchViewPagePO {
     if (options?.injector) {
       throw Error('[PageObjectError] PageObject does not support the option `injector`.');
     }
-    if (options?.context) {
-      throw Error('[PageObjectError] PageObject does not support the option `context`.');
-    }
 
     const componentMatch = content && /^component:(?<component>.+)$/.exec(content);
     if (componentMatch) {
@@ -77,6 +74,9 @@ export class MessageBoxOpenerPagePO implements WorkbenchViewPagePO {
     if (options?.modality) {
       await this.locator.locator('select.e2e-modality').selectOption(options.modality);
     }
+
+    const context = options?.context && (typeof options.context === 'object' ? options.context.viewId : options.context);
+    await this.locator.locator('input.e2e-context').fill(context || (context === null ? '<null>' : '<undefined>'));
 
     if (options?.contentSelectable) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-content-selectable')).toggle(options.contentSelectable);

@@ -9,11 +9,11 @@
 */
 
 import {Event, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterEvent} from '@angular/router';
-import {createEnvironmentInjector, EnvironmentInjector, inject, Injectable, runInInjectionContext} from '@angular/core';
+import {inject, Injectable, Injector, runInInjectionContext} from '@angular/core';
 import {WorkbenchAuxiliaryRouteInstaller} from './workbench-auxiliary-route-installer.service';
 import {MAIN_AREA_LAYOUT_QUERY_PARAM} from '../workbench.constants';
-import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
-import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
+import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
+import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
@@ -47,10 +47,10 @@ export class WorkbenchUrlObserver {
 
   private readonly _router = inject(Router);
   private readonly _auxiliaryRouteInstaller = inject(WorkbenchAuxiliaryRouteInstaller);
-  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
-  private readonly _partRegistry = inject(WORKBENCH_PART_REGISTRY);
+  private readonly _viewRegistry = inject(WorkbenchViewRegistry);
+  private readonly _partRegistry = inject(WorkbenchPartRegistry);
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
-  private readonly _environmentInjector = inject(EnvironmentInjector);
+  private readonly _injector = inject(Injector);
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _workbenchLayoutFactory = inject(ɵWorkbenchLayoutFactory);
   private readonly _workbenchLayoutDiffer = inject(WorkbenchLayoutDiffer);
@@ -219,7 +219,7 @@ export class WorkbenchUrlObserver {
   }
 
   /**
-   * For each added part, constructs a {@link WorkbenchPart} and registers it in {@link WORKBENCH_PART_REGISTRY}.
+   * For each added part, constructs a {@link WorkbenchPart} and registers it in {@link WorkbenchPartRegistry}.
    */
   private registerAddedWorkbenchParts(): void {
     const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
@@ -233,7 +233,7 @@ export class WorkbenchUrlObserver {
   }
 
   /**
-   * For each removed part, destroys the {@link WorkbenchPart} and unregisters it in {@link WORKBENCH_PART_REGISTRY}.
+   * For each removed part, destroys the {@link WorkbenchPart} and unregisters it in {@link WorkbenchPartRegistry}.
    */
   private unregisterRemovedWorkbenchParts(): void {
     const {layoutDiff} = this._workbenchRouter.getCurrentNavigationContext();
@@ -245,7 +245,7 @@ export class WorkbenchUrlObserver {
   }
 
   /**
-   * For each added view, constructs a {@link WorkbenchView} and registers it in {@link WORKBENCH_VIEW_REGISTRY}.
+   * For each added view, constructs a {@link WorkbenchView} and registers it in {@link WorkbenchViewRegistry}.
    */
   private registerAddedWorkbenchViews(): void {
     const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
@@ -259,7 +259,7 @@ export class WorkbenchUrlObserver {
   }
 
   /**
-   * For each removed view, destroys the {@link WorkbenchView} and unregisters it from {@link WORKBENCH_VIEW_REGISTRY}.
+   * For each removed view, destroys the {@link WorkbenchView} and unregisters it from {@link WorkbenchViewRegistry}.
    */
   private unregisterRemovedWorkbenchViews(): void {
     const {layoutDiff} = this._workbenchRouter.getCurrentNavigationContext();
@@ -272,14 +272,14 @@ export class WorkbenchUrlObserver {
 
   private createWorkbenchPart(partId: PartId, layout: ɵWorkbenchLayout): ɵWorkbenchPart {
     // Construct the handle in an injection context that shares the part's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
-    const partEnvironmentInjector = createEnvironmentInjector([], this._environmentInjector, `Workbench Part ${partId}`);
-    return runInInjectionContext(partEnvironmentInjector, () => new ɵWorkbenchPart(partId, layout));
+    const partInjector = Injector.create({parent: this._injector, providers: [], name: `Workbench Part ${partId}`});
+    return runInInjectionContext(partInjector, () => new ɵWorkbenchPart(partId, layout));
   }
 
   private createWorkbenchView(viewId: ViewId, layout: ɵWorkbenchLayout): ɵWorkbenchView {
     // Construct the handle in an injection context that shares the view's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
-    const viewEnvironmentInjector = createEnvironmentInjector([], this._environmentInjector, `Workbench View ${viewId}`);
-    return runInInjectionContext(viewEnvironmentInjector, () => new ɵWorkbenchView(viewId, layout));
+    const viewInjector = Injector.create({parent: this._injector, providers: [], name: `Workbench View ${viewId}`});
+    return runInInjectionContext(viewInjector, () => new ɵWorkbenchView(viewId, layout));
   }
 
   /**

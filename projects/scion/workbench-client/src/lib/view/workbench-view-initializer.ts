@@ -26,6 +26,7 @@ export class WorkbenchViewInitializer implements Initializer {
     if (viewId !== null) {
       const workbenchView = new ɵWorkbenchView(viewId);
       Beans.register(WorkbenchView, {useValue: workbenchView});
+      Beans.register(Symbol.for('WORKBENCH_ELEMENT'), {useExisting: WorkbenchView});
       // Wait until initialized the view, supporting synchronous access to view properties in microfrontend constructor.
       await workbenchView.whenProperties;
     }

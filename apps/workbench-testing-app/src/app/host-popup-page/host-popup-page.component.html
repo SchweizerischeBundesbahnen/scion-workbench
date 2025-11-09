@@ -46,7 +46,7 @@
     </sci-accordion>
 
     @if (popup.params | appNullIfEmpty; as params) {
-      <sci-accordion class="e2e-popup-params" variant="solid">
+      <sci-accordion class="popup-params e2e-popup-params" variant="solid">
         <ng-template sciAccordionItem [panel]="panel_popup_params">
           <header>Popup Params</header>
         </ng-template>

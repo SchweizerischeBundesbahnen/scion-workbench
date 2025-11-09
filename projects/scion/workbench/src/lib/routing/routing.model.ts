@@ -23,9 +23,9 @@ export interface WorkbenchNavigationExtras extends NavigationExtras {
    * Controls where to open the view. Defaults to `auto`.
    *
    * One of:
-   * - 'auto':   Navigates existing views that match the path, or opens a new view otherwise. Matrix params do not affect view resolution.
-   * - 'blank':  Opens a new view and navigates it.
-   * - <viewId>: Navigates the specified view. If already opened, replaces it, or opens a new view otherwise.
+   * - `auto`:   Navigates existing views that match the path, or opens a new view otherwise. Matrix params do not affect view resolution.
+   * - `blank`:  Opens a new view and navigates it.
+   * - `<viewId>`: Navigates the specified view. If already opened, replaces it, or opens a new view otherwise.
    */
   target?: ViewId | string | 'blank' | 'auto';
   /**

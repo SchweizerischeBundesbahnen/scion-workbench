@@ -16,7 +16,9 @@ import {WorkbenchPart} from './part/workbench-part.model';
 import {Injectable, Signal, WritableSignal} from '@angular/core';
 import {ɵWorkbenchService} from './ɵworkbench.service';
 import {WorkbenchLayout} from './layout/workbench-layout';
-import {PartId, ViewId} from './workbench.identifiers';
+import {DialogId, PartId, PopupId, ViewId} from './workbench.identifiers';
+import {WorkbenchDialog} from './dialog/workbench-dialog';
+import {WorkbenchPopup} from './popup/workbench-popup';
 
 /**
  * The central class of the SCION Workbench.
@@ -94,13 +96,6 @@ export abstract class WorkbenchService {
   public abstract readonly parts: Signal<WorkbenchPart[]>;
 
   /**
-   * Returns the handle of the specified part, or `null` if not found.
-   *
-   * A handle represents a part in the layout. The handle has methods to interact with the part. A part is added to the layout via {@link WorkbenchRouter}.
-   */
-  public abstract getPart(partId: PartId): WorkbenchPart | null;
-
-  /**
    * Provides the handles of the views in the current workbench layout.
    *
    * Each handle represents a view in the layout. The handle has methods to interact with the view. Views are opened via {@link WorkbenchRouter}.
@@ -108,11 +103,46 @@ export abstract class WorkbenchService {
   public abstract readonly views: Signal<WorkbenchView[]>;
 
   /**
+   * Provides the handles of the dialogs opened in the workbench.
+   *
+   * Each handle represents a dialog. The handle has methods to interact with the dialog. Dialogs are opened via {@link WorkbenchDialogService}.
+   */
+  public abstract readonly dialogs: Signal<WorkbenchDialog[]>;
+
+  /**
+   * Provides the handles of the popups opened in the workbench.
+   *
+   * Each handle represents a popup. The handle has methods to interact with the popup. Popups are opened via {@link WorkbenchPopupService}.
+   */
+  public abstract readonly popups: Signal<WorkbenchPopup[]>;
+
+  /**
+   * Returns the handle of the specified part, or `null` if not found.
+   *
+   * A handle represents a part in the layout. The handle has methods to interact with the part. A part is added to the layout via {@link WorkbenchRouter}.
+   */
+  public abstract getPart(partId: PartId): WorkbenchPart | null;
+
+  /**
    * Returns the handle of the specified view, or `null` if not found.
    *
    * A handle represents a view in the layout. The handle has methods to interact with the view. A view is opened via {@link WorkbenchRouter}.
    */
   public abstract getView(viewId: ViewId): WorkbenchView | null;
+
+  /**
+   * Returns the handle of the specified dialog, or `null` if not found.
+   *
+   * A handle represents a dialog opened in the workbench. The handle has methods to interact with the dialog. A dialog is opened via {@link WorkbenchDialogService}.
+   */
+  public abstract getDialog(dialogId: DialogId): WorkbenchDialog | null;
+
+  /**
+   * Returns the handle of the specified popup, or `null` if not found.
+   *
+   * A handle represents a popup opened in the workbench. The handle has methods to interact with the popup. A popup is opened via {@link WorkbenchPopupService}.
+   */
+  public abstract getPopup(popupId: PopupId): WorkbenchPopup | null;
 
   /**
    * Closes the specified workbench views.

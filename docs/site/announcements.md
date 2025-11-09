@@ -17,7 +17,7 @@ On this page you will find the latest news about the development of the SCION Wo
   The workbench layout can be modified using the workbench router.
 
 - **2023-11: Added Workbench Dialog**\
-  SCION Workbench enables the display of a component in a modal dialog. A dialog can be view-modal or application-modal.
+  SCION Workbench enables the display of a component in a modal dialog. A dialog can be context-modal or application-modal.
  
 - **2023-10: Theming of SCION Workbench**\
   SCION Workbench has introduced design tokens for applications to control the look of the workbench.

@@ -9,7 +9,7 @@
  */
 
 import {ComponentType} from '@angular/cdk/portal';
-import {assertNotInReactiveContext, ComponentRef, computed, createComponent, DestroyRef, EnvironmentInjector, inject, Injector, Provider, signal, ViewContainerRef} from '@angular/core';
+import {assertNotInReactiveContext, ComponentRef, computed, createComponent, DestroyRef, Directive, EnvironmentInjector, inject, Injector, Provider, signal, ViewContainerRef} from '@angular/core';
 import {Logger, LoggerNames} from '../logging';
 
 /**
@@ -180,12 +180,14 @@ export interface OnDetach {
  * Creates the specified component based on given options.
  */
 function createPortalComponent<T>(componentType: ComponentType<T>, options: {injector: Injector; providers?: Provider[]}): ComponentRef<T> {
+  // Provide providers via host directive.
+  @Directive({providers: options.providers ?? []})
+  class InjectionContextDirective {
+  }
+
   return createComponent(componentType, {
-    elementInjector: Injector.create({
-      name: 'WbComponentPortalInjector',
-      parent: options.injector,
-      providers: options.providers ?? [],
-    }),
+    directives: [InjectionContextDirective],
+    elementInjector: options.injector,
     environmentInjector: options.injector.get(EnvironmentInjector),
   });
 }

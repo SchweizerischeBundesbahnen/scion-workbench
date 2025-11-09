@@ -10,7 +10,7 @@
 
 import {Component, ElementRef, inject, viewChild} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {CloseStrategy, PopupOrigin, ViewId, WorkbenchPopupService, WorkbenchView} from '@scion/workbench-client';
+import {CloseStrategy, DialogId, PartId, PopupId, PopupOrigin, ViewId, WorkbenchPopupService} from '@scion/workbench-client';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
@@ -22,6 +22,8 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {parseTypedString} from '../common/parse-typed-value.util';
 import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
+import {UUID} from '@scion/toolkit/uuid';
+import {MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
 
 @Component({
   selector: 'app-popup-opener-page',
@@ -64,7 +66,7 @@ export default class PopupOpenerPageComponent {
       width: this._formBuilder.control<number | undefined>(undefined),
       height: this._formBuilder.control<number | undefined>(undefined),
     }),
-    contextualViewId: this._formBuilder.control<ViewId | ''>(''),
+    context: this._formBuilder.control<ViewId | PartId | DialogId | PopupId | '<null>' | ''>(''),
     align: this._formBuilder.control<'east' | 'west' | 'north' | 'south' | ''>(''),
     cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
     closeStrategy: this._formBuilder.group({
@@ -76,8 +78,10 @@ export default class PopupOpenerPageComponent {
   protected popupError: string | undefined;
   protected returnValue: string | undefined;
 
+  protected readonly nullList = `autocomplete-null-${UUID.randomUUID()}`;
+
   constructor() {
-    inject(WorkbenchView).signalReady();
+    MicrofrontendPlatformClient.signalReady();
     this._popupOrigin$ = this.observePopupOrigin$();
   }
 
@@ -97,9 +101,7 @@ export default class PopupOpenerPageComponent {
         onEscape: this.form.controls.closeStrategy.controls.onEscape.value,
       }),
       cssClass: this.form.controls.cssClass.value,
-      context: {
-        viewId: parseTypedString(this.form.controls.contextualViewId.value || undefined),
-      },
+      context: parseTypedString(this.form.controls.context.value, {undefinedIfEmpty: true}),
     })
       .then(result => this.returnValue = result)
       .catch((error: unknown) => this.popupError = stringifyError(error) || 'Popup was closed with an error');

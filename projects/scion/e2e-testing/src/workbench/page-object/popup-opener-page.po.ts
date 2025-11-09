@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, DomRect, fromRect, rejectWhenAttached} from '../../helper/testing.util';
+import {coerceArray, rejectWhenAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
-import {BottomLeftPoint, BottomRightPoint, PopupSize, TopLeftPoint, TopRightPoint, ViewId} from '@scion/workbench';
+import {BottomLeftPoint, BottomRightPoint, DialogId, PartId, PopupId, PopupSize, TopLeftPoint, TopRightPoint, ViewId} from '@scion/workbench';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
@@ -18,6 +18,7 @@ import {ViewPO} from '../../view.po';
 import {PopupPO} from '../../popup.po';
 import {DialogPO} from '../../dialog.po';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
+import {PartPO} from '../../part.po';
 
 /**
  * Page object to interact with {@link PopupOpenerPageComponent}.
@@ -25,11 +26,11 @@ import {WorkbenchViewPagePO} from './workbench-view-page.po';
 export class PopupOpenerPagePO implements WorkbenchViewPagePO {
 
   public readonly locator: Locator;
+  public readonly openButton: Locator;
   public readonly returnValue: Locator;
   public readonly error: Locator;
-  public readonly openButton: Locator;
 
-  constructor(private _locateBy: ViewPO | PopupPO | DialogPO) {
+  constructor(private _locateBy: ViewPO | PartPO | PopupPO | DialogPO) {
     this.locator = this._locateBy.locator.locator('app-popup-opener-page');
     this.openButton = this.locator.locator('button.e2e-open');
     this.returnValue = this.locator.locator('output.e2e-return-value');
@@ -42,6 +43,15 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO {
     }
     else {
       throw Error('[PageObjectError] Test page not opened in a view.');
+    }
+  }
+
+  public get part(): PartPO {
+    if (this._locateBy instanceof PartPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a part.');
     }
   }
 
@@ -171,8 +181,8 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO {
     }
   }
 
-  public async enterContextualViewId(viewId: ViewId | '<null>' | ''): Promise<void> {
-    await this.locator.locator('input.e2e-contextual-view-id').fill(viewId);
+  public async enterContext(context: ViewId | PartId | DialogId | PopupId | null | undefined): Promise<void> {
+    await this.locator.locator('input.e2e-context').fill(context || (context === null ? '<null>' : '<undefined>'));
   }
 
   public async open(options?: {waitUntilAttached?: boolean}): Promise<void> {
@@ -193,10 +203,6 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO {
     const cssClass = (await this.locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
     const popup = new AppPO(this.locator.page()).popup({cssClass});
     await popup.locator.waitFor({state: 'attached'});
-  }
-
-  public async getAnchorElementBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.openButton.boundingBox());
   }
 
   public async click(options?: {timeout?: number}): Promise<void> {

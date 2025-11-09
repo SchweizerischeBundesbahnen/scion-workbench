@@ -10,19 +10,20 @@
 
 import {inject, Injectable} from '@angular/core';
 import {APP_IDENTITY, Handler, IntentInterceptor, IntentMessage, mapToBody, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
-import {WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchPopupReferrer, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupCommand} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchPopupReferrer, ɵWorkbenchCommands, ɵWorkbenchPopupCommand} from '@scion/workbench-client';
 import {MicrofrontendPopupComponent} from './microfrontend-popup.component';
 import {Observable} from 'rxjs';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {stringifyError} from '../../common/stringify-error.util';
-import {Arrays, Maps} from '@scion/toolkit/util';
-import {PopupService} from '../../popup/popup.service';
+import {Arrays} from '@scion/toolkit/util';
+import {WorkbenchPopupService} from '../../popup/workbench-popup.service';
 import {PopupOrigin} from '../../popup/popup.origin';
-import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {MicrofrontendHostPopupComponent} from '../microfrontend-host-popup/microfrontend-host-popup.component';
+import {isViewId, PopupId} from '../../workbench.identifiers';
+import {MicrofrontendPopupInput} from './microfrontend-popup-input';
+import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {MicrofrontendWorkbenchView} from '../microfrontend-view/microfrontend-workbench-view.model';
-import {PopupId} from '../../workbench.identifiers';
 
 /**
  * Handles popup intents, instructing the workbench to open a popup with the microfrontend declared on the resolved capability.
@@ -35,8 +36,8 @@ import {PopupId} from '../../workbench.identifiers';
 @Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
 
-  private readonly _popupService = inject(PopupService);
-  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _popupService = inject(WorkbenchPopupService);
+  private readonly _viewRegistry = inject(WorkbenchViewRegistry);
   private readonly _logger = inject(Logger);
   private readonly _openedPopups = new Set<PopupId>();
 
@@ -90,21 +91,17 @@ export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
     const isHostProvider = capability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
     this._logger.debug(() => 'Handling microfrontend popup command', LoggerNames.MICROFRONTEND, command);
 
-    const popupContext: ɵPopupContext = {
-      popupId: command.popupId,
-      capability: capability,
-      params: new Map([
-        ...Maps.coerce(message.intent.params),
-        ...Maps.coerce(message.intent.qualifier),
-      ]),
-      closeOnFocusLost: command.closeStrategy?.onFocusLost ?? true,
+    const popupInput: MicrofrontendPopupInput = {
+      capability,
+      params: message.intent.params ?? new Map<string, unknown>(),
       referrer: this.getReferrer(command),
+      closeOnFocusLost: command.closeStrategy?.onFocusLost ?? true,
     };
 
     return this._popupService.open({
       id: command.popupId,
       component: isHostProvider ? MicrofrontendHostPopupComponent : MicrofrontendPopupComponent,
-      input: popupContext,
+      input: popupInput,
       anchor: this.observePopupOrigin$(command),
       context: command.context,
       align: command.align,
@@ -128,11 +125,12 @@ export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
    * Returns information about the context in which a popup was opened.
    */
   private getReferrer(command: ɵWorkbenchPopupCommand): WorkbenchPopupReferrer {
-    if (!command.context?.viewId) {
+    const context = command.context && (typeof command.context === 'object' ? command.context.viewId : command.context);
+    if (!isViewId(context)) {
       return {};
     }
 
-    const view = this._viewRegistry.get(command.context.viewId);
+    const view = this._viewRegistry.get(context);
     return {
       viewId: view.id,
       viewCapabilityId: view.adapt(MicrofrontendWorkbenchView)?.capability.metadata!.id,

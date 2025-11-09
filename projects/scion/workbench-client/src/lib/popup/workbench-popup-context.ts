@@ -24,7 +24,7 @@ export interface ɵPopupContext {
   popupId: PopupId;
   params: Map<string, any>;
   capability: WorkbenchPopupCapability;
-  closeOnFocusLost: boolean;
+  /** @deprecated since version 1.0.0-beta.34. No replacement. Marked for removal. */
   referrer: WorkbenchPopupReferrer;
 }
 

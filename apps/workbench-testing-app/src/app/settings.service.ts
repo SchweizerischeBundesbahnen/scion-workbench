@@ -63,13 +63,17 @@ const SETTINGS = {
     default: false,
     storageKey: 'scion.workbench.testing-app.settings.highlight-focus',
   },
+  highlightGlasspane: {
+    default: false,
+    storageKey: 'scion.workbench.testing-app.settings.highlight-glasspane',
+  },
   logAngularChangeDetectionCycles: {
     default: environment.logAngularChangeDetectionCycles,
     storageKey: 'scion.workbench.testing-app.settings.log-angular-change-detection-cycles',
   },
-  displaySkeletons: {
+  showSkeletons: {
     default: !isDevMode(),
-    storageKey: 'scion.workbench.testing-app.settings.display-skeletons',
+    storageKey: 'scion.workbench.testing-app.settings.show-skeletons',
   },
   showTestPerspectives: {
     default: isDevMode(),

@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ViewId} from '../workbench.identifiers';
+import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 
 /**
- * Configures the dialog to display a microfrontend in a workbench dialog using {@link WorkbenchDialogService}.
+ * Controls the appearance and behavior of a dialog.
  *
  * @category Dialog
  */
@@ -23,27 +23,23 @@ export interface WorkbenchDialogOptions {
    */
   params?: Map<string, unknown> | {[param: string]: unknown};
   /**
-   * Controls which area of the application to block by the dialog.
+   * Controls which area of the application to block by the dialog. Defaults to `context`.
    *
-   * - **Application-modal:**
-   *   Use to block the workbench, or the browser's viewport if configured in the workbench host application.
-   *
-   * - **View-modal:**
-   *   Use to block only the contextual view of the dialog, allowing the user to interact with other views.
-   *   This is the default if opening the dialog in the context of a view.
+   * One of:
+   * - `context`: Blocks a specific part of the application, as specified in {@link context}, defaulting to the calling context.
+   * - `application`: Blocks the workbench or browser viewport, based on global workbench settings.
+   * - `view`: Deprecated. Same as `context`. Marked for removal.
    */
-  modality?: 'application' | 'view';
+  modality?: 'context' | 'application' | ViewModality;
   /**
-   * Specifies the context in which to open the dialog.
+   * Binds the dialog to a context (e.g., a part or view). Defaults to the calling context.
+   *
+   * The dialog is displayed only if the context is visible and closes when the context is disposed.
+   * The dialog is opened in the center of its context, if any, unless opened from the peripheral area.
+   *
+   * Set to `null` to open the dialog outside a context.
    */
-  context?: {
-    /**
-     * Controls which view to block when opening a dialog view-modal.
-     *
-     * By default, if opening the dialog in the context of a view, that view is used as the contextual view.
-     */
-    viewId?: ViewId;
-  };
+  context?: ViewId | PartId | DialogId | PopupId | Context | null;
   /**
    * Controls whether to animate the opening of the dialog. Defaults is `false`.
    */
@@ -52,4 +48,19 @@ export interface WorkbenchDialogOptions {
    * Specifies CSS class(es) to add to the dialog, e.g., to locate the dialog in tests.
    */
   cssClass?: string | string[];
+}
+
+/**
+ * @deprecated since version 1.0.0-beta.34. Renamed to `context`. Marked for removal.
+ */
+type ViewModality = 'view';
+
+/**
+ * @deprecated since version 1.0.0-beta.34. Set view id directly. Migrate `{context: {viewId: 'view.x'}}` to `{context: 'view.x'}`. Marked for removal.
+ */
+interface Context {
+  /**
+   * @deprecated since version 1.0.0-beta.34. Set view id directly. Migrate `{context: {viewId: 'view.x'}}` to `{context: 'view.x'}`. Marked for removal.
+   */
+  viewId?: ViewId | null;
 }

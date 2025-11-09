@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Injector, signal, Signal, untracked, viewChild} from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Injector, Provider, signal, Signal, untracked, viewChild} from '@angular/core';
 import {ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {WorkbenchPartCapability, ɵWORKBENCH_PART_CONTEXT, ɵWorkbenchCommands, ɵWorkbenchPartContext} from '@scion/workbench-client';
@@ -27,6 +27,8 @@ import {ɵWorkbenchPart} from '../../part/ɵworkbench-part.model';
 import {MicrofrontendPartNavigationData} from './microfrontend-part-navigation-data';
 import {Router} from '@angular/router';
 import {pairwise} from 'rxjs';
+import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../../glass-pane/glass-pane.directive';
+import {WorkbenchPart} from '../../part/workbench-part.model';
 
 /**
  * Embeds the microfrontend of a part capability.
@@ -38,6 +40,10 @@ import {pairwise} from 'rxjs';
   imports: [
     ContentAsOverlayComponent,
     NgComponentOutlet,
+    GlassPaneDirective,
+  ],
+  viewProviders: [
+    configureMicrofrontendGlassPane(),
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a custom element
 })
@@ -195,6 +201,22 @@ export class MicrofrontendPartComponent {
     void this._messageClient.publish(ɵWorkbenchCommands.partFocusedTopic(this.part.id), undefined, {retain: true});
     void this._outletRouter.navigate(null, {outlet: this.part.id});
   }
+}
+
+/**
+ * Blocks the microfrontend outlet when dialog(s) overlay this part.
+ */
+function configureMicrofrontendGlassPane(): Provider[] {
+  return [
+    {
+      provide: GLASS_PANE_BLOCKABLE,
+      useFactory: () => inject(ɵWorkbenchPart),
+    },
+    {
+      provide: GLASS_PANE_OPTIONS,
+      useFactory: () => ({attributes: {'data-partid': inject(WorkbenchPart).id}}) satisfies GlassPaneOptions,
+    },
+  ];
 }
 
 /**

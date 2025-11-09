@@ -16,6 +16,8 @@ import {WorkbenchDialogRegistry} from './workbench-dialog.registry';
 import {throwError} from '../common/throw-error.util';
 import {TestComponent} from '../testing/test.component';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
+import {LogLevel} from '../logging';
+import {WorkbenchMessageBoxService} from '../message-box/workbench-message-box.service';
 
 describe('Dialog', () => {
 
@@ -46,6 +48,87 @@ describe('Dialog', () => {
 
     // Expect the injector to be destroyed.
     expect(injectorDestroyed).toBeTrue();
+  });
+
+  it('should destroy component when closing the dialog', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+      ],
+    });
+
+    @Component({template: 'Dialog'})
+    class SpecDialogComponent {
+
+      public destroyed = false;
+      public dialog = inject(WorkbenchDialog);
+
+      constructor() {
+        inject(DestroyRef).onDestroy(() => this.destroyed = true);
+      }
+    }
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+
+    // Open dialog.
+    void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent);
+    await waitUntilStable();
+
+    // Get component.
+    const dialogComponent = getDialogComponent(fixture, SpecDialogComponent);
+
+    // Close dialog.
+    dialogComponent.dialog.close();
+    await waitUntilStable();
+
+    // Expect the component to be destroyed.
+    expect(dialogComponent.destroyed).toBeTrue();
+  });
+
+  it('should destroy dialog-aware services when closing the dialog', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          logging: {logLevel: LogLevel.DEBUG},
+        }),
+      ],
+    });
+
+    @Component({template: 'Dialog'})
+    class SpecDialogComponent {
+
+      public dialog = inject(WorkbenchDialog);
+
+      constructor() {
+        inject(WorkbenchMessageBoxService);
+        inject(WorkbenchDialogService);
+      }
+    }
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+
+    // Spy console.
+    spyOn(console, 'debug').and.callThrough();
+
+    // Open dialog.
+    void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent);
+    await waitUntilStable();
+
+    const dialog = getDialogComponent(fixture, SpecDialogComponent).dialog;
+
+    // Expect dialog-aware services to be constructed.
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining(`Constructing WorkbenchMessageBoxService [context=${dialog.id}]`));
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining(`Constructing WorkbenchDialogService [context=${dialog.id}]`));
+
+    // Close dialog.
+    dialog.close();
+    await waitUntilStable();
+
+    // Expect dialog-aware services to be destroyed.
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining(`Destroying WorkbenchMessageBoxService [context=${dialog.id}]`));
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining(`Destroying WorkbenchDialogService [context=${dialog.id}]`));
   });
 
   it('should allow for custom injector', async () => {
@@ -381,7 +464,7 @@ describe('Dialog', () => {
 });
 
 function getDialog(locator: {cssClass: string}): ɵWorkbenchDialog {
-  return TestBed.inject(WorkbenchDialogRegistry).dialogs().find(dialog => dialog.cssClass().includes(locator.cssClass)) ?? throwError('[NullDialogError]');
+  return TestBed.inject(WorkbenchDialogRegistry).elements().find(dialog => dialog.cssClass().includes(locator.cssClass)) ?? throwError('[NullDialogError]');
 }
 
 function getDialogComponent<T>(fixture: ComponentFixture<unknown>, type: Type<T>): T {

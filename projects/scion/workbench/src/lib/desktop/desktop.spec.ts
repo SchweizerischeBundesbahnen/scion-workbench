@@ -21,7 +21,7 @@ import {MAIN_AREA} from '../layout/workbench-layout';
 import {WorkbenchDesktopDirective} from './desktop.directive';
 import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
+import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 
 describe('Desktop', () => {
 
@@ -276,7 +276,7 @@ describe('Desktop', () => {
       expect(desktopViewport.scrollTop).toBe(0);
 
       // Close view.
-      await TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.1').close();
+      await TestBed.inject(WorkbenchViewRegistry).get('view.1').close();
 
       // Expect the desktop to display.
       expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.main-area"] wb-desktop-slot'))).not.toBeNull();
@@ -594,7 +594,7 @@ describe('Desktop', () => {
       expect(desktopViewport.scrollTop).toBe(0);
 
       // Close view.
-      await TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.1').close();
+      await TestBed.inject(WorkbenchViewRegistry).get('view.1').close();
 
       // Expect the desktop to display.
       expect(fixture.debugElement.query(By.css('wb-layout wb-desktop-slot'))).not.toBeNull();

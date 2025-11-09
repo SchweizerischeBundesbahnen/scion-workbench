@@ -41,34 +41,18 @@ export class WorkbenchAccessor {
     }, viewIds);
   }
 
-  /**
-   * Finds views based on given criteria.
-   */
-  public views(findBy?: {viewId?: ViewId; alternativeId?: string}): Promise<WorkbenchViewE2E[]> {
-    return this._page.evaluate(findBy => {
+  public async closeDialogs(...dialogIds: DialogId[]): Promise<void> {
+    await this._page.evaluate((dialogIds: DialogId[]) => {
       const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
-      return workbenchService.views()
-        .filter(view => {
-          if (findBy?.viewId && findBy.viewId !== view.id) {
-            return false;
-          }
-          if (findBy?.alternativeId && findBy.alternativeId !== view.alternativeId) {
-            return false;
-          }
-          return true;
-        })
-        .map(view => ({
-          id: view.id,
-          alternativeId: view.alternativeId,
-          partId: view.part().id,
-          activationInstant: view.activationInstant(),
-          navigation: {
-            path: view.navigation()?.path.join('/'),
-            hint: view.navigation()?.hint,
-            state: view.navigation()?.state,
-          },
-        }));
-    }, findBy);
+      dialogIds.forEach(dialogId => workbenchService.getDialog(dialogId)!.close());
+    }, dialogIds);
+  }
+
+  public async closePopups(...popupIds: PopupId[]): Promise<void> {
+    await this._page.evaluate((popupIds: PopupId[]) => {
+      const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
+      popupIds.forEach(popupId => workbenchService.getPopup(popupId)!.close());
+    }, popupIds);
   }
 
   /**
@@ -95,6 +79,36 @@ export class WorkbenchAccessor {
             path: part.navigation()?.path.join('/'),
             hint: part.navigation()?.hint,
             state: part.navigation()?.state,
+          },
+        }));
+    }, findBy);
+  }
+
+  /**
+   * Finds views based on given criteria.
+   */
+  public views(findBy?: {viewId?: ViewId; alternativeId?: string}): Promise<WorkbenchViewE2E[]> {
+    return this._page.evaluate(findBy => {
+      const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
+      return workbenchService.views()
+        .filter(view => {
+          if (findBy?.viewId && findBy.viewId !== view.id) {
+            return false;
+          }
+          if (findBy?.alternativeId && findBy.alternativeId !== view.alternativeId) {
+            return false;
+          }
+          return true;
+        })
+        .map(view => ({
+          id: view.id,
+          alternativeId: view.alternativeId,
+          partId: view.part().id,
+          activationInstant: view.activationInstant(),
+          navigation: {
+            path: view.navigation()?.path.join('/'),
+            hint: view.navigation()?.hint,
+            state: view.navigation()?.state,
           },
         }));
     }, findBy);
@@ -149,6 +163,13 @@ export class WorkbenchAccessor {
   }
 }
 
+export interface WorkbenchPartE2E {
+  id: PartId;
+  alternativeId: string | undefined;
+  activationInstant: number;
+  navigation: WorkbenchPartNavigationE2E;
+}
+
 export interface WorkbenchViewE2E {
   id: ViewId;
   alternativeId: string | undefined;
@@ -157,20 +178,13 @@ export interface WorkbenchViewE2E {
   navigation: WorkbenchViewNavigationE2E;
 }
 
-export interface WorkbenchPartE2E {
-  id: PartId;
-  alternativeId: string | undefined;
-  activationInstant: number;
-  navigation: WorkbenchPartNavigationE2E;
-}
-
-export interface WorkbenchViewNavigationE2E {
+export interface WorkbenchPartNavigationE2E {
   path?: string;
   hint?: string;
   state?: Record<string, unknown>;
 }
 
-export interface WorkbenchPartNavigationE2E {
+export interface WorkbenchViewNavigationE2E {
   path?: string;
   hint?: string;
   state?: Record<string, unknown>;

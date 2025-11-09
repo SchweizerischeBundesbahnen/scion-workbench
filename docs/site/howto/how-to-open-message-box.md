@@ -8,7 +8,9 @@
 A message box is a standardized dialog for presenting a message to the user, such as an info, warning or alert, or for prompting the user for confirmation. The message can be plain text or a component, allowing for
 structured content or input prompts.
 
-Displayed on top of other content, a message box blocks interaction with other parts of the application. A message box can be view-modal or application-modal. Multiple message boxes are stacked, and only the topmost message box in each modality stack can be interacted with.
+Displayed on top of other content, a message box blocks interaction with other parts of the application. A message box can be context-modal or application-modal. Message boxes are stacked per modality, with only the topmost message box in each stack being interactive.
+
+A message box can be bound to a context (e.g., a part or view), displaying the message box only if the context is visible and closing it when the context is disposed. A message box is opened in the center of its context, if any, unless opened from the peripheral area.
 
 ### How to Display a Text Message
 To display a text message, inject `MessageBoxService` and invoke the `open` method, passing the text to display. 
@@ -75,9 +77,9 @@ if (action === 'yes') {
 ```
 
 ### How to Set the Modality of a Message Box
-A message box can be view-modal or application-modal. A view-modal message box blocks only a specific view, allowing the user to interact with other views. An application-modal message box blocks the workbench by default, or the browser's viewport, if set in the global workbench dialog settings.
+A message box can be context-modal or application-modal. Context-modal blocks a specific part of the application, as specified by the context; application-modal blocks the workbench or browser viewport, based on global workbench settings.
 
-By default, the calling context determines the modality of the message box. If the message box is opened from a view, only this view is blocked. To open the message box with a different modality, specify the modality in the message box options.
+By default, the message box is modal to the calling context. Specify a different modality in message box options.
 
 ```ts
 import {inject} from '@angular/core';

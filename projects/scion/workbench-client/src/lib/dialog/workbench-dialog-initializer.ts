@@ -25,6 +25,7 @@ export class WorkbenchDialogInitializer implements Initializer {
     const dialogContext = await Beans.get(ContextService).lookup<ɵDialogContext>(ɵDIALOG_CONTEXT);
     if (dialogContext !== null) {
       Beans.register(WorkbenchDialog, {useValue: new ɵWorkbenchDialog(dialogContext)});
+      Beans.register(Symbol.for('WORKBENCH_ELEMENT'), {useExisting: WorkbenchDialog});
     }
   }
 }

@@ -8,18 +8,20 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {InjectionToken} from '@angular/core';
-import {WorkbenchObjectRegistry} from '../registry/workbench-object-registry';
-import {ɵPopup} from './popup.config';
+import {Injectable} from '@angular/core';
+import {WorkbenchElementRegistry} from '../registry/workbench-element-registry';
 import {PopupId} from '../workbench.identifiers';
+import {ɵWorkbenchPopup} from './ɵworkbench-popup';
 
 /**
- * Registry for {@link WorkbenchPopup} model objects.
+ * Registry for {@link WorkbenchPopup} elements.
  */
-export const WORKBENCH_POPUP_REGISTRY = new InjectionToken<WorkbenchObjectRegistry<PopupId, ɵPopup>>('WORKBENCH_POPUP_REGISTRY', {
-  providedIn: 'root',
-  factory: () => new WorkbenchObjectRegistry<PopupId, ɵPopup>({
-    nullObjectErrorFn: popupId => Error(`[NullPopupError] Popup '${popupId}' not found.`),
-    onUnregister: popup => popup.destroy(),
-  }),
-});
+@Injectable({providedIn: 'root'})
+export class WorkbenchPopupRegistry extends WorkbenchElementRegistry<PopupId, ɵWorkbenchPopup> {
+  constructor() {
+    super({
+      nullElementErrorFn: popupId => Error(`[NullPopupError] Popup '${popupId}' not found.`),
+      onUnregister: popup => popup.destroy(),
+    });
+  }
+}

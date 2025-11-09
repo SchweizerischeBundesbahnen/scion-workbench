@@ -16,16 +16,16 @@ import {PopupPagePO} from './page-object/popup-page.po';
 import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
 import {expectPopup} from '../matcher/popup-matcher';
-import {waitUntilBoundingBoxStable} from '../helper/testing.util';
 import {PopupPositionTestPagePO} from './page-object/test-pages/popup-position-test-page.po';
 import {SizeTestPagePO} from './page-object/test-pages/size-test-page.po';
 import {expectView} from '../matcher/view-matcher';
 import {MAIN_AREA} from '../workbench.model';
-import {POPUP_DIAMOND_ANCHOR_SIZE} from './workbench-layout-constants';
+import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
+import {BlankTestPagePO} from './page-object/test-pages/blank-test-page.po';
 
 test.describe('Workbench Popup', () => {
 
-  test.describe('popup alignment if using HTMLElement anchor', () => {
+  test.describe('Popup Alignment (Element Anchor)', () => {
 
     test('should, by default, open in the north of the anchor', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
@@ -42,11 +42,7 @@ test.describe('Workbench Popup', () => {
       const popupPage = new PopupPagePO(popup);
 
       await expectPopup(popupPage).toBeVisible();
-      await expect.poll(() => popup.getAlign()).toEqual('north');
-
-      const anchorBox = await popupOpenerPage.getAnchorElementBoundingBox();
-      await expect.poll(() => popup.getBoundingBox().then(box => box.bottom + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(anchorBox.top, 0);
-      await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toBeCloseTo(anchorBox.hcenter, 0);
+      await expectPopup(popupPage).toHavePosition('north', popupOpenerPage.openButton);
     });
 
     test('should open in the north of the anchor', async ({appPO, workbenchNavigator}) => {
@@ -64,11 +60,7 @@ test.describe('Workbench Popup', () => {
       const popupPage = new PopupPagePO(popup);
 
       await expectPopup(popupPage).toBeVisible();
-      await expect.poll(() => popup.getAlign()).toEqual('north');
-
-      const anchorBox = await popupOpenerPage.getAnchorElementBoundingBox();
-      await expect.poll(() => popup.getBoundingBox().then(box => box.bottom + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(anchorBox.top, 0);
-      await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toBeCloseTo(anchorBox.hcenter, 0);
+      await expectPopup(popupPage).toHavePosition('north', popupOpenerPage.openButton);
     });
 
     test('should open in the south of the anchor', async ({appPO, workbenchNavigator}) => {
@@ -86,11 +78,7 @@ test.describe('Workbench Popup', () => {
       const popupPage = new PopupPagePO(popup);
 
       await expectPopup(popupPage).toBeVisible();
-      await expect.poll(() => popup.getAlign()).toEqual('south');
-
-      const anchorBox = await popupOpenerPage.getAnchorElementBoundingBox();
-      await expect.poll(() => popup.getBoundingBox().then(box => box.top - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(anchorBox.bottom, 0);
-      await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toBeCloseTo(anchorBox.hcenter, 0);
+      await expectPopup(popupPage).toHavePosition('south', popupOpenerPage.openButton);
     });
 
     test('should open in the east of the anchor', async ({appPO, workbenchNavigator}) => {
@@ -108,11 +96,7 @@ test.describe('Workbench Popup', () => {
       const popupPage = new PopupPagePO(popup);
 
       await expectPopup(popupPage).toBeVisible();
-      await expect.poll(() => popup.getAlign()).toEqual('east');
-
-      const anchorBox = await popupOpenerPage.getAnchorElementBoundingBox();
-      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(anchorBox.vcenter, 0);
-      await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(anchorBox.right, 0);
+      await expectPopup(popupPage).toHavePosition('east', popupOpenerPage.openButton);
     });
 
     test('should open in the west of the anchor', async ({appPO, workbenchNavigator}) => {
@@ -130,15 +114,11 @@ test.describe('Workbench Popup', () => {
       const popupPage = new PopupPagePO(popup);
 
       await expectPopup(popupPage).toBeVisible();
-      await expect.poll(() => popup.getAlign()).toEqual('west');
-
-      const anchorBox = await popupOpenerPage.getAnchorElementBoundingBox();
-      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(anchorBox.vcenter, 0);
-      await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(anchorBox.left, 0);
+      await expectPopup(popupPage).toHavePosition('west', popupOpenerPage.openButton);
     });
   });
 
-  test.describe('popup alignment if using coordinate anchor', () => {
+  test.describe('Popup Alignment (Coordinate Anchor)', () => {
 
     test('should, by default, open in the north of the anchor', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
@@ -155,11 +135,7 @@ test.describe('Workbench Popup', () => {
       const popupPage = new PopupPagePO(popup);
 
       await expectPopup(popupPage).toBeVisible();
-      await expect.poll(() => popup.getAlign()).toEqual('north');
-
-      const viewBounds = await appPO.activePart({grid: 'mainArea'}).activeView.getBoundingBox();
-      await expect.poll(() => popup.getBoundingBox().then(box => box.bottom + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(viewBounds.top + 300, 0);
-      await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toBeCloseTo(viewBounds.left + 300, 0);
+      await expectPopup(popupPage).toHavePosition('north', appPO.activePart({grid: 'mainArea'}).activeView.locator, {left: 300, top: 300});
     });
 
     test('should open in the north of the anchor', async ({appPO, workbenchNavigator}) => {
@@ -177,11 +153,7 @@ test.describe('Workbench Popup', () => {
       const popupPage = new PopupPagePO(popup);
 
       await expectPopup(popupPage).toBeVisible();
-      await expect.poll(() => popup.getAlign()).toEqual('north');
-
-      const viewBounds = await appPO.activePart({grid: 'mainArea'}).activeView.getBoundingBox();
-      await expect.poll(() => popup.getBoundingBox().then(box => box.bottom + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(viewBounds.top + 300, 0);
-      await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toBeCloseTo(viewBounds.left + 300, 0);
+      await expectPopup(popupPage).toHavePosition('north', appPO.activePart({grid: 'mainArea'}).activeView.locator, {left: 300, top: 300});
     });
 
     test('should open in the south of the anchor', async ({appPO, workbenchNavigator}) => {
@@ -199,11 +171,7 @@ test.describe('Workbench Popup', () => {
       const popupPage = new PopupPagePO(popup);
 
       await expectPopup(popupPage).toBeVisible();
-      await expect.poll(() => popup.getAlign()).toEqual('south');
-
-      const viewBounds = await appPO.activePart({grid: 'mainArea'}).activeView.getBoundingBox();
-      await expect.poll(() => popup.getBoundingBox().then(box => box.top - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(viewBounds.top + 300, 0);
-      await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toBeCloseTo(viewBounds.left + 300, 0);
+      await expectPopup(popupPage).toHavePosition('south', appPO.activePart({grid: 'mainArea'}).activeView.locator, {left: 300, top: 300});
     });
 
     test('should open in the east of the anchor', async ({appPO, workbenchNavigator}) => {
@@ -221,11 +189,7 @@ test.describe('Workbench Popup', () => {
       const popupPage = new PopupPagePO(popup);
 
       await expectPopup(popupPage).toBeVisible();
-      await expect.poll(() => popup.getAlign()).toEqual('east');
-
-      const viewBounds = await appPO.activePart({grid: 'mainArea'}).activeView.getBoundingBox();
-      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(viewBounds.top + 300, 0);
-      await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(viewBounds.left + 300, 0);
+      await expectPopup(popupPage).toHavePosition('east', appPO.activePart({grid: 'mainArea'}).activeView.locator, {left: 300, top: 300});
     });
 
     test('should open in the west of the anchor', async ({appPO, workbenchNavigator}) => {
@@ -243,11 +207,7 @@ test.describe('Workbench Popup', () => {
       const popupPage = new PopupPagePO(popup);
 
       await expectPopup(popupPage).toBeVisible();
-      await expect.poll(() => popup.getAlign()).toEqual('west');
-
-      const viewBounds = await appPO.activePart({grid: 'mainArea'}).activeView.getBoundingBox();
-      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(viewBounds.top + 300, 0);
-      await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(viewBounds.left + 300, 0);
+      await expectPopup(popupPage).toHavePosition('west', appPO.activePart({grid: 'mainArea'}).activeView.locator, {left: 300, top: 300});
     });
   });
 
@@ -267,16 +227,14 @@ test.describe('Workbench Popup', () => {
     await popupOpenerView.enterCloseStrategy({closeOnFocusLost: false});
     await popupOpenerView.open();
 
-    const popup = appPO.popup({cssClass: 'testee'});
+    const popupPage = new BlankTestPagePO(appPO.popup({cssClass: 'testee'}));
 
     // Remove the right part by closing its only view, causing the workbench to re-layout workbench parts.
     await appPO.view({viewId: 'view.100'}).tab.close();
-    await expect(popup.locator).toBeVisible();
+    await expectPopup(popupPage).toBeVisible();
 
     // Expect the popup to stick to the popup anchor.
-    const anchorBox = await popupOpenerView.getAnchorElementBoundingBox();
-    await expect.poll(() => popup.getBoundingBox().then(box => box.bottom + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(anchorBox.top, 0);
-    await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toBeCloseTo(anchorBox.hcenter, 0);
+    await expectPopup(popupPage).toHavePosition('north', popupOpenerView.openButton);
   });
 
   test('should allow passing a value to the popup component', async ({appPO, workbenchNavigator}) => {
@@ -294,7 +252,7 @@ test.describe('Workbench Popup', () => {
     await expect(popupPage.input).toHaveText('TEST INPUT');
   });
 
-  test.describe('popup result', () => {
+  test.describe('Popup Result', () => {
     test('should allow closing the popup and returning a value to the popup opener', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
@@ -390,7 +348,7 @@ test.describe('Workbench Popup', () => {
     await expectPopup(popupPage).toBeVisible();
   });
 
-  test.describe('Moving the anchor', () => {
+  test.describe('Moving Popup Anchor', () => {
 
     test('should stick to the popup anchor', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
@@ -404,41 +362,15 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.enterSize({width: '100px', height: '100px'});
       await popupOpenerPage.open();
 
-      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
 
-      // Wait until popup is positioned and sized.
-      await waitUntilBoundingBoxStable(popup.locator);
-
-      // capture current popup and anchor location
-      const anchorBoxInitial = await popupOpenerPage.getAnchorElementBoundingBox();
-      const popupBoundsInitial = await popup.getBoundingBox();
-
-      // expand a collapsed panel to move the popup anchor downward
+      // Expand a collapsed panel to move the popup anchor downward.
       await popupOpenerPage.expandSizePanel();
-      await expect(async () => {
-        const anchorBox = await popupOpenerPage.getAnchorElementBoundingBox();
-        const popupBounds = await popup.getBoundingBox();
-        const xDelta = anchorBox.left - anchorBoxInitial.left;
-        const yDelta = anchorBox.top - anchorBoxInitial.top;
+      await expectPopup(popupPage).toHavePosition('north', popupOpenerPage.openButton);
 
-        // assert the anchor to moved downward
-        expect(anchorBox.top).toBeGreaterThan(anchorBoxInitial.top);
-        expect(anchorBox.left).toEqual(anchorBoxInitial.left);
-
-        // assert the popup location
-        expect(popupBounds.top).toEqual(popupBoundsInitial.top + yDelta);
-        expect(popupBounds.left).toEqual(popupBoundsInitial.left + xDelta);
-      }).toPass();
-
-      // collapse the panel to move the popup anchor upward
+      // Collapse the panel to move the popup anchor upward.
       await popupOpenerPage.collapseSizePanel();
-      await expect(async () => {
-        const popupBounds = await popup.getBoundingBox();
-
-        // assert the popup location
-        expect(popupBounds.top).toEqual(popupBoundsInitial.top);
-        expect(popupBounds.left).toEqual(popupBoundsInitial.left);
-      }).toPass();
+      await expectPopup(popupPage).toHavePosition('north', popupOpenerPage.openButton);
     });
 
     test('should allow repositioning the popup if using a coordinate anchor', async ({appPO, workbenchNavigator}) => {
@@ -453,27 +385,363 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.enterSize({width: '100px', height: '100px'});
       await popupOpenerPage.open();
 
-      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
 
-      const viewBounds = await appPO.activePart({grid: 'mainArea'}).activeView.getBoundingBox();
-      await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toEqual(viewBounds.left + 150);
-      await expect.poll(() => popup.getBoundingBox().then(box => box.top - POPUP_DIAMOND_ANCHOR_SIZE)).toEqual(viewBounds.top + 150);
+      await expectPopup(popupPage).toHavePosition('south', appPO.activePart({grid: 'mainArea'}).activeView.locator, {left: 150, top: 150});
 
-      // move the anchor to another position
+      // Move the anchor to another position.
       await popupOpenerPage.enterPosition({left: 200, top: 300});
-      await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toEqual(viewBounds.left + 200);
-      await expect.poll(() => popup.getBoundingBox().then(box => box.top - POPUP_DIAMOND_ANCHOR_SIZE)).toEqual(viewBounds.top + 300);
+      await expectPopup(popupPage).toHavePosition('south', appPO.activePart({grid: 'mainArea'}).activeView.locator, {left: 200, top: 300});
 
-      // move the anchor to another position
+      // Move the anchor to another position.
       await popupOpenerPage.enterPosition({left: 300, top: 400});
-      await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toEqual(viewBounds.left + 300);
-      await expect.poll(() => popup.getBoundingBox().then(box => box.top - POPUP_DIAMOND_ANCHOR_SIZE)).toEqual(viewBounds.top + 400);
+      await expectPopup(popupPage).toHavePosition('south', appPO.activePart({grid: 'mainArea'}).activeView.locator, {left: 300, top: 400});
     });
   });
 
-  test.describe('view context', () => {
+  test.describe('Part Context', () => {
 
-    test('should hide the popup when its contextual view (if any) is deactivated, and then display the popup again when activating it', async ({appPO, workbenchNavigator}) => {
+    test('should bind popup to contextual part', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective('testee', factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.testee', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity', ɵactivityId: 'activity.1'})
+        .navigatePart('part.testee', ['test-popup-opener'])
+        .activatePart('part.testee'),
+      );
+
+      // Open popup.
+      const popupOpenerPage = new PopupOpenerPagePO(appPO.part({partId: 'part.testee'}));
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition('element');
+      await popupOpenerPage.enterSize({width: '50px', height: '50px'});
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.open();
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+
+      // Expect popup to be visible.
+      await expectPopup(popupPage).toBeVisible();
+      const componentInstanceId = await popupPage.getComponentInstanceId();
+      await expectPopup(popupPage).toHavePosition('north', popupOpenerPage.openButton);
+
+      // Close activity.
+      await appPO.activityItem({activityId: 'activity.1'}).click();
+
+      // Expect popup to be hidden.
+      await expectPopup(popupPage).toBeHidden();
+
+      // Open activity.
+      await appPO.activityItem({activityId: 'activity.1'}).click();
+
+      // Expect popup to be visible.
+      await expectPopup(popupPage).toBeVisible();
+      await expectPopup(popupPage).toHavePosition('north', popupOpenerPage.openButton);
+
+      // Expect popup not to be constructed anew.
+      await expect.poll(() => popupPage.getComponentInstanceId()).toEqual(componentInstanceId);
+    });
+
+    test('should bind popup to any part', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective('testee', factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.testee', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity', ɵactivityId: 'activity.1'})
+        .activatePart('part.testee'),
+      );
+
+      // Open popup.
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterContext('part.testee');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition({top: 100, left: 100});
+      await popupOpenerPage.enterSize({width: '50px', height: '50px'});
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.open();
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+
+      // Expect popup to be visible.
+      await expectPopup(popupPage).toBeVisible();
+      const componentInstanceId = await popupPage.getComponentInstanceId();
+      await expectPopup(popupPage).toHavePosition('north', appPO.part({partId: 'part.testee'}).slot.locator, {top: 100, left: 100});
+
+      // Close activity.
+      await appPO.activityItem({activityId: 'activity.1'}).click();
+
+      // Expect popup to be hidden.
+      await expectPopup(popupPage).toBeHidden();
+
+      // Open activity.
+      await appPO.activityItem({activityId: 'activity.1'}).click();
+
+      // Expect popup to be visible.
+      await expectPopup(popupPage).toBeVisible();
+      await expectPopup(popupPage).toHavePosition('north', appPO.part({partId: 'part.testee'}).slot.locator, {top: 100, left: 100});
+
+      // Expect popup not to be constructed anew.
+      await expect.poll(() => popupPage.getComponentInstanceId()).toEqual(componentInstanceId);
+    });
+
+    test('should not bind popup to contextual part if context null', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective('testee', factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.testee', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity', ɵactivityId: 'activity.1'})
+        .navigatePart('part.testee', ['test-popup-opener'])
+        .activatePart('part.testee'),
+      );
+
+      // Open popup.
+      const popupOpenerPage = new PopupOpenerPagePO(appPO.part({partId: 'part.testee'}));
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.enterContext(null);
+      await popupOpenerPage.enterPosition({top: 300, left: 300});
+      await popupOpenerPage.enterSize({height: '100px', width: '100px'});
+      await popupOpenerPage.open();
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+
+      await expectPopup(popupPage).toBeVisible();
+      await expectPopup(popupPage).toHavePosition('north', 'viewport', {top: 300, left: 300});
+
+      // Close activity.
+      await appPO.activityItem({activityId: 'activity.1'}).click();
+      await expectPopup(popupPage).toBeVisible();
+
+      // Open activity.
+      await appPO.activityItem({activityId: 'activity.1'}).click();
+      await expectPopup(popupPage).toBeVisible();
+    });
+
+    test('should open popup in the top left corner', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective('testee', factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.testee', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity', activate: true})
+        .navigatePart('part.testee', ['test-popup-opener']));
+
+      const part = appPO.part({partId: 'part.testee'});
+
+      const popupOpenerPage = new PopupOpenerPagePO(part);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition({top: 0, left: 0});
+      await popupOpenerPage.enterSize({width: '10px', height: '10px'});
+      await popupOpenerPage.open();
+
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      await expectPopup(popupPage).toHavePosition('north', part.slot.locator, {top: 0, left: 0});
+    });
+
+    test('should open popup in the top right corner', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective('testee', factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.testee', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity', activate: true})
+        .navigatePart('part.testee', ['test-popup-opener']));
+
+      const part = appPO.part({partId: 'part.testee'});
+
+      const popupOpenerPage = new PopupOpenerPagePO(part);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition({top: 0, right: 0});
+      await popupOpenerPage.enterSize({width: '10px', height: '10px'});
+      await popupOpenerPage.open();
+
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      await expectPopup(popupPage).toHavePosition('north', part.slot.locator, {top: 0, right: 0});
+    });
+
+    test('should open popup in the bottom left corner', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective('testee', factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.testee', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity', activate: true})
+        .navigatePart('part.testee', ['test-popup-opener']));
+
+      const part = appPO.part({partId: 'part.testee'});
+
+      const popupOpenerPage = new PopupOpenerPagePO(part);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition({bottom: 0, left: 0});
+      await popupOpenerPage.enterSize({width: '10px', height: '10px'});
+      await popupOpenerPage.open();
+
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      await expectPopup(popupPage).toHavePosition('north', part.slot.locator, {bottom: 0, left: 0});
+    });
+
+    test('should open popup in the bottom right corner', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective('testee', factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.testee', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity', activate: true})
+        .navigatePart('part.testee', ['test-popup-opener']));
+
+      const part = appPO.part({partId: 'part.testee'});
+
+      const popupOpenerPage = new PopupOpenerPagePO(part);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition({bottom: 0, right: 0});
+      await popupOpenerPage.enterSize({width: '10px', height: '10px'});
+      await popupOpenerPage.open();
+
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      await expectPopup(popupPage).toHavePosition('north', part.slot.locator, {bottom: 0, right: 0});
+    });
+
+    test('should adjust popup position when sashing part', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective('testee', factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.testee', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity', activate: true})
+        .navigatePart('part.testee', ['test-popup-opener']));
+
+      const part = appPO.part({partId: 'part.testee'});
+
+      // Open popup in top left corner.
+      const popupOpenerPage = new PopupOpenerPagePO(part);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition({top: 0, left: 0});
+      await popupOpenerPage.enterSize({width: '10px', height: '10px'});
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.open();
+
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+
+      // Expect popup to be opened in top left corner.
+      await expectPopup(popupPage).toHavePosition('north', part.slot.locator, {top: 0, left: 0});
+
+      await test.step('Sash right activity panel 100px to the left', async () => {
+        await appPO.activityPanel('right').resize(-100);
+
+        // Expect popup to stick to part bounds.
+        await expectPopup(popupPage).toHavePosition('north', part.slot.locator, {top: 0, left: 0});
+      });
+
+      await test.step('Sash right activity panel 100px to the right', async () => {
+        await appPO.activityPanel('right').resize(100);
+
+        // Expect popup to stick to part bounds.
+        await expectPopup(popupPage).toHavePosition('north', part.slot.locator, {top: 0, left: 0});
+      });
+    });
+
+    test('should maintain popup bounds if contextual part is not active (to not flicker on reactivation; to support for virtual scrolling) [element anchor]', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective('testee', factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.testee', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity', ɵactivityId: 'activity.1'})
+        .navigatePart('part.testee', ['test-popup-opener'])
+        .activatePart('part.testee'),
+      );
+
+      // Open popup.
+      const popupOpenerPage = new PopupOpenerPagePO(appPO.part({partId: 'part.testee'}));
+      await popupOpenerPage.selectPopupComponent('size-test-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition('element');
+      await popupOpenerPage.enterSize({width: '500px', height: '200px'});
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.open();
+
+      const popupPage = new SizeTestPagePO(appPO.popup({cssClass: 'testee'}));
+
+      // Expect popup to be visible.
+      await expectPopup(popupPage).toBeVisible();
+      const popupSize = await popupPage.getBoundingBox();
+      const sizeChanges = await popupPage.getRecordedSizeChanges();
+
+      // Close activity.
+      await appPO.activityItem({activityId: 'activity.1'}).click();
+
+      // Expect popup to be hidden.
+      await expectPopup(popupPage).toBeHidden();
+
+      // Expect popup bounding box not to have changed.
+      await expect.poll(() => popupPage.getBoundingBox()).toEqual(popupSize);
+
+      // Open activity.
+      await appPO.activityItem({activityId: 'activity.1'}).click();
+
+      // Expect popup to be visible.
+      await expectPopup(popupPage).toBeVisible();
+
+      // Expect popup not to be resized
+      await expect.poll(() => popupPage.getRecordedSizeChanges()).toEqual(sizeChanges);
+    });
+
+    test('should maintain popup bounds if contextual part is not active (to not flicker on reactivation; to support for virtual scrolling) [coordinate anchor]', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective('testee', factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.testee', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity', ɵactivityId: 'activity.1'})
+        .navigatePart('part.testee', ['test-popup-opener'])
+        .activatePart('part.testee'),
+      );
+
+      // Open popup.
+      const popupOpenerPage = new PopupOpenerPagePO(appPO.part({partId: 'part.testee'}));
+      await popupOpenerPage.selectPopupComponent('size-test-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition({left: 0, top: 0});
+      await popupOpenerPage.enterSize({width: '500px', height: '200px'});
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.open();
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new SizeTestPagePO(popup);
+
+      // Expect popup to be visible.
+      await expectPopup(popupPage).toBeVisible();
+      const popupSize = await popupPage.getBoundingBox();
+      const sizeChanges = await popupPage.getRecordedSizeChanges();
+
+      // Close activity.
+      await appPO.activityItem({activityId: 'activity.1'}).click();
+
+      // Expect popup to be hidden.
+      await expectPopup(popupPage).toBeHidden();
+
+      // Expect popup bounding box not to have changed.
+      await expect.poll(() => popupPage.getBoundingBox()).toEqual(popupSize);
+
+      // Open activity.
+      await appPO.activityItem({activityId: 'activity.1'}).click();
+
+      // Expect popup to be visible.
+      await expectPopup(popupPage).toBeVisible();
+
+      // Expect popup not to be resized
+      await expect.poll(() => popupPage.getRecordedSizeChanges()).toEqual(sizeChanges);
+    });
+  });
+
+  test.describe('View Context', () => {
+
+    test('should bind popup to contextual view', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
@@ -486,14 +754,199 @@ test.describe('Workbench Popup', () => {
       const popupPage = new PopupPagePO(popup);
 
       await expectPopup(popupPage).toBeVisible();
+      await expectPopup(popupPage).toHavePosition('north', popupOpenerPage.openButton);
+      const componentInstanceId = await popupPage.getComponentInstanceId();
 
-      // activate another view
+      // Deactivate view.
       await appPO.openNewViewTab();
       await expectPopup(popupPage).toBeHidden();
 
-      // re-activate the view
+      // Activate view.
       await popupOpenerPage.view.tab.click();
       await expectPopup(popupPage).toBeVisible();
+
+      // Expect popup not to be constructed anew.
+      await expect.poll(() => popupPage.getComponentInstanceId()).toEqual(componentInstanceId);
+    });
+
+    test('should bind popup to any view', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective('testee', factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.right', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity', ɵactivityId: 'activity.1'})
+        .addView('view.right', {partId: 'part.right'})
+        .activatePart('part.right'),
+      );
+
+      // Open popup.
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterContext('view.right');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition({top: 100, left: 100});
+      await popupOpenerPage.enterSize({width: '50px', height: '50px'});
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.open();
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+
+      // Expect popup to be visible.
+      await expectPopup(popupPage).toBeVisible();
+      const componentInstanceId = await popupPage.getComponentInstanceId();
+      await expectPopup(popupPage).toHavePosition('north', appPO.view({viewId: 'view.right'}).locator, {top: 100, left: 100});
+
+      // Close activity.
+      await appPO.activityItem({activityId: 'activity.1'}).click();
+
+      // Expect popup to be hidden.
+      await expectPopup(popupPage).toBeHidden();
+
+      // Open activity.
+      await appPO.activityItem({activityId: 'activity.1'}).click();
+
+      // Expect popup to be visible.
+      await expectPopup(popupPage).toBeVisible();
+      await expectPopup(popupPage).toHavePosition('north', appPO.view({viewId: 'view.right'}).locator, {top: 100, left: 100});
+
+      // Expect popup not to be constructed anew.
+      await expect.poll(() => popupPage.getComponentInstanceId()).toEqual(componentInstanceId);
+    });
+
+    test('should not bind popup to contextual view if context null', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.enterContext(null);
+      await popupOpenerPage.enterPosition({top: 300, left: 300});
+      await popupOpenerPage.enterSize({height: '100px', width: '100px'});
+      await popupOpenerPage.open();
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+
+      await expectPopup(popupPage).toBeVisible();
+      await expectPopup(popupPage).toHavePosition('north', 'viewport', {top: 300, left: 300});
+
+      // Detach view.
+      await appPO.openNewViewTab();
+      await expectPopup(popupPage).toBeVisible();
+
+      // Attach view.
+      await popupOpenerPage.view.tab.click();
+      await expectPopup(popupPage).toBeVisible();
+
+      // Close the view.
+      await popupOpenerPage.view.tab.close();
+      await expectPopup(popupPage).toBeVisible();
+    });
+
+    test('should open popup in the top left corner', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.left', {align: 'left'})
+        .addPart('part.right', {align: 'right'})
+        .addPart('part.top', {align: 'top'})
+        .addPart('part.bottom', {align: 'bottom'})
+        .navigatePart('part.left', ['path/to/part'])
+        .navigatePart('part.right', ['path/to/part'])
+        .navigatePart('part.top', ['path/to/part'])
+        .navigatePart('part.bottom', ['path/to/part']),
+      );
+
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition({top: 0, left: 0});
+      await popupOpenerPage.enterSize({width: '10px', height: '10px'});
+      await popupOpenerPage.open();
+
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      await expectPopup(popupPage).toHavePosition('north', popupOpenerPage.view.locator, {top: 0, left: 0});
+    });
+
+    test('should open popup in the top right corner', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.left', {align: 'left'})
+        .addPart('part.right', {align: 'right'})
+        .addPart('part.top', {align: 'top'})
+        .addPart('part.bottom', {align: 'bottom'})
+        .navigatePart('part.left', ['path/to/part'])
+        .navigatePart('part.right', ['path/to/part'])
+        .navigatePart('part.top', ['path/to/part'])
+        .navigatePart('part.bottom', ['path/to/part']),
+      );
+
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition({top: 0, right: 0});
+      await popupOpenerPage.enterSize({width: '10px', height: '10px'});
+      await popupOpenerPage.open();
+
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      await expectPopup(popupPage).toHavePosition('north', popupOpenerPage.view.locator, {top: 0, right: 0});
+    });
+
+    test('should open popup in the bottom left corner', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.left', {align: 'left'})
+        .addPart('part.right', {align: 'right'})
+        .addPart('part.top', {align: 'top'})
+        .addPart('part.bottom', {align: 'bottom'})
+        .navigatePart('part.left', ['path/to/part'])
+        .navigatePart('part.right', ['path/to/part'])
+        .navigatePart('part.top', ['path/to/part'])
+        .navigatePart('part.bottom', ['path/to/part']),
+      );
+
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition({bottom: 0, left: 0});
+      await popupOpenerPage.enterSize({width: '10px', height: '10px'});
+      await popupOpenerPage.open();
+
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      await expectPopup(popupPage).toHavePosition('north', popupOpenerPage.view.locator, {bottom: 0, left: 0});
+    });
+
+    test('should open popup in the bottom right corner', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.left', {align: 'left'})
+        .addPart('part.right', {align: 'right'})
+        .addPart('part.top', {align: 'top'})
+        .addPart('part.bottom', {align: 'bottom'})
+        .navigatePart('part.left', ['path/to/part'])
+        .navigatePart('part.right', ['path/to/part'])
+        .navigatePart('part.top', ['path/to/part'])
+        .navigatePart('part.bottom', ['path/to/part']),
+      );
+
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition({bottom: 0, right: 0});
+      await popupOpenerPage.enterSize({width: '10px', height: '10px'});
+      await popupOpenerPage.open();
+
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      await expectPopup(popupPage).toHavePosition('north', popupOpenerPage.view.locator, {bottom: 0, right: 0});
     });
 
     test('should detach popup if contextual view is opened in peripheral area and the main area is maximized', async ({appPO, workbenchNavigator}) => {
@@ -515,12 +968,14 @@ test.describe('Workbench Popup', () => {
       await popupOpenerView.selectPopupComponent('popup-page');
       await popupOpenerView.enterCssClass('testee');
       await popupOpenerView.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerView.enterSize({height: '100px', width: '100px'});
       await popupOpenerView.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
       const popupPage = new PopupPagePO(popup);
 
       await expectPopup(popupPage).toBeVisible();
+      await expectPopup(popupPage).toHavePosition('north', popupOpenerView.openButton);
 
       // Maximize the main area.
       await viewPageInMainArea.view.tab.dblclick();
@@ -529,9 +984,10 @@ test.describe('Workbench Popup', () => {
       // Restore the layout.
       await viewPageInMainArea.view.tab.dblclick();
       await expectPopup(popupPage).toBeVisible();
+      await expectPopup(popupPage).toHavePosition('north', popupOpenerView.openButton);
     });
 
-    test('should maintain popup bounds if view is not active (to not flicker on reactivation; to support for virtual scrolling) [element anchor]', async ({appPO, workbenchNavigator}) => {
+    test('should maintain popup bounds if contextual view is not active (to not flicker on reactivation; to support for virtual scrolling) [element anchor]', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // Open view 1 with popup.
@@ -561,7 +1017,7 @@ test.describe('Workbench Popup', () => {
       await expect.poll(() => popupPage.getRecordedSizeChanges()).toEqual(sizeChanges);
     });
 
-    test('should maintain popup bounds if view is not active (to not flicker on reactivation; to support for virtual scrolling) [coordinate anchor]', async ({appPO, workbenchNavigator}) => {
+    test('should maintain popup bounds if contextual view is not active (to not flicker on reactivation; to support for virtual scrolling) [coordinate anchor]', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // Open view 1 with popup.
@@ -590,11 +1046,20 @@ test.describe('Workbench Popup', () => {
       // Expect popup not to be resized (no flickering).
       await expect.poll(() => popupPage.getRecordedSizeChanges()).toEqual(sizeChanges);
     });
+  });
 
-    test('should not destroy the popup when its contextual view (if any) is deactivated', async ({appPO, workbenchNavigator}) => {
+  test.describe('Dialog Context', () => {
+
+    test('should bind popup to contextual dialog', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      // Open dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('popup-opener-page', {cssClass: 'popup-opener'});
+      const dialog = appPO.dialog({cssClass: 'popup-opener'});
+
+      // Open popup in dialog.
+      const popupOpenerPage = new PopupOpenerPagePO(dialog);
       await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
@@ -603,167 +1068,629 @@ test.describe('Workbench Popup', () => {
       const popup = appPO.popup({cssClass: 'testee'});
       const popupPage = new PopupPagePO(popup);
 
-      const componentInstanceId = await popupPage.getComponentInstanceId();
       await expectPopup(popupPage).toBeVisible();
+      await expectPopup(popupPage).toHavePosition('north', popupOpenerPage.openButton);
+      const componentInstanceId = await popupPage.getComponentInstanceId();
 
-      // activate another view
+      // Detach dialog.
       await appPO.openNewViewTab();
       await expectPopup(popupPage).toBeHidden();
 
-      // re-activate the view
-      await popupOpenerPage.view.tab.click();
+      // Attach dialog.
+      await dialogOpenerPage.view.tab.click();
       await expectPopup(popupPage).toBeVisible();
 
-      // expect the component not to be constructed anew
+      // Expect popup not to be constructed anew.
       await expect.poll(() => popupPage.getComponentInstanceId()).toEqual(componentInstanceId);
     });
 
-    test('should allow binding the popup to any view', async ({appPO, workbenchNavigator}) => {
+    test('should not bind popup to contextual dialog if context null', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const startPage = await appPO.openNewViewTab();
+      // Open dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('popup-opener-page', {cssClass: 'popup-opener'});
 
-      // open a popup and bind it to the start page view.
-      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.selectPopupComponent('popup-page');
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterContextualViewId(await startPage.view.getViewId());
-      await popupOpenerPage.enterPosition({left: appPO.viewportBoundingBox().hcenter, top: appPO.viewportBoundingBox().vcenter});
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.open({waitUntilAttached: false});
-
-      const popup = appPO.popup({cssClass: 'testee'});
-      const popupPage = new PopupPagePO(popup);
-
-      await expectPopup(popupPage).not.toBeAttached();
-
-      // activate the view to which the popup is bound to
-      await startPage.view.tab.click();
-      await expectPopup(popupPage).toBeVisible();
-
-      // activate another view
-      await appPO.openNewViewTab();
-      await expectPopup(popupPage).toBeHidden();
-
-      // activate another view
-      await popupOpenerPage.view.tab.click();
-      await expectPopup(popupPage).toBeHidden();
-
-      // activate the view to which the popup is bound to
-      await startPage.view.tab.click();
-      await expectPopup(popupPage).toBeVisible();
-    });
-
-    test('should bind the popup to the current view, if opened in the context of a view', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
-
-      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      // Open popup in dialog.
+      const popupOpenerPage = new PopupOpenerPagePO(appPO.dialog({cssClass: 'popup-opener'}));
       await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.enterContext(null);
+      await popupOpenerPage.enterPosition({top: 300, left: 300});
+      await popupOpenerPage.enterSize({height: '100px', width: '100px'});
       await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
       const popupPage = new PopupPagePO(popup);
 
       await expectPopup(popupPage).toBeVisible();
+      await expectPopup(popupPage).toHavePosition('north', 'viewport', {top: 300, left: 300});
 
-      // deactivate the view
+      // Detach dialog.
       await appPO.openNewViewTab();
-      await expectPopup(popupPage).toBeHidden();
-
-      // activate the view again
-      await popupOpenerPage.view.tab.click();
       await expectPopup(popupPage).toBeVisible();
 
-      // close the view
-      await popupOpenerPage.view.tab.close();
-      await expectPopup(popupPage).not.toBeAttached();
+      // Attach dialog.
+      await dialogOpenerPage.view.tab.click();
+      await expectPopup(popupPage).toBeVisible();
     });
 
-    test('should allow the popup do detach from its contextual view', async ({appPO, workbenchNavigator}) => {
+    test('should bind popup to any dialog', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
+      await workbenchNavigator.createPerspective('testee', factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.right', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity', ɵactivityId: 'activity.1'})
+        .navigatePart('part.right', ['test-dialog-opener'])
+        .activatePart('part.right'),
+      );
+
+      // Open dialog.
+      const dialogOpenerPage = new DialogOpenerPagePO(appPO.part({partId: 'part.right'}));
+      await dialogOpenerPage.open('popup-opener-page', {cssClass: 'dialog'});
+      const dialog = appPO.dialog({cssClass: 'dialog'});
+      await dialog.moveDialog('bottom-left-corner');
+
+      // Open popup.
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
       await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterContext(await dialog.getDialogId());
       await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition({top: 100, left: 100});
+      await popupOpenerPage.enterSize({width: '50px', height: '50px'});
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterContextualViewId('<null>');
-      await popupOpenerPage.enterPosition({left: 300, top: 300});
       await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
       const popupPage = new PopupPagePO(popup);
 
+      // Expect popup to be visible.
       await expectPopup(popupPage).toBeVisible();
+      const componentInstanceId = await popupPage.getComponentInstanceId();
+      await expectPopup(popupPage).toHavePosition('north', dialog.slot, {top: 100, left: 100});
 
-      // deactivate the view
-      await appPO.openNewViewTab();
-      await expectPopup(popupPage).toBeVisible();
+      // Close activity.
+      await appPO.activityItem({activityId: 'activity.1'}).click();
 
-      // activate the view again
-      await popupOpenerPage.view.tab.click();
-      await expectPopup(popupPage).toBeVisible();
+      // Expect popup to be hidden.
+      await expectPopup(popupPage).toBeHidden();
 
-      // close the view
-      await popupOpenerPage.view.tab.close();
+      // Open activity.
+      await appPO.activityItem({activityId: 'activity.1'}).click();
+
+      // Expect popup to be visible.
       await expectPopup(popupPage).toBeVisible();
+      await expectPopup(popupPage).toHavePosition('north', dialog.slot, {top: 100, left: 100});
+
+      // Expect popup not to be constructed anew.
+      await expect.poll(() => popupPage.getComponentInstanceId()).toEqual(componentInstanceId);
     });
 
-    test('should propagate view context', async ({appPO, workbenchNavigator}) => {
+    test('should open popup in the top left corner', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      // Open target view.
-      const popupTargetViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+      // Open popup opener page in dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('popup-opener-page', {cssClass: 'popup-opener'});
 
-      // Open popup in target view.
-      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.selectPopupComponent('popup-opener-page');
-      await popupOpenerPage.enterCssClass('testee-1');
+      const dialog = appPO.dialog({cssClass: 'popup-opener'});
+
+      // Open popup.
+      const popupOpenerPage = new PopupOpenerPagePO(dialog);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition({top: 0, left: 0});
+      await popupOpenerPage.enterSize({width: '10px', height: '10px'});
+      await popupOpenerPage.open();
+
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      await expectPopup(popupPage).toHavePosition('north', dialog.slot, {top: 0, left: 0});
+    });
+
+    test('should open popup in the top right corner', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open popup opener page in dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('popup-opener-page', {cssClass: 'popup-opener'});
+
+      const dialog = appPO.dialog({cssClass: 'popup-opener'});
+
+      // Open popup.
+      const popupOpenerPage = new PopupOpenerPagePO(dialog);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition({top: 0, right: 0});
+      await popupOpenerPage.enterSize({width: '10px', height: '10px'});
+      await popupOpenerPage.open();
+
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      await expectPopup(popupPage).toHavePosition('north', dialog.slot, {top: 0, right: 0});
+    });
+
+    test('should open popup in the bottom left corner', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open popup opener page in dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('popup-opener-page', {cssClass: 'popup-opener'});
+
+      const dialog = appPO.dialog({cssClass: 'popup-opener'});
+
+      // Open popup.
+      const popupOpenerPage = new PopupOpenerPagePO(dialog);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition({bottom: 0, left: 0});
+      await popupOpenerPage.enterSize({width: '10px', height: '10px'});
+      await popupOpenerPage.open();
+
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      await expectPopup(popupPage).toHavePosition('north', dialog.slot, {bottom: 0, left: 0});
+    });
+
+    test('should open popup in the bottom right corner', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open popup opener page in dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('popup-opener-page', {cssClass: 'popup-opener'});
+
+      const dialog = appPO.dialog({cssClass: 'popup-opener'});
+
+      // Open popup.
+      const popupOpenerPage = new PopupOpenerPagePO(dialog);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition({bottom: 0, right: 0});
+      await popupOpenerPage.enterSize({width: '10px', height: '10px'});
+      await popupOpenerPage.open();
+
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      await expectPopup(popupPage).toHavePosition('north', dialog.slot, {bottom: 0, right: 0});
+    });
+
+    test('should adjust popup position when moving contextual dialog', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open popup opener page in dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('popup-opener-page', {cssClass: 'popup-opener'});
+
+      const dialog = appPO.dialog({cssClass: 'popup-opener'});
+
+      // Open popup.
+      const popupOpenerPage = new PopupOpenerPagePO(dialog);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition({left: 0, top: 0});
+      await popupOpenerPage.enterSize({width: '10px', height: '10px'});
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterContextualViewId(await popupTargetViewPage.view.getViewId());
-      await popupOpenerPage.enterPosition({left: 300, top: 300});
-      await popupOpenerPage.open({waitUntilAttached: false});
+      await popupOpenerPage.open();
 
-      const popup1 = appPO.popup({cssClass: 'testee-1'});
-      const popupPopupOpenerPage1 = new PopupOpenerPagePO(popup1);
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
 
-      await expectPopup(popupPopupOpenerPage1).not.toBeAttached();
+      // Expect popup to open in top left corner.
+      await expectPopup(popupPage).toHavePosition('north', dialog.slot, {top: 0, left: 0});
 
-      // Activate target view.
-      await popupTargetViewPage.view.tab.click();
-      await expectPopup(popupPopupOpenerPage1).toBeVisible();
+      await test.step('Move dialog 100px to the left', async () => {
+        await dialog.moveDialog({x: -100, y: 0});
 
-      // Open another popup from the popup (inherit popup's view context).
-      await popupPopupOpenerPage1.selectPopupComponent('popup-page');
-      await popupPopupOpenerPage1.enterCssClass('testee-2');
-      await popupPopupOpenerPage1.enterCloseStrategy({closeOnFocusLost: false});
-      await popupPopupOpenerPage1.enterPosition({left: 300, top: 300});
-      await popupPopupOpenerPage1.open();
+        // Expect popup to stick to dialog bounds.
+        await expectPopup(popupPage).toHavePosition('north', dialog.slot, {top: 0, left: 0});
+      });
 
-      const popup2 = appPO.popup({cssClass: 'testee-2'});
-      const popupPage2 = new PopupPagePO(popup2);
+      await test.step('Move dialog 100px to the bottom', async () => {
+        await dialog.moveDialog({x: 0, y: 100});
 
-      // Expect popup 2 to have contextual view of popup 1, i.e., is also visible.
-      await expectPopup(popupPage2).toBeVisible();
+        // Expect popup to stick to dialog bounds.
+        await expectPopup(popupPage).toHavePosition('north', dialog.slot, {top: 0, left: 0});
+      });
 
-      // Activate target view.
-      await popupOpenerPage.view.tab.click();
+      await test.step('Move dialog 100px to the right', async () => {
+        await dialog.moveDialog({x: 100, y: 0});
 
-      // Expect popup 1 and popup 2 not to be visible because contextual view is not active.
-      await expectPopup(popupPopupOpenerPage1).toBeHidden();
-      await expectPopup(popupPage2).toBeHidden();
+        // Expect popup to stick to dialog bounds.
+        await expectPopup(popupPage).toHavePosition('north', dialog.slot, {top: 0, left: 0});
+      });
 
-      // Activate contextual view of the popups.
-      await popupTargetViewPage.view.tab.click();
+      await test.step('Move dialog 100px to the top', async () => {
+        await dialog.moveDialog({x: 0, y: -100});
 
-      // Expect popup 1 and popup 2 to be visible.
-      await expectPopup(popupPopupOpenerPage1).toBeVisible();
-      await expectPopup(popupPage2).toBeVisible();
+        // Expect popup to stick to dialog bounds.
+        await expectPopup(popupPage).toHavePosition('north', dialog.slot, {top: 0, left: 0});
+      });
+    });
+
+    test('should maintain popup bounds if contextual dialog is not active (to not flicker on reactivation; to support for virtual scrolling) [element anchor]', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('popup-opener-page', {cssClass: 'popup-opener'});
+
+      // Open popup in dialog.
+      const popupOpenerPage = new PopupOpenerPagePO(appPO.dialog({cssClass: 'popup-opener'}));
+      await popupOpenerPage.selectPopupComponent('size-test-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition('element');
+      await popupOpenerPage.enterSize({width: '500px', height: '200px'});
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.open();
+
+      const popupPage = new SizeTestPagePO(appPO.popup({cssClass: 'testee'}));
+
+      // Expect popup to be visible.
+      await expectPopup(popupPage).toBeVisible();
+      const popupSize = await popupPage.getBoundingBox();
+      const sizeChanges = await popupPage.getRecordedSizeChanges();
+
+      // Detach dialog.
+      await appPO.openNewViewTab();
+      await expectPopup(popupPage).toBeHidden();
+
+      // Expect popup bounding box not to have changed.
+      await expect.poll(() => popupPage.getBoundingBox()).toEqual(popupSize);
+
+      // Attach dialog.
+      await dialogOpenerPage.view.tab.click();
+      await expectPopup(popupPage).toBeVisible();
+
+      // Expect popup not to be resized
+      await expect.poll(() => popupPage.getRecordedSizeChanges()).toEqual(sizeChanges);
+    });
+
+    test('should maintain popup bounds if contextual dialog is not active (to not flicker on reactivation; to support for virtual scrolling) [element coordinate]', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('popup-opener-page', {cssClass: 'popup-opener'});
+
+      // Open popup in dialog.
+      const popupOpenerPage = new PopupOpenerPagePO(appPO.dialog({cssClass: 'popup-opener'}));
+      await popupOpenerPage.selectPopupComponent('size-test-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterPosition({top: 0, left: 0});
+      await popupOpenerPage.enterSize({width: '500px', height: '200px'});
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.open();
+
+      const popupPage = new SizeTestPagePO(appPO.popup({cssClass: 'testee'}));
+
+      // Expect popup to be visible.
+      await expectPopup(popupPage).toBeVisible();
+      const popupSize = await popupPage.getBoundingBox();
+      const sizeChanges = await popupPage.getRecordedSizeChanges();
+
+      // Detach dialog.
+      await appPO.openNewViewTab();
+      await expectPopup(popupPage).toBeHidden();
+
+      // Expect popup bounding box not to have changed.
+      await expect.poll(() => popupPage.getBoundingBox()).toEqual(popupSize);
+
+      // Attach dialog.
+      await dialogOpenerPage.view.tab.click();
+      await expectPopup(popupPage).toBeVisible();
+
+      // Expect popup not to be resized
+      await expect.poll(() => popupPage.getRecordedSizeChanges()).toEqual(sizeChanges);
     });
   });
 
-  test.describe('popup closing', () => {
+  test.describe('Popup Context', () => {
+
+    test('should bind popup to contextual popup', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open popup.
+      const popupOpenerPage1 = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage1.selectPopupComponent('popup-opener-page');
+      await popupOpenerPage1.enterCssClass('popup-1');
+      await popupOpenerPage1.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage1.open();
+      const popupPage1 = new PopupOpenerPagePO(appPO.popup({cssClass: 'popup-1'}));
+
+      // Open popup in popup.
+      await popupPage1.selectPopupComponent('popup-page');
+      await popupPage1.enterCssClass('popup-2');
+      await popupPage1.enterCloseStrategy({closeOnFocusLost: false});
+      await popupPage1.enterSize({height: '100px', width: '100px'});
+      await popupPage1.open();
+      const popupPage2 = new PopupPagePO(appPO.popup({cssClass: 'popup-2'}));
+
+      await expectPopup(popupPage2).toBeVisible();
+      await expectPopup(popupPage2).toHavePosition('north', popupPage1.openButton);
+      const componentInstanceId = await popupPage2.getComponentInstanceId();
+
+      // Detach popup 1.
+      await appPO.openNewViewTab();
+      await expectPopup(popupPage2).toBeHidden();
+
+      // Attach popup 1.
+      await popupOpenerPage1.view.tab.click();
+      await expectPopup(popupPage2).toBeVisible();
+
+      // Expect popup not to be constructed anew.
+      await expect.poll(() => popupPage2.getComponentInstanceId()).toEqual(componentInstanceId);
+    });
+
+    test('should not bind popup to contextual popup if context null', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open popup.
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-opener-page');
+      await popupOpenerPage.enterCssClass('popup-1');
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.open();
+
+      // Open popup in popup.
+      const popupOpenerPage1 = new PopupOpenerPagePO(appPO.popup({cssClass: 'popup-1'}));
+      await popupOpenerPage1.selectPopupComponent('popup-page');
+      await popupOpenerPage1.enterCssClass('testee');
+      await popupOpenerPage1.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage1.enterContext(null);
+      await popupOpenerPage1.enterPosition({left: 300, top: 300});
+      await popupOpenerPage1.enterSize({height: '100px', width: '100px'});
+      await popupOpenerPage1.open();
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+
+      await expectPopup(popupPage).toBeVisible();
+      await expectPopup(popupPage).toHavePosition('north', 'viewport', {top: 300, left: 300});
+
+      // Detach contextual popup.
+      await appPO.openNewViewTab();
+      await expectPopup(popupPage).toBeVisible();
+
+      // Attach contextual popup.
+      await popupOpenerPage.view.tab.click();
+      await expectPopup(popupPage).toBeVisible();
+    });
+
+    test('should bind popup to any popup', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective('testee', factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.right', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity', ɵactivityId: 'activity.1'})
+        .navigatePart('part.right', ['test-popup-opener'])
+        .activatePart('part.right'),
+      );
+
+      // Open popup 1.
+      const popupOpenerPage1 = new PopupOpenerPagePO(appPO.part({partId: 'part.right'}));
+      await popupOpenerPage1.selectPopupComponent('popup-page');
+      await popupOpenerPage1.enterCssClass('popup-1');
+      await popupOpenerPage1.enterSize({width: '50px', height: '50px'});
+      await popupOpenerPage1.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage1.open();
+      const popup1 = appPO.popup({cssClass: 'popup-1'});
+
+      // Open popup 2 in popup 1.
+      const popupOpenerPage2 = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage2.selectPopupComponent('popup-page');
+      await popupOpenerPage2.enterContext(await popup1.getPopupId());
+      await popupOpenerPage2.enterCssClass('popup-2');
+      await popupOpenerPage2.enterPosition({top: 0, left: 0});
+      await popupOpenerPage2.enterSize({width: '50px', height: '50px'});
+      await popupOpenerPage2.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage2.open();
+
+      const popup2 = appPO.popup({cssClass: 'popup-2'});
+      const popupPage2 = new PopupPagePO(popup2);
+
+      // Expect popup to be visible.
+      await expectPopup(popupPage2).toBeVisible();
+      const componentInstanceId = await popupPage2.getComponentInstanceId();
+      await expectPopup(popupPage2).toHavePosition('north', popup1.locator, {top: 0, left: 0});
+
+      // Close activity.
+      await appPO.activityItem({activityId: 'activity.1'}).click();
+
+      // Expect popup to be hidden.
+      await expectPopup(popupPage2).toBeHidden();
+
+      // Open activity.
+      await appPO.activityItem({activityId: 'activity.1'}).click();
+
+      // Expect popup to be visible.
+      await expectPopup(popupPage2).toBeVisible();
+      await expectPopup(popupPage2).toHavePosition('north', popup1.locator, {top: 0, left: 0});
+
+      // Expect popup not to be constructed anew.
+      await expect.poll(() => popupPage2.getComponentInstanceId()).toEqual(componentInstanceId);
+    });
+
+    test('should open popup in the top left corner', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open popup opener page in popup.
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-opener-page');
+      await popupOpenerPage.enterCssClass('popup-opener');
+      await popupOpenerPage.enterSize({width: '250px', height: '250px'});
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.open();
+
+      const popup = appPO.popup({cssClass: 'popup-opener'});
+
+      // Open popup in popup.
+      const testeePopupOpenerPage = new PopupOpenerPagePO(popup);
+      await testeePopupOpenerPage.selectPopupComponent('popup-page');
+      await testeePopupOpenerPage.enterCssClass('testee');
+      await testeePopupOpenerPage.enterPosition({top: 0, left: 0});
+      await testeePopupOpenerPage.enterSize({width: '10px', height: '10px'});
+      await testeePopupOpenerPage.open();
+
+      const testeePopupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      await expectPopup(testeePopupPage).toHavePosition('north', popup.locator, {top: 0, left: 0});
+    });
+
+    test('should open popup in the top right corner', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open popup opener page in popup.
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-opener-page');
+      await popupOpenerPage.enterCssClass('popup-opener');
+      await popupOpenerPage.enterSize({width: '250px', height: '250px'});
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.open();
+
+      const popup = appPO.popup({cssClass: 'popup-opener'});
+
+      // Open popup in popup.
+      const testeePopupOpenerPage = new PopupOpenerPagePO(popup);
+      await testeePopupOpenerPage.selectPopupComponent('popup-page');
+      await testeePopupOpenerPage.enterCssClass('testee');
+      await testeePopupOpenerPage.enterPosition({top: 0, right: 0});
+      await testeePopupOpenerPage.enterSize({width: '10px', height: '10px'});
+      await testeePopupOpenerPage.open();
+
+      const testeePopupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      await expectPopup(testeePopupPage).toHavePosition('north', popup.locator, {top: 0, right: 0});
+    });
+
+    test('should open popup in the bottom left corner', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open popup opener page in popup.
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-opener-page');
+      await popupOpenerPage.enterCssClass('popup-opener');
+      await popupOpenerPage.enterSize({width: '250px', height: '250px'});
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.open();
+
+      const popup = appPO.popup({cssClass: 'popup-opener'});
+
+      // Open popup in popup.
+      const testeePopupOpenerPage = new PopupOpenerPagePO(popup);
+      await testeePopupOpenerPage.selectPopupComponent('popup-page');
+      await testeePopupOpenerPage.enterCssClass('testee');
+      await testeePopupOpenerPage.enterPosition({bottom: 0, left: 0});
+      await testeePopupOpenerPage.enterSize({width: '10px', height: '10px'});
+      await testeePopupOpenerPage.open();
+
+      const testeePopupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      await expectPopup(testeePopupPage).toHavePosition('north', popup.locator, {bottom: 0, left: 0});
+    });
+
+    test('should open popup in the bottom right corner', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open popup opener page in popup.
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-opener-page');
+      await popupOpenerPage.enterCssClass('popup-opener');
+      await popupOpenerPage.enterSize({width: '250px', height: '250px'});
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.open();
+
+      const popup = appPO.popup({cssClass: 'popup-opener'});
+
+      // Open popup in popup.
+      const testeePopupOpenerPage = new PopupOpenerPagePO(popup);
+      await testeePopupOpenerPage.selectPopupComponent('popup-page');
+      await testeePopupOpenerPage.enterCssClass('testee');
+      await testeePopupOpenerPage.enterPosition({bottom: 0, right: 0});
+      await testeePopupOpenerPage.enterSize({width: '10px', height: '10px'});
+      await testeePopupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await testeePopupOpenerPage.open();
+
+      const testeePopupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      await expectPopup(testeePopupPage).toHavePosition('north', popup.locator, {bottom: 0, right: 0});
+    });
+
+    test('should maintain popup bounds if contextual popup is not active (to not flicker on reactivation; to support for virtual scrolling) [element anchor]', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open popup.
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-opener-page');
+      await popupOpenerPage.enterCssClass('popup-1');
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.open();
+
+      // Open popup in popup.
+      const popupOpenerPage1 = new PopupOpenerPagePO(appPO.popup({cssClass: 'popup-1'}));
+      await popupOpenerPage1.selectPopupComponent('size-test-page');
+      await popupOpenerPage1.enterCssClass('popup-2');
+      await popupOpenerPage1.enterPosition('element');
+      await popupOpenerPage1.enterSize({width: '500px', height: '200px'});
+      await popupOpenerPage1.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage1.open();
+
+      const popupPage2 = new SizeTestPagePO(appPO.popup({cssClass: 'popup-2'}));
+
+      // Expect popup to be visible.
+      await expectPopup(popupPage2).toBeVisible();
+      const popupSize = await popupPage2.getBoundingBox();
+      const sizeChanges = await popupPage2.getRecordedSizeChanges();
+
+      // Detach contextual popup.
+      await appPO.openNewViewTab();
+      await expectPopup(popupPage2).toBeHidden();
+
+      // Expect popup bounding box not to have changed.
+      await expect.poll(() => popupPage2.getBoundingBox()).toEqual(popupSize);
+
+      // Attach contextual popup.
+      await popupOpenerPage.view.tab.click();
+      await expectPopup(popupPage2).toBeVisible();
+
+      // Expect popup not to be resized
+      await expect.poll(() => popupPage2.getRecordedSizeChanges()).toEqual(sizeChanges);
+    });
+
+    test('should maintain popup bounds if contextual popup is not active (to not flicker on reactivation; to support for virtual scrolling) [coordinate anchor]', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open popup.
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-opener-page');
+      await popupOpenerPage.enterCssClass('popup-1');
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.open();
+
+      // Open popup in popup.
+      const popupOpenerPage1 = new PopupOpenerPagePO(appPO.popup({cssClass: 'popup-1'}));
+      await popupOpenerPage1.selectPopupComponent('size-test-page');
+      await popupOpenerPage1.enterCssClass('popup-2');
+      await popupOpenerPage1.enterPosition({top: 0, left: 0});
+      await popupOpenerPage1.enterSize({width: '500px', height: '200px'});
+      await popupOpenerPage1.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage1.open();
+
+      const popupPage2 = new SizeTestPagePO(appPO.popup({cssClass: 'popup-2'}));
+
+      // Expect popup to be visible.
+      await expectPopup(popupPage2).toBeVisible();
+      const popupSize = await popupPage2.getBoundingBox();
+      const sizeChanges = await popupPage2.getRecordedSizeChanges();
+
+      // Detach contextual popup.
+      await appPO.openNewViewTab();
+      await expectPopup(popupPage2).toBeHidden();
+
+      // Expect popup bounding box not to have changed.
+      await expect.poll(() => popupPage2.getBoundingBox()).toEqual(popupSize);
+
+      // Attach contextual popup.
+      await popupOpenerPage.view.tab.click();
+      await expectPopup(popupPage2).toBeVisible();
+
+      // Expect popup not to be resized
+      await expect.poll(() => popupPage2.getRecordedSizeChanges()).toEqual(sizeChanges);
+    });
+  });
+
+  test.describe('Popup Closing', () => {
 
     test('should close the popup on focus loss', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
@@ -871,7 +1798,7 @@ test.describe('Workbench Popup', () => {
     });
   });
 
-  test.describe('focus trap', () => {
+  test.describe('Focus Trap', () => {
 
     test('should automatically focus the first field', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
@@ -972,7 +1899,7 @@ test.describe('Workbench Popup', () => {
     });
   });
 
-  test.describe('stick popup to view or part bounds', () => {
+  test.describe('Stick Popup to View or Part Bounds', () => {
 
     test('should stick popup anchor to bottom view bounds when scrolling up', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});

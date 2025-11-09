@@ -10,8 +10,9 @@
 
 import {Beans, Initializer} from '@scion/toolkit/bean-manager';
 import {ContextService} from '@scion/microfrontend-platform';
-import {WorkbenchPopup, ɵWorkbenchPopup} from './workbench-popup';
+import {WorkbenchPopup} from './workbench-popup';
 import {ɵPOPUP_CONTEXT, ɵPopupContext} from './workbench-popup-context';
+import {ɵWorkbenchPopup} from './ɵworkbench-popup';
 
 /**
  * Registers {@link WorkbenchPopup} in the bean manager if in the context of a workbench popup.
@@ -24,6 +25,7 @@ export class WorkbenchPopupInitializer implements Initializer {
     const popupContext = await Beans.get(ContextService).lookup<ɵPopupContext>(ɵPOPUP_CONTEXT);
     if (popupContext !== null) {
       Beans.register(WorkbenchPopup, {useValue: new ɵWorkbenchPopup(popupContext)});
+      Beans.register(Symbol.for('WORKBENCH_ELEMENT'), {useExisting: WorkbenchPopup});
     }
   }
 }

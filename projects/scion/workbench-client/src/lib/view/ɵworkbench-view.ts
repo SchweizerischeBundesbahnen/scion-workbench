@@ -14,12 +14,12 @@ import {WorkbenchViewCapability} from './workbench-view-capability';
 import {ManifestService, mapToBody, MessageClient, MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {distinctUntilChanged, filter, map, mergeMap, shareReplay, skip, switchMap, takeUntil, tap} from 'rxjs/operators';
-import {ɵMicrofrontendRouteParams} from '../routing/workbench-router';
 import {Observables} from '@scion/toolkit/util';
 import {CanCloseFn, CanCloseRef, ViewSnapshot, WorkbenchView} from './workbench-view';
 import {decorateObservable} from '../observable-decorator';
 import {PartId, ViewId} from '../workbench.identifiers';
 import {Translatable} from '../text/workbench-text-provider.model';
+import {ɵMicrofrontendRouteParams} from '../routing/ɵworkbench-router';
 
 export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
 
@@ -48,6 +48,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
     partId: undefined!,
     active: false,
     focused: false,
+    capability: undefined!,
   };
 
   constructor(public id: ViewId) {
@@ -109,6 +110,10 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
     this.focused$
       .pipe(takeUntil(this._destroy$))
       .subscribe(focused => this.snapshot.focused = focused);
+    // Update capability snapshot when the capability changes.
+    this.capability$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(capability => this.snapshot.capability = capability);
     // Detect navigation to a different view capability of the same app.
     // Do NOT use `capability$` observable to detect capability change, as its lookup is asynchronous.
     this.params$
@@ -126,7 +131,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
       });
 
     // Signal view properties available.
-    this.whenProperties = firstValueFrom(combineLatest([this.partId$, this.params$])).then();
+    this.whenProperties = firstValueFrom(combineLatest([this.partId$, this.params$, this.capability$])).then();
   }
 
   /** @inheritDoc */
