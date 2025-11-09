@@ -20,7 +20,7 @@ test.describe('Workbench View Properties', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
-      qualifier: {test: 'view-properties'},
+      qualifier: {component: 'testee'},
       params: [{name: 'title', required: true}],
       properties: {
         path: 'test-pages/view-properties-test-page',
@@ -31,7 +31,7 @@ test.describe('Workbench View Properties', () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       const viewId = await routerPage.view.getViewId();
 
-      await routerPage.navigate({test: 'view-properties'}, {
+      await routerPage.navigate({component: 'testee'}, {
         target: viewId,
         params: {title: 'Title 1,Title 2,Title 3'},
       });
@@ -40,7 +40,7 @@ test.describe('Workbench View Properties', () => {
 
     await test.step('navigating to new view [target="blank"]', async () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.navigate({test: 'view-properties'}, {
+      await routerPage.navigate({component: 'testee'}, {
         target: 'blank',
         params: {title: 'Title 1,Title 2,Title 3'},
         cssClass: 'testee-blank',
@@ -57,7 +57,7 @@ test.describe('Workbench View Properties', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
-      qualifier: {test: 'view-properties'},
+      qualifier: {component: 'testee'},
       params: [{name: 'heading', required: true}],
       properties: {
         path: 'test-pages/view-properties-test-page',
@@ -68,7 +68,7 @@ test.describe('Workbench View Properties', () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       const viewId = await routerPage.view.getViewId();
 
-      await routerPage.navigate({test: 'view-properties'}, {
+      await routerPage.navigate({component: 'testee'}, {
         target: viewId,
         params: {heading: 'Heading 1,Heading 2,Heading 3'},
       });
@@ -77,7 +77,7 @@ test.describe('Workbench View Properties', () => {
 
     await test.step('navigating to new view [target="blank"]', async () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.navigate({test: 'view-properties'}, {
+      await routerPage.navigate({component: 'testee'}, {
         target: 'blank',
         params: {heading: 'Heading 1,Heading 2,Heading 3'},
         cssClass: 'testee-blank',
@@ -94,7 +94,7 @@ test.describe('Workbench View Properties', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
-      qualifier: {test: 'view-properties'},
+      qualifier: {component: 'testee'},
       params: [{name: 'dirty', required: true}],
       properties: {
         path: 'test-pages/view-properties-test-page',
@@ -105,7 +105,7 @@ test.describe('Workbench View Properties', () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       const viewId = await routerPage.view.getViewId();
 
-      await routerPage.navigate({test: 'view-properties'}, {
+      await routerPage.navigate({component: 'testee'}, {
         target: viewId,
         params: {dirty: 'true,false'},
       });
@@ -114,7 +114,7 @@ test.describe('Workbench View Properties', () => {
 
     await test.step('navigating to new view [target="blank"]', async () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.navigate({test: 'view-properties'}, {
+      await routerPage.navigate({component: 'testee'}, {
         target: 'blank',
         params: {dirty: 'true,false'},
         cssClass: 'testee-blank',
@@ -131,7 +131,7 @@ test.describe('Workbench View Properties', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
-      qualifier: {test: 'view-properties'},
+      qualifier: {component: 'testee'},
       params: [{name: 'dirty', required: true}],
       properties: {
         path: 'test-pages/view-properties-test-page',
@@ -142,7 +142,7 @@ test.describe('Workbench View Properties', () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       const viewId = await routerPage.view.getViewId();
 
-      await routerPage.navigate({test: 'view-properties'}, {
+      await routerPage.navigate({component: 'testee'}, {
         target: viewId,
         params: {dirty: 'true,false,true'},
       });
@@ -151,7 +151,7 @@ test.describe('Workbench View Properties', () => {
 
     await test.step('navigating to new view [target="blank"]', async () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.navigate({test: 'view-properties'}, {
+      await routerPage.navigate({component: 'testee'}, {
         target: 'blank',
         params: {dirty: 'true,false,true'},
         cssClass: 'testee-blank',
@@ -168,7 +168,7 @@ test.describe('Workbench View Properties', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
-      qualifier: {test: 'view-properties'},
+      qualifier: {component: 'testee'},
       params: [{name: 'closable', required: true}],
       properties: {
         path: 'test-pages/view-properties-test-page',
@@ -179,7 +179,7 @@ test.describe('Workbench View Properties', () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       const viewId = await routerPage.view.getViewId();
 
-      await routerPage.navigate({test: 'view-properties'}, {
+      await routerPage.navigate({component: 'testee'}, {
         target: viewId,
         params: {closable: 'true,false'},
       });
@@ -188,7 +188,7 @@ test.describe('Workbench View Properties', () => {
 
     await test.step('navigating to new view [target="blank"]', async () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.navigate({test: 'view-properties'}, {
+      await routerPage.navigate({component: 'testee'}, {
         target: 'blank',
         params: {closable: 'true,false'},
         cssClass: 'testee-blank',
@@ -205,7 +205,7 @@ test.describe('Workbench View Properties', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
-      qualifier: {test: 'view-properties'},
+      qualifier: {component: 'testee'},
       params: [{name: 'closable', required: true}],
       properties: {
         path: 'test-pages/view-properties-test-page',
@@ -216,7 +216,7 @@ test.describe('Workbench View Properties', () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       const viewId = await routerPage.view.getViewId();
 
-      await routerPage.navigate({test: 'view-properties'}, {
+      await routerPage.navigate({component: 'testee'}, {
         target: viewId,
         params: {closable: 'true,false,true'},
       });
@@ -225,7 +225,7 @@ test.describe('Workbench View Properties', () => {
 
     await test.step('navigating to new view [target="blank"]', async () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.navigate({test: 'view-properties'}, {
+      await routerPage.navigate({component: 'testee'}, {
         target: 'blank',
         params: {closable: 'true,false,true'},
         cssClass: 'testee-blank',

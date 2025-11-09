@@ -11,13 +11,24 @@
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {WorkbenchThemeTestPagePO} from './page-object/test-pages/workbench-theme-test-page.po';
+import {RouterPagePO} from './page-object/router-page.po';
 
 test.describe('WorkbenchClient', () => {
 
   test('should provide workbench theme', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const testPage = await WorkbenchThemeTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-pages/workbench-theme-test-page',
+      },
+    });
+
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+    const testPage = new WorkbenchThemeTestPagePO(appPO, {cssClass: 'testee'});
 
     await appPO.header.changeColorScheme('light');
     await expect(testPage.theme).toHaveText('scion-light');
@@ -29,7 +40,17 @@ test.describe('WorkbenchClient', () => {
   test('should provide workbench color scheme', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const testPage = await WorkbenchThemeTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-pages/workbench-theme-test-page',
+      },
+    });
+
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+    const testPage = new WorkbenchThemeTestPagePO(appPO, {cssClass: 'testee'});
 
     await appPO.header.changeColorScheme('light');
     await expect(testPage.colorScheme).toHaveText('light');
@@ -41,7 +62,17 @@ test.describe('WorkbenchClient', () => {
   test('should propagate theme to inactive view', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const testPage = await WorkbenchThemeTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-pages/workbench-theme-test-page',
+      },
+    });
+
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+    const testPage = new WorkbenchThemeTestPagePO(appPO, {cssClass: 'testee'});
 
     // Open new tab to deactivate testPage.
     await appPO.openNewViewTab();

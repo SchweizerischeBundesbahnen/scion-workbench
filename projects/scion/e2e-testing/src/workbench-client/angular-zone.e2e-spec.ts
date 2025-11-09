@@ -11,6 +11,7 @@
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {AngularZoneTestPagePO} from './page-object/test-pages/angular-zone-test-page.po';
+import {RouterPagePO} from './page-object/router-page.po';
 
 /**
  * Tests RxJS Observables to emit in the correct Angular zone.
@@ -25,7 +26,18 @@ test.describe('Angular Zone Synchronization', () => {
   test('should emit in the same Angular zone as subscribed to "WorkbenchView#partId$"', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const angularZoneTestPage = await AngularZoneTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-pages/angular-zone-test-page',
+      },
+    });
+
+    // Open test page.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+    const angularZoneTestPage = new AngularZoneTestPagePO(appPO, {cssClass: 'testee'});
 
     const partIdPanel = angularZoneTestPage.workbenchView.partIdPanel;
     await partIdPanel.expand();
@@ -45,7 +57,18 @@ test.describe('Angular Zone Synchronization', () => {
   test('should emit in the same Angular zone as subscribed to "WorkbenchView#capability$"', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const angularZoneTestPage = await AngularZoneTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-pages/angular-zone-test-page',
+      },
+    });
+
+    // Open test page.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+    const angularZoneTestPage = new AngularZoneTestPagePO(appPO, {cssClass: 'testee'});
 
     const capabilityPanel = angularZoneTestPage.workbenchView.capabilityPanel;
     await capabilityPanel.expand();
@@ -65,7 +88,18 @@ test.describe('Angular Zone Synchronization', () => {
   test('should emit in the same Angular zone as subscribed to "WorkbenchView#params$"', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const angularZoneTestPage = await AngularZoneTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-pages/angular-zone-test-page',
+      },
+    });
+
+    // Open test page.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+    const angularZoneTestPage = new AngularZoneTestPagePO(appPO, {cssClass: 'testee'});
 
     const paramsPanel = angularZoneTestPage.workbenchView.paramsPanel;
     await paramsPanel.expand();
@@ -85,7 +119,18 @@ test.describe('Angular Zone Synchronization', () => {
   test('should emit in the same Angular zone as subscribed to "WorkbenchView#active$"', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const angularZoneTestPage = await AngularZoneTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-pages/angular-zone-test-page',
+      },
+    });
+
+    // Open test page.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+    const angularZoneTestPage = new AngularZoneTestPagePO(appPO, {cssClass: 'testee'});
 
     const activePanel = angularZoneTestPage.workbenchView.activePanel;
     await activePanel.expand();
@@ -105,7 +150,18 @@ test.describe('Angular Zone Synchronization', () => {
   test('should emit in the same Angular zone as subscribed to "WorkbenchView#focused$"', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const angularZoneTestPage = await AngularZoneTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-pages/angular-zone-test-page',
+      },
+    });
+
+    // Open test page.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+    const angularZoneTestPage = new AngularZoneTestPagePO(appPO, {cssClass: 'testee'});
 
     const focusedPanel = angularZoneTestPage.workbenchView.focusedPanel;
     await focusedPanel.expand();
@@ -125,7 +181,18 @@ test.describe('Angular Zone Synchronization', () => {
   test('should emit in the same Angular zone as subscribed to "WorkbenchPart#active$"', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const angularZoneTestPage = await AngularZoneTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-pages/angular-zone-test-page',
+      },
+    });
+
+    // Open test page.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+    const angularZoneTestPage = new AngularZoneTestPagePO(appPO, {cssClass: 'testee'});
 
     const activePanel = angularZoneTestPage.workbenchPart.activePanel;
     await activePanel.expand();
@@ -145,7 +212,18 @@ test.describe('Angular Zone Synchronization', () => {
   test('should emit in the same Angular zone as subscribed to "WorkbenchPart#focused$"', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const angularZoneTestPage = await AngularZoneTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-pages/angular-zone-test-page',
+      },
+    });
+
+    // Open test page.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+    const angularZoneTestPage = new AngularZoneTestPagePO(appPO, {cssClass: 'testee'});
 
     const focusedPanel = angularZoneTestPage.workbenchPart.focusedPanel;
     await focusedPanel.expand();

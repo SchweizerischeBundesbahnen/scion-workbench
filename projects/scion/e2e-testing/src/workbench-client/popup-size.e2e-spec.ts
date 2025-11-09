@@ -22,7 +22,7 @@ test.describe('Workbench Popup', () => {
 
       await microfrontendNavigator.registerCapability('app1', {
         type: 'popup',
-        qualifier: {test: 'popup'},
+        qualifier: {component: 'testee'},
         properties: {
           path: 'test-popup',
           size: {
@@ -38,7 +38,7 @@ test.describe('Workbench Popup', () => {
 
       // open the popup
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPage.enterQualifier({test: 'popup'});
+      await popupOpenerPage.enterQualifier({component: 'testee'});
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.open();
 
@@ -60,13 +60,15 @@ test.describe('Workbench Popup', () => {
     });
 
     /**
+     * TODO [#271]: Activate when fixed; Use host view to open popup.
+     *
      * In this test, we do not open the popup from within a microfrontend because opening the popup from within a microfrontend causes that
      * microfrontend to lose focus, which would trigger a change detection cycle in the host, causing the popup to be displayed at the correct size.
      *
      * This test verifies that the popup is displayed at the correct size even without an "additional" change detection cycle, i.e., is opened
      * inside the Angular zone.
      */
-    test('should size the popup as configured in the popup capability (insideAngularZone)', async ({appPO, microfrontendNavigator}) => {
+    test.fixme('should size the popup as configured in the popup capability (insideAngularZone)', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       await microfrontendNavigator.registerCapability('app1', {
@@ -84,8 +86,8 @@ test.describe('Workbench Popup', () => {
       });
 
       // open the popup directly from the start page
-      const startPage = await appPO.openNewViewTab();
-      await startPage.clickTestCapability('testee', 'app1');
+      // const startPage = await appPO.openNewViewTab();
+      // await startPage.clickTestCapability('testee', 'app1');
 
       const popup = appPO.popup({cssClass: 'testee'});
 

@@ -10,9 +10,9 @@
 
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, HostBinding, HostListener, inject, viewChild} from '@angular/core';
 import {PartId, WorkbenchConfig, WorkbenchRouteData, WorkbenchRouter, WorkbenchService, WorkbenchView} from '@scion/workbench';
-import {Capability, IntentClient, ManifestService} from '@scion/microfrontend-platform';
+import {ManifestService} from '@scion/microfrontend-platform';
 import {Observable} from 'rxjs';
-import {WorkbenchCapabilities, WorkbenchPopupService as WorkbenchClientPopupService, WorkbenchRouter as WorkbenchClientRouter, WorkbenchViewCapability} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchRouter as WorkbenchClientRouter, WorkbenchViewCapability} from '@scion/workbench-client';
 import {filterArray, sortArray} from '@scion/toolkit/operators';
 import {PRIMARY_OUTLET, Route, Router, Routes} from '@angular/router';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
@@ -45,9 +45,7 @@ export default class StartPageComponent {
 
   private readonly _view = inject(WorkbenchView, {optional: true}); // not available on entry point page
   private readonly _workbenchClientRouter = inject(WorkbenchClientRouter, {optional: true}); // not available if starting the workbench standalone
-  private readonly _intentClient = inject(IntentClient, {optional: true}); // not available if starting the workbench standalone
   private readonly _manifestService = inject(ManifestService, {optional: true}); // not available if starting the workbench standalone
-  private readonly _workbenchClientPopupService = inject(WorkbenchClientPopupService, {optional: true}); // not available if starting the workbench standalone
   private readonly _workbenchService = inject(WorkbenchService);
   private readonly _workbenchRouter = inject(WorkbenchRouter);
   private readonly _cd = inject(ChangeDetectorRef);
@@ -57,7 +55,6 @@ export default class StartPageComponent {
   protected readonly filterControl = inject(NonNullableFormBuilder).control('');
   protected readonly workbenchViewRoutes: Routes;
   protected readonly microfrontendViewCapabilities$: Observable<WorkbenchViewCapability[]> | undefined;
-  protected readonly testCapabilities$: Observable<Capability[]> | undefined;
 
   @HostBinding('attr.data-partid')
   protected partId: PartId | undefined;
@@ -75,14 +72,6 @@ export default class StartPageComponent {
       this.microfrontendViewCapabilities$ = this._manifestService!.lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View})
         .pipe(
           filterArray(viewCapability => 'pinToDesktop' in viewCapability.properties && !!viewCapability.properties['pinToDesktop']),
-          filterArray(viewCapability => !isTestCapability(viewCapability)),
-          sortArray((a, b) => a.metadata!.appSymbolicName.localeCompare(b.metadata!.appSymbolicName)),
-        );
-      // Read test capabilities to be pinned to the desktop.
-      this.testCapabilities$ = this._manifestService!.lookupCapabilities$()
-        .pipe(
-          filterArray(capability => !!capability.properties && 'pinToDesktop' in capability.properties && !!capability.properties['pinToDesktop']),
-          filterArray(viewCapability => isTestCapability(viewCapability)),
           sortArray((a, b) => a.metadata!.appSymbolicName.localeCompare(b.metadata!.appSymbolicName)),
         );
     }
@@ -105,25 +94,6 @@ export default class StartPageComponent {
       target: event.ctrlKey ? 'blank' : this._view?.id ?? 'blank',
       activate: !event.ctrlKey,
     });
-  }
-
-  protected async onTestCapabilityOpen(testCapability: Capability, event: MouseEvent): Promise<void> {
-    event.preventDefault(); // Prevent href navigation imposed by accessibility rules
-    // TODO [#343] Remove switch-case after fixed issue https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/343
-    switch (testCapability.type) {
-      case WorkbenchCapabilities.View: {
-        await this._workbenchClientRouter!.navigate(testCapability.qualifier!, {target: this._view?.id});
-        break;
-      }
-      case WorkbenchCapabilities.Popup: {
-        await this._workbenchClientPopupService!.open(testCapability.qualifier!, {anchor: event.target as HTMLElement});
-        break;
-      }
-      default: {
-        await this._intentClient!.publish({type: testCapability.type, qualifier: testCapability.qualifier});
-        break;
-      }
-    }
   }
 
   @HostListener('keydown', ['$event'])
@@ -163,17 +133,9 @@ export default class StartPageComponent {
     return viewCapability.properties.title;
   };
 
-  public selectTestCapabilityText = (testCapability: Capability): string | undefined => {
-    return testCapability.properties?.['cssClass'] as string | undefined;
-  };
-
   public selectViewRouteText = (route: Route): string | undefined => {
     return route.data?.[WorkbenchRouteData.title] as string | undefined;
   };
-}
-
-function isTestCapability(capability: Capability): boolean {
-  return Object.keys(capability.qualifier ?? {}).includes('test');
 }
 
 /**
