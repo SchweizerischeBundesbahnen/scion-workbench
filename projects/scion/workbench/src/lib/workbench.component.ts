@@ -9,7 +9,7 @@
  */
 
 import {ChangeDetectorRef, Component, DestroyRef, DOCUMENT, effect, ElementRef, inject, NgZone, Provider, viewChild, ViewContainerRef} from '@angular/core';
-import {IFRAME_OVERLAY_HOST, VIEW_DROP_ZONE_OVERLAY_HOST, WORKBENCH_ELEMENT_REF} from './workbench-element-references';
+import {IFRAME_OVERLAY_HOST, VIEW_DROP_ZONE_OVERLAY_HOST, WORKBENCH_COMPONENT_REF} from './workbench-element-references';
 import {WorkbenchLauncher} from './startup/workbench-launcher.service';
 import {WorkbenchStartup} from './startup/workbench-startup.service';
 import {WorkbenchConfig} from './workbench-config';
@@ -120,9 +120,9 @@ export class WorkbenchComponent {
    */
   private provideWorkbenchElementReferences(): void {
     // Provide reference to the workbench element.
-    const workbenchElementRef = inject(WORKBENCH_ELEMENT_REF);
-    workbenchElementRef.set(inject(ViewContainerRef));
-    inject(DestroyRef).onDestroy(() => workbenchElementRef.set(undefined));
+    const workbenchComponentRef = inject(WORKBENCH_COMPONENT_REF);
+    workbenchComponentRef.set(inject(ViewContainerRef));
+    inject(DestroyRef).onDestroy(() => workbenchComponentRef.set(undefined));
 
     // Provide reference to the iframe overlay host.
     const iframeOverlayHost = inject(IFRAME_OVERLAY_HOST);
@@ -156,7 +156,7 @@ function configureWorkbenchGlassPane(): Provider[] {
     {
       provide: GLASS_PANE_BLOCKABLE,
       useFactory: (): Blockable => ({
-        blockedBy$: inject(WorkbenchDialogRegistry).top$(),
+        blockedBy: inject(WorkbenchDialogRegistry).top(),
       }),
     },
     {

@@ -8,9 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {type ɵWorkbenchPopupCommand} from './workbench-popup-open-command';
+export {type ɵWorkbenchPopupCommand} from './workbench-popup-command';
 export {WorkbenchPopupService} from './workbench-popup-service';
-export {WorkbenchPopup, ɵWorkbenchPopupMessageHeaders} from './workbench-popup';
+export {ɵWorkbenchPopupService} from './ɵworkbench-popup-service';
+export {WorkbenchPopup} from './workbench-popup';
+export {ɵWorkbenchPopupMessageHeaders} from './ɵworkbench-popup';
 export {type WorkbenchPopupCapability, type PopupSize} from './workbench-popup-capability';
 export {type WorkbenchPopupConfig, type CloseStrategy} from './workbench-popup.config';
 export {type WorkbenchPopupReferrer} from './workbench-popup-referrer';

@@ -88,7 +88,6 @@ Import the SCION Workbench component in `app.component.ts`.
 
     @Component({
       selector: 'app-root',
-      standalone: true,
       imports: [
 [+]     WorkbenchComponent
       ],

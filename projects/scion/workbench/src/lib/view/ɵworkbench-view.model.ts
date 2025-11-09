@@ -8,21 +8,21 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {firstValueFrom, Observable} from 'rxjs';
+import {firstValueFrom} from 'rxjs';
 import {ActivatedRouteSnapshot, ChildrenOutletContexts} from '@angular/router';
 import {ViewDragService, ViewMoveEventSource} from '../view-dnd/view-drag.service';
 import {CanCloseFn, CanCloseRef, WorkbenchMenuItem, WorkbenchViewMenuItemFn} from '../workbench.model';
+import {WORKBENCH_ELEMENT} from '../workbench-element-references';
 import {WorkbenchView, WorkbenchViewNavigation} from './workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {WbComponentPortal} from '../portal/wb-component-portal';
-import {AbstractType, afterRenderEffect, assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, Type, untracked} from '@angular/core';
+import {AbstractType, afterRenderEffect, assertNotInReactiveContext, computed, DestroyableInjector, effect, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, Type, untracked} from '@angular/core';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
-import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
+import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
-import {takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-interop';
-import {provideViewContext} from './view-context-provider';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
 import {Blockable} from '../glass-pane/blockable';
 import {ViewId, WORKBENCH_ID} from '../workbench.identifiers';
@@ -33,23 +33,26 @@ import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {Arrays, Observables} from '@scion/toolkit/util';
 import {Logger} from '../logging/logger';
-import {WORKBENCH_VIEW_MENU_ITEM_REGISTRY} from './workbench-view-menu-item.registry';
+import {WorkbenchViewMenuItemRegistry} from './workbench-view-menu-item.registry';
 import {Translatable} from '../text/workbench-text-provider.model';
 import {ViewSlotComponent} from './view-slot.component';
 import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
-import {WORKBENCH_POPUP_REGISTRY} from '../popup/workbench-popup.registry';
+import {WorkbenchPopupRegistry} from '../popup/workbench-popup.registry';
+import {boundingClientRect} from '@scion/components/dimension';
+import {provideContextAwareServices} from '../context-aware-service-provider';
 
+/** @inheritDoc */
 export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
-  private readonly _viewEnvironmentInjector = inject(EnvironmentInjector);
+  /** Injector for the view; destroyed when the view is closed. */
+  public readonly injector = inject(Injector) as DestroyableInjector;
   private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _workbenchService = inject(ɵWorkbenchService);
   private readonly _layout = inject(WorkbenchLayoutService).layout;
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _rootOutletContexts = inject(ChildrenOutletContexts);
-  private readonly _partRegistry = inject(WORKBENCH_PART_REGISTRY);
+  private readonly _partRegistry = inject(WorkbenchPartRegistry);
   private readonly _viewDragService = inject(ViewDragService);
-  private readonly _workbenchDialogRegistry = inject(WorkbenchDialogRegistry);
   private readonly _focusMonitor = inject(WorkbenchFocusMonitor);
   private readonly _logger = inject(Logger);
 
@@ -59,7 +62,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _heading = signal<Translatable | null>(null);
   private readonly _dirty = signal(false);
   private readonly _closable = signal(true);
-  private readonly _blockedBy: Signal<ɵWorkbenchDialog | null>;
   private readonly _scrolledIntoView = signal(true);
 
   public alternativeId: string | undefined;
@@ -77,10 +79,13 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public readonly active = signal<boolean>(false);
   public readonly focused = computed(() => this._focusMonitor.activeElement()?.id === this.id);
   public readonly menuItems: Signal<WorkbenchMenuItem[]>;
-  public readonly blockedBy$: Observable<ɵWorkbenchDialog | null>;
-  public readonly slot: {portal: WbComponentPortal<ViewSlotComponent>};
+  public readonly blockedBy: Signal<ɵWorkbenchDialog | null>;
+  public readonly slot: {
+    portal: WbComponentPortal<ViewSlotComponent>;
+    bounds: Signal<DOMRect | undefined>;
+  };
   public readonly classList = new ClassList();
-  public readonly isClosable = computed(() => this._closable() && !this._blockedBy());
+  public readonly isClosable = computed(() => this._closable() && !this.blockedBy());
 
   /**
    * Guard to confirm closing the view, if any.
@@ -91,20 +96,29 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   constructor(public readonly id: ViewId, layout: ɵWorkbenchLayout) {
     this.alternativeId = layout.view({viewId: this.id}).alternativeId;
-    this.slot = {portal: this.createPortal()};
+    this.slot = {
+      portal: this.createPortal(),
+      bounds: boundingClientRect(computed(() => this.slot.portal.element()), {injector: this.injector}),
+    };
     this.menuItems = this.computeMenuItems();
-    this._blockedBy = toSignal(inject(WorkbenchDialogRegistry).top$({viewId: this.id}), {requireSync: true});
-    this.blockedBy$ = toObservable<ɵWorkbenchDialog | null>(this._blockedBy);
+    this.blockedBy = inject(WorkbenchDialogRegistry).top(this.id);
+
     this.installModelUpdater();
     this.onLayoutChange({layout});
     this.activateOnFocus();
     this.focusOnActivate();
   }
 
+  /**
+   * Creates a portal to render {@link ViewSlotComponent} in the view's injection context.
+   */
   private createPortal(): WbComponentPortal<ViewSlotComponent> {
     return new WbComponentPortal(ViewSlotComponent, {
       providers: [
-        provideViewContext(this),
+        {provide: ɵWorkbenchView, useValue: this},
+        {provide: WorkbenchView, useExisting: ɵWorkbenchView},
+        {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchView},
+        provideContextAwareServices(),
         // Prevent injecting this part into the view because the view may be dragged to a different part.
         {provide: WorkbenchPart, useFactory: () => undefined},
         {provide: ɵWorkbenchPart, useFactory: () => undefined},
@@ -337,13 +351,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   /**
-   * Reference to the handle's injector. The injector will be destroyed when closing the view.
-   */
-  public get injector(): Injector {
-    return this._viewEnvironmentInjector;
-  }
-
-  /**
    * Registers an adapter for this view, replacing any previously registered adapter of the same type.
    *
    * Adapters enable loosely coupled extension of an object, allowing one object to be adapted to another.
@@ -379,11 +386,11 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
     // Use a differ to avoid re-creating every menu item on registration or change.
     const differ = inject(IterableDiffers).find([]).create<WorkbenchViewMenuItemFn>();
-    const menuItemRegistry = inject(WORKBENCH_VIEW_MENU_ITEM_REGISTRY);
+    const menuItemRegistry = inject(WorkbenchViewMenuItemRegistry);
     const menuItems = new Map<WorkbenchViewMenuItemFn, Signal<WorkbenchMenuItem | null>>();
 
     return computed(() => {
-      const changes = differ.diff(menuItemRegistry.objects());
+      const changes = differ.diff(menuItemRegistry.elements());
       changes?.forEachAddedItem(({item: fn}) => menuItems.set(fn, computed(() => runInInjectionContext(constructInjector(this, this.part()), () => fn(this)))));
       changes?.forEachRemovedItem(({item: fn}) => menuItems.delete(fn));
       return Array.from(menuItems.values()).map(menuItem => menuItem()).filter(menuItem => !!menuItem);
@@ -393,7 +400,8 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
       return Injector.create({
         parent: injector,
         providers: [
-          provideViewContext(view),
+          {provide: ɵWorkbenchView, useValue: view},
+          {provide: WorkbenchView, useExisting: ɵWorkbenchView},
           {provide: ɵWorkbenchPart, useValue: part},
           {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
         ],
@@ -442,7 +450,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
    */
   private focusOnActivate(): void {
     const dialogRegistry = inject(WorkbenchDialogRegistry);
-    const popupRegistry = inject(WORKBENCH_POPUP_REGISTRY);
+    const popupRegistry = inject(WorkbenchPopupRegistry);
 
     afterRenderEffect(() => {
       const activationInstant = this.activationInstant();
@@ -469,12 +477,12 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
         }
 
         // Do not request focus if the view is blocked by a dialog.
-        if (dialogRegistry.dialogs().some(dialog => !dialog.context.view || dialog.context.view === this)) {
+        if (dialogRegistry.elements().some(dialog => !dialog.invocationContext || dialog.invocationContext.elementId === this.id)) {
           return;
         }
 
         // Do not request focus if a popup is opened within this view.
-        if (popupRegistry.objects().some(popup => popup.context.view === this)) {
+        if (popupRegistry.elements().some(popup => popup.invocationContext?.elementId === this.id)) {
           return;
         }
 
@@ -489,7 +497,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   public destroy(): void {
-    this._viewEnvironmentInjector.destroy();
-    this._workbenchDialogRegistry.dialogs({viewId: this.id}).forEach(dialog => dialog.destroy());
+    this.injector.destroy();
   }
 }

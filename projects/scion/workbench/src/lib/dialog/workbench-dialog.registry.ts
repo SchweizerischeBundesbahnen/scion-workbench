@@ -8,30 +8,29 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable, OnDestroy} from '@angular/core';
+import {assertNotInReactiveContext, computed, Injectable, Signal} from '@angular/core';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
-import {BehaviorSubject, Observable} from 'rxjs';
-import {distinctUntilChanged, map} from 'rxjs/operators';
-import {ViewId} from '../workbench.identifiers';
+import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
+import {WorkbenchElementRegistry} from '../registry/workbench-element-registry';
 
 /**
- * Registry for {@link ɵWorkbenchDialog} objects.
+ * Registry for {@link ɵWorkbenchDialog} elements.
  */
 @Injectable({providedIn: 'root'})
-export class WorkbenchDialogRegistry implements OnDestroy {
+export class WorkbenchDialogRegistry extends WorkbenchElementRegistry<DialogId, ɵWorkbenchDialog> {
 
-  private _dialogs$ = new BehaviorSubject<ɵWorkbenchDialog[]>([]);
-
-  public register(dialog: ɵWorkbenchDialog): void {
-    this._dialogs$.next(this._dialogs$.value.concat(dialog));
+  constructor() {
+    super({
+      nullElementErrorFn: dialogId => Error(`[NullDialogError] Dialog '${dialogId}' not found.`),
+      onUnregister: dialog => dialog.destroy(),
+    });
   }
 
-  public unregister(dialog: ɵWorkbenchDialog): void {
-    this._dialogs$.next(this._dialogs$.value.filter(candidate => candidate !== dialog));
-  }
-
+  /**
+   * Gets the position of a dialog in its invocation context.
+   */
   public indexOf(dialog: ɵWorkbenchDialog): number {
-    const index = this.dialogs({viewId: dialog.context.view?.id}).indexOf(dialog);
+    const index = this.elements().filter(element => element.invocationContext?.elementId === dialog.invocationContext?.elementId).indexOf(dialog);
     if (index === -1) {
       throw Error('[NullDialogError] Dialog not found');
     }
@@ -39,41 +38,20 @@ export class WorkbenchDialogRegistry implements OnDestroy {
   }
 
   /**
-   * Returns currently opened dialogs, sorted by the time they were opened, based on the specified filter.
-   */
-  public dialogs(filter?: {viewId?: ViewId} | ((dialog: ɵWorkbenchDialog) => boolean)): ɵWorkbenchDialog[] {
-    const filterFn = typeof filter === 'function' ? filter : (dialog: ɵWorkbenchDialog) => !filter?.viewId || dialog.context.view?.id === filter.viewId;
-    return this._dialogs$.value.filter(filterFn);
-  }
-
-  /**
-   * Observes the topmost dialog in the given context.
+   * Gets the topmost dialog in the given context, including application modal dialogs overlapping any context.
    *
-   * If a view context is specified, the topmost dialog that overlays that view is returned.
-   * This can be either a view-modal or an application-modal dialog. Otherwise, returns
-   * the topmost application-modal dialog.
+   * Method must not be called in a reactive context.
    */
-  public top$(context?: {viewId?: ViewId}): Observable<ɵWorkbenchDialog | null> {
-    return this._dialogs$
-      .pipe(
-        map(() => this.top(context)),
-        distinctUntilChanged(),
-      );
-  }
+  public top(context?: ViewId | PartId | DialogId | PopupId): Signal<ɵWorkbenchDialog | null> {
+    assertNotInReactiveContext(this.top, 'Call WorkbenchDialogRegistry.top() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
-  /**
-   * Returns the topmost dialog in the given context.
-   *
-   * If a view context is specified, the topmost dialog that overlays that view is returned.
-   * This can be either a view-modal or an application-modal dialog. Otherwise, returns
-   * the topmost application-modal dialog.
-   */
-  public top(context?: {viewId?: ViewId}): ɵWorkbenchDialog | null {
-    return this.dialogs(dialog => !dialog.context.view || dialog.context.view.id === context?.viewId).at(-1) ?? null;
-  }
+    return computed(() => {
+      const top = this.elements().filter(dialog => !dialog.invocationContext || dialog.invocationContext.elementId === context).at(-1) ?? null;
+      if (!top || top.id === context) {
+        return null;
+      }
 
-  public ngOnDestroy(): void {
-    this._dialogs$.value.forEach(dialog => dialog.destroy());
-    this._dialogs$.next([]);
+      return top;
+    });
   }
 }

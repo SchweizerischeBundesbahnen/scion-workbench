@@ -136,6 +136,11 @@ export const routes: Routes = [
     data: {[WorkbenchRouteData.title]: 'Workbench Layout', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-layout', pinToDesktop: true},
   },
   {
+    path: 'test-part-opener',
+    loadComponent: () => import('./part-opener-page/part-opener-page.component'),
+    data: {[WorkbenchRouteData.title]: 'Workbench Part', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', pinToDesktop: true},
+  },
+  {
     path: 'test-message-box-opener',
     loadComponent: () => import('./message-box-opener-page/message-box-opener-page.component'),
     data: {[WorkbenchRouteData.title]: 'Workbench Messagebox', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-message-box-opener', pinToDesktop: true},

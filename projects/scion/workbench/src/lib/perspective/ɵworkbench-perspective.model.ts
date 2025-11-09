@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
-import {computed, EnvironmentInjector, inject, InjectionToken, Injector, runInInjectionContext, Signal} from '@angular/core';
+import {computed, DestroyableInjector, inject, InjectionToken, Injector, runInInjectionContext, Signal} from '@angular/core';
 import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './workbench-perspective.model';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
@@ -18,7 +18,7 @@ import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {LatestTaskExecutor} from '../executor/latest-task-executor';
 import {UrlSegment} from '@angular/router';
 import {WorkbenchLayoutFn} from '../layout/workbench-layout';
-import {WORKBENCH_PERSPECTIVE_REGISTRY} from './workbench-perspective.registry';
+import {WorkbenchPerspectiveRegistry} from './workbench-perspective.registry';
 import {WorkbenchStartup} from '../startup/workbench-startup.service';
 import {Objects} from '../common/objects.util';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
@@ -31,7 +31,8 @@ import {from} from 'rxjs';
  */
 export class ɵWorkbenchPerspective implements WorkbenchPerspective {
 
-  private readonly _perspectiveEnvironmentInjector = inject(EnvironmentInjector);
+  /** Injector for the perspective; destroyed when the perspective is unregistered. */
+  public readonly injector = inject(Injector) as DestroyableInjector;
   private readonly _workbenchLayoutFactory = inject(ɵWorkbenchLayoutFactory);
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
   private readonly _workbenchLayoutMerger = inject(WorkbenchLayoutMerger);
@@ -88,13 +89,6 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   }
 
   /**
-   * Reference to the handle's injector. The injector will be destroyed when unregistering the perspective.
-   */
-  public get injector(): Injector {
-    return this._perspectiveEnvironmentInjector;
-  }
-
-  /**
    * Creates the perspective layout using the main area of the current layout.
    */
   private createLayoutForActivation(currentLayout: ɵWorkbenchLayout): ɵWorkbenchLayout {
@@ -132,7 +126,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
    * Creates the initial layout of this perspective as defined in the perspective definition.
    */
   private async createInitialLayout(): Promise<ɵWorkbenchLayout> {
-    let initialLayout = await runInInjectionContext(this._perspectiveEnvironmentInjector, () => this._initialLayoutFn(this._workbenchLayoutFactory)) as ɵWorkbenchLayout;
+    let initialLayout = await runInInjectionContext(this.injector, () => this._initialLayoutFn(this._workbenchLayoutFactory)) as ɵWorkbenchLayout;
 
     // Ensure each part to have an active view.
     initialLayout.parts()
@@ -244,7 +238,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   }
 
   public destroy(): void {
-    this._perspectiveEnvironmentInjector.destroy();
+    this.injector.destroy();
   }
 }
 
@@ -255,7 +249,7 @@ export const ACTIVE_PERSPECTIVE = new InjectionToken<Signal<ɵWorkbenchPerspecti
   providedIn: 'root',
   factory: (): Signal<ɵWorkbenchPerspective | undefined> => {
     const layout = inject(WorkbenchLayoutService).layout;
-    const workbenchPerspectiveRegistry = inject(WORKBENCH_PERSPECTIVE_REGISTRY);
+    const perspectiveRegistry = inject(WorkbenchPerspectiveRegistry);
     const workbenchStartup = inject(WorkbenchStartup);
 
     return computed(() => {
@@ -269,7 +263,7 @@ export const ACTIVE_PERSPECTIVE = new InjectionToken<Signal<ɵWorkbenchPerspecti
         return undefined; // The initial perspective has not been activated yet.
       }
 
-      return workbenchPerspectiveRegistry.get(perspectiveId);
+      return perspectiveRegistry.get(perspectiveId);
     });
   },
 });

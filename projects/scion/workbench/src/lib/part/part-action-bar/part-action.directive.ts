@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DestroyRef, Directive, inject, input, TemplateRef} from '@angular/core';
+import {DestroyRef, Directive, inject, Injector, input, TemplateRef} from '@angular/core';
 import {WorkbenchService} from '../../workbench.service';
 import {WorkbenchPart} from '../workbench-part.model';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
@@ -53,6 +53,8 @@ import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
  */
 @Directive({selector: 'ng-template[wbPartAction]'})
 export class WorkbenchPartActionDirective {
+
+  private readonly _injector = inject(Injector);
 
   /**
    * Specifies where to place this action in the part bar. Defaults to `end`.
@@ -104,6 +106,7 @@ export class WorkbenchPartActionDirective {
         content: template,
         align: this.align(),
         cssClass: this.cssClass(),
+        injector: this._injector,
       };
     });
 

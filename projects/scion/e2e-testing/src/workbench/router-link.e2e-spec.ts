@@ -209,7 +209,7 @@ test.describe('Workbench RouterLink', () => {
     // WHEN
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.navigateViaRouterLink(['/test-view'], {
-      viewContextActive: false, // simulate navigating outside a view context
+      rootContext: true, // simulate navigating outside a view context
       cssClass: 'testee',
     });
 

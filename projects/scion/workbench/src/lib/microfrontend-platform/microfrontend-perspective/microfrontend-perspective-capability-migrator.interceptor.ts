@@ -34,7 +34,7 @@ export class MicrofrontendPerspectiveCapabilityMigrator implements CapabilityInt
   }
 
   private async migrate(perspectiveCapabilityV1: WorkbenchPerspectiveCapabilityV1, manifest: CapabilityInterceptor.Manifest): Promise<WorkbenchPerspectiveCapability> {
-    this._logger.warn(`[PerspectiveDefinitionWarning] Deprecated perspective definition detected. The perspective capability '${Objects.toMatrixNotation(perspectiveCapabilityV1.qualifier)}' of app '${perspectiveCapabilityV1.metadata!.appSymbolicName}' uses a deprecated model. Parts must be modeled as part capabilities and views referenced from part capabilities. To migrate, update @scion/workbench-client to version '1.0.0-beta.34' or higher and refer to the documentation of 'WorkbenchPerspectiveCapability' and 'WorkbenchPartCapability'. Support for the deprecated model will be removed in a future version.`, LoggerNames.MICROFRONTEND);
+    this._logger.warn(`[PerspectiveDefinitionWarning] Deprecated perspective definition detected. The perspective capability '${Objects.toMatrixNotation(perspectiveCapabilityV1.qualifier)}' of app '${perspectiveCapabilityV1.metadata!.appSymbolicName}' uses a deprecated model. Parts must be modeled as part capabilities and views referenced from part capabilities. To migrate, update @scion/workbench-client to version '1.0.0-beta.34' or higher and refer to the documentation of 'WorkbenchPerspectiveCapability' and 'WorkbenchPartCapability'. Support for the deprecated model is marked for removal.`, LoggerNames.MICROFRONTEND);
 
     const [initialPartV1, ...partsV1] = perspectiveCapabilityV1.properties.layout;
     return {

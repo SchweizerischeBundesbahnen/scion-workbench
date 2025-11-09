@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, computed, createComponent, effect, ElementRef, EnvironmentInjector, inject, Injector, input, Renderer2, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, createComponent, DestroyRef, effect, ElementRef, EnvironmentInjector, inject, Injector, input, Renderer2, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
 import {WORKBENCH_ICON_PROVIDER, WorkbenchIconDescriptor, WorkbenchIconProviderFn} from './workbench-icon-provider.model';
 
 /**
@@ -42,7 +42,8 @@ export class IconComponent {
 
   constructor() {
     // Render icon in an animation frame to capture CSS classes set on the host.
-    requestAnimationFrame(() => this.renderIcon());
+    const animationFrame = requestAnimationFrame(() => this.renderIcon());
+    inject(DestroyRef).onDestroy(() => cancelAnimationFrame(animationFrame));
   }
 
   /**

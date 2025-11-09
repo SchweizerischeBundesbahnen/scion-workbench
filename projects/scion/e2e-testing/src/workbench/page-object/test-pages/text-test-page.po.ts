@@ -11,7 +11,7 @@
 import {Locator} from '@playwright/test';
 import {WorkbenchDialogPagePO} from '../workbench-dialog-page.po';
 import {DialogPO} from '../../../dialog.po';
-import {Translatable} from '@scion/workbench-client';
+import {Translatable} from '@scion/workbench';
 
 export class TextTestPagePO implements WorkbenchDialogPagePO {
 

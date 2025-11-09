@@ -8,7 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {InjectionToken, signal, ViewContainerRef, WritableSignal} from '@angular/core';
+import {computed, inject, InjectionToken, Signal, signal, ViewContainerRef, WritableSignal} from '@angular/core';
+import {boundingClientRect} from '@scion/components/dimension';
+import {WorkbenchElement} from './workbench.model';
 
 /**
  * DI token to inject the DOM location where to attach iframes.
@@ -29,7 +31,23 @@ export const VIEW_DROP_ZONE_OVERLAY_HOST = new InjectionToken<WritableSignal<Vie
 /**
  * DI token to inject the DOM location of the {@link WorkbenchComponent} HTML element.
  */
-export const WORKBENCH_ELEMENT_REF = new InjectionToken<WritableSignal<ViewContainerRef | undefined>>('WORKBENCH_ELEMENT_REF', {
+export const WORKBENCH_COMPONENT_REF = new InjectionToken<WritableSignal<ViewContainerRef | undefined>>('WORKBENCH_COMPONENT_REF', {
   providedIn: 'root',
   factory: () => signal(undefined),
 });
+
+/**
+ * DI token to inject the bounds of the {@link WorkbenchComponent} HTML element.
+ */
+export const WORKBENCH_COMPONENT_BOUNDS = new InjectionToken<Signal<DOMRect | undefined>>('WORKBENCH_COMPONENT_BOUNDS', {
+  providedIn: 'root',
+  factory: () => {
+    const workbenchElement = inject(WORKBENCH_COMPONENT_REF);
+    return boundingClientRect(computed(() => workbenchElement()?.element.nativeElement as HTMLElement | undefined));
+  },
+});
+
+/**
+ * DI token to inject the workbench element available in the current context.
+ */
+export const WORKBENCH_ELEMENT = new InjectionToken<WorkbenchElement>('WORKBENCH_ELEMENT');

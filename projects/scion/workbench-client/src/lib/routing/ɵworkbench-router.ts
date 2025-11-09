@@ -1,0 +1,110 @@
+/*
+ * Copyright (c) 2018-2022 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
+import {IntentClient, mapToBody, MessageClient, Qualifier, RequestError} from '@scion/microfrontend-platform';
+import {Beans} from '@scion/toolkit/bean-manager';
+import {WorkbenchView} from '../view/workbench-view';
+import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
+import {Dictionaries, Dictionary, Maps} from '@scion/toolkit/util';
+import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
+import {lastValueFrom} from 'rxjs';
+import {Empty} from '../common/utility-types';
+import {WorkbenchNavigationExtras, WorkbenchRouter} from './workbench-router';
+
+/**
+ * @ignore
+ * @docs-private Not public API. For internal use only.
+ */
+export class ɵWorkbenchRouter implements WorkbenchRouter {
+
+  /** @inheritDoc */
+  public async navigate(qualifier: Qualifier | Empty<Qualifier>, extras?: WorkbenchNavigationExtras): Promise<boolean> {
+    if (this.isSelfNavigation(qualifier)) {
+      return this.updateViewParams(extras);
+    }
+    else {
+      return this.issueViewIntent(qualifier, extras);
+    }
+  }
+
+  private async issueViewIntent(qualifier: Qualifier, extras?: WorkbenchNavigationExtras): Promise<boolean> {
+    const navigationExtras: WorkbenchNavigationExtras = {
+      ...extras,
+      params: undefined, // included in the intent
+      paramsHandling: undefined, // only applicable for self-navigation
+    };
+    const navigate$ = Beans.get(IntentClient).request$<boolean>({type: WorkbenchCapabilities.View, qualifier, params: Maps.coerce(extras?.params)}, navigationExtras);
+    try {
+      return await lastValueFrom(navigate$.pipe(mapToBody()));
+    }
+    catch (error) {
+      throw (error instanceof RequestError ? error.message : error);
+    }
+  }
+
+  private async updateViewParams(extras?: WorkbenchNavigationExtras): Promise<boolean> {
+    const viewCapabilityId = Beans.get(WorkbenchView).snapshot.params.get(ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID) as string | undefined;
+    if (viewCapabilityId === undefined) {
+      return false; // Params cannot be updated until the loading of the view is completed
+    }
+
+    const command: ɵViewParamsUpdateCommand = {
+      params: Dictionaries.coerce(extras?.params),
+      paramsHandling: extras?.paramsHandling,
+    };
+    const updateParams$ = Beans.get(MessageClient).request$<boolean>(ɵWorkbenchCommands.viewParamsUpdateTopic(Beans.get(WorkbenchView).id, viewCapabilityId), command);
+    try {
+      return await lastValueFrom(updateParams$.pipe(mapToBody()));
+    }
+    catch (error) {
+      throw (error instanceof RequestError ? error.message : error);
+    }
+  }
+
+  private isSelfNavigation(qualifier: Qualifier | Empty<Qualifier>): boolean {
+    if (Object.keys(qualifier).length === 0) {
+      if (!Beans.opt(WorkbenchView)) {
+        throw Error('[NavigateError] Self-navigation is supported only if in the context of a view.');
+      }
+      return true;
+    }
+    return false;
+  }
+}
+
+/**
+ * Command object for instructing the Workbench Router to update view params in self-navigation.
+ *
+ * @docs-private Not public API. For internal use only.
+ * @ignore
+ */
+export interface ɵViewParamsUpdateCommand {
+  /**
+   * @see WorkbenchNavigationExtras#params
+   */
+  params: Dictionary;
+  /**
+   * @see WorkbenchNavigationExtras#paramsHandling
+   */
+  paramsHandling?: 'merge' | 'replace';
+}
+
+/**
+ * Named parameters used in microfrontend routes.
+ *
+ * @docs-private Not public API. For internal use only.
+ * @ignore
+ */
+export enum ɵMicrofrontendRouteParams {
+  /**
+   * Named path segment in the microfrontend route representing the view capability for which to embed its microfrontend.
+   */
+  ɵVIEW_CAPABILITY_ID = 'ɵViewCapabilityId',
+}

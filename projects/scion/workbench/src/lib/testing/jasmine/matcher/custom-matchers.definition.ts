@@ -96,7 +96,7 @@ export interface CustomMatchers<T> extends jasmine.Matchers<T> {
   toBeActive(): boolean;
 
   /**
-   * Expects the view to be registered in {@link WORKBENCH_VIEW_REGISTRY} with specified properties.
+   * Expects the view to be registered in {@link WorkbenchViewRegistry} with specified properties.
    *
    * The actual value must be a view id.
    *

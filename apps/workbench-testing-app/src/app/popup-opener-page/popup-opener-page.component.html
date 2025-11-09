@@ -12,8 +12,8 @@
       </select>
     </sci-form-field>
 
-    <sci-form-field label="Contextual View ID">
-      <input [formControl]="form.controls.contextualViewId" class="e2e-contextual-view-id" placeholder="Reference to the view to bind this popup to; can be empty string (default), <null>, or a view id">
+    <sci-form-field label="Context">
+      <input [formControl]="form.controls.context" class="e2e-context" placeholder="Part ID, View ID, Dialog ID, Popup ID, or <null>" [attr.list]="nullList">
     </sci-form-field>
 
     <sci-form-field label="Align">
@@ -133,3 +133,7 @@
     {{popupError}}
   </output>
 }
+
+<datalist [attr.id]="nullList">
+  <option value="<null>"></option>
+</datalist>

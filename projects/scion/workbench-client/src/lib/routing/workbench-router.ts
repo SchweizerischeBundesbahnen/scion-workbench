@@ -8,13 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {IntentClient, mapToBody, MessageClient, Qualifier, RequestError} from '@scion/microfrontend-platform';
-import {Beans} from '@scion/toolkit/bean-manager';
-import {WorkbenchView} from '../view/workbench-view';
-import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
-import {Dictionaries, Dictionary, Maps} from '@scion/toolkit/util';
-import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
-import {lastValueFrom} from 'rxjs';
+import {Qualifier} from '@scion/microfrontend-platform';
+import {Dictionary} from '@scion/toolkit/util';
 import {Empty} from '../common/utility-types';
 import {PartId} from '../workbench.identifiers';
 
@@ -24,13 +19,12 @@ import {PartId} from '../workbench.identifiers';
  * A view is a visual workbench element for displaying content side-by-side or stacked.
  *
  * A microfrontend provided as a view capability can be opened in a view. The qualifier differentiates between different
- * view capabilities. An application can open the public view capabilities of other applications if it manifests a respective
- * intention.
+ * view capabilities. Declaring an intention allows for opening public view capabilities of other applications.
  *
  * @category Router
  * @category View
  */
-export class WorkbenchRouter {
+export abstract class WorkbenchRouter {
 
   /**
    * Navigates to a microfrontend of a view capability based on the given qualifier and extras.
@@ -45,58 +39,7 @@ export class WorkbenchRouter {
    * @param  extras - Options to control navigation.
    * @return Promise that resolves to `true` on successful navigation, or `false` otherwise.
    */
-  public async navigate(qualifier: Qualifier | Empty<Qualifier>, extras?: WorkbenchNavigationExtras): Promise<boolean> {
-    if (this.isSelfNavigation(qualifier)) {
-      return this.updateViewParams(extras);
-    }
-    else {
-      return this.issueViewIntent(qualifier, extras);
-    }
-  }
-
-  private async issueViewIntent(qualifier: Qualifier, extras?: WorkbenchNavigationExtras): Promise<boolean> {
-    const navigationExtras: WorkbenchNavigationExtras = {
-      ...extras,
-      params: undefined, // included in the intent
-      paramsHandling: undefined, // only applicable for self-navigation
-    };
-    const navigate$ = Beans.get(IntentClient).request$<boolean>({type: WorkbenchCapabilities.View, qualifier, params: Maps.coerce(extras?.params)}, navigationExtras);
-    try {
-      return await lastValueFrom(navigate$.pipe(mapToBody()));
-    }
-    catch (error) {
-      throw (error instanceof RequestError ? error.message : error);
-    }
-  }
-
-  private async updateViewParams(extras?: WorkbenchNavigationExtras): Promise<boolean> {
-    const viewCapabilityId = Beans.get(WorkbenchView).snapshot.params.get(ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID) as string | undefined;
-    if (viewCapabilityId === undefined) {
-      return false; // Params cannot be updated until the loading of the view is completed
-    }
-
-    const command: ɵViewParamsUpdateCommand = {
-      params: Dictionaries.coerce(extras?.params),
-      paramsHandling: extras?.paramsHandling,
-    };
-    const updateParams$ = Beans.get(MessageClient).request$<boolean>(ɵWorkbenchCommands.viewParamsUpdateTopic(Beans.get(WorkbenchView).id, viewCapabilityId), command);
-    try {
-      return await lastValueFrom(updateParams$.pipe(mapToBody()));
-    }
-    catch (error) {
-      throw (error instanceof RequestError ? error.message : error);
-    }
-  }
-
-  private isSelfNavigation(qualifier: Qualifier | Empty<Qualifier>): boolean {
-    if (Object.keys(qualifier).length === 0) {
-      if (!Beans.opt(WorkbenchView)) {
-        throw Error('[NavigateError] Self-navigation is supported only if in the context of a view.');
-      }
-      return true;
-    }
-    return false;
-  }
+  public abstract navigate(qualifier: Qualifier | Empty<Qualifier>, extras?: WorkbenchNavigationExtras): Promise<boolean>;
 }
 
 /**
@@ -129,9 +72,9 @@ export interface WorkbenchNavigationExtras {
    * Controls where to open the view. Defaults to `auto`.
    *
    * One of:
-   * - 'auto':   Navigates existing views that match the qualifier and required params, or opens a new view otherwise. Optional parameters do not affect view resolution.
-   * - 'blank':  Opens a new view and navigates it.
-   * - <viewId>: Navigates the specified view. If already opened, replaces it, or opens a new view otherwise.
+   * - `auto`:   Navigates existing views that match the qualifier and required params, or opens a new view otherwise. Optional parameters do not affect view resolution.
+   * - `blank`:  Opens a new view and navigates it.
+   * - `<viewId>`: Navigates the specified view. If already opened, replaces it, or opens a new view otherwise.
    */
   target?: string | 'blank' | 'auto';
   /**
@@ -163,34 +106,4 @@ export interface WorkbenchNavigationExtras {
    * Specifies CSS class(es) to add to the view, e.g., to locate the view in tests.
    */
   cssClass?: string | string[];
-}
-
-/**
- * Command object for instructing the Workbench Router to update view params in self-navigation.
- *
- * @docs-private Not public API. For internal use only.
- * @ignore
- */
-export interface ɵViewParamsUpdateCommand {
-  /**
-   * @see WorkbenchNavigationExtras#params
-   */
-  params: Dictionary;
-  /**
-   * @see WorkbenchNavigationExtras#paramsHandling
-   */
-  paramsHandling?: 'merge' | 'replace';
-}
-
-/**
- * Named parameters used in microfrontend routes.
- *
- * @docs-private Not public API. For internal use only.
- * @ignore
- */
-export enum ɵMicrofrontendRouteParams {
-  /**
-   * Named path segment in the microfrontend route representing the view capability for which to embed its microfrontend.
-   */
-  ɵVIEW_CAPABILITY_ID = 'ɵViewCapabilityId',
 }

@@ -7,9 +7,9 @@
                        [name]="view.id"
                        [attr.data-capabilityid]="capability()?.metadata!.id"
                        [attr.data-app]="capability()?.metadata!.appSymbolicName"
+                       [keystrokes]="keystrokesToBubble()"
                        [class]="view.classList.asList()"
-                       (focuswithin)="onFocusWithin($event)"
-                       [keystrokes]="keystrokesToBubble()">
+                       (focuswithin)="onFocusWithin($event)">
       <ng-container *ngComponentOutlet="splash"/>
     </sci-router-outlet>
   </div>

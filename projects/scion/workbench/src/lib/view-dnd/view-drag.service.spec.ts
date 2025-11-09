@@ -5,7 +5,7 @@ import {MAIN_AREA} from '../layout/workbench-layout';
 import {ViewDragData, ViewDragService} from './view-drag.service';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
-import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
+import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 import {UUID} from '@scion/toolkit/uuid';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {WorkbenchComponent} from '../workbench.component';
@@ -79,7 +79,7 @@ describe('ViewDragService', () => {
     TestBed.createComponent(WorkbenchComponent);
     await waitUntilWorkbenchStarted();
 
-    const workbenchPartRegistry = TestBed.inject(WORKBENCH_PART_REGISTRY);
+    const workbenchPartRegistry = TestBed.inject(WorkbenchPartRegistry);
     const viewDragService = TestBed.inject(ViewDragService);
 
     // Simulate dragging view.
@@ -105,7 +105,7 @@ describe('ViewDragService', () => {
     TestBed.createComponent(WorkbenchComponent);
     await waitUntilWorkbenchStarted();
 
-    const workbenchPartRegistry = TestBed.inject(WORKBENCH_PART_REGISTRY);
+    const workbenchPartRegistry = TestBed.inject(WorkbenchPartRegistry);
     const viewDragService = TestBed.inject(ViewDragService);
 
     // Simulate dragging view.
@@ -130,7 +130,7 @@ describe('ViewDragService', () => {
     TestBed.createComponent(WorkbenchComponent);
     await waitUntilWorkbenchStarted();
 
-    const workbenchPartRegistry = TestBed.inject(WORKBENCH_PART_REGISTRY);
+    const workbenchPartRegistry = TestBed.inject(WorkbenchPartRegistry);
     const viewDragService = TestBed.inject(ViewDragService);
 
     // Simulate dragging activity view.
@@ -158,7 +158,7 @@ describe('ViewDragService', () => {
     TestBed.createComponent(WorkbenchComponent);
     await waitUntilWorkbenchStarted();
 
-    const workbenchPartRegistry = TestBed.inject(WORKBENCH_PART_REGISTRY);
+    const workbenchPartRegistry = TestBed.inject(WorkbenchPartRegistry);
     const viewDragService = TestBed.inject(ViewDragService);
 
     // Simulate dragging activity view.
@@ -184,7 +184,7 @@ describe('ViewDragService', () => {
     TestBed.createComponent(WorkbenchComponent);
     await waitUntilWorkbenchStarted();
 
-    const workbenchPartRegistry = TestBed.inject(WORKBENCH_PART_REGISTRY);
+    const workbenchPartRegistry = TestBed.inject(WorkbenchPartRegistry);
     const viewDragService = TestBed.inject(ViewDragService);
 
     // Simulate dragging activity view.
@@ -209,7 +209,7 @@ describe('ViewDragService', () => {
     TestBed.createComponent(WorkbenchComponent);
     await waitUntilWorkbenchStarted();
 
-    const workbenchPartRegistry = TestBed.inject(WORKBENCH_PART_REGISTRY);
+    const workbenchPartRegistry = TestBed.inject(WorkbenchPartRegistry);
     const viewDragService = TestBed.inject(ViewDragService);
 
     // Simulate dragging activity view of different window.
@@ -234,7 +234,7 @@ describe('ViewDragService', () => {
     TestBed.createComponent(WorkbenchComponent);
     await waitUntilWorkbenchStarted();
 
-    const workbenchPartRegistry = TestBed.inject(WORKBENCH_PART_REGISTRY);
+    const workbenchPartRegistry = TestBed.inject(WorkbenchPartRegistry);
     const viewDragService = TestBed.inject(ViewDragService);
 
     // Simulate dragging activity view of different window.

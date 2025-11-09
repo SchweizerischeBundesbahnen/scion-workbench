@@ -8,18 +8,20 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {InjectionToken} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
-import {WorkbenchObjectRegistry} from '../registry/workbench-object-registry';
+import {WorkbenchElementRegistry} from '../registry/workbench-element-registry';
 import {PartId} from '../workbench.identifiers';
 
 /**
- * Registry for {@link WorkbenchPart} model objects.
+ * Registry for {@link WorkbenchPart} elements.
  */
-export const WORKBENCH_PART_REGISTRY = new InjectionToken<WorkbenchObjectRegistry<PartId, ɵWorkbenchPart>>('WORKBENCH_PART_REGISTRY', {
-  providedIn: 'root',
-  factory: () => new WorkbenchObjectRegistry<PartId, ɵWorkbenchPart>({
-    nullObjectErrorFn: partId => Error(`[NullPartError] Part '${partId}' not found.`),
-    onUnregister: part => part.destroy(),
-  }),
-});
+@Injectable({providedIn: 'root'})
+export class WorkbenchPartRegistry extends WorkbenchElementRegistry<PartId, ɵWorkbenchPart> {
+  constructor() {
+    super({
+      nullElementErrorFn: partId => Error(`[NullPartError] Part '${partId}' not found.`),
+      onUnregister: part => part.destroy(),
+    });
+  }
+}

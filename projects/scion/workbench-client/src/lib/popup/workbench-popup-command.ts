@@ -9,10 +9,10 @@
  */
 
 import {CloseStrategy} from './workbench-popup.config';
-import {PopupId, ViewId} from '../workbench.identifiers';
+import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 
 /**
- * Command object for instructing the Workbench to open the microfrontend of given popup capability in a popup.
+ * Command to open a popup.
  *
  * @docs-private Not public API. For internal use only.
  * @ignore
@@ -22,7 +22,15 @@ export interface ɵWorkbenchPopupCommand {
   align?: 'east' | 'west' | 'north' | 'south';
   closeStrategy?: CloseStrategy;
   cssClass?: string | string[];
-  context?: {
-    viewId?: ViewId | null;
-  };
+  context?: ViewId | PartId | DialogId | PopupId | Context | null;
+}
+
+/**
+ * @deprecated since version 1.0.0-beta.34. Set view id directly. Migrate `{context: {viewId: 'view.x'}}` to `{context: 'view.x'}`. Marked for removal.
+ */
+interface Context {
+  /**
+   * @deprecated since version 1.0.0-beta.34. Set view id directly. Migrate `{context: {viewId: 'view.x'}}` to `{context: 'view.x'}`. Marked for removal.
+   */
+  viewId?: ViewId | null;
 }

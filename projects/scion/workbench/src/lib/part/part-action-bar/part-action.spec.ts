@@ -18,8 +18,17 @@ import {UUID} from '@scion/toolkit/uuid';
 import {WorkbenchPart} from '../workbench-part.model';
 import {expect} from '../../testing/jasmine/matcher/custom-matchers.definition';
 import {By} from '@angular/platform-browser';
+import {WorkbenchDialogService} from '../../dialog/workbench-dialog.service';
+import {provideRouter} from '@angular/router';
+import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
+import {toShowCustomMatcher} from '../../testing/jasmine/matcher/to-show.matcher';
+import {WorkbenchPartActionDirective} from './part-action.directive';
 
 describe('PartAction', () => {
+
+  beforeEach(() => {
+    jasmine.addMatchers(toShowCustomMatcher);
+  });
 
   it('should retain order when updating action', async () => {
     TestBed.configureTestingModule({
@@ -385,6 +394,162 @@ describe('PartAction', () => {
     partFilter.set('part.right');
     expect(leftPart.actions()).toEqual([]);
     expect(rightPart.actions()).toEqual([jasmine.objectContaining({cssClass: 'testee'})]);
+  });
+
+  it('should construct part action in part injection context', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          layout: factory => factory
+            .addPart('part.main')
+            .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity', ɵactivityId: 'activity.1'})
+            .navigatePart('part.activity', ['path/to/part'])
+            .activatePart('part.activity'),
+        }),
+        provideRouter([
+          {path: 'path/to/part', loadComponent: () => SpecPartComponent},
+        ]),
+      ],
+    });
+
+    @Component({
+      selector: 'spec-dialog',
+      template: 'Dialog',
+    })
+    class SpecDialogComponent {
+    }
+
+    @Component({
+      selector: 'spec-part-action',
+      template: 'Part Action',
+      host: {
+        '(click)': 'onClick()',
+      },
+    })
+    class SpecPartActionComponent {
+
+      private _dialogService = inject(WorkbenchDialogService);
+
+      protected onClick(): void {
+        void this._dialogService.open(SpecDialogComponent);
+      }
+    }
+
+    @Component({
+      selector: 'spec-part',
+      template: '<ng-template wbPartAction><spec-part-action/></ng-template>',
+      imports: [
+        SpecPartActionComponent,
+        WorkbenchPartActionDirective,
+      ],
+    })
+    class SpecPartComponent {
+    }
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    const body = fixture.debugElement.parent!;
+    await waitUntilWorkbenchStarted();
+
+    // Click part action.
+    const partActionComponent = fixture.debugElement.query(By.directive(SpecPartActionComponent)).nativeElement as HTMLElement;
+    partActionComponent.click();
+    await fixture.whenStable();
+
+    // Expect dialog to display.
+    expect(body).toShow(SpecDialogComponent);
+
+    // Close docked part.
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.1'));
+    await fixture.whenStable();
+
+    // Expect dialog not to display.
+    expect(body).not.toShow(SpecDialogComponent);
+
+    // Open docked part.
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.1'));
+    await fixture.whenStable();
+
+    // Expect dialog to display.
+    expect(body).toShow(SpecDialogComponent);
+  });
+
+  it('should construct part action in view injection context', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          layout: factory => factory
+            .addPart('part.main')
+            .addView('view.1', {partId: 'part.main'})
+            .addView('view.2', {partId: 'part.main'})
+            .navigateView('view.1', ['path/to/view'])
+            .navigateView('view.2', ['path/to/view'])
+            .activateView('view.1'),
+        }),
+        provideRouter([
+          {path: 'path/to/view', loadComponent: () => SpecViewComponent},
+        ]),
+      ],
+    });
+
+    @Component({
+      selector: 'spec-dialog',
+      template: 'Dialog',
+    })
+    class SpecDialogComponent {
+    }
+
+    @Component({
+      selector: 'spec-part-action',
+      template: 'Part Action',
+      host: {
+        '(click)': 'onClick()',
+      },
+    })
+    class SpecPartActionComponent {
+
+      private _dialogService = inject(WorkbenchDialogService);
+
+      protected onClick(): void {
+        void this._dialogService.open(SpecDialogComponent);
+      }
+    }
+
+    @Component({
+      selector: 'spec-view',
+      template: '<ng-template wbPartAction><spec-part-action/></ng-template>',
+      imports: [
+        SpecPartActionComponent,
+        WorkbenchPartActionDirective,
+      ],
+    })
+    class SpecViewComponent {
+    }
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    const body = fixture.debugElement.parent!;
+    await waitUntilWorkbenchStarted();
+
+    // Click part action.
+    const partActionComponent = fixture.debugElement.query(By.directive(SpecPartActionComponent)).nativeElement as HTMLElement;
+    partActionComponent.click();
+    await fixture.whenStable();
+
+    // Expect dialog to display.
+    expect(body).toShow(SpecDialogComponent);
+
+    // Activate view.2.
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.activateView('view.2'));
+    await fixture.whenStable();
+
+    // Expect dialog not to display.
+    expect(body).not.toShow(SpecDialogComponent);
+
+    // Activate view.1.
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.activateView('view.1'));
+    await fixture.whenStable();
+
+    // Expect dialog to display.
+    expect(body).toShow(SpecDialogComponent);
   });
 
   describe('Template PartAction', () => {

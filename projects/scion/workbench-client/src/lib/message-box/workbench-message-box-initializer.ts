@@ -25,6 +25,7 @@ export class WorkbenchMessageBoxInitializer implements Initializer {
     const messageBoxContext = await Beans.get(ContextService).lookup<ɵMessageBoxContext>(ɵMESSAGE_BOX_CONTEXT);
     if (messageBoxContext !== null) {
       Beans.register(WorkbenchMessageBox, {useValue: new ɵWorkbenchMessageBox(messageBoxContext)});
+      Beans.register(Symbol.for('WORKBENCH_ELEMENT'), {useExisting: WorkbenchMessageBox});
     }
   }
 }

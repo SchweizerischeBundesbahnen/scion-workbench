@@ -217,11 +217,11 @@ export abstract class WorkbenchConfig {
    */
   public abstract dialog?: {
     /**
-     * Configures the area to block for application-modal dialogs. If not set, defaults to `workbench`.
+     * Configures the area to block for application-modal dialogs. Defaults to `workbench`.
      *
-     * - **workbench:** blocks the {@link WorkbenchComponent|workbench element}, still allowing interaction with elements outside the workbench element.
-     *
-     * - **viewport** blocks the browser viewport, preventing interaction with the application until application-modal dialogs are closed.
+     * One of:
+     * - `workbench`: Blocks the workbench, still allowing interaction with elements outside the workbench.
+     * - `viewport`: Blocks the browser viewport, preventing interaction with the application until application-modal dialogs are closed.
      */
     modalityScope?: 'workbench' | 'viewport';
   };

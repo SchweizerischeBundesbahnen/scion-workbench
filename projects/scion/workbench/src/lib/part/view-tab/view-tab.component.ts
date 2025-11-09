@@ -9,7 +9,7 @@
  */
 
 import {Component, computed, ElementRef, HostListener, inject, Injector, input, Signal} from '@angular/core';
-import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
+import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {VIEW_DRAG_TRANSFER_TYPE, ViewDragService} from '../../view-dnd/view-drag.service';
 import {createElement} from '../../common/dom.util';
 import {CdkPortalOutlet, ComponentPortal} from '@angular/cdk/portal';
@@ -55,7 +55,7 @@ export class ViewTabComponent {
 
   private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _workbenchConfig = inject(WorkbenchConfig);
-  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _viewRegistry = inject(WorkbenchViewRegistry);
   private readonly _viewMenuService = inject(ViewMenuService);
   private readonly _layout = inject(WorkbenchLayoutService).layout;
   private readonly _injector = inject(Injector);

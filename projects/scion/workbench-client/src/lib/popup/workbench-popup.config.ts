@@ -11,10 +11,10 @@
 import {Observable} from 'rxjs';
 import {Dictionary} from '@scion/toolkit/util';
 import {PopupOrigin} from './popup.origin';
-import {ViewId} from '../workbench.identifiers';
+import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 
 /**
- * Configures the popup to display a microfrontend in a workbench popup using {@link WorkbenchPopupService}.
+ * Controls the appearance and behavior of a popup.
  *
  * @category Popup
  */
@@ -22,18 +22,16 @@ export interface WorkbenchPopupConfig {
   /**
    * Controls where to open the popup.
    *
-   * Can be an HTML element or coordinates:
-   * - Using an element: The popup opens and sticks to the element.
-   * - Using coordinates: The popup opens and sticks relative to the view or page bounds.
+   * Can be an HTML element or a coordinate. The coordinate is relative to the {@link context}, defaulting to the calling context.
    *
    * Supported coordinate pairs:
-   * - x/y: Relative to the top/left corner of the view or page.
+   * - x/y: Relative to the top/left corner of the context.
    * - top/left: Same as x/y.
-   * - top/right: Relative to the top/right corner.
-   * - bottom/left: Relative to the bottom/left corner.
-   * - bottom/right: Relative to the bottom/right corner.
+   * - top/right: Relative to the top/right corner of the context.
+   * - bottom/left: Relative to the bottom/left corner of the context.
+   * - bottom/right: Relative to the bottom/right corner of the context.
    *
-   * Coordinates can be updated using an Observable. The popup displays when the Observable emits the first coordinate.
+   * Passing an Observable allows for updating the coordinate.
    */
   anchor: Element | PopupOrigin | Observable<PopupOrigin>;
   /**
@@ -56,19 +54,23 @@ export interface WorkbenchPopupConfig {
    */
   cssClass?: string | string[];
   /**
-   * Specifies the context in which to open the popup.
+   * Binds the popup to a context (e.g., a part or view). Defaults to the calling context.
+   *
+   * The popup is displayed only if the context is visible and closes when the context is disposed.
+   *
+   * Set to `null` to open the popup outside a context.
    */
-  context?: {
-    /**
-     * Specifies the view the popup belongs to.
-     *
-     * Binds the popup to the lifecycle of a view so that it displays only if the view is active and closes when the view is closed.
-     *
-     * By default, if opening the popup in the context of a view, that view is used as the popup's contextual view.
-     * If you set the view id to `null`, the popup will open without referring to the contextual view.
-     */
-    viewId?: ViewId | null;
-  };
+  context?: ViewId | PartId | DialogId | PopupId | Context | null;
+}
+
+/**
+ * @deprecated since version 1.0.0-beta.34. Set view id directly. Migrate `{context: {viewId: 'view.x'}}` to `{context: 'view.x'}`. Marked for removal.
+ */
+interface Context {
+  /**
+   * @deprecated since version 1.0.0-beta.34. Set view id directly. Migrate `{context: {viewId: 'view.x'}}` to `{context: 'view.x'}`. Marked for removal.
+   */
+  viewId?: ViewId | null;
 }
 
 /**

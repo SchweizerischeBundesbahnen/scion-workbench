@@ -9,13 +9,16 @@
  */
 
 import {WorkbenchViewMenuItemFn} from '../workbench.model';
-import {InjectionToken} from '@angular/core';
-import {WorkbenchObjectRegistry} from '../registry/workbench-object-registry';
+import {Injectable} from '@angular/core';
+import {WorkbenchElementRegistry} from '../registry/workbench-element-registry';
 
 /**
  * Registry for {@link WorkbenchMenuItem} factory functions to contribute menu items to the context menu of views.
  */
-export const WORKBENCH_VIEW_MENU_ITEM_REGISTRY = new InjectionToken<WorkbenchObjectRegistry<WorkbenchViewMenuItemFn, WorkbenchViewMenuItemFn>>('WORKBENCH_VIEW_MENU_ITEM_REGISTRY', {
-  providedIn: 'root',
-  factory: () => new WorkbenchObjectRegistry<WorkbenchViewMenuItemFn, WorkbenchViewMenuItemFn>(),
-});
+@Injectable({providedIn: 'root'})
+export class WorkbenchViewMenuItemRegistry extends WorkbenchElementRegistry<WorkbenchViewMenuItemFn, WorkbenchViewMenuItemFn> {
+
+  constructor() {
+    super({}); // NG2006: Angular requires a super call
+  }
+}

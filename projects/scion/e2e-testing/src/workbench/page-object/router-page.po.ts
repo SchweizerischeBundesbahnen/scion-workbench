@@ -80,7 +80,7 @@ export class RouterPagePO implements WorkbenchViewPagePO {
     await this.checkClose(extras?.close);
     await this.enterPosition(extras?.position);
     await this.enterPartId(extras?.partId);
-    await this.checkViewContext(extras?.viewContextActive);
+    await this.enableRootContext(extras?.rootContext);
     await this.enterCssClass(extras?.cssClass);
   }
 
@@ -128,15 +128,15 @@ export class RouterPagePO implements WorkbenchViewPagePO {
     await this.locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
   }
 
-  private async checkViewContext(check?: boolean): Promise<void> {
-    if (check !== undefined) {
-      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-view-context')).toggle(check);
+  private async enableRootContext(enable?: boolean): Promise<void> {
+    if (enable !== undefined) {
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-root-context')).toggle(enable);
     }
   }
 }
 
 export interface RouterPageOptions {
-  viewContextActive?: boolean;
+  rootContext?: boolean;
   noWaitAfter?: false;
 }
 

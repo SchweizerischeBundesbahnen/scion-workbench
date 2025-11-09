@@ -24,6 +24,7 @@ export class DialogPO {
   public readonly title: Locator;
   public readonly closeButton: Locator;
   public readonly resizeHandles: Locator;
+  public readonly slot: Locator;
   public readonly footer: Locator;
 
   public readonly contentScrollbars: {
@@ -36,6 +37,7 @@ export class DialogPO {
     this.header = this.dialog.locator('header.e2e-dialog-header');
     this.title = this.header.locator('div.e2e-title > span');
     this.closeButton = this.header.locator('button.e2e-close');
+    this.slot = this.locator.locator('sci-viewport.e2e-dialog-content');
     this.footer = this.dialog.locator('footer.e2e-dialog-footer');
     this.resizeHandles = this.dialog.locator('div.e2e-resize-handle');
     this.contentScrollbars = {

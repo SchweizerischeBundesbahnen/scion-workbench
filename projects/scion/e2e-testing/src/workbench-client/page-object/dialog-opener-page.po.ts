@@ -17,22 +17,33 @@ import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
-import {ViewId, WorkbenchDialogOptions} from '@scion/workbench-client';
+import {DialogId, PartId, PopupId, ViewId, WorkbenchDialogOptions} from '@scion/workbench-client';
+import {PartPO} from '../../part.po';
+import {PopupPO} from '../../popup.po';
+import {DialogPO} from '../../dialog.po';
+import {MicrofrontendDialogPagePO} from '../../workbench/page-object/workbench-dialog-page.po';
+import {MicrofrontendPopupPagePO} from '../../workbench/page-object/workbench-popup-page.po';
 
 /**
  * Page object to interact with {@link DialogOpenerPageComponent}.
  */
-export class DialogOpenerPagePO implements MicrofrontendViewPagePO {
+export class DialogOpenerPagePO implements MicrofrontendViewPagePO, MicrofrontendDialogPagePO, MicrofrontendPopupPagePO {
 
   public readonly locator: Locator;
   public readonly view: ViewPO;
+  public readonly part: PartPO;
+  public readonly dialog: DialogPO;
+  public readonly popup: PopupPO;
   public readonly outlet: SciRouterOutletPO;
   public readonly returnValue: Locator;
   public readonly error: Locator;
 
-  constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.outlet = new SciRouterOutletPO(this._appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
+  constructor(private _appPO: AppPO, locateBy: {id?: ViewId | PartId; cssClass?: string}) {
+    this.view = this._appPO.view({viewId: locateBy.id as ViewId | undefined, cssClass: locateBy.cssClass});
+    this.part = this._appPO.part({partId: locateBy.id as PartId | undefined, cssClass: locateBy.cssClass});
+    this.dialog = this._appPO.dialog({dialogId: locateBy.id as DialogId | undefined, cssClass: locateBy.cssClass});
+    this.popup = this._appPO.popup({popupId: locateBy.id as PopupId | undefined, cssClass: locateBy.cssClass});
+    this.outlet = new SciRouterOutletPO(this._appPO, {name: locateBy.id, cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-dialog-opener-page');
     this.returnValue = this.locator.locator('output.e2e-return-value');
     this.error = this.locator.locator('output.e2e-dialog-error');
@@ -51,9 +62,8 @@ export class DialogOpenerPagePO implements MicrofrontendViewPagePO {
       await this.locator.locator('select.e2e-modality').selectOption(options.modality);
     }
 
-    if (options?.context?.viewId) {
-      await this.locator.locator('input.e2e-contextual-view-id').fill(options.context.viewId);
-    }
+    const context = options?.context && (typeof options.context === 'object' ? options.context.viewId : options.context);
+    await this.locator.locator('input.e2e-context').fill(context || (context === null ? '<null>' : '<undefined>'));
 
     if (options?.animate !== undefined) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-animate')).toggle(options.animate);

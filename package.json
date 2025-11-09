@@ -86,7 +86,7 @@
     "@scion/components": "20.0.0",
     "@scion/components.internal": "20.0.1",
     "@scion/microfrontend-platform": "1.6.0",
-    "@scion/toolkit": "2.0.1",
+    "@scion/toolkit": "2.0.2",
     "rxjs": "7.8.2",
     "tslib": "2.8.1",
     "zone.js": "0.15.1"

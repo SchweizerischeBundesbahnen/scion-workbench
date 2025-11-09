@@ -1,6 +1,7 @@
 @use '@scion/workbench';
 @use '@scion/components.internal/design' as sci-design;
 @use 'app/focus-highlight';
+@use 'app/glasspane-highlight';
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:wght@300..400');

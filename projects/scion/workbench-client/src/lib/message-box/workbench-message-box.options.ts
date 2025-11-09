@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ViewId} from '../workbench.identifiers';
+import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
@@ -54,16 +54,24 @@ export interface WorkbenchMessageBoxOptions {
   severity?: 'info' | 'warn' | 'error';
 
   /**
-   * Controls which area of the application to block by the message box.
+   * Controls which area of the application to block by the message box. Defaults to `context`.
    *
-   * - **Application-modal:**
-   *   Use to block the workbench, or the browser's viewport if configured in the workbench host application.
-   *
-   * - **View-modal:**
-   *   Use to block only the contextual view of the message box, allowing the user to interact with other views.
-   *   This is the default if opening the message box in the context of a view.
+   * One of:
+   * - `context`: Blocks a specific part of the application, as specified in {@link context}, defaulting to the calling context.
+   * - `application`: Blocks the workbench or browser viewport, based on global workbench settings.
+   * - `view`: Deprecated. Same as `context`. Marked for removal.
    */
-  modality?: 'application' | 'view';
+  modality?: 'context' | 'application' | ViewModality;
+
+  /**
+   * Binds the message box to a context (e.g., a part or view). Defaults to the calling context.
+   *
+   * The message box is displayed only if the context is visible and closes when the context is disposed.
+   * The message box is opened in the center of its context, if any, unless opened from the peripheral area.
+   *
+   * Set to `null` to open the message box outside a context.
+   */
+  context?: ViewId | PartId | DialogId | PopupId | Context | null;
 
   /**
    * Specifies if the user can select text displayed in the message box. Defaults to `false`.
@@ -81,16 +89,19 @@ export interface WorkbenchMessageBoxOptions {
    * Specifies CSS class(es) to add to the message box, e.g., to locate the message box in tests.
    */
   cssClass?: string | string[];
+}
 
+/**
+ * @deprecated since version 1.0.0-beta.34. Renamed to `context`. Marked for removal.
+ */
+type ViewModality = 'view';
+
+/**
+ * @deprecated since version 1.0.0-beta.34. Set view id directly. Migrate `{context: {viewId: 'view.x'}}` to `{context: 'view.x'}`. Marked for removal.
+ */
+interface Context {
   /**
-   * Specifies the context in which to open the message box.
+   * @deprecated since version 1.0.0-beta.34. Set view id directly. Migrate `{context: {viewId: 'view.x'}}` to `{context: 'view.x'}`. Marked for removal.
    */
-  context?: {
-    /**
-     * Allows controlling which view to block when opening a view-modal message box.
-     *
-     * By default, if opening the message box in the context of a view, that view is used as the contextual view.
-     */
-    viewId?: ViewId;
-  };
+  viewId?: ViewId | null;
 }

@@ -25,6 +25,7 @@ export class WorkbenchPartInitializer implements Initializer {
     const partContext = await Beans.get(ContextService).lookup<ɵWorkbenchPartContext>(ɵWORKBENCH_PART_CONTEXT);
     if (partContext !== null) {
       Beans.register(WorkbenchPart, {useValue: new ɵWorkbenchPart(partContext)});
+      Beans.register(Symbol.for('WORKBENCH_ELEMENT'), {useExisting: WorkbenchPart});
     }
   }
 }

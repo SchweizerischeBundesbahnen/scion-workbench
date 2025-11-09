@@ -61,8 +61,8 @@
       <sci-checkbox [formControl]="form.controls.extras.controls.close" class="e2e-close"/>
     </sci-form-field>
 
-    <sci-form-field label="View Context" title="Controls whether to navigate outside the view context (only relevant if navigating via router link)">
-      <sci-checkbox [formControl]="form.controls.viewContext" class="e2e-view-context"/>
+    <sci-form-field label="Root Injector" title="Controls whether to navigate inside root injection context (only relevant if navigating via router link)">
+      <sci-checkbox [formControl]="form.controls.rootContext" class="e2e-root-context"/>
     </sci-form-field>
 
     <sci-form-field label="CSS Class(es)">
@@ -74,7 +74,7 @@
     Navigate via Router
   </button>
 
-  <ng-container *ngTemplateOutlet="router_link; injector: form.controls.viewContext.value ? null : nullViewInjector"/>
+  <ng-container *ngTemplateOutlet="router_link; injector: form.controls.rootContext.value ? nullContextInjector : null"/>
   <ng-template #router_link>
     <!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
     <!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->

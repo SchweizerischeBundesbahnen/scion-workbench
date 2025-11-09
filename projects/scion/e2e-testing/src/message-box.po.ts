@@ -24,10 +24,10 @@ export class MessageBoxPO {
   public readonly title: Locator;
   public readonly actions: Locator;
 
-  constructor(private _dialog: DialogPO) {
-    this.locator = this._dialog.locator.locator('wb-message-box');
-    this._header = this._dialog.header.locator('wb-message-box-header');
-    this._footer = this._dialog.footer.locator('wb-message-box-footer');
+  constructor(public dialog: DialogPO) {
+    this.locator = this.dialog.locator.locator('wb-message-box');
+    this._header = this.dialog.header.locator('wb-message-box-header');
+    this._footer = this.dialog.footer.locator('wb-message-box-footer');
     this.title = this._header.locator('span.e2e-title');
     this.actions = this._footer.locator('button.e2e-action');
   }
@@ -51,6 +51,6 @@ export class MessageBoxPO {
   }
 
   public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this._dialog.getDialogBoundingBox());
+    return fromRect(await this.dialog.getDialogBoundingBox());
   }
 }

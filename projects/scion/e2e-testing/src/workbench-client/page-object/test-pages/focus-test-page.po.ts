@@ -13,6 +13,7 @@ import {SciRouterOutletPO} from '../sci-router-outlet.po';
 import {DialogId, PartId, PopupId, ViewId} from '@scion/workbench-client';
 import {AppPO} from '../../../app.po';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
+import {RequireOne} from '../../../helper/utility-types';
 
 /**
  * Page object to interact with {@link FocusTestPageComponent}.
@@ -25,8 +26,8 @@ export class FocusTestPagePO {
   public middleField: Locator;
   public lastField: Locator;
 
-  constructor(appPO: AppPO, locateBy: {id?: PartId | ViewId | DialogId | PopupId}) {
-    const outlet = new SciRouterOutletPO(appPO, {name: locateBy.id});
+  constructor(appPO: AppPO, locateBy: RequireOne<{id: PartId | ViewId | DialogId | PopupId; cssClass: string}>) {
+    const outlet = new SciRouterOutletPO(appPO, {name: locateBy.id, cssClass: locateBy.cssClass});
     this.locator = outlet.frameLocator.locator('app-focus-test-page');
     this.firstField = this.locator.locator('input.e2e-first-field');
     this.middleField = this.locator.locator('input.e2e-middle-field');

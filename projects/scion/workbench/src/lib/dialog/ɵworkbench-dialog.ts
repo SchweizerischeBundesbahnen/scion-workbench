@@ -8,71 +8,64 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {BehaviorSubject, concatWith, delay, firstValueFrom, map, of, Subject, switchMap} from 'rxjs';
-import {ApplicationRef, assertNotInReactiveContext, ComponentRef, computed, effect, EnvironmentInjector, inject, Injector, Signal, signal, untracked} from '@angular/core';
+import {BehaviorSubject, concatWith, delay, firstValueFrom, of, Subject, switchMap} from 'rxjs';
+import {assertNotInReactiveContext, ComponentRef, computed, DestroyableInjector, DestroyRef, effect, inject, Injector, Signal, signal, untracked} from '@angular/core';
 import {WorkbenchDialog, WorkbenchDialogSize, ɵWorkbenchDialogSize} from './workbench-dialog';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
 import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
 import {Overlay, OverlayRef} from '@angular/cdk/overlay';
 import {WorkbenchDialogComponent} from './workbench-dialog.component';
-import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {WorkbenchDialogRegistry} from './workbench-dialog.registry';
-import {ɵDestroyRef} from '../common/ɵdestroy-ref';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {setStyle} from '../common/dom.util';
 import {fromResize$} from '@scion/toolkit/observable';
 import {ViewDragService} from '../view-dnd/view-drag.service';
-import {WORKBENCH_ELEMENT_REF} from '../workbench-element-references';
+import {WORKBENCH_COMPONENT_BOUNDS, WORKBENCH_COMPONENT_REF, WORKBENCH_ELEMENT} from '../workbench-element-references';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchConfig} from '../workbench-config';
-import {distinctUntilChanged, filter} from 'rxjs/operators';
+import {distinctUntilChanged} from 'rxjs/operators';
 import {WorkbenchDialogActionDirective} from './dialog-footer/workbench-dialog-action.directive';
 import {WorkbenchDialogFooterDirective} from './dialog-footer/workbench-dialog-footer.directive';
 import {WorkbenchDialogHeaderDirective} from './dialog-header/workbench-dialog-header.directive';
 import {Disposable} from '../common/disposable';
 import {Blockable} from '../glass-pane/blockable';
 import {Blocking} from '../glass-pane/blocking';
-import {provideViewContext} from '../view/view-context-provider';
 import {boundingClientRect} from '@scion/components/dimension';
 import {Translatable} from '../text/workbench-text-provider.model';
 import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
 import {DialogId} from '../workbench.identifiers';
+import {provideContextAwareServices} from '../context-aware-service-provider';
+import {WorkbenchInvocationContext} from '../invocation-context/invocation-context';
 
 /** @inheritDoc */
 export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Blockable, Blocking {
 
-  private readonly _dialogEnvironmentInjector = inject(EnvironmentInjector);
+  /** Injector for the dialog; destroyed when the dialog is closed. */
+  public readonly injector = inject(Injector) as DestroyableInjector;
 
   private readonly _overlayRef: OverlayRef;
   private readonly _portal: ComponentPortal<WorkbenchDialogComponent>;
   private readonly _workbenchDialogRegistry = inject(WorkbenchDialogRegistry);
   private readonly _workbenchConfig = inject(WorkbenchConfig);
-  private readonly _destroyRef = new ɵDestroyRef();
   private readonly _blink$ = new Subject<void>();
   private readonly _focusMonitor = inject(WorkbenchFocusMonitor);
-  private readonly _attached: Signal<boolean>;
   private readonly _title = signal<Translatable | undefined>(undefined);
   private readonly _closable = signal(true);
   private readonly _resizable = signal(true);
   private readonly _padding = signal(true);
   private readonly _cssClass = signal<string[]>([]);
 
-  /**
-   * Result (or error) to be passed to the dialog opener.
-   */
+  /** Result (or error) to be passed to the dialog opener. */
   private _result: R | Error | undefined;
-  private _componentRef: ComponentRef<WorkbenchDialogComponent> | undefined;
+  private _componentRef = signal<ComponentRef<WorkbenchDialogComponent> | undefined>(undefined);
 
-  /**
-   * Indicates whether this dialog is blocked by other dialog(s) that overlay this dialog.
-   */
-  public readonly blockedBy$ = new BehaviorSubject<ɵWorkbenchDialog | null>(null);
+  public readonly blockedBy: Signal<ɵWorkbenchDialog | null>;
   public readonly size: WorkbenchDialogSize = new ɵWorkbenchDialogSize();
   public readonly focused = computed(() => this._focusMonitor.activeElement()?.id === this.id);
+  public readonly attached: Signal<boolean>;
+  public readonly destroyed = signal<boolean>(false);
+  public readonly bounds = boundingClientRect(computed(() => this._componentRef()?.instance.dialogContent()));
   public readonly blinking$ = new BehaviorSubject(false);
-  public readonly context = {
-    view: inject(ɵWorkbenchView, {optional: true}),
-  };
 
   public header: WorkbenchDialogHeaderDirective | undefined;
   public footer: WorkbenchDialogFooterDirective | undefined;
@@ -80,38 +73,44 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
 
   constructor(public id: DialogId,
               public component: ComponentType<unknown>,
+              public invocationContext: WorkbenchInvocationContext | null,
               private _options: WorkbenchDialogOptions) {
     this._overlayRef = this.createOverlay();
     this._portal = this.createPortal();
     this._cssClass.set(Arrays.coerce(this._options.cssClass));
-    this._attached = this.monitorHostElementAttached();
-
-    this.stickToHostElement();
-    this.blockWhenNotOnTop();
+    this.attached = this.monitorHostElementAttached();
+    this.blockedBy = this.computeBlocked();
+    this.bindToHostElement();
     this.restoreFocusOnAttach();
     this.restoreFocusOnUnblock();
+    this.closeOnHostDestroy();
     this.blinkOnRequest();
+
+    inject(DestroyRef).onDestroy(() => this.destroyed.set(true));
   }
 
-  public async open(): Promise<R | undefined> {
+  /**
+   * Waits for the dialog to close, resolving to its result or rejecting if closed with an error.
+   */
+  public async waitForClose(): Promise<R | undefined> {
     // Wait for the overlay to be initially positioned to have a smooth slide-in animation.
     if (this.animate) {
       await firstValueFrom(fromResize$(this._overlayRef.hostElement));
     }
 
     // Attach the dialog portal to the overlay.
-    this._componentRef = this._overlayRef.attach(this._portal);
+    this._componentRef.set(this._overlayRef.attach(this._portal));
 
     // Ensure to destroy this handle on browser back/forward navigation.
-    this._componentRef.onDestroy(() => this.destroy());
+    this._componentRef()!.onDestroy(() => this.destroy());
 
     // Trigger a manual change detection cycle to avoid 'ExpressionChangedAfterItHasBeenCheckedError'
     // when the dialog sets dialog-specific properties such as title or size during construction.
-    this._componentRef.changeDetectorRef.detectChanges();
+    this._componentRef()!.changeDetectorRef.detectChanges();
 
     // Wait for the dialog to close, resolving to its result or rejecting if closed with an error.
     return new Promise<R | undefined>((resolve, reject) => {
-      this._destroyRef.onDestroy(() => {
+      this.injector.get(DestroyRef).onDestroy(() => {
         this._result instanceof Error ? reject(this._result) : resolve(this._result);
       });
     });
@@ -120,6 +119,12 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   /** @inheritDoc */
   public close(result?: R | Error): void {
     assertNotInReactiveContext(this.close, 'Call WorkbenchDialog.close() in a non-reactive (non-tracking) context, such as within the untracked() function.');
+
+    // Prevent closing if blocked.
+    if (this.blockedBy()) {
+      return;
+    }
+
     this._result = result;
     this.destroy();
   }
@@ -140,8 +145,8 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
 
   /** @inheritDoc */
   public focus(): void {
-    if (!this.blockedBy$.value) {
-      this._componentRef?.instance.focus();
+    if (!this.blockedBy()) {
+      this._componentRef()?.instance.focus();
     }
   }
 
@@ -243,26 +248,20 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   }
 
   /**
-   * Reference to the handle's injector. The injector will be destroyed when closing the dialog.
+   * Creates a portal to render {@link WorkbenchDialogComponent} in the dialog's injection context.
    */
-  public get injector(): Injector {
-    return this._dialogEnvironmentInjector;
-  }
-
   private createPortal(): ComponentPortal<WorkbenchDialogComponent> {
-    return new ComponentPortal(WorkbenchDialogComponent, null, Injector.create({
-      // Use the root environment injector instead of the dialog's environment injector.
-      // Otherwise, if an application-modal dialog opens a view-modal dialog, the view-modal dialog
-      // would not open because it uses the same environment injector, which, however, was destroyed
-      // when closed the application-modal dialog. View-modal dialogs are only opened after
-      // all application-modal dialogs have been closed.
-      parent: this._options.injector ?? inject(ApplicationRef).injector,
+    const injector = Injector.create({
+      parent: this._options.injector ?? inject(Injector),
       providers: [
-        provideViewContext(this.context.view),
         {provide: ɵWorkbenchDialog, useValue: this},
         {provide: WorkbenchDialog, useExisting: ɵWorkbenchDialog},
+        {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchDialog},
+        provideContextAwareServices(),
       ],
-    }));
+    });
+    inject(DestroyRef).onDestroy(() => injector.destroy());
+    return new ComponentPortal(WorkbenchDialogComponent, null, injector);
   }
 
   /**
@@ -283,7 +282,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
    */
   private restoreFocusOnAttach(): void {
     effect(() => {
-      const attached = this._attached();
+      const attached = this.attached();
       untracked(() => attached && this.focus());
     });
   }
@@ -292,45 +291,41 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
    * Restores focus when unblocking this dialog.
    */
   private restoreFocusOnUnblock(): void {
-    this.blockedBy$
-      .pipe(
-        filter(blockedBy => !blockedBy),
-        takeUntilDestroyed(),
-      )
-      .subscribe(() => {
-        this.focus();
-      });
+    effect(() => {
+      const blocked = this.blockedBy();
+      untracked(() => !blocked && this.focus());
+    });
   }
 
   /**
    * Monitors attachment of the host element.
    */
   private monitorHostElementAttached(): Signal<boolean> {
-    if (this.context.view) {
-      return this.context.view.slot.portal.attached;
+    if (this.invocationContext) {
+      return this.invocationContext.attached;
     }
     if (this._workbenchConfig.dialog?.modalityScope === 'viewport') {
       return computed(() => true);
     }
-    const workbenchElementRef = inject(WORKBENCH_ELEMENT_REF);
-    return computed(() => !!workbenchElementRef());
+    const workbenchComponentRef = inject(WORKBENCH_COMPONENT_REF);
+    return computed(() => !!workbenchComponentRef());
   }
 
   /**
-   * Aligns this dialog with the boundaries of the host element.
+   * Binds this dialog to its workbench host element, displaying it only when the host element is attached.
+   *
+   * Dialogs opened in non-peripheral area are displayed in the center of the host.
    */
-  private stickToHostElement(): void {
-    if (this._options.modality === 'application' && this._workbenchConfig.dialog?.modalityScope === 'viewport') {
+  private bindToHostElement(): void {
+    if (!this.invocationContext && this._workbenchConfig.dialog?.modalityScope === 'viewport') {
       setStyle(this._overlayRef.hostElement, {inset: '0'});
     }
     else {
-      const workbenchElementRef = inject(WORKBENCH_ELEMENT_REF);
-      const hostElement = computed(() => (this.context.view ? this.context.view.slot.portal.element() : workbenchElementRef()?.element.nativeElement) as HTMLElement);
-      const hostBounds = boundingClientRect(hostElement);
       const viewDragService = inject(ViewDragService);
+      const workbenchComponentBounds = inject(WORKBENCH_COMPONENT_BOUNDS);
 
       effect(() => {
-        const visible = this._attached() && !viewDragService.dragging();
+        const visible = this.attached() && !viewDragService.dragging();
 
         // Maintain position and size when hidden to prevent flickering when visible again and to support for virtual scrolling in dialog content.
         if (!visible) {
@@ -338,8 +333,15 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
           return;
         }
 
+        // Align dialog relative to contextual element if opened in non-peripheral area.
+        const hostBounds = this.invocationContext?.peripheral() === false ? this.invocationContext.bounds() : workbenchComponentBounds();
+        if (!hostBounds) {
+          setStyle(this._overlayRef.overlayElement, {visibility: 'hidden'}); // Hide via `visibility` instead of `display` property to retain the size.
+          return;
+        }
+
         // IMPORTANT: Track host bounds only if visible to prevent flickering.
-        const {left, top, width, height} = hostBounds();
+        const {left, top, width, height} = hostBounds;
         setStyle(this._overlayRef.overlayElement, {visibility: null});
         setStyle(this._overlayRef.hostElement, {
           top: `${top}px`,
@@ -352,15 +354,24 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   }
 
   /**
-   * Blocks this dialog if not the topmost dialog in its context.
+   * Computes if this dialog is blocked by another dialog.
    */
-  private blockWhenNotOnTop(): void {
-    this._workbenchDialogRegistry.top$({viewId: this.context.view?.id})
-      .pipe(
-        map(top => top === this ? null : top),
-        takeUntilDestroyed(),
-      )
-      .subscribe(this.blockedBy$);
+  private computeBlocked(): Signal<ɵWorkbenchDialog | null> {
+    const dialogRegistry = inject(WorkbenchDialogRegistry);
+    const topInThisContext = dialogRegistry.top(this.id);
+    const topInInvocationContext = dialogRegistry.top(this.invocationContext?.elementId);
+
+    return computed(() => {
+      // Get the top dialog in the context spawned by this dialog.
+      if (topInThisContext()) {
+        return topInThisContext();
+      }
+      // Get the top dialog in the context this dialog was opened in.
+      if (topInInvocationContext() !== this) {
+        return topInInvocationContext();
+      }
+      return null;
+    });
   }
 
   private blinkOnRequest(): void {
@@ -374,12 +385,24 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   }
 
   /**
+   * Closes the dialog when the context element is destroyed.
+   */
+  private closeOnHostDestroy(): void {
+    if (this.invocationContext) {
+      effect(() => {
+        if (this.invocationContext!.destroyed()) {
+          untracked(() => this.close());
+        }
+      });
+    }
+  }
+
+  /**
    * Destroys this dialog and associated resources.
    */
   public destroy(): void {
-    if (!this._destroyRef.destroyed) { // TODO [Angular 21] DestroyRef not required anymore because EnvironmentInjector has a destroyed property.
-      this._dialogEnvironmentInjector.destroy();
-      this._destroyRef.destroy();
+    if (!this.destroyed()) {
+      this.injector.destroy();
       this._overlayRef.dispose();
     }
   }

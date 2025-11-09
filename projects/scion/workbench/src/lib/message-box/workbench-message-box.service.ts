@@ -18,15 +18,21 @@ import {Translatable} from '../text/workbench-text-provider.model';
  * or for prompting the user for confirmation. The message can be plain text or a component, allowing for
  * structured content or input prompts.
  *
- * ## Modality
  * Displayed on top of other content, a message box blocks interaction with other parts of the application.
  *
- * A message box can be view-modal or application-modal. A view-modal message box blocks only a specific view,
- * allowing the user to interact with other views. An application-modal message box blocks the workbench,
- * or the browser's viewport if configured in {@link WorkbenchConfig.dialog.modalityScope}.
+ * ## Modality
+ * A message box can be context-modal or application-modal. Context-modal blocks a specific part of the application, as specified by the context;
+ * application-modal blocks the workbench or browser viewport, based on {@link WorkbenchConfig.dialog.modalityScope}.
+ *
+ * ## Context
+ * A message box can be bound to a context (e.g., a part or view), defaulting to the calling context.
+ * The message box is displayed only if the context is visible and closes when the context is disposed.
+ *
+ * ## Positioning
+ * A message box is opened in the center of its context, if any, unless opened from the peripheral area.
  *
  * ## Stacking
- * Multiple message boxes are stacked, and only the topmost message box in each modality stack can be interacted with.
+ * Message boxes are stacked per modality, with only the topmost message box in each stack being interactive.
  *
  * ## Styling
  * The following CSS variables can be set to customize the default look of a message box.
@@ -46,11 +52,9 @@ export abstract class WorkbenchMessageBoxService {
   /**
    * Displays the specified message in a message box.
    *
-   * By default, the calling context determines the modality of the message box. If the message box is opened from a view, only this view is blocked.
-   * To open the message box with a different modality, specify the modality in {@link WorkbenchMessageBoxOptions.modality}.
+   * By default, the message box is modal to the calling context. Specify a different modality in {@link WorkbenchMessageBoxOptions.modality}.
    *
-   * **Example:**
-   *
+   * @example
    * ```ts
    * const action = await inject(WorkbenchMessageBoxService).open('Do you want to save changes?', {
    *   actions: {
@@ -71,14 +75,12 @@ export abstract class WorkbenchMessageBoxService {
   /**
    * Displays the specified component in a message box.
    *
-   * By default, the calling context determines the modality of the message box. If the message box is opened from a view, only this view is blocked.
-   * To open the message box with a different modality, specify the modality in {@link WorkbenchMessageBoxOptions.modality}.
+   * By default, the message box is modal to the calling context. Specify a different modality in {@link WorkbenchMessageBoxOptions.modality}.
    *
    * Data can be passed to the component as inputs via {@link WorkbenchMessageBoxOptions.inputs} property or by providing a custom injector
    * via {@link WorkbenchMessageBoxOptions.injector} property. Inputs are available as input properties in the component.
    *
-   * **Example:**
-   *
+   * @example
    * ```ts
    * const action = await inject(WorkbenchMessageBoxService).open(SomeComponent, {
    *   inputs: {

@@ -18,6 +18,7 @@ import {fromEvent} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {SettingsService} from './settings.service';
 import {installFocusHighlighter} from './focus-highlight/focus-highlighter';
+import {installGlasspaneHighlighter} from './glasspane-highlight/glasspane-highlighter';
 
 @Component({
   selector: 'app-root',
@@ -52,6 +53,7 @@ export class AppComponent implements DoCheck {
     this.installPropagatedKeyboardEventLogger();
     this.provideWorkbenchService();
     installFocusHighlighter();
+    installGlasspaneHighlighter();
   }
 
   public ngDoCheck(): void {

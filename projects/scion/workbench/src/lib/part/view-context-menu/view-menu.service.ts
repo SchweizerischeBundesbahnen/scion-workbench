@@ -13,18 +13,20 @@ import {ConnectedPosition, Overlay, OverlayConfig, OverlayRef} from '@angular/cd
 import {ComponentPortal} from '@angular/cdk/portal';
 import {ViewMenuComponent} from './view-menu.component';
 import {WorkbenchMenuItem} from '../../workbench.model';
-import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
+import {WORKBENCH_ELEMENT} from '../../workbench-element-references';
+import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {fromEvent, Subscription} from 'rxjs';
 import {MenuItemConfig, WorkbenchConfig} from '../../workbench-config';
 import {WorkbenchService} from '../../workbench.service';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {ViewId} from '../../workbench.identifiers';
 import {WorkbenchView} from '../../view/workbench-view.model';
-import {provideViewContext} from '../../view/view-context-provider';
 import {Arrays} from '@scion/toolkit/util';
 import {TextComponent} from './text/text.component';
 import {coerceElement} from '@angular/cdk/coercion';
 import {rootEffect} from '../../common/rxjs-interop.util';
+import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
+import {provideContextAwareServices} from '../../context-aware-service-provider';
 
 /**
  * Shows menu items of a {@link WorkbenchView} in a menu.
@@ -39,7 +41,7 @@ export class ViewMenuService {
 
   private readonly _overlay = inject(Overlay);
   private readonly _injector = inject(Injector);
-  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _viewRegistry = inject(WorkbenchViewRegistry);
   private readonly _workbenchService = inject(WorkbenchService);
   private readonly _workbenchConfig = inject(WorkbenchConfig);
 
@@ -96,7 +98,10 @@ export class ViewMenuService {
       parent: this._injector,
       providers: [
         {provide: OverlayRef, useValue: overlayRef},
-        provideViewContext(view),
+        {provide: ɵWorkbenchView, useValue: view},
+        {provide: WorkbenchView, useExisting: ɵWorkbenchView},
+        {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchView},
+        provideContextAwareServices(),
       ],
     });
     overlayRef.attach(new ComponentPortal(ViewMenuComponent, null, injector));

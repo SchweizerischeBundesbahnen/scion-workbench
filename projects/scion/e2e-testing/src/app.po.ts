@@ -63,6 +63,11 @@ export class AppPO {
   public readonly dialogs: Locator;
 
   /**
+   * Locates workbench popups.
+   */
+  public readonly popups: Locator;
+
+  /**
    * Locates the drop placeholder.
    */
   public readonly dropPlaceholder: Locator;
@@ -83,6 +88,7 @@ export class AppPO {
     this.desktop = new DesktopPO(this.page.locator('wb-desktop-slot'));
     this.notifications = this.page.locator('wb-notification');
     this.dialogs = this.page.locator('wb-dialog');
+    this.popups = this.page.locator('wb-popup');
     this.dropPlaceholder = this.page.locator('div.e2e-drop-placeholder');
     this.dropZones = this.page.locator('div.e2e-drop-zone');
     this.workbench = new WorkbenchAccessor(this.page);
@@ -504,6 +510,13 @@ export class AppPO {
    */
   public async isWorkbenchBlocked(): Promise<boolean> {
     return (await this.page.locator('.e2e-glasspane.e2e-workbench').count()) > 0;
+  }
+
+  /**
+   * Indicates if the specified part is blocked by a dialog.
+   */
+  public async isPartBlocked(partId: PartId | Promise<PartId>): Promise<boolean> {
+    return (await this.page.locator(`.e2e-glasspane[data-partid="${await partId}"]`).count()) > 0;
   }
 
   /**

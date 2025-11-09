@@ -9,9 +9,9 @@
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {booleanAttribute, Component, DebugElement, DestroyRef, Directive, effect, inject, Injector, OnDestroy, OnInit, Type} from '@angular/core';
+import {booleanAttribute, Component, DebugElement, DestroyRef, Directive, effect, inject, Injector, OnDestroy, OnInit, signal, Type} from '@angular/core';
 import {ActivatedRoute, provideRouter} from '@angular/router';
-import {WORKBENCH_VIEW_REGISTRY} from './workbench-view.registry';
+import {WorkbenchViewRegistry} from './workbench-view.registry';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {WorkbenchView, WorkbenchViewNavigation} from './workbench-view.model';
 import {firstValueFrom, ReplaySubject, Subject} from 'rxjs';
@@ -43,6 +43,7 @@ import {NullContentComponent} from '../null-content/null-content.component';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {PartId, ViewId} from '../workbench.identifiers';
+import {LogLevel} from '../logging/logging.model';
 
 describe('View', () => {
 
@@ -69,7 +70,7 @@ describe('View', () => {
     await waitUntilStable();
 
     // Get reference to the view injector.
-    const view = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100');
+    const view = TestBed.inject(WorkbenchViewRegistry).get('view.100');
     let injectorDestroyed = false;
     view.injector.get(DestroyRef).onDestroy(() => injectorDestroyed = true);
 
@@ -79,6 +80,88 @@ describe('View', () => {
 
     // Expect the injector to be destroyed.
     expect(injectorDestroyed).toBeTrue();
+  });
+
+  it('should destroy component when removing the view', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'path/to/view', loadComponent: () => SpecViewComponent},
+        ]),
+      ],
+    });
+
+    @Component({template: ''})
+    class SpecViewComponent {
+
+      public destroyed = false;
+
+      constructor() {
+        inject(DestroyRef).onDestroy(() => this.destroyed = true);
+      }
+    }
+
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+
+    // Add view.
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.1'});
+    await waitUntilStable();
+
+    // Get component.
+    const viewComponent = TestBed.inject(WorkbenchViewRegistry).get('view.1').getComponent<SpecViewComponent>()!;
+
+    // Remove view.
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.removeView('view.1'));
+    await waitUntilStable();
+
+    // Expect the component to be destroyed.
+    expect(viewComponent.destroyed).toBeTrue();
+  });
+
+  it('should destroy view-aware services when closing the view', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          logging: {logLevel: LogLevel.DEBUG},
+        }),
+        provideRouter([
+          {path: 'path/to/view', loadComponent: () => SpecViewComponent},
+        ]),
+      ],
+    });
+
+    @Component({template: ''})
+    class SpecViewComponent {
+
+      constructor() {
+        inject(WorkbenchMessageBoxService);
+        inject(WorkbenchDialogService);
+      }
+    }
+
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+    await waitUntilWorkbenchStarted();
+
+    // Spy console.
+    spyOn(console, 'debug').and.callThrough();
+
+    // Navigate to "path/to/view".
+    await workbenchRouter.navigate(['path/to/view'], {target: 'view.1'});
+    await waitUntilStable();
+
+    // Expect view-aware services to be constructed.
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining('Constructing WorkbenchMessageBoxService [context=view.1]'));
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining('Constructing WorkbenchDialogService [context=view.1]'));
+
+    // Close view.
+    await TestBed.inject(WorkbenchViewRegistry).get('view.1').close();
+
+    // Expect view-aware services to be destroyed.
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining('Destroying WorkbenchMessageBoxService [context=view.1]'));
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining('Destroying WorkbenchDialogService [context=view.1]'));
   });
 
   it('should render dirty state', async () => {
@@ -102,12 +185,12 @@ describe('View', () => {
     expect(isViewDirty(fixture, 'view.100')).toBeFalse();
 
     // Set dirty flag.
-    TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').dirty = true;
+    TestBed.inject(WorkbenchViewRegistry).get('view.100').dirty = true;
     fixture.detectChanges();
     expect(isViewDirty(fixture, 'view.100')).toBeTrue();
 
     // Clear dirty flag.
-    TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').dirty = false;
+    TestBed.inject(WorkbenchViewRegistry).get('view.100').dirty = false;
     fixture.detectChanges();
     expect(isViewDirty(fixture, 'view.100')).toBeFalse();
   });
@@ -133,12 +216,12 @@ describe('View', () => {
     expect(getViewTitle(fixture, 'view.100')).toEqual('');
 
     // Set title.
-    TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').title = 'Title 1';
+    TestBed.inject(WorkbenchViewRegistry).get('view.100').title = 'Title 1';
     fixture.detectChanges();
     expect(getViewTitle(fixture, 'view.100')).toEqual('Title 1');
 
     // Set title.
-    TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').title = 'Title 2';
+    TestBed.inject(WorkbenchViewRegistry).get('view.100').title = 'Title 2';
     fixture.detectChanges();
     expect(getViewTitle(fixture, 'view.100')).toEqual('Title 2');
   });
@@ -164,7 +247,7 @@ describe('View', () => {
     expect(isViewHeadingVisible(fixture, 'view.100')).toBeFalse();
 
     // Set heading.
-    TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').heading = 'Heading';
+    TestBed.inject(WorkbenchViewRegistry).get('view.100').heading = 'Heading';
     fixture.detectChanges();
 
     // Expect heading not to display.
@@ -193,7 +276,7 @@ describe('View', () => {
     expect(isViewHeadingVisible(fixture, 'view.100')).toBeFalse();
 
     // Set heading.
-    TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').heading = 'Heading';
+    TestBed.inject(WorkbenchViewRegistry).get('view.100').heading = 'Heading';
     fixture.detectChanges();
 
     // Expect heading not to display.
@@ -222,13 +305,13 @@ describe('View', () => {
     expect(isViewHeadingVisible(fixture, 'view.100')).toBeFalse();
 
     // Set heading.
-    TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').heading = 'Heading 1';
+    TestBed.inject(WorkbenchViewRegistry).get('view.100').heading = 'Heading 1';
     fixture.detectChanges();
     expect(isViewHeadingVisible(fixture, 'view.100')).toBeTrue();
     expect(getViewHeading(fixture, 'view.100')).toEqual('Heading 1');
 
     // Set heading.
-    TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').heading = 'Heading 2';
+    TestBed.inject(WorkbenchViewRegistry).get('view.100').heading = 'Heading 2';
     fixture.detectChanges();
     expect(isViewHeadingVisible(fixture, 'view.100')).toBeTrue();
     expect(getViewHeading(fixture, 'view.100')).toEqual('Heading 2');
@@ -256,8 +339,8 @@ describe('View', () => {
     await workbenchRouter.navigate(['path/to/view/2'], {target: 'view.102'});
     await waitUntilStable();
 
-    const view1 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.101');
-    const view2 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.102');
+    const view1 = TestBed.inject(WorkbenchViewRegistry).get('view.101');
+    const view2 = TestBed.inject(WorkbenchViewRegistry).get('view.102');
 
     // Activate view 1.
     await view1.activate();
@@ -313,8 +396,8 @@ describe('View', () => {
     await workbenchRouter.navigate(['path/to/view/2'], {target: 'view.102'});
     await waitUntilStable();
 
-    const view1 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.101');
-    const view2 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.102');
+    const view1 = TestBed.inject(WorkbenchViewRegistry).get('view.101');
+    const view2 = TestBed.inject(WorkbenchViewRegistry).get('view.102');
 
     // Activate view 1.
     await view1.activate();
@@ -368,7 +451,7 @@ describe('View', () => {
     await workbenchRouter.navigate(['path/to/view'], {target: 'view.100'});
     await waitUntilStable();
 
-    const view = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100');
+    const view = TestBed.inject(WorkbenchViewRegistry).get('view.100');
     const component = view.getComponent<SpecViewComponent>()!;
 
     // Expect component not to be destroyed.
@@ -407,8 +490,8 @@ describe('View', () => {
     await workbenchRouter.navigate(['path/to/view/2'], {target: 'view.102'});
     await waitUntilStable();
 
-    const view1 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.101');
-    const view2 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.102');
+    const view1 = TestBed.inject(WorkbenchViewRegistry).get('view.101');
+    const view2 = TestBed.inject(WorkbenchViewRegistry).get('view.102');
 
     // Activate view 1.
     await view1.activate();
@@ -448,7 +531,7 @@ describe('View', () => {
     await waitUntilWorkbenchStarted();
 
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
-    const workbenchViewRegistry = TestBed.inject(WORKBENCH_VIEW_REGISTRY);
+    const workbenchViewRegistry = TestBed.inject(WorkbenchViewRegistry);
     const workbenchService = TestBed.inject(WorkbenchService);
 
     await workbenchRouter.navigate(['path/to/view/1'], {target: 'view.101'});
@@ -501,7 +584,7 @@ describe('View', () => {
     await waitUntilWorkbenchStarted();
 
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
-    const workbenchViewRegistry = TestBed.inject(WORKBENCH_VIEW_REGISTRY);
+    const workbenchViewRegistry = TestBed.inject(WorkbenchViewRegistry);
     const workbenchService = TestBed.inject(WorkbenchService);
 
     await workbenchRouter.navigate(['path/to/view/1'], {target: 'view.101'});
@@ -555,7 +638,7 @@ describe('View', () => {
     await workbenchRouter.navigate(['path/to/view'], {target: 'view.100'});
     await waitUntilStable();
 
-    const view = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100');
+    const view = TestBed.inject(WorkbenchViewRegistry).get('view.100');
     const component = view.getComponent<SpecViewComponent>()!;
 
     // Try to close View (prevent)
@@ -596,7 +679,7 @@ describe('View', () => {
     await workbenchRouter.navigate([], {hint: 'view-1', target: 'view.100'});
     await waitUntilStable();
 
-    const view = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100');
+    const view = TestBed.inject(WorkbenchViewRegistry).get('view.100');
     const component = view.getComponent<SpecViewComponent>()!;
 
     // Try to close View (prevent)
@@ -652,7 +735,7 @@ describe('View', () => {
     await workbenchRouter.navigate(['path/to/module/view'], {target: 'view.100'});
     await waitUntilStable();
 
-    const view = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100');
+    const view = TestBed.inject(WorkbenchViewRegistry).get('view.100');
     const component = view.getComponent<SpecViewComponent>()!;
 
     // Try to close View (prevent)
@@ -693,12 +776,11 @@ describe('View', () => {
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
     await fixture.whenStable();
 
-    const view = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100');
+    const view = TestBed.inject(WorkbenchViewRegistry).get('view.100');
 
     // Open view-modal message box.
     void TestBed.inject(WorkbenchMessageBoxService).open('Message', {
-      modality: 'view',
-      context: {viewId: 'view.100'},
+      context: 'view.100',
       cssClass: 'message-box',
     });
     await waitUntilStable();
@@ -746,7 +828,7 @@ describe('View', () => {
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
     await fixture.whenStable();
 
-    const view = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100');
+    const view = TestBed.inject(WorkbenchViewRegistry).get('view.100');
 
     // Open application-modal message box.
     void TestBed.inject(WorkbenchMessageBoxService).open('Message', {
@@ -798,12 +880,11 @@ describe('View', () => {
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
     await fixture.whenStable();
 
-    const view = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100');
+    const view = TestBed.inject(WorkbenchViewRegistry).get('view.100');
 
     // Open view-modal dialog.
     void TestBed.inject(WorkbenchDialogService).open(TestComponent, {
-      modality: 'view',
-      context: {viewId: 'view.100'},
+      context: 'view.100',
       cssClass: 'dialog',
     });
     await waitUntilStable();
@@ -851,7 +932,7 @@ describe('View', () => {
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
     await fixture.whenStable();
 
-    const view = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100');
+    const view = TestBed.inject(WorkbenchViewRegistry).get('view.100');
 
     // Open application-modal dialog.
     void TestBed.inject(WorkbenchDialogService).open(TestComponent, {
@@ -966,10 +1047,32 @@ describe('View', () => {
       providers: [
         provideWorkbenchForTest(),
         provideRouter([
-          {path: 'path/to/view', component: SpecViewComponent},
+          {path: 'path/to/view', loadComponent: () => SpecViewComponent},
         ]),
       ],
     });
+
+    @Component({template: ''})
+    class SpecViewComponent {
+
+      public readonly view = inject(WorkbenchView);
+      public readonly messageBoxService = inject(WorkbenchMessageBoxService);
+      public readonly dialogService = inject(WorkbenchDialogService);
+
+      public canCloseView: WorkbenchView | undefined;
+      public canCloseMessageBoxService: WorkbenchMessageBoxService | undefined;
+      public canCloseDialogService: WorkbenchDialogService | undefined;
+
+      constructor() {
+        this.view.canClose(() => {
+          this.canCloseView = inject(WorkbenchView);
+          this.canCloseMessageBoxService = inject(WorkbenchMessageBoxService);
+          this.canCloseDialogService = inject(WorkbenchDialogService);
+          return true;
+        });
+      }
+    }
+
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
@@ -977,16 +1080,17 @@ describe('View', () => {
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
     await fixture.whenStable();
 
-    const view = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100');
+    const view = TestBed.inject(WorkbenchViewRegistry).get('view.100');
     const component = view.getComponent<SpecViewComponent>()!;
-
     await view.close();
     await fixture.whenStable();
 
     // Expect `CanClose` guard to be invoked in the view's injection context.
-    expect(component.canCloseInjector!.get(WorkbenchView)).toBe(view);
-    expect(component.canCloseInjector!.get(WorkbenchMessageBoxService)).toBe(component.injector.get(WorkbenchMessageBoxService));
-    expect(component.canCloseInjector!.get(WorkbenchMessageBoxService)).not.toBe(TestBed.inject(WorkbenchMessageBoxService));
+    expect(component.canCloseView).toBe(component.view);
+    expect(component.canCloseMessageBoxService).toBe(component.messageBoxService);
+    expect(component.canCloseDialogService).toBe(component.dialogService);
+    expect(component.canCloseMessageBoxService).not.toBe(TestBed.inject(WorkbenchMessageBoxService));
+    expect(component.canCloseDialogService).not.toBe(TestBed.inject(WorkbenchDialogService));
   });
 
   it('should remove view without a view handle', async () => {
@@ -1006,7 +1110,7 @@ describe('View', () => {
     );
     await fixture.whenStable();
 
-    expect(TestBed.inject(WORKBENCH_VIEW_REGISTRY).has('view.100')).toBeFalse();
+    expect(TestBed.inject(WorkbenchViewRegistry).has('view.100')).toBeFalse();
   });
 
   it('should provide navigated component', async () => {
@@ -1041,17 +1145,17 @@ describe('View', () => {
     const workbenchRouter = TestBed.inject(ɵWorkbenchRouter);
     await workbenchRouter.navigate(layout => layout.addView('view.100', {partId: layout.activePart({grid: 'mainArea'}).id, activateView: true}));
     await waitUntilStable();
-    expect(TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent()).toBe(getComponent(fixture, NullContentComponent));
+    expect(TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent()).toBe(getComponent(fixture, NullContentComponent));
 
     // Navigate to "path/to/view".
     await workbenchRouter.navigate(['path/to/view'], {target: 'view.100'});
     await waitUntilStable();
-    expect(TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent()).toBe(getComponent(fixture, SpecView1Component));
+    expect(TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent()).toBe(getComponent(fixture, SpecView1Component));
 
     // Navigate to "path/to/module/view".
     await workbenchRouter.navigate(['path/to/module/view'], {target: 'view.100'});
     await waitUntilStable();
-    expect(TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent()).toBe(getComponent(fixture, SpecView2Component));
+    expect(TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent()).toBe(getComponent(fixture, SpecView2Component));
   });
 
   it('should fill view content to available space', async () => {
@@ -1143,7 +1247,7 @@ describe('View', () => {
     expect(body).not.toShow(By.css('button.spec-action'));
 
     // Show action.
-    const componentInstance = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecViewComponent>()!;
+    const componentInstance = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecViewComponent>()!;
     componentInstance.showAction = true;
     fixture.detectChanges(); // Only trigger one change detection cycle.
     await waitUntilStable();
@@ -1576,8 +1680,8 @@ describe('View', () => {
       expect(getViewHeading(fixture, 'view.100')).toBeNull();
 
       // Set title and heading via handle.
-      TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').title = 'Title From Handle';
-      TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').heading = 'Heading From Handle';
+      TestBed.inject(WorkbenchViewRegistry).get('view.100').title = 'Title From Handle';
+      TestBed.inject(WorkbenchViewRegistry).get('view.100').heading = 'Heading From Handle';
       fixture.detectChanges();
       expect(getViewTitle(fixture, 'view.100')).toEqual('Title From Handle');
       expect(getViewHeading(fixture, 'view.100')).toEqual('Heading From Handle');
@@ -1618,8 +1722,8 @@ describe('View', () => {
       expect(getViewHeading(fixture, 'view.100')).toEqual('Heading From Route 1');
 
       // Set title and heading via handle.
-      TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').title = 'Title From Handle';
-      TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').heading = 'Heading From Handle';
+      TestBed.inject(WorkbenchViewRegistry).get('view.100').title = 'Title From Handle';
+      TestBed.inject(WorkbenchViewRegistry).get('view.100').heading = 'Heading From Handle';
       fixture.detectChanges();
       expect(getViewTitle(fixture, 'view.100')).toEqual('Title From Handle');
       expect(getViewHeading(fixture, 'view.100')).toEqual('Heading From Handle');
@@ -1693,7 +1797,7 @@ describe('View', () => {
       expect(isViewDirty(fixture, 'view.100')).toBeFalse();
 
       // Mark view dirty.
-      TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').dirty = true;
+      TestBed.inject(WorkbenchViewRegistry).get('view.100').dirty = true;
       fixture.detectChanges();
       expect(isViewDirty(fixture, 'view.100')).toBeTrue();
 
@@ -1723,7 +1827,7 @@ describe('View', () => {
       expect(isViewDirty(fixture, 'view.100')).toBeFalse();
 
       // Mark view dirty.
-      TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').dirty = true;
+      TestBed.inject(WorkbenchViewRegistry).get('view.100').dirty = true;
       fixture.detectChanges();
       expect(isViewDirty(fixture, 'view.100')).toBeTrue();
 
@@ -1771,7 +1875,7 @@ describe('View', () => {
       await waitUntilStable();
 
       // Set CSS class.
-      TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').cssClass = 'css-class';
+      TestBed.inject(WorkbenchViewRegistry).get('view.100').cssClass = 'css-class';
       fixture.detectChanges();
       expect(getViewCssClass(fixture, 'view.100')).toContain('css-class');
 
@@ -1800,7 +1904,7 @@ describe('View', () => {
       await waitUntilStable();
 
       // Set CSS class.
-      TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').cssClass = 'css-class';
+      TestBed.inject(WorkbenchViewRegistry).get('view.100').cssClass = 'css-class';
       fixture.detectChanges();
       expect(getViewCssClass(fixture, 'view.100')).toContain('css-class');
 
@@ -1955,7 +2059,7 @@ describe('View', () => {
       await workbenchRouter.navigate(['view-1'], {target: 'view.100', data: {data: 'view-1'}, state: {state: 'view-1'}, hint: 'view-1', cssClass: 'view-1'});
       await waitUntilStable();
       // Expect properties to be set in constructor.
-      const componentInstanceView1 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecView1Component>()!;
+      const componentInstanceView1 = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecView1Component>()!;
       expect(componentInstanceView1).toBeInstanceOf(SpecView1Component);
       expect(componentInstanceView1.titleReadInConstructor).toEqual('Title View 1');
       expect(componentInstanceView1.headingReadInConstructor).toEqual('Heading View 1');
@@ -1966,7 +2070,7 @@ describe('View', () => {
       await workbenchRouter.navigate(['view-2'], {target: 'view.100', data: {data: 'view-2'}, state: {state: 'view-2'}, hint: 'view-2', cssClass: 'view-2'});
       await waitUntilStable();
       // Expect properties to be set in constructor.
-      const componentInstanceView2 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecView2Component>()!;
+      const componentInstanceView2 = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecView2Component>()!;
       expect(componentInstanceView2).toBeInstanceOf(SpecView2Component);
       expect(componentInstanceView2.titleReadInConstructor).toEqual('Title View 2');
       expect(componentInstanceView2.headingReadInConstructor).toEqual('Heading View 2');
@@ -1982,7 +2086,7 @@ describe('View', () => {
       await workbenchRouter.navigate(['view/3'], {target: 'view.100', data: {data: 'view-3'}, state: {state: 'view-3'}, hint: 'view-3', cssClass: 'view-3'});
       await waitUntilStable();
       // Expect properties to be set in constructor.
-      const componentInstanceView3 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecView3Component>()!;
+      const componentInstanceView3 = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecView3Component>()!;
       expect(componentInstanceView3).toBeInstanceOf(SpecView3Component);
       expect(componentInstanceView3.titleReadInConstructor).toEqual('Title View 3');
       expect(componentInstanceView3.headingReadInConstructor).toEqual('Heading View 3');
@@ -1998,7 +2102,7 @@ describe('View', () => {
       await workbenchRouter.navigate(['view/4'], {target: 'view.100', data: {data: 'view-4'}, state: {state: 'view-4'}, hint: 'view-4', cssClass: 'view-4'});
       await waitUntilStable();
       // Expect properties to be set in constructor.
-      const componentInstanceView4 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecView4Component>()!;
+      const componentInstanceView4 = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecView4Component>()!;
       expect(componentInstanceView4).toBeInstanceOf(SpecView4Component);
       expect(componentInstanceView4.titleReadInConstructor).toEqual('Title View 4');
       expect(componentInstanceView4.headingReadInConstructor).toEqual('Heading View 4');
@@ -2014,7 +2118,7 @@ describe('View', () => {
       await workbenchRouter.navigate(['path/to/module-a/view-5'], {target: 'view.100', data: {data: 'view-5'}, state: {state: 'view-5'}, hint: 'view-5', cssClass: 'view-5'});
       await waitUntilStable();
       // Expect properties to be set in constructor.
-      const componentInstanceView5 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecView5Component>()!;
+      const componentInstanceView5 = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecView5Component>()!;
       expect(componentInstanceView5).toBeInstanceOf(SpecView5Component);
       expect(componentInstanceView5.titleReadInConstructor).toEqual('Title View 5');
       expect(componentInstanceView5.headingReadInConstructor).toEqual('Heading View 5');
@@ -2030,7 +2134,7 @@ describe('View', () => {
       await workbenchRouter.navigate(['path/to/module-b/view/6'], {target: 'view.100', data: {data: 'view-6'}, state: {state: 'view-6'}, hint: 'view-6', cssClass: 'view-6'});
       await waitUntilStable();
       // Expect properties to be set in constructor.
-      const componentInstanceView6 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecView6Component>()!;
+      const componentInstanceView6 = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecView6Component>()!;
       expect(componentInstanceView6).toBeInstanceOf(SpecView6Component);
       expect(componentInstanceView6.titleReadInConstructor).toEqual('Title View 6');
       expect(componentInstanceView6.headingReadInConstructor).toEqual('Heading View 6');
@@ -2046,7 +2150,7 @@ describe('View', () => {
       await workbenchRouter.navigate(['path/to/module-b/view/7'], {target: 'view.100', data: {data: 'view-7'}, state: {state: 'view-7'}, hint: 'view-7', cssClass: 'view-7'});
       await waitUntilStable();
       // Expect properties to be set in constructor.
-      const componentInstanceView7 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecView7Component>()!;
+      const componentInstanceView7 = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecView7Component>()!;
       expect(componentInstanceView7).toBeInstanceOf(SpecView7Component);
       expect(componentInstanceView7.titleReadInConstructor).toEqual('Title View 7');
       expect(componentInstanceView7.headingReadInConstructor).toEqual('Heading View 7');
@@ -2140,7 +2244,7 @@ describe('View', () => {
       );
       await waitUntilStable();
       // Expect properties to be set in constructor.
-      const componentInstanceView1 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecView1Component>()!;
+      const componentInstanceView1 = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecView1Component>()!;
       expect(componentInstanceView1).toBeInstanceOf(SpecView1Component);
       expect(componentInstanceView1.partReadInConstructor).toEqual('part.left');
 
@@ -2154,7 +2258,7 @@ describe('View', () => {
       );
       await waitUntilStable();
       // Expect properties to be set in constructor.
-      const componentInstanceView2 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecView2Component>()!;
+      const componentInstanceView2 = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecView2Component>()!;
       expect(componentInstanceView2).toBeInstanceOf(SpecView2Component);
       expect(componentInstanceView2.partReadInConstructor).toEqual('part.right');
       // Expect properties not to be changed until destroyed previous component.
@@ -2239,7 +2343,7 @@ describe('View', () => {
       );
       await waitUntilStable();
       // Expect properties to be set in constructor.
-      const componentInstanceView1 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecView1Component>()!;
+      const componentInstanceView1 = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecView1Component>()!;
       expect(componentInstanceView1).toBeInstanceOf(SpecView1Component);
       expect(componentInstanceView1.activeReadInConstructor).toBeTrue();
 
@@ -2251,7 +2355,7 @@ describe('View', () => {
       );
       await waitUntilStable();
       // Expect properties to be set in constructor.
-      const componentInstanceView2 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecView2Component>()!;
+      const componentInstanceView2 = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecView2Component>()!;
       expect(componentInstanceView2).toBeInstanceOf(SpecView2Component);
       expect(componentInstanceView2.activeReadInConstructor).toBeFalse();
       // Expect properties not to be changed until destroyed previous component.
@@ -2335,7 +2439,7 @@ describe('View', () => {
       );
       await waitUntilStable();
       // Expect properties to be set in constructor.
-      const componentInstanceView1 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecView1Component>()!;
+      const componentInstanceView1 = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecView1Component>()!;
       expect(componentInstanceView1).toBeInstanceOf(SpecView1Component);
       expect(componentInstanceView1.dirtyReadInConstructor).toBeFalse();
 
@@ -2346,7 +2450,7 @@ describe('View', () => {
       await workbenchRouter.navigate(layout => layout.navigateView('view.100', ['path/to/module-b/view-2']));
       await waitUntilStable();
       // Expect properties to be set in constructor.
-      const componentInstanceView2 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecView2Component>()!;
+      const componentInstanceView2 = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecView2Component>()!;
       expect(componentInstanceView2).toBeInstanceOf(SpecView2Component);
       expect(componentInstanceView2.dirtyReadInConstructor).toBeFalse();
       // Expect properties not to be changed until destroyed previous component.
@@ -2391,7 +2495,7 @@ describe('View', () => {
         .activateView('view.100'),
       );
       await waitUntilStable();
-      const viewComponent = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecViewComponent>()!;
+      const viewComponent = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecViewComponent>()!;
       expect(viewComponent.view.navigation()!.data).toEqual({data: 'a'});
       expect(viewComponent.navigationDataCaptor).toEqual([{data: 'a'}]);
 
@@ -2441,7 +2545,7 @@ describe('View', () => {
         .activateView('view.100'),
       );
       await waitUntilStable();
-      const viewComponent = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecViewComponent>()!;
+      const viewComponent = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecViewComponent>()!;
       expect(viewComponent.view.navigation()!.state).toEqual({state: 'a'});
       expect(viewComponent.navigationStateCaptor).toEqual([{state: 'a'}]);
 
@@ -2953,6 +3057,58 @@ describe('View', () => {
     const headingElement = fixture.debugElement.query(By.css('wb-view-tab[data-viewid="view.100"] span.e2e-heading')).nativeElement as HTMLElement;
     expect(headingElement.innerText).toEqual('HEADING (translated)');
   });
+
+  it('should run effect in view component after re-layout', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'path/to/view', loadComponent: () => SpecEffectViewComponent},
+        ]),
+      ],
+    });
+
+    @Component({template: ''})
+    class SpecEffectViewComponent {
+
+      public value = signal(0);
+      public result = new Array<number>();
+
+      constructor() {
+        effect(() => {
+          this.result.push(this.value());
+        });
+      }
+    }
+
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+    await waitUntilWorkbenchStarted();
+
+    // Navigate to "path/to/view".
+    await workbenchRouter.navigate(['path/to/view'], {target: 'view.1'});
+    await waitUntilStable();
+
+    const view = TestBed.inject(WorkbenchViewRegistry).get('view.1');
+
+    // Expect effect to run.
+    expect(view.getComponent<SpecEffectViewComponent>()!.result).toEqual([0]);
+
+    // Add left part (forces re-layout).
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout
+      .addPart('part.left', {align: 'left'})
+      .addView('other-view', {partId: 'part.left'})
+      .navigateView('other-view', ['path/to/view']),
+    );
+    await waitUntilStable();
+
+    // Update signal.
+    view.getComponent<SpecEffectViewComponent>()!.value.set(1);
+    await waitUntilStable();
+
+    // Expect effect to still run after re-layout.
+    expect(view.getComponent<SpecEffectViewComponent>()!.result).toEqual([0, 1]);
+  });
 });
 
 @Component({
@@ -2966,7 +3122,6 @@ class SpecViewComponent {
   public preventClosing = false;
   public view = inject(WorkbenchView);
   public injector = inject(Injector);
-  public canCloseInjector: Injector | undefined;
 
   constructor() {
     const params = inject(ActivatedRoute).snapshot.paramMap;
@@ -2984,7 +3139,6 @@ class SpecViewComponent {
     }
     this.view.canClose(() => {
       console.log(`[SpecViewComponent][CanClose] CanClose invoked for view '${this.view.id}'. [path=${this.view.navigation()?.path.join('/')}]`);
-      this.canCloseInjector = inject(Injector);
       return !this.preventClosing;
     });
 
@@ -3049,7 +3203,7 @@ function getComponent<T>(fixture: ComponentFixture<unknown>, type: Type<T>): T {
 }
 
 function getDialog(cssClass: string): WorkbenchDialog {
-  return TestBed.inject(WorkbenchDialogRegistry).dialogs().find(dialog => dialog.cssClass().includes(cssClass)) ?? throwError('[NullDialogError]');
+  return TestBed.inject(WorkbenchDialogRegistry).elements().find(dialog => dialog.cssClass().includes(cssClass)) ?? throwError('[NullDialogError]');
 }
 
 function getSize(fixture: ComponentFixture<unknown>, type: Type<unknown>): {width: number; height: number} {
