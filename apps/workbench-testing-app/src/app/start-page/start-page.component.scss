@@ -59,11 +59,11 @@
           @include start-page.tile-background-color(var(--devtools-app-color));
         }
 
-        &:is(.microfrontend, .test-capability).workbench-client-testing-app1 {
+        &.microfrontend.workbench-client-testing-app1 {
           @include start-page.tile-background-color(var(--workbench-client-testing-app1-color));
         }
 
-        &:is(.microfrontend, .test-capability).workbench-client-testing-app2 {
+        &.microfrontend.workbench-client-testing-app2 {
           @include start-page.tile-background-color(var(--workbench-client-testing-app2-color));
         }
       }

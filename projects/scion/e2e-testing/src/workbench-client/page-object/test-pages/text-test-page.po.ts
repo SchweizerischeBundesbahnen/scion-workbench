@@ -15,9 +15,12 @@ import {MicrofrontendDialogPagePO} from '../../../workbench/page-object/workbenc
 import {ViewPO} from '../../../view.po';
 import {DialogPO} from '../../../dialog.po';
 import {AppPO} from '../../../app.po';
-import {DialogId, Translatable, ViewId} from '@scion/workbench-client';
+import {DialogId, PartId, PopupId, Translatable, ViewId} from '@scion/workbench-client';
+import {MicrofrontendPopupPagePO} from '../../../workbench/page-object/workbench-popup-page.po';
+import {PopupPO} from '../../../popup.po';
+import {RequireOne} from '../../../helper/utility-types';
 
-export class TextTestPagePO implements MicrofrontendViewPagePO, MicrofrontendDialogPagePO {
+export class TextTestPagePO implements MicrofrontendViewPagePO, MicrofrontendDialogPagePO, MicrofrontendPopupPagePO {
 
   public readonly locator: Locator;
   public readonly text1: TextObservePO;
@@ -25,30 +28,22 @@ export class TextTestPagePO implements MicrofrontendViewPagePO, MicrofrontendDia
   public readonly text3: TextObservePO;
   public readonly text4: TextObservePO;
 
-  private constructor(public outlet: SciRouterOutletPO, private _locateBy: ViewPO | DialogPO) {
+  public readonly view: ViewPO;
+  public readonly dialog: DialogPO;
+  public readonly popup: PopupPO;
+  public readonly outlet: SciRouterOutletPO;
+
+  constructor(appPO: AppPO, locateBy: RequireOne<{id: PartId | ViewId | DialogId | PopupId; cssClass: string}>) {
+    this.outlet = new SciRouterOutletPO(appPO, {name: locateBy.id, cssClass: locateBy.cssClass});
+    this.view = appPO.view({viewId: locateBy.id as ViewId | undefined, cssClass: locateBy.cssClass});
+    this.dialog = appPO.dialog({dialogId: locateBy.id as DialogId | undefined, cssClass: locateBy.cssClass});
+    this.popup = appPO.popup({popupId: locateBy.id as PopupId | undefined, cssClass: locateBy.cssClass});
+    this.outlet = new SciRouterOutletPO(appPO, {name: locateBy.id, cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-text-test-page');
     this.text1 = new TextObservePO(this.locator.locator('app-observe-text:nth-of-type(1)'));
     this.text2 = new TextObservePO(this.locator.locator('app-observe-text:nth-of-type(2)'));
     this.text3 = new TextObservePO(this.locator.locator('app-observe-text:nth-of-type(3)'));
     this.text4 = new TextObservePO(this.locator.locator('app-observe-text:nth-of-type(4)'));
-  }
-
-  public get view(): ViewPO {
-    if (this._locateBy instanceof ViewPO) {
-      return this._locateBy;
-    }
-    else {
-      throw Error('[PageObjectError] Test page not opened in a view.');
-    }
-  }
-
-  public get dialog(): DialogPO {
-    if (this._locateBy instanceof DialogPO) {
-      return this._locateBy;
-    }
-    else {
-      throw Error('[PageObjectError] Test page not opened in a dialog.');
-    }
   }
 
   public async provideText(key: string, text: string | '<undefined>'): Promise<void> {
@@ -84,18 +79,6 @@ export class TextTestPagePO implements MicrofrontendViewPagePO, MicrofrontendDia
   public async setDialogTitle(title: Translatable): Promise<void> {
     await this.locator.locator('section.e2e-dialog-handle input.e2e-title').fill(title);
     await this.locator.locator('section.e2e-dialog-handle button.e2e-set-title').click();
-  }
-
-  public static newViewPO(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}): TextTestPagePO {
-    const view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
-    const outlet = new SciRouterOutletPO(appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
-    return new TextTestPagePO(outlet, view);
-  }
-
-  public static newDialogPO(appPO: AppPO, locateBy: {dialogId?: DialogId; cssClass?: string}): TextTestPagePO {
-    const dialog = appPO.dialog({dialogId: locateBy.dialogId, cssClass: locateBy.cssClass});
-    const outlet = new SciRouterOutletPO(appPO, {locator: dialog.locator.locator('sci-router-outlet')});
-    return new TextTestPagePO(outlet, dialog);
   }
 }
 

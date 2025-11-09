@@ -83,12 +83,4 @@ export class StartPagePO implements WorkbenchViewPagePO {
     // Wait until completed navigation.
     await this._appPO.waitForLayoutChange({navigationId});
   }
-
-  /**
-   * Clicks the test capability tile with specified CSS class set.
-   */
-  public async clickTestCapability(capabilityCssClass: string, app: string): Promise<void> {
-    await this._tabbar.selectTab('e2e-test-capabilities');
-    await this._tabbarLocator.locator(`.e2e-test-capability-tiles button.${capabilityCssClass}.workbench-client-testing-${app}`).click();
-  }
 }

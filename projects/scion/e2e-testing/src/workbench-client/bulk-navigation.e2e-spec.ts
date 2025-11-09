@@ -11,13 +11,26 @@
 import {test} from '../fixtures';
 import {expect} from '@playwright/test';
 import {BulkNavigationTestPagePO} from './page-object/test-pages/bulk-navigation-test-page.po';
+import {RouterPagePO} from './page-object/router-page.po';
 
 test.describe('Bulk Navigation', () => {
 
   test('should navigate to multiple views if waiting for each navigation to complete', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const bulkNavigationTestPage = await BulkNavigationTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-pages/bulk-navigation-test-page',
+      },
+    });
+
+    // Open test page.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+    const bulkNavigationTestPage = new BulkNavigationTestPagePO(appPO, {cssClass: 'testee'});
+
     await bulkNavigationTestPage.enterViewCount(10);
     await bulkNavigationTestPage.enterCssClass('bulk-navigation-test-target');
     await bulkNavigationTestPage.clickNavigateAwait();
@@ -28,7 +41,19 @@ test.describe('Bulk Navigation', () => {
   test('should navigate to multiple views if not waiting for each navigation to complete', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const bulkNavigationTestPage = await BulkNavigationTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-pages/bulk-navigation-test-page',
+      },
+    });
+
+    // Open test page.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+    const bulkNavigationTestPage = new BulkNavigationTestPagePO(appPO, {cssClass: 'testee'});
+
     await bulkNavigationTestPage.enterViewCount(10);
     await bulkNavigationTestPage.enterCssClass('bulk-navigation-test-target');
     await bulkNavigationTestPage.clickNavigateNoAwait();
