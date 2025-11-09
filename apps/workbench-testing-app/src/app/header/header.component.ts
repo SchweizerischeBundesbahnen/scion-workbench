@@ -199,22 +199,25 @@ export class HeaderComponent {
       }),
       new MenuItem({
         text: 'Highlight Focus',
-        cssClass: 'e2e-highlight-focus',
         checked: this._settingsService.isEnabled('highlightFocus'),
         onAction: () => this._settingsService.toggle('highlightFocus'),
       }),
       new MenuItem({
-        text: 'Display Skeletons in Sample View',
-        checked: this._settingsService.isEnabled('displaySkeletons'),
+        text: 'Highlight Glasspane',
+        checked: this._settingsService.isEnabled('highlightGlasspane'),
+        onAction: () => this._settingsService.toggle('highlightGlasspane'),
+      }),
+      new MenuItem({
+        text: 'Show Skeletons',
+        checked: this._settingsService.isEnabled('showSkeletons'),
         onAction: () => {
-          this._settingsService.toggle('displaySkeletons');
+          this._settingsService.toggle('showSkeletons');
           // Perform navigation for Angular to evaluate `CanMatch` guards.
           void inject(Router).navigate([{outlets: {}}], {skipLocationChange: true});
         },
       }),
       new MenuItem({
         text: 'Show Test Perspectives',
-        cssClass: 'e2e-show-test-perspectives',
         checked: this._settingsService.isEnabled('showTestPerspectives'),
         onAction: () => this._settingsService.toggle('showTestPerspectives'),
       }),

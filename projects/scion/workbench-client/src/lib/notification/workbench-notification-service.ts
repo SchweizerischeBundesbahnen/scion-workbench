@@ -8,12 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {IntentClient, Qualifier, RequestError} from '@scion/microfrontend-platform';
+import {Qualifier} from '@scion/microfrontend-platform';
 import {WorkbenchNotificationConfig} from './workbench-notification.config';
-import {Beans} from '@scion/toolkit/bean-manager';
-import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
-import {Maps} from '@scion/toolkit/util';
-import {lastValueFrom} from 'rxjs';
 import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
@@ -42,7 +38,7 @@ import {Translatable} from '../text/workbench-text-provider.model';
  * @see WorkbenchNotificationCapability
  * @category Notification
  */
-export class WorkbenchNotificationService {
+export abstract class WorkbenchNotificationService {
 
   /**
    * Presents the user with a notification that is displayed in the upper-right corner based on the given qualifier.
@@ -57,16 +53,5 @@ export class WorkbenchNotificationService {
    *         the notification intention, or because no notification provider could be found that provides a notification under the specified
    *         qualifier.
    */
-  public async show(notification: Translatable | WorkbenchNotificationConfig, qualifier?: Qualifier): Promise<void> {
-    const config: WorkbenchNotificationConfig = typeof notification === 'string' ? {content: notification} : notification;
-    const params = Maps.coerce(config.params);
-
-    const showNotification$ = Beans.get(IntentClient).request$<void>({type: WorkbenchCapabilities.Notification, qualifier, params}, config);
-    try {
-      await lastValueFrom(showNotification$, {defaultValue: undefined});
-    }
-    catch (error) {
-      throw (error instanceof RequestError ? error.message : error);
-    }
-  }
+  public abstract show(notification: Translatable | WorkbenchNotificationConfig, qualifier?: Qualifier): Promise<void>;
 }

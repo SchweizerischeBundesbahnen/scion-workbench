@@ -1,10 +1,11 @@
 import {coerceElement} from '@angular/cdk/coercion';
-import {booleanAttribute, DestroyRef, ElementRef, inject, Injector, numberAttribute, DOCUMENT} from '@angular/core';
+import {booleanAttribute, DestroyRef, DOCUMENT, ElementRef, inject, Injector, numberAttribute} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 
 import {UID} from './uid.util';
 import {DisposeFn} from './disposable';
 import {Observable} from 'rxjs';
+import {clamp} from './math.util';
 
 /**
  * Creates an HTML element and optionally adds it to the DOM.
@@ -197,6 +198,27 @@ export function nextAnimationFrame$(): Observable<void> {
     const animationFrame = requestAnimationFrame(() => observer.next());
     return () => cancelAnimationFrame(animationFrame);
   });
+}
+
+/**
+ * Constrain passed bounding box based on specified constraints.
+ */
+export function constrainClientRect(clientRect: DOMRect, constraints: DOMRect | undefined): DOMRect;
+export function constrainClientRect(clientRect: DOMRect | undefined, constraints: DOMRect | undefined): DOMRect | undefined;
+export function constrainClientRect(clientRect: DOMRect | undefined, constraints: DOMRect | undefined): DOMRect | undefined {
+  if (!clientRect) {
+    return undefined;
+  }
+  if (!constraints) {
+    return clientRect;
+  }
+  const top = clamp(clientRect.top, {min: constraints.top, max: constraints.bottom});
+  const right = clamp(clientRect.right, {min: constraints.left, max: constraints.right});
+  const bottom = clamp(clientRect.bottom, {min: constraints.top, max: constraints.bottom});
+  const left = clamp(clientRect.left, {min: constraints.left, max: constraints.right});
+  const width = right - left;
+  const height = bottom - top;
+  return new DOMRect(left, top, width, height);
 }
 
 /**

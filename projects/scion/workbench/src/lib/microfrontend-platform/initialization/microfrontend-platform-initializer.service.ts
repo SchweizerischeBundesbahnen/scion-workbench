@@ -20,7 +20,7 @@ import {MicrofrontendViewIntentHandler} from '../microfrontend-view/microfronten
 import {WorkbenchHostManifestInterceptor} from './workbench-host-manifest-interceptor.service';
 import {MicrofrontendPopupIntentHandler} from '../microfrontend-popup/microfrontend-popup-intent-handler.interceptor';
 import {MicrofrontendPopupCapabilityValidator} from '../microfrontend-popup/microfrontend-popup-capability-validator.interceptor';
-import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter, WorkbenchTextService, ɵWorkbenchDialogService, ɵWorkbenchMessageBoxService, ɵWorkbenchTextService} from '@scion/workbench-client';
+import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter, WorkbenchTextService, ɵWorkbenchDialogService, ɵWorkbenchMessageBoxService, ɵWorkbenchNotificationService, ɵWorkbenchPopupService, ɵWorkbenchRouter, ɵWorkbenchTextService} from '@scion/workbench-client';
 import {MicrofrontendMessageBoxIntentHandler} from '../microfrontend-message-box/microfrontend-message-box-intent-handler.interceptor';
 import {MicrofrontendDialogIntentHandler} from '../microfrontend-dialog/microfrontend-dialog-intent-handler.interceptor';
 import {MicrofrontendDialogCapabilityValidator} from '../microfrontend-dialog/microfrontend-dialog-capability-validator.interceptor';
@@ -70,11 +70,11 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
     await runWorkbenchInitializers(MICROFRONTEND_PLATFORM_PRE_STARTUP, this._injector);
 
     // Register beans of @scion/workbench-client.
-    Beans.register(WorkbenchRouter);
-    Beans.register(WorkbenchPopupService);
-    Beans.register(WorkbenchMessageBoxService, {useClass: ɵWorkbenchMessageBoxService});
+    Beans.register(WorkbenchRouter, {useClass: ɵWorkbenchRouter});
     Beans.register(WorkbenchDialogService, {useClass: ɵWorkbenchDialogService});
-    Beans.register(WorkbenchNotificationService);
+    Beans.register(WorkbenchMessageBoxService, {useClass: ɵWorkbenchMessageBoxService});
+    Beans.register(WorkbenchPopupService, {useClass: ɵWorkbenchPopupService});
+    Beans.register(WorkbenchNotificationService, {useClass: ɵWorkbenchNotificationService});
     Beans.register(WorkbenchTextService, {useClass: ɵWorkbenchTextService});
 
     // Register host manifest interceptor for the workbench to register workbench-specific intentions and capabilities.

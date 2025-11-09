@@ -20,7 +20,7 @@ import {MAIN_AREA} from '../workbench-layout';
 import {toHaveComponentStateCustomMatcher} from '../../testing/jasmine/matcher/to-have-component-state.matcher';
 import {enterComponentState, TestComponent, withComponentContent, withComponentStateInputElement} from '../../testing/test.component';
 import {segments, styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../../testing/testing.util';
-import {WORKBENCH_PART_REGISTRY} from '../../part/workbench-part.registry';
+import {WorkbenchPartRegistry} from '../../part/workbench-part.registry';
 import {WORKBENCH_ID} from '../../workbench.identifiers';
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
 import {WorkbenchComponent} from '../../workbench.component';
@@ -182,7 +182,7 @@ describe('WorkbenchLayout Component', () => {
 
     // THEN expect view.3 to be moved: ['view.3', 'view.1', 'view.2', 'view.4']
     expect('view.3').toBeRegistered({partId: 'part.initial', active: true});
-    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.initial').views().map(view => view.id)).toEqual(['view.3', 'view.1', 'view.2', 'view.4']);
+    expect(TestBed.inject(WorkbenchPartRegistry).get('part.initial').views().map(view => view.id)).toEqual(['view.3', 'view.1', 'view.2', 'view.4']);
 
     // WHEN moving view.3 to position 1
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -202,7 +202,7 @@ describe('WorkbenchLayout Component', () => {
 
     // THEN expect view.3 not to be moved
     expect('view.3').toBeRegistered({partId: 'part.initial', active: true});
-    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.initial').views().map(view => view.id)).toEqual(['view.3', 'view.1', 'view.2', 'view.4']);
+    expect(TestBed.inject(WorkbenchPartRegistry).get('part.initial').views().map(view => view.id)).toEqual(['view.3', 'view.1', 'view.2', 'view.4']);
 
     // WHEN moving view.3 to position 2
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -222,7 +222,7 @@ describe('WorkbenchLayout Component', () => {
 
     // THEN view.3 to be moved as follows: ['view.1', 'view.3', 'view.2', 'view.4']
     expect('view.3').toBeRegistered({partId: 'part.initial', active: true});
-    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.initial').views().map(view => view.id)).toEqual(['view.1', 'view.3', 'view.2', 'view.4']);
+    expect(TestBed.inject(WorkbenchPartRegistry).get('part.initial').views().map(view => view.id)).toEqual(['view.1', 'view.3', 'view.2', 'view.4']);
 
     // WHEN moving view.3 to position 3
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -242,7 +242,7 @@ describe('WorkbenchLayout Component', () => {
 
     // THEN expect view.3 to be moved as follows: ['view.1', 'view.2', 'view.3', 'view.4']
     expect('view.3').toBeRegistered({partId: 'part.initial', active: true});
-    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.initial').views().map(view => view.id)).toEqual(['view.1', 'view.2', 'view.3', 'view.4']);
+    expect(TestBed.inject(WorkbenchPartRegistry).get('part.initial').views().map(view => view.id)).toEqual(['view.1', 'view.2', 'view.3', 'view.4']);
 
     // WHEN moving view.3 to position 4
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -262,7 +262,7 @@ describe('WorkbenchLayout Component', () => {
 
     // THEN expect view.3 to be moved as follows: ['view.1', 'view.2', 'view.4', 'view.3']
     expect('view.3').toBeRegistered({partId: 'part.initial', active: true});
-    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.initial').views().map(view => view.id)).toEqual(['view.1', 'view.2', 'view.4', 'view.3']);
+    expect(TestBed.inject(WorkbenchPartRegistry).get('part.initial').views().map(view => view.id)).toEqual(['view.1', 'view.2', 'view.4', 'view.3']);
   });
 
   it('allows to move a view to a new part in the east', async () => {

@@ -17,8 +17,8 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
  * A message box is a standardized dialog for presenting a message to the user, such as an info, warning or alert,
  * or for prompting the user for confirmation.
  *
- * Displayed on top of other content, a message box blocks interaction with other parts of the application. Multiple message boxes are stacked,
- * and only the topmost message box in each modality stack can be interacted with.
+ * Displayed on top of other content, a message box blocks interaction with other parts of the application. A message box can be context-modal
+ * or application-modal. Message boxes are stacked per modality, with only the topmost message box in each stack being interactive.
  *
  * The microfrontend can inject the {@link WorkbenchMessageBox} handle to interact with the message box, such as reading parameters or signaling readiness.
  *

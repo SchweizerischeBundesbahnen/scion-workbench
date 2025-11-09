@@ -5,9 +5,13 @@
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Dialog
 
-A dialog is a visual element for focused interaction with the user, such as prompting the user for input or confirming actions. The user can move or resize a dialog.
+A dialog is a visual element for focused interaction with the user, such as prompting the user for input or confirming actions. The user can move and resize a dialog.
 
-Displayed on top of other content, a dialog blocks interaction with other parts of the application. A dialog can be view-modal or application-modal. Multiple dialogs are stacked, and only the topmost dialog in each modality stack can be interacted with.
+Displayed on top of other content, a dialog blocks interaction with other parts of the application. A dialog can be context-modal or application-modal. Dialogs are stacked per modality, with only the topmost dialog in each stack being interactive.
+
+A dialog can be bound to a context (e.g., a part or view), displaying the dialog only if the context is visible and closing it when the context is disposed. Defaults to the calling context. 
+
+A dialog is opened in the center of its context, if any, unless opened from the peripheral area.
 
 ### How to Open a Dialog
 To open a dialog, inject `WorkbenchDialogService` and invoke the `open` method, passing the component to display.
@@ -18,13 +22,13 @@ import {WorkbenchDialogService} from '@scion/workbench';
 
 const dialogService = inject(WorkbenchDialogService);
 
-dialogService.open(MyDialogComponent);
+dialogService.open(YourDialogComponent);
 ```
 
 ### How to Set the Modality of a Dialog
-A dialog can be view-modal or application-modal. A view-modal dialog blocks only a specific view, allowing the user to interact with other views. An application-modal dialog blocks the workbench by default, or the browser's viewport, if set in the global workbench settings.
+A dialog can be context-modal or application-modal. Context-modal blocks a specific part of the application, as specified by the context; application-modal blocks the workbench or browser viewport, based on global workbench settings.
 
-By default, the calling context determines the modality of the dialog. If the dialog is opened from a view, only this view is blocked. To open the dialog with a different modality, specify the modality in the dialog options.
+By default, the dialog is modal to the calling context. Specify a different modality in dialog options.
 
 ```ts
 import {inject} from '@angular/core';
@@ -32,7 +36,7 @@ import {WorkbenchDialogService} from '@scion/workbench';
 
 const dialogService = inject(WorkbenchDialogService);
 
-dialogService.open(MyDialogComponent, {
+dialogService.open(YourDialogComponent, {
   modality: 'application',
 });
 ```
@@ -62,7 +66,7 @@ import {WorkbenchDialogService} from '@scion/workbench';
 
 const dialogService = inject(WorkbenchDialogService);
 
-dialogService.open(MyDialogComponent, {
+dialogService.open(YourDialogComponent, {
   inputs: {
     firstname: 'Firstname',
     lastname: 'Lastname'
@@ -76,7 +80,7 @@ Dialog inputs are available as input properties in the dialog component.
 import {Component, Input} from '@angular/core';
 
 @Component({...})
-export class MyDialogComponent {
+export class YourDialogComponent {
 
   @Input()
   public firstname: string;
@@ -146,7 +150,7 @@ import {WorkbenchDialog} from '@scion/workbench';
 
 const dialogService = inject(WorkbenchDialogService);
 
-const result = await dialogService.open(MyDialogComponent);
+const result = await dialogService.open(YourDialogComponent);
 ```
 
 ### How to Size the Dialog

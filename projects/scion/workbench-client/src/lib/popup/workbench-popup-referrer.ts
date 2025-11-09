@@ -13,6 +13,8 @@ import {ViewId} from '../workbench.identifiers';
 /**
  * Information about the context in which a popup was opened.
  *
+ * @deprecated since version 1.0.0-beta.34. Marked for removal. No replacement. Instead, add a parameter to the popup capability for the popup opener to pass required referrer information.
+ *
  * @category Popup
  */
 export interface WorkbenchPopupReferrer {

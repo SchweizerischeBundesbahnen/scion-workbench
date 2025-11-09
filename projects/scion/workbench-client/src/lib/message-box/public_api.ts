@@ -14,3 +14,4 @@ export {ɵWorkbenchMessageBoxService} from './ɵworkbench-message-box-service';
 export {type WorkbenchMessageBoxOptions} from './workbench-message-box.options';
 export {WorkbenchMessageBox} from './workbench-message-box';
 export {type ɵMessageBoxContext, ɵMESSAGE_BOX_CONTEXT} from './ɵworkbench-message-box-context';
+export {type ɵWorkbenchMessageBoxCommand} from './workbench-message-box-command';

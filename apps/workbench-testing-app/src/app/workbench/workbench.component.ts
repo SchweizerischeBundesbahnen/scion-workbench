@@ -42,7 +42,6 @@ import LayoutPageComponent from '../layout-page/layout-page.component';
 export class WorkbenchComponent implements OnDestroy {
 
   private readonly _workbenchRouter = inject(WorkbenchRouter);
-  private readonly _dialogService = inject(WorkbenchDialogService);
 
   protected readonly workbenchService = inject(WorkbenchService);
   protected readonly desktop = this.readQueryParamFlag<'legacy-start-page' | 'desktop-page' | 'focus-page' | 'layout-page'>(WorkbenchStartupQueryParams.DESKTOP);
@@ -60,16 +59,16 @@ export class WorkbenchComponent implements OnDestroy {
   };
 
   protected onMoveView(view: WorkbenchView): void {
-    void this._dialogService.open(ViewMoveDialogTestPageComponent, {
+    void inject(WorkbenchDialogService).open(ViewMoveDialogTestPageComponent, {
       inputs: {view},
       cssClass: 'e2e-move-view',
-      context: {viewId: view.id},
     });
   }
 
   protected onShowViewInfo(view: WorkbenchView): void {
-    void this._dialogService.open(ViewInfoDialogComponent, {
+    void inject(WorkbenchDialogService).open(ViewInfoDialogComponent, {
       inputs: {view},
+      modality: 'application', // to open view info of inactive views
       cssClass: 'e2e-view-info',
     });
   }

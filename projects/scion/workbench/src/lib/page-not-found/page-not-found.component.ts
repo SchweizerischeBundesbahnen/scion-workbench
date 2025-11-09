@@ -17,8 +17,8 @@ import {Router} from '@angular/router';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {WorkbenchDialog} from '../dialog/workbench-dialog';
-import {Popup} from '../popup/popup.config';
 import {isDialogOutlet, isPartOutlet, isPopupOutlet, isViewOutlet} from '../workbench.identifiers';
+import {WorkbenchPopup} from '../popup/workbench-popup';
 
 @Component({
   selector: 'wb-page-not-found',
@@ -44,7 +44,7 @@ export default class PageNotFoundComponent {
   protected readonly view = inject(WorkbenchView, {optional: true});
   protected readonly part = inject(WorkbenchPart, {optional: true});
   protected readonly dialog = inject(WorkbenchDialog, {optional: true});
-  protected readonly popup = inject(Popup, {optional: true});
+  protected readonly popup = inject(WorkbenchPopup, {optional: true});
 
   protected readonly path = computed(() => {
     // Track the URL.

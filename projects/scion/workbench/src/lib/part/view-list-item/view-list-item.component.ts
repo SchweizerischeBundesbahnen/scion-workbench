@@ -10,7 +10,7 @@
 
 import {ChangeDetectionStrategy, Component, computed, inject, Injector, input, Signal} from '@angular/core';
 import {CdkPortalOutlet, ComponentPortal} from '@angular/cdk/portal';
-import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
+import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
 import {WorkbenchConfig} from '../../workbench-config';
 import {ViewId} from '../../workbench.identifiers';
@@ -38,7 +38,7 @@ export class ViewListItemComponent {
 
   public readonly viewId = input.required<ViewId>();
 
-  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _viewRegistry = inject(WorkbenchViewRegistry);
 
   protected view = computed(() => this._viewRegistry.get(this.viewId()));
   protected viewTabContentPortal = this.computeViewTabContentPortal();

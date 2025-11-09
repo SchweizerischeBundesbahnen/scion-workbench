@@ -18,6 +18,7 @@ import {DialogPO} from '../../dialog.po';
 import {PopupPO} from '../../popup.po';
 import {WorkbenchDialogOptions} from '@scion/workbench';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
+import {PartPO} from '../../part.po';
 
 /**
  * Page object to interact with {@link DialogOpenerPageComponent}.
@@ -29,7 +30,7 @@ export class DialogOpenerPagePO implements WorkbenchViewPagePO {
   public readonly error: Locator;
   public readonly openButton: Locator;
 
-  constructor(private _locateBy: ViewPO | PopupPO | DialogPO) {
+  constructor(private _locateBy: ViewPO | PartPO | PopupPO | DialogPO) {
     this.locator = this._locateBy.locator.locator('app-dialog-opener-page');
     this.returnValue = this.locator.locator('output.e2e-return-value');
     this.error = this.locator.locator('output.e2e-dialog-error');
@@ -42,6 +43,15 @@ export class DialogOpenerPagePO implements WorkbenchViewPagePO {
     }
     else {
       throw Error('[PageObjectError] Test page not opened in a view.');
+    }
+  }
+
+  public get part(): PartPO {
+    if (this._locateBy instanceof PartPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a part.');
     }
   }
 
@@ -80,9 +90,8 @@ export class DialogOpenerPagePO implements WorkbenchViewPagePO {
       await this.locator.locator('select.e2e-modality').selectOption(options.modality);
     }
 
-    if (options?.context?.viewId) {
-      await this.locator.locator('input.e2e-contextual-view-id').fill(options.context.viewId);
-    }
+    const context = options?.context && (typeof options.context === 'object' ? options.context.viewId : options.context);
+    await this.locator.locator('input.e2e-context').fill(context || (context === null ? '<null>' : '<undefined>'));
 
     if (options?.cssClass) {
       await this.locator.locator('input.e2e-class').fill(coerceArray(options.cssClass).join(' '));
@@ -96,8 +105,8 @@ export class DialogOpenerPagePO implements WorkbenchViewPagePO {
       await this.locator.locator('input.e2e-count').fill(`${options.count}`);
     }
 
-    if (options?.viewContextActive !== undefined) {
-      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-view-context')).toggle(options.viewContextActive);
+    if (options?.rootContext !== undefined) {
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-root-context')).toggle(options.rootContext);
     }
 
     await this.openButton.click();
@@ -127,6 +136,6 @@ export class DialogOpenerPagePO implements WorkbenchViewPagePO {
 
 export interface DialogOpenerPageOptions {
   count?: number;
-  viewContextActive?: boolean;
+  rootContext?: boolean;
   waitUntilOpened?: boolean;
 }

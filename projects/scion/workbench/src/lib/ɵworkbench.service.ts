@@ -13,36 +13,44 @@ import {WorkbenchPartActionFn, WorkbenchTheme, WorkbenchViewMenuItemFn} from './
 import {Disposable} from './common/disposable';
 import {WorkbenchService} from './workbench.service';
 import {WorkbenchRouter} from './routing/workbench-router.service';
-import {WORKBENCH_VIEW_REGISTRY} from './view/workbench-view.registry';
+import {WorkbenchViewRegistry} from './view/workbench-view.registry';
 import {WorkbenchPerspectiveService} from './perspective/workbench-perspective.service';
 import {WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
-import {WORKBENCH_PART_REGISTRY} from './part/workbench-part.registry';
+import {WorkbenchPartRegistry} from './part/workbench-part.registry';
 import {ɵWorkbenchView} from './view/ɵworkbench-view.model';
 import {ɵWorkbenchPart} from './part/ɵworkbench-part.model';
 import {ɵWorkbenchPerspective} from './perspective/ɵworkbench-perspective.model';
-import {WORKBENCH_PERSPECTIVE_REGISTRY} from './perspective/workbench-perspective.registry';
-import {WORKBENCH_PART_ACTION_REGISTRY} from './part/workbench-part-action.registry';
+import {WorkbenchPerspectiveRegistry} from './perspective/workbench-perspective.registry';
+import {WorkbenchPartActionRegistry} from './part/workbench-part-action.registry';
 import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
-import {PartId, ViewId} from './workbench.identifiers';
+import {DialogId, PartId, PopupId, ViewId} from './workbench.identifiers';
 import {WorkbenchLayoutService} from './layout/workbench-layout.service';
-import {WORKBENCH_VIEW_MENU_ITEM_REGISTRY} from './view/workbench-view-menu-item.registry';
+import {WorkbenchViewMenuItemRegistry} from './view/workbench-view-menu-item.registry';
 import {WorkbenchFocusMonitor} from './focus/workbench-focus-tracker.service';
+import {WorkbenchDialogRegistry} from './dialog/workbench-dialog.registry';
+import {WorkbenchPopupRegistry} from './popup/workbench-popup.registry';
+import {ɵWorkbenchPopup} from './popup/ɵworkbench-popup';
+import {ɵWorkbenchDialog} from './dialog/ɵworkbench-dialog';
 
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchService implements WorkbenchService {
 
   private readonly _workbenchRouter = inject(WorkbenchRouter);
-  private readonly _perspectiveRegistry = inject(WORKBENCH_PERSPECTIVE_REGISTRY);
-  private readonly _partRegistry = inject(WORKBENCH_PART_REGISTRY);
-  private readonly _partActionRegistry = inject(WORKBENCH_PART_ACTION_REGISTRY);
-  private readonly _viewMenuItemRegistry = inject(WORKBENCH_VIEW_MENU_ITEM_REGISTRY);
-  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _perspectiveRegistry = inject(WorkbenchPerspectiveRegistry);
+  private readonly _partRegistry = inject(WorkbenchPartRegistry);
+  private readonly _viewRegistry = inject(WorkbenchViewRegistry);
+  private readonly _dialogRegistry = inject(WorkbenchDialogRegistry);
+  private readonly _popupRegistry = inject(WorkbenchPopupRegistry);
+  private readonly _partActionRegistry = inject(WorkbenchPartActionRegistry);
+  private readonly _viewMenuItemRegistry = inject(WorkbenchViewMenuItemRegistry);
   private readonly _perspectiveService = inject(WorkbenchPerspectiveService);
 
   public readonly layout = inject(WorkbenchLayoutService).layout;
-  public readonly perspectives = inject(WORKBENCH_PERSPECTIVE_REGISTRY).objects;
-  public readonly parts = inject(WORKBENCH_PART_REGISTRY).objects;
-  public readonly views = inject(WORKBENCH_VIEW_REGISTRY).objects;
+  public readonly perspectives = inject(WorkbenchPerspectiveRegistry).elements;
+  public readonly parts = inject(WorkbenchPartRegistry).elements;
+  public readonly views = inject(WorkbenchViewRegistry).elements;
+  public readonly dialogs = inject(WorkbenchDialogRegistry).elements;
+  public readonly popups = inject(WorkbenchPopupRegistry).elements;
   public readonly activePerspective = inject(WorkbenchPerspectiveService).activePerspective;
   public readonly activeElement = inject(WorkbenchFocusMonitor).activeElement;
   public readonly theme = this.computeLegacyThemeObject();
@@ -65,6 +73,16 @@ export class ɵWorkbenchService implements WorkbenchService {
   /** @inheritDoc */
   public getView(viewId: ViewId): ɵWorkbenchView | null {
     return this._viewRegistry.get(viewId, {orElse: null});
+  }
+
+  /** @inheritDoc */
+  public getDialog(dialogId: DialogId): ɵWorkbenchDialog | null {
+    return this._dialogRegistry.get(dialogId, {orElse: null});
+  }
+
+  /** @inheritDoc */
+  public getPopup(popupId: PopupId): ɵWorkbenchPopup | null {
+    return this._popupRegistry.get(popupId, {orElse: null});
   }
 
   /** @inheritDoc */

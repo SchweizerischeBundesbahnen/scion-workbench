@@ -5,8 +5,13 @@ import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {WorkbenchComponent} from '../workbench.component';
 import {By} from '@angular/platform-browser';
-import {PopupService} from './popup.service';
-import {ɵPopup} from './popup.config';
+import {WorkbenchPopupService} from './workbench-popup.service';
+import {ɵWorkbenchPopup} from './ɵworkbench-popup';
+import {WorkbenchPopup} from './workbench-popup';
+import {LogLevel} from '../logging';
+import {WorkbenchMessageBoxService} from '../message-box/workbench-message-box.service';
+import {WorkbenchDialogService} from '../dialog/workbench-dialog.service';
+import {WorkbenchPopupRegistry} from './workbench-popup.registry';
 
 describe('Popup', () => {
 
@@ -20,14 +25,14 @@ describe('Popup', () => {
       template: 'Popup',
     })
     class SpecPopupComponent {
-      public popup = inject(ɵPopup);
+      public popup = inject(ɵWorkbenchPopup);
     }
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     // Open popup.
-    void TestBed.inject(PopupService).open({component: SpecPopupComponent, anchor: {x: 0, y: 0}});
+    void TestBed.inject(WorkbenchPopupService).open({component: SpecPopupComponent, anchor: {x: 0, y: 0}});
     await waitUntilStable();
 
     // Get reference to the popup injector.
@@ -40,6 +45,83 @@ describe('Popup', () => {
 
     // Expect the injector to be destroyed.
     expect(injectorDestroyed).toBeTrue();
+  });
+
+  it('should destroy component when closing the popup', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+      ],
+    });
+
+    @Component({template: 'Popup'})
+    class SpecPopupComponent {
+
+      public destroyed = false;
+      public popup = inject(WorkbenchPopup);
+
+      constructor() {
+        inject(DestroyRef).onDestroy(() => this.destroyed = true);
+      }
+    }
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+
+    // Open popup.
+    void TestBed.inject(WorkbenchPopupService).open({component: SpecPopupComponent, anchor: {x: 0, y: 0}});
+    await waitUntilStable();
+
+    // Get component.
+    const popupComponent = getPopupComponent(fixture, SpecPopupComponent);
+
+    // Close popup.
+    popupComponent.popup.close();
+    await waitUntilStable();
+
+    // Expect the component to be destroyed.
+    expect(popupComponent.destroyed).toBeTrue();
+  });
+
+  it('should destroy popup-aware services when closing the popup', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          logging: {logLevel: LogLevel.DEBUG},
+        }),
+      ],
+    });
+
+    @Component({template: 'Popup'})
+    class SpecPopupComponent {
+
+      constructor() {
+        inject(WorkbenchMessageBoxService);
+        inject(WorkbenchDialogService);
+      }
+    }
+
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+
+    // Spy console.
+    spyOn(console, 'debug').and.callThrough();
+
+    // Open popup.
+    void TestBed.inject(WorkbenchPopupService).open({id: 'popup.1', component: SpecPopupComponent, anchor: {x: 0, y: 0}});
+    await waitUntilStable();
+
+    // Expect popup-aware services to be constructed.
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining('Constructing WorkbenchMessageBoxService [context=popup.1]'));
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining('Constructing WorkbenchDialogService [context=popup.1]'));
+
+    // Close popup.
+    TestBed.inject(WorkbenchPopupRegistry).get('popup.1').close();
+    await waitUntilStable();
+
+    // Expect popup-aware services to be destroyed.
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining('Destroying WorkbenchMessageBoxService [context=popup.1]'));
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining('Destroying WorkbenchDialogService [context=popup.1]'));
   });
 
   it('should allow for custom injector and providers', async () => {
@@ -69,7 +151,7 @@ describe('Popup', () => {
     });
 
     // Open popup.
-    void TestBed.inject(PopupService).open({
+    void TestBed.inject(WorkbenchPopupService).open({
       component: SpecPopupComponent,
       anchor: {x: 0, y: 0},
       componentConstructOptions: {

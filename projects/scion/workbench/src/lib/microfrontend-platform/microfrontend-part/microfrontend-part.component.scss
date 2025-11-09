@@ -2,13 +2,16 @@
   display: grid;
 }
 
-sci-router-outlet {
+// Extra DIV required because the glass pane cannot be installed on the router outlet as the outlet uses its content as splash.
+div.microfrontend-part {
+  display: grid;
+
   // Disable pointer events during workbench drag operation for the workbench to consume drag events.
   &.workbench-drag {
     pointer-events: none;
   }
 
-  &::part(splash) {
+  > sci-router-outlet::part(splash) {
     display: grid;
   }
 }

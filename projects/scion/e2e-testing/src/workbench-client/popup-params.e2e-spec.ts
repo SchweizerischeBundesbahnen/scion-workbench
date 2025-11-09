@@ -15,7 +15,7 @@ import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 
 test.describe('Popup', () => {
 
-  test('should allow passing a value to the popup component', async ({appPO, microfrontendNavigator}) => {
+  test('should pass params to the popup component', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     await microfrontendNavigator.registerCapability('app1', {
@@ -29,7 +29,7 @@ test.describe('Popup', () => {
       },
     });
 
-    // open the popup
+    // Open the popup.
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPage.enterQualifier({component: 'testee'});
     await popupOpenerPage.enterParams({id: '123'});
@@ -39,71 +39,22 @@ test.describe('Popup', () => {
     const popup = appPO.popup({cssClass: 'testee'});
     const popupPage = new PopupPagePO(popup);
 
-    // expect qualifier to be contained in popup params
-    await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({component: 'testee', id: '123'}));
+    // Expect param to be available in the microfrontend.
+    await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({id: '123'}));
   });
 
-  test('should contain the qualifier in popup params', async ({appPO, microfrontendNavigator}) => {
+  test('should substitute named URL params', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'popup',
       qualifier: {component: 'testee'},
-      properties: {
-        path: 'test-popup',
-      },
-    });
-
-    // open the popup
-    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'testee'});
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.open();
-
-    const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(popup);
-
-    // expect qualifier to be contained in popup params
-    await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({component: 'testee'}));
-  });
-
-  test('should not overwrite qualifier values with param values', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-
-    await microfrontendNavigator.registerCapability('app1', {
-      type: 'popup',
-      qualifier: {component: 'testee', mode: 'new'},
       params: [
-        {name: 'mode', required: true},
-      ],
-      properties: {
-        path: 'test-popup',
-      },
-    });
-
-    // open the popup
-    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'testee', mode: 'new'});
-    await popupOpenerPage.enterParams({mode: 'edit'}); // should be ignored
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.open();
-
-    const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(popup);
-
-    // expect qualifier values not to be overwritten by params
-    await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({component: 'testee', mode: 'new'}));
-  });
-
-  test('should substitute named URL params with values of the qualifier and params', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-
-    await microfrontendNavigator.registerCapability('app1', {
-      type: 'popup',
-      qualifier: {component: 'testee', seg1: 'SEG1', mp1: 'MP1', qp1: 'QP1'},
-      params: [
+        {name: 'seg1', required: true},
         {name: 'seg3', required: true},
+        {name: 'mp1', required: true},
         {name: 'mp2', required: true},
+        {name: 'qp1', required: true},
         {name: 'qp2', required: true},
         {name: 'fragment', required: true},
       ],
@@ -112,18 +63,18 @@ test.describe('Popup', () => {
       },
     });
 
-    // open the popup
+    // Open the popup.
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'testee', seg1: 'SEG1', mp1: 'MP1', qp1: 'QP1'});
-    await popupOpenerPage.enterParams({seg3: 'SEG3', mp2: 'MP2', qp2: 'QP2', fragment: 'FRAGMENT'});
+    await popupOpenerPage.enterQualifier({component: 'testee'});
+    await popupOpenerPage.enterParams({seg1: 'SEG1', seg3: 'SEG3', mp1: 'MP1', mp2: 'MP2', qp1: 'QP1', qp2: 'QP2', fragment: 'FRAGMENT'});
     await popupOpenerPage.enterCssClass('testee');
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
     const popupPage = new PopupPagePO(popup);
 
-    // expect named params to be substituted
-    await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({component: 'testee', seg1: 'SEG1', seg3: 'SEG3', mp1: 'MP1', mp2: 'MP2', qp1: 'QP1', qp2: 'QP2', fragment: 'FRAGMENT'}));
+    // Expect named params to be substituted.
+    await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({seg1: 'SEG1', seg3: 'SEG3', mp1: 'MP1', mp2: 'MP2', qp1: 'QP1', qp2: 'QP2', fragment: 'FRAGMENT'}));
     await expect.poll(() => popupPage.getRouteParams()).toEqual({segment1: 'SEG1', segment3: 'SEG3', mp1: 'MP1', mp2: 'MP2'});
     await expect.poll(() => popupPage.getRouteQueryParams()).toEqual({qp1: 'QP1', qp2: 'QP2'});
     await expect.poll(() => popupPage.getRouteFragment()).toEqual('FRAGMENT');

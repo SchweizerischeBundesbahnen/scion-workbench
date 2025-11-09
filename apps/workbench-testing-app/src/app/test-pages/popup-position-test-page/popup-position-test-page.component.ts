@@ -9,7 +9,7 @@
  */
 
 import {Component, ElementRef, inject, signal, viewChild} from '@angular/core';
-import {PopupService} from '@scion/workbench';
+import {WorkbenchPopupService} from '@scion/workbench';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {FormsModule} from '@angular/forms';
 import BlankTestPageComponent from '../blank-test-page/blank-test-page.component';
@@ -32,7 +32,7 @@ export default class PopupPositionTestPageComponent {
     left: signal(0),
   };
 
-  private _popupService = inject(PopupService);
+  private _popupService = inject(WorkbenchPopupService);
   private _openButton = viewChild.required<ElementRef<HTMLButtonElement>>('open_button');
 
   protected onOpen(): void {

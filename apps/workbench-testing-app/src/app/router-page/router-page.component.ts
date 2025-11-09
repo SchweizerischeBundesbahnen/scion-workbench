@@ -63,10 +63,10 @@ export default class RouterPageComponent {
       close: this._formBuilder.control<boolean | undefined>(undefined),
       cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
     }),
-    viewContext: this._formBuilder.control(true),
+    rootContext: this._formBuilder.control(false),
   });
 
-  protected readonly nullViewInjector = Injector.create({
+  protected readonly nullContextInjector = Injector.create({
     parent: inject(Injector),
     providers: [
       {provide: WorkbenchView, useValue: undefined},

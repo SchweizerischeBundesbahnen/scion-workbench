@@ -8,11 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {expect} from '@playwright/test';
 import {test} from '../fixtures';
-import {fromRect} from '../helper/testing.util';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
-import {POPUP_DIAMOND_ANCHOR_SIZE} from '../workbench/workbench-layout-constants';
+import {expectPopup} from '../matcher/popup-matcher';
+import {PopupPagePO} from './page-object/popup-page.po';
 
 test.describe('Workbench Popup Position', () => {
 
@@ -36,18 +35,15 @@ test.describe('Workbench Popup Position', () => {
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterPosition({top: 100, left: 100});
       await popupOpenerPage.selectAlign('east');
-      await popupOpenerPage.enterContextualViewId('<null>');
+      await popupOpenerPage.enterContext(null);
       await popupOpenerPage.open();
 
-      const popup = appPO.popup({cssClass: 'testee'});
-
-      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
-      await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      await expectPopup(popupPage).toHavePosition('east', 'viewport', {top: 100, left: 100});
 
       await test.step('update position', async () => {
         await popupOpenerPage.enterPosition({top: 150, left: 200});
-        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(150, 0);
-        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(200, 0);
+        await expectPopup(popupPage).toHavePosition('east', 'viewport', {top: 150, left: 200});
       });
     });
 
@@ -69,18 +65,15 @@ test.describe('Workbench Popup Position', () => {
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterPosition({top: 100, right: 100});
       await popupOpenerPage.selectAlign('west');
-      await popupOpenerPage.enterContextualViewId('<null>');
+      await popupOpenerPage.enterContext(null);
       await popupOpenerPage.open();
 
-      const popup = appPO.popup({cssClass: 'testee'});
-
-      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
-      await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      await expectPopup(popupPage).toHavePosition('west', 'viewport', {top: 100, right: 100});
 
       await test.step('update position', async () => {
         await popupOpenerPage.enterPosition({top: 150, right: 200});
-        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(150, 0);
-        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 200, 0);
+        await expectPopup(popupPage).toHavePosition('west', 'viewport', {top: 150, right: 200});
       });
     });
 
@@ -102,18 +95,15 @@ test.describe('Workbench Popup Position', () => {
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterPosition({bottom: 100, right: 100});
       await popupOpenerPage.selectAlign('west');
-      await popupOpenerPage.enterContextualViewId('<null>');
+      await popupOpenerPage.enterContext(null);
       await popupOpenerPage.open();
 
-      const popup = appPO.popup({cssClass: 'testee'});
-
-      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-      await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      await expectPopup(popupPage).toHavePosition('west', 'viewport', {bottom: 100, right: 100});
 
       await test.step('update position', async () => {
         await popupOpenerPage.enterPosition({bottom: 150, right: 200});
-        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 150, 0);
-        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 200, 0);
+        await expectPopup(popupPage).toHavePosition('west', 'viewport', {bottom: 150, right: 200});
       });
     });
 
@@ -135,18 +125,15 @@ test.describe('Workbench Popup Position', () => {
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterPosition({bottom: 100, left: 100});
       await popupOpenerPage.selectAlign('east');
-      await popupOpenerPage.enterContextualViewId('<null>');
+      await popupOpenerPage.enterContext(null);
       await popupOpenerPage.open();
 
-      const popup = appPO.popup({cssClass: 'testee'});
-
-      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-      await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      await expectPopup(popupPage).toHavePosition('east', 'viewport', {bottom: 100, left: 100});
 
       await test.step('update position', async () => {
         await popupOpenerPage.enterPosition({bottom: 150, left: 200});
-        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 150, 0);
-        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(200, 0);
+        await expectPopup(popupPage).toHavePosition('east', 'viewport', {bottom: 150, left: 200});
       });
     });
   });
@@ -173,16 +160,13 @@ test.describe('Workbench Popup Position', () => {
       await popupOpenerPage.selectAlign('east');
       await popupOpenerPage.open();
 
-      const popup = appPO.popup({cssClass: 'testee'});
-      const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-
-      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 100, 0);
-      await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 100, 0);
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      const view = popupOpenerPage.view.locator;
+      await expectPopup(popupPage).toHavePosition('east', view, {top: 100, left: 100});
 
       await test.step('update position', async () => {
         await popupOpenerPage.enterPosition({top: 150, left: 200});
-        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 150, 0);
-        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 200, 0);
+        await expectPopup(popupPage).toHavePosition('east', view, {top: 150, left: 200});
       });
     });
 
@@ -206,16 +190,13 @@ test.describe('Workbench Popup Position', () => {
       await popupOpenerPage.selectAlign('west');
       await popupOpenerPage.open();
 
-      const popup = appPO.popup({cssClass: 'testee'});
-      const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-
-      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 100, 0);
-      await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 100, 0);
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      const view = popupOpenerPage.view.locator;
+      await expectPopup(popupPage).toHavePosition('west', view, {top: 100, right: 100});
 
       await test.step('update position', async () => {
         await popupOpenerPage.enterPosition({top: 150, right: 200});
-        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 150, 0);
-        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 200, 0);
+        await expectPopup(popupPage).toHavePosition('west', view, {top: 150, right: 200});
       });
     });
 
@@ -239,16 +220,13 @@ test.describe('Workbench Popup Position', () => {
       await popupOpenerPage.selectAlign('west');
       await popupOpenerPage.open();
 
-      const popup = appPO.popup({cssClass: 'testee'});
-      const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-
-      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 100, 0);
-      await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 100, 0);
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      const view = popupOpenerPage.view.locator;
+      await expectPopup(popupPage).toHavePosition('west', view, {bottom: 100, right: 100});
 
       await test.step('update position', async () => {
         await popupOpenerPage.enterPosition({bottom: 150, right: 200});
-        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 150, 0);
-        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 200, 0);
+        await expectPopup(popupPage).toHavePosition('west', view, {bottom: 150, right: 200});
       });
     });
 
@@ -272,16 +250,13 @@ test.describe('Workbench Popup Position', () => {
       await popupOpenerPage.selectAlign('east');
       await popupOpenerPage.open();
 
-      const popup = appPO.popup({cssClass: 'testee'});
-      const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-
-      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 100, 0);
-      await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 100, 0);
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+      const view = popupOpenerPage.view.locator;
+      await expectPopup(popupPage).toHavePosition('east', view, {bottom: 100, left: 100});
 
       await test.step('update position', async () => {
         await popupOpenerPage.enterPosition({bottom: 150, left: 200});
-        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 150, 0);
-        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 200, 0);
+        await expectPopup(popupPage).toHavePosition('east', view, {bottom: 150, left: 200});
       });
     });
   });

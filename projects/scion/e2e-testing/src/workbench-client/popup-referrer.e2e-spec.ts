@@ -59,7 +59,7 @@ test.describe('Workbench Popup', () => {
 
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'testee'});
-      await popupOpenerPage.enterContextualViewId(startPageViewId);
+      await popupOpenerPage.enterContext(startPageViewId);
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.open({waitUntilAttached: false});
@@ -88,7 +88,7 @@ test.describe('Workbench Popup', () => {
 
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'testee'});
-      await popupOpenerPage.enterContextualViewId(microfrontendViewId);
+      await popupOpenerPage.enterContext(microfrontendViewId);
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.open({waitUntilAttached: false});
@@ -117,7 +117,7 @@ test.describe('Workbench Popup', () => {
 
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'testee'});
-      await popupOpenerPage.enterContextualViewId('<null>');
+      await popupOpenerPage.enterContext(null);
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.open();
 

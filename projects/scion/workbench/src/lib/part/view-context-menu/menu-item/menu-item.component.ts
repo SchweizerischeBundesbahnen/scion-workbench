@@ -10,13 +10,12 @@
 
 import {Component, inject, Injector, input, runInInjectionContext, TemplateRef} from '@angular/core';
 import {WorkbenchMenuItem} from '../../../workbench.model';
+import {WORKBENCH_ELEMENT} from '../../../workbench-element-references';
 import {ComponentType} from '@angular/cdk/portal';
 import {NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
 import {InstanceofPipe} from '../../../common/instanceof.pipe';
-import {provideViewContext} from '../../../view/view-context-provider';
 import {ɵWorkbenchView} from '../../../view/ɵworkbench-view.model';
-import {ɵWorkbenchPart} from '../../ɵworkbench-part.model';
-import {WorkbenchPart} from '../../workbench-part.model';
+import {WorkbenchView} from '../../../view/workbench-view.model';
 
 @Component({
   selector: 'wb-menu-item',
@@ -46,9 +45,9 @@ function transform(menuItem: WorkbenchMenuItem): ComponentMenuItem | TemplateMen
   const injector = Injector.create({
     parent: menuItem.injector ?? inject(Injector),
     providers: [
-      provideViewContext(view),
-      {provide: ɵWorkbenchPart, useValue: view.part()},
-      {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
+      {provide: ɵWorkbenchView, useValue: view},
+      {provide: WorkbenchView, useExisting: ɵWorkbenchView},
+      {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchView},
     ],
   });
 

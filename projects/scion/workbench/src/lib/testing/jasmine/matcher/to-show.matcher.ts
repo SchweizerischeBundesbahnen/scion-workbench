@@ -20,10 +20,15 @@ import {By} from '@angular/platform-browser';
 export const toShowCustomMatcher: jasmine.CustomMatcherFactories = {
   toShow: (): CustomMatcher => {
     return {
-      compare(element: any, expected: Type<unknown> | Predicate<DebugElement>, failOutput: string | undefined): CustomMatcherResult {
+      compare(fixture: any, expected: Type<unknown> | Predicate<DebugElement>, failOutput: string | undefined): CustomMatcherResult {
         const predicate = isPredicate(expected) ? expected : By.directive(expected);
-        const found = coerceDebugElement(element).query(predicate) as DebugElement | null !== null;
-        return found ? pass() : fail(`Expected ${isPredicate(expected) ? `${expected}` : expected.name} to show`);
+        const element = (coerceDebugElement(fixture).query(predicate) as DebugElement | undefined)?.nativeElement as HTMLElement | undefined;
+        if (element?.checkVisibility({visibilityProperty: true})) {
+          return pass();
+        }
+        else {
+          return fail(`Expected ${isPredicate(expected) ? `${expected}` : expected.name} to show`);
+        }
 
         function pass(): CustomMatcherResult {
           return {pass: true};

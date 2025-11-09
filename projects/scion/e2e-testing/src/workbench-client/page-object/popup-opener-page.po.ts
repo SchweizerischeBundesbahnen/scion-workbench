@@ -8,18 +8,18 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, DomRect, rejectWhenAttached, waitUntilBoundingBoxStable} from '../../helper/testing.util';
+import {coerceArray, rejectWhenAttached, waitForCondition, waitUntilBoundingBoxStable} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {Qualifier} from '@scion/microfrontend-platform';
-import {BottomLeftPoint, BottomRightPoint, TopLeftPoint, TopRightPoint} from '@scion/workbench';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
-import {ViewId} from '@scion/workbench-client';
+import {BottomLeftPoint, BottomRightPoint, DialogId, PartId, PopupId, TopLeftPoint, TopRightPoint, ViewId} from '@scion/workbench-client';
+import {PartPO} from '../../part.po';
 
 /**
  * Page object to interact with {@link PopupOpenerPageComponent}.
@@ -28,16 +28,20 @@ export class PopupOpenerPagePO implements MicrofrontendViewPagePO {
 
   public readonly locator: Locator;
   public readonly view: ViewPO;
+  public readonly part: PartPO;
   public readonly outlet: SciRouterOutletPO;
   public readonly returnValue: Locator;
   public readonly error: Locator;
+  public readonly openButton: Locator;
 
-  constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.outlet = new SciRouterOutletPO(this._appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
+  constructor(private _appPO: AppPO, locateBy: {id?: ViewId | PartId | DialogId; cssClass?: string}) {
+    this.view = this._appPO.view({viewId: locateBy.id as ViewId | undefined, cssClass: locateBy.cssClass});
+    this.part = this._appPO.part({partId: locateBy.id as PartId | undefined, cssClass: locateBy.cssClass});
+    this.outlet = new SciRouterOutletPO(this._appPO, {name: locateBy.id, cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-popup-opener-page');
     this.returnValue = this.locator.locator('output.e2e-return-value');
     this.error = this.locator.locator('output.e2e-popup-error');
+    this.openButton = this.locator.locator('button.e2e-open');
   }
 
   public async enterQualifier(qualifier: Qualifier): Promise<void> {
@@ -95,8 +99,8 @@ export class PopupOpenerPagePO implements MicrofrontendViewPagePO {
     }
   }
 
-  public async enterContextualViewId(viewId: ViewId | '<null>' | ''): Promise<void> {
-    await this.locator.locator('input.e2e-contextual-view-id').fill(viewId);
+  public async enterContext(context: ViewId | PartId | DialogId | PopupId | null | undefined): Promise<void> {
+    await this.locator.locator('input.e2e-context').fill(context || (context === null ? '<null>' : '<undefined>'));
   }
 
   public async selectAlign(align: 'east' | 'west' | 'north' | 'south'): Promise<void> {
@@ -134,6 +138,7 @@ export class PopupOpenerPagePO implements MicrofrontendViewPagePO {
   }
 
   public async open(options?: {waitUntilAttached?: boolean}): Promise<void> {
+    const popupCount = await this._appPO.popups.count();
     await this.locator.locator('button.e2e-open').click();
 
     if (!(options?.waitUntilAttached ?? true)) {
@@ -142,19 +147,28 @@ export class PopupOpenerPagePO implements MicrofrontendViewPagePO {
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([
-      this.waitUntilPopupAttached(),
+      this.waitUntilPopupAttached(popupCount),
       rejectWhenAttached(this.error),
     ]);
   }
 
-  private async waitUntilPopupAttached(): Promise<void> {
-    const cssClass = (await this.locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
-    const popup = this._appPO.popup({cssClass});
-    await popup.locator.waitFor({state: 'attached'});
-  }
+  private async waitUntilPopupAttached(prevPopupCount: number): Promise<void> {
+    // Wait until popup attached to the DOM.
+    await waitForCondition(async () => (await this._appPO.popups.count()) > prevPopupCount);
 
-  public async getAnchorElementBoundingBox(): Promise<DomRect> {
-    const buttonLocator = this.locator.locator('button.e2e-open');
-    return waitUntilBoundingBoxStable(buttonLocator);
+    // Get popup index.
+    const index = await this._appPO.popups.count() - 1;
+    const popupId = await this._appPO.popups.nth(index).getAttribute('data-popupid') as PopupId | null;
+    if (!popupId) {
+      throw Error('[PageObjectError] No popup found');
+    }
+
+    const popup = this._appPO.popup({popupId});
+
+    // Wait for the popup to have a stable size.
+    await waitUntilBoundingBoxStable(popup.locator);
+
+    // Wait for the popup to have focus.
+    await waitForCondition(async () => (await this._appPO.focusOwner()) === await popup.getPopupId());
   }
 }

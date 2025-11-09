@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Observable} from 'rxjs';
 import {Blocking} from './blocking';
+import {Signal} from '@angular/core';
 
 /**
  * Represents an object that can be blocked by another object, such as a dialog, preventing user interaction with the object.
@@ -17,7 +17,7 @@ import {Blocking} from './blocking';
 export interface Blockable {
 
   /**
-   * Emits the object blocking this object, or `null` if not blocked.
+   * Indicates whether an object (typically a dialog) blocks this object.
    */
-  blockedBy$: Observable<Blocking | null>;
+  blockedBy: Signal<Blocking | null>;
 }

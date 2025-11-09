@@ -196,6 +196,10 @@ export interface CanCloseRef {
  */
 export interface ViewSnapshot {
   /**
+   * Capability of the microfrontend loaded into the view.
+   */
+  capability: WorkbenchViewCapability;
+  /**
    * Parameters of the microfrontend loaded into the view.
    */
   params: ReadonlyMap<string, any>;

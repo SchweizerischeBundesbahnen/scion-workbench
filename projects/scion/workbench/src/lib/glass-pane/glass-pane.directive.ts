@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AfterViewInit, Directive, ElementRef, inject, InjectionToken, Injector, OnDestroy, runInInjectionContext} from '@angular/core';
+import {Directive, effect, ElementRef, inject, InjectionToken, untracked} from '@angular/core';
 import {createElement, positionElement, setStyle} from '../common/dom.util';
 import {fromEvent} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -27,36 +27,29 @@ import {Arrays} from '@scion/toolkit/util';
  * - {@link GLASS_PANE_OPTIONS}: Configures the glass pane.
  */
 @Directive({selector: '[wbGlassPane]'})
-export class GlassPaneDirective implements OnDestroy, AfterViewInit {
+export class GlassPaneDirective {
 
-  private readonly _injector = inject(Injector);
   private readonly _targetElement = coerceElement<HTMLElement>(inject(GLASS_PANE_TARGET_ELEMENT, {optional: true, host: true}) ?? inject(ElementRef));
   private readonly _options = inject(GLASS_PANE_OPTIONS, {optional: true, host: true}) ?? undefined;
 
-  private _glassPane: GlassPane | null = null;
-
   constructor() {
     positionElement(this._targetElement, {context: 'glasspane'});
-  }
-
-  public ngAfterViewInit(): void {
-    // Install the glass pane after Angular has finished initializing the component's view, critical
-    // if the component is already blocked at construction time, so that the glass pane is added after
-    // the view children.
-    runInInjectionContext(this._injector, () => this.installGlassPane());
+    this.installGlassPane();
   }
 
   private installGlassPane(): void {
-    inject(GLASS_PANE_BLOCKABLE, {host: true}).blockedBy$
-      .pipe(takeUntilDestroyed())
-      .subscribe((blockedBy: Blocking | null) => {
-        this._glassPane?.dispose();
-        this._glassPane = blockedBy ? new GlassPane(this._targetElement, blockedBy, this._options) : null;
-      });
-  }
+    const blockable = inject(GLASS_PANE_BLOCKABLE, {host: true});
+    effect(onCleanup => {
+      const blockedBy = blockable.blockedBy();
+      if (!blockedBy) {
+        return;
+      }
 
-  public ngOnDestroy(): void {
-    this._glassPane?.dispose();
+      untracked(() => {
+        const glassPane = new GlassPane(this._targetElement, blockedBy, this._options);
+        onCleanup(() => glassPane.dispose());
+      });
+    });
   }
 }
 

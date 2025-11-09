@@ -81,7 +81,7 @@ export class MicrofrontendNavigator {
     switch (page) {
       case MessageBoxOpenerPagePO: {
         await startPage.openMicrofrontendView('e2e-test-message-box-opener', app);
-        return new MessageBoxOpenerPagePO(this._appPO, {viewId, cssClass: 'e2e-test-message-box-opener'});
+        return new MessageBoxOpenerPagePO(this._appPO, {id: viewId, cssClass: 'e2e-test-message-box-opener'});
       }
       case RegisterWorkbenchIntentionPagePO: {
         await startPage.openMicrofrontendView('e2e-register-workbench-intention', app);
@@ -109,11 +109,11 @@ export class MicrofrontendNavigator {
       }
       case PopupOpenerPagePO: {
         await startPage.openMicrofrontendView('e2e-test-popup-opener', app);
-        return new PopupOpenerPagePO(this._appPO, {viewId, cssClass: 'e2e-test-popup-opener'});
+        return new PopupOpenerPagePO(this._appPO, {id: viewId, cssClass: 'e2e-test-popup-opener'});
       }
       case DialogOpenerPagePO: {
         await startPage.openMicrofrontendView('e2e-test-dialog-opener', app);
-        return new DialogOpenerPagePO(this._appPO, {viewId, cssClass: 'e2e-test-dialog-opener'});
+        return new DialogOpenerPagePO(this._appPO, {id: viewId, cssClass: 'e2e-test-dialog-opener'});
       }
       case MessagingPagePO: {
         await startPage.openMicrofrontendView('e2e-messaging', app);

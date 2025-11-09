@@ -17,7 +17,7 @@ import {toSignal} from '@angular/core/rxjs-interop';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {distinctUntilChanged, map} from 'rxjs/operators';
-import {WORKBENCH_PART_REGISTRY} from '../workbench-part.registry';
+import {WorkbenchPartRegistry} from '../workbench-part.registry';
 import {IconComponent} from '../../icon/icon.component';
 import {TextPipe} from '../../text/text.pipe';
 import {PartId} from '../../workbench.identifiers';
@@ -81,7 +81,7 @@ export class ViewTabDragImageComponent {
    * Computes if dragging this view tab over a tabbar located in the peripheral area.
    */
   private computeDragOverPeripheralTabbar(): Signal<boolean> {
-    const partRegistry = inject(WORKBENCH_PART_REGISTRY);
+    const partRegistry = inject(WorkbenchPartRegistry);
     return computed(() => {
       const partId = this.isDragOverTabbar();
       return untracked(() => partId && partRegistry.get(partId).peripheral());

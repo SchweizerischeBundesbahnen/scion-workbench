@@ -8,18 +8,20 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {InjectionToken} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
-import {WorkbenchObjectRegistry} from '../registry/workbench-object-registry';
+import {WorkbenchElementRegistry} from '../registry/workbench-element-registry';
 import {ViewId} from '../workbench.identifiers';
 
 /**
- * Registry for {@link WorkbenchView} model objects.
+ * Registry for {@link WorkbenchView} elements.
  */
-export const WORKBENCH_VIEW_REGISTRY = new InjectionToken<WorkbenchObjectRegistry<ViewId, ɵWorkbenchView>>('WORKBENCH_VIEW_REGISTRY', {
-  providedIn: 'root',
-  factory: () => new WorkbenchObjectRegistry<ViewId, ɵWorkbenchView>({
-    nullObjectErrorFn: viewId => Error(`[NullViewError] View '${viewId}' not found.`),
-    onUnregister: view => view.destroy(),
-  }),
-});
+@Injectable({providedIn: 'root'})
+export class WorkbenchViewRegistry extends WorkbenchElementRegistry<ViewId, ɵWorkbenchView> {
+  constructor() {
+    super({
+      nullElementErrorFn: viewId => Error(`[NullViewError] View '${viewId}' not found.`),
+      onUnregister: view => view.destroy(),
+    });
+  }
+}

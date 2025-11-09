@@ -20,7 +20,6 @@ import {ViewInfo} from '../workbench/page-object/view-info-dialog.po';
 import {TextMessagePO} from './page-object/text-message.po';
 import {SizeTestPagePO} from './page-object/test-pages/size-test-page.po';
 import {MAIN_AREA} from '../workbench.model';
-import {SciRouterOutletPO} from './page-object/sci-router-outlet.po';
 import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
 import {waitForCondition} from '../helper/testing.util';
 import {MicrofrontendTestPage1PO} from './page-object/microfrontend-test-page-1.po';
@@ -412,27 +411,38 @@ test.describe('Workbench View', () => {
   test('should maintain view size if not active (to not flicker on reactivation; to support for virtual scrolling)', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    // Open view 1.
-    const viewPage1 = await SizeTestPagePO.openInNewTab(appPO);
-    await expectView(viewPage1).toBeActive();
-    const viewSize = await viewPage1.getBoundingBox();
-    const sizeChanges = await viewPage1.getRecordedSizeChanges();
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-pages/size-test-page',
+      },
+    });
 
-    // Open view 2.
-    const viewPage2 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    await expectView(viewPage1).toBeInactive();
-    await expectView(viewPage2).toBeActive();
+    // Open view.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+
+    const viewPage = new SizeTestPagePO(appPO, {cssClass: 'testee'});
+
+    // Expect view to be visible.
+    await expectView(viewPage).toBeActive();
+    const viewSize = await viewPage.getBoundingBox();
+    const sizeChanges = await viewPage.getRecordedSizeChanges();
+
+    // Detach contextual view.
+    await appPO.openNewViewTab();
+    await expectView(viewPage).toBeInactive();
 
     // Expect view bounding box not to have changed.
-    await expect.poll(() => viewPage1.getBoundingBox()).toEqual(viewSize);
+    await expect.poll(() => viewPage.getBoundingBox()).toEqual(viewSize);
 
-    // Activate view 1.
-    await viewPage1.view.tab.click();
-    await expectView(viewPage1).toBeActive();
-    await expectView(viewPage2).toBeInactive();
+    // Attach contextual view.
+    await viewPage.view.tab.click();
+    await expectView(viewPage).toBeActive();
 
-    // Expect view not to be resized (no flickering).
-    await expect.poll(() => viewPage1.getRecordedSizeChanges()).toEqual(sizeChanges);
+    // Expect view not to be resized.
+    await expect.poll(() => viewPage.getRecordedSizeChanges()).toEqual(sizeChanges);
   });
 
   test('should not invoke `CanClose` guard when switching between viewtabs', async ({appPO, microfrontendNavigator}) => {
@@ -1471,9 +1481,7 @@ test.describe('Workbench View', () => {
     await appPO.switchPerspective(perspective.metadata!.id);
 
     // Enter component state in view.
-    const view = appPO.view({cssClass: 'testee'});
-    const outlet = new SciRouterOutletPO(appPO, {cssClass: 'testee'});
-    const testeeViewPage = new InputFieldTestPagePO(outlet, view);
+    const testeeViewPage = new InputFieldTestPagePO(appPO, {cssClass: 'testee'});
     await testeeViewPage.enterText('A');
     await expect(testeeViewPage.input).toHaveValue('A');
 

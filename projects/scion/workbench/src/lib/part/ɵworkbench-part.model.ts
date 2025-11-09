@@ -7,19 +7,20 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {afterRenderEffect, assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, TemplateRef, untracked, WritableSignal} from '@angular/core';
+import {afterRenderEffect, assertNotInReactiveContext, computed, DestroyableInjector, effect, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, TemplateRef, untracked, WritableSignal} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchPartAction, WorkbenchPartActionFn} from '../workbench.model';
+import {WORKBENCH_ELEMENT} from '../workbench-element-references';
 import {WorkbenchPart, WorkbenchPartNavigation} from './workbench-part.model';
 import {PartId} from '../workbench.identifiers';
-import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
+import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {ComponentType} from '@angular/cdk/portal';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {ActivatedRouteSnapshot, ChildrenOutletContexts} from '@angular/router';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
-import {WORKBENCH_PART_ACTION_REGISTRY} from './workbench-part-action.registry';
+import {WorkbenchPartActionRegistry} from './workbench-part-action.registry';
 import {ClassList} from '../common/class-list';
 import {Routing} from '../routing/routing.util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
@@ -33,10 +34,17 @@ import {PartComponent} from './part.component';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
 import {Translatable} from '../text/workbench-text-provider.model';
+import {boundingClientRect} from '@scion/components/dimension';
+import {provideContextAwareServices} from '../context-aware-service-provider';
+import {Blockable} from '../glass-pane/blockable';
+import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
+import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
 
-export class ɵWorkbenchPart implements WorkbenchPart {
+/** @inheritDoc */
+export class ɵWorkbenchPart implements WorkbenchPart, Blockable {
 
-  private readonly _partEnvironmentInjector = inject(EnvironmentInjector);
+  /** Injector for the part; destroyed when the part is removed. */
+  public readonly injector = inject(Injector) as DestroyableInjector;
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _rootOutletContexts = inject(ChildrenOutletContexts);
   private readonly _focusMonitor = inject(WorkbenchFocusMonitor);
@@ -64,7 +72,12 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   public readonly views: Signal<ɵWorkbenchView[]>;
   public readonly classList = new ClassList();
   public readonly portal: WbComponentPortal<MainAreaPartComponent | PartComponent>;
-  public readonly slot: {portal: WbComponentPortal<PartSlotComponent>};
+  public readonly bounds: Signal<DOMRect | undefined>;
+  public readonly blockedBy: Signal<ɵWorkbenchDialog | null>;
+  public readonly slot: {
+    portal: WbComponentPortal<PartSlotComponent>;
+    bounds: Signal<DOMRect | undefined>;
+  };
 
   private _isInMainArea: boolean | undefined;
 
@@ -75,8 +88,13 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     this.activeView = computeActiveView(this.mPart);
     this.views = computeViews(this.mPart);
     this.alternativeId = this.mPart().alternativeId;
-    this.portal = this.createPortal<MainAreaPartComponent | PartComponent>(id === MAIN_AREA ? MainAreaPartComponent : PartComponent);
-    this.slot = {portal: this.createPortal(PartSlotComponent)};
+    this.portal = this.createPartPortal();
+    this.bounds = boundingClientRect(computed(() => this.portal.element()));
+    this.blockedBy = inject(WorkbenchDialogRegistry).top(this.id);
+    this.slot = {
+      portal: this.createPartSlotPortal(),
+      bounds: boundingClientRect(computed(() => this.slot.portal.element())),
+    };
     this.installModelUpdater();
     this.onLayoutChange({layout});
     this.activateOnFocus();
@@ -88,11 +106,29 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     this.slot.portal.componentRef()?.instance.focus();
   }
 
-  private createPortal<T>(componentType: ComponentType<T>): WbComponentPortal<T> {
-    return new WbComponentPortal<T>(componentType, {
+  /**
+   * Creates a portal to render {@link PartComponent} or {@link MainAreaPartComponent} in the part's injection context.
+   */
+  private createPartPortal(): WbComponentPortal<MainAreaPartComponent | PartComponent> {
+    return new WbComponentPortal<MainAreaPartComponent | PartComponent>(this.id === MAIN_AREA ? MainAreaPartComponent : PartComponent, {
       providers: [
         {provide: ɵWorkbenchPart, useValue: this},
         {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
+        {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchPart},
+      ],
+    });
+  }
+
+  /**
+   * Creates a portal to render {@link PartSlotComponent} in the part's injection context.
+   */
+  private createPartSlotPortal(): WbComponentPortal<PartSlotComponent> {
+    return new WbComponentPortal(PartSlotComponent, {
+      providers: [
+        {provide: ɵWorkbenchPart, useValue: this},
+        {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
+        {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchPart},
+        provideContextAwareServices(),
       ],
     });
   }
@@ -195,13 +231,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     return this._isInMainArea ?? false;
   }
 
-  /**
-   * Reference to the handle's injector. The injector will be destroyed when removing the part.
-   */
-  public get injector(): Injector {
-    return this._partEnvironmentInjector;
-  }
-
   /** @inheritDoc */
   public get title(): Signal<Translatable | undefined> {
     return this._titleComputed;
@@ -292,7 +321,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   }
 
   public destroy(): void {
-    this._partEnvironmentInjector.destroy();
+    this.injector.destroy();
   }
 }
 
@@ -356,11 +385,11 @@ function computePartActions(part: ɵWorkbenchPart): Signal<WorkbenchPartAction[]
 
   // Use a differ to avoid re-creating every action on registration or change.
   const differ = inject(IterableDiffers).find([]).create<WorkbenchPartActionFn>();
-  const partActionRegistry = inject(WORKBENCH_PART_ACTION_REGISTRY);
+  const partActionRegistry = inject(WorkbenchPartActionRegistry);
   const partActions = new Map<WorkbenchPartActionFn, Signal<WorkbenchPartAction | null>>();
 
   return computed(() => {
-    const changes = differ.diff(partActionRegistry.objects());
+    const changes = differ.diff(partActionRegistry.elements());
     changes?.forEachAddedItem(({item: fn}) => partActions.set(fn, computed(() => constructPartAction(fn, injector))));
     changes?.forEachRemovedItem(({item: fn}) => partActions.delete(fn));
     return Array.from(partActions.values()).map(partAction => partAction()).filter(partAction => !!partAction);
@@ -379,7 +408,7 @@ function computePartActions(part: ɵWorkbenchPart): Signal<WorkbenchPartAction[]
  * Computes the active view of given part, or `null` if none.
  */
 function computeActiveView(mPart: Signal<MPart>): Signal<ɵWorkbenchView | null> {
-  const viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  const viewRegistry = inject(WorkbenchViewRegistry);
   return computed(() => mPart().activeViewId ? viewRegistry.get(mPart().activeViewId!) : null);
 }
 
@@ -387,6 +416,6 @@ function computeActiveView(mPart: Signal<MPart>): Signal<ɵWorkbenchView | null>
  * Computes the views opened in given part.
  */
 function computeViews(mPart: Signal<MPart>): Signal<ɵWorkbenchView[]> {
-  const viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  const viewRegistry = inject(WorkbenchViewRegistry);
   return computed(() => mPart().views.map(mView => viewRegistry.get(mView.id)), {equal: (a, b) => Arrays.isEqual(a, b, {exactOrder: true})});
 }

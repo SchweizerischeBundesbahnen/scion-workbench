@@ -12,12 +12,12 @@ import {TestBed} from '@angular/core/testing';
 import {TestComponent} from '../testing/test.component';
 import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
-import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
+import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
-import {WORKBENCH_PART_REGISTRY} from './workbench-part.registry';
+import {WorkbenchPartRegistry} from './workbench-part.registry';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
-import {Component, DestroyRef, Directive, inject, OnDestroy, signal} from '@angular/core';
+import {Component, DestroyRef, Directive, effect, inject, OnDestroy, signal} from '@angular/core';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
 import {WorkbenchPartNavigation} from './workbench-part.model';
@@ -27,6 +27,9 @@ import {MAIN_AREA} from '../layout/workbench-layout';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
+import {WorkbenchMessageBoxService} from '../message-box/workbench-message-box.service';
+import {WorkbenchDialogService} from '../dialog/workbench-dialog.service';
+import {LogLevel} from '../logging';
 
 describe('WorkbenchPart', () => {
 
@@ -43,21 +46,108 @@ describe('WorkbenchPart', () => {
     styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
-    // Add part to the right.
-    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.addPart('part.right', {align: 'right'}));
+    // Add part.
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.addPart('part.testee', {align: 'right'}));
     await waitUntilStable();
 
     // Get reference to the part injector.
-    const part = TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.right');
+    const part = TestBed.inject(WorkbenchPartRegistry).get('part.testee');
     let injectorDestroyed = false;
     part.injector.get(DestroyRef).onDestroy(() => injectorDestroyed = true);
 
     // Remove the part.
-    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.removePart('part.right'));
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.removePart('part.testee'));
     await waitUntilStable();
 
     // Expect the injector to be destroyed.
     expect(injectorDestroyed).toBeTrue();
+  });
+
+  it('should destroy component when removing the part', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'path/to/part', loadComponent: () => SpecPartComponent},
+        ]),
+      ],
+    });
+
+    @Component({template: ''})
+    class SpecPartComponent {
+
+      public destroyed = false;
+
+      constructor() {
+        inject(DestroyRef).onDestroy(() => this.destroyed = true);
+      }
+    }
+
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+
+    // Add part.
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout
+      .addPart('part.testee', {align: 'right'})
+      .navigatePart('part.testee', ['path/to/part']),
+    );
+    await waitUntilStable();
+
+    // Get component.
+    const partComponent = TestBed.inject(WorkbenchPartRegistry).get('part.testee').getComponent<SpecPartComponent>()!;
+
+    // Remove part.
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.removePart('part.testee'));
+    await waitUntilStable();
+
+    // Expect the component to be destroyed.
+    expect(partComponent.destroyed).toBeTrue();
+  });
+
+  it('should destroy part-aware services when removing the part', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          logging: {logLevel: LogLevel.DEBUG},
+        }),
+        provideRouter([
+          {path: 'path/to/part', loadComponent: () => SpecPartComponent},
+        ]),
+      ],
+    });
+
+    @Component({template: ''})
+    class SpecPartComponent {
+
+      constructor() {
+        inject(WorkbenchMessageBoxService);
+        inject(WorkbenchDialogService);
+      }
+    }
+
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+
+    // Spy console.
+    spyOn(console, 'debug').and.callThrough();
+
+    // Add part.
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout
+      .addPart('part.testee', {align: 'right'})
+      .navigatePart('part.testee', ['path/to/part']),
+    );
+    await waitUntilStable();
+
+    // Expect part-aware services to be constructed.
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining('Constructing WorkbenchMessageBoxService [context=part.testee]'));
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining('Constructing WorkbenchDialogService [context=part.testee]'));
+
+    // Remove part.
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.removePart('part.testee'));
+
+    // Expect part-aware services to be destroyed.
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining('Destroying WorkbenchMessageBoxService [context=part.testee]'));
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining('Destroying WorkbenchDialogService [context=part.testee]'));
   });
 
   it('should activate part even if view is already active', async () => {
@@ -82,15 +172,15 @@ describe('WorkbenchPart', () => {
     await waitUntilWorkbenchStarted();
 
     // Expect part 'left-top' to be active.
-    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.left-top').active()).toBeTrue();
-    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.left-bottom').active()).toBeFalse();
+    expect(TestBed.inject(WorkbenchPartRegistry).get('part.left-top').active()).toBeTrue();
+    expect(TestBed.inject(WorkbenchPartRegistry).get('part.left-bottom').active()).toBeFalse();
 
     // WHEN activating already active view
-    await TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.102').activate();
+    await TestBed.inject(WorkbenchViewRegistry).get('view.102').activate();
 
     // THEN expect part to be activated.
-    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.left-top').active()).toBeFalse();
-    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.left-bottom').active()).toBeTrue();
+    expect(TestBed.inject(WorkbenchPartRegistry).get('part.left-top').active()).toBeFalse();
+    expect(TestBed.inject(WorkbenchPartRegistry).get('part.left-bottom').active()).toBeTrue();
   });
 
   it('should activate part using `Part.activate()`', async () => {
@@ -660,7 +750,7 @@ describe('WorkbenchPart', () => {
     await workbenchRouter.navigate(layout => layout.navigatePart('part.testee', ['part-1'], {data: {data: 'part-1'}, state: {state: 'part-1'}, hint: 'part-1', cssClass: 'part-1'}));
     await waitUntilStable();
     // Expect properties to be set in constructor.
-    const componentInstancePart1 = TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.testee').getComponent<SpecPart1Component>()!;
+    const componentInstancePart1 = TestBed.inject(WorkbenchPartRegistry).get('part.testee').getComponent<SpecPart1Component>()!;
     expect(componentInstancePart1).toBeInstanceOf(SpecPart1Component);
     expect(componentInstancePart1.navigationReadInConstructor).toEqual(jasmine.objectContaining({data: {data: 'part-1'}, state: {state: 'part-1'}, hint: 'part-1'}));
     expect(componentInstancePart1.navigationCssClassReadInConstructor).toEqual(['part-1']);
@@ -669,7 +759,7 @@ describe('WorkbenchPart', () => {
     await workbenchRouter.navigate(layout => layout.navigatePart('part.testee', ['part-2'], {data: {data: 'part-2'}, state: {state: 'part-2'}, hint: 'part-2', cssClass: 'part-2'}));
     await waitUntilStable();
     // Expect properties to be set in constructor.
-    const componentInstancePart2 = TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.testee').getComponent<SpecPart2Component>()!;
+    const componentInstancePart2 = TestBed.inject(WorkbenchPartRegistry).get('part.testee').getComponent<SpecPart2Component>()!;
     expect(componentInstancePart2).toBeInstanceOf(SpecPart2Component);
     expect(componentInstancePart2.navigationReadInConstructor).toEqual(jasmine.objectContaining({data: {data: 'part-2'}, state: {state: 'part-2'}, hint: 'part-2'}));
     expect(componentInstancePart2.navigationCssClassReadInConstructor).toEqual(['part-2']);
@@ -681,7 +771,7 @@ describe('WorkbenchPart', () => {
     await workbenchRouter.navigate(layout => layout.navigatePart('part.testee', ['part/3'], {data: {data: 'part-3'}, state: {state: 'part-3'}, hint: 'part-3', cssClass: 'part-3'}));
     await waitUntilStable();
     // Expect properties to be set in constructor.
-    const componentInstancePart3 = TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.testee').getComponent<SpecPart3Component>()!;
+    const componentInstancePart3 = TestBed.inject(WorkbenchPartRegistry).get('part.testee').getComponent<SpecPart3Component>()!;
     expect(componentInstancePart3).toBeInstanceOf(SpecPart3Component);
     expect(componentInstancePart3.navigationReadInConstructor).toEqual(jasmine.objectContaining({data: {data: 'part-3'}, state: {state: 'part-3'}, hint: 'part-3'}));
     expect(componentInstancePart3.navigationCssClassReadInConstructor).toEqual(['part-3']);
@@ -693,7 +783,7 @@ describe('WorkbenchPart', () => {
     await workbenchRouter.navigate(layout => layout.navigatePart('part.testee', ['part/4'], {data: {data: 'part-4'}, state: {state: 'part-4'}, hint: 'part-4', cssClass: 'part-4'}));
     await waitUntilStable();
     // Expect properties to be set in constructor.
-    const componentInstancePart4 = TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.testee').getComponent<SpecPart4Component>()!;
+    const componentInstancePart4 = TestBed.inject(WorkbenchPartRegistry).get('part.testee').getComponent<SpecPart4Component>()!;
     expect(componentInstancePart4).toBeInstanceOf(SpecPart4Component);
     expect(componentInstancePart4.navigationReadInConstructor).toEqual(jasmine.objectContaining({data: {data: 'part-4'}, state: {state: 'part-4'}, hint: 'part-4'}));
     expect(componentInstancePart4.navigationCssClassReadInConstructor).toEqual(['part-4']);
@@ -705,7 +795,7 @@ describe('WorkbenchPart', () => {
     await workbenchRouter.navigate(layout => layout.navigatePart('part.testee', ['path/to/module-a/part-5'], {data: {data: 'part-5'}, state: {state: 'part-5'}, hint: 'part-5', cssClass: 'part-5'}));
     await waitUntilStable();
     // Expect properties to be set in constructor.
-    const componentInstancePart5 = TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.testee').getComponent<SpecPart5Component>()!;
+    const componentInstancePart5 = TestBed.inject(WorkbenchPartRegistry).get('part.testee').getComponent<SpecPart5Component>()!;
     expect(componentInstancePart5).toBeInstanceOf(SpecPart5Component);
     expect(componentInstancePart5.navigationReadInConstructor).toEqual(jasmine.objectContaining({data: {data: 'part-5'}, state: {state: 'part-5'}, hint: 'part-5'}));
     expect(componentInstancePart5.navigationCssClassReadInConstructor).toEqual(['part-5']);
@@ -717,7 +807,7 @@ describe('WorkbenchPart', () => {
     await workbenchRouter.navigate(layout => layout.navigatePart('part.testee', ['path/to/module-b/part/6'], {data: {data: 'part-6'}, state: {state: 'part-6'}, hint: 'part-6', cssClass: 'part-6'}));
     await waitUntilStable();
     // Expect properties to be set in constructor.
-    const componentInstancePart6 = TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.testee').getComponent<SpecPart6Component>()!;
+    const componentInstancePart6 = TestBed.inject(WorkbenchPartRegistry).get('part.testee').getComponent<SpecPart6Component>()!;
     expect(componentInstancePart6).toBeInstanceOf(SpecPart6Component);
     expect(componentInstancePart6.navigationReadInConstructor).toEqual(jasmine.objectContaining({data: {data: 'part-6'}, state: {state: 'part-6'}, hint: 'part-6'}));
     expect(componentInstancePart6.navigationCssClassReadInConstructor).toEqual(['part-6']);
@@ -729,7 +819,7 @@ describe('WorkbenchPart', () => {
     await workbenchRouter.navigate(layout => layout.navigatePart('part.testee', ['path/to/module-b/part/7'], {data: {data: 'part-7'}, state: {state: 'part-7'}, hint: 'part-7', cssClass: 'part-7'}));
     await waitUntilStable();
     // Expect properties to be set in constructor.
-    const componentInstancePart7 = TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.testee').getComponent<SpecPart7Component>()!;
+    const componentInstancePart7 = TestBed.inject(WorkbenchPartRegistry).get('part.testee').getComponent<SpecPart7Component>()!;
     expect(componentInstancePart7).toBeInstanceOf(SpecPart7Component);
     expect(componentInstancePart7.navigationReadInConstructor).toEqual(jasmine.objectContaining({data: {data: 'part-7'}, state: {state: 'part-7'}, hint: 'part-7'}));
     expect(componentInstancePart7.navigationCssClassReadInConstructor).toEqual(['part-7']);
@@ -797,10 +887,10 @@ describe('WorkbenchPart', () => {
     await waitUntilStable();
 
     // Expect part to be in main area.
-    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.inMainArea').isInMainArea).toBeTrue();
+    expect(TestBed.inject(WorkbenchPartRegistry).get('part.inMainArea').isInMainArea).toBeTrue();
 
     // Expect part not to be in main area.
-    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.notInMainArea').isInMainArea).toBeFalse();
+    expect(TestBed.inject(WorkbenchPartRegistry).get('part.notInMainArea').isInMainArea).toBeFalse();
   });
 
   describe('Part Bar', () => {
@@ -1216,10 +1306,63 @@ describe('WorkbenchPart', () => {
       expect(mainAreaViewport.scrollTop).toBe(0);
 
       // Close view.
-      await TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.1').close();
+      await TestBed.inject(WorkbenchViewRegistry).get('view.1').close();
 
       // Expect scroll position to be restored.
       expect(mainAreaViewport.scrollTop).toBe(scrollTop);
     });
+  });
+
+  it('should run effects after re-layout', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'path/to/part', loadComponent: () => SpecEffectPartComponent},
+        ]),
+      ],
+    });
+
+    @Component({template: ''})
+    class SpecEffectPartComponent {
+
+      public value = signal(0);
+      public result = new Array<number>();
+
+      constructor() {
+        effect(() => {
+          this.result.push(this.value());
+        });
+      }
+    }
+
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+
+    // Navigate to "path/to/part".
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout
+      .addPart('part.testee', {align: 'right'})
+      .navigatePart('part.testee', ['path/to/part']),
+    );
+    await waitUntilStable();
+
+    const part = TestBed.inject(WorkbenchPartRegistry).get('part.testee');
+
+    // Expect effect to run.
+    expect(part.getComponent<SpecEffectPartComponent>()!.result).toEqual([0]);
+
+    // Add left part (forces re-layout).
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout
+      .addPart('part.left', {align: 'left'})
+      .navigatePart('part.left', ['path/to/part']),
+    );
+    await waitUntilStable();
+
+    // Update signal.
+    part.getComponent<SpecEffectPartComponent>()!.value.set(1);
+    await waitUntilStable();
+
+    // Expect effect to still run after re-layout.
+    expect(part.getComponent<SpecEffectPartComponent>()!.result).toEqual([0, 1]);
   });
 });

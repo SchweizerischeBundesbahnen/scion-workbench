@@ -9,10 +9,10 @@
  */
 
 import {Injector} from '@angular/core';
-import {ViewId} from '../workbench.identifiers';
+import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 
 /**
- * Controls how to open a dialog.
+ * Controls the appearance and behavior of a dialog.
  */
 export interface WorkbenchDialogOptions {
 
@@ -27,16 +27,24 @@ export interface WorkbenchDialogOptions {
   inputs?: {[name: string]: unknown};
 
   /**
-   * Controls which area of the application to block by the dialog.
+   * Controls which area of the application to block by the dialog. Defaults to `context`.
    *
-   * - **Application-modal:**
-   *   Use to block the workbench, or the browser's viewport if configured in {@link WorkbenchConfig.dialog.modalityScope}.
-   *
-   * - **View-modal:**
-   *   Use to block only the contextual view of the dialog, allowing the user to interact with other views.
-   *   This is the default if opening the dialog in the context of a view.
+   * One of:
+   * - `context`: Blocks a specific part of the application, as specified in {@link context}, defaulting to the calling context.
+   * - `application`: Blocks the workbench or browser viewport, based on {@link WorkbenchConfig.dialog.modalityScope}.
+   * - `view`: Deprecated. Same as `context`. Will be removed in version 22.
    */
-  modality?: 'application' | 'view';
+  modality?: 'context' | 'application' | ViewModality;
+
+  /**
+   * Binds the dialog to a context (e.g., a part or view). Defaults to the calling context.
+   *
+   * The dialog is displayed only if the context is visible and closes when the context is disposed.
+   * The dialog is opened in the center of its context, if any, unless opened from the peripheral area.
+   *
+   * Set to `null` to open the dialog outside a context.
+   */
+  context?: ViewId | PartId | DialogId | PopupId | Context | null;
 
   /**
    * Sets the injector for the instantiation of the dialog component, giving control over the objects available
@@ -64,16 +72,19 @@ export interface WorkbenchDialogOptions {
    * Controls whether to animate the opening of the dialog. Defaults to `false`.
    */
   animate?: boolean;
+}
 
+/**
+ * @deprecated since version 20.0.0-beta.9. Renamed to `context`. Will be removed in version 22.
+ */
+type ViewModality = 'view';
+
+/**
+ * @deprecated since version 20.0.0-beta.9. Set view id directly. Migrate `{context: {viewId: 'view.x'}}` to `{context: 'view.x'}`. Marked for removal in version 22.
+ */
+interface Context {
   /**
-   * Specifies the context in which to open the dialog.
+   * @deprecated since version 20.0.0-beta.9. Set view id directly. Migrate `{context: {viewId: 'view.x'}}` to `{context: 'view.x'}`. Marked for removal in version 22.
    */
-  context?: {
-    /**
-     * Controls which view to block when opening a dialog view-modal.
-     *
-     * By default, if opening the dialog in the context of a view, that view is used as the contextual view.
-     */
-    viewId?: ViewId;
-  };
+  viewId?: ViewId | null;
 }

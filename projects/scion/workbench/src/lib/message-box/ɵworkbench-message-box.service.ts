@@ -7,13 +7,15 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {assertNotInReactiveContext, inject, Injectable, NgZone} from '@angular/core';
+import {assertNotInReactiveContext, DestroyRef, inject, Injectable, NgZone} from '@angular/core';
 import {WorkbenchMessageBoxOptions} from './workbench-message-box.options';
 import {WorkbenchDialogService} from '../dialog/workbench-dialog.service';
 import {WorkbenchMessageBoxComponent} from './workbench-message-box.component';
 import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchMessageBoxService} from './workbench-message-box.service';
 import {Translatable} from '../text/workbench-text-provider.model';
+import {Logger, LoggerNames} from '../logging';
+import {WORKBENCH_ELEMENT} from '../workbench-element-references';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})
@@ -21,6 +23,10 @@ export class ɵWorkbenchMessageBoxService implements WorkbenchMessageBoxService 
 
   private readonly _workbenchDialogService = inject(WorkbenchDialogService);
   private readonly _zone = inject(NgZone);
+
+  constructor() {
+    this.installServiceLifecycleLogger();
+  }
 
   /**
    * @inheritDoc
@@ -41,5 +47,12 @@ export class ɵWorkbenchMessageBoxService implements WorkbenchMessageBoxService 
       context: options?.context,
       animate: true,
     }))!;
+  }
+
+  private installServiceLifecycleLogger(): void {
+    const logger = inject(Logger);
+    const workbenchElement = inject(WORKBENCH_ELEMENT, {optional: true});
+    logger.debug(() => `Constructing WorkbenchMessageBoxService [context=${workbenchElement?.id}]`, LoggerNames.LIFECYCLE);
+    inject(DestroyRef).onDestroy(() => logger.debug(() => `Destroying WorkbenchMessageBoxService [context=${workbenchElement?.id}]'`, LoggerNames.LIFECYCLE));
   }
 }

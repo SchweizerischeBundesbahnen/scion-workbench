@@ -10,16 +10,16 @@
 
 import {Component, inject} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {Translatable, ViewId, WorkbenchMessageBoxOptions, WorkbenchMessageBoxService, WorkbenchView} from '@scion/workbench-client';
+import {DialogId, PartId, PopupId, Translatable, ViewId, WorkbenchMessageBoxOptions, WorkbenchMessageBoxService} from '@scion/workbench-client';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {stringifyError} from '../common/stringify-error.util';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
-import {startWith} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import {parseTypedString} from '../common/parse-typed-value.util';
 import {UUID} from '@scion/toolkit/uuid';
+import {MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
 
 @Component({
   selector: 'app-message-box-opener-page',
@@ -46,8 +46,8 @@ export default class MessageBoxOpenerPageComponent {
       title: this._formBuilder.control(''),
       actions: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
       severity: this._formBuilder.control<'info' | 'warn' | 'error' | ''>(''),
-      modality: this._formBuilder.control<'application' | 'view' | ''>(''),
-      contextualViewId: this._formBuilder.control<ViewId | ''>(''),
+      modality: this._formBuilder.control<'application' | 'view' | 'context' | ''>(''),
+      context: this._formBuilder.control<ViewId | PartId | DialogId | PopupId | '<null>' | ''>(''),
       contentSelectable: this._formBuilder.control(true),
       cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
     }),
@@ -56,11 +56,11 @@ export default class MessageBoxOpenerPageComponent {
   protected isEmptyQualifier = true;
   protected openError: string | undefined;
   protected closeAction: string | undefined;
+
   protected readonly nullList = `autocomplete-null-${UUID.randomUUID()}`;
 
   constructor() {
-    inject(WorkbenchView).signalReady();
-    this.installContextualViewIdEnabler();
+    MicrofrontendPlatformClient.signalReady();
     this.installEmptyQualifierDetector();
   }
 
@@ -93,32 +93,10 @@ export default class MessageBoxOpenerPageComponent {
       actions: SciKeyValueFieldComponent.toDictionary(options.actions) ?? undefined,
       severity: options.severity.value || undefined,
       modality: options.modality.value || undefined,
-      context: {
-        viewId: options.contextualViewId.value || undefined,
-      },
+      context: parseTypedString(options.context.value, {undefinedIfEmpty: true}),
       contentSelectable: options.contentSelectable.value || undefined,
       cssClass: options.cssClass.value,
     };
-  }
-
-  /**
-   * Enables the field for setting a contextual view reference when choosing view modality.
-   */
-  private installContextualViewIdEnabler(): void {
-    this.form.controls.options.controls.modality.valueChanges
-      .pipe(
-        startWith(this.form.controls.options.controls.modality.value),
-        takeUntilDestroyed(),
-      )
-      .subscribe(modality => {
-        if (modality === 'view') {
-          this.form.controls.options.controls.contextualViewId.enable();
-        }
-        else {
-          this.form.controls.options.controls.contextualViewId.setValue('');
-          this.form.controls.options.controls.contextualViewId.disable();
-        }
-      });
   }
 
   /**

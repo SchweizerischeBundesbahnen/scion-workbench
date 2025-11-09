@@ -97,14 +97,5 @@ $diamond-height: 8;
         border-left-color: var(--sci-color-background-elevation);
       }
     }
-
-    // Hide the popup when contextual view is detached, e.g., if not active, or located in the peripheral area and the main area is maximized.
-    &.wb-view-context:not(.wb-view-attached) {
-      // We use `visibility: hidden` and not `display: none` to preserve the dimension of the popup.
-      // Otherwise:
-      // - The popup would flicker when attaching the contextual view, most noticeable with popups that display a microfrontend.
-      // - The popup would not retain virtual scrollable content since `display:none` sets width and height to 0.
-      visibility: hidden;
-    }
   }
 }
