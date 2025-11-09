@@ -11,11 +11,11 @@
 import {AppPO} from '../../../app.po';
 import {Locator} from '@playwright/test';
 import {waitUntilStable} from '../../../helper/testing.util';
-import {MicrofrontendNavigator} from '../../microfrontend-navigator';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../../view.po';
 import {ViewId} from '@scion/workbench-client';
+import {RequireOne} from '../../../helper/utility-types';
 
 export class BulkNavigationTestPagePO implements MicrofrontendViewPagePO {
 
@@ -23,9 +23,9 @@ export class BulkNavigationTestPagePO implements MicrofrontendViewPagePO {
   public readonly view: ViewPO;
   public readonly outlet: SciRouterOutletPO;
 
-  constructor(private _appPO: AppPO, viewId: ViewId) {
-    this.view = this._appPO.view({viewId});
-    this.outlet = new SciRouterOutletPO(this._appPO, {name: viewId});
+  constructor(private _appPO: AppPO, locateBy: RequireOne<{viewId: ViewId; cssClass: string}>) {
+    this.outlet = new SciRouterOutletPO(this._appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
+    this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-bulk-navigation-test-page');
   }
 
@@ -53,28 +53,5 @@ export class BulkNavigationTestPagePO implements MicrofrontendViewPagePO {
     await this.locator.locator('button.e2e-navigate-await').click();
     // Wait for the URL to become stable after navigating.
     await waitUntilStable(() => this._appPO.getCurrentNavigationId());
-  }
-
-  public static async openInNewTab(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator): Promise<BulkNavigationTestPagePO> {
-    await microfrontendNavigator.registerCapability('app1', {
-      type: 'view',
-      qualifier: {test: 'bulk-navigation'},
-      properties: {
-        path: 'test-pages/bulk-navigation-test-page',
-        cssClass: 'e2e-test-bulk-navigation',
-        title: 'Bulk Navigation Test',
-        pinToDesktop: true,
-      },
-    });
-
-    // Navigate to the view.
-    const startPage = await appPO.openNewViewTab();
-    const viewId = await startPage.view.getViewId();
-    await startPage.clickTestCapability('e2e-test-bulk-navigation', 'app1');
-
-    // Create the page object.
-    const view = appPO.view({cssClass: 'e2e-test-bulk-navigation', viewId: viewId});
-    await view.waitUntilAttached();
-    return new BulkNavigationTestPagePO(appPO, viewId);
   }
 }

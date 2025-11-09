@@ -12,11 +12,11 @@ import {Locator} from '@playwright/test';
 import {AppPO} from '../../../app.po';
 import {SciAccordionPO} from '../../../@scion/components.internal/accordion.po';
 import {SciCheckboxPO} from '../../../@scion/components.internal/checkbox.po';
-import {MicrofrontendNavigator} from '../../microfrontend-navigator';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../../view.po';
 import {ViewId} from '@scion/workbench-client';
+import {RequireOne} from '../../../helper/utility-types';
 
 export class AngularZoneTestPagePO implements MicrofrontendViewPagePO {
 
@@ -37,9 +37,9 @@ export class AngularZoneTestPagePO implements MicrofrontendViewPagePO {
     focusedPanel: PanelPO;
   };
 
-  constructor(appPO: AppPO, viewId: ViewId) {
-    this.view = appPO.view({viewId});
-    this.outlet = new SciRouterOutletPO(appPO, {name: viewId});
+  constructor(appPO: AppPO, locateBy: RequireOne<{viewId: ViewId; cssClass: string}>) {
+    this.outlet = new SciRouterOutletPO(appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
+    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-angular-zone-test-page');
 
     this.workbenchView = {
@@ -54,29 +54,6 @@ export class AngularZoneTestPagePO implements MicrofrontendViewPagePO {
       activePanel: new PanelPO(this.locator.locator('sci-accordion'), 'e2e-workbench-part.e2e-active'),
       focusedPanel: new PanelPO(this.locator.locator('sci-accordion'), 'e2e-workbench-part.e2e-focused'),
     };
-  }
-
-  public static async openInNewTab(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator): Promise<AngularZoneTestPagePO> {
-    await microfrontendNavigator.registerCapability('app1', {
-      type: 'view',
-      qualifier: {test: 'angular-zone'},
-      properties: {
-        path: 'test-pages/angular-zone-test-page',
-        cssClass: 'e2e-test-angular-zone',
-        title: 'Angular Zone Test Page',
-        pinToDesktop: true,
-      },
-    });
-
-    // Navigate to the view.
-    const startPage = await appPO.openNewViewTab();
-    const viewId = await startPage.view.getViewId();
-    await startPage.clickTestCapability('e2e-test-angular-zone', 'app1');
-
-    // Create the page object.
-    const view = appPO.view({cssClass: 'e2e-test-angular-zone', viewId: viewId});
-    await view.waitUntilAttached();
-    return new AngularZoneTestPagePO(appPO, viewId);
   }
 }
 

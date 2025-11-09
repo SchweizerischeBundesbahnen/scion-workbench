@@ -40,7 +40,7 @@ test.describe('Text Provider', () => {
       // Open test view.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-      const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+      const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
       // Provide text.
       await testPage.provideText('key', 'TEXT 1');
@@ -69,7 +69,7 @@ test.describe('Text Provider', () => {
       // Open test view.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-      const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+      const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
       // Provide text.
       await testPage.provideText('key', 'TEXT');
@@ -98,7 +98,7 @@ test.describe('Text Provider', () => {
       // Open test view.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-      const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+      const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
       // Provide `undefined` for requested text.
       await testPage.provideText('key', '<undefined>');
@@ -126,7 +126,7 @@ test.describe('Text Provider', () => {
       // Open test view.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-      const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+      const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
       // Observe text.
       await testPage.text1.observe('%key', {app: 'workbench-client-testing-app2'});
@@ -154,7 +154,7 @@ test.describe('Text Provider', () => {
       // Open test view.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-      const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+      const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
       // Provide text.
       await testPage.provideText('key', 'TEXT');
@@ -241,8 +241,8 @@ test.describe('Text Provider', () => {
         },
       });
 
-      const textProviderApp1Page = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee-app1'});
-      const textProviderApp2Page = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee-app2'});
+      const textProviderApp1Page = new TextTestPagePO(appPO, {cssClass: 'testee-app1'});
+      const textProviderApp2Page = new TextTestPagePO(appPO, {cssClass: 'testee-app2'});
 
       // Provide text in app 2.
       await textProviderApp2Page.provideText('key', 'TEXT 1');
@@ -283,7 +283,7 @@ test.describe('Text Provider', () => {
       // Open test view.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-      const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+      const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
       // Provide text.
       await testPage.provideText('key', 'TEXT');
@@ -382,10 +382,10 @@ test.describe('Text Provider', () => {
       });
 
       // Provide text.
-      const textProviderApp1Page = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee-app1'});
+      const textProviderApp1Page = new TextTestPagePO(appPO, {cssClass: 'testee-app1'});
       await textProviderApp1Page.provideText('key', 'TEXT (app1)');
 
-      const textProviderApp2Page = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee-app2'});
+      const textProviderApp2Page = new TextTestPagePO(appPO, {cssClass: 'testee-app2'});
       await textProviderApp2Page.provideText('key', 'TEXT (app2)');
 
       // Observe text.
@@ -503,10 +503,10 @@ test.describe('Text Provider', () => {
       });
 
       // Provide text.
-      const textProviderApp1Page = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee-app1'});
+      const textProviderApp1Page = new TextTestPagePO(appPO, {cssClass: 'testee-app1'});
       await textProviderApp1Page.provideText('key', 'TEXT (app1)');
 
-      const textProviderApp2Page = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee-app2'});
+      const textProviderApp2Page = new TextTestPagePO(appPO, {cssClass: 'testee-app2'});
       await textProviderApp2Page.provideText('key', 'TEXT (app2)');
 
       // Observe text.
@@ -567,7 +567,7 @@ test.describe('Text Provider', () => {
       // Open test view.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-      const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+      const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
       // Provide text.
       await testPage.provideText('key', 'TEXT - {{param}}');
@@ -615,7 +615,7 @@ test.describe('Text Provider', () => {
       // Open test view.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-      const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+      const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
       // Provide text.
       await testPage.provideText('key', 'TEXT 1');
@@ -685,7 +685,7 @@ test.describe('Text Provider', () => {
       // Open test view.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-      const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+      const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
       // Provide text.
       await testPage.provideText('key', 'TEXT');
@@ -796,7 +796,7 @@ test.describe('Text Provider', () => {
       // Open test view.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-      const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+      const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
       // Provide text.
       await testPage.provideText('key', 'TEXT - {{param1}} - {{param2}}');
@@ -821,7 +821,7 @@ test.describe('Text Provider', () => {
       // Open test view.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-      const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+      const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
       // Provide text.
       await testPage.provideText('key', 'TEXT - {{param1}} - {{param2}}');
@@ -915,7 +915,7 @@ test.describe('Text Provider', () => {
         // Open text view.
         const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
         await routerPage.navigate({component: 'text'}, {cssClass: 'text'});
-        const textPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'text'});
+        const textPage = new TextTestPagePO(appPO, {cssClass: 'text'});
 
         // Provide text.
         await test.step('Provide text', async () => {
@@ -1047,7 +1047,7 @@ test.describe('Text Provider', () => {
         // Open text view.
         const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
         await routerPage.navigate({component: 'text'}, {cssClass: 'text'});
-        const textPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'text'});
+        const textPage = new TextTestPagePO(appPO, {cssClass: 'text'});
 
         // Provide text.
         await textPage.provideText('part_label', 'Label - {{id}} - {{name}} - {{undefined}}');
@@ -1212,7 +1212,7 @@ test.describe('Text Provider', () => {
         // Open text view.
         const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
         await routerPage.navigate({component: 'text'}, {cssClass: 'text'});
-        const textPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'text'});
+        const textPage = new TextTestPagePO(appPO, {cssClass: 'text'});
 
         // Provide text.
         await textPage.provideText('part_label', 'Label - {{id}} - {{name}}');
@@ -1287,7 +1287,7 @@ test.describe('Text Provider', () => {
           },
         });
 
-        const textPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'text'});
+        const textPage = new TextTestPagePO(appPO, {cssClass: 'text'});
         const testPart = appPO.part({cssClass: 'testee'});
 
         // Provide text and value.
@@ -1375,7 +1375,7 @@ test.describe('Text Provider', () => {
           },
         });
 
-        const textPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'text'});
+        const textPage = new TextTestPagePO(appPO, {cssClass: 'text'});
         const testPart = appPO.part({cssClass: 'testee'});
 
         // Provide text and value.
@@ -1552,7 +1552,7 @@ test.describe('Text Provider', () => {
         // Open text view.
         const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
         await routerPage.navigate({component: 'text'}, {cssClass: 'text'});
-        const textPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'text'});
+        const textPage = new TextTestPagePO(appPO, {cssClass: 'text'});
 
         const activityItem = appPO.activityItem({cssClass: 'testee-1'});
         const dockedPart = appPO.part({cssClass: 'testee-1'});
@@ -1708,7 +1708,7 @@ test.describe('Text Provider', () => {
         // Open text view.
         const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
         await routerPage.navigate({component: 'text'}, {cssClass: 'text'});
-        const textPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'text'});
+        const textPage = new TextTestPagePO(appPO, {cssClass: 'text'});
 
         const activityItem = appPO.activityItem({cssClass: 'testee-1'});
         const dockedPart = appPO.part({cssClass: 'testee-1'});
@@ -1783,7 +1783,7 @@ test.describe('Text Provider', () => {
           },
         });
 
-        const textPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'text'});
+        const textPage = new TextTestPagePO(appPO, {cssClass: 'text'});
         const testPart = appPO.part({cssClass: 'testee'});
 
         // Provide value.
@@ -1869,7 +1869,7 @@ test.describe('Text Provider', () => {
           },
         });
 
-        const textPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'text'});
+        const textPage = new TextTestPagePO(appPO, {cssClass: 'text'});
         const testPart = appPO.part({cssClass: 'testee'});
 
         // Provide value.
@@ -1916,7 +1916,7 @@ test.describe('Text Provider', () => {
         // Open test view.
         const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
         await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-        const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+        const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
         // Provide text.
         await test.step('Provide text', async () => {
@@ -1969,7 +1969,7 @@ test.describe('Text Provider', () => {
         // Open test view.
         const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
         await routerPage.navigate({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
-        const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+        const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
         // Provide text.
         await testPage.provideText('view_title', 'Title - {{id}} - {{name}} - {{undefined}}');
@@ -2052,7 +2052,7 @@ test.describe('Text Provider', () => {
         // Open test view.
         const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
         await routerPage.navigate({component: 'testee'}, {params: {id: '123;456'}, cssClass: 'testee'});
-        const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+        const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
         await testPage.provideText('view_title', 'Title - {{id}} - {{name}}');
         await testPage.provideText('view_heading', 'Heading - {{id}} - {{name}}');
@@ -2077,7 +2077,7 @@ test.describe('Text Provider', () => {
         // Open test view.
         const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
         await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-        const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+        const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
         // Set title and heading via view handle.
         await testPage.setViewTitle('%view_title');
@@ -2134,7 +2134,7 @@ test.describe('Text Provider', () => {
         // Open test view.
         const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
         await routerPage.navigate({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
-        const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+        const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
         // Provide text and value.
         await testPage.provideText('view_title', 'Title - {{id}} - {{name}}');
@@ -2189,7 +2189,7 @@ test.describe('Text Provider', () => {
         // Open test view.
         const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
         await routerPage.navigate({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
-        const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+        const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
         // Provide text and value.
         await testPage.provideText('view_title', 'Title - {{id}} - {{name}}');
@@ -2271,7 +2271,7 @@ test.describe('Text Provider', () => {
         // Open test view.
         const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
         await routerPage.navigate({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
-        const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+        const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
         // No resolved value yet.
         await test.step('No resolved value yet', async () => {
@@ -2350,7 +2350,7 @@ test.describe('Text Provider', () => {
         // Open test view.
         const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
         await routerPage.navigate({component: 'testee'}, {params: {id: '123;456'}, cssClass: 'testee'});
-        const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+        const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
         await testPage.provideValue('123;456', 'A;B');
 
@@ -2381,7 +2381,7 @@ test.describe('Text Provider', () => {
         // Open test view.
         const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
         await routerPage.navigate({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
-        const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+        const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
         // Provide value.
         await testPage.provideValue('123', 'RESOLVED');
@@ -2432,7 +2432,7 @@ test.describe('Text Provider', () => {
         // Open test view.
         const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
         await routerPage.navigate({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
-        const testPage = TextTestPagePO.newViewPO(appPO, {cssClass: 'testee'});
+        const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
         // Provide value.
         await testPage.provideValue('123', 'RESOLVED');
@@ -2486,7 +2486,7 @@ test.describe('Text Provider', () => {
         // Open test dialog.
         const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
         await dialogOpener.open({component: 'testee'}, {cssClass: 'testee'});
-        const testPage = TextTestPagePO.newDialogPO(appPO, {cssClass: 'testee'});
+        const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
         // Provide text.
         await test.step('Provide text', async () => {
@@ -2533,7 +2533,7 @@ test.describe('Text Provider', () => {
         // Open test dialog.
         const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
         await dialogOpener.open({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
-        const testPage = TextTestPagePO.newDialogPO(appPO, {cssClass: 'testee'});
+        const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
         // Provide text.
         await testPage.provideText('dialog_title', 'Title - {{id}} - {{name}} - {{undefined}}');
@@ -2611,7 +2611,7 @@ test.describe('Text Provider', () => {
         // Open test dialog.
         const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
         await dialogOpener.open({component: 'testee'}, {params: {id: '123;456'}, cssClass: 'testee'});
-        const testPage = TextTestPagePO.newDialogPO(appPO, {cssClass: 'testee'});
+        const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
         await testPage.provideText('dialog_title', 'Title - {{id}} - {{name}}');
         await testPage.provideValue('123;456', 'A;B');
@@ -2634,7 +2634,7 @@ test.describe('Text Provider', () => {
         // Open test dialog.
         const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
         await dialogOpener.open({component: 'testee'}, {cssClass: 'testee'});
-        const testPage = TextTestPagePO.newDialogPO(appPO, {cssClass: 'testee'});
+        const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
         // Set dialog title via dialog handle.
         await testPage.setDialogTitle('%dialog_title');
@@ -2713,7 +2713,7 @@ test.describe('Text Provider', () => {
         // Open test dialog.
         const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
         await dialogOpener.open({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
-        const testPage = TextTestPagePO.newDialogPO(appPO, {cssClass: 'testee'});
+        const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
         // No resolved value yet.
         await test.step('No resolved value yet', async () => {
@@ -2788,7 +2788,7 @@ test.describe('Text Provider', () => {
         // Open test dialog.
         const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
         await dialogOpener.open({component: 'testee'}, {params: {id: '123;456'}, cssClass: 'testee'});
-        const testPage = TextTestPagePO.newDialogPO(appPO, {cssClass: 'testee'});
+        const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
         await testPage.provideValue('123;456', 'A;B');
 
@@ -3017,7 +3017,7 @@ test.describe('Text Provider', () => {
         });
       });
 
-      test('should support semicolon in text, parameter and resolver', async ({appPO, microfrontendNavigator, page}) => {
+      test('should support semicolon in text, parameter and resolver', async ({appPO, microfrontendNavigator}) => {
         await appPO.navigateTo({microfrontendSupport: true});
 
         // TODO [#271]: Register host dialog capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
@@ -3129,7 +3129,7 @@ test.describe('Text Provider', () => {
         },
       });
 
-      const textPageApp1 = TextTestPagePO.newViewPO(appPO, {cssClass: 'text-app1'});
+      const textPageApp1 = new TextTestPagePO(appPO, {cssClass: 'text-app1'});
       const messageBoxOpenerApp1 = new MessageBoxOpenerPagePO(appPO, {cssClass: 'messagebox-opener-app1'});
 
       // Open test message box from app 1.
@@ -3241,7 +3241,7 @@ test.describe('Text Provider', () => {
         },
       });
 
-      const textPageApp1 = TextTestPagePO.newViewPO(appPO, {cssClass: 'text-app1'});
+      const textPageApp1 = new TextTestPagePO(appPO, {cssClass: 'text-app1'});
       const messageBoxOpenerApp1 = new MessageBoxOpenerPagePO(appPO, {cssClass: 'messagebox-opener-app1'});
 
       // Open test message box.
@@ -3355,7 +3355,7 @@ test.describe('Text Provider', () => {
         },
       });
 
-      const textPageApp1 = TextTestPagePO.newViewPO(appPO, {cssClass: 'text-app1'});
+      const textPageApp1 = new TextTestPagePO(appPO, {cssClass: 'text-app1'});
       const messageBoxOpenerApp1 = new MessageBoxOpenerPagePO(appPO, {cssClass: 'messagebox-opener-app1'});
 
       // Open test message box.
@@ -3478,7 +3478,7 @@ test.describe('Text Provider', () => {
         },
       });
 
-      const textPageApp1 = TextTestPagePO.newViewPO(appPO, {cssClass: 'text-app1'});
+      const textPageApp1 = new TextTestPagePO(appPO, {cssClass: 'text-app1'});
       const notificationOpenerApp1 = new NotificationOpenerPagePO(appPO, {cssClass: 'notification-opener-app1'});
 
       // Open test notification.

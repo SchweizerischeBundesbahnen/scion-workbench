@@ -2025,7 +2025,7 @@ test.describe('Workbench View', () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'text'}, {target: 'view.1'});
 
-      const textPage = TextTestPagePO.newViewPO(appPO, {viewId: 'view.1'});
+      const textPage = new TextTestPagePO(appPO, {id: 'view.1'});
       await textPage.provideText('view.title', 'Test View {{id}} - {{name}}');
       await textPage.provideValue('123', 'RESOLVED');
 

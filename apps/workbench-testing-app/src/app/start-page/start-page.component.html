@@ -44,22 +44,4 @@
       </section>
     </ng-template>
   }
-
-  @if (testCapabilities$ | async | appNullIfEmpty; as testCapabilities) {
-    <ng-template sciTab label="Test Capabilities" cssClass="e2e-test-capabilities">
-      <section class="tiles e2e-test-capability-tiles">
-        <sci-filter-field [formControl]="filterControl" (keydown)="$event.stopPropagation()"/>
-        @for (testCapability of testCapabilities | appFilter$:filterControl:selectTestCapabilityText | async; track testCapability.metadata!.id) {
-          <button (click)="onTestCapabilityOpen(testCapability, $event)"
-                  [ngClass]="[testCapability.metadata!.appSymbolicName] | appConcatArray:testCapability.properties?.['cssClass']"
-                  class="test-capability">
-            {{testCapability.properties?.['cssClass']}}
-            <span class="description">
-              {{testCapability.metadata!.appSymbolicName}}
-            </span>
-          </button>
-        }
-      </section>
-    </ng-template>
-  }
 </sci-tabbar>
