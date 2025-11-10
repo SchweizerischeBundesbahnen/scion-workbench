@@ -40,6 +40,10 @@ export class NotificationPO {
     return null;
   }
 
+  public async hover(): Promise<void> {
+    await this.locator.hover();
+  }
+
   public async close(): Promise<void> {
     await this.locator.locator('.e2e-close').click();
   }

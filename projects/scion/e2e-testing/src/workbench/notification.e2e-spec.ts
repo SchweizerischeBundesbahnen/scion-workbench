@@ -304,6 +304,45 @@ test.describe('Workbench Notification', () => {
     expect(await notification.locator.isVisible()).toBe(false);
   });
 
+  test('should not close notification on hover', async ({appPO, workbenchNavigator, page}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPage.enterCssClass('testee');
+    await notificationOpenerPage.selectDuration(1);
+    await notificationOpenerPage.enterContent('Notification');
+    await notificationOpenerPage.open();
+
+    // Expect the notification to display.
+    const notification = appPO.notification({cssClass: 'testee'});
+    const notificationPage = new TextNotificationPagePO(notification);
+    await expectNotification(notificationPage).toBeVisible();
+
+    // Hover the notification.
+    await notification.hover();
+
+    // Expect notification not to be disposed after 3s.
+    await page.waitForTimeout(3000);
+    await expectNotification(notificationPage).toBeVisible();
+
+    // Do not hover notification.
+    await appPO.workbenchRoot.hover({position: {x: 0, y: 0}});
+
+    // Hover the notification.
+    await notification.hover();
+
+    // Expect notification not to be disposed after 3s.
+    await page.waitForTimeout(3000);
+    await expectNotification(notificationPage).toBeVisible();
+
+    // Do not hover notification.
+    await appPO.workbenchRoot.hover({position: {x: 0, y: 0}});
+
+    // Expect notification to be disposed after 2s.
+    await page.waitForTimeout(2000);
+    await expectNotification(notificationPage).not.toBeAttached();
+  });
+
   test.describe('Custom Notification Provider', () => {
 
     test.describe('Custom Message Component', () => {
