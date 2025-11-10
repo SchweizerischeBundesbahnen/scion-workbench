@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, HostListener, inject, Injector, input, output, untracked} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, HostListener, inject, Injector, input, output, signal, untracked} from '@angular/core';
 import {EMPTY, OperatorFunction, timer} from 'rxjs';
-import {switchMap} from 'rxjs/operators';
+import {filter, switchMap} from 'rxjs/operators';
 import {ɵNotification} from './ɵnotification';
 import {CdkPortalOutlet, ComponentPortal} from '@angular/cdk/portal';
 import {Notification} from './notification';
@@ -35,6 +35,10 @@ import {IconComponent} from '../icon/icon.component';
     TextPipe,
     IconComponent,
   ],
+  host: {
+    '(mouseenter)': 'hover.set(true)',
+    '(mouseleave)': 'hover.set(false)',
+  },
 })
 export class NotificationComponent {
 
@@ -45,6 +49,7 @@ export class NotificationComponent {
   private readonly _cd = inject(ChangeDetectorRef);
 
   protected portal: ComponentPortal<unknown> | undefined;
+  protected readonly hover = signal(false);
 
   constructor() {
     this.createPortal();
@@ -90,10 +95,14 @@ export class NotificationComponent {
   private installAutoCloseTimer(): void {
     effect(onCleanup => {
       const notification = this.notification();
+      const hover = this.hover();
 
       untracked(() => {
         const subscription = notification.duration$
-          .pipe(delayDuration())
+          .pipe(
+            filter(() => !hover),
+            delayDuration(),
+          )
           .subscribe(() => this.closeNotification.emit());
         onCleanup(() => subscription.unsubscribe());
       });
