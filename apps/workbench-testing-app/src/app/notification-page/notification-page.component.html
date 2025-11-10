@@ -34,4 +34,6 @@
   <sci-form-field label="CSS Class(es)" direction="column">
     <app-multi-value-input [formControl]="form.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
   </sci-form-field>
+
+  <button (click)="onClose()" class="e2e-close" sci-primary>Close</button>
 </ng-container>

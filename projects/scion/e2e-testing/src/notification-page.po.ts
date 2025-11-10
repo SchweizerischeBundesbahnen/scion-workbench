@@ -65,4 +65,8 @@ export class NotificationPagePO implements WorkbenchNotificationPagePO {
   public async enterCssClass(cssClass: string | string[]): Promise<void> {
     await this.locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
   }
+
+  public async close(): Promise<void> {
+    await this.locator.locator('button.e2e-close').click();
+  }
 }
