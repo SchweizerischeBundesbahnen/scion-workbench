@@ -68,8 +68,7 @@ export function provideRemoteTextProvider(): EnvironmentProviders {
         // Ensure the observable to never complete independent of text provider request completion, simplifying cache cleanup as
         // finalize is only called when the last subscriber unsubscribes, after the specified TTL.
         concatWith(NEVER),
-        map(params => params.reduce((translatable, [param, value]) => `${translatable};${param}=${encodeSemicolons(value)}`, `%${key}`)),
-        switchMap(translatable => Beans.get(WorkbenchTextService).text$(translatable, {provider})),
+        switchMap(params => Beans.get(WorkbenchTextService).text$(`%${key}`, {provider, params: new Map(params)})),
         map(text => text ?? `%${key}`),
         // Remove cached text when an error occurs, or when the subscriber count drops to zero, after the specified TTL.
         finalize(() => cache.delete(cacheKey)),

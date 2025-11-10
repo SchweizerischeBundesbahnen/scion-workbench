@@ -1,11 +1,14 @@
 <sci-form-field label="Translatable" direction="column">
-  <input [formControl]="formGroup.controls.translatable" class="e2e-translatable">
+  <input [formControl]="form.controls.translatable" class="e2e-translatable">
 </sci-form-field>
-<sci-form-field label="App" direction="column">
-  <input [formControl]="formGroup.controls.app" [attr.list]="appList" class="e2e-app">
+<sci-form-field label="Params" direction="column">
+  <app-record [formControl]="form.controls.params" class="e2e-params"/>
+</sci-form-field>
+<sci-form-field label="Provider" direction="column">
+  <input [formControl]="form.controls.provider" [attr.list]="appList" class="e2e-provider">
 </sci-form-field>
 <sci-form-field label="TTL" direction="column">
-  <input [formControl]="formGroup.controls.ttl" type="number" [attr.list]="undefinedList" class="e2e-ttl">
+  <input [formControl]="form.controls.ttl" type="number" [attr.list]="undefinedList" class="e2e-ttl">
 </sci-form-field>
 
 @if (subscription) {
@@ -14,7 +17,7 @@
     <output class="e2e-text">{{text}}</output>
   }
 } @else {
-  <button (click)="onObserve()" [disabled]="formGroup.invalid" class="e2e-observe">Observe</button>
+  <button (click)="onObserve()" [disabled]="form.invalid" class="e2e-observe">Observe</button>
 }
 
 <datalist [attr.id]="appList">
