@@ -21,7 +21,7 @@ export interface ɵWorkbenchMessageBoxCommand {
   title?: Translatable;
   actions?: {[key: string]: Translatable};
   severity?: 'info' | 'warn' | 'error';
-  modality?: 'context' | 'application' | ViewModality;
+  modality?: 'none' | 'context' | 'application' | ViewModality;
   contentSelectable?: boolean;
   cssClass?: string | string[];
   context?: ViewId | PartId | DialogId | PopupId | Context | null;

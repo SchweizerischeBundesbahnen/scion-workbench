@@ -20,7 +20,7 @@ import {WorkbenchDialogOptions} from './workbench-dialog.options';
  * A microfrontend provided as a `dialog` capability can be opened in a dialog. The qualifier differentiates between different
  * dialog capabilities. Declaring an intention allows for opening public dialog capabilities of other applications.
  *
- * Displayed on top of other content, a dialog blocks interaction with other parts of the application.
+ * Displayed on top of other content, a modal dialog blocks interaction with other parts of the application.
  *
  * ## Modality
  * A dialog can be context-modal or application-modal. Context-modal blocks a specific part of the application, as specified by the context;

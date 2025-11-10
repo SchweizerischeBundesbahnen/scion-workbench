@@ -1119,6 +1119,127 @@ test.describe('Workbench Dialog', () => {
     });
   });
 
+  test.describe('Non-Blocking Dialog', () => {
+
+    test('should not block contextual element', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open the dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('dialog-page', {cssClass: 'testee', modality: 'none'});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(dialog);
+
+      await expectDialog(dialogPage).toBeVisible();
+      await expect.poll(() => appPO.isViewBlocked(dialogOpenerPage.view.getViewId())).toBe(false);
+      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set());
+    });
+
+    test('should not block workbench', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open the dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('dialog-page', {cssClass: 'testee', modality: 'none', context: null});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(dialog);
+
+      await expectDialog(dialogPage).toBeVisible();
+      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set());
+    });
+
+    test('should bind non-blocking dialog to context', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open the dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('dialog-page', {cssClass: 'testee', modality: 'none'});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(dialog);
+
+      await expectDialog(dialogPage).toBeVisible();
+      await expect.poll(() => appPO.isViewBlocked(dialogOpenerPage.view.getViewId())).toBe(false);
+      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set());
+
+      // Activate another view.
+      await appPO.openNewViewTab();
+      await expectDialog(dialogPage).toBeHidden();
+
+      // Re-activate the view.
+      await dialogOpenerPage.view.tab.click();
+      await expectDialog(dialogPage).toBeVisible();
+      await expect.poll(() => appPO.isViewBlocked(dialogOpenerPage.view.getViewId())).toBe(false);
+      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set());
+    });
+
+    test('should delay opening non-blocking dialog until all application-modal dialogs are closed', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open two application-modal dialogs.
+      const dialogOpenerViewPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerViewPage.open('dialog-opener-page', {cssClass: 'test-application-modal', modality: 'application', count: 2});
+
+      const applicationModalDialog1 = appPO.dialog({cssClass: 'test-application-modal', nth: 0});
+      const applicationModalDialog2 = appPO.dialog({cssClass: 'test-application-modal', nth: 1});
+
+      await expect(applicationModalDialog1.locator).toBeVisible();
+      await expect(applicationModalDialog2.locator).toBeVisible();
+
+      const dialogOpenerDialogPage = new DialogOpenerPagePO(applicationModalDialog2);
+      const contextualViewId = await dialogOpenerViewPage.view.getViewId();
+
+      // Open non-blocking dialog.
+      // Expect non-blocking dialog to be attached only after all application-modal dialogs are closed.
+      await dialogOpenerDialogPage.open('dialog-page', {cssClass: 'testee', context: contextualViewId, modality: 'none', waitUntilOpened: false});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(dialog);
+
+      await expectDialog(dialogPage).not.toBeAttached();
+
+      await applicationModalDialog2.close();
+      await expectDialog(dialogPage).not.toBeAttached();
+
+      await applicationModalDialog1.close();
+      await expectDialog(dialogPage).toBeVisible();
+    });
+
+    test('should hide non-blocking dialog when unmounting the workbench', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open the dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('dialog-page', {cssClass: 'testee', modality: 'none', context: null});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(dialog);
+
+      const componentInstanceId = await dialogPage.getComponentInstanceId();
+      await expectDialog(dialogPage).toBeVisible();
+
+      // Unmount the workbench component by navigating the primary router outlet.
+      await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
+      await expectDialog(dialogPage).toBeHidden();
+
+      // Re-mount the workbench component by navigating the primary router.
+      await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
+      await expectDialog(dialogPage).toBeVisible();
+      await expect.poll(() => appPO.isViewBlocked(dialogOpenerPage.view.getViewId())).toBe(false);
+      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set());
+
+      // Expect the component not to be constructed anew.
+      await expect.poll(() => dialogPage.getComponentInstanceId()).toEqual(componentInstanceId);
+    });
+  });
+
   test.describe('Focus', () => {
 
     test('should focus first element when opened', async ({appPO, workbenchNavigator}) => {

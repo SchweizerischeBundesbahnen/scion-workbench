@@ -8,7 +8,7 @@
 A message box is a standardized dialog for presenting a message to the user, such as an info, warning or alert, or for prompting the user for confirmation. The message can be plain text or a component, allowing for
 structured content or input prompts.
 
-Displayed on top of other content, a message box blocks interaction with other parts of the application. A message box can be context-modal or application-modal. Message boxes are stacked per modality, with only the topmost message box in each stack being interactive.
+Displayed on top of other content, a modal message box blocks interaction with other parts of the application. A message box can be context-modal or application-modal. Message boxes are stacked per modality, with only the topmost message box in each stack being interactive.
 
 A message box can be bound to a context (e.g., a part or view), displaying the message box only if the context is visible and closing it when the context is disposed. A message box is opened in the center of its context, if any, unless opened from the peripheral area.
 

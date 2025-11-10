@@ -46,7 +46,10 @@ export class WorkbenchDialogRegistry extends WorkbenchElementRegistry<DialogId, 
     assertNotInReactiveContext(this.top, 'Call WorkbenchDialogRegistry.top() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
     return computed(() => {
-      const top = this.elements().filter(dialog => !dialog.invocationContext || dialog.invocationContext.elementId === context).at(-1) ?? null;
+      const top = this.elements()
+        .filter(dialog => dialog.modal)
+        .filter(dialog => !dialog.invocationContext || dialog.invocationContext.elementId === context)
+        .at(-1) ?? null;
       if (!top || top.id === context) {
         return null;
       }
