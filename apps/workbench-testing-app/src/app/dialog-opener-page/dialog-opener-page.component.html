@@ -19,10 +19,11 @@
 
     <sci-form-field label="Modality">
       <select [formControl]="form.controls.options.controls.modality" class="e2e-modality">
+        <option value="">default</option>
+        <option value="none">none</option>
         <option value="context">context</option>
         <option value="application">application</option>
         <option value="view">view</option>
-        <option value="">default</option>
       </select>
     </sci-form-field>
 

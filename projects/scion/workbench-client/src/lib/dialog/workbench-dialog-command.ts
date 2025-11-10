@@ -17,7 +17,7 @@ import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
  * @ignore
  */
 export interface ɵWorkbenchDialogCommand {
-  modality?: 'context' | 'application' | ViewModality;
+  modality?: 'none' | 'context' | 'application' | ViewModality;
   animate?: boolean;
   cssClass?: string | string[];
   context?: ViewId | PartId | DialogId | PopupId | Context | null;

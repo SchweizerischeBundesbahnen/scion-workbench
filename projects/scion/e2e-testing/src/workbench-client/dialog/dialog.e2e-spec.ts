@@ -1453,6 +1453,94 @@ test.describe('Workbench Dialog', () => {
     });
   });
 
+  test.describe('Non-Blocking Dialog', () => {
+
+    test('should not block contextual element', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'dialog',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-dialog',
+          size: {height: '475px', width: '300px'},
+        },
+      });
+
+      // Open the dialog.
+      const dialogOpenerPage = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+      await dialogOpenerPage.open({component: 'testee'}, {cssClass: 'testee', modality: 'none'});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(dialog);
+
+      await expectDialog(dialogPage).toBeVisible();
+      await expect.poll(() => appPO.isViewBlocked(dialogOpenerPage.view.getViewId())).toBe(false);
+      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set());
+    });
+
+    test('should not block workbench', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'dialog',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-dialog',
+          size: {height: '475px', width: '300px'},
+        },
+      });
+
+      // Open the dialog.
+      const dialogOpenerPage = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+      await dialogOpenerPage.open({component: 'testee'}, {cssClass: 'testee', modality: 'none', context: null});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(dialog);
+
+      await expectDialog(dialogPage).toBeVisible();
+      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set());
+    });
+
+    test('should bind non-blocking dialog to context', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'dialog',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-dialog',
+          size: {height: '475px', width: '300px'},
+        },
+      });
+
+      // Open the dialog.
+      const dialogOpenerPage = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+      await dialogOpenerPage.open({component: 'testee'}, {cssClass: 'testee', modality: 'none'});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(dialog);
+
+      await expectDialog(dialogPage).toBeVisible();
+      await expect.poll(() => appPO.isViewBlocked(dialogOpenerPage.view.getViewId())).toBe(false);
+      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set());
+
+      // Activate another view.
+      await appPO.openNewViewTab();
+      await expectDialog(dialogPage).toBeHidden();
+
+      // Re-activate the view.
+      await dialogOpenerPage.view.tab.click();
+      await expectDialog(dialogPage).toBeVisible();
+      await expect.poll(() => appPO.isViewBlocked(dialogOpenerPage.view.getViewId())).toBe(false);
+      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set());
+    });
+  });
+
   test.describe('Title', () => {
 
     test('should set title from capability', async ({appPO, microfrontendNavigator}) => {

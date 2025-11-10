@@ -65,6 +65,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   public readonly attached: Signal<boolean>;
   public readonly destroyed = signal<boolean>(false);
   public readonly bounds = boundingClientRect(computed(() => this._componentRef()?.instance.dialogContent()));
+  public readonly modal: boolean;
   public readonly blinking$ = new BehaviorSubject(false);
 
   public header: WorkbenchDialogHeaderDirective | undefined;
@@ -80,6 +81,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
     this._cssClass.set(Arrays.coerce(this._options.cssClass));
     this.attached = this.monitorHostElementAttached();
     this.blockedBy = this.computeBlocked();
+    this.modal = this._options.modality !== 'none';
     this.bindToHostElement();
     this.restoreFocusOnAttach();
     this.restoreFocusOnUnblock();

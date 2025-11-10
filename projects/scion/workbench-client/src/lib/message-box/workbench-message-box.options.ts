@@ -57,11 +57,12 @@ export interface WorkbenchMessageBoxOptions {
    * Controls which area of the application to block by the message box. Defaults to `context`.
    *
    * One of:
+   * - 'none': Non-blocking message box.
    * - `context`: Blocks a specific part of the application, as specified in {@link context}, defaulting to the calling context.
    * - `application`: Blocks the workbench or browser viewport, based on global workbench settings.
    * - `view`: Deprecated. Same as `context`. Marked for removal.
    */
-  modality?: 'context' | 'application' | ViewModality;
+  modality?: 'none' | 'context' | 'application' | ViewModality;
 
   /**
    * Binds the message box to a context (e.g., a part or view). Defaults to the calling context.

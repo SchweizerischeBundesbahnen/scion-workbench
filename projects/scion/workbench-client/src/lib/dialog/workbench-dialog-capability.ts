@@ -18,7 +18,7 @@ import {Translatable} from '../text/workbench-text-provider.model';
  * A dialog is a visual element for focused interaction with the user, such as prompting the user for input or confirming actions.
  * The user can move and resize a dialog.
  *
- * Displayed on top of other content, a dialog blocks interaction with other parts of the application. A dialog can be context-modal
+ * Displayed on top of other content, a modal dialog blocks interaction with other parts of the application. A dialog can be context-modal
  * or application-modal. Dialogs are stacked per modality, with only the topmost dialog in each stack being interactive.
  *
  * The microfrontend can inject the {@link WorkbenchDialog} handle to interact with the dialog, such as setting the title, reading
