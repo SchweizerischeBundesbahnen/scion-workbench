@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, HostListener, inject, Injector, input, output, signal, untracked} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, HostListener, inject, Injector, input, signal, untracked} from '@angular/core';
 import {EMPTY, OperatorFunction, timer} from 'rxjs';
 import {filter, switchMap} from 'rxjs/operators';
 import {ɵNotification} from './ɵnotification';
@@ -43,7 +43,6 @@ import {IconComponent} from '../icon/icon.component';
 export class NotificationComponent {
 
   public readonly notification = input.required<ɵNotification>();
-  public readonly closeNotification = output<void>();
 
   private readonly _injector = inject(Injector);
   private readonly _cd = inject(ChangeDetectorRef);
@@ -59,12 +58,12 @@ export class NotificationComponent {
   @HostListener('mousedown', ['$event'])
   protected onMousedown(event: MouseEvent): void {
     if (event.buttons === AUXILARY_MOUSE_BUTTON) {
-      this.closeNotification.emit();
+      this.notification().close();
     }
   }
 
   protected onClose(): void {
-    this.closeNotification.emit();
+    this.notification().close();
   }
 
   /**
@@ -103,7 +102,7 @@ export class NotificationComponent {
             filter(() => !hover),
             delayDuration(),
           )
-          .subscribe(() => this.closeNotification.emit());
+          .subscribe(() => this.notification().close());
         onCleanup(() => subscription.unsubscribe());
       });
     });

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertNotInReactiveContext, DOCUMENT, inject, Injectable, NgZone} from '@angular/core';
+import {assertNotInReactiveContext, DOCUMENT, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
 import {BehaviorSubject, fromEvent, Observable} from 'rxjs';
 import {ɵNotification} from './ɵnotification';
 import {NotificationConfig} from './notification.config';
@@ -33,6 +33,7 @@ import {Translatable} from '../text/workbench-text-provider.model';
 export class NotificationService {
 
   private readonly _zone = inject(NgZone);
+  private readonly _injector = inject(Injector);
   private readonly _document = inject(DOCUMENT);
   private readonly _notifications$ = new BehaviorSubject<ɵNotification[]>([]);
 
@@ -82,33 +83,35 @@ export class NotificationService {
   private constructNotification(config: NotificationConfig, notifications: ɵNotification[]): {notification: ɵNotification; index: number} {
     config = {...config};
 
-    // Check whether the notification belongs to a group. If so, replace any present notification of that group.
-    const group = config.group;
-    if (!group) {
+    return runInInjectionContext(this._injector, () => {
+      // Check whether the notification belongs to a group. If so, replace any present notification of that group.
+      const group = config.group;
+      if (!group) {
+        return {
+          notification: new ɵNotification(config),
+          index: notifications.length,
+        };
+      }
+
+      // Check whether there is a notification of the same group present.
+      const index = notifications.findIndex(it => it.config.group === group);
+      if (index === -1) {
+        return {
+          notification: new ɵNotification(config),
+          index: notifications.length,
+        };
+      }
+
+      // Reduce the notification's input, if specified a reducer.
+      if (config.groupInputReduceFn) {
+        config.componentInput = config.groupInputReduceFn(notifications[index]!.input, config.componentInput);
+      }
+
       return {
         notification: new ɵNotification(config),
-        index: notifications.length,
+        index: index,
       };
-    }
-
-    // Check whether there is a notification of the same group present.
-    const index = notifications.findIndex(it => it.config.group === group);
-    if (index === -1) {
-      return {
-        notification: new ɵNotification(config),
-        index: notifications.length,
-      };
-    }
-
-    // Reduce the notification's input, if specified a reducer.
-    if (config.groupInputReduceFn) {
-      config.componentInput = config.groupInputReduceFn(notifications[index]!.input, config.componentInput);
-    }
-
-    return {
-      notification: new ɵNotification(config),
-      index: index,
-    };
+    });
   }
 
   private get notifications(): ɵNotification[] {

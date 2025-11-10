@@ -11,7 +11,6 @@
 import {animate, AnimationMetadata, style, transition, trigger} from '@angular/animations';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {NotificationService} from './notification.service';
-import {ɵNotification} from './ɵnotification';
 import {NotificationComponent} from './notification.component';
 import {AsyncPipe, NgClass} from '@angular/common';
 import {NotificationCssClassesPipe} from './notification-css-classes.pipe';
@@ -34,13 +33,7 @@ import {NotificationCssClassesPipe} from './notification-css-classes.pipe';
 })
 export class NotificationListComponent {
 
-  private readonly _notificationService = inject(NotificationService);
-
-  protected readonly notifications$ = this._notificationService.notifications$;
-
-  protected onNotificationClose(notification: ɵNotification): void {
-    this._notificationService.closeNotification(notification);
-  }
+  protected readonly notifications$ = inject(NotificationService).notifications$;
 
   /**
    * Returns animation metadata to slide-in a new notification, and to fade-out upon dismiss.
