@@ -21,7 +21,7 @@ import {Translatable} from '../text/workbench-text-provider.model';
  * A microfrontend provided as a `messagebox` capability can be opened in a message box. The qualifier differentiates between different
  * message box capabilities. Declaring an intention allows for opening public message box capabilities of other applications.
  *
- * Displayed on top of other content, a message box blocks interaction with other parts of the application.
+ * Displayed on top of other content, a modal message box blocks interaction with other parts of the application.
  *
  * ## Modality
  * A message box can be context-modal or application-modal. Context-modal blocks a specific part of the application, as specified by the context;

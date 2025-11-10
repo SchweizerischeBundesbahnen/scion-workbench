@@ -7,7 +7,7 @@
 
 A dialog is a visual element for focused interaction with the user, such as prompting the user for input or confirming actions. The user can move and resize a dialog.
 
-Displayed on top of other content, a dialog blocks interaction with other parts of the application. A dialog can be context-modal or application-modal. Dialogs are stacked per modality, with only the topmost dialog in each stack being interactive.
+Displayed on top of other content, a modal dialog blocks interaction with other parts of the application. A dialog can be context-modal or application-modal. Dialogs are stacked per modality, with only the topmost dialog in each stack being interactive.
 
 A dialog can be bound to a context (e.g., a part or view), displaying the dialog only if the context is visible and closing it when the context is disposed. Defaults to the calling context. 
 

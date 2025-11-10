@@ -46,7 +46,7 @@ export default class MessageBoxOpenerPageComponent {
       title: this._formBuilder.control(''),
       actions: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
       severity: this._formBuilder.control<'info' | 'warn' | 'error' | ''>(''),
-      modality: this._formBuilder.control<'application' | 'view' | 'context' | ''>(''),
+      modality: this._formBuilder.control<'' | 'none' | 'context' | 'application' | 'view'>(''),
       context: this._formBuilder.control<ViewId | PartId | DialogId | PopupId | '<null>' | ''>(''),
       contentSelectable: this._formBuilder.control(false),
       inputs: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),

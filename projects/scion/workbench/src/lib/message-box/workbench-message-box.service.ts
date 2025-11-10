@@ -18,7 +18,7 @@ import {Translatable} from '../text/workbench-text-provider.model';
  * or for prompting the user for confirmation. The message can be plain text or a component, allowing for
  * structured content or input prompts.
  *
- * Displayed on top of other content, a message box blocks interaction with other parts of the application.
+ * Displayed on top of other content, a modal message box blocks interaction with other parts of the application.
  *
  * ## Modality
  * A message box can be context-modal or application-modal. Context-modal blocks a specific part of the application, as specified by the context;

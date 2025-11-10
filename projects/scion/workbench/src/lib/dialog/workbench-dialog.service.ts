@@ -19,7 +19,7 @@ import {ɵWorkbenchDialogService} from './ɵworkbench-dialog.service';
  * A dialog is a visual element for focused interaction with the user, such as prompting the user for input or confirming actions.
  * The user can move and resize a dialog.
  *
- * Displayed on top of other content, a dialog blocks interaction with other parts of the application.
+ * Displayed on top of other content, a modal dialog blocks interaction with other parts of the application.
  *
  * ## Modality
  * A dialog can be context-modal or application-modal. Context-modal blocks a specific part of the application, as specified by the context;

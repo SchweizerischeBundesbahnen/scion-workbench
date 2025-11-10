@@ -50,7 +50,7 @@ export default class DialogOpenerPageComponent {
     ], Validators.required),
     options: this._formBuilder.group({
       params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
-      modality: this._formBuilder.control<'application' | 'view' | 'context' | ''>(''),
+      modality: this._formBuilder.control<'' | 'none' | 'context' | 'application' | 'view'>(''),
       context: this._formBuilder.control<ViewId | PartId | DialogId | PopupId | '<null>' | ''>(''),
       animate: this._formBuilder.control(undefined),
       cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
