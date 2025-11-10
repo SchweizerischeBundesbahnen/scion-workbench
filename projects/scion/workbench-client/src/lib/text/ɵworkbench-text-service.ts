@@ -15,30 +15,40 @@ import {Beans, PreDestroy} from '@scion/toolkit/bean-manager';
 import {finalize} from 'rxjs/operators';
 import {Translatable} from './workbench-text-provider.model';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
+import {Maps} from '@scion/toolkit/util';
 
 /** @inheritDoc */
 export class ɵWorkbenchTextService implements WorkbenchTextService, PreDestroy {
 
-  private readonly _cache = new Map<Translatable, Observable<string | undefined>>();
+  private readonly _cache = new Map<string, Observable<string | undefined>>();
 
   /** @inheritDoc */
-  public text$(translatable: Translatable | undefined, options: {provider: string; ttl?: number}): Observable<string | undefined> {
-    if (!translatable?.startsWith('%') || translatable === '%') {
+  public text$(translatable: Translatable | undefined, options: {provider: string; params?: Record<string, unknown> | Map<string, unknown>; ttl?: number}): Observable<string | undefined> {
+    if (!translatable) {
+      return of(undefined);
+    }
+    if (!translatable.startsWith('%') || translatable === '%') {
       return of(translatable);
     }
 
-    const cacheKey = `${translatable}@${options.provider};ttl=${options.ttl ?? 0}`;
+    // Parse translatable into key and params.
+    const {key, params} = parseTranslatable(translatable as `%${string}`);
+
+    // Append params from options.
+    Maps.coerce(options.params).forEach((value, name) => params.set(name, `${value}`));
+
+    // Compute cache key.
+    const cacheKey = createCacheKey(key, params, options);
     if (this._cache.has(cacheKey)) {
       return this._cache.get(cacheKey)!;
     }
 
-    const {key, params} = parseTranslatable(translatable as `%${string}`);
     const translateIntent: Intent = {
       type: WorkbenchCapabilities.TextProvider,
       qualifier: {provider: options.provider},
       params: new Map()
         .set('key', key)
-        .set('params', params),
+        .set('params', Object.fromEntries(params)),
     };
 
     const text$ = Beans.get(IntentClient).request$<string | undefined>(translateIntent, undefined, {retain: true})
@@ -72,6 +82,16 @@ export class ɵWorkbenchTextService implements WorkbenchTextService, PreDestroy 
 }
 
 /**
+ * Creates the cache key for specified translatable.
+ *
+ * Format: `${translatable}@${provider};ttl=${ttl}`
+ */
+function createCacheKey(key: string, params: Map<string, string>, options: {provider: string; ttl?: number}): string {
+  const translatable = Array.from(params.entries()).reduce((translatable, [param, value]) => `${translatable};${param}=${value}`, `%${key}`);
+  return `${translatable}@${options.provider};ttl=${options.ttl ?? 0}`;
+}
+
+/**
  * Waits until registered specified text provider, or errors when the specified timeout elapses, if any.
  */
 function waitUntilRegisteredTextProvider<T>(provider: string, options?: {timeout?: number}): MonoTypeOperatorFunction<T> {
@@ -97,7 +117,7 @@ function waitUntilRegisteredTextProvider<T>(provider: string, options?: {timeout
  * - `%key;param=value`: translation key with a single interpolation parameter
  * - `%key;param1=value1;param2=value2`: translation key with multiple interpolation parameters
  */
-function parseTranslatable(translationKey: `%${string}`): {key: string; params: Record<string, string>} {
+function parseTranslatable(translationKey: `%${string}`): {key: string; params: Map<string, string>} {
   const {key, params} = /^%(?<key>[^;]+)(;(?<params>.*))?$/.exec(translationKey)!.groups!;
   return {key: key!, params: parseMatrixParams(params)};
 }
@@ -107,15 +127,15 @@ function parseTranslatable(translationKey: `%${string}`): {key: string; params: 
  *
  * Format: `param1=value1;param2=value2`
  */
-function parseMatrixParams(matrixParams: string | undefined): Record<string, string> {
+function parseMatrixParams(matrixParams: string | undefined): Map<string, string> {
   if (!matrixParams?.length) {
-    return {};
+    return new Map();
   }
 
-  const params: Record<string, string> = {};
+  const params = new Map<string, string>();
   for (const match of encodeEscapedSemicolons(matrixParams).matchAll(/(?<paramName>[^=;]+)=(?<paramValue>[^;]*)/g)) {
     const {paramName, paramValue} = match.groups as {paramName: string; paramValue: string};
-    params[paramName] = decodeSemicolons(paramValue);
+    params.set(paramName, decodeSemicolons(paramValue));
   }
   return params;
 

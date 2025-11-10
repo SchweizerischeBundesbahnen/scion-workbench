@@ -19,6 +19,7 @@ import {DialogId, PartId, PopupId, Translatable, ViewId} from '@scion/workbench-
 import {MicrofrontendPopupPagePO} from '../../../workbench/page-object/workbench-popup-page.po';
 import {PopupPO} from '../../../popup.po';
 import {RequireOne} from '../../../helper/utility-types';
+import {toMatrixNotation} from '../../../helper/testing.util';
 
 export class TextTestPagePO implements MicrofrontendViewPagePO, MicrofrontendDialogPagePO, MicrofrontendPopupPagePO {
 
@@ -90,9 +91,10 @@ export class TextObservePO {
     this.text = this.locator.locator('output.e2e-text');
   }
 
-  public async observe(translatable: string, options: {app: 'workbench-client-testing-app1' | 'workbench-client-testing-app2'; ttl?: number}): Promise<void> {
-    await this.locator.locator(`input.e2e-translatable`).fill(translatable);
-    await this.locator.locator('input.e2e-app').fill(options.app);
+  public async observe(translatable: string, options: {provider: 'workbench-client-testing-app1' | 'workbench-client-testing-app2'; params?: Record<string, string>; ttl?: number}): Promise<void> {
+    await this.locator.locator('input.e2e-translatable').fill(translatable);
+    await this.locator.locator('input.e2e-provider').fill(options.provider);
+    await this.locator.locator('input.e2e-params').fill(toMatrixNotation(options.params));
     await this.locator.locator('input.e2e-ttl').fill(`${options.ttl ?? ''}`);
     await this.locator.locator('button.e2e-observe').click();
   }
