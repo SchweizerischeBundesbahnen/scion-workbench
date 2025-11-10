@@ -52,4 +52,9 @@ export abstract class Notification<T = any> {
    * Specifies CSS class(es) to add to the notification, e.g., to locate the notification in tests.
    */
   public abstract setCssClass(cssClass: string | string[]): void;
+
+  /**
+   * Closes the notification.
+   */
+  public abstract close(): void;
 }

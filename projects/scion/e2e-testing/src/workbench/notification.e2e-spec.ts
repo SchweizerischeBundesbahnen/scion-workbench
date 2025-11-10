@@ -343,6 +343,27 @@ test.describe('Workbench Notification', () => {
     await expectNotification(notificationPage).not.toBeAttached();
   });
 
+  test('should close notification via handle', async ({appPO, workbenchNavigator, page}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPage.enterCssClass('testee');
+    await notificationOpenerPage.selectDuration('infinite');
+    await notificationOpenerPage.selectComponent('notification-page');
+    await notificationOpenerPage.open();
+
+    // Expect the notification to display.
+    const notification = appPO.notification({cssClass: 'testee'});
+    const notificationPage = new NotificationPagePO(notification);
+    await expectNotification(notificationPage).toBeVisible();
+
+    // Close notification.
+    await notificationPage.close();
+
+    // Expect notification to be closed.
+    await expectNotification(notificationPage).not.toBeAttached();
+  });
+
   test.describe('Custom Notification Provider', () => {
 
     test.describe('Custom Message Component', () => {

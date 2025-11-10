@@ -77,6 +77,10 @@ export class NotificationPageComponent {
       });
   }
 
+  protected onClose(): void {
+    this.notification.close();
+  }
+
   private parseDurationFromUI(duration: 'short' | 'medium' | 'long' | 'infinite' | string): 'short' | 'medium' | 'long' | 'infinite' | number {
     if (isNaN(Number(duration))) {
       return duration as 'short' | 'medium' | 'long' | 'infinite';

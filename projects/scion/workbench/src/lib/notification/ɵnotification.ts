@@ -8,15 +8,18 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Type} from '@angular/core';
+import {inject, Type} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {Arrays} from '@scion/toolkit/util';
 import {Notification} from './notification';
 import {NotificationConfig} from './notification.config';
 import {TextNotificationComponent} from './text-notification.component';
 import {Translatable} from '../text/workbench-text-provider.model';
+import {NotificationService} from './notification.service';
 
 export class ɵNotification implements Notification {
+
+  private readonly _notificationService = inject(NotificationService);
 
   public readonly input: unknown;
   public readonly title$: BehaviorSubject<Translatable | undefined | Observable<Translatable | undefined>>;
@@ -54,5 +57,9 @@ export class ɵNotification implements Notification {
 
   public setCssClass(cssClass: string | string[]): void {
     this.cssClass$.next(Arrays.coerce(this.config.cssClass).concat(Arrays.coerce(cssClass)));
+  }
+
+  public close(): void {
+    this._notificationService.closeNotification(this);
   }
 }
