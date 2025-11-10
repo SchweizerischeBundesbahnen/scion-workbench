@@ -15,6 +15,8 @@ import {UUID} from '@scion/toolkit/uuid';
 import {WorkbenchTextService} from '@scion/workbench-client';
 import {Subscription} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {RecordComponent} from '../../../record/record.component';
+import {undefinedIfEmpty} from '../../../common/undefined-if-empty.util';
 
 @Component({
   selector: 'app-observe-text',
@@ -23,6 +25,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,
+    RecordComponent,
   ],
   host: {
     '[attr.data-state]': 'state()',
@@ -40,25 +43,27 @@ export default class ObserveTextComponent {
   protected state = signal<undefined | 'completed' | 'errored'>(undefined);
   protected subscription: Subscription | undefined;
 
-  protected readonly formGroup = this._formBuilder.group({
+  protected readonly form = this._formBuilder.group({
     translatable: this._formBuilder.control('', Validators.required),
-    app: this._formBuilder.control('', Validators.required),
+    params: this._formBuilder.control<Record<string, string> | undefined>(undefined),
+    provider: this._formBuilder.control('', Validators.required),
     ttl: this._formBuilder.control<number>(0),
   });
 
   protected onObserve(): void {
-    const translatable = this.formGroup.controls.translatable.value;
-    const app = this.formGroup.controls.app.value;
-    const ttl = this.formGroup.controls.ttl.value || undefined;
+    const translatable = this.form.controls.translatable.value;
+    const params = this.form.controls.params.value;
+    const provider = this.form.controls.provider.value;
+    const ttl = this.form.controls.ttl.value || undefined;
 
-    this.subscription = this._workbenchTextService.text$(translatable, {provider: app, ttl})
+    this.subscription = this._workbenchTextService.text$(translatable, {params: undefinedIfEmpty(params), provider, ttl})
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe({
         next: text => this.text.set(text ?? '<undefined>'),
         complete: () => this.state.set('completed'),
         error: () => this.state.set('errored'),
       });
-    this.formGroup.disable();
+    this.form.disable();
   }
 
   protected onCancel(): void {
@@ -66,6 +71,6 @@ export default class ObserveTextComponent {
     this.subscription = undefined;
     this.text.set(undefined);
     this.state.set(undefined);
-    this.formGroup.enable();
+    this.form.enable();
   }
 }

@@ -46,12 +46,95 @@ test.describe('Text Provider', () => {
       await testPage.provideText('key', 'TEXT 1');
 
       // Observe text.
-      await testPage.text1.observe('%key', {app: 'workbench-client-testing-app1'});
+      await testPage.text1.observe('%key', {provider: 'workbench-client-testing-app1'});
       await expect(testPage.text1.text).toHaveText('TEXT 1');
 
       // Change text.
       await testPage.provideText('key', 'TEXT 2');
       await expect(testPage.text1.text).toHaveText('TEXT 2');
+    });
+
+    test('should observe text with params (appended to the translatable)', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register test view.
+      await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+        type: 'view',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-pages/text-test-page',
+        },
+      });
+
+      // Open test view.
+      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+      const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
+
+      // Provide text.
+      await testPage.provideText('key', 'TEXT 1 - {{param1}} {{param2}}');
+
+      // Observe text.
+      await testPage.text1.observe('%key;param1=value1;param2=value2', {provider: 'workbench-client-testing-app1'});
+      await expect(testPage.text1.text).toHaveText('TEXT 1 - value1 value2');
+
+      // Change text.
+      await testPage.provideText('key', 'TEXT 2 - {{param1}} {{param2}}');
+      await expect(testPage.text1.text).toHaveText('TEXT 2 - value1 value2');
+    });
+
+    test('should observe text with params (passed via options)', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register test view.
+      await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+        type: 'view',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-pages/text-test-page',
+        },
+      });
+
+      // Open test view.
+      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+      const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
+
+      // Provide text.
+      await testPage.provideText('key', 'TEXT 1 - {{param1}} {{param2}}');
+
+      // Observe text.
+      await testPage.text1.observe('%key', {provider: 'workbench-client-testing-app1', params: {param1: 'value1', param2: 'value2'}});
+      await expect(testPage.text1.text).toHaveText('TEXT 1 - value1 value2');
+
+      // Change text.
+      await testPage.provideText('key', 'TEXT 2 - {{param1}} {{param2}}');
+      await expect(testPage.text1.text).toHaveText('TEXT 2 - value1 value2');
+    });
+
+    test('should observe text with params (appended to the translatable and passed via options)', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register test view.
+      await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+        type: 'view',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-pages/text-test-page',
+        },
+      });
+
+      // Open test view.
+      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+      const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
+
+      // Provide text.
+      await testPage.provideText('key', 'TEXT 1 - {{param1}} {{param2}} {{param3}} {{param4}}');
+
+      // Observe text.
+      await testPage.text1.observe('%key;param1=value1;param2=value2', {provider: 'workbench-client-testing-app1', params: {param2: 'VALUE2', param3: 'VALUE3', param4: 'VALUE4'}});
+      await expect(testPage.text1.text).toHaveText('TEXT 1 - value1 VALUE2 VALUE3 VALUE4');
     });
 
     test('should observe non-translatable text', async ({appPO, microfrontendNavigator}) => {
@@ -75,7 +158,7 @@ test.describe('Text Provider', () => {
       await testPage.provideText('key', 'TEXT');
 
       // Observe text.
-      await testPage.text1.observe('key', {app: 'workbench-client-testing-app1'});
+      await testPage.text1.observe('key', {provider: 'workbench-client-testing-app1'});
       await expect(testPage.text1.text).toHaveText('key');
 
       // Change text.
@@ -104,7 +187,7 @@ test.describe('Text Provider', () => {
       await testPage.provideText('key', '<undefined>');
 
       // Expect key to be returned.
-      await testPage.text1.observe('%key', {app: 'workbench-client-testing-app1'});
+      await testPage.text1.observe('%key', {provider: 'workbench-client-testing-app1'});
       await expect(testPage.text1.text).toHaveText('<undefined>');
 
       // Expect no error to be logged.
@@ -129,7 +212,7 @@ test.describe('Text Provider', () => {
       const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
 
       // Observe text.
-      await testPage.text1.observe('%key', {app: 'workbench-client-testing-app2'});
+      await testPage.text1.observe('%key', {provider: 'workbench-client-testing-app2'});
 
       // Expect key to be returned.
       await expect(testPage.text1.text).toHaveText('%key');
@@ -160,12 +243,12 @@ test.describe('Text Provider', () => {
       await testPage.provideText('key', 'TEXT');
 
       // Observe text (provider does not complete request).
-      await testPage.text1.observe('%key', {app: 'workbench-client-testing-app1'});
+      await testPage.text1.observe('%key', {provider: 'workbench-client-testing-app1'});
       await expect(testPage.text1.text).toHaveText('TEXT');
       await expect.poll(() => testPage.text1.state()).toBeUndefined();
 
       // Observe text (provider completes request).
-      await testPage.text2.observe('%key;options.complete=true', {app: 'workbench-client-testing-app1'});
+      await testPage.text2.observe('%key;options.complete=true', {provider: 'workbench-client-testing-app1'});
       await expect(testPage.text2.text).toHaveText('TEXT');
       await expect.poll(() => testPage.text2.state()).toBeUndefined();
     });
@@ -254,7 +337,7 @@ test.describe('Text Provider', () => {
       });
 
       // Observe text of app 2 from app 1.
-      await textProviderApp1Page.text1.observe('%key', {app: 'workbench-client-testing-app2'});
+      await textProviderApp1Page.text1.observe('%key', {provider: 'workbench-client-testing-app2'});
       await expect(textProviderApp1Page.text1.text).toHaveText('TEXT 1');
 
       // Change text.
@@ -292,7 +375,7 @@ test.describe('Text Provider', () => {
       await testPage.unregisterTextProvider();
 
       // Observe text.
-      await testPage.text1.observe('%key', {app: 'workbench-client-testing-app1'});
+      await testPage.text1.observe('%key', {provider: 'workbench-client-testing-app1'});
 
       // Wait some time.
       await page.waitForTimeout(1000);
@@ -389,7 +472,7 @@ test.describe('Text Provider', () => {
       await textProviderApp2Page.provideText('key', 'TEXT (app2)');
 
       // Observe text.
-      await textProviderApp1Page.text1.observe('%key', {app: 'workbench-client-testing-app1'});
+      await textProviderApp1Page.text1.observe('%key', {provider: 'workbench-client-testing-app1'});
       await expect(textProviderApp1Page.text1.text).toHaveText('TEXT (app1)');
 
       // Expect request to the text provider.
@@ -399,7 +482,7 @@ test.describe('Text Provider', () => {
       consoleLogs.clear();
 
       // Observe text again.
-      await textProviderApp1Page.text2.observe('%key', {app: 'workbench-client-testing-app1'});
+      await textProviderApp1Page.text2.observe('%key', {provider: 'workbench-client-testing-app1'});
       await expect(textProviderApp1Page.text2.text).toHaveText('TEXT (app1)');
 
       // Expect no request to the text provider.
@@ -413,7 +496,7 @@ test.describe('Text Provider', () => {
       });
 
       // Observe text of other app.
-      await textProviderApp1Page.text3.observe('%key', {app: 'workbench-client-testing-app2'});
+      await textProviderApp1Page.text3.observe('%key', {provider: 'workbench-client-testing-app2'});
       await expect(textProviderApp1Page.text3.text).toHaveText('TEXT (app2)');
 
       // Expect request to the text provider of app 2.
@@ -423,7 +506,7 @@ test.describe('Text Provider', () => {
       consoleLogs.clear();
 
       // Observe text again.
-      await textProviderApp1Page.text4.observe('%key', {app: 'workbench-client-testing-app2'});
+      await textProviderApp1Page.text4.observe('%key', {provider: 'workbench-client-testing-app2'});
       await expect(textProviderApp1Page.text4.text).toHaveText('TEXT (app2)');
 
       // Expect no request to the text provider.
@@ -510,7 +593,7 @@ test.describe('Text Provider', () => {
       await textProviderApp2Page.provideText('key', 'TEXT (app2)');
 
       // Observe text.
-      await textProviderApp1Page.text1.observe('%key;options.complete=true', {app: 'workbench-client-testing-app1'});
+      await textProviderApp1Page.text1.observe('%key;options.complete=true', {provider: 'workbench-client-testing-app1'});
       await expect(textProviderApp1Page.text1.text).toHaveText('TEXT (app1)');
 
       // Expect request to the text provider.
@@ -520,7 +603,7 @@ test.describe('Text Provider', () => {
       consoleLogs.clear();
 
       // Observe text again.
-      await textProviderApp1Page.text2.observe('%key;options.complete=true', {app: 'workbench-client-testing-app1'});
+      await textProviderApp1Page.text2.observe('%key;options.complete=true', {provider: 'workbench-client-testing-app1'});
       await expect(textProviderApp1Page.text2.text).toHaveText('TEXT (app1)');
 
       // Expect no request to the text provider.
@@ -534,7 +617,7 @@ test.describe('Text Provider', () => {
       });
 
       // Observe text of other app.
-      await textProviderApp1Page.text3.observe('%key;options.complete=true', {app: 'workbench-client-testing-app2'});
+      await textProviderApp1Page.text3.observe('%key;options.complete=true', {provider: 'workbench-client-testing-app2'});
       await expect(textProviderApp1Page.text3.text).toHaveText('TEXT (app2)');
 
       // Expect request to the text provider of app 2.
@@ -544,7 +627,7 @@ test.describe('Text Provider', () => {
       consoleLogs.clear();
 
       // Observe text again.
-      await textProviderApp1Page.text4.observe('%key;options.complete=true', {app: 'workbench-client-testing-app2'});
+      await textProviderApp1Page.text4.observe('%key;options.complete=true', {provider: 'workbench-client-testing-app2'});
       await expect(textProviderApp1Page.text4.text).toHaveText('TEXT (app2)');
 
       // Expect no request to the text provider.
@@ -573,7 +656,7 @@ test.describe('Text Provider', () => {
       await testPage.provideText('key', 'TEXT - {{param}}');
 
       // Observe text.
-      await testPage.text1.observe('%key;param=value1', {app: 'workbench-client-testing-app1'});
+      await testPage.text1.observe('%key;param=value1', {provider: 'workbench-client-testing-app1'});
       await expect(testPage.text1.text).toHaveText('TEXT - value1');
 
       // Expect request to the text provider.
@@ -583,16 +666,24 @@ test.describe('Text Provider', () => {
       consoleLogs.clear();
 
       // Observe text again.
-      await testPage.text2.observe('%key;param=value1', {app: 'workbench-client-testing-app1'});
+      await testPage.text2.observe('%key;param=value1', {provider: 'workbench-client-testing-app1'});
       await expect(testPage.text2.text).toHaveText('TEXT - value1');
 
       // Expect no request to the text provider.
       await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([]);
       consoleLogs.clear();
 
+      // Observe text again (params passed via options).
+      await testPage.text3.observe('%key', {params: {param: 'value1'}, provider: 'workbench-client-testing-app1'});
+      await expect(testPage.text3.text).toHaveText('TEXT - value1');
+
+      // Expect no request to the text provider.
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([]);
+      consoleLogs.clear();
+
       // Observe text with different param.
-      await testPage.text3.observe('%key;param=value2', {app: 'workbench-client-testing-app1'});
-      await expect(testPage.text3.text).toHaveText('TEXT - value2');
+      await testPage.text4.observe('%key;param=value2', {provider: 'workbench-client-testing-app1'});
+      await expect(testPage.text4.text).toHaveText('TEXT - value2');
 
       // Expect request to text provider.
       await expect.poll(() => consoleLogs.get({severity: 'debug', message: /TextProvider/})).toEqual([
@@ -621,7 +712,7 @@ test.describe('Text Provider', () => {
       await testPage.provideText('key', 'TEXT 1');
 
       // Observe text (first subscription).
-      await testPage.text1.observe('%key', {app: 'workbench-client-testing-app1'});
+      await testPage.text1.observe('%key', {provider: 'workbench-client-testing-app1'});
       await expect(testPage.text1.text).toHaveText('TEXT 1');
 
       // Expect request to the text provider.
@@ -631,7 +722,7 @@ test.describe('Text Provider', () => {
       consoleLogs.clear();
 
       // Observe text again (second subscription).
-      await testPage.text2.observe('%key', {app: 'workbench-client-testing-app1'});
+      await testPage.text2.observe('%key', {provider: 'workbench-client-testing-app1'});
       await expect(testPage.text2.text).toHaveText('TEXT 1');
 
       // Expect no request to the text provider.
@@ -648,7 +739,7 @@ test.describe('Text Provider', () => {
       await expect(testPage.text2.text).toHaveText('TEXT 2');
 
       // Observe text again (third subscription).
-      await testPage.text3.observe('%key', {app: 'workbench-client-testing-app1'});
+      await testPage.text3.observe('%key', {provider: 'workbench-client-testing-app1'});
       await expect(testPage.text3.text).toHaveText('TEXT 2');
 
       // Expect no request to the text provider.
@@ -661,7 +752,7 @@ test.describe('Text Provider', () => {
       await testPage.text3.cancel();
 
       // Observe text again (fourth subscription).
-      await testPage.text4.observe('%key', {app: 'workbench-client-testing-app1'});
+      await testPage.text4.observe('%key', {provider: 'workbench-client-testing-app1'});
       await expect(testPage.text4.text).toHaveText('TEXT 2');
 
       // Expect request to the text provider.
@@ -692,7 +783,7 @@ test.describe('Text Provider', () => {
 
       // Observe text with no TTL
       await test.step('Observe text with no TTL', async () => {
-        await testPage.text1.observe('%key', {app: 'workbench-client-testing-app1'});
+        await testPage.text1.observe('%key', {provider: 'workbench-client-testing-app1'});
         await expect(testPage.text1.text).toHaveText('TEXT');
 
         // Expect request to the text provider.
@@ -704,7 +795,7 @@ test.describe('Text Provider', () => {
 
       // Observe text with TTL 2000.
       await test.step('Observe text with TTL 2000', async () => {
-        await testPage.text2.observe('%key', {app: 'workbench-client-testing-app1', ttl: 2000});
+        await testPage.text2.observe('%key', {provider: 'workbench-client-testing-app1', ttl: 2000});
         await expect(testPage.text2.text).toHaveText('TEXT');
 
         // Expect request to the text provider.
@@ -716,7 +807,7 @@ test.describe('Text Provider', () => {
 
       // Observe text with TTL 2000.
       await test.step('Observe text with TTL 2000', async () => {
-        await testPage.text3.observe('%key', {app: 'workbench-client-testing-app1', ttl: 2000});
+        await testPage.text3.observe('%key', {provider: 'workbench-client-testing-app1', ttl: 2000});
         await expect(testPage.text3.text).toHaveText('TEXT');
 
         // Expect no request to the text provider.
@@ -730,7 +821,7 @@ test.describe('Text Provider', () => {
 
       // Observe text with TTL 2000.
       await test.step('Observe text with TTL 2000', async () => {
-        await testPage.text1.observe('%key', {app: 'workbench-client-testing-app1', ttl: 2000});
+        await testPage.text1.observe('%key', {provider: 'workbench-client-testing-app1', ttl: 2000});
         await expect(testPage.text1.text).toHaveText('TEXT');
 
         // Expect no request to the text provider.
@@ -740,7 +831,7 @@ test.describe('Text Provider', () => {
 
       // Observe text with no TTL
       await test.step('Observe text with no TTL', async () => {
-        await testPage.text2.observe('%key', {app: 'workbench-client-testing-app1'});
+        await testPage.text2.observe('%key', {provider: 'workbench-client-testing-app1'});
         await expect(testPage.text2.text).toHaveText('TEXT');
 
         // Expect request to the text provider.
@@ -753,7 +844,7 @@ test.describe('Text Provider', () => {
 
       // Observe text with TTL 1000.
       await test.step('Observe text with TTL 1000', async () => {
-        await testPage.text3.observe('%key', {app: 'workbench-client-testing-app1', ttl: 1000});
+        await testPage.text3.observe('%key', {provider: 'workbench-client-testing-app1', ttl: 1000});
         await expect(testPage.text3.text).toHaveText('TEXT');
 
         // Expect request to the text provider.
@@ -769,7 +860,7 @@ test.describe('Text Provider', () => {
 
       // Observe text with TTL 2000.
       await test.step('Observe text with TTL 2000', async () => {
-        await testPage.text4.observe('%key', {app: 'workbench-client-testing-app1', ttl: 2000});
+        await testPage.text4.observe('%key', {provider: 'workbench-client-testing-app1', ttl: 2000});
         await expect(testPage.text4.text).toHaveText('TEXT');
 
         // Expect request to the text provider.
@@ -802,7 +893,7 @@ test.describe('Text Provider', () => {
       await testPage.provideText('key', 'TEXT - {{param1}} - {{param2}}');
 
       // Observe text.
-      await testPage.text1.observe('%key;param1=value1;param2=value2', {app: 'workbench-client-testing-app1'});
+      await testPage.text1.observe('%key;param1=value1;param2=value2', {provider: 'workbench-client-testing-app1'});
       await expect(testPage.text1.text).toHaveText('TEXT - value1 - value2');
     });
 
@@ -827,8 +918,33 @@ test.describe('Text Provider', () => {
       await testPage.provideText('key', 'TEXT - {{param1}} - {{param2}}');
 
       // Observe text.
-      await testPage.text1.observe('%key;param1=v\\;al=ue1;param2=va\\;lue2', {app: 'workbench-client-testing-app1'});
+      await testPage.text1.observe('%key;param1=v\\;al=ue1;param2=va\\;lue2', {provider: 'workbench-client-testing-app1'});
       await expect(testPage.text1.text).toHaveText('TEXT - v;al=ue1 - va;lue2');
+    });
+
+    test('should support semicolon character in parameter passed via options', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register test view.
+      await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+        type: 'view',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-pages/text-test-page',
+        },
+      });
+
+      // Open test view.
+      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+      const testPage = new TextTestPagePO(appPO, {cssClass: 'testee'});
+
+      // Provide text.
+      await testPage.provideText('key', 'TEXT - {{param1}} - {{param2}}');
+
+      // Observe text.
+      await testPage.text1.observe('%key', {params: {param1: 'val;ue1', param2: 'val=ue2'}, provider: 'workbench-client-testing-app1'});
+      await expect(testPage.text1.text).toHaveText('TEXT - val;ue1 - val=ue2');
     });
   });
 
