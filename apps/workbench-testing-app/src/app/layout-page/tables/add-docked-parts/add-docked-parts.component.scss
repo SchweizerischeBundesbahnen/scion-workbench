@@ -5,7 +5,7 @@
 
   > form {
     display: grid;
-    grid-template-columns: 10em repeat(7, 1fr) auto;
+    grid-template-columns: 10em repeat(7, 1fr) min-content auto;
     gap: .5em .75em;
     align-items: center;
 

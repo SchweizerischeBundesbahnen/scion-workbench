@@ -106,9 +106,9 @@ export class AddPartsComponent implements ControlValueAccessor, Validator {
           ratio: this._formBuilder.control<number | undefined>({value: isInitialPart ? undefined : part.relativeTo.ratio, disabled: isInitialPart}),
         }),
         extras: this._formBuilder.group({
-          title: part.extras?.title,
+          title: this._formBuilder.control<Translatable | undefined>(part.extras?.title),
           cssClass: this._formBuilder.control<string | string[] | undefined>(part.extras?.cssClass),
-          activate: part.extras?.activate,
+          activate: this._formBuilder.control<boolean | undefined>(part.extras?.activate),
         }),
       }), {emitEvent: options?.emitEvent ?? true});
   }

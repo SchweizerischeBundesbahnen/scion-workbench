@@ -44,11 +44,11 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, extras?: PartExtras): WorkbenchLayout;
   public addPart(id: string, dockTo: DockingArea, extras: DockedPartExtras): WorkbenchLayout;
   public addPart(id: string, reference: ReferencePart | DockingArea, extras?: PartExtras | DockedPartExtras): WorkbenchLayout {
-    if ((reference as Partial<DockingArea>).dockTo) {
-      return this.addDockedPart(id, reference as DockingArea, extras as DockedPartExtras);
+    if ('dockTo' in reference) {
+      return this.addDockedPart(id, reference, extras as DockedPartExtras);
     }
     else {
-      return this._addPart(id, reference as ReferencePart, extras as PartExtras);
+      return this._addPart(id, reference, extras as PartExtras);
     }
   }
 
@@ -74,6 +74,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       tooltip: extras.tooltip,
       title: extras.title,
       cssClass: extras.cssClass,
+      activate: extras.activate,
       ɵactivityId: extras.ɵactivityId,
     });
     return this;
@@ -165,6 +166,7 @@ export interface DockedPartDescriptor {
   tooltip?: Translatable;
   title?: Translatable | false;
   cssClass?: string | string[];
+  activate?: boolean;
   ɵactivityId?: ActivityId;
 }
 

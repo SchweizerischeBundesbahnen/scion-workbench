@@ -4694,6 +4694,31 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.part({partId: 'part.activity-1'}).title).toEqual('Title');
       expect(workbenchLayout.part({partId: 'part.activity-1'}).cssClass).toEqual(['class-1']);
       expect(workbenchLayout.part({partId: 'part.activity-1'}).structural).toBeTrue();
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toBeUndefined();
+    });
+
+    it('should activate activity if configured', () => {
+      const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'icon', label: 'Label', ɵactivityId: 'activity.1', activate: true});
+
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toEqual('activity.1');
+    });
+
+    it('should not activate activity if configured', () => {
+      const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'icon', label: 'Label', ɵactivityId: 'activity.1', activate: false});
+
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toBeUndefined();
+    });
+
+    it('should not activate activity by default', () => {
+      const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'icon', label: 'Label', ɵactivityId: 'activity.1'});
+
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toBeUndefined();
     });
 
     it('should change activity panel size', () => {
