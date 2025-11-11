@@ -394,11 +394,11 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     const alternativeId = isPartId(id) ? (id === MAIN_AREA ? MAIN_AREA_ALTERNATIVE_ID : undefined) : id;
     const workingCopy = this.workingCopy();
 
-    if ((reference as Partial<DockingArea>).dockTo) {
-      workingCopy.__addActivity(partId, reference as DockingArea, {...extras, alternativeId} as DockedPartExtras & {alternativeId?: string});
+    if ('dockTo' in reference) {
+      workingCopy.__addActivity(partId, reference, {...extras, alternativeId} as DockedPartExtras & {alternativeId?: string});
     }
     else {
-      workingCopy.__addPart(partId, reference as ReferencePart, {...extras, alternativeId} as PartExtras & {alternativeId?: string; structural?: boolean});
+      workingCopy.__addPart(partId, reference, {...extras, alternativeId} as PartExtras & {alternativeId?: string; structural?: boolean});
     }
     return workingCopy;
   }
@@ -734,15 +734,17 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     const activityId = extras.ɵactivityId ?? computeActivityId();
     const title = extras.title === false ? undefined : extras.title ?? extras.label;
+    const part = new MPart({
+      id,
+      alternativeId: extras.alternativeId,
+      title,
+      structural: true,
+      views: [],
+      cssClass: extras.cssClass ? Arrays.coerce(extras.cssClass) : undefined,
+    });
+
     this._grids[activityId] = {
-      root: new MPart({
-        id,
-        alternativeId: extras.alternativeId,
-        title,
-        structural: true,
-        views: [],
-        cssClass: extras.cssClass ? Arrays.coerce(extras.cssClass) : undefined,
-      }),
+      root: part,
       activePartId: id,
       referencePartId: id,
     };
@@ -755,6 +757,11 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       tooltip: extras.tooltip ?? extras.label,
       cssClass: extras.cssClass,
     });
+
+    // Activate the part.
+    if (extras.activate) {
+      this.__activatePart(part);
+    }
   }
 
   /**
