@@ -1,7 +1,9 @@
 name: Publish TypeDoc for @scion/workbench-client
 on: workflow_dispatch
 env:
-  NODE_VERSION: 22.16.0
+  NODE_VERSION: 24.11.0
+permissions:
+  contents: read
 jobs:
   install:
     name: 'Installing NPM modules'
