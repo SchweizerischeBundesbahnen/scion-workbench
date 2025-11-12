@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationConfig} from '@angular/core';
+import {ApplicationConfig, provideZoneChangeDetection} from '@angular/core';
 import {provideRouter, withHashLocation} from '@angular/router';
 import {routes} from './app.routes';
 import {provideAnimations} from '@angular/platform-browser/animations';
@@ -29,6 +29,7 @@ export const AppWithGuard = {
         provideWorkbench(workbenchConfig),
         provideRouter(routes(options), withHashLocation()),
         provideAnimations(),
+        provideZoneChangeDetection(),
       ],
     };
   },
