@@ -23,15 +23,6 @@ export const WORKBENCH_ID = new InjectionToken<string>('WORKBENCH_ID', {
 });
 
 /**
- * Format of a view identifier.
- *
- * Each view is assigned a unique identifier (e.g., `view.d4de99fb`, `view.cad347dd`, etc.).
- * A view can also have an alternative id, a meaningful but not necessarily unique name. A view can
- * be identified either by its unique or alternative id.
- */
-export type ViewId = `${typeof VIEW_ID_PREFIX}${string}`;
-
-/**
  * Format of a part identifier.
  *
  * Each part is assigned a unique identifier (e.g., `part.9fdf7ab4`, `part.c6485225`, etc.).
@@ -39,6 +30,15 @@ export type ViewId = `${typeof VIEW_ID_PREFIX}${string}`;
  * be identified either by its unique or alternative id.
  */
 export type PartId = `${typeof PART_ID_PREFIX}${string}`;
+
+/**
+ * Format of a view identifier.
+ *
+ * Each view is assigned a unique identifier (e.g., `view.d4de99fb`, `view.cad347dd`, etc.).
+ * A view can also have an alternative id, a meaningful but not necessarily unique name. A view can
+ * be identified either by its unique or alternative id.
+ */
+export type ViewId = `${typeof VIEW_ID_PREFIX}${string}`;
 
 /**
  * Format of a dialog identifier.

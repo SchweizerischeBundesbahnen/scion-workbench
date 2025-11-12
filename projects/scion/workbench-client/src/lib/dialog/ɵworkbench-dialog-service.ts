@@ -15,7 +15,7 @@ import {catchError, firstValueFrom, throwError} from 'rxjs';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
 import {Defined, Maps} from '@scion/toolkit/util';
 import {WorkbenchDialogService} from './workbench-dialog-service';
-import {WorkbenchElement} from '../workbench.identifiers';
+import {WORKBENCH_ELEMENT, WorkbenchElement} from '../workbench.model';
 import {ɵWorkbenchDialogCommand} from './workbench-dialog-command';
 
 /**
@@ -34,7 +34,7 @@ export class ɵWorkbenchDialogService implements WorkbenchDialogService {
       context: (() => {
         // TODO [Angular 22] Remove backward compatiblity.
         const context = options?.context && (typeof options.context === 'object' ? options.context.viewId : options.context);
-        return Defined.orElse(context, () => Beans.opt<WorkbenchElement>(Symbol.for('WORKBENCH_ELEMENT'))?.id);
+        return Defined.orElse(context, () => Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.id);
       })(),
     };
 

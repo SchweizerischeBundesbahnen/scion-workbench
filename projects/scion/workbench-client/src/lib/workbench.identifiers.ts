@@ -9,10 +9,6 @@
  */
 
 import {UUID} from '@scion/toolkit/uuid';
-import {WorkbenchPart} from './part/workbench-part';
-import {WorkbenchView} from './view/workbench-view';
-import {WorkbenchDialog} from './dialog/workbench-dialog';
-import {WorkbenchPopup} from './popup/workbench-popup';
 
 /**
  * Format of a view identifier.
@@ -54,8 +50,3 @@ export type ActivityId = `activity.${string}`;
 export function computePopupId(): PopupId {
   return `popup.${UUID.randomUUID().substring(0, 8)}`;
 }
-
-/**
- * Union of workbench elements.
- */
-export type WorkbenchElement = WorkbenchPart | WorkbenchView | WorkbenchDialog | WorkbenchPopup;

@@ -19,7 +19,8 @@ import {ɵWorkbenchPopupCommand} from './workbench-popup-command';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {WorkbenchPopupConfig} from './workbench-popup.config';
 import {PopupOrigin} from './popup.origin';
-import {computePopupId, WorkbenchElement} from '../workbench.identifiers';
+import {computePopupId} from '../workbench.identifiers';
+import {WORKBENCH_ELEMENT, WorkbenchElement} from '../workbench.model';
 import {WorkbenchPopupService} from './workbench-popup-service';
 
 /**
@@ -38,7 +39,7 @@ export class ɵWorkbenchPopupService implements WorkbenchPopupService {
       context: (() => {
         // TODO [Angular 22] Remove backward compatiblity.
         const context = config.context && (typeof config.context === 'object' ? config.context.viewId : config.context);
-        return Defined.orElse(context, () => Beans.opt<WorkbenchElement>(Symbol.for('WORKBENCH_ELEMENT'))?.id);
+        return Defined.orElse(context, () => Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.id);
       })(),
     };
     const popupOriginReporter = this.observePopupOrigin$(config)
