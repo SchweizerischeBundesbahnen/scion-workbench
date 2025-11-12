@@ -17,7 +17,7 @@ import {catchError, firstValueFrom, throwError} from 'rxjs';
 import {eMESSAGE_BOX_MESSAGE_PARAM} from './workbench-message-box-capability';
 import {WorkbenchMessageBoxService} from './workbench-message-box-service';
 import {Translatable} from '../text/workbench-text-provider.model';
-import {WorkbenchElement} from '../workbench.identifiers';
+import {WORKBENCH_ELEMENT, WorkbenchElement} from '../workbench.model';
 import {ɵWorkbenchMessageBoxCommand} from './workbench-message-box-command';
 
 /**
@@ -46,7 +46,7 @@ export class ɵWorkbenchMessageBoxService implements WorkbenchMessageBoxService 
       context: (() => {
         // TODO [Angular 22] Remove backward compatiblity.
         const context = options?.context && (typeof options.context === 'object' ? options.context.viewId : options.context);
-        return Defined.orElse(context, () => Beans.opt<WorkbenchElement>(Symbol.for('WORKBENCH_ELEMENT'))?.id);
+        return Defined.orElse(context, () => Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.id);
       })(),
     };
 

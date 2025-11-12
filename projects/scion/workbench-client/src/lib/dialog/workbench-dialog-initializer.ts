@@ -13,6 +13,7 @@ import {ContextService} from '@scion/microfrontend-platform';
 import {ɵDIALOG_CONTEXT, ɵDialogContext} from './ɵworkbench-dialog-context';
 import {WorkbenchDialog} from './workbench-dialog';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
+import {WORKBENCH_ELEMENT} from '../workbench.model';
 
 /**
  * Registers {@link WorkbenchDialog} in the bean manager if in the context of a workbench dialog.
@@ -25,7 +26,7 @@ export class WorkbenchDialogInitializer implements Initializer {
     const dialogContext = await Beans.get(ContextService).lookup<ɵDialogContext>(ɵDIALOG_CONTEXT);
     if (dialogContext !== null) {
       Beans.register(WorkbenchDialog, {useValue: new ɵWorkbenchDialog(dialogContext)});
-      Beans.register(Symbol.for('WORKBENCH_ELEMENT'), {useExisting: WorkbenchDialog});
+      Beans.register(WORKBENCH_ELEMENT, {useExisting: WorkbenchDialog});
     }
   }
 }

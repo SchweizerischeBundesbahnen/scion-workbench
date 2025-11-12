@@ -13,6 +13,7 @@ import {ContextService} from '@scion/microfrontend-platform';
 import {ɵWorkbenchMessageBox} from './ɵworkbench-message-box';
 import {WorkbenchMessageBox} from './workbench-message-box';
 import {ɵMESSAGE_BOX_CONTEXT, ɵMessageBoxContext} from './ɵworkbench-message-box-context';
+import {WORKBENCH_ELEMENT} from '../workbench.model';
 
 /**
  * Registers {@link WorkbenchMessageBox} in the bean manager if in the context of a workbench message box.
@@ -25,7 +26,7 @@ export class WorkbenchMessageBoxInitializer implements Initializer {
     const messageBoxContext = await Beans.get(ContextService).lookup<ɵMessageBoxContext>(ɵMESSAGE_BOX_CONTEXT);
     if (messageBoxContext !== null) {
       Beans.register(WorkbenchMessageBox, {useValue: new ɵWorkbenchMessageBox(messageBoxContext)});
-      Beans.register(Symbol.for('WORKBENCH_ELEMENT'), {useExisting: WorkbenchMessageBox});
+      Beans.register(WORKBENCH_ELEMENT, {useExisting: WorkbenchMessageBox});
     }
   }
 }

@@ -12,6 +12,7 @@ export {WorkbenchClient} from './workbench-client';
 export {WorkbenchCapabilities} from './workbench-capabilities.enum';
 export {ɵWorkbenchCommands} from './ɵworkbench-commands';
 export {type ViewId, type PartId, type DialogId, type PopupId, type ActivityId} from './workbench.identifiers';
+export {type WorkbenchElement, WORKBENCH_ELEMENT} from './workbench.model';
 
 export * from './common/public_api';
 export * from './dialog/public_api';

@@ -13,6 +13,7 @@ import {ContextService} from '@scion/microfrontend-platform';
 import {ɵWorkbenchPart} from './ɵworkbench-part';
 import {WorkbenchPart} from './workbench-part';
 import {ɵWORKBENCH_PART_CONTEXT, ɵWorkbenchPartContext} from './ɵworkbench-part-context';
+import {WORKBENCH_ELEMENT} from '../workbench.model';
 
 /**
  * Registers {@link WorkbenchPart} in the bean manager if in the context of a workbench part.
@@ -25,7 +26,7 @@ export class WorkbenchPartInitializer implements Initializer {
     const partContext = await Beans.get(ContextService).lookup<ɵWorkbenchPartContext>(ɵWORKBENCH_PART_CONTEXT);
     if (partContext !== null) {
       Beans.register(WorkbenchPart, {useValue: new ɵWorkbenchPart(partContext)});
-      Beans.register(Symbol.for('WORKBENCH_ELEMENT'), {useExisting: WorkbenchPart});
+      Beans.register(WORKBENCH_ELEMENT, {useExisting: WorkbenchPart});
     }
   }
 }
