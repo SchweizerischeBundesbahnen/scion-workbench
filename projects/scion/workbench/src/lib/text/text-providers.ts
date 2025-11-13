@@ -11,7 +11,6 @@
 import {EnvironmentProviders, makeEnvironmentProviders, Signal} from '@angular/core';
 import {WorkbenchConfig} from '../workbench-config';
 import {WORKBENCH_TEXT_PROVIDER, WorkbenchTextProviderFn} from './workbench-text-provider.model';
-import {workbenchViewMenuConfigTextProvider} from './workbench-view-menu-config-text-provider';
 import {workbenchTextProvider} from './workbench-text-provider';
 
 /**
@@ -23,12 +22,6 @@ export function provideTextProviders(config: WorkbenchConfig): EnvironmentProvid
     {
       provide: WORKBENCH_TEXT_PROVIDER,
       useValue: applicationTextProvider(config),
-      multi: true,
-    },
-    // Provide texts of menu items configured in `config.viewMenuItems`.
-    {
-      provide: WORKBENCH_TEXT_PROVIDER,
-      useValue: workbenchViewMenuConfigTextProvider(config),
       multi: true,
     },
     // Provide built-in texts.
