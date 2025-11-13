@@ -1,0 +1,4 @@
+{
+  "module": "../fesm2022/scion-components-sashbox.mjs",
+  "typings": "../types/scion-components-sashbox.d.ts"
+}

@@ -1,0 +1,4 @@
+{
+  "module": "../fesm2022/scion-components.internal-toggle-button.mjs",
+  "typings": "../types/scion-components.internal-toggle-button.d.ts"
+}

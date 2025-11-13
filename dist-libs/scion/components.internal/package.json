@@ -1,0 +1,92 @@
+{
+  "name": "@scion/components.internal",
+  "version": "20.0.1",
+  "description": "Provides a collection of Angular components designed exclusively for use in SCION library projects. Note that this module is private to SCION and not public API. DO NOT USE THIS MODULE IN YOUR PROJECT AS IT IS NOT GUARANTEED TO BE STABLE AND MAY CHANGE WITHOUT NOTICE.",
+  "license": "EPL-2.0",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/SchweizerischeBundesbahnen/scion-toolkit",
+  "bugs": {
+    "url": "https://github.com/SchweizerischeBundesbahnen/scion-toolkit/issues"
+  },
+  "author": {
+    "name": "SCION contributors"
+  },
+  "exports": {
+    "./design": {
+      "sass": "./design/_index.scss"
+    },
+    "./package.json": {
+      "default": "./package.json"
+    },
+    ".": {
+      "types": "./types/scion-components.internal.d.ts",
+      "default": "./fesm2022/scion-components.internal.mjs"
+    },
+    "./accordion": {
+      "types": "./types/scion-components.internal-accordion.d.ts",
+      "default": "./fesm2022/scion-components.internal-accordion.mjs"
+    },
+    "./checkbox": {
+      "types": "./types/scion-components.internal-checkbox.d.ts",
+      "default": "./fesm2022/scion-components.internal-checkbox.mjs"
+    },
+    "./filter-field": {
+      "types": "./types/scion-components.internal-filter-field.d.ts",
+      "default": "./fesm2022/scion-components.internal-filter-field.mjs"
+    },
+    "./form-field": {
+      "types": "./types/scion-components.internal-form-field.d.ts",
+      "default": "./fesm2022/scion-components.internal-form-field.mjs"
+    },
+    "./key-value": {
+      "types": "./types/scion-components.internal-key-value.d.ts",
+      "default": "./fesm2022/scion-components.internal-key-value.mjs"
+    },
+    "./key-value-field": {
+      "types": "./types/scion-components.internal-key-value-field.d.ts",
+      "default": "./fesm2022/scion-components.internal-key-value-field.mjs"
+    },
+    "./list": {
+      "types": "./types/scion-components.internal-list.d.ts",
+      "default": "./fesm2022/scion-components.internal-list.mjs"
+    },
+    "./material-icon": {
+      "types": "./types/scion-components.internal-material-icon.d.ts",
+      "default": "./fesm2022/scion-components.internal-material-icon.mjs"
+    },
+    "./qualifier-chip-list": {
+      "types": "./types/scion-components.internal-qualifier-chip-list.d.ts",
+      "default": "./fesm2022/scion-components.internal-qualifier-chip-list.mjs"
+    },
+    "./tabbar": {
+      "types": "./types/scion-components.internal-tabbar.d.ts",
+      "default": "./fesm2022/scion-components.internal-tabbar.mjs"
+    },
+    "./toggle-button": {
+      "types": "./types/scion-components.internal-toggle-button.d.ts",
+      "default": "./fesm2022/scion-components.internal-toggle-button.mjs"
+    }
+  },
+  "dependencies": {
+    "tslib": "^2.5.0"
+  },
+  "peerDependencies": {
+    "@angular/core": "^21.0.0-0",
+    "@angular/common": "^21.0.0-0",
+    "@angular/animations": "^21.0.0-0",
+    "@angular/cdk": "^21.0.0-0",
+    "@scion/components": "^20.0.0 || ^21.0.0-0",
+    "@scion/toolkit": "^1.6.0 || ^2.0.0",
+    "rxjs": "^7.8.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SchweizerischeBundesbahnen/scion-toolkit.git"
+  },
+  "sideEffects": false,
+  "module": "fesm2022/scion-components.internal.mjs",
+  "typings": "types/scion-components.internal.d.ts"
+}

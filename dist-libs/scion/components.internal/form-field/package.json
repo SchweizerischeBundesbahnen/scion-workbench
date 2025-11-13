@@ -1,0 +1,4 @@
+{
+  "module": "../fesm2022/scion-components.internal-form-field.mjs",
+  "typings": "../types/scion-components.internal-form-field.d.ts"
+}

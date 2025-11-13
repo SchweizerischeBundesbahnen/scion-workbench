@@ -1,0 +1,4 @@
+{
+  "module": "../fesm2022/scion-components.internal-filter-field.mjs",
+  "typings": "../types/scion-components.internal-filter-field.d.ts"
+}

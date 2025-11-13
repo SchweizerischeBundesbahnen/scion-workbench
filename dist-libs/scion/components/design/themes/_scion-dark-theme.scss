@@ -1,0 +1,57 @@
+@use 'sass:map';
+@use '../theming' as sci-theming;
+@use '../colors/scion-static-colors';
+@use '../colors/scion-dark-colors';
+@use '../components/scion-component-tokens';
+
+$theme: sci-theming.map-merge(scion-static-colors.$tokens, scion-dark-colors.$tokens, scion-component-tokens.$tokens, (
+  // Use for highlighting calls to action and emphasizing important information or key messages.
+  --sci-color-accent: var(--sci-color-blue-500),
+  --sci-color-accent-inverse: var(--sci-static-color-white),
+  --sci-color-background-accent: var(--sci-color-blue-1200),
+  // Use as positive semantic color to indicate success, positive states and completed tasks.
+  --sci-color-positive: var(--sci-color-green-500),
+  --sci-color-positive-inverse: var(--sci-static-color-white),
+  --sci-color-background-positive: var(--sci-color-green-1300),
+  // Use as negative semantic color to indicate errors, negative states and critical issues that need immediate attention.
+  --sci-color-negative: var(--sci-color-red-500),
+  --sci-color-negative-inverse: var(--sci-static-color-white),
+  --sci-color-background-negative: var(--sci-color-red-1200),
+  // Use as notice semantic color to indicate warnings or a state of caution that requires user attention.
+  --sci-color-notice: var(--sci-color-orange-700),
+  --sci-color-notice-inverse: var(--sci-static-color-white),
+  --sci-color-background-notice: var(--sci-color-orange-1200),
+  // Use for skeleton loading progress indicators.
+  --sci-color-skeleton-subtle: var(--sci-color-gray-200),
+  --sci-color-skeleton: var(--sci-color-gray-300),
+  --sci-color-skeleton-hover: var(--sci-color-gray-400),
+  --sci-color-skeleton-active: var(--sci-color-gray-400),
+  // Use as the primary background for the UI.
+  --sci-color-background-primary: var(--sci-color-gray-50),
+  // Use as the background for navbars, menubars, toolbars, tabbars, sidebars and panels
+  --sci-color-background-secondary: var(--sci-color-gray-100),
+  --sci-color-background-secondary-hover: var(--sci-color-gray-200),
+  --sci-color-background-secondary-selected: var(--sci-color-gray-300),
+  // Use as the background for elevated elements, such as dialogs, menus and overlays.
+  --sci-color-background-elevation: var(--sci-color-gray-75),
+  --sci-color-background-elevation-hover: var(--sci-color-gray-100),
+  // Use as the background for input elements.
+  --sci-color-background-input: color-mix(in srgb, transparent 95%, var(--sci-static-color-white)),
+  --sci-color-background-input-disabled: color-mix(in srgb, transparent 85%, var(--sci-static-color-white)),
+  // Use for separators and element borders/strokes.
+  --sci-color-border: var(--sci-color-gray-300),
+  --sci-color-border-subtle: var(--sci-color-gray-200),
+  --sci-color-border-subtlest: var(--sci-color-gray-100),
+  --sci-color-border-strong: var(--sci-color-gray-400),
+  // Use for primary text, such as body text and input element values.
+  --sci-color-text: var(--sci-color-gray-900),
+  // Use for secondary text, such as labels and icons.
+  --sci-color-text-subtle: var(--sci-color-gray-700),
+  // Use for tertiary text, such as disabled text, placeholders and meta-data.
+  --sci-color-text-subtlest: var(--sci-color-gray-600),
+  // Use the box shadow effect for elevated elements on top UI layer, such as dialogs, menus and overlays.
+  --sci-elevation: 0 0 5px -3px,
+  // Use as corner radius for elements, such as tabs and input elements.
+  --sci-corner: 5px,
+  --sci-corner-small: 4px,
+));

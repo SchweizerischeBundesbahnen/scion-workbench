@@ -1,0 +1,4 @@
+{
+  "module": "../fesm2022/scion-components.internal-key-value.mjs",
+  "typings": "../types/scion-components.internal-key-value.d.ts"
+}

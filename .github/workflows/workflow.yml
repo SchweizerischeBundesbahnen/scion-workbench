@@ -20,7 +20,7 @@ jobs:
           path: ./node_modules
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
       - if: steps.node-modules-cache.outputs.cache-hit != 'true'
-        run: npm ci
+        run: npm ci --force
   build-libs:
     name: 'Building Libs'
     needs: install

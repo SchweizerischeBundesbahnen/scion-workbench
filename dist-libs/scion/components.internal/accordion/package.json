@@ -1,0 +1,4 @@
+{
+  "module": "../fesm2022/scion-components.internal-accordion.mjs",
+  "typings": "../types/scion-components.internal-accordion.d.ts"
+}

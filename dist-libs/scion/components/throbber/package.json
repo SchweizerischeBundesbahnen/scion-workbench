@@ -1,0 +1,4 @@
+{
+  "module": "../fesm2022/scion-components-throbber.mjs",
+  "typings": "../types/scion-components-throbber.d.ts"
+}

@@ -1,0 +1,4 @@
+{
+  "module": "../fesm2022/scion-components-viewport.mjs",
+  "typings": "../types/scion-components-viewport.d.ts"
+}

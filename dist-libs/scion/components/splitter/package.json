@@ -1,0 +1,4 @@
+{
+  "module": "../fesm2022/scion-components-splitter.mjs",
+  "typings": "../types/scion-components-splitter.d.ts"
+}

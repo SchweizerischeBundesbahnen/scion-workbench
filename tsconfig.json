@@ -24,6 +24,14 @@
       ],
       "@scion/workbench-client": [
         "./dist/scion/workbench-client"
+      ],
+      "@scion/components/*": [
+        "./dist-libs/scion/components/*",
+        "./dist-libs/scion/components/*/src/public_api"
+      ],
+      "@scion/components.internal/*": [
+        "./dist-libs/scion/components.internal/*",
+        "./dist-libs/scion/components.internal/*/src/public_api"
       ]
     }
     /*

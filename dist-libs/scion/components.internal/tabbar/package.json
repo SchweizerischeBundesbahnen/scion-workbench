@@ -1,0 +1,4 @@
+{
+  "module": "../fesm2022/scion-components.internal-tabbar.mjs",
+  "typings": "../types/scion-components.internal-tabbar.d.ts"
+}
