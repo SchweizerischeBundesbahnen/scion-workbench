@@ -8,8 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {EnvironmentProviders, InjectionToken, makeEnvironmentProviders} from '@angular/core';
-import {WorkbenchInitializer, WorkbenchInitializerFn} from './../startup/workbench-initializer';
+import {EnvironmentProviders, InjectionToken, Injector, makeEnvironmentProviders, runInInjectionContext} from '@angular/core';
 
 /**
  * Registers a function that is executed during the startup of the SCION Microfrontend Platform.
@@ -31,9 +30,10 @@ import {WorkbenchInitializer, WorkbenchInitializerFn} from './../startup/workben
  * @param options - Controls execution of the function.
  * @return A set of dependency-injection providers to be registered in Angular.
  */
-export function provideMicrofrontendPlatformInitializer(initializerFn: WorkbenchInitializerFn, options?: MicrofrontendPlatformInitializerOptions): EnvironmentProviders {
+export function provideMicrofrontendPlatformInitializer(initializerFn: MicrofrontendPlatformInitializerFn, options?: MicrofrontendPlatformInitializerOptions): EnvironmentProviders {
+  const token = MICROFRONTEND_PLATFORM_STARTUP_TOKENS.get(options?.phase ?? MicrofrontendPlatformStartupPhase.PostStartup);
   return makeEnvironmentProviders([{
-    provide: options?.phase === MicrofrontendPlatformStartupPhase.PreStartup ? MICROFRONTEND_PLATFORM_PRE_STARTUP : MICROFRONTEND_PLATFORM_POST_STARTUP,
+    provide: token,
     useValue: initializerFn,
     multi: true,
   }]);
@@ -50,7 +50,7 @@ export interface MicrofrontendPlatformInitializerOptions {
 }
 
 /**
- * Enumeration of phases for running a {@link WorkbenchInitializerFn} function during the startup of the SCION Microfrontend Platform.
+ * Enumeration of phases for running a {@link MicrofrontendPlatformInitializerFn} function during the startup of the SCION Microfrontend Platform.
  *
  * Functions associated with the same phase may run in parallel. Defaults to {@link PostStartup} phase.
  */
@@ -76,31 +76,56 @@ export enum MicrofrontendPlatformStartupPhase {
 }
 
 /**
- * DI token to register a {@link WorkbenchInitializerFn} as a multi-provider to hook into the startup process of the SCION Microfrontend Platform.
+ * The signature of a function executed during the startup of the SCION Workbench.
  *
- * Initializers associated with this DI token are executed during {@link WORKBENCH_STARTUP} before starting the SCION Microfrontend Platform.
+ * Initializers are used to run initialization tasks during startup of the SCION Workbench.
  *
- * Typically, you would configure the SCION Microfrontend Platform in this lifecycle hook, for example, register interceptors or decorators.
- * At this point, you cannot interact with the microfrontend platform because it has not been started yet.
+ * Initializers are registered using the `provideMicrofrontendPlatformInitializer()` function and can specify a phase for execution.
+ * Initializers in lower phases execute before initializers in higher phases. Initializers in the same phase may
+ * execute in parallel. If no phase is specified, the initializer executes in the `PostStartup` phase.
  *
- * This lifecycle hook is only called if microfrontend support is enabled.
+ * Microfrontend platform initializers run during the {@link WorkbenchStartupPhase.Startup} phase.
  *
- * @see WorkbenchInitializerFn
- * @deprecated since version 19.0.0-beta.3. Register initializer using `provideMicrofrontendPlatformInitializer` function. See `provideMicrofrontendPlatformInitializer` for an example. API will be removed in version 21.
+ * Available phases, in order of execution:
+ * - {@link MicrofrontendPlatformStartupPhase.PreStartup}
+ * - {@link MicrofrontendPlatformStartupPhase.PostStartup}
+ *
+ * The function can call `inject` to get any required dependencies.
+ *
+ * ### Example:
+ *
+ * ```ts
+ * import {provideWorkbench, provideMicrofrontendPlatformInitializer} from '@scion/workbench';
+ * import {bootstrapApplication} from '@angular/platform-browser';
+ * import {inject} from '@angular/core';
+ *
+ * bootstrapApplication(AppComponent, {
+ *   providers: [
+ *     provideWorkbench(),
+ *     provideMicrofrontendPlatformInitializer(() => inject(SomeService).init()),
+ *   ],
+ * });
+ * ```
+ * @see provideMicrofrontendPlatformInitializer
  */
-export const MICROFRONTEND_PLATFORM_PRE_STARTUP = new InjectionToken<WorkbenchInitializerFn | WorkbenchInitializer | object>('MICROFRONTEND_PLATFORM_PRE_STARTUP');
+export type MicrofrontendPlatformInitializerFn = () => void | Promise<void>;
 
 /**
- * DI token to register a {@link WorkbenchInitializerFn} as a multi-provider to hook into the startup process of the SCION Microfrontend Platform.
+ * Runs microfrontend platform initializers in the given phase. Initializer functions can call `inject` to get required dependencies.
  *
- * Initializers associated with this DI token are executed during {@link WORKBENCH_STARTUP} after started the SCION Microfrontend Platform.
- *
- * Typically, you would install intent and message handlers in this lifecycle hook.
- * At this point, the activators of the micro applications are not yet installed.
- *
- * This lifecycle hook is only called if microfrontend support is enabled.
- *
- * @see WorkbenchInitializerFn
- * @deprecated since version 19.0.0-beta.3. Register initializer using `provideMicrofrontendPlatformInitializer` function. See `provideMicrofrontendPlatformInitializer` for an example. API will be removed in version 21.
+ * Microfrontend platform initializers run during startup of the SCION Microfrontend Platform and only execute if microfrontend support is enabled.
  */
-export const MICROFRONTEND_PLATFORM_POST_STARTUP = new InjectionToken<WorkbenchInitializerFn | WorkbenchInitializer | object>('MICROFRONTEND_PLATFORM_POST_STARTUP');
+export async function runMicrofrontendPlatformInitializers(phase: MicrofrontendPlatformStartupPhase, injector: Injector): Promise<void> {
+  const token = MICROFRONTEND_PLATFORM_STARTUP_TOKENS.get(phase)!;
+  const initializers = injector.get<MicrofrontendPlatformInitializerFn[]>(token, [], {optional: true});
+  if (!initializers.length) {
+    return;
+  }
+
+  // Run and await initializer functions in parallel.
+  await Promise.all(initializers.map(initializer => runInInjectionContext(injector, initializer)));
+}
+
+const MICROFRONTEND_PLATFORM_STARTUP_TOKENS = new Map<MicrofrontendPlatformStartupPhase, InjectionToken<MicrofrontendPlatformInitializerFn>>()
+  .set(MicrofrontendPlatformStartupPhase.PreStartup, new InjectionToken<MicrofrontendPlatformInitializerFn>('MICROFRONTEND_PLATFORM_PRE_STARTUP'))
+  .set(MicrofrontendPlatformStartupPhase.PostStartup, new InjectionToken<MicrofrontendPlatformInitializerFn>('MICROFRONTEND_PLATFORM_POST_STARTUP'));
