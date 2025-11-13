@@ -23,7 +23,7 @@ import {ɵMicrofrontendRouteParams} from '../routing/ɵworkbench-router';
 
 export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
 
-  private _propertyChange$ = new Subject<'title' | 'heading' | 'dirty' | 'closable'>();
+  private _propertyChange$ = new Subject<'dirty' | 'closable'>();
   private _destroy$ = new Subject<void>();
   /**
    * Observable that emits when the application loaded into the current view receives an unloading event,
@@ -140,27 +140,13 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
   }
 
   /** @inheritDoc */
-  public setTitle(title: Translatable | Observable<string>): void {
-    this._propertyChange$.next('title');
-
-    Observables.coerce(title)
-      .pipe(
-        mergeMap(it => Beans.get(MessageClient).publish(ɵWorkbenchCommands.viewTitleTopic(this.id), it)),
-        takeUntil(merge(this._propertyChange$.pipe(filter(prop => prop === 'title')), this._beforeInAppNavigation$, this._beforeUnload$, this._destroy$)),
-      )
-      .subscribe();
+  public setTitle(title: Translatable): void {
+    void Beans.get(MessageClient).publish(ɵWorkbenchCommands.viewTitleTopic(this.id), title);
   }
 
   /** @inheritDoc */
-  public setHeading(heading: Translatable | Observable<Translatable>): void {
-    this._propertyChange$.next('heading');
-
-    Observables.coerce(heading)
-      .pipe(
-        mergeMap(it => Beans.get(MessageClient).publish(ɵWorkbenchCommands.viewHeadingTopic(this.id), it)),
-        takeUntil(merge(this._propertyChange$.pipe(filter(prop => prop === 'heading')), this._beforeInAppNavigation$, this._beforeUnload$, this._destroy$)),
-      )
-      .subscribe();
+  public setHeading(heading: Translatable): void {
+    void Beans.get(MessageClient).publish(ɵWorkbenchCommands.viewHeadingTopic(this.id), heading);
   }
 
   /** @inheritDoc */
