@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,14 +16,12 @@ import {ComponentPortal, DomPortalOutlet} from '@angular/cdk/portal';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ViewTabDragImageComponent} from '../part/view-tab-drag-image/view-tab-drag-image.component';
-import {UrlSegment} from '@angular/router';
 import {CanCloseFn, CanCloseRef, WorkbenchMenuItem} from '../workbench.model';
 import {ViewId} from '../workbench.identifiers';
 import {WorkbenchView, WorkbenchViewNavigation} from '../view/workbench-view.model';
 import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../workbench.constants';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {Disposable} from '../common/disposable';
-import {NavigationData, NavigationState} from '../routing/routing.model';
 import {throwError} from '../common/throw-error.util';
 import {UUID} from '@scion/toolkit/uuid';
 import {Translatable} from '../text/workbench-text-provider.model';
@@ -206,9 +204,6 @@ class DragImageWorkbenchView implements WorkbenchView {
   public readonly id: ViewId;
   public readonly alternativeId: string | undefined;
   public readonly navigation: Signal<WorkbenchViewNavigation | undefined>;
-  public readonly navigationHint: Signal<string | undefined>;
-  public readonly navigationData: Signal<NavigationData>;
-  public readonly navigationState: Signal<NavigationState>;
   public readonly part: Signal<WorkbenchPart>;
   public readonly title: Signal<Translatable | null>;
   public readonly heading: Signal<Translatable | null>;
@@ -219,7 +214,6 @@ class DragImageWorkbenchView implements WorkbenchView {
   public readonly focused = signal(true).asReadonly();
   public readonly blocked = false;
   public readonly cssClass = signal([]).asReadonly();
-  public readonly urlSegments: Signal<UrlSegment[]>;
   public readonly first = signal(true).asReadonly();
   public readonly last = signal(true).asReadonly();
   public readonly position = signal(0).asReadonly();
@@ -233,10 +227,6 @@ class DragImageWorkbenchView implements WorkbenchView {
     this.alternativeId = dragData.alternativeViewId;
     this.part = computed(() => throwError('UnsupportedOperationError'));
     this.navigation = signal(dragData.navigation && {...dragData.navigation, id: UUID.randomUUID()});
-    this.navigationHint = computed(() => this.navigation()?.hint);
-    this.navigationData = computed(() => this.navigation()?.data ?? {});
-    this.navigationState = computed(() => this.navigation()?.state ?? {});
-    this.urlSegments = computed(() => this.navigation()?.path ?? []);
     this.title = signal(dragData.viewTitle).asReadonly();
     this.heading = signal(dragData.viewHeading).asReadonly();
     this.dirty = signal(dragData.viewDirty).asReadonly();

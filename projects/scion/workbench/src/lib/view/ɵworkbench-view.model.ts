@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -66,10 +66,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   public alternativeId: string | undefined;
   public readonly navigation = signal<WorkbenchViewNavigation | undefined>(undefined);
-  public readonly navigationHint = computed(() => this.navigation()?.hint);
-  public readonly navigationData = computed(() => this.navigation()?.data ?? {});
-  public readonly navigationState = computed(() => this.navigation()?.state ?? {});
-  public readonly urlSegments = computed(() => this.navigation()?.path ?? []);
   public readonly position = computed(() => this.part().views().indexOf(this));
   public readonly first = computed(() => this.position() === 0);
   public readonly last = computed(() => this.position() === this.part().views().length - 1);
