@@ -315,7 +315,7 @@ export class ViewMenuService {
  * Tests if given built-in menu item is enabled for display.
  */
 function isEnabled(config: MenuItemConfig | false): config is MenuItemConfig {
-  return config && (config.visible ?? true);
+  return !!config;
 }
 
 /**
