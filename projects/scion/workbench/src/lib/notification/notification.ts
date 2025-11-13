@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Observable} from 'rxjs';
 import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
@@ -27,15 +26,10 @@ export abstract class Notification<T = any> {
 
   /**
    * Sets the title of the notification.
+   *
+   * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    */
   public abstract setTitle(title: Translatable | undefined): void;
-
-  /**
-   * Sets the title of the notification.
-   *
-   * @deprecated since version 20.0.0-beta.6. To migrate, pass a translatable and provide the text using a text provider registered in `WorkbenchClient.registerTextProvider`.
-   */
-  public abstract setTitle(title: Observable<Translatable | undefined>): void; // eslint-disable-line @typescript-eslint/unified-signatures
 
   /**
    * Sets the severity of the notification.

@@ -14,8 +14,6 @@ import {filter, switchMap} from 'rxjs/operators';
 import {ɵNotification} from './ɵnotification';
 import {CdkPortalOutlet, ComponentPortal} from '@angular/cdk/portal';
 import {Notification} from './notification';
-import {AsyncPipe} from '@angular/common';
-import {CoerceObservablePipe} from '../common/coerce-observable.pipe';
 import {TextPipe} from '../text/text.pipe';
 import {IconComponent} from '../icon/icon.component';
 
@@ -29,9 +27,7 @@ import {IconComponent} from '../icon/icon.component';
   styleUrls: ['./notification.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AsyncPipe,
     CdkPortalOutlet,
-    CoerceObservablePipe,
     TextPipe,
     IconComponent,
   ],
