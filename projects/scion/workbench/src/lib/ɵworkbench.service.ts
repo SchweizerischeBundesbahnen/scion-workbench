@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertNotInReactiveContext, computed, DOCUMENT, inject, Injectable, Signal, untracked} from '@angular/core';
-import {WorkbenchPartActionFn, WorkbenchTheme, WorkbenchViewMenuItemFn} from './workbench.model';
+import {assertNotInReactiveContext, inject, Injectable} from '@angular/core';
+import {WorkbenchPartActionFn, WorkbenchViewMenuItemFn} from './workbench.model';
 import {Disposable} from './common/disposable';
 import {WorkbenchService} from './workbench.service';
 import {WorkbenchRouter} from './routing/workbench-router.service';
@@ -53,7 +53,6 @@ export class ɵWorkbenchService implements WorkbenchService {
   public readonly popups = inject(WorkbenchPopupRegistry).elements;
   public readonly activePerspective = inject(WorkbenchPerspectiveService).activePerspective;
   public readonly activeElement = inject(WorkbenchFocusMonitor).activeElement;
-  public readonly theme = this.computeLegacyThemeObject();
   public readonly settings = {
     theme: inject(WorkbenchThemeSwitcher).theme,
     panelAlignment: inject(WorkbenchLayoutService).panelAlignment,
@@ -125,30 +124,5 @@ export class ɵWorkbenchService implements WorkbenchService {
     return {
       dispose: () => this._viewMenuItemRegistry.unregister(fn),
     };
-  }
-
-  /** @inheritDoc */
-  public async switchTheme(theme: string): Promise<void> {
-    assertNotInReactiveContext(this.switchTheme, 'Call WorkbenchService.switchTheme() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    this.settings.theme.set(theme);
-  }
-
-  private computeLegacyThemeObject(): Signal<WorkbenchTheme | null> {
-    const documentElement = inject(DOCUMENT).documentElement;
-
-    return computed(() => {
-      const theme = this.settings.theme();
-
-      return untracked(() => {
-        if (!theme) {
-          return null;
-        }
-
-        return {
-          name: theme,
-          colorScheme: getComputedStyle(documentElement).colorScheme as 'light' | 'dark',
-        };
-      });
-    });
   }
 }

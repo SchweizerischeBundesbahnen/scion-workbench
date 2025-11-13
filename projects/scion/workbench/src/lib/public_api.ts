@@ -12,7 +12,7 @@ export {WorkbenchConfig, type MenuItemConfig, type ViewMenuItemsConfig} from './
 export {provideWorkbench} from './workbench.provider';
 export {WorkbenchService} from './workbench.service';
 export {WORKBENCH_ID, type ViewId, type PartId, type ActivityId, type DialogId, type PopupId} from './workbench.identifiers';
-export {type WorkbenchPartAction, type WorkbenchPartActionFn, type WorkbenchMenuItem, type WorkbenchViewMenuItemFn, type WorkbenchTheme, type CanCloseFn, type CanCloseRef, type WorkbenchElement} from './workbench.model';
+export {type WorkbenchPartAction, type WorkbenchPartActionFn, type WorkbenchMenuItem, type WorkbenchViewMenuItemFn, type CanCloseFn, type CanCloseRef, type WorkbenchElement} from './workbench.model';
 export {WorkbenchComponent} from './workbench.component';
 export {VIEW_TAB_RENDERING_CONTEXT, type ViewTabRenderingContext} from './workbench.constants';
 

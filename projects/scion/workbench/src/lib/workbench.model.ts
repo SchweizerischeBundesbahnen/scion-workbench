@@ -192,22 +192,6 @@ export type WorkbenchPartActionFn = (part: WorkbenchPart) => WorkbenchPartAction
 export type WorkbenchViewMenuItemFn = (view: WorkbenchView) => WorkbenchMenuItem | null;
 
 /**
- * Information about a workbench theme.
- *
- * @deprecated since version 19.0.0-beta.3. Read the theme from `WorkbenchService.settings.theme` signal, and the color scheme from 'getComputedStyle(inject(DOCUMENT).documentElement).colorScheme'. API will be removed in version 21.
- */
-export interface WorkbenchTheme {
-  /**
-   * The name of the theme.
-   */
-  name: string;
-  /**
-   * The color scheme of the theme.
-   */
-  colorScheme: 'light' | 'dark';
-}
-
-/**
  * Union of workbench elements.
  */
 export type WorkbenchElement = WorkbenchPart | WorkbenchView | WorkbenchDialog | WorkbenchPopup;

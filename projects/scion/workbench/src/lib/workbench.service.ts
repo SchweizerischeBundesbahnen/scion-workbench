@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 
 import {Disposable} from './common/disposable';
-import {WorkbenchElement, WorkbenchPartActionFn, WorkbenchTheme, WorkbenchViewMenuItemFn} from './workbench.model';
+import {WorkbenchElement, WorkbenchPartActionFn, WorkbenchViewMenuItemFn} from './workbench.model';
 import {WorkbenchView} from './view/workbench-view.model';
 import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
 import {WorkbenchPart} from './part/workbench-part.model';
@@ -201,20 +201,6 @@ export abstract class WorkbenchService {
   public abstract registerViewMenuItem(fn: WorkbenchViewMenuItemFn): Disposable;
 
   /**
-   * Switches the theme of the workbench.
-   *
-   * Themes can be registered when loading the `@scion/workbench` SCSS module in the application's `styles.scss` file.
-   * By default, SCION provides a light and a dark theme, `scion-light` and `scion-dark`.
-   *
-   * See the documentation of `@scion/workbench` SCSS module for more information.
-   *
-   * @param theme - The name of the theme to switch to.
-   *
-   * @deprecated since version 19.0.0-beta.3. Switch theme using `WorkbenchService.settings.theme` signal. API will be removed in version 21.
-   */
-  public abstract switchTheme(theme: string): Promise<void>;
-
-  /**
    * Defines settings to adapt the workbench to personal preferences and working styles.
    *
    * Settings are stored in {@link WorkbenchConfig.storage} (defaults to local storage).
@@ -246,11 +232,4 @@ export abstract class WorkbenchService {
    * Provides the focused workbench element, or `null` if the focus is on a DOM element outside any workbench element.
    */
   public abstract readonly activeElement: Signal<WorkbenchElement | null>;
-
-  /**
-   * Provides the current workbench theme, if any.
-   *
-   * @deprecated since version 19.0.0-beta.3. Read the theme from `WorkbenchService.settings.theme` signal, and the color scheme from 'getComputedStyle(inject(DOCUMENT).documentElement).colorScheme'. API will be removed in version 21.
-   */
-  public abstract readonly theme: Signal<WorkbenchTheme | null>;
 }
