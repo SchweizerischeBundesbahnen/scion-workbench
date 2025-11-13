@@ -30,22 +30,4 @@ export abstract class WorkbenchStartup {
    * After startup, the workbench layout is available.
    */
   public abstract readonly whenDone: Promise<void>;
-
-  /**
-   * Indicates whether the workbench has completed startup.
-   *
-   * After startup, the workbench layout is available.
-   *
-   * @deprecated since version 19.0.0-beta.3. Use `WorkbenchStartup.done` instead. API will be removed in version 21.
-   */
-  public abstract readonly isStarted: Signal<boolean>;
-
-  /**
-   * Resolves when the workbench completes startup.
-   *
-   * After startup, the workbench layout is available.
-   *
-   * @deprecated since version 19.0.0-beta.3. Use `WorkbenchStartup.whenDone` instead. API will be removed in version 21.
-   */
-  public abstract readonly whenStarted: Promise<true>;
 }

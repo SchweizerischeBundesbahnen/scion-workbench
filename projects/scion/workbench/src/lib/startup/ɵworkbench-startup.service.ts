@@ -25,10 +25,4 @@ export class ɵWorkbenchStartup implements WorkbenchStartup {
 
   /** @inheritDoc */
   public readonly whenDone = resolveWhen(this.done);
-
-  /** @inheritDoc */
-  public readonly isStarted = this.done;
-
-  /** @inheritDoc */
-  public readonly whenStarted = this.whenDone.then<true>(() => true);
 }
