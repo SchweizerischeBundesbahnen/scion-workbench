@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,9 +13,8 @@ import {ɵDialogContext} from './ɵworkbench-dialog-context';
 import {WorkbenchDialog} from './workbench-dialog';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
-import {merge, Observable, Subject} from 'rxjs';
-import {Observables} from '@scion/toolkit/util';
-import {shareReplay, takeUntil} from 'rxjs/operators';
+import {Observable, Subject} from 'rxjs';
+import {shareReplay} from 'rxjs/operators';
 import {WorkbenchDialogCapability} from './workbench-dialog-capability';
 import {decorateObservable} from '../observable-decorator';
 import {DialogId} from '../workbench.identifiers';
@@ -28,7 +27,6 @@ import {Translatable} from '../text/workbench-text-provider.model';
 export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog {
 
   private _destroy$ = new Subject<void>();
-  private _titleChange$ = new Subject<void>();
 
   public readonly id: DialogId;
   public readonly capability: WorkbenchDialogCapability;
@@ -50,12 +48,8 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog {
   /**
    * @inheritDoc
    */
-  public setTitle(title: Translatable | Observable<Translatable>): void {
-    this._titleChange$.next();
-
-    Observables.coerce(title)
-      .pipe(takeUntil(merge(this._destroy$, this._titleChange$)))
-      .subscribe(value => void Beans.get(MessageClient).publish(ɵWorkbenchCommands.dialogTitleTopic(this._context.dialogId), value));
+  public setTitle(title: Translatable): void {
+    void Beans.get(MessageClient).publish(ɵWorkbenchCommands.dialogTitleTopic(this._context.dialogId), title);
   }
 
   /**

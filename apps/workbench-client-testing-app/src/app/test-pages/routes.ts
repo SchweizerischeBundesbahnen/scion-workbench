@@ -20,10 +20,6 @@ const routes: Routes = [
     loadComponent: (): any => import('./view-properties-test-page/view-properties-test-page.component'),
   },
   {
-    path: 'dialog-properties-test-page',
-    loadComponent: (): any => import('./dialog-properties-test-page/dialog-properties-test-page.component'),
-  },
-  {
     path: 'input-field-test-page',
     loadComponent: (): any => import('./input-field-test-page/input-field-test-page.component'),
   },

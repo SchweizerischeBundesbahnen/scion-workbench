@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,7 +14,6 @@ import {DialogOpenerPagePO} from '../page-object/dialog-opener-page.po';
 import {DialogPagePO} from '../page-object/dialog-page.po';
 import {expectDialog} from '../../matcher/dialog-matcher';
 import {ViewPagePO} from '../page-object/view-page.po';
-import {DialogPropertiesTestPagePO} from '../page-object/test-pages/dialog-properties-test-page.po';
 import {SizeTestPagePO} from '../page-object/test-pages/size-test-page.po';
 import {MAIN_AREA} from '../../workbench.model';
 import {RouterPagePO} from '../page-object/router-page.po';
@@ -1594,61 +1593,6 @@ test.describe('Workbench Dialog', () => {
 
       // Expect title to be updated.
       await expect(dialog.title).toHaveText('TITLE 2');
-    });
-
-    test('should unsubscribe from previous observable when setting observable', async ({appPO, microfrontendNavigator, page}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      await microfrontendNavigator.registerCapability('app1', {
-        type: 'dialog',
-        qualifier: {component: 'testee'},
-        properties: {
-          path: 'test-pages/dialog-properties-test-page',
-          size: {height: '475px', width: '300px'},
-        },
-      });
-
-      // Open dialog.
-      const dialogOpenerPage = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
-      await dialogOpenerPage.open({component: 'testee'}, {cssClass: 'testee'});
-
-      const dialog = appPO.dialog({cssClass: 'testee'});
-      const dialogPage = new DialogPropertiesTestPagePO(dialog);
-
-      // Install Observable 1.
-      await dialogPage.installTitleObservable1();
-
-      // Emit title from Observable 1.
-      await dialogPage.emitTitle1('A1');
-      await expect(dialog.title).toHaveText('A1');
-
-      // Emit title from Observable 1.
-      await dialogPage.emitTitle1('A2');
-      await expect(dialog.title).toHaveText('A2');
-
-      // Install Observable 2.
-      await dialogPage.installTitleObservable2();
-
-      // Emit title from Observable 2.
-      await dialogPage.emitTitle2('B1');
-      await expect(dialog.title).toHaveText('B1');
-
-      // Emit title from Observable 2.
-      await dialogPage.emitTitle2('B2');
-      await expect(dialog.title).toHaveText('B2');
-
-      // Emit title from Observable 1.
-      await dialogPage.emitTitle1('A3');
-
-      // Wait 500ms
-      await page.waitForTimeout(500);
-
-      // Expect title not to be updated from Observable 1.
-      await expect(dialog.title).toHaveText('B2');
-
-      // Emit title from Observable 2.
-      await dialogPage.emitTitle2('B3');
-      await expect(dialog.title).toHaveText('B3');
     });
   });
 
