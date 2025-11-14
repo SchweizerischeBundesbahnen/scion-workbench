@@ -599,12 +599,11 @@ export interface Options {
    * Specifies the component to display as desktop. Defaults to `StartPageComponent`.
    *
    * Available desktops:
-   * - 'legacy-start-page': Displays the start page using a primary router-outlet. No longer required with the removal of legacy start page support.
    * - 'desktop-page': Displays the 'DesktopPageComponent'.
    * - 'focus-page': Displays the 'FocusTestPageComponent'.
    * - 'layout-page': Displays the 'LayoutPageComponent'.
    */
-  desktop?: 'legacy-start-page' | 'desktop-page' | 'focus-page' | 'layout-page';
+  desktop?: 'desktop-page' | 'focus-page' | 'layout-page';
   /**
    * Wait until the workbench completed startup.
    */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,7 +13,6 @@ import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testi
 import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchService} from '../workbench.service';
 import {TestComponent, withComponentContent} from '../testing/test.component';
-import {By} from '@angular/platform-browser';
 import {Component, DestroyRef, inject, isSignal} from '@angular/core';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {firstValueFrom, Subject, timer} from 'rxjs';
@@ -22,7 +21,7 @@ import {MAIN_AREA} from '../layout/workbench-layout';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
-import {canMatchWorkbenchPerspective, canMatchWorkbenchView} from '../routing/workbench-route-guards';
+import {canMatchWorkbenchView} from '../routing/workbench-route-guards';
 import {WorkbenchPerspective} from './workbench-perspective.model';
 import {provideWorkbenchInitializer} from '../startup/workbench-initializer';
 import {WorkbenchPerspectiveRegistry} from './workbench-perspective.registry';
@@ -346,59 +345,6 @@ describe('Workbench Perspective', () => {
         },
       },
     });
-  });
-
-  /** @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support. */
-  it('should support configuring different start page per perspective [deprecated]', async () => {
-    TestBed.configureTestingModule({
-      providers: [
-        provideWorkbenchForTest({
-          layout: {
-            perspectives: [
-              {id: 'perspective-1', layout: factory => factory.addPart(MAIN_AREA)},
-              {id: 'perspective-2', layout: factory => factory.addPart(MAIN_AREA)},
-              {id: 'perspective-3', layout: factory => factory.addPart(MAIN_AREA)},
-            ],
-          },
-        }),
-        provideRouter([
-          {
-            path: '',
-            loadComponent: () => import('../testing/test.component'),
-            providers: [withComponentContent('Start Page Perspective 1')],
-            canMatch: [canMatchWorkbenchPerspective('perspective-1')],
-          },
-          {
-            path: '',
-            loadComponent: () => import('../testing/test.component'),
-            providers: [withComponentContent('Start Page Perspective 2')],
-            canMatch: [canMatchWorkbenchPerspective('perspective-2')],
-          },
-          {
-            path: '',
-            loadComponent: () => import('../testing/test.component'),
-            providers: [withComponentContent('Start Page')],
-          },
-        ]),
-      ],
-    });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitUntilWorkbenchStarted();
-    const workbenchService = TestBed.inject(WorkbenchService);
-
-    expect(fixture.debugElement.query(By.css('router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page Perspective 1');
-
-    // Switch to perspective-2
-    await workbenchService.switchPerspective('perspective-2');
-    expect(fixture.debugElement.query(By.css('router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page Perspective 2');
-
-    // Switch to perspective-3
-    await workbenchService.switchPerspective('perspective-3');
-    expect(fixture.debugElement.query(By.css('router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page');
-
-    // Switch to perspective-1
-    await workbenchService.switchPerspective('perspective-1');
-    expect(fixture.debugElement.query(By.css('router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page Perspective 1');
   });
 
   it('should support configuring different desktop per perspective', async () => {

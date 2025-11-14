@@ -19,13 +19,6 @@ export const routes: Routes = [
     path: '',
     component: WorkbenchComponent,
     canMatch: [canMatchWorkbenchOutlet(false)],
-    // TODO [Angular 21] No longer needed with the removal of legacy start page support.
-    children: [
-      {
-        path: '',
-        loadComponent: () => import('./start-page/start-page.component'),
-      },
-    ],
   },
   {
     path: 'workbench-page',

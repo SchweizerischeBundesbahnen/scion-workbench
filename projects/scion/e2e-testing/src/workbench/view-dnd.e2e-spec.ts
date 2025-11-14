@@ -600,28 +600,6 @@ test.describe('View Drag & Drop', () => {
       await expectView(testeeViewPage).toBeActive();
       await expect.poll(() => testeeViewPage.view.part.isPeripheral()).toBe(false);
     });
-
-    /** @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support. */
-    test('should drop view on start page of the main area [deprecated]', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false, desktop: 'legacy-start-page'});
-
-      await workbenchNavigator.createPerspective(factory => factory
-        .addPart(MAIN_AREA)
-        .addPart('part.left', {align: 'left'})
-        .addView('view.100', {partId: 'part.left'})
-        .navigateView('view.100', ['test-view']),
-      );
-
-      // Drop view on the main area.
-      const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
-      const dragHandle = await testeeViewPage.view.tab.startDrag();
-      await dragHandle.dragToPart(MAIN_AREA, {region: 'center'});
-      await dragHandle.drop();
-
-      // Expect view to be moved to the main area.
-      await expectView(testeeViewPage).toBeActive();
-      await expect.poll(() => testeeViewPage.view.part.isPeripheral()).toBe(false);
-    });
   });
 
   test.describe('drag image', () => {
@@ -993,94 +971,8 @@ test.describe('View Drag & Drop', () => {
       });
     });
 
-    /** @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support. */
-    test('should activate drop zone when dragging over the desktop of the main area [deprecated]', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial', desktop: 'legacy-start-page'});
-
-      await workbenchNavigator.createPerspective(layout => layout.addPart(MAIN_AREA));
-      await workbenchNavigator.modifyLayout(layout => layout.addView('view.100', {partId: 'part.initial'}));
-
-      const tab = appPO.view({viewId: 'view.100'}).tab;
-      const mainAreaPart = appPO.part({partId: MAIN_AREA});
-      const {top, right, bottom, left, vcenter, hcenter} = await mainAreaPart.getBoundingBox('content');
-
-      const dragHandle = await tab.startDrag();
-      await dragHandle.dragTo({x: hcenter, y: vcenter});
-
-      // Close view to display the desktop.
-      await appPO.workbench.closeViews('view.100');
-
-      await test.step('drag to the north', async () => {
-        await dragHandle.dragTo({x: hcenter, y: top + 75});
-        await expect.poll(() => appPO.desktop.getActiveDropZone()).toEqual('center');
-      });
-
-      await test.step('drag to the east', async () => {
-        await dragHandle.dragTo({x: right - 75, y: vcenter});
-        await expect.poll(() => appPO.desktop.getActiveDropZone()).toEqual('center');
-      });
-
-      await test.step('drag to the south', async () => {
-        await dragHandle.dragTo({x: hcenter, y: bottom - 75});
-        await expect.poll(() => appPO.desktop.getActiveDropZone()).toEqual('center');
-      });
-
-      await test.step('drag to the west', async () => {
-        await dragHandle.dragTo({x: left + 75, y: vcenter});
-        await expect.poll(() => appPO.desktop.getActiveDropZone()).toEqual('center');
-      });
-
-      await test.step('drag to the center', async () => {
-        await dragHandle.dragTo({x: hcenter, y: vcenter});
-        await expect.poll(() => appPO.desktop.getActiveDropZone()).toEqual('center');
-      });
-    });
-
     test('should activate drop zone when dragging over the desktop of the workbench', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
-
-      await workbenchNavigator.createPerspective(layout => layout
-        .addPart('part.part')
-        .addView('view.100', {partId: 'part.part'}),
-      );
-      const tab = appPO.view({viewId: 'view.100'}).tab;
-      const {top, right, bottom, left, vcenter, hcenter} = await appPO.workbenchBoundingBox();
-
-      const dragHandle = await tab.startDrag();
-      await dragHandle.dragTo({x: hcenter, y: vcenter});
-
-      // Close view to display the desktop.
-      await appPO.workbench.closeViews('view.100');
-
-      await test.step('drag to the north', async () => {
-        await dragHandle.dragTo({x: hcenter, y: top + 75});
-        await expect.poll(() => appPO.desktop.getActiveDropZone()).toEqual('center');
-      });
-
-      await test.step('drag to the east', async () => {
-        await dragHandle.dragTo({x: right - 75, y: vcenter});
-        await expect.poll(() => appPO.desktop.getActiveDropZone()).toEqual('center');
-      });
-
-      await test.step('drag to the south', async () => {
-        await dragHandle.dragTo({x: hcenter, y: bottom - 75});
-        await expect.poll(() => appPO.desktop.getActiveDropZone()).toEqual('center');
-      });
-
-      await test.step('drag to the west', async () => {
-        await dragHandle.dragTo({x: left + 75, y: vcenter});
-        await expect.poll(() => appPO.desktop.getActiveDropZone()).toEqual('center');
-      });
-
-      await test.step('drag to the center', async () => {
-        await dragHandle.dragTo({x: hcenter, y: vcenter});
-        await expect.poll(() => appPO.desktop.getActiveDropZone()).toEqual('center');
-      });
-    });
-
-    /** @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support. */
-    test('should activate drop zone when dragging over the desktop of the workbench [deprecated]', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false, desktop: 'legacy-start-page'});
 
       await workbenchNavigator.createPerspective(layout => layout
         .addPart('part.part')

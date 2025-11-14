@@ -44,7 +44,7 @@ export class WorkbenchComponent implements OnDestroy {
   private readonly _workbenchRouter = inject(WorkbenchRouter);
 
   protected readonly workbenchService = inject(WorkbenchService);
-  protected readonly desktop = this.readQueryParamFlag<'legacy-start-page' | 'desktop-page' | 'focus-page' | 'layout-page'>(WorkbenchStartupQueryParams.DESKTOP);
+  protected readonly desktop = this.readQueryParamFlag<'desktop-page' | 'focus-page' | 'layout-page'>(WorkbenchStartupQueryParams.DESKTOP);
 
   constructor() {
     console.debug('[WorkbenchComponent#construct]');
