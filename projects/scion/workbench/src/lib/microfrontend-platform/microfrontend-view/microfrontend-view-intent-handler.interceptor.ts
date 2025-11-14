@@ -16,8 +16,8 @@ import {MicrofrontendViewRoutes} from './microfrontend-view-routes';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Dictionaries} from '@scion/toolkit/util';
-import {Objects} from '../../common/objects.util';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
+import {prune} from '../../common/prune.util';
 
 /**
  * Handles microfrontend view intents, instructing the workbench to navigate to the microfrontend of the resolved capability.
@@ -54,7 +54,7 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
     const viewCapability = message.capability as WorkbenchViewCapability;
     const extras: WorkbenchNavigationExtras = message.body ?? {};
 
-    const intentParams = Objects.withoutUndefinedEntries(Dictionaries.coerce(message.intent.params));
+    const intentParams = prune(Dictionaries.coerce(message.intent.params));
     const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(intentParams, viewCapability);
     const targets = this.resolveTargets(message, extras);
     const commands = extras.close ? [] : MicrofrontendViewRoutes.createMicrofrontendNavigateCommands(viewCapability.metadata!.id, urlParams);
@@ -69,7 +69,7 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
         close: extras.close,
         position: extras.position,
         cssClass: extras.cssClass,
-        state: Objects.withoutUndefinedEntries({
+        state: prune({
           [MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS]: transientParams,
         }),
       });

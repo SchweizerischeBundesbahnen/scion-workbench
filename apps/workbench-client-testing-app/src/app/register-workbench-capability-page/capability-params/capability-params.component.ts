@@ -18,7 +18,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {ParamDefinition} from '@scion/microfrontend-platform';
 import {UUID} from '@scion/toolkit/uuid';
 import {Arrays} from '@scion/toolkit/util';
-import {Objects} from '../../common/objects.util';
+import {prune} from '../../common/prune.util';
 
 @Component({
   selector: 'app-capability-params',
@@ -61,7 +61,7 @@ export class CapabilityParamsComponent implements ControlValueAccessor, Validato
       )
       .subscribe(() => {
         const params: ParamDefinition[] = this.form.controls.params.controls.map((paramFormGroup): ParamDefinition => {
-          return Objects.withoutUndefinedEntries({
+          return prune({
             name: paramFormGroup.controls.name.value!,
             required: paramFormGroup.controls.required.value ?? false,
             transient: this.showTransientParams() ? (paramFormGroup.controls.transient.value ?? undefined) : undefined,

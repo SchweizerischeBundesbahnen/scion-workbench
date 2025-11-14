@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Dictionaries, Objects as ToolkitObjects} from '@scion/toolkit/util';
+import {Objects as ToolkitObjects} from '@scion/toolkit/util';
 
 /**
  * Provides helper functions for working with objects.
@@ -36,12 +36,6 @@ export const Objects = {
     return Object.entries(object as Record<P, T[P]>) as Array<[P, T[P]]>;
   },
 
-  /**
-   * Like {@link Dictionaries.withoutUndefinedEntries}, but preserving the object data type.
-   */
-  withoutUndefinedEntries: <T>(object: T & Record<string, unknown>): T => {
-    return Dictionaries.withoutUndefinedEntries(object) as T;
-  },
   /**
    * Stringifies given object to matrix notation: a=b;c=d;e=f
    */

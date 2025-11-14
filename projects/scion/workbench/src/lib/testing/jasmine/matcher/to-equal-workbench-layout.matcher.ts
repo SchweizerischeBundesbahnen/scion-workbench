@@ -27,6 +27,7 @@ import {WorkbenchComponent} from '../../../workbench.component';
 import {MActivity as _MActivity, MActivityLayout as _MActivityLayout, MActivityStack as _MActivityStack} from '../../../activity/workbench-activity.model';
 import {throwError} from '../../../common/throw-error.util';
 import {ActivityId} from '../../../workbench.identifiers';
+import {prune} from '../../../common/prune.util';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
@@ -572,11 +573,7 @@ export class MTreeNode extends _MTreeNode {
     super(treeNode as _MTreeNode);
     // If `useDefineForClassFields` TypeScript flag is enabled, all class members that are not explicitly set will be initialised to `undefined`.
     // In test expectations, only the explicitly set properties should be asserted. Therefore, `undefined` properties are deleted.
-    Object.keys(this).forEach(key => {
-      if (this[key as keyof this] === undefined) {
-        delete this[key as keyof this]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
-      }
-    });
+    prune(this);
   }
 }
 
@@ -588,11 +585,7 @@ export class MPart extends _MPart {
     super(part as _MPart);
     // If `useDefineForClassFields` TypeScript flag is enabled, all class members that are not explicitly set will be initialised to `undefined`.
     // In test expectations, only the explicitly set properties should be asserted. Therefore, `undefined` properties are deleted.
-    Object.keys(this).forEach(key => {
-      if (this[key as keyof this] === undefined) {
-        delete this[key as keyof this]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
-      }
-    });
+    prune(this);
   }
 }
 
