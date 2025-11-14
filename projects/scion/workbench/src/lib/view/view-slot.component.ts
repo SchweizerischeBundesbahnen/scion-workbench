@@ -19,7 +19,6 @@ import {ViewDragService} from '../view-dnd/view-drag.service';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
 import {WorkbenchView} from './workbench-view.model';
 import {OnAttach, OnDetach} from '../portal/wb-component-portal';
-import {synchronizeCssClasses} from '../common/css-class.util';
 import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-context.directive';
 import {FocusTrackerRef, trackFocus} from '../focus/workbench-focus-tracker.service';
 
@@ -43,6 +42,7 @@ import {FocusTrackerRef, trackFocus} from '../focus/workbench-focus-tracker.serv
     '[attr.data-viewid]': 'view.id',
     '[attr.data-active]': `view.active() ? '' : null`,
     '[class.view-drag]': 'viewDragService.dragging()',
+    '[class]': 'view.classList.asList()',
   },
   providers: [
     configureViewGlassPane(),
@@ -68,7 +68,6 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
     this.installComponentLifecycleLogger();
     this.installMenuAccelerators();
     this.unsetActiveElementOnPartDeactivate();
-    this.addHostCssClasses();
   }
 
   public focus(): void {
@@ -107,11 +106,6 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
 
   private installMenuAccelerators(): void {
     inject(ViewMenuService).installMenuAccelerators(inject(ElementRef), this.view);
-  }
-
-  private addHostCssClasses(): void {
-    const host = inject(ElementRef).nativeElement as HTMLElement;
-    synchronizeCssClasses(host, this.view.classList.asList);
   }
 
   /**

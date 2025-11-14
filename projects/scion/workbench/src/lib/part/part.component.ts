@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, DestroyRef, effect, ElementRef, inject, Injector, OnInit, untracked} from '@angular/core';
+import {ChangeDetectorRef, Component, DestroyRef, effect, inject, Injector, OnInit, untracked} from '@angular/core';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
@@ -16,7 +16,6 @@ import {Logger, LoggerNames} from '../logging';
 import {PartBarComponent} from './part-bar/part-bar.component';
 import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';
 import {WORKBENCH_ID} from '../workbench.identifiers';
-import {synchronizeCssClasses} from '../common/css-class.util';
 import {dasherize} from '../common/dasherize.util';
 
 @Component({
@@ -35,6 +34,7 @@ import {dasherize} from '../common/dasherize.util';
     '[attr.data-active]': `part.active() ? '' : null`,
     '[attr.data-referencepart]': `part.referencePart() ? '' : null`,
     '[attr.tabindex]': '-1',
+    '[class]': 'part.classList.asList()',
   },
 })
 export class PartComponent implements OnInit {
@@ -51,7 +51,6 @@ export class PartComponent implements OnInit {
   constructor() {
     this.installComponentLifecycleLogger();
     this.constructInactiveViewComponents();
-    this.addHostCssClasses();
   }
 
   public ngOnInit(): void {
@@ -96,11 +95,6 @@ export class PartComponent implements OnInit {
           inactiveView.slot.portal.construct(this._injector);
         }));
     });
-  }
-
-  private addHostCssClasses(): void {
-    const host = inject(ElementRef).nativeElement as HTMLElement;
-    synchronizeCssClasses(host, this.part.classList.asList);
   }
 
   private installComponentLifecycleLogger(): void {

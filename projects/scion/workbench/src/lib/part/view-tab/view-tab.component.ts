@@ -21,7 +21,6 @@ import {ViewId, WORKBENCH_ID} from '../../workbench.identifiers';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {boundingClientRect} from '@scion/components/dimension';
 import {UUID} from '@scion/toolkit/uuid';
-import {synchronizeCssClasses} from '../../common/css-class.util';
 import {TextPipe} from '../../text/text.pipe';
 import {IconComponent} from '../../icon/icon.component';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
@@ -48,6 +47,7 @@ import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
     '[attr.draggable]': 'true',
     '[attr.tabindex]': '-1', // make the view focusable to install view menu accelerators
     '[class.view-drag]': 'viewDragService.dragging()',
+    '[class]': 'view().classList.asList()',
     '[style.--sci-workbench-tab-title-offset-right]': 'viewTitleOffsetRight()',
   },
 })
@@ -69,7 +69,6 @@ export class ViewTabComponent {
   protected readonly viewTitleOffsetRight = computed(() => this.view().closable() ? '1.5rem' : undefined); // offset for the title to not overlap the close button
 
   constructor() {
-    this.addHostCssClasses();
     this.installMenuAccelerators();
     this.viewTabContentPortal = this.createViewTabContentPortal();
   }
@@ -148,11 +147,6 @@ export class ViewTabComponent {
   @HostListener('dragend')
   protected onDragEnd(): void {
     this.viewDragService.unsetViewDragData();
-  }
-
-  private addHostCssClasses(): void {
-    const host = inject(ElementRef).nativeElement as HTMLElement;
-    synchronizeCssClasses(host, computed(() => this.view().classList.asList()));
   }
 
   private installMenuAccelerators(): void {
