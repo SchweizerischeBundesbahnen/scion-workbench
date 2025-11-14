@@ -43,8 +43,8 @@ export class NotificationPagePO implements WorkbenchNotificationPagePO {
 
     let match: RegExpExecArray | null;
     while (match = mapEntryRegex.exec(rawContent)) { // eslint-disable-line no-cond-assign
-      const key = match.groups!.key!;
-      const value = match.groups!.value!;
+      const key = match.groups!['key']!;
+      const value = match.groups!['value']!;
       dictionary[key] = value === 'undefined' ? undefined : JSON.parse(value);
     }
     return dictionary;

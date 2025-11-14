@@ -172,7 +172,7 @@ export async function getPerspectiveId(page: Page): Promise<string> {
   if (!match) {
     throw Error('[IllegalStateError] No perspective active in page.');
   }
-  return match.groups!.perspective!;
+  return match.groups!['perspective']!;
 }
 
 /**

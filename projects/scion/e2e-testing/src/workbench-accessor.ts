@@ -22,35 +22,35 @@ export class WorkbenchAccessor {
 
   public resetPerspective(): Promise<void> {
     return this._page.evaluate(() => {
-      const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
+      const workbenchService = (window as unknown as Record<string, unknown>)['__workbenchService'] as WorkbenchService;
       return workbenchService.resetPerspective();
     });
   }
 
   public activeElement(): Promise<PartId | ViewId | DialogId | PopupId | null> {
     return this._page.evaluate(() => {
-      const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
+      const workbenchService = (window as unknown as Record<string, unknown>)['__workbenchService'] as WorkbenchService;
       return workbenchService.activeElement()?.id ?? null;
     });
   }
 
   public closeViews(...viewIds: ViewId[]): Promise<boolean> {
     return this._page.evaluate((viewIds: ViewId[]) => {
-      const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
+      const workbenchService = (window as unknown as Record<string, unknown>)['__workbenchService'] as WorkbenchService;
       return workbenchService.closeViews(...viewIds);
     }, viewIds);
   }
 
   public async closeDialogs(...dialogIds: DialogId[]): Promise<void> {
     await this._page.evaluate((dialogIds: DialogId[]) => {
-      const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
+      const workbenchService = (window as unknown as Record<string, unknown>)['__workbenchService'] as WorkbenchService;
       dialogIds.forEach(dialogId => workbenchService.getDialog(dialogId)!.close());
     }, dialogIds);
   }
 
   public async closePopups(...popupIds: PopupId[]): Promise<void> {
     await this._page.evaluate((popupIds: PopupId[]) => {
-      const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
+      const workbenchService = (window as unknown as Record<string, unknown>)['__workbenchService'] as WorkbenchService;
       popupIds.forEach(popupId => workbenchService.getPopup(popupId)!.close());
     }, popupIds);
   }
@@ -60,7 +60,7 @@ export class WorkbenchAccessor {
    */
   public parts(findBy?: {partId?: PartId; alternativeId?: string}): Promise<WorkbenchPartE2E[]> {
     return this._page.evaluate(findBy => {
-      const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
+      const workbenchService = (window as unknown as Record<string, unknown>)['__workbenchService'] as WorkbenchService;
       return workbenchService.parts()
         .filter(part => {
           if (findBy?.partId && findBy.partId !== part.id) {
@@ -89,7 +89,7 @@ export class WorkbenchAccessor {
    */
   public views(findBy?: {viewId?: ViewId; alternativeId?: string}): Promise<WorkbenchViewE2E[]> {
     return this._page.evaluate(findBy => {
-      const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
+      const workbenchService = (window as unknown as Record<string, unknown>)['__workbenchService'] as WorkbenchService;
       return workbenchService.views()
         .filter(view => {
           if (findBy?.viewId && findBy.viewId !== view.id) {
@@ -147,7 +147,7 @@ export class WorkbenchAccessor {
    */
   public activatePart(partId: PartId): Promise<boolean> {
     return this._page.evaluate(partId => {
-      const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
+      const workbenchService = (window as unknown as Record<string, unknown>)['__workbenchService'] as WorkbenchService;
       return workbenchService.getPart(partId)!.activate();
     }, partId);
   }
@@ -157,7 +157,7 @@ export class WorkbenchAccessor {
    */
   public activateView(viewId: ViewId): Promise<boolean> {
     return this._page.evaluate(viewId => {
-      const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
+      const workbenchService = (window as unknown as Record<string, unknown>)['__workbenchService'] as WorkbenchService;
       return workbenchService.getView(viewId)!.activate();
     }, viewId);
   }
