@@ -15,7 +15,6 @@ import {WorkbenchConfig} from './workbench-config';
 import {ViewMenuService} from './part/view-context-menu/view-menu.service';
 import {ViewMoveHandler} from './view/view-move-handler.service';
 import {provideWorkbenchMicrofrontendSupport} from './microfrontend-platform/workbench-microfrontend-support';
-import {provideWorkbenchLauncher} from './startup/workbench-launcher.service';
 import {provideLogging} from './logging';
 import {provideWorkbenchInitializer, WorkbenchStartupPhase} from './startup/workbench-initializer';
 import {WorkbenchPerspectiveService} from './perspective/workbench-perspective.service';
@@ -131,7 +130,6 @@ export function provideWorkbench(config?: WorkbenchConfig): EnvironmentProviders
     provideWorkbenchInitializer(() => inject(WorkbenchPerspectiveService).init(), {phase: WorkbenchStartupPhase.PostStartup}),
     provideEnvironmentInitializer(() => inject(WorkbenchUrlObserver)),
     provideEnvironmentInitializer(() => rejectIfNotRootEnvironment()),
-    provideWorkbenchLauncher(config),
     provideTextProviders(config),
     provideIconProviders(config),
     provideLogging(config),

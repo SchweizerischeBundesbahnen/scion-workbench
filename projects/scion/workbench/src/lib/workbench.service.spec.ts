@@ -59,7 +59,6 @@ describe('Workbench Service', () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({
-          startup: {launcher: 'APP_INITIALIZER'},
           layout: {
             perspectives: [
               {
@@ -75,6 +74,7 @@ describe('Workbench Service', () => {
         }),
       ],
     });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
     const workbenchService = TestBed.inject(WorkbenchService);
 

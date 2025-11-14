@@ -32,23 +32,6 @@ describe('Workbench Startup', () => {
   /**
    * Tests that activation of the initial perspective does not block application startup.
    */
-  it('should not block application startup if starting workbench in APP_INITIALIZER', async () => {
-    TestBed.configureTestingModule({
-      providers: [
-        provideWorkbench({ // DO NOT use `provideWorkbenchForTest` to not trigger the initial navigation. By default, the initial navigation is performed after application initializers complete.
-          startup: {
-            launcher: 'APP_INITIALIZER',
-          },
-        }),
-      ],
-    });
-
-    await expectAsync(TestBed.inject(ApplicationInitStatus).donePromise).toBeResolved();
-  });
-
-  /**
-   * Tests that activation of the initial perspective does not block application startup.
-   */
   it('should not block application startup if starting workbench manually in APP_INITIALIZER', async () => {
     TestBed.configureTestingModule({
       providers: [

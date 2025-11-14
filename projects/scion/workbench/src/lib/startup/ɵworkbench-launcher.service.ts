@@ -48,7 +48,7 @@ export class ɵWorkbenchLauncher implements WorkbenchLauncher {
 
     switch (this.state()) {
       case LaunchState.Stopped: {
-        this._logger.debug(() => `Starting Workbench. Waiting for workbench initializers to complete. [launcher=${this._injector.get(ApplicationInitStatus).done as boolean ? 'LAZY' : 'APP_INITIALIZER'}]`, LoggerNames.LIFECYCLE);
+        this._logger.debug(() => `Starting Workbench. Waiting for workbench initializers to complete. [applicationInitStatus.done=${this._injector.get(ApplicationInitStatus).done as boolean}]`, LoggerNames.LIFECYCLE);
         this.state.set(LaunchState.Starting);
         await runWorkbenchInitializers(WorkbenchStartupPhase.PreStartup, this._injector);
         await runWorkbenchInitializers(WorkbenchStartupPhase.Startup, this._injector);

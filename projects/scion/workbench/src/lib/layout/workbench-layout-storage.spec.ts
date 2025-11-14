@@ -47,7 +47,6 @@ describe('WorkbenchPerspectiveStorage', () => {
               },
             ],
           },
-          startup: {launcher: 'APP_INITIALIZER'},
         }),
         provideRouter([
           {path: 'view', component: TestComponent},
@@ -175,7 +174,6 @@ describe('WorkbenchPerspectiveStorage', () => {
             ],
           },
           storage: TestStorage,
-          startup: {launcher: 'APP_INITIALIZER'},
         }),
         provideRouter([
           {path: 'view', component: TestComponent},
@@ -246,7 +244,6 @@ describe('WorkbenchPerspectiveStorage', () => {
             ],
             initialPerspective: 'perspective-1',
           },
-          startup: {launcher: 'APP_INITIALIZER'},
         }),
         provideRouter([
           {path: 'view', component: TestComponent},
@@ -374,7 +371,6 @@ describe('WorkbenchPerspectiveStorage', () => {
             ],
             initialPerspective: 'perspective-1',
           },
-          startup: {launcher: 'APP_INITIALIZER'},
         }),
         provideRouter([
           {path: 'path/to/view', component: TestComponent},

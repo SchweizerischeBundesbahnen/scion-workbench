@@ -3441,7 +3441,6 @@ describe('WorkbenchLayout', () => {
               .navigatePart('part.activity-11', ['test-part'])
               .addPart('part.activity-12', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'Activity 12', ɵactivityId: 'activity.12'})
               .navigatePart('part.activity-12', ['test-part']),
-            startup: {launcher: 'APP_INITIALIZER'},
           }),
           provideRouter([
             {path: 'test-part', component: TestComponent},
