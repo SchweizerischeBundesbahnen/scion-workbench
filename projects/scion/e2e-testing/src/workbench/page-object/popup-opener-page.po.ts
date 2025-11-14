@@ -95,6 +95,11 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO {
       await this.enterSize(options.size);
     }
 
+    // Control if to delay the reporting of initial anchor coordinates.
+    if (options.anchor !== 'element') {
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-delay-initial-anchor-coordinates')).toggle(options.delayInitialAnchorCoordinates ?? false);
+    }
+
     // Open popup.
     await this.openButton.click();
 
@@ -247,6 +252,10 @@ export interface PopupOpenerPageOptions {
    * Controls at which size to open the popup.
    */
   size?: PopupSize;
+  /**
+   * Controls if to delay the reporting of initial anchor coordinates.
+   */
+  delayInitialAnchorCoordinates?: boolean;
 }
 
 export interface PopupSize {

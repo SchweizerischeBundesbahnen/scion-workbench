@@ -38,6 +38,9 @@
       <sci-form-field label="&nbsp;&nbsp;&nbsp;Height">
         <input [formControl]="anchor.controls.height" type="number" class="e2e-anchor-height">
       </sci-form-field>
+      <sci-form-field label="&nbsp;&nbsp;&nbsp;Initial Delay" title="Controls if to delay the reporting of initial anchor coordinates.">
+        <sci-checkbox [formControl]="form.controls.delayInitialAnchorCoordinates" class="e2e-delay-initial-anchor-coordinates"/>
+      </sci-form-field>
     }
 
     <!-- Align -->

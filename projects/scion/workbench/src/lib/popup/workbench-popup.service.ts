@@ -32,7 +32,7 @@ export abstract class WorkbenchPopupService {
    * An anchor is used to position the popup based on its preferred alignment. The anchor can be an element or a coordinate.
    *
    * Data can be passed to the component as inputs via {@link WorkbenchPopupOptions.inputs} property. Inputs are available as input
-   * properties in the component. Alternatively, data can be passed via a custom injector ({@link WorkbenchPopupOptions.injector})
+   * properties in the component. Alternatively, data can be passed for injection via a custom injector ({@link WorkbenchPopupOptions.injector})
    * or providers ({@link WorkbenchPopupOptions.providers}).
    *
    * By default, the popup closes on focus loss or when pressing the escape key.

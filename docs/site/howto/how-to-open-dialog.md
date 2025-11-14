@@ -77,18 +77,16 @@ dialogService.open(YourDialogComponent, {
 Dialog inputs are available as input properties in the dialog component.
 
 ```ts
-import {Component, Input} from '@angular/core';
+import {Component, input} from '@angular/core';
 
 @Component({...})
 export class YourDialogComponent {
-
-  @Input()
-  public firstname: string;
-
-  @Input()
-  public lastname: string;
+  firstname = input.required();
+  lastname = input.required();
 }
 ```
+
+Alternatively, data can be passed for injection via a custom injector (`WorkbenchDialogOptions.injector`) or providers (`WorkbenchDialogOptions.providers`).
 
 ### How to Set a Dialog Title 
 The dialog component can inject the `WorkbenchDialog` handle and set the title.
@@ -154,7 +152,7 @@ const result = await dialogService.open(YourDialogComponent);
 ```
 
 ### How to Size the Dialog
-The dialog handle can be used to specify a preferred size, displaying scrollbar(s) if the component overflows. If no size is specified, the dialog has the size of the component.
+By default, the dialog adapts its size to the component size. Configure size constraints using the `WorkbenchDialog` handle.
 
 ```ts
 import {inject} from '@angular/core';
