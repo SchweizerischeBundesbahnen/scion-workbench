@@ -11,8 +11,8 @@
 import {CustomMatchers} from './src/matcher/custom-matchers.definition';
 import {defineConfig} from '@playwright/test';
 
-const runInCI = !!process.env.CI;
-const runHeadless = !!process.env.HEADLESS;
+const runInCI = !!process.env['CI'];
+const runHeadless = !!process.env['HEADLESS'];
 
 export default defineConfig({
   forbidOnly: runInCI,
