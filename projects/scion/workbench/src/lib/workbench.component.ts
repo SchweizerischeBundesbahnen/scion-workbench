@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -57,7 +57,7 @@ export class WorkbenchComponent {
   private _viewDropZoneOverlayHost = viewChild('view_drop_zone_overlay_host', {read: ViewContainerRef});
 
   /** Splash to display during workbench startup. */
-  protected splash = inject(WorkbenchConfig).splashComponent ?? inject(WorkbenchConfig).startup?.splash ?? SplashComponent;
+  protected splash = inject(WorkbenchConfig).splashComponent ?? SplashComponent;
   protected workbenchStartup = inject(WorkbenchStartup);
   protected workbenchService = inject(ɵWorkbenchService);
 
