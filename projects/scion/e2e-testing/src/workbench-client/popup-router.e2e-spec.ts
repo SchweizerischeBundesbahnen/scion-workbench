@@ -31,9 +31,10 @@ test.describe('Popup Router', () => {
 
     // open the popup
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'testee'});
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.open();
+    await popupOpenerPage.open({component: 'testee'}, {
+      anchor: 'element',
+      cssClass: 'testee',
+    });
 
     const popup = appPO.popup({cssClass: 'testee'});
     const popupPage = new PopupPagePO(popup);
@@ -56,9 +57,10 @@ test.describe('Popup Router', () => {
 
     // open the popup
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'testee'});
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.open();
+    await popupOpenerPage.open({component: 'testee'}, {
+      anchor: 'element',
+      cssClass: 'testee',
+    });
 
     const popup = appPO.popup({cssClass: 'testee'});
     const popupPage = new PopupPagePO(popup);
@@ -85,9 +87,11 @@ test.describe('Popup Router', () => {
 
     // open the popup
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'testee'});
-    await popupOpenerPage.enterCssClass('testee');
-    await expect(popupOpenerPage.open()).rejects.toThrow(/NullProviderError/);
+    const open = popupOpenerPage.open({component: 'testee'}, {
+      anchor: 'element',
+      cssClass: 'testee',
+    });
+    await expect(open).rejects.toThrow(/NullProviderError/);
 
     const popup = appPO.popup({cssClass: 'testee'});
     const popupPage = new PopupPagePO(popup);
@@ -114,9 +118,10 @@ test.describe('Popup Router', () => {
 
     // open the popup
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'testee'});
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.open();
+    await popupOpenerPage.open({component: 'testee'}, {
+      anchor: 'element',
+      cssClass: 'testee',
+    });
 
     const popup = appPO.popup({cssClass: 'testee'});
     const popupPage = new PopupPagePO(popup);
@@ -139,9 +144,11 @@ test.describe('Popup Router', () => {
 
     // open the popup
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'testee'});
-    await popupOpenerPage.enterCssClass('testee');
-    await expect(popupOpenerPage.open()).rejects.toThrow(/NotQualifiedError/);
+    const open = popupOpenerPage.open({component: 'testee'}, {
+      anchor: 'element',
+      cssClass: 'testee',
+    });
+    await expect(open).rejects.toThrow(/NotQualifiedError/);
 
     const popup = appPO.popup({cssClass: 'testee'});
     const popupPage = new PopupPagePO(popup);
@@ -178,10 +185,11 @@ test.describe('Popup Router', () => {
 
     // open the first popup for app-1
     const popupOpenerPage1 = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage1.enterQualifier({component: 'testee-1'});
-    await popupOpenerPage1.enterCloseStrategy({closeOnFocusLost: false, closeOnEscape: false});
-    await popupOpenerPage1.enterCssClass('testee-1');
-    await popupOpenerPage1.open();
+    await popupOpenerPage1.open({component: 'testee-1'}, {
+      anchor: 'element',
+      closeStrategy: {onFocusLost: false, onEscape: false},
+      cssClass: 'testee-1',
+    });
 
     const popup1 = appPO.popup({cssClass: 'testee-1'});
     const popupPage1 = new PopupPagePO(popup1);
@@ -192,10 +200,11 @@ test.describe('Popup Router', () => {
 
     // open the second popup for app-1
     const popupOpenerPage2 = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage2.enterQualifier({component: 'testee-2'});
-    await popupOpenerPage2.enterCloseStrategy({closeOnFocusLost: false, closeOnEscape: false});
-    await popupOpenerPage2.enterCssClass('testee-2');
-    await popupOpenerPage2.open();
+    await popupOpenerPage2.open({component: 'testee-2'}, {
+      anchor: 'element',
+      closeStrategy: {onFocusLost: false, onEscape: false},
+      cssClass: 'testee-2',
+    });
 
     // expect popup to display
     const popup2 = appPO.popup({cssClass: 'testee-2'});
@@ -207,10 +216,11 @@ test.describe('Popup Router', () => {
 
     // open the popup for app-2
     const popupOpenerPage3 = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app2');
-    await popupOpenerPage3.enterQualifier({component: 'testee-3'});
-    await popupOpenerPage3.enterCloseStrategy({closeOnFocusLost: false, closeOnEscape: false});
-    await popupOpenerPage3.enterCssClass('testee-3');
-    await popupOpenerPage3.open();
+    await popupOpenerPage3.open({component: 'testee-3'}, {
+      anchor: 'element',
+      closeStrategy: {onFocusLost: false, onEscape: false},
+      cssClass: 'testee-3',
+    });
 
     // expect popup to display
     const popup3 = appPO.popup({cssClass: 'testee-3'});
@@ -234,9 +244,10 @@ test.describe('Popup Router', () => {
 
     // open the popup with `empty` as path
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'testee', path: 'empty'});
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.open();
+    await popupOpenerPage.open({component: 'testee', path: 'empty'}, {
+      anchor: 'element',
+      cssClass: 'testee',
+    });
 
     const popup = appPO.popup({cssClass: 'testee'});
     const popupPage = new MicrofrontendPopupTestPagePO(popup);
@@ -270,9 +281,10 @@ test.describe('Popup Router', () => {
 
     // open the popup
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'testee'});
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.open();
+    await popupOpenerPage.open({component: 'testee'}, {
+      anchor: 'element',
+      cssClass: 'testee',
+    });
 
     const popup = appPO.popup({cssClass: 'testee'});
     const popupPage = new PopupPagePO(popup);
@@ -303,9 +315,10 @@ test.describe('Popup Router', () => {
 
     // open the popup
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'testee'});
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.open();
+    await popupOpenerPage.open({component: 'testee'}, {
+      anchor: 'element',
+      cssClass: 'testee',
+    });
 
     const popup = appPO.popup({cssClass: 'testee'});
     const popupPage = new PopupPagePO(popup);
@@ -340,9 +353,10 @@ test.describe('Popup Router', () => {
 
     // open the popup
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'testee'});
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.open();
+    await popupOpenerPage.open({component: 'testee'}, {
+      anchor: 'element',
+      cssClass: 'testee',
+    });
 
     const popup = appPO.popup({cssClass: 'testee'});
     const popupPage = new PopupPagePO(popup);
@@ -374,9 +388,10 @@ test.describe('Popup Router', () => {
 
     // open the popup
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'testee'});
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.open();
+    await popupOpenerPage.open({component: 'testee'}, {
+      anchor: 'element',
+      cssClass: 'testee',
+    });
 
     const popup = appPO.popup({cssClass: 'testee'});
     const popupPage = new PopupPagePO(popup);
@@ -402,9 +417,10 @@ test.describe('Popup Router', () => {
 
     // open the popup for the first time
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'testee'});
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.open();
+    await popupOpenerPage.open({component: 'testee'}, {
+      anchor: 'element',
+      cssClass: 'testee',
+    });
 
     const popup = appPO.popup({cssClass: 'testee'});
     const popupPage = new PopupPagePO(popup);
@@ -416,7 +432,10 @@ test.describe('Popup Router', () => {
     await expectPopup(popupPage).not.toBeAttached();
 
     // open the popup for the second time
-    await popupOpenerPage.open();
+    await popupOpenerPage.open({component: 'testee'}, {
+      anchor: 'element',
+      cssClass: 'testee',
+    });
     await expectPopup(popupPage).toBeVisible();
   });
 });

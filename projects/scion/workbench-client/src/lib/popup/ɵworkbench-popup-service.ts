@@ -17,7 +17,7 @@ import {fromBoundingClientRect$} from '@scion/toolkit/observable';
 import {concat, firstValueFrom, NEVER, Observable} from 'rxjs';
 import {ɵWorkbenchPopupCommand} from './workbench-popup-command';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
-import {WorkbenchPopupConfig} from './workbench-popup.config';
+import {WorkbenchPopupOptions} from './workbench-popup.options';
 import {PopupOrigin} from './popup.origin';
 import {computePopupId} from '../workbench.identifiers';
 import {WORKBENCH_ELEMENT, WorkbenchElement} from '../workbench.model';
@@ -30,24 +30,27 @@ import {WorkbenchPopupService} from './workbench-popup-service';
 export class ɵWorkbenchPopupService implements WorkbenchPopupService {
 
   /** @inheritDoc */
-  public async open<T>(qualifier: Qualifier, config: WorkbenchPopupConfig): Promise<T | undefined> {
+  public async open<T>(qualifier: Qualifier, options: WorkbenchPopupOptions): Promise<T | undefined> {
     const command: ɵWorkbenchPopupCommand = {
       popupId: computePopupId(),
-      align: config.align,
-      closeStrategy: config.closeStrategy,
-      cssClass: config.cssClass,
+      align: options.align,
+      closeStrategy: {
+        onFocusLost: options.closeStrategy?.onFocusLost,
+        onEscape: options.closeStrategy?.onEscape,
+      },
+      cssClass: options.cssClass,
       context: (() => {
         // TODO [Angular 22] Remove backward compatiblity.
-        const context = config.context && (typeof config.context === 'object' ? config.context.viewId : config.context);
+        const context = options.context && (typeof options.context === 'object' ? options.context.viewId : options.context);
         return Defined.orElse(context, () => Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.id);
       })(),
     };
-    const popupOriginReporter = this.observePopupOrigin$(config)
+    const popupOriginReporter = this.observePopupOrigin$(options)
       .pipe(finalize(() => void Beans.get(MessageClient).publish<PopupOrigin>(ɵWorkbenchCommands.popupOriginTopic(command.popupId), undefined, {retain: true})))
       .subscribe(origin => void Beans.get(MessageClient).publish<PopupOrigin>(ɵWorkbenchCommands.popupOriginTopic(command.popupId), origin, {retain: true}));
 
     try {
-      const params = Maps.coerce(config.params);
+      const params = Maps.coerce(options.params);
       const openPopup$ = Beans.get(IntentClient).request$<T>({type: WorkbenchCapabilities.Popup, qualifier, params}, command).pipe(mapToBody());
       return await firstValueFrom(openPopup$, {defaultValue: undefined});
     }
@@ -65,12 +68,12 @@ export class ɵWorkbenchPopupService implements WorkbenchPopupService {
    * The Observable emits the anchor's initial position, and each time its position changes.
    * The Observable never completes.
    */
-  private observePopupOrigin$(config: WorkbenchPopupConfig): Observable<PopupOrigin> {
-    if (config.anchor instanceof Element) {
-      return fromBoundingClientRect$(config.anchor as HTMLElement);
+  private observePopupOrigin$(options: WorkbenchPopupOptions): Observable<PopupOrigin> {
+    if (options.anchor instanceof Element) {
+      return fromBoundingClientRect$(options.anchor as HTMLElement);
     }
     else {
-      return concat(Observables.coerce(config.anchor), NEVER);
+      return concat(Observables.coerce(options.anchor), NEVER);
     }
   }
 }

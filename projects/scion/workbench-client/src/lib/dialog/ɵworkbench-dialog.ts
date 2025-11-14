@@ -25,7 +25,7 @@ import {Translatable} from '../text/workbench-text-provider.model';
  * @ignore
  * @docs-private Not public API. For internal use only.
  */
-export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog {
+export class ɵWorkbenchDialog implements WorkbenchDialog {
 
   private _destroy$ = new Subject<void>();
   private _titleChange$ = new Subject<void>();
@@ -61,7 +61,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog {
   /**
    * @inheritDoc
    */
-  public close(result?: R | Error): void {
+  public close<R>(result?: R | Error): void {
     this._destroy$.next();
     if (result instanceof Error) {
       const headers = new Map().set(ɵWorkbenchDialogMessageHeaders.CLOSE_WITH_ERROR, true);

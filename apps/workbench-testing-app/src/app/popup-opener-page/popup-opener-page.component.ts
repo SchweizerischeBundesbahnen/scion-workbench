@@ -9,14 +9,13 @@
  */
 
 import {Component, ElementRef, inject, Type, viewChild} from '@angular/core';
-import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {DialogId, PartId, PopupId, PopupOrigin, PopupSize, ViewId, WorkbenchPopupService} from '@scion/workbench';
+import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {DialogId, PartId, PopupId, PopupOrigin, PopupService, ViewId, WorkbenchPopupService} from '@scion/workbench';
 import {PopupPageComponent} from '../popup-page/popup-page.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import {map, startWith} from 'rxjs/operators';
 import {Observable} from 'rxjs';
 import BlankTestPageComponent from '../test-pages/blank-test-page/blank-test-page.component';
-import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
 import {PopupPositionLabelPipe, Position} from './popup-position-label.pipe';
 import {stringifyError} from '../common/stringify-error.util';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
@@ -24,16 +23,18 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import InputFieldTestPageComponent from '../test-pages/input-field-test-page/input-field-test-page.component';
 import DialogOpenerPageComponent from '../dialog-opener-page/dialog-opener-page.component';
-import {Dictionaries} from '@scion/toolkit/util';
 import {parseTypedString} from '../common/parse-typed-value.util';
 import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import SizeTestPageComponent from '../test-pages/size-test-page/size-test-page.component';
 import {UUID} from '@scion/toolkit/uuid';
+import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
+import {prune} from '../common/prune.util';
+import {PopupSizeDirective} from './popup-size.directive';
 
 @Component({
   selector: 'app-popup-opener-page',
   templateUrl: './popup-opener-page.component.html',
-  styleUrls: ['./popup-opener-page.component.scss'],
+  styleUrl: './popup-opener-page.component.scss',
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,
@@ -42,40 +43,47 @@ import {UUID} from '@scion/toolkit/uuid';
     SciCheckboxComponent,
     PopupPositionLabelPipe,
     MultiValueInputComponent,
+    SciKeyValueFieldComponent,
   ],
+  hostDirectives: [{directive: PopupSizeDirective, inputs: ['size']}],
 })
 export default class PopupOpenerPageComponent {
 
   private readonly _popupService = inject(WorkbenchPopupService);
+  private readonly _legacyPopupService = inject(PopupService);
   private readonly _formBuilder = inject(NonNullableFormBuilder);
   private readonly _openButton = viewChild.required<ElementRef<HTMLButtonElement>>('open_button');
   private readonly _popupOrigin$: Observable<PopupOrigin>;
 
   protected readonly form = this._formBuilder.group({
-    popupComponent: this._formBuilder.control('popup-page', Validators.required),
-    anchor: this._formBuilder.group({
-      position: this._formBuilder.control<Position | 'element'>('element', Validators.required),
-      verticalPosition: this._formBuilder.control(0, Validators.required),
-      horizontalPosition: this._formBuilder.control(0, Validators.required),
-      width: this._formBuilder.control<number | undefined>(undefined),
-      height: this._formBuilder.control<number | undefined>(undefined),
-    }),
-    context: this._formBuilder.control<ViewId | PartId | DialogId | PopupId | '<null>' | ''>(''),
-    align: this._formBuilder.control<'east' | 'west' | 'north' | 'south' | ''>(''),
-    cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
-    input: this._formBuilder.control(''),
-    closeStrategy: this._formBuilder.group({
-      onFocusLost: this._formBuilder.control(true),
-      onEscape: this._formBuilder.control(true),
+    component: this._formBuilder.control('popup-page', Validators.required),
+    options: this._formBuilder.group({
+      inputs: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
+      inputLegacy: this._formBuilder.control(''),
+      anchor: this._formBuilder.group({
+        position: this._formBuilder.control<Position | 'element'>('element', Validators.required),
+        verticalPosition: this._formBuilder.control(0, Validators.required),
+        horizontalPosition: this._formBuilder.control(0, Validators.required),
+        width: this._formBuilder.control<number | undefined>(undefined),
+        height: this._formBuilder.control<number | undefined>(undefined),
+      }),
+      align: this._formBuilder.control<'east' | 'west' | 'north' | 'south' | ''>(''),
+      context: this._formBuilder.control<ViewId | PartId | DialogId | PopupId | '<null>' | ''>(''),
+      cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
+      closeStrategy: this._formBuilder.group({
+        onFocusLost: this._formBuilder.control(true),
+        onEscape: this._formBuilder.control(true),
+      }),
     }),
     size: this._formBuilder.group({
-      minHeight: this._formBuilder.control(''),
       height: this._formBuilder.control(''),
+      width: this._formBuilder.control(''),
+      minHeight: this._formBuilder.control(''),
       maxHeight: this._formBuilder.control(''),
       minWidth: this._formBuilder.control(''),
-      width: this._formBuilder.control(''),
       maxWidth: this._formBuilder.control(''),
     }),
+    legacyAPI: this._formBuilder.control(false),
   });
 
   protected popupError: string | undefined;
@@ -91,32 +99,62 @@ export default class PopupOpenerPageComponent {
     this.popupError = undefined;
     this.returnValue = undefined;
 
-    await this._popupService.open<string>({
-      component: this.parsePopupComponentInput(),
-      input: this.form.controls.input.value || undefined,
-      anchor: this.form.controls.anchor.controls.position.value === 'element' ? this._openButton() : this._popupOrigin$,
-      align: this.form.controls.align.value || undefined,
-      cssClass: this.form.controls.cssClass.value,
-      closeStrategy: {
-        onFocusLost: this.form.controls.closeStrategy.controls.onFocusLost.value,
-        onEscape: this.form.controls.closeStrategy.controls.onEscape.value,
-      },
-      size: undefinedIfEmpty(Dictionaries.withoutUndefinedEntries({
-        width: this.form.controls.size.controls.width.value || undefined,
-        height: this.form.controls.size.controls.height.value || undefined,
-        minWidth: this.form.controls.size.controls.minWidth.value || undefined,
-        maxWidth: this.form.controls.size.controls.maxWidth.value || undefined,
-        minHeight: this.form.controls.size.controls.minHeight.value || undefined,
-        maxHeight: this.form.controls.size.controls.maxHeight.value || undefined,
-      } satisfies PopupSize)),
-      context: parseTypedString(this.form.controls.context.value, {undefinedIfEmpty: true}),
-    })
-      .then(result => this.returnValue = result)
-      .catch((error: unknown) => this.popupError = stringifyError(error) || 'Workbench Popup was closed with an error');
+    if (this.form.controls.legacyAPI.value) {
+      const options = this.form.controls.options.controls;
+      await this._legacyPopupService.open<string>({
+        component: this.parsePopupComponentFromUI(),
+        input: options.inputLegacy.value || undefined,
+        anchor: options.anchor.controls.position.value === 'element' ? this._openButton() : this._popupOrigin$,
+        align: options.align.value || undefined,
+        cssClass: options.cssClass.value,
+        closeStrategy: {
+          onFocusLost: options.closeStrategy.controls.onFocusLost.value,
+          onEscape: options.closeStrategy.controls.onEscape.value,
+        },
+        size: prune({
+          width: this.form.controls.size.controls.width.value || undefined,
+          height: this.form.controls.size.controls.height.value || undefined,
+          minWidth: this.form.controls.size.controls.minWidth.value || undefined,
+          maxWidth: this.form.controls.size.controls.maxWidth.value || undefined,
+          minHeight: this.form.controls.size.controls.minHeight.value || undefined,
+          maxHeight: this.form.controls.size.controls.maxHeight.value || undefined,
+        }, {pruneIfEmpty: true}),
+        context: parseTypedString(options.context.value, {undefinedIfEmpty: true}),
+      })
+        .then(result => this.returnValue = result)
+        .catch((error: unknown) => this.popupError = stringifyError(error) || 'Workbench Popup was closed with an error');
+    }
+    else {
+      const component = this.parsePopupComponentFromUI();
+      const options = this.form.controls.options.controls;
+      await this._popupService.open<string>(component, {
+        inputs: prune({
+          ...SciKeyValueFieldComponent.toDictionary(options.inputs, false),
+          size: {
+            width: this.form.controls.size.controls.width.value || undefined,
+            height: this.form.controls.size.controls.height.value || undefined,
+            minWidth: this.form.controls.size.controls.minWidth.value || undefined,
+            maxWidth: this.form.controls.size.controls.maxWidth.value || undefined,
+            minHeight: this.form.controls.size.controls.minHeight.value || undefined,
+            maxHeight: this.form.controls.size.controls.maxHeight.value || undefined,
+          },
+        }, {pruneIfEmpty: true}),
+        anchor: options.anchor.controls.position.value === 'element' ? this._openButton() : this._popupOrigin$,
+        align: options.align.value || undefined,
+        cssClass: options.cssClass.value,
+        closeStrategy: {
+          onFocusLost: options.closeStrategy.controls.onFocusLost.value,
+          onEscape: options.closeStrategy.controls.onEscape.value,
+        },
+        context: parseTypedString(options.context.value, {undefinedIfEmpty: true}),
+      })
+        .then(result => this.returnValue = result)
+        .catch((error: unknown) => this.popupError = stringifyError(error) || 'Workbench Popup was closed with an error');
+    }
   }
 
-  private parsePopupComponentInput(): Type<PopupPageComponent | FocusTestPageComponent | BlankTestPageComponent> {
-    switch (this.form.controls.popupComponent.value) {
+  private parsePopupComponentFromUI(): Type<PopupPageComponent | FocusTestPageComponent | BlankTestPageComponent> {
+    switch (this.form.controls.component.value) {
       case 'popup-page':
         return PopupPageComponent;
       case 'focus-test-page':
@@ -132,53 +170,54 @@ export default class PopupOpenerPageComponent {
       case 'popup-opener-page':
         return PopupOpenerPageComponent;
       default:
-        throw Error(`[IllegalPopupComponent] Popup component not supported: ${this.form.controls.popupComponent.value}`);
+        throw Error(`[IllegalPopupComponent] Popup component not supported: ${this.form.controls.component.value}`);
     }
   }
 
   private observePopupOrigin$(): Observable<PopupOrigin> {
-    return this.form.controls.anchor.valueChanges
+    return this.form.controls.options.controls.anchor.valueChanges
       .pipe(
         startWith(undefined as void),
         map((): PopupOrigin => {
-          switch (this.form.controls.anchor.controls.position.value) {
+          const anchor = this.form.controls.options.controls.anchor.controls;
+          switch (anchor.position.value) {
             case 'top-left':
               return {
-                top: this.form.controls.anchor.controls.verticalPosition.value,
-                left: this.form.controls.anchor.controls.horizontalPosition.value,
-                width: this.form.controls.anchor.controls.width.value,
-                height: this.form.controls.anchor.controls.height.value,
+                top: anchor.verticalPosition.value,
+                left: anchor.horizontalPosition.value,
+                width: anchor.width.value,
+                height: anchor.height.value,
               };
             case 'top-right':
               return {
-                top: this.form.controls.anchor.controls.verticalPosition.value,
-                right: this.form.controls.anchor.controls.horizontalPosition.value,
-                width: this.form.controls.anchor.controls.width.value,
-                height: this.form.controls.anchor.controls.height.value,
+                top: anchor.verticalPosition.value,
+                right: anchor.horizontalPosition.value,
+                width: anchor.width.value,
+                height: anchor.height.value,
               };
             case 'bottom-left':
               return {
-                bottom: this.form.controls.anchor.controls.verticalPosition.value,
-                left: this.form.controls.anchor.controls.horizontalPosition.value,
-                width: this.form.controls.anchor.controls.width.value,
-                height: this.form.controls.anchor.controls.height.value,
+                bottom: anchor.verticalPosition.value,
+                left: anchor.horizontalPosition.value,
+                width: anchor.width.value,
+                height: anchor.height.value,
               };
             case 'bottom-right':
               return {
-                bottom: this.form.controls.anchor.controls.verticalPosition.value,
-                right: this.form.controls.anchor.controls.horizontalPosition.value,
-                width: this.form.controls.anchor.controls.width.value,
-                height: this.form.controls.anchor.controls.height.value,
+                bottom: anchor.verticalPosition.value,
+                right: anchor.horizontalPosition.value,
+                width: anchor.width.value,
+                height: anchor.height.value,
               };
             case 'point':
               return {
-                x: this.form.controls.anchor.controls.horizontalPosition.value,
-                y: this.form.controls.anchor.controls.verticalPosition.value,
-                width: this.form.controls.anchor.controls.width.value,
-                height: this.form.controls.anchor.controls.height.value,
+                x: anchor.horizontalPosition.value,
+                y: anchor.verticalPosition.value,
+                width: anchor.width.value,
+                height: anchor.height.value,
               };
             default: {
-              throw Error(`Invalid popup origin specified: ${this.form.controls.anchor.controls.position.value}`);
+              throw Error(`Invalid popup origin specified: ${anchor.position.value}`);
             }
           }
         }),

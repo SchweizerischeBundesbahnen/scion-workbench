@@ -14,9 +14,10 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 /**
  * Represents a microfrontend for display in a workbench popup.
  *
- * A popup is a visual workbench component for displaying content above other content.
+ * A popup is a visual workbench element for displaying content above other content. The popup is positioned relative
+ * to an anchor based on its preferred alignment.
  *
- * Unlike views, popups are not part of the persistent workbench navigation, meaning that popups do not survive a page reload.
+ * The microfrontend can inject the {@link WorkbenchPopup} handle to interact with the popup.
  *
  * @category Popup
  */
@@ -56,13 +57,22 @@ export interface WorkbenchPopupCapability extends Capability {
      */
     path: string;
     /**
-     * Specifies the preferred popup size.
+     * Specifies the size of this popup.
      *
-     * If not set, the popup will adjust its size to the content size reported by the embedded content using {@link @scion/microfrontend-platform!PreferredSizeService}.
-     * Note that the microfrontend may take some time to load, causing the popup to flicker when opened. Therefore, for fixed-sized popups,
-     * consider declaring the popup size in the popup capability.
+     * If not set, the microfrontend must report the preferred size using {@link @scion/microfrontend-platform!PreferredSizeService}.
+     *
+     * @example - Reporting the size of a microfrontend
+     * ```ts
+     * Beans.get(PreferredSizeService).fromDimension(<Microfrontend HTMLElement>);
+     * ```
+     *
+     * If the content can grow and shrink, e.g., if using expandable panels, position the microfrontend `absolute` to allow infinite
+     * space for rendering at its preferred size.
+     *
+     * Since loading a microfrontend may take time, prefer setting the popup size in the popup capability to avoid flickering when
+     * opening the popup.
      */
-    size?: PopupSize;
+    size?: WorkbenchPopupSize;
     /**
      * Instructs the workbench to show a splash, such as a skeleton or loading indicator, until the popup microfrontend signals readiness.
      *
@@ -83,31 +93,31 @@ export interface WorkbenchPopupCapability extends Capability {
 }
 
 /**
- * Represents the preferred popup size.
+ * Specifies the popup size.
  */
-export interface PopupSize {
+export interface WorkbenchPopupSize {
   /**
-   * Specifies the min-height of the popup.
-   */
-  minHeight?: string;
-  /**
-   * Specifies the height of the popup.
+   * Specifies the height of the popup, constrained by {@link minHeight} and {@link maxHeight}, if any.
    */
   height?: string;
   /**
-   * Specifies the max-height of the popup.
-   */
-  maxHeight?: string;
-  /**
-   * Specifies the min-width of the popup.
-   */
-  minWidth?: string;
-  /**
-   * Specifies the width of the popup.
+   * Specifies the width of the popup, constrained by {@link minWidth} and {@link maxWidth}, if any.
    */
   width?: string;
   /**
-   * Specifies the max-width of the popup.
+   * Specifies the minimum height of the popup.
+   */
+  minHeight?: string;
+  /**
+   * Specifies the maximum height of the popup.
+   */
+  maxHeight?: string;
+  /**
+   * Specifies the minimum width of the popup.
+   */
+  minWidth?: string;
+  /**
+   * Specifies the maximum width of the popup.
    */
   maxWidth?: string;
 }

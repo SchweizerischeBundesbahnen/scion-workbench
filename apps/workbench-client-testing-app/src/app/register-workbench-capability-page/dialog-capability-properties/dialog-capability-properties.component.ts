@@ -43,11 +43,11 @@ export class DialogCapabilityPropertiesComponent implements ControlValueAccessor
   protected readonly form = this._formBuilder.group({
     path: this._formBuilder.control(''),
     size: this._formBuilder.group({
-      minHeight: this._formBuilder.control(''),
       height: this._formBuilder.control(''),
+      width: this._formBuilder.control(''),
+      minHeight: this._formBuilder.control(''),
       maxHeight: this._formBuilder.control(''),
       minWidth: this._formBuilder.control(''),
-      width: this._formBuilder.control(''),
       maxWidth: this._formBuilder.control(''),
     }),
     title: this._formBuilder.control(''),

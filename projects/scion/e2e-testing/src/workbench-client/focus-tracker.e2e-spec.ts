@@ -574,10 +574,12 @@ test.describe('Focus Tracker', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual(popupOpenerViewId);
 
     // TEST: Open popup.
-    await popupOpener.enterQualifier({component: 'testee'});
-    await popupOpener.enterCssClass('testee');
-    await popupOpener.enterCloseStrategy({closeOnFocusLost: false});
-    await popupOpener.open();
+    await popupOpener.open({component: 'testee'}, {
+      anchor: 'element',
+      closeStrategy: {onFocusLost: false},
+      cssClass: 'testee',
+    });
+
     const popupId = await appPO.popup({cssClass: 'testee'}).getPopupId();
     const focusTestPage = new FocusTestPagePO(appPO, {id: popupId});
     await focusTestPage.waitUntilAttached();
@@ -656,10 +658,12 @@ test.describe('Focus Tracker', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual(popupOpenerViewId);
 
     // TEST: Open popup.
-    await popupOpener.enterQualifier({component: 'host-popup', variant: 'focus-page'});
-    await popupOpener.enterCssClass('testee');
-    await popupOpener.enterCloseStrategy({closeOnFocusLost: false});
-    await popupOpener.open();
+    await popupOpener.open({component: 'host-popup', variant: 'focus-page'}, {
+      anchor: 'element',
+      closeStrategy: {onFocusLost: false},
+      cssClass: 'testee',
+    });
+
     const popupId = await appPO.popup({cssClass: 'testee'}).getPopupId();
     const focusTestPage = new HostFocusTestPagePO(appPO.popup({popupId}));
 

@@ -30,9 +30,10 @@ test.describe('Workbench Popup', () => {
       });
 
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPage.enterQualifier({component: 'testee'});
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open({component: 'testee'}, {
+        anchor: 'element',
+        cssClass: 'testee',
+      });
 
       const popup = appPO.popup({cssClass: 'testee'});
       const popupPage = new PopupPagePO(popup);
@@ -58,11 +59,13 @@ test.describe('Workbench Popup', () => {
       const startPageViewId = await startPage.view.getViewId();
 
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPage.enterQualifier({component: 'testee'});
-      await popupOpenerPage.enterContext(startPageViewId);
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.open({waitUntilAttached: false});
+      await popupOpenerPage.open({component: 'testee'}, {
+        anchor: 'element',
+        context: startPageViewId,
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'testee',
+        waitUntilAttached: false,
+      });
 
       await startPage.view.tab.click();
 
@@ -87,11 +90,13 @@ test.describe('Workbench Popup', () => {
       const microfrontendViewId = await microfrontendPage.view.getViewId();
 
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPage.enterQualifier({component: 'testee'});
-      await popupOpenerPage.enterContext(microfrontendViewId);
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.open({waitUntilAttached: false});
+      await popupOpenerPage.open({component: 'testee'}, {
+        anchor: 'element',
+        context: microfrontendViewId,
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'testee',
+        waitUntilAttached: false,
+      });
 
       await microfrontendPage.view.tab.click();
 
@@ -116,10 +121,11 @@ test.describe('Workbench Popup', () => {
       });
 
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPage.enterQualifier({component: 'testee'});
-      await popupOpenerPage.enterContext(null);
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open({component: 'testee'}, {
+        anchor: 'element',
+        context: null,
+        cssClass: 'testee',
+      });
 
       const popup = appPO.popup({cssClass: 'testee'});
       const popupPage = new PopupPagePO(popup);

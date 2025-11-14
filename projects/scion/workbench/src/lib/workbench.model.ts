@@ -51,7 +51,7 @@ export interface WorkbenchPartAction {
    */
   content: ComponentType<unknown> | TemplateRef<unknown>;
   /**
-   * Optional data to pass to the component or template.
+   * Specifies data to pass to the component or template.
    *
    * If using a component, inputs are available as input properties.
    *
@@ -109,7 +109,7 @@ export interface WorkbenchMenuItem {
    */
   content: ComponentType<unknown> | TemplateRef<unknown>;
   /**
-   * Optional data to pass to the component or template.
+   * Specifies data to pass to the component or template.
    *
    * If using a component, inputs are available as input properties.
    *

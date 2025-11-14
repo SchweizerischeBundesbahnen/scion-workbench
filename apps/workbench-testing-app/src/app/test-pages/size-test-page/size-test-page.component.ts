@@ -15,14 +15,14 @@ import {map, Observable, Subject} from 'rxjs';
 import {distinctUntilChanged, startWith} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {observeIn} from '@scion/toolkit/operators';
+import {PopupSizeDirective} from '../../popup-opener-page/popup-size.directive';
 
 @Component({
   selector: 'app-size-test-page',
   templateUrl: './size-test-page.component.html',
   styleUrl: './size-test-page.component.scss',
-  imports: [
-    SciViewportComponent,
-  ],
+  imports: [SciViewportComponent],
+  hostDirectives: [{directive: PopupSizeDirective, inputs: ['size']}],
 })
 export default class SizeTestPageComponent {
 

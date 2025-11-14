@@ -25,7 +25,7 @@ import {Observable} from 'rxjs';
 export abstract class WorkbenchMessageBox {
 
   /**
-   * Represents the identity of this message box.
+   * Identity of this message box.
    */
   public abstract readonly id: DialogId;
 

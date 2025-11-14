@@ -71,7 +71,7 @@ export interface NotificationConfig {
   };
 
   /**
-   * Optional data to pass to the notification component. In the component, you can inject the notification handle {@link Notification} to
+   * Specifies data to pass to the notification component. In the component, you can inject the notification handle {@link Notification} to
    * read input data. Use only in combination with a custom notification component, has no effect otherwise.
    */
   componentInput?: unknown;

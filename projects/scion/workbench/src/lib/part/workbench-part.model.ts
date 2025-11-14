@@ -21,13 +21,11 @@ import {Translatable} from '../text/workbench-text-provider.model';
  * positioned relative to each other. A part can display content or stack views.
  *
  * The part component can inject this handle to interact with the part.
- *
- * @see WorkbenchView
  */
 export abstract class WorkbenchPart {
 
   /**
-   * Unique identity of this part.
+   * Identity of this part.
    */
   public abstract readonly id: PartId;
 

@@ -42,6 +42,9 @@ export class MessageBoxOpenerPagePO implements WorkbenchViewPagePO {
     if (options?.injector) {
       throw Error('[PageObjectError] PageObject does not support the option `injector`.');
     }
+    if (options?.providers) {
+      throw Error('[PageObjectError] PageObject does not support the option `providers`.');
+    }
 
     const componentMatch = content && /^component:(?<component>.+)$/.exec(content);
     if (componentMatch) {

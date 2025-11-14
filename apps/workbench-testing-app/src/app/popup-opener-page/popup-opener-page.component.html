@@ -1,7 +1,7 @@
 <form [formGroup]="form">
   <section>
     <sci-form-field label="Component">
-      <select [formControl]="form.controls.popupComponent" class="e2e-popup-component">
+      <select [formControl]="form.controls.component" class="e2e-popup-component">
         <option value="popup-page">PopupPageComponent</option>
         <option value="focus-test-page">FocusTestPageComponent</option>
         <option value="blank-test-page">BlankTestPageComponent</option>
@@ -11,13 +11,38 @@
         <option value="popup-opener-page">PopupOpenerPageComponent</option>
       </select>
     </sci-form-field>
+  </section>
 
-    <sci-form-field label="Context">
-      <input [formControl]="form.controls.context" class="e2e-context" placeholder="Part ID, View ID, Dialog ID, Popup ID, or <null>" [attr.list]="nullList">
+  <section>
+    <!-- Anchor -->
+    @let anchor = form.controls.options.controls.anchor;
+    <sci-form-field label="Anchor">
+      <select [formControl]="anchor.controls.position" class="e2e-position">
+        <option value="element">Element</option>
+        <option value="top-left">Coordinate (top-left)</option>
+        <option value="top-right">Coordinate (top-right)</option>
+        <option value="bottom-left">Coordinate (bottom-left)</option>
+        <option value="bottom-right">Coordinate (bottom-right)</option>
+      </select>
     </sci-form-field>
+    @if (anchor.controls.position.value !== 'element') {
+      <sci-form-field [label]="`&nbsp;&nbsp;&nbsp;${$any(anchor.controls.position.value) | wbPopupPositionLabel:'vertical'}`">
+        <input [formControl]="anchor.controls.verticalPosition" type="number" class="e2e-position-vertical">
+      </sci-form-field>
+      <sci-form-field [label]="`&nbsp;&nbsp;&nbsp;${$any(anchor.controls.position.value) | wbPopupPositionLabel:'horizontal'}`">
+        <input [formControl]="anchor.controls.horizontalPosition" type="number" class="e2e-position-horizontal">
+      </sci-form-field>
+      <sci-form-field label="&nbsp;&nbsp;&nbsp;Width">
+        <input [formControl]="anchor.controls.width" type="number" class="e2e-anchor-width">
+      </sci-form-field>
+      <sci-form-field label="&nbsp;&nbsp;&nbsp;Height">
+        <input [formControl]="anchor.controls.height" type="number" class="e2e-anchor-height">
+      </sci-form-field>
+    }
 
+    <!-- Align -->
     <sci-form-field label="Align">
-      <select [formControl]="form.controls.align" class="e2e-align">
+      <select [formControl]="form.controls.options.controls.align" class="e2e-align">
         <option value="east">east</option>
         <option value="west">west</option>
         <option value="north">north</option>
@@ -26,62 +51,37 @@
       </select>
     </sci-form-field>
 
+    <!-- Inputs -->
+    <sci-form-field label="Inputs">
+      @if (form.controls.legacyAPI.value) {
+        <input [formControl]="form.controls.options.controls.inputLegacy" class="e2e-input" placeholder="Data to pass to the popup component">
+      } @else {
+        <sci-key-value-field [keyValueFormArray]="form.controls.options.controls.inputs" [addable]="true" [removable]="true" class="e2e-inputs"/>
+      }
+    </sci-form-field>
+
+    <!-- Context -->
+    <sci-form-field label="Context">
+      <input [formControl]="form.controls.options.controls.context" class="e2e-context" placeholder="Part ID, View ID, Dialog ID, Popup ID, or <null>" [attr.list]="nullList">
+    </sci-form-field>
+
+    <!-- CSS Classes -->
     <sci-form-field label="CSS Class(es)">
-      <app-multi-value-input [formControl]="form.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
+      <app-multi-value-input [formControl]="form.controls.options.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
     </sci-form-field>
   </section>
 
-  <sci-accordion class="anchor e2e-anchor" variant="solid" [formGroup]="form.controls.anchor">
-    <ng-template sciAccordionItem [panel]="panel_anchor">
-      <header>Anchor</header>
-    </ng-template>
-    <ng-template #panel_anchor>
-      <sci-form-field label="Position">
-        <select [formControl]="form.controls.anchor.controls.position" class="e2e-position">
-          <option value="element">Element</option>
-          <option value="top-left">Coordinate (top-left)</option>
-          <option value="top-right">Coordinate (top-right)</option>
-          <option value="bottom-left">Coordinate (bottom-left)</option>
-          <option value="bottom-right">Coordinate (bottom-right)</option>
-        </select>
-      </sci-form-field>
-      @if (form.controls.anchor.controls.position.value !== 'element') {
-        <sci-form-field [label]="$any(form.controls.anchor.controls.position.value) | wbPopupPositionLabel:'vertical'">
-          <input [formControl]="form.controls.anchor.controls.verticalPosition" type="number" class="e2e-position-vertical">
-        </sci-form-field>
-        <sci-form-field [label]="$any(form.controls.anchor.controls.position.value) | wbPopupPositionLabel:'horizontal'">
-          <input [formControl]="form.controls.anchor.controls.horizontalPosition" type="number" class="e2e-position-horizontal">
-        </sci-form-field>
-        <sci-form-field label="Width">
-          <input [formControl]="form.controls.anchor.controls.width" type="number" class="e2e-anchor-width">
-        </sci-form-field>
-        <sci-form-field label="Height">
-          <input [formControl]="form.controls.anchor.controls.height" type="number" class="e2e-anchor-height">
-        </sci-form-field>
-      }
-    </ng-template>
-  </sci-accordion>
-
-  <sci-accordion class="e2e-input input" variant="solid">
-    <ng-template sciAccordionItem [panel]="panel_input">
-      <header>Popup Component Input</header>
-    </ng-template>
-    <ng-template #panel_input>
-      <input [formControl]="form.controls.input" class="e2e-input" placeholder="Optional data to pass to the popup component">
-    </ng-template>
-  </sci-accordion>
-
-  <sci-accordion class="e2e-close-strategy" variant="solid" [formGroup]="form.controls.closeStrategy">
+  <sci-accordion class="e2e-close-strategy" variant="solid" [formGroup]="form.controls.options.controls.closeStrategy">
     <ng-template sciAccordionItem [panel]="panel_close_strategy">
       <header>Close Strategy</header>
     </ng-template>
     <ng-template #panel_close_strategy>
       <sci-form-field label="onFocusLost">
-        <sci-checkbox [formControl]="form.controls.closeStrategy.controls.onFocusLost" class="e2e-close-on-focus-lost"/>
+        <sci-checkbox [formControl]="form.controls.options.controls.closeStrategy.controls.onFocusLost" class="e2e-close-on-focus-lost"/>
       </sci-form-field>
 
       <sci-form-field label="onEscape">
-        <sci-checkbox [formControl]="form.controls.closeStrategy.controls.onEscape" class="e2e-close-on-escape"/>
+        <sci-checkbox [formControl]="form.controls.options.controls.closeStrategy.controls.onEscape" class="e2e-close-on-escape"/>
       </sci-form-field>
     </ng-template>
   </sci-accordion>
@@ -91,12 +91,16 @@
       <header>Size</header>
     </ng-template>
     <ng-template #panel_size>
-      <sci-form-field label="Min Height">
-        <input [formControl]="form.controls.size.controls.minHeight" class="e2e-min-height">
-      </sci-form-field>
-
       <sci-form-field label="Height">
         <input [formControl]="form.controls.size.controls.height" class="e2e-height">
+      </sci-form-field>
+
+      <sci-form-field label="Width">
+        <input [formControl]="form.controls.size.controls.width" class="e2e-width">
+      </sci-form-field>
+
+      <sci-form-field label="Min Height">
+        <input [formControl]="form.controls.size.controls.minHeight" class="e2e-min-height">
       </sci-form-field>
 
       <sci-form-field label="Max Height">
@@ -107,15 +111,17 @@
         <input [formControl]="form.controls.size.controls.minWidth" class="e2e-min-width">
       </sci-form-field>
 
-      <sci-form-field label="Width">
-        <input [formControl]="form.controls.size.controls.width" class="e2e-width">
-      </sci-form-field>
-
       <sci-form-field label="Max Width">
         <input [formControl]="form.controls.size.controls.maxWidth" class="e2e-max-width">
       </sci-form-field>
     </ng-template>
   </sci-accordion>
+
+  <section>
+    <sci-form-field label="Legacy API">
+      <sci-checkbox [formControl]="form.controls.legacyAPI" class="e2e-legacy-api"/>
+    </sci-form-field>
+  </section>
 </form>
 
 <button (click)="onOpen()" [disabled]="form.invalid" class="open e2e-open" #open_button sci-primary>

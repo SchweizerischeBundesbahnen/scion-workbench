@@ -18,12 +18,16 @@
       <header>Dialog Size</header>
     </ng-template>
     <ng-template #panel_size>
-      <sci-form-field label="Min Height">
-        <input [formControl]="form.controls.dialogSize.controls.minHeight" class="e2e-min-height">
-      </sci-form-field>
-
       <sci-form-field label="Height">
         <input [formControl]="form.controls.dialogSize.controls.height" class="e2e-height">
+      </sci-form-field>
+
+      <sci-form-field label="Width">
+        <input [formControl]="form.controls.dialogSize.controls.width" class="e2e-width">
+      </sci-form-field>
+
+      <sci-form-field label="Min Height">
+        <input [formControl]="form.controls.dialogSize.controls.minHeight" class="e2e-min-height">
       </sci-form-field>
 
       <sci-form-field label="Max Height">
@@ -32,10 +36,6 @@
 
       <sci-form-field label="Min Width">
         <input [formControl]="form.controls.dialogSize.controls.minWidth" class="e2e-min-width">
-      </sci-form-field>
-
-      <sci-form-field label="Width">
-        <input [formControl]="form.controls.dialogSize.controls.width" class="e2e-width">
       </sci-form-field>
 
       <sci-form-field label="Max Width">
@@ -50,11 +50,11 @@
     </ng-template>
     <ng-template #panel_content_size>
       <sci-form-field label="Height">
-        <input [formControl]="form.controls.contentSize.controls.height" class="e2e-height">
+        <input [formControl]="form.controls.componentSize.controls.height" class="e2e-height">
       </sci-form-field>
 
       <sci-form-field label="Width">
-        <input [formControl]="form.controls.contentSize.controls.width" class="e2e-width">
+        <input [formControl]="form.controls.componentSize.controls.width" class="e2e-width">
       </sci-form-field>
     </ng-template>
   </sci-accordion>

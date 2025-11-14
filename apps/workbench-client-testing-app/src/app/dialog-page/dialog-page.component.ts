@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, inject} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {WorkbenchDialog} from '@scion/workbench-client';
 import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
@@ -41,33 +41,29 @@ import {CdkTrapFocus} from '@angular/cdk/a11y';
     SciCheckboxComponent,
     CdkTrapFocus,
   ],
+  host: {
+    '[style.height]': 'form.controls.componentSize.controls.height.value',
+    '[style.width]': 'form.controls.componentSize.controls.width.value',
+  },
 })
 export default class DialogPageComponent {
 
   private readonly _formBuilder = inject(NonNullableFormBuilder);
 
   protected readonly route = inject(ActivatedRoute);
-  protected readonly dialog = inject<WorkbenchDialog<string>>(WorkbenchDialog);
+  protected readonly dialog = inject(WorkbenchDialog);
   protected readonly uuid = UUID.randomUUID();
   protected readonly focused = toSignal(inject(WorkbenchDialog).focused$, {initialValue: true});
 
   protected readonly form = this._formBuilder.group({
     title: this._formBuilder.control(''),
-    height: this._formBuilder.control(''),
-    width: this._formBuilder.control(''),
+    componentSize: this._formBuilder.group({
+      height: this._formBuilder.control(''),
+      width: this._formBuilder.control(''),
+    }),
     closeWithError: this._formBuilder.control(false),
     result: this._formBuilder.control(''),
   });
-
-  @HostBinding('style.width')
-  protected get width(): string {
-    return this.form.controls.width.value;
-  }
-
-  @HostBinding('style.height')
-  protected get height(): string {
-    return this.form.controls.height.value;
-  }
 
   constructor() {
     this.dialog.signalReady();

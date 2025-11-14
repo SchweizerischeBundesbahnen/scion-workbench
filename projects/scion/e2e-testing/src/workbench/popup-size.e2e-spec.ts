@@ -19,19 +19,25 @@ test.describe('Workbench Popup', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-    await popupOpenerPage.selectPopupComponent('popup-page');
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.enterSize({
-      width: '300px',
-      height: '400px',
+    await popupOpenerPage.open('popup-page', {
+      anchor: 'element',
+      size: {width: '300px', height: '400px'},
+      cssClass: 'testee',
     });
-    await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
+    const popupPage = new PopupPagePO(popup);
 
     await expect.poll(() => popup.getBoundingBox({box: 'content-box'})).toEqual(expect.objectContaining({
       width: 300,
       height: 400,
+    }));
+
+    // Change size.
+    await popupPage.enterPopupSize({width: '500px', height: '600px'});
+    await expect.poll(() => popup.getBoundingBox({box: 'content-box'})).toEqual(expect.objectContaining({
+      width: 500,
+      height: 600,
     }));
   });
 
@@ -40,10 +46,11 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.selectPopupComponent('popup-page');
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.enterSize({height: '400px'});
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('popup-page', {
+        anchor: 'element',
+        size: {height: '400px'},
+        cssClass: 'testee',
+      });
 
       const popup = appPO.popup({cssClass: 'testee'});
       const popupPage = new PopupPagePO(popup);
@@ -68,10 +75,11 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.selectPopupComponent('popup-page');
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.enterSize({width: '400px'});
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('popup-page', {
+        anchor: 'element',
+        size: {width: '400px'},
+        cssClass: 'testee',
+      });
 
       const popup = appPO.popup({cssClass: 'testee'});
       const popupPage = new PopupPagePO(popup);
@@ -96,10 +104,11 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.selectPopupComponent('popup-page');
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.enterSize({height: '400px'});
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('popup-page', {
+        anchor: 'element',
+        size: {height: '400px'},
+        cssClass: 'testee',
+      });
 
       const popup = appPO.popup({cssClass: 'testee'});
       const popupPage = new PopupPagePO(popup);
@@ -124,10 +133,11 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.selectPopupComponent('popup-page');
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.enterSize({width: '400px'});
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('popup-page', {
+        anchor: 'element',
+        size: {width: '400px'},
+        cssClass: 'testee',
+      });
 
       const popup = appPO.popup({cssClass: 'testee'});
       const popupPage = new PopupPagePO(popup);
@@ -154,10 +164,11 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.selectPopupComponent('popup-page');
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.enterSize({maxHeight: '400px'});
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('popup-page', {
+        anchor: 'element',
+        size: {maxHeight: '400px'},
+        cssClass: 'testee',
+      });
 
       const popup = appPO.popup({cssClass: 'testee'});
       const popupPage = new PopupPagePO(popup);
@@ -191,10 +202,11 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.selectPopupComponent('popup-page');
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.enterSize({maxWidth: '400px'});
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('popup-page', {
+        anchor: 'element',
+        size: {maxWidth: '400px'},
+        cssClass: 'testee',
+      });
 
       const popup = appPO.popup({cssClass: 'testee'});
       const popupPage = new PopupPagePO(popup);
@@ -230,10 +242,11 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.selectPopupComponent('popup-page');
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.enterSize({minHeight: '400px'});
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('popup-page', {
+        anchor: 'element',
+        size: {minHeight: '400px'},
+        cssClass: 'testee',
+      });
 
       const popup = appPO.popup({cssClass: 'testee'});
       const popupPage = new PopupPagePO(popup);
@@ -267,10 +280,11 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.selectPopupComponent('popup-page');
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.enterSize({minWidth: '400px'});
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('popup-page', {
+        anchor: 'element',
+        size: {minWidth: '400px'},
+        cssClass: 'testee',
+      });
 
       const popup = appPO.popup({cssClass: 'testee'});
       const popupPage = new PopupPagePO(popup);

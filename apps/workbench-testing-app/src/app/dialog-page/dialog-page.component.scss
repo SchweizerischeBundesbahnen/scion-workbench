@@ -2,10 +2,6 @@
 
 :host {
   display: block;
-  --ɵapp-dialog-page-height: initial;
-  --ɵapp-dialog-page-width: initial;
-  height: var(--ɵapp-dialog-page-height);
-  width: var(--ɵapp-dialog-page-width);
   overflow: hidden; // crop overflow when changing minimum size in end-to-end test
 
   > form {

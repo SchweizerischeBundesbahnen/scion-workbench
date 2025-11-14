@@ -47,13 +47,13 @@ test.describe('Workbench Popup Position', () => {
 
     test('should stick to the top-left viewport corner', async ({workbenchNavigator, appPO, page}) => {
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.selectPopupComponent('blank-test-page');
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterPosition({top: 100, left: 100});
-      await popupOpenerPage.selectAlign('east');
-      await popupOpenerPage.enterContext(null);
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('blank-test-page', {
+        anchor: {top: 100, left: 100},
+        align: 'east',
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'testee',
+        context: null,
+      });
 
       const popupPage = new BlankTestPagePO(appPO.popup({cssClass: 'testee'}));
       await expectPopup(popupPage).toHavePosition('east', 'viewport', {top: 100, left: 100});
@@ -113,13 +113,13 @@ test.describe('Workbench Popup Position', () => {
 
     test('should stick to the top-right viewport corner', async ({workbenchNavigator, appPO, page}) => {
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.selectPopupComponent('blank-test-page');
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterPosition({top: 100, right: 100});
-      await popupOpenerPage.selectAlign('west');
-      await popupOpenerPage.enterContext(null);
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('blank-test-page', {
+        anchor: {top: 100, right: 100},
+        align: 'west',
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'testee',
+        context: null,
+      });
 
       const popupPage = new BlankTestPagePO(appPO.popup({cssClass: 'testee'}));
       await expectPopup(popupPage).toHavePosition('west', 'viewport', {top: 100, right: 100});
@@ -179,13 +179,13 @@ test.describe('Workbench Popup Position', () => {
 
     test('should stick to the bottom-right viewport corner', async ({workbenchNavigator, appPO, page}) => {
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.selectPopupComponent('blank-test-page');
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterPosition({bottom: 100, right: 100});
-      await popupOpenerPage.selectAlign('west');
-      await popupOpenerPage.enterContext(null);
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('blank-test-page', {
+        anchor: {bottom: 100, right: 100},
+        align: 'west',
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'testee',
+        context: null,
+      });
 
       const popupPage = new BlankTestPagePO(appPO.popup({cssClass: 'testee'}));
       await expectPopup(popupPage).toHavePosition('west', 'viewport', {bottom: 100, right: 100});
@@ -245,13 +245,13 @@ test.describe('Workbench Popup Position', () => {
 
     test('should stick to the bottom-left viewport corner', async ({workbenchNavigator, appPO, page}) => {
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.selectPopupComponent('blank-test-page');
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterPosition({bottom: 100, left: 100});
-      await popupOpenerPage.selectAlign('east');
-      await popupOpenerPage.enterContext(null);
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('blank-test-page', {
+        anchor: {bottom: 100, left: 100},
+        align: 'east',
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'testee',
+        context: null,
+      });
 
       const popupPage = new BlankTestPagePO(appPO.popup({cssClass: 'testee'}));
       await expectPopup(popupPage).toHavePosition('east', 'viewport', {bottom: 100, left: 100});
@@ -314,12 +314,12 @@ test.describe('Workbench Popup Position', () => {
 
     test('should stick to the top-left view corner', async ({workbenchNavigator, appPO}) => {
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.selectPopupComponent('blank-test-page');
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterPosition({top: 100, left: 100});
-      await popupOpenerPage.selectAlign('east');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('blank-test-page', {
+        anchor: {top: 100, left: 100},
+        align: 'east',
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'testee',
+      });
 
       const popupPage = new BlankTestPagePO(appPO.popup({cssClass: 'testee'}));
       const view = popupOpenerPage.view.locator;
@@ -368,12 +368,12 @@ test.describe('Workbench Popup Position', () => {
 
     test('should stick to the top-right view corner', async ({workbenchNavigator, appPO}) => {
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.selectPopupComponent('blank-test-page');
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterPosition({top: 100, right: 100});
-      await popupOpenerPage.selectAlign('west');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('blank-test-page', {
+        anchor: {top: 100, right: 100},
+        align: 'west',
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'testee',
+      });
 
       const popupPage = new BlankTestPagePO(appPO.popup({cssClass: 'testee'}));
       const view = popupOpenerPage.view.locator;
@@ -422,12 +422,12 @@ test.describe('Workbench Popup Position', () => {
 
     test('should stick to the bottom-right view corner', async ({workbenchNavigator, appPO}) => {
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.selectPopupComponent('blank-test-page');
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterPosition({bottom: 100, right: 100});
-      await popupOpenerPage.selectAlign('west');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('blank-test-page', {
+        anchor: {bottom: 100, right: 100},
+        align: 'west',
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'testee',
+      });
 
       const popupPage = new BlankTestPagePO(appPO.popup({cssClass: 'testee'}));
       const view = popupOpenerPage.view.locator;
@@ -476,12 +476,12 @@ test.describe('Workbench Popup Position', () => {
 
     test('should stick to the bottom-left view corner', async ({workbenchNavigator, appPO}) => {
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.selectPopupComponent('blank-test-page');
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterPosition({bottom: 100, left: 100});
-      await popupOpenerPage.selectAlign('east');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('blank-test-page', {
+        anchor: {bottom: 100, left: 100},
+        align: 'east',
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'testee',
+      });
 
       const popupPage = new BlankTestPagePO(appPO.popup({cssClass: 'testee'}));
       const view = popupOpenerPage.view.locator;

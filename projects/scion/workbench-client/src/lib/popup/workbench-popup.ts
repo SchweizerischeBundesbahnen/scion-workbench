@@ -14,38 +14,44 @@ import {Observable} from 'rxjs';
 import {PopupId} from '../workbench.identifiers';
 
 /**
- * A popup is a visual workbench component for displaying content above other content.
+ * A popup is a visual workbench element for displaying content above other content. The popup is positioned relative
+ * to an anchor based on its preferred alignment. The anchor can be an element or a coordinate.
  *
- * If a microfrontend lives in the context of a workbench popup, regardless of its embedding level, it can inject an instance
- * of this class to interact with the workbench popup, such as reading passed parameters or closing the popup.
+ * The microfrontend can inject this handle to interact with the popup.
  *
- * #### Preferred Size
- * You can report preferred popup size using {@link @scion/microfrontend-platform!PreferredSizeService}. Typically, you would
- * subscribe to size changes of the microfrontend's primary content and report it. As a convenience, {@link @scion/microfrontend-platform!PreferredSizeService}
- * provides API to pass an element for automatic dimension monitoring. If your content can grow and shrink, e.g., if using expandable
- * panels, consider positioning primary content out of the document flow, that is, setting its position to `absolute`. This way,
- * you give it infinite space so that it can always be rendered at its preferred size.
+ * #### Popup Size
+ * Configure the popup with a fixed size in {@link WorkbenchPopupCapability.properties.size}, or report its intrinsic content
+ * size using {@link @scion/microfrontend-platform!PreferredSizeService}.
  *
- * ```typescript
- * Beans.get(PreferredSizeService).fromDimension(<HTMLElement>);
+ * @example - Reporting the size of a microfrontend
+ * ```ts
+ * Beans.get(PreferredSizeService).fromDimension(<Microfrontend HTMLElement>);
  * ```
  *
- * Note that the microfrontend may take some time to load, causing the popup to flicker when opened. Therefore, for fixed-sized
- * popups, consider declaring the popup size in the popup capability.
+ * If the content can grow and shrink, e.g., if using expandable panels, position the microfrontend `absolute` to allow infinite
+ * space for rendering at its preferred size.
+ *
+ * Since loading a microfrontend may take time, prefer setting the popup size in the popup capability to avoid flickering when
+ * opening the popup.
  *
  * @category Popup
  */
-export abstract class WorkbenchPopup<R = unknown> {
+export abstract class WorkbenchPopup {
 
   /**
-   * Represents the identity of this popup.
+   * Identity of this popup.
    */
   public abstract readonly id: PopupId;
 
   /**
-   * Capability that represents the microfrontend loaded into this workbench popup.
+   * Capability of the microfrontend loaded into this popup.
    */
   public abstract readonly capability: WorkbenchPopupCapability;
+
+  /**
+   * Parameters passed to the microfrontend loaded into the popup.
+   */
+  public abstract readonly params: Map<string, unknown>;
 
   /**
    * Indicates whether this popup has the focus.
@@ -69,17 +75,12 @@ export abstract class WorkbenchPopup<R = unknown> {
   public abstract readonly referrer: WorkbenchPopupReferrer;
 
   /**
-   * Parameters including qualifier entries as passed for navigation by the popup opener.
-   */
-  public abstract readonly params: Map<string, any>;
-
-  /**
    * Sets a result that will be passed to the popup opener when the popup is closed on focus loss {@link CloseStrategy#onFocusLost}.
    */
-  public abstract setResult(result?: R): void;
+  public abstract setResult<R>(result?: R): void;
 
   /**
    * Closes the popup. Optionally, pass a result or an error to the popup opener.
    */
-  public abstract close(result?: R | Error): void;
+  public abstract close<R>(result?: R | Error): void;
 }

@@ -32,7 +32,7 @@ describe('Popup', () => {
     await waitUntilWorkbenchStarted();
 
     // Open popup.
-    void TestBed.inject(WorkbenchPopupService).open({component: SpecPopupComponent, anchor: {x: 0, y: 0}});
+    void TestBed.inject(WorkbenchPopupService).open(SpecPopupComponent, {anchor: {x: 0, y: 0}});
     await waitUntilStable();
 
     // Get reference to the popup injector.
@@ -69,7 +69,7 @@ describe('Popup', () => {
     await waitUntilWorkbenchStarted();
 
     // Open popup.
-    void TestBed.inject(WorkbenchPopupService).open({component: SpecPopupComponent, anchor: {x: 0, y: 0}});
+    void TestBed.inject(WorkbenchPopupService).open(SpecPopupComponent, {anchor: {x: 0, y: 0}});
     await waitUntilStable();
 
     // Get component.
@@ -108,7 +108,7 @@ describe('Popup', () => {
     spyOn(console, 'debug').and.callThrough();
 
     // Open popup.
-    void TestBed.inject(WorkbenchPopupService).open({id: 'popup.1', component: SpecPopupComponent, anchor: {x: 0, y: 0}});
+    void TestBed.inject(WorkbenchPopupService).open(SpecPopupComponent, {anchor: {x: 0, y: 0}, id: 'popup.1'});
     await waitUntilStable();
 
     // Expect popup-aware services to be constructed.
@@ -124,7 +124,7 @@ describe('Popup', () => {
     expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining('Destroying WorkbenchDialogService [context=popup.1]'));
   });
 
-  it('should allow for custom injector and providers', async () => {
+  it('should allow for custom injector', async () => {
     TestBed.configureTestingModule({
       providers: [provideWorkbenchForTest()],
     });
@@ -140,31 +140,55 @@ describe('Popup', () => {
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
-    // Create custom injector.
-    const diToken1 = new InjectionToken('token1');
-    const diToken2 = new InjectionToken('token2');
-    const injector = Injector.create({
-      parent: TestBed.inject(EnvironmentInjector),
-      providers: [
-        {provide: diToken1, useValue: 'value 1'},
-      ],
-    });
+    // Create DI token.
+    const TOKEN = new InjectionToken('TOKEN');
 
     // Open popup.
-    void TestBed.inject(WorkbenchPopupService).open({
-      component: SpecPopupComponent,
+    void TestBed.inject(WorkbenchPopupService).open(SpecPopupComponent, {
       anchor: {x: 0, y: 0},
-      componentConstructOptions: {
-        injector,
-        providers: [{provide: diToken2, useValue: 'value 2'}],
-      },
+      injector: Injector.create({
+        parent: TestBed.inject(EnvironmentInjector),
+        providers: [
+          {provide: TOKEN, useValue: 'value'},
+        ],
+      }),
     });
     await waitUntilStable();
 
     // Expect DI token to be found.
     const popupComponent = getPopupComponent(fixture, SpecPopupComponent);
-    expect(popupComponent.injector.get(diToken1)).toEqual('value 1');
-    expect(popupComponent.injector.get(diToken2)).toEqual('value 2');
+    expect(popupComponent.injector.get(TOKEN)).toEqual('value');
+  });
+
+  it('should allow for custom provider', async () => {
+    TestBed.configureTestingModule({
+      providers: [provideWorkbenchForTest()],
+    });
+
+    @Component({
+      selector: 'spec-popup',
+      template: 'Popup',
+    })
+    class SpecPopupComponent {
+      public injector = inject(Injector);
+    }
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+
+    // Create DI token.
+    const TOKEN = new InjectionToken('TOKEN');
+
+    // Open popup.
+    void TestBed.inject(WorkbenchPopupService).open(SpecPopupComponent, {
+      anchor: {x: 0, y: 0},
+      providers: [{provide: TOKEN, useValue: 'value'}],
+    });
+    await waitUntilStable();
+
+    // Expect DI token to be found.
+    const popupComponent = getPopupComponent(fixture, SpecPopupComponent);
+    expect(popupComponent.injector.get(TOKEN)).toEqual('value');
   });
 });
 

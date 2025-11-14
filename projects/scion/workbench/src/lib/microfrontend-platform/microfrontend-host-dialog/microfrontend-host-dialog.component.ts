@@ -24,7 +24,7 @@ import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {createRemoteTranslatable} from '../text/remote-text-provider';
 
 /**
- * Navigates to the microfrontend of a given {@link WorkbenchDialogCapability} via {@link Router}.
+ * Displays the microfrontend of a dialog capability provided by the host.
  *
  * Unlike {@link MicrofrontendDialogComponent}, this component uses a `<router-outlet>` instead of a `<sci-router-outlet>`
  * to allow direct integration of the content provided by the workbench host application via the Angular router.

@@ -769,10 +769,11 @@ test.describe('Workbench Dialog', () => {
 
       // Open a popup.
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterCssClass('popup');
-      await popupOpenerPage.selectPopupComponent('dialog-opener-page');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('dialog-opener-page', {
+        anchor: 'element',
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'popup',
+      });
       const popupPage = new DialogOpenerPagePO(appPO.popup({cssClass: 'popup'}));
 
       // Open dialog from dialog.
@@ -792,10 +793,11 @@ test.describe('Workbench Dialog', () => {
 
       // Open a popup.
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterCssClass('popup');
-      await popupOpenerPage.selectPopupComponent('dialog-opener-page');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('dialog-opener-page', {
+        anchor: 'element',
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'popup',
+      });
       const popupPage = new DialogOpenerPagePO(appPO.popup({cssClass: 'popup'}));
 
       // Expect to error when opening the popup.
@@ -810,10 +812,11 @@ test.describe('Workbench Dialog', () => {
 
       // Open a popup.
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterCssClass('popup');
-      await popupOpenerPage.selectPopupComponent('dialog-opener-page');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('dialog-opener-page', {
+        anchor: 'element',
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'popup',
+      });
       const popupPage = new DialogOpenerPagePO(appPO.popup({cssClass: 'popup'}));
 
       // Open dialog from popup.
@@ -844,10 +847,11 @@ test.describe('Workbench Dialog', () => {
 
       // Open a popup.
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterCssClass('popup');
-      await popupOpenerPage.selectPopupComponent('dialog-opener-page');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('dialog-opener-page', {
+        anchor: 'element',
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'popup',
+      });
       const popupPage = new DialogOpenerPagePO(appPO.popup({cssClass: 'popup'}));
 
       // Open dialog from popup.
@@ -893,11 +897,12 @@ test.describe('Workbench Dialog', () => {
 
       // Open popup in part 1.
       const popupOpenerPage = new PopupOpenerPagePO(appPO.part({partId: 'part.testee-1'}));
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterCssClass('popup');
-      await popupOpenerPage.selectAlign('east');
-      await popupOpenerPage.selectPopupComponent('dialog-opener-page');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('dialog-opener-page', {
+        anchor: 'element',
+        align: 'east',
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'popup',
+      });
       const popupPage = new DialogOpenerPagePO(appPO.popup({cssClass: 'popup'}));
 
       // Open dialog in poup.
@@ -928,10 +933,11 @@ test.describe('Workbench Dialog', () => {
 
       // Open a popup.
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterCssClass('popup');
-      await popupOpenerPage.selectPopupComponent('dialog-opener-page');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('dialog-opener-page', {
+        anchor: 'element',
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'popup',
+      });
       const popupPage = new DialogOpenerPagePO(appPO.popup({cssClass: 'popup'}));
 
       // Open dialog from popup.
@@ -960,10 +966,11 @@ test.describe('Workbench Dialog', () => {
 
       // Open a popup.
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: true});
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.selectPopupComponent('dialog-opener-page');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('dialog-opener-page', {
+        anchor: 'element',
+        closeStrategy: {onFocusLost: true},
+        cssClass: 'testee',
+      });
       const popupPage = new DialogOpenerPagePO(appPO.popup({cssClass: 'testee'}));
 
       // Block popup, thus losing focus because dialog gains focus.
@@ -978,10 +985,11 @@ test.describe('Workbench Dialog', () => {
 
       // Open a popup.
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.selectPopupComponent('dialog-opener-page');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open('dialog-opener-page', {
+        anchor: 'element',
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'testee',
+      });
       const popupPage = new DialogOpenerPagePO(appPO.popup({cssClass: 'testee'}));
 
       // Block popup.
@@ -2979,11 +2987,11 @@ test.describe('Workbench Dialog', () => {
 
       // Open popup
       const popupOpenerViewPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerViewPage.selectPopupComponent('dialog-opener-page');
-      await popupOpenerViewPage.enterCssClass('testee');
-      await popupOpenerViewPage.enterPosition({bottom: 0, left: 0});
-      await popupOpenerViewPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerViewPage.open();
+      await popupOpenerViewPage.open('dialog-opener-page', {
+        anchor: {bottom: 0, left: 0},
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'testee',
+      });
       const popup = appPO.popup({cssClass: 'testee'});
 
       // Open dialog from popup.

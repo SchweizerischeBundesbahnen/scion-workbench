@@ -1,9 +1,9 @@
 <sci-router-outlet #router_outlet
                    [name]="popup.id"
-                   [attr.data-capabilityid]="popupCapability.metadata!.id"
-                   [attr.data-app]="popupCapability.metadata!.appSymbolicName"
+                   [attr.data-capabilityid]="capability().metadata!.id"
+                   [attr.data-app]="capability().metadata!.appSymbolicName"
                    keystrokes="keydown.escape"
-                   [class]="popup.cssClasses"
+                   [class]="popup.cssClass()"
                    (focuswithin)="onFocusWithin($event)">
   <ng-container *ngComponentOutlet="splash"/>
 </sci-router-outlet>

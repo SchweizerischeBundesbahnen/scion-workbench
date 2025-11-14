@@ -30,9 +30,10 @@ test.describe('Workbench Page Not Found', () => {
       await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup', variant: 'invalid-path'}});
 
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPage.enterQualifier({component: 'host-popup', variant: 'invalid-path'});
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open({component: 'host-popup', variant: 'invalid-path'}, {
+        anchor: 'element',
+        cssClass: 'testee',
+      });
 
       // Expect "Not Found" page to display.
       const notFoundPage = new PageNotFoundPagePO(appPO.popup({cssClass: 'testee'}));

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Injector} from '@angular/core';
+import {Injector, Provider} from '@angular/core';
 import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 import {Translatable} from '../text/workbench-text-provider.model';
 
@@ -74,10 +74,11 @@ export interface WorkbenchMessageBoxOptions {
   contentSelectable?: boolean;
 
   /**
-   * Specifies data available as input properties in the message component.
+   * Specifies data to pass to the message component. Inputs are available as input properties in the message component.
    *
-   * This property only applies to a message box opened with a component, not a plain text message.
+   * Has no effect if opening a plain text message.
    *
+   * @example - Reading inputs in the component
    * ```ts
    * public someInput = input.required<string>();
    * ```
@@ -85,12 +86,10 @@ export interface WorkbenchMessageBoxOptions {
   inputs?: {[name: string]: unknown};
 
   /**
-   * Specifies the injector for the instantiation of the message component.
+   * Specifies the injector for the instantiation of the message box, giving control over the objects available
+   * for injection in the message component. Defaults to the application's root injector.
    *
-   * This property only applies to a message box opened with a component, not a plain text message.
-   *
-   * A custom injector gives control over the objects available for injection into the message component. If not specified, uses the
-   * application's root injector, or the view's injector if opened in the context of a view.
+   * @example - Creating an injector with a DI token
    *
    * ```ts
    * Injector.create({
@@ -102,6 +101,13 @@ export interface WorkbenchMessageBoxOptions {
    * ```
    */
   injector?: Injector;
+
+  /**
+   * Specifies providers available for injection in the message component.
+   *
+   * Providers can inject {@link WorkbenchMessageBox} to interact with the message.
+   */
+  providers?: Provider[];
 
   /**
    * Specifies CSS class(es) to add to the message box, e.g., to locate the message box in tests.

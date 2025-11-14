@@ -9,11 +9,11 @@
  */
 
 import {PopupPO} from '../../popup.po';
-import {PopupSize} from '@scion/workbench';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Locator} from '@playwright/test';
 import {WorkbenchPopupPagePO} from './workbench-popup-page.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
+import {WorkbenchPopupSize} from '@scion/workbench-client';
 
 /**
  * Page object to interact with {@link PopupPageComponent}.
@@ -32,13 +32,36 @@ export class PopupPagePO implements WorkbenchPopupPagePO {
     return this.locator.locator('span.e2e-component-instance-id').innerText();
   }
 
-  public async enterComponentSize(size: PopupSize): Promise<void> {
-    await this.locator.locator('input.e2e-width').fill(size.width ?? '');
-    await this.locator.locator('input.e2e-height').fill(size.height ?? '');
-    await this.locator.locator('input.e2e-min-width').fill(size.minWidth ?? '');
-    await this.locator.locator('input.e2e-max-width').fill(size.maxWidth ?? '');
-    await this.locator.locator('input.e2e-min-height').fill(size.minHeight ?? '');
-    await this.locator.locator('input.e2e-max-height').fill(size.maxHeight ?? '');
+  public async enterComponentSize(size: WorkbenchPopupSize): Promise<void> {
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-component-size'));
+    await accordion.expand();
+    try {
+      await accordion.itemLocator().locator('input.e2e-width').fill(size.width ?? '');
+      await accordion.itemLocator().locator('input.e2e-height').fill(size.height ?? '');
+      await accordion.itemLocator().locator('input.e2e-min-width').fill(size.minWidth ?? '');
+      await accordion.itemLocator().locator('input.e2e-max-width').fill(size.maxWidth ?? '');
+      await accordion.itemLocator().locator('input.e2e-min-height').fill(size.minHeight ?? '');
+      await accordion.itemLocator().locator('input.e2e-max-height').fill(size.maxHeight ?? '');
+    }
+    finally {
+      await accordion.collapse();
+    }
+  }
+
+  public async enterPopupSize(size: WorkbenchPopupSize): Promise<void> {
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-popup-size'));
+    await accordion.expand();
+    try {
+      await accordion.itemLocator().locator('input.e2e-width').fill(size.width ?? '');
+      await accordion.itemLocator().locator('input.e2e-height').fill(size.height ?? '');
+      await accordion.itemLocator().locator('input.e2e-min-width').fill(size.minWidth ?? '');
+      await accordion.itemLocator().locator('input.e2e-max-width').fill(size.maxWidth ?? '');
+      await accordion.itemLocator().locator('input.e2e-min-height').fill(size.minHeight ?? '');
+      await accordion.itemLocator().locator('input.e2e-max-height').fill(size.maxHeight ?? '');
+    }
+    finally {
+      await accordion.collapse();
+    }
   }
 
   public async close(options?: {returnValue?: string; closeWithError?: boolean}): Promise<void> {

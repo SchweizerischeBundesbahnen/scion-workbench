@@ -10,7 +10,7 @@
 
 import {BehaviorSubject, concatWith, delay, firstValueFrom, of, Subject, switchMap} from 'rxjs';
 import {assertNotInReactiveContext, ComponentRef, computed, DestroyableInjector, DestroyRef, effect, inject, Injector, Signal, signal, untracked} from '@angular/core';
-import {WorkbenchDialog, WorkbenchDialogSize, ɵWorkbenchDialogSize} from './workbench-dialog';
+import {WorkbenchDialog, WorkbenchDialogSize} from './workbench-dialog';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
 import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
 import {Overlay, OverlayRef} from '@angular/cdk/overlay';
@@ -38,7 +38,7 @@ import {provideContextAwareServices} from '../context-aware-service-provider';
 import {WorkbenchInvocationContext} from '../invocation-context/invocation-context';
 
 /** @inheritDoc */
-export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Blockable, Blocking {
+export class ɵWorkbenchDialog implements WorkbenchDialog, Blockable, Blocking {
 
   /** Injector for the dialog; destroyed when the dialog is closed. */
   public readonly injector = inject(Injector) as DestroyableInjector;
@@ -56,7 +56,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   private readonly _cssClass = signal<string[]>([]);
 
   /** Result (or error) to be passed to the dialog opener. */
-  private _result: R | Error | undefined;
+  private _result: unknown | Error | undefined;
   private _componentRef = signal<ComponentRef<WorkbenchDialogComponent> | undefined>(undefined);
 
   public readonly blockedBy: Signal<ɵWorkbenchDialog | null>;
@@ -94,7 +94,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   /**
    * Waits for the dialog to close, resolving to its result or rejecting if closed with an error.
    */
-  public async waitForClose(): Promise<R | undefined> {
+  public async waitForClose<R>(): Promise<R | undefined> {
     // Wait for the overlay to be initially positioned to have a smooth slide-in animation.
     if (this.animate) {
       await firstValueFrom(fromResize$(this._overlayRef.hostElement));
@@ -113,13 +113,13 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
     // Wait for the dialog to close, resolving to its result or rejecting if closed with an error.
     return new Promise<R | undefined>((resolve, reject) => {
       this.injector.get(DestroyRef).onDestroy(() => {
-        this._result instanceof Error ? reject(this._result) : resolve(this._result);
+        this._result instanceof Error ? reject(this._result) : resolve(this._result as R);
       });
     });
   }
 
   /** @inheritDoc */
-  public close(result?: R | Error): void {
+  public close<R>(result?: R | Error): void {
     assertNotInReactiveContext(this.close, 'Call WorkbenchDialog.close() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
     // Prevent closing if blocked.
@@ -260,6 +260,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
         {provide: WorkbenchDialog, useExisting: ɵWorkbenchDialog},
         {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchDialog},
         provideContextAwareServices(),
+        ...this._options.providers ?? [],
       ],
     });
     inject(DestroyRef).onDestroy(() => injector.destroy());
@@ -407,5 +408,76 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
       this.injector.destroy();
       this._overlayRef.dispose();
     }
+  }
+}
+
+/** @inheritDoc */
+class ɵWorkbenchDialogSize implements WorkbenchDialogSize {
+
+  private readonly _height = signal<string | undefined>(undefined);
+  private readonly _width = signal<string | undefined>(undefined);
+  private readonly _minHeight = signal<string | undefined>(undefined);
+  private readonly _maxHeight = signal<string | undefined>(undefined);
+  private readonly _minWidth = signal<string | undefined>(undefined);
+  private readonly _maxWidth = signal<string | undefined>(undefined);
+
+  /** @inheritDoc */
+  public get height(): Signal<string | undefined> {
+    return this._height;
+  }
+
+  /** @inheritDoc */
+  public set height(height: string | undefined) {
+    untracked(() => this._height.set(height));
+  }
+
+  /** @inheritDoc */
+  public get width(): Signal<string | undefined> {
+    return this._width;
+  }
+
+  /** @inheritDoc */
+  public set width(width: string | undefined) {
+    untracked(() => this._width.set(width));
+  }
+
+  /** @inheritDoc */
+  public get minHeight(): Signal<string | undefined> {
+    return this._minHeight;
+  }
+
+  /** @inheritDoc */
+  public set minHeight(minHeight: string | undefined) {
+    untracked(() => this._minHeight.set(minHeight));
+  }
+
+  /** @inheritDoc */
+  public get maxHeight(): Signal<string | undefined> {
+    return this._maxHeight;
+  }
+
+  /** @inheritDoc */
+  public set maxHeight(maxHeight: string | undefined) {
+    untracked(() => this._maxHeight.set(maxHeight));
+  }
+
+  /** @inheritDoc */
+  public get minWidth(): Signal<string | undefined> {
+    return this._minWidth;
+  }
+
+  /** @inheritDoc */
+  public set minWidth(minWidth: string | undefined) {
+    untracked(() => this._minWidth.set(minWidth));
+  }
+
+  /** @inheritDoc */
+  public get maxWidth(): Signal<string | undefined> {
+    return this._maxWidth;
+  }
+
+  /** @inheritDoc */
+  public set maxWidth(maxWidth: string | undefined) {
+    untracked(() => this._maxWidth.set(maxWidth));
   }
 }

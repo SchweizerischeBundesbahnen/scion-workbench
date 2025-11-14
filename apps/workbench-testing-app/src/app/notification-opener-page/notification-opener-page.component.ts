@@ -56,7 +56,7 @@ export default class NotificationOpenerPageComponent {
     try {
       this._notificationService.notify({
         title: this.restoreLineBreaks(this.form.controls.title.value) || undefined,
-        content: this.isUseComponent() ? this.parseComponentFromUI() : this.restoreLineBreaks(this.form.controls.content.value),
+        content: this.isUseComponent() ? this.readComponentFromUI() : this.restoreLineBreaks(this.form.controls.content.value),
         componentInput: (this.isUseComponent() ? undefinedIfEmpty(this.form.controls.componentInput.value) : undefined),
         severity: this.form.controls.severity.value || undefined,
         duration: this.parseDurationFromUI(),
@@ -70,7 +70,7 @@ export default class NotificationOpenerPageComponent {
     }
   }
 
-  private parseComponentFromUI(): Type<NotificationPageComponent> {
+  private readComponentFromUI(): Type<NotificationPageComponent> {
     switch (this.form.controls.component.value) {
       case 'notification-page':
         return NotificationPageComponent;

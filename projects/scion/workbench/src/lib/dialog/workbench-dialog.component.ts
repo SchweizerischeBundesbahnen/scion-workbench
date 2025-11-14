@@ -27,10 +27,7 @@ import {fromMutation$} from '@scion/toolkit/observable';
 import {trackFocus} from '../focus/workbench-focus-tracker.service';
 
 /**
- * Renders the workbench dialog.
- *
- * This component is added to a CDK overlay aligned to the modality context defined by the dialog.
- * The dialog itself is rendered in the center of its modality context.
+ * Renders the content of a workbench dialog.
  */
 @Component({
   selector: 'wb-dialog',

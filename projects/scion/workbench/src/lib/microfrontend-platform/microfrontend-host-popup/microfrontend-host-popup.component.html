@@ -1,4 +1,4 @@
-<ng-container *ngTemplateOutlet="router_outlet; injector: outletInjector"/>
+<ng-container *ngTemplateOutlet="router_outlet; injector: outletInjector()"/>
 
 <ng-template #router_outlet>
   <router-outlet [name]="popup.id"/>
