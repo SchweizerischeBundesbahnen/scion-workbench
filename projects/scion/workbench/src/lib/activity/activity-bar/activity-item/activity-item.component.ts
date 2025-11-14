@@ -8,11 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, ElementRef, inject, input, Signal, untracked} from '@angular/core';
+import {Component, computed, inject, input, Signal, untracked} from '@angular/core';
 import {MActivity} from '../../workbench-activity.model';
 import {ɵWorkbenchRouter} from '../../../routing/ɵworkbench-router.service';
-import {synchronizeCssClasses} from '../../../common/css-class.util';
-import {Arrays} from '@scion/toolkit/util';
 import {IconComponent} from '../../../icon/icon.component';
 import {text} from '../../../text/text';
 import {WorkbenchLayoutService} from '../../../layout/workbench-layout.service';
@@ -34,6 +32,7 @@ import {WorkbenchFocusMonitor} from '../../../focus/workbench-focus-tracker.serv
     '[attr.data-focus-within-activity]': `focusWithinActivity() ? '' : null`,
     '[attr.data-activityid]': 'activity().id',
     '[attr.title]': 'tooltip()',
+    '[class]': 'activity().cssClass',
   },
 })
 export class ActivityItemComponent {
@@ -46,17 +45,8 @@ export class ActivityItemComponent {
 
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
 
-  constructor() {
-    this.addHostCssClasses();
-  }
-
   protected onToggle(): void {
     void this._workbenchRouter.navigate(layout => layout.toggleActivity(this.activity().id));
-  }
-
-  private addHostCssClasses(): void {
-    const host = inject(ElementRef).nativeElement as HTMLElement;
-    synchronizeCssClasses(host, computed(() => Arrays.coerce(this.activity().cssClass)));
   }
 
   private computeFocusWithinActivity(): Signal<boolean> {

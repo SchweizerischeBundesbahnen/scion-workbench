@@ -24,7 +24,6 @@ import {DialogFooterComponent} from './dialog-footer/dialog-footer.component';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
 import {filter, map, startWith, takeUntil} from 'rxjs/operators';
 import {fromMutation$} from '@scion/toolkit/observable';
-import {synchronizeCssClasses} from '../common/css-class.util';
 import {trackFocus} from '../focus/workbench-focus-tracker.service';
 
 /**
@@ -67,6 +66,7 @@ import {trackFocus} from '../focus/workbench-focus-tracker.service';
     '[style.--ɵdialog-min-width]': 'dialog.size.minWidth() ?? \'100px\'',
     '[style.--ɵdialog-width]': 'dialog.size.width()',
     '[style.--ɵdialog-max-width]': 'dialog.size.maxWidth()',
+    '[class]': 'dialog.cssClass()',
   },
 })
 export class WorkbenchDialogComponent {
@@ -89,7 +89,6 @@ export class WorkbenchDialogComponent {
 
   constructor() {
     this.setDialogOffset();
-    this.addHostCssClasses();
     this.trackFocus();
     this.autoFocus();
 
@@ -100,11 +99,6 @@ export class WorkbenchDialogComponent {
     const stackPosition = this.dialog.getPositionInDialogStack();
     this.transformTranslateX.set(stackPosition * 10);
     this.transformTranslateY.set(stackPosition * 10);
-  }
-
-  private addHostCssClasses(): void {
-    const host = inject(ElementRef).nativeElement as HTMLElement;
-    synchronizeCssClasses(host, this.dialog.cssClass);
   }
 
   /**
