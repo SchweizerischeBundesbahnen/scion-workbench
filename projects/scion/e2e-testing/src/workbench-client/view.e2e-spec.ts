@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -91,8 +91,6 @@ test.describe('Workbench View', () => {
 
     // expect following Observables to complete
     await expect.poll(() => consoleLogs.get({severity: 'debug', message: /ObservableComplete/})).toEqualIgnoreOrder([
-      `[TitleObservableComplete] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
-      `[HeadingObservableComplete] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[DirtyObservableComplete] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[ClosableObservableComplete] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
     ]);
@@ -128,8 +126,6 @@ test.describe('Workbench View', () => {
       `[ActiveObservableComplete] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
       `[FocusedObservableComplete] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
 
-      `[TitleObservableComplete] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
-      `[HeadingObservableComplete] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
       `[DirtyObservableComplete] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
       `[ClosableObservableComplete] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
     ]);
@@ -151,8 +147,6 @@ test.describe('Workbench View', () => {
       `[ActiveObservableComplete] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
       `[FocusedObservableComplete] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
 
-      `[TitleObservableComplete] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
-      `[HeadingObservableComplete] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
       `[DirtyObservableComplete] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
       `[ClosableObservableComplete] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
     ]);
