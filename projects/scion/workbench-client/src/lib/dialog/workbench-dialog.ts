@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -46,13 +46,6 @@ export abstract class WorkbenchDialog<R = unknown> {
    * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    */
   public abstract setTitle(title: Translatable): void;
-
-  /**
-   * Sets the title of the dialog.
-   *
-   * @deprecated since version 1.0.0-beta.31. To migrate, pass a translatable and provide the text using a text provider registered in `WorkbenchClient.registerTextProvider`.
-   */
-  public abstract setTitle(title: Observable<Translatable>): void; // eslint-disable-line @typescript-eslint/unified-signatures
 
   /**
    * Indicates whether this dialog has the focus.
