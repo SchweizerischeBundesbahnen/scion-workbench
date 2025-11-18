@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -170,15 +170,6 @@ export abstract class WorkbenchConfig {
      * @deprecated since version 19.0.0-beta.3. To start the workbench in an app initializer, use Angular's `provideAppInitializer()` function: `provideAppInitializer(() => inject(WorkbenchLauncher).launch())`. Otherwise, no migration is necessary. No replacement. API will be removed in version 21.
      */
     launcher?: 'LAZY' | 'APP_INITIALIZER';
-
-    /**
-     * Specifies the component to display in `<wb-workbench>` while the workbench is starting.
-     *
-     * Note: No splash screen is displayed when using the app initializer strategy.
-     *
-     * @deprecated since version 19.0.0-beta.3. Property has been moved. Configure the splash in `WorkbenchConfig.splashComponent`. Property will be removed in version 21.
-     */
-    splash?: ComponentType<unknown>;
   };
 
   /**
