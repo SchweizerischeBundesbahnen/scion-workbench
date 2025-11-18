@@ -1,5 +1,5 @@
 <div class="outline">
-  @if (notification().title$ | async | wbCoerceObservable$ | async; as title) {
+  @if (notification().title(); as title) {
     <header class="e2e-title">{{(title | wbText)()}}</header>
   }
   <ng-container *cdkPortalOutlet="portal"/>
