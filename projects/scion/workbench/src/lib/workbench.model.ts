@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -190,22 +190,6 @@ export type WorkbenchPartActionFn = (part: WorkbenchPart) => WorkbenchPartAction
  *   Use Angular's `untracked` function to execute code outside this reactive context.
  */
 export type WorkbenchViewMenuItemFn = (view: WorkbenchView) => WorkbenchMenuItem | null;
-
-/**
- * Information about a workbench theme.
- *
- * @deprecated since version 19.0.0-beta.3. Read the theme from `WorkbenchService.settings.theme` signal, and the color scheme from 'getComputedStyle(inject(DOCUMENT).documentElement).colorScheme'. API will be removed in version 21.
- */
-export interface WorkbenchTheme {
-  /**
-   * The name of the theme.
-   */
-  name: string;
-  /**
-   * The color scheme of the theme.
-   */
-  colorScheme: 'light' | 'dark';
-}
 
 /**
  * Union of workbench elements.
