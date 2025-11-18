@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -173,7 +173,7 @@ export class ViewMenuService {
   }
 
   private registerCloseMenuItem(config: MenuItemConfig | false): void {
-    if (isEnabled(config)) {
+    if (config) {
       this._workbenchService.registerViewMenuItem(view => ({
         content: TextComponent,
         inputs: {text: '%workbench.close_tab.action'},
@@ -187,7 +187,7 @@ export class ViewMenuService {
   }
 
   private registerCloseOtherTabsMenuItem(config: MenuItemConfig | false): void {
-    if (isEnabled(config)) {
+    if (config) {
       this._workbenchService.registerViewMenuItem(view => ({
         content: TextComponent,
         inputs: {text: '%workbench.close_other_tabs.action'},
@@ -201,7 +201,7 @@ export class ViewMenuService {
   }
 
   private registerCloseAllTabsMenuItem(config: MenuItemConfig | false): void {
-    if (isEnabled(config)) {
+    if (config) {
       this._workbenchService.registerViewMenuItem(view => ({
         content: TextComponent,
         inputs: {text: '%workbench.close_all_tabs.action'},
@@ -214,7 +214,7 @@ export class ViewMenuService {
   }
 
   private registerCloseRightTabsMenuItem(config: MenuItemConfig | false): void {
-    if (isEnabled(config)) {
+    if (config) {
       this._workbenchService.registerViewMenuItem(view => ({
         content: TextComponent,
         inputs: {text: '%workbench.close_tabs_to_the_right.action'},
@@ -227,7 +227,7 @@ export class ViewMenuService {
   }
 
   private registerCloseLeftTabsMenuItem(config: MenuItemConfig | false): void {
-    if (isEnabled(config)) {
+    if (config) {
       this._workbenchService.registerViewMenuItem(view => ({
         content: TextComponent,
         inputs: {text: '%workbench.close_tabs_to_the_left.action'},
@@ -240,7 +240,7 @@ export class ViewMenuService {
   }
 
   private registerMoveRightMenuItem(config: MenuItemConfig | false): void {
-    if (isEnabled(config)) {
+    if (config) {
       this._workbenchService.registerViewMenuItem(view => ({
         content: TextComponent,
         inputs: {text: '%workbench.move_tab_to_the_right.action'},
@@ -254,7 +254,7 @@ export class ViewMenuService {
   }
 
   private registerMoveLeftMenuItem(config: MenuItemConfig | false): void {
-    if (isEnabled(config)) {
+    if (config) {
       this._workbenchService.registerViewMenuItem(view => ({
         content: TextComponent,
         inputs: {text: '%workbench.move_tab_to_the_left.action'},
@@ -267,7 +267,7 @@ export class ViewMenuService {
   }
 
   private registerMoveUpMenuItem(config: MenuItemConfig | false): void {
-    if (isEnabled(config)) {
+    if (config) {
       this._workbenchService.registerViewMenuItem(view => ({
         content: TextComponent,
         inputs: {text: '%workbench.move_tab_up.action'},
@@ -280,7 +280,7 @@ export class ViewMenuService {
   }
 
   private registerMoveDownMenuItem(config: MenuItemConfig | false): void {
-    if (isEnabled(config)) {
+    if (config) {
       this._workbenchService.registerViewMenuItem(view => ({
         content: TextComponent,
         inputs: {text: '%workbench.move_tab_down.action'},
@@ -293,7 +293,7 @@ export class ViewMenuService {
   }
 
   private registerMoveToNewWindowMenuItem(config: MenuItemConfig | false): void {
-    if (isEnabled(config)) {
+    if (config) {
       this._workbenchService.registerViewMenuItem(view => {
         if (view.part().peripheral()) {
           return null;
@@ -309,13 +309,6 @@ export class ViewMenuService {
       });
     }
   }
-}
-
-/**
- * Tests if given built-in menu item is enabled for display.
- */
-function isEnabled(config: MenuItemConfig | false): config is MenuItemConfig {
-  return config && (config.visible ?? true);
 }
 
 /**

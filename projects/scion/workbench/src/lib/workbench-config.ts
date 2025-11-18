@@ -339,10 +339,6 @@ export interface ViewMenuItemsConfig {
  */
 export interface MenuItemConfig {
   /**
-   * @deprecated since version 19.0.0-beta.2. Set to `false` in {@link ViewMenuItemsConfig} to exclude the menu item. API will be removed in version 21.
-   */
-  visible?: boolean;
-  /**
    * Specifies the text of this menu item.
    *
    * Can be a string or a function that returns a string or a {@link Signal}.
