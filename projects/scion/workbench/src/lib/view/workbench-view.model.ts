@@ -52,27 +52,6 @@ export abstract class WorkbenchView {
   public abstract readonly navigation: Signal<WorkbenchViewNavigation | undefined>;
 
   /**
-   * Hint passed to the navigation.
-   *
-   * @deprecated since version 19.0.0-beta.2. Use {@link navigation.hint} instead. API will be removed in version 21.
-   */
-  public abstract readonly navigationHint: Signal<string | undefined>;
-
-  /**
-   * Data passed to the navigation.
-   *
-   * @deprecated since version 19.0.0-beta.2. Use {@link navigation.data} instead. API will be removed in version 21.
-   */
-  public abstract readonly navigationData: Signal<NavigationData>;
-
-  /**
-   * State passed to the navigation.
-   *
-   * @deprecated since version 19.0.0-beta.2. Use {@link navigation.state} instead. API will be removed in version 21.
-   */
-  public abstract readonly navigationState: Signal<NavigationState>;
-
-  /**
    * Part which contains this view.
    *
    * Note: the part of a view can change, e.g., when the view is moved to another part.
@@ -155,13 +134,6 @@ export abstract class WorkbenchView {
    * Menu items associated with this view.
    */
   public abstract readonly menuItems: Signal<WorkbenchMenuItem[]>;
-
-  /**
-   * URL associated with this view.
-   *
-   * @deprecated since version 19.0.0-beta.2. Use {@link navigation.path} instead. API will be removed in version 21.
-   */
-  public abstract readonly urlSegments: Signal<UrlSegment[]>;
 
   /**
    * Gets the activation instant of this view.
