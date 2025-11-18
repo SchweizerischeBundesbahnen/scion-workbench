@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,8 +21,6 @@ export default class ViewPropertiesTestPageComponent {
   private readonly _view = inject(WorkbenchView);
 
   constructor() {
-    this._view.setTitle(this.observeParam$('title'));
-    this._view.setHeading(this.observeParam$('heading'));
     this._view.markDirty(this.observeParam$('dirty').pipe(map(booleanAttribute)));
     this._view.setClosable(this.observeParam$('closable').pipe(map(booleanAttribute)));
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -74,8 +74,6 @@ export default class ViewPageComponent {
   });
 
   constructor() {
-    this.view.setTitle(this.form.controls.title.valueChanges.pipe(this.logCompletion('TitleObservableComplete')));
-    this.view.setHeading(this.form.controls.heading.valueChanges.pipe(this.logCompletion('HeadingObservableComplete')));
     this.view.markDirty(NEVER.pipe(this.logCompletion('DirtyObservableComplete')));
     this.view.setClosable(this.form.controls.closable.valueChanges.pipe(this.logCompletion('ClosableObservableComplete')));
 
@@ -83,6 +81,14 @@ export default class ViewPageComponent {
     this.installViewActiveStateLogger();
     this.installObservableCompletionLogger();
     this.view.signalReady();
+
+    this.form.controls.title.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(title => this.view.setTitle(title));
+
+    this.form.controls.heading.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(heading => this.view.setHeading(heading));
 
     this.view.capability$
       .pipe(
