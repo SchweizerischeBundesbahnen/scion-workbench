@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,6 @@
 
 import {Injector, ViewContainerRef} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
-import {Observable} from 'rxjs';
 import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
@@ -28,10 +27,8 @@ export interface NotificationConfig {
    * Optional title of the notification.
    *
    * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
-   *
-   * TODO [Angular 21] Passing an Observable is deprecated. To migrate, pass a translatable and provide the text using a text provider registered in `WorkbenchClient.registerTextProvider`. API will be removed in version 21.
    */
-  title?: Translatable | Observable<Translatable | undefined>;
+  title?: Translatable;
 
   /**
    * Content of the notification, can be either a plain text message or a component.
