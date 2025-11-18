@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,10 +18,6 @@ const routes: Routes = [
   {
     path: 'view-properties-test-page',
     loadComponent: (): any => import('./view-properties-test-page/view-properties-test-page.component'),
-  },
-  {
-    path: 'dialog-properties-test-page',
-    loadComponent: (): any => import('./dialog-properties-test-page/dialog-properties-test-page.component'),
   },
   {
     path: 'input-field-test-page',
