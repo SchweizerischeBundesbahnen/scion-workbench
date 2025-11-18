@@ -9,7 +9,7 @@
  */
 
 import {ComponentType} from '@angular/cdk/portal';
-import {Signal, Type} from '@angular/core';
+import {Type} from '@angular/core';
 import {LogAppender, LogLevel} from './logging';
 import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
 import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform/microfrontend-platform-config-loader';
@@ -338,16 +338,6 @@ export interface ViewMenuItemsConfig {
  * Configures a built-in menu item.
  */
 export interface MenuItemConfig {
-  /**
-   * Specifies the text of this menu item.
-   *
-   * Can be a string or a function that returns a string or a {@link Signal}.
-   *
-   * The function can call `inject` to get any required dependencies, or use `toSignal` to convert an observable to a signal.
-   *
-   * @deprecated since version 19.0.0-beta.3. Register a text provider to change or localize menu item texts. Register the text provider via workbench configuration passed to the `provideWorkbench` function. API will be removed in version 21.
-   */
-  text?: string | (() => string | Signal<string>);
   accelerator?: string[];
   group?: string;
   cssClass?: string | string[];
