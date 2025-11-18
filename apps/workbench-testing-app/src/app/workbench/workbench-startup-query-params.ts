@@ -74,7 +74,6 @@ export const WorkbenchStartupQueryParams = {
    * Query param to control which desktop component to display. Defaults to {@link StartPageComponent}.
    *
    * Available desktops:
-   * - 'legacy-start-page': Displays the start page using a primary router-outlet. No longer required with the removal of legacy start page support.
    * - 'desktop-page': Displays the 'DesktopPageComponent'.
    * - 'focus-page': Displays {@link FocusTestPageComponent}.
    * - 'layout-page': Displays {@link LayoutPageComponent}.

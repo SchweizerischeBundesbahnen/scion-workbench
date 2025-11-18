@@ -92,53 +92,6 @@ describe('Desktop', () => {
       expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.main-area"] wb-part[data-partid="part.initial"]'))).toBeNull();
     });
 
-    /** @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support. */
-    it('should display start page [deprecated]', async () => {
-      TestBed.configureTestingModule({
-        providers: [
-          provideWorkbenchForTest({
-            mainAreaInitialPartId: 'part.initial',
-            layout: factory => factory.addPart(MAIN_AREA),
-          }),
-          provideRouter([
-            {
-              path: '',
-              loadComponent: () => import('../testing/test.component'),
-              providers: [withComponentContent('Desktop')],
-            },
-            {
-              path: 'test-view',
-              loadComponent: () => import('../testing/test.component'),
-              providers: [withComponentContent('View')],
-            },
-          ]),
-        ],
-      });
-      const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-      await waitUntilWorkbenchStarted();
-      const wbRouter = TestBed.inject(WorkbenchRouter);
-
-      // Expect desktop to display
-      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.main-area"] wb-desktop-slot router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Desktop');
-      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.main-area"] wb-part[data-partid="part.initial"]'))).toBeNull();
-
-      // Open view
-      await wbRouter.navigate(['/test-view']);
-      await waitUntilStable();
-
-      // Expect desktop not to display
-      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.main-area"] wb-desktop-slot router-outlet'))).toBeNull();
-      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.main-area"] wb-part[data-partid="part.initial"]'))).not.toBeNull();
-
-      // Close view
-      await wbRouter.navigate(['/test-view'], {close: true});
-      await waitUntilStable();
-
-      // Expect desktop to display
-      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.main-area"] wb-desktop-slot router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Desktop');
-      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.main-area"] wb-part[data-partid="part.initial"]'))).toBeNull();
-    });
-
     it('should overflow desktop if exceeding available vertical space', async () => {
       TestBed.configureTestingModule({
         providers: [
@@ -174,33 +127,6 @@ describe('Desktop', () => {
 
       // Change height of desktop to 5000px
       fixture.debugElement.query(By.css('div.desktop.testee')).nativeElement.style.height = '5000px';
-
-      // Expect desktop not to exceed 500px
-      expect(getComputedStyle(fixture.debugElement.query(By.css('wb-part[data-partid="part.main-area"] wb-desktop-slot')).nativeElement as HTMLElement).height).toEqual('500px');
-    });
-
-    /** @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support. */
-    it('should overflow start page if exceeding available vertical space [deprecated]', async () => {
-      TestBed.configureTestingModule({
-        providers: [
-          provideWorkbenchForTest({
-            layout: factory => factory.addPart(MAIN_AREA),
-          }),
-          provideRouter([
-            {
-              path: '',
-              loadComponent: () => import('../testing/test.component'),
-              providers: [withComponentContent('Desktop')],
-            },
-          ]),
-        ],
-      });
-      const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-      fixture.debugElement.nativeElement.style.height = '500px';
-      await waitUntilWorkbenchStarted();
-
-      // Change height of desktop to 5000px
-      fixture.debugElement.query(By.css('spec-test-component')).nativeElement.style.height = '5000px';
 
       // Expect desktop not to exceed 500px
       expect(getComputedStyle(fixture.debugElement.query(By.css('wb-part[data-partid="part.main-area"] wb-desktop-slot')).nativeElement as HTMLElement).height).toEqual('500px');
@@ -417,52 +343,6 @@ describe('Desktop', () => {
       expect(fixture.debugElement.query(By.css('wb-layout wb-part[data-partid="part.part"]'))).toBeNull();
     });
 
-    /** @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support. */
-    it('should display start page [deprecated]', async () => {
-      TestBed.configureTestingModule({
-        providers: [
-          provideWorkbenchForTest({
-            layout: factory => factory.addPart('part.part'),
-          }),
-          provideRouter([
-            {
-              path: '',
-              loadComponent: () => import('../testing/test.component'),
-              providers: [withComponentContent('Desktop')],
-            },
-            {
-              path: 'test-view',
-              loadComponent: () => import('../testing/test.component'),
-              providers: [withComponentContent('View')],
-            },
-          ]),
-        ],
-      });
-      const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-      await waitUntilWorkbenchStarted();
-      const wbRouter = TestBed.inject(WorkbenchRouter);
-
-      // Expect desktop to display
-      expect(fixture.debugElement.query(By.css('wb-layout wb-desktop-slot router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Desktop');
-      expect(fixture.debugElement.query(By.css('wb-layout wb-part[data-partid="part.part"]'))).toBeNull();
-
-      // Open view
-      await wbRouter.navigate(['test-view'], {target: 'view.100'});
-      await waitUntilStable();
-
-      // Expect desktop not to display
-      expect(fixture.debugElement.query(By.css('wb-layout wb-desktop-slot router-outlet + spec-test-component'))).toBeNull();
-      expect(fixture.debugElement.query(By.css('wb-layout wb-part[data-partid="part.part"]'))).not.toBeNull();
-
-      // Close view
-      await wbRouter.navigate([], {target: 'view.100', close: true});
-      await waitUntilStable();
-
-      // Expect desktop to display
-      expect(fixture.debugElement.query(By.css('wb-layout wb-desktop-slot router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Desktop');
-      expect(fixture.debugElement.query(By.css('wb-layout wb-part[data-partid="part.part"]'))).toBeNull();
-    });
-
     it('should overflow desktop if exceeding available vertical space ', async () => {
       TestBed.configureTestingModule({
         providers: [
@@ -497,33 +377,6 @@ describe('Desktop', () => {
 
       // Change height of desktop to 5000px
       fixture.debugElement.query(By.css('div.desktop.testee')).nativeElement.style.height = '5000px';
-
-      // Expect desktop not to exceed 500px
-      expect(getComputedStyle(fixture.debugElement.query(By.css('wb-layout wb-desktop-slot')).nativeElement as HTMLElement).height).toEqual('500px');
-    });
-
-    /** @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support. */
-    it('should overflow start page if exceeding available vertical space [deprecated]', async () => {
-      TestBed.configureTestingModule({
-        providers: [
-          provideWorkbenchForTest({
-            layout: factory => factory.addPart('part.part'),
-          }),
-          provideRouter([
-            {
-              path: '',
-              loadComponent: () => import('../testing/test.component'),
-              providers: [withComponentContent('Desktop')],
-            },
-          ]),
-        ],
-      });
-      const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-      fixture.debugElement.nativeElement.style.height = '500px';
-      await waitUntilWorkbenchStarted();
-
-      // Change height of desktop to 5000px
-      fixture.debugElement.query(By.css('spec-test-component')).nativeElement.style.height = '5000px';
 
       // Expect desktop not to exceed 500px
       expect(getComputedStyle(fixture.debugElement.query(By.css('wb-layout wb-desktop-slot')).nativeElement as HTMLElement).height).toEqual('500px');
