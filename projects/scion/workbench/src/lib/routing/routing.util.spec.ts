@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -70,12 +70,13 @@ describe('Routing.commandsToSegments', () => {
   it('should error if appending matrix parameters to empty-path `relativeTo`', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest(),
         provideRouter([
           {path: '', canMatch: [canMatchWorkbenchView('test-view')], component: TestComponent},
         ]),
       ],
     });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     // Add view to use as 'relativeTo'.
@@ -92,12 +93,13 @@ describe('Routing.commandsToSegments', () => {
   it('should ignore `relativeTo` for absolute commands', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest(),
         provideRouter([
           {path: 'relative/to', component: TestComponent},
         ]),
       ],
     });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     // Add view to use as 'relativeTo'.
@@ -114,12 +116,13 @@ describe('Routing.commandsToSegments', () => {
   it('should make commands relative to another route', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest(),
         provideRouter([
           {path: 'relative/to', component: TestComponent},
         ]),
       ],
     });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     // Add view to use as 'relativeTo'.
@@ -143,12 +146,13 @@ describe('Routing.commandsToSegments', () => {
   it('should append matrix parameters to `relativeTo`', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest(),
         provideRouter([
           {path: 'relative/to', component: TestComponent},
         ]),
       ],
     });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     // Add view to use as 'relativeTo'.
@@ -165,12 +169,13 @@ describe('Routing.commandsToSegments', () => {
   it('should append commands to empty-path `relativeTo`', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest(),
         provideRouter([
           {path: '', canMatch: [canMatchWorkbenchView('test-view')], component: TestComponent},
         ]),
       ],
     });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     // Add view to use as 'relativeTo'.
@@ -187,12 +192,13 @@ describe('Routing.commandsToSegments', () => {
   it('should append empty commands to empty-path `relativeTo`', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest(),
         provideRouter([
           {path: '', canMatch: [canMatchWorkbenchView('test-view')], component: TestComponent},
         ]),
       ],
     });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     // Add view to use as 'relativeTo'.
@@ -209,12 +215,13 @@ describe('Routing.commandsToSegments', () => {
   it('should append empty commands to `relativeTo`', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest(),
         provideRouter([
           {path: 'relative/to', component: TestComponent},
         ]),
       ],
     });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     // Add view to use as 'relativeTo'.
@@ -249,7 +256,7 @@ describe('Routing.parseOutlets', () => {
   it('should parse outlets from URL', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest(),
         provideRouter([
           {path: 'path/to/view/:id', component: TestComponent},
           {path: 'path/to/part/:id', component: TestComponent},
@@ -257,6 +264,7 @@ describe('Routing.parseOutlets', () => {
         ]),
       ],
     });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     // Add view outlets view.101 and view.103 to the URL.
@@ -301,13 +309,14 @@ describe('Routing.hasEmptyPathFromRoot', () => {
   it('should indicate empty path from root', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest(),
         provideRouter([
           {path: '', canMatch: [canMatchWorkbenchView('test-view')], component: TestComponent},
           {path: 'path/to/view', component: TestComponent},
         ]),
       ],
     });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     const rootRoute = TestBed.inject(Router).routerState.root;
@@ -328,7 +337,7 @@ describe('Routing.resolveEffectiveRoute', () => {
   it('should resolve the effective route', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest(),
         provideRouter([
           {
             path: 'view', loadComponent: () => TestComponent,
@@ -353,7 +362,7 @@ describe('Routing.resolveEffectiveRoute', () => {
   it('should resolve the effective child route', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest(),
         provideRouter([
           {
             path: 'path',
@@ -389,7 +398,7 @@ describe('Routing.resolveEffectiveRoute', () => {
   it('should resolve the effective child outlet', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest(),
         provideRouter([
           {
             path: 'path',

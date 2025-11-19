@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,6 +24,7 @@ import {provideMainAreaInitialPartId} from './workbench/main-area-initial-part-i
 import {provideDesignTokens} from './workbench/provide-design-tokens';
 import {ActiveWorkbenchElementCollector} from './active-workbench-element-log-page/active-workbench-element-collector.service';
 import {provideValueFromStorage} from './text/storage-text-provider';
+import {provideWorkbenchLauncher} from './workbench-launcher.provider';
 
 /**
  * Central place to configure the workbench-testing-app.
@@ -32,6 +33,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes, withHashLocation(), withPreloading(PreloadAllModules)),
     provideWorkbench(workbenchConfig),
+    provideWorkbenchLauncher(),
     provideConfirmWorkbenchStartup(),
     provideDesignTokens(),
     provideThrottleCapabilityLookupInterceptor(),

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -3441,7 +3441,6 @@ describe('WorkbenchLayout', () => {
               .navigatePart('part.activity-11', ['test-part'])
               .addPart('part.activity-12', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'Activity 12', ɵactivityId: 'activity.12'})
               .navigatePart('part.activity-12', ['test-part']),
-            startup: {launcher: 'APP_INITIALIZER'},
           }),
           provideRouter([
             {path: 'test-part', component: TestComponent},
