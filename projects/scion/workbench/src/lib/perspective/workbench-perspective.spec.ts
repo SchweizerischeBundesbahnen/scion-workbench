@@ -13,7 +13,7 @@ import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testi
 import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchService} from '../workbench.service';
 import {TestComponent, withComponentContent} from '../testing/test.component';
-import {Component, DestroyRef, inject, isSignal} from '@angular/core';
+import {Component, DestroyRef, inject, isSignal, provideAppInitializer} from '@angular/core';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {firstValueFrom, Subject, timer} from 'rxjs';
 import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
@@ -26,6 +26,7 @@ import {WorkbenchPerspective} from './workbench-perspective.model';
 import {provideWorkbenchInitializer} from '../startup/workbench-initializer';
 import {WorkbenchPerspectiveRegistry} from './workbench-perspective.registry';
 import {WorkbenchDesktopDirective} from '../desktop/desktop.directive';
+import {WorkbenchLauncher} from '../startup/workbench-launcher.service';
 
 describe('Workbench Perspective', () => {
 
@@ -62,10 +63,10 @@ describe('Workbench Perspective', () => {
       providers: [
         provideWorkbenchForTest({
           mainAreaInitialPartId: 'part.initial',
-          startup: {launcher: 'APP_INITIALIZER'},
         }),
       ],
     });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     expectPerspectives([{id: 'default', active: true}]);
@@ -86,13 +87,13 @@ describe('Workbench Perspective', () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({
-          startup: {launcher: 'APP_INITIALIZER'},
           layout: factory => factory
             .addPart('part.left')
             .addPart('part.right', {align: 'right'}),
         }),
       ],
     });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     expectPerspectives([{id: 'default', active: true}]);
@@ -113,7 +114,6 @@ describe('Workbench Perspective', () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({
-          startup: {launcher: 'APP_INITIALIZER'},
           layout: {
             perspectives: [
               {
@@ -135,6 +135,7 @@ describe('Workbench Perspective', () => {
         }),
       ],
     });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     expectPerspectives([
@@ -158,7 +159,6 @@ describe('Workbench Perspective', () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({
-          startup: {launcher: 'APP_INITIALIZER'},
           layout: {
             perspectives: [
               {
@@ -183,6 +183,7 @@ describe('Workbench Perspective', () => {
         }),
       ],
     });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     expectPerspectives([
@@ -208,7 +209,6 @@ describe('Workbench Perspective', () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({
-          startup: {launcher: 'APP_INITIALIZER'},
           layout: {
             perspectives: [
               {
@@ -239,6 +239,7 @@ describe('Workbench Perspective', () => {
         }),
       ],
     });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     expectPerspectives([
@@ -264,7 +265,6 @@ describe('Workbench Perspective', () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({
-          startup: {launcher: 'APP_INITIALIZER'},
           layout: {
             perspectives: [
               {
@@ -284,6 +284,7 @@ describe('Workbench Perspective', () => {
         }),
       ],
     });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     expectPerspectives([
@@ -307,7 +308,6 @@ describe('Workbench Perspective', () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({
-          startup: {launcher: 'APP_INITIALIZER'},
           layout: {
             perspectives: [
               {
@@ -328,6 +328,7 @@ describe('Workbench Perspective', () => {
         }),
       ],
     });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     expectPerspectives([
@@ -453,7 +454,6 @@ describe('Workbench Perspective', () => {
             .addPart('part.left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
             .addView('view.101', {partId: 'part.left'})
             .navigateView('view.101', [], {hint: 'navigator'}),
-          startup: {launcher: 'APP_INITIALIZER'},
         }),
         provideRouter([
           {
@@ -463,6 +463,7 @@ describe('Workbench Perspective', () => {
             canActivate: [() => firstValueFrom(canActivate)],
           },
         ]),
+        provideAppInitializer(() => inject(WorkbenchLauncher).launch()), // Start Workbench in app initializer to not block startup until activated the initial perspective.
       ],
     });
 
@@ -574,9 +575,7 @@ describe('Workbench Perspective', () => {
   it('should support registering perspectives during workbench startup (without configured perspectives)', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({
-          startup: {launcher: 'APP_INITIALIZER'},
-        }),
+        provideWorkbenchForTest(),
         provideWorkbenchInitializer(async () => {
           const workbenchService = inject(WorkbenchService);
           // Wait some time to simulate late perspective registration.
@@ -592,6 +591,7 @@ describe('Workbench Perspective', () => {
       ],
     });
 
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     // Expect only the contributed perspective to be registered (and not the default perspective too).
@@ -603,7 +603,6 @@ describe('Workbench Perspective', () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({
-          startup: {launcher: 'APP_INITIALIZER'},
           layout: {
             perspectives: [
               {
@@ -630,6 +629,7 @@ describe('Workbench Perspective', () => {
       ],
     });
 
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     expect(perspectivesForActivation).toEqual(['perspective-2', 'perspective-1']);

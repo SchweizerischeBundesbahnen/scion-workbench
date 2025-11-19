@@ -8,9 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {EnvironmentProviders, inject, Injectable, makeEnvironmentProviders, provideAppInitializer} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {ɵWorkbenchLauncher} from './ɵworkbench-launcher.service';
-import {WorkbenchConfig} from '../workbench-config';
 
 /**
  * Provides the main entry point to start the SCION Workbench.
@@ -67,17 +66,4 @@ export abstract class WorkbenchLauncher {
    * @return A Promise that resolves when the workbench has completed the startup or that rejects if the startup failed.
    */
   public abstract launch(): Promise<true>;
-}
-
-/**
- * Provides a set of DI providers for launching the workbench.
- */
-export function provideWorkbenchLauncher(workbenchConfig: WorkbenchConfig): EnvironmentProviders | [] {
-  if (workbenchConfig.startup?.launcher !== 'APP_INITIALIZER') {
-    return [];
-  }
-
-  return makeEnvironmentProviders([
-    provideAppInitializer(() => inject(WorkbenchLauncher).launch()),
-  ]);
 }

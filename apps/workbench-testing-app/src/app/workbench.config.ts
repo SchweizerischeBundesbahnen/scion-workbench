@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,9 +18,6 @@ import {provideTextFromStorage} from './text/storage-text-provider';
  * Configures SCION Workbench for the testing application.
  */
 export const workbenchConfig: WorkbenchConfig = {
-  startup: {
-    launcher: WorkbenchStartupQueryParams.launcher(),
-  },
   microfrontendPlatform: WorkbenchStartupQueryParams.standalone() ? undefined : {
     ...environment.microfrontendPlatformConfig, // eslint-disable-line  @typescript-eslint/no-misused-spread
     preloadInactiveViews: WorkbenchStartupQueryParams.preloadInactiveMicrofrontendViews() ?? environment.microfrontendPlatformConfig.preloadInactiveViews,

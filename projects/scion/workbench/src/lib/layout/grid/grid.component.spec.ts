@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -149,7 +149,7 @@ describe('WorkbenchLayout Component', () => {
   it('allows moving a view in the tabbar', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view', component: TestComponent},
         ]),
@@ -268,7 +268,7 @@ describe('WorkbenchLayout Component', () => {
   it('allows to move a view to a new part in the east', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
@@ -348,7 +348,7 @@ describe('WorkbenchLayout Component', () => {
   it('allows to move a view to a new part in the west', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
@@ -428,7 +428,7 @@ describe('WorkbenchLayout Component', () => {
   it('allows to move a view to a new part in the north', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
@@ -508,7 +508,7 @@ describe('WorkbenchLayout Component', () => {
   it('allows to move a view to a new part in the south', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
@@ -588,7 +588,7 @@ describe('WorkbenchLayout Component', () => {
   it('disallows to move a view to a new part in the center', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
@@ -661,7 +661,7 @@ describe('WorkbenchLayout Component', () => {
   it('allows to move views to another part', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
@@ -828,7 +828,7 @@ describe('WorkbenchLayout Component', () => {
   it('allows to move the last view of a part to a new part in the east', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
@@ -943,7 +943,7 @@ describe('WorkbenchLayout Component', () => {
   it('allows to move the last view of a part to a new part in the west', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
@@ -1058,7 +1058,7 @@ describe('WorkbenchLayout Component', () => {
   it('allows to move the last view of a part to a new part in the north', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
@@ -1172,7 +1172,7 @@ describe('WorkbenchLayout Component', () => {
   it('allows to move the last view of a part to a new part in the south', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
@@ -1286,7 +1286,7 @@ describe('WorkbenchLayout Component', () => {
   it('allows to move a view around parts', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
@@ -1471,7 +1471,7 @@ describe('WorkbenchLayout Component', () => {
   it('allows to move a view to a new part in the south and back to the initial part ', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
@@ -1578,7 +1578,7 @@ describe('WorkbenchLayout Component', () => {
   it('allows to move a view to a new part in the east and then to the south of the initial part ', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
@@ -1692,7 +1692,7 @@ describe('WorkbenchLayout Component', () => {
   it('allows to move a view to a new part in the west and then to the south of the initial part ', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
@@ -1806,7 +1806,7 @@ describe('WorkbenchLayout Component', () => {
   it('should open the same view multiple times (target=auto)', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
@@ -1871,7 +1871,7 @@ describe('WorkbenchLayout Component', () => {
   it('should open the same view multiple times (target=blank)', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
@@ -1939,7 +1939,7 @@ describe('WorkbenchLayout Component', () => {
   it('should open views to the right and to the left, and then close them', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
@@ -2331,7 +2331,7 @@ describe('WorkbenchLayout Component', () => {
   it('should detach views before being re-parented in the DOM (1)', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
@@ -2440,7 +2440,7 @@ describe('WorkbenchLayout Component', () => {
   it('should detach views before being re-parented in the DOM (2)', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
@@ -2544,7 +2544,7 @@ describe('WorkbenchLayout Component', () => {
   it('should detach views before being re-parented in the DOM (3)', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
@@ -2850,7 +2850,7 @@ describe('WorkbenchLayout Component', () => {
   it('should detach views before being re-parented in the DOM (4)', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
@@ -2997,7 +2997,7 @@ describe('WorkbenchLayout Component', () => {
   it('should detach views before being re-parented in the DOM (5)', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
@@ -3144,7 +3144,7 @@ describe('WorkbenchLayout Component', () => {
   it('should detach views before being re-parented in the DOM (6)', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'path/to/view', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
