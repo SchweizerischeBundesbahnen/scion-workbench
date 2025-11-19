@@ -17,11 +17,11 @@ import {MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platfor
  */
 export function provideWorkbenchLifecycleHookLoggers(): EnvironmentProviders {
   return makeEnvironmentProviders([
-    provideWorkbenchInitializer(() => log('WORKBENCH_PRE_STARTUP'), {phase: WorkbenchStartupPhase.PreStartup}),
-    provideWorkbenchInitializer(() => log('WORKBENCH_STARTUP'), {phase: WorkbenchStartupPhase.Startup}),
-    provideWorkbenchInitializer(() => log('WORKBENCH_POST_STARTUP'), {phase: WorkbenchStartupPhase.PostStartup}),
-    provideMicrofrontendPlatformInitializer(() => log('MICROFRONTEND_PLATFORM_PRE_STARTUP'), {phase: MicrofrontendPlatformStartupPhase.PreStartup}),
-    provideMicrofrontendPlatformInitializer(() => log('MICROFRONTEND_PLATFORM_POST_STARTUP'), {phase: MicrofrontendPlatformStartupPhase.PostStartup}),
+    provideWorkbenchInitializer(() => log('WorkbenchStartupPhase.PreStartup'), {phase: WorkbenchStartupPhase.PreStartup}),
+    provideWorkbenchInitializer(() => log('WorkbenchStartupPhase.Startup'), {phase: WorkbenchStartupPhase.Startup}),
+    provideWorkbenchInitializer(() => log('WorkbenchStartupPhase.PostStartup'), {phase: WorkbenchStartupPhase.PostStartup}),
+    provideMicrofrontendPlatformInitializer(() => log('MicrofrontendPlatformStartupPhase.PreStartup'), {phase: MicrofrontendPlatformStartupPhase.PreStartup}),
+    provideMicrofrontendPlatformInitializer(() => log('MicrofrontendPlatformStartupPhase.PostStartup'), {phase: MicrofrontendPlatformStartupPhase.PostStartup}),
   ]);
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,8 +13,7 @@ import {ApplicationInitStatus, Component, inject, Injector, NgZone, provideAppIn
 import {WorkbenchLauncher} from './workbench-launcher.service';
 import {provideWorkbench} from '../workbench.provider';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
-import {provideWorkbenchInitializer, WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP, WORKBENCH_STARTUP, WorkbenchInitializerFn, WorkbenchStartupPhase} from './workbench-initializer';
-import {MICROFRONTEND_PLATFORM_POST_STARTUP, MICROFRONTEND_PLATFORM_PRE_STARTUP, MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform/microfrontend-platform-initializer.provider';
+import {provideWorkbenchInitializer, WorkbenchInitializerFn, WorkbenchStartupPhase} from './workbench-initializer';
 import {resolveWhen} from '../common/resolve-when.util';
 import {styleFixture} from '../testing/testing.util';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
@@ -61,122 +60,15 @@ describe('Workbench Startup', () => {
     await expectAsync(TestBed.inject(ApplicationInitStatus).donePromise).toBeResolved();
   });
 
-  it('should register workbench initializer in default phase "WORKBENCH_STARTUP"', async () => {
-    const initialzerFn: WorkbenchInitializerFn = () => {
-      // noop
-    };
-
-    TestBed.configureTestingModule({
-      providers: [
-        provideWorkbenchInitializer(initialzerFn),
-      ],
-    });
-
-    expect(TestBed.inject(WORKBENCH_PRE_STARTUP, [])).withContext('WORKBENCH_PRE_STARTUP').not.toContain(initialzerFn);
-    expect(TestBed.inject(WORKBENCH_STARTUP, [])).withContext('WORKBENCH_STARTUP').toContain(initialzerFn);
-    expect(TestBed.inject(WORKBENCH_POST_STARTUP, [])).withContext('WORKBENCH_POST_STARTUP').not.toContain(initialzerFn);
-  });
-
-  it('should register workbench initializer in phase "WORKBENCH_PRE_STARTUP"', async () => {
-    const initialzerFn: WorkbenchInitializerFn = () => {
-      // noop
-    };
-
-    TestBed.configureTestingModule({
-      providers: [
-        provideWorkbenchInitializer(initialzerFn, {phase: WorkbenchStartupPhase.PreStartup}),
-      ],
-    });
-
-    expect(TestBed.inject(WORKBENCH_PRE_STARTUP, [])).withContext('WORKBENCH_PRE_STARTUP').toContain(initialzerFn);
-    expect(TestBed.inject(WORKBENCH_STARTUP, [])).withContext('WORKBENCH_STARTUP').not.toContain(initialzerFn);
-    expect(TestBed.inject(WORKBENCH_POST_STARTUP, [])).withContext('WORKBENCH_POST_STARTUP').not.toContain(initialzerFn);
-  });
-
-  it('should register workbench initializer in phase "WORKBENCH_STARTUP"', async () => {
-    const initialzerFn: WorkbenchInitializerFn = () => {
-      // noop
-    };
-
-    TestBed.configureTestingModule({
-      providers: [
-        provideWorkbenchInitializer(initialzerFn, {phase: WorkbenchStartupPhase.Startup}),
-      ],
-    });
-
-    expect(TestBed.inject(WORKBENCH_PRE_STARTUP, [])).withContext('WORKBENCH_PRE_STARTUP').not.toContain(initialzerFn);
-    expect(TestBed.inject(WORKBENCH_STARTUP, [])).withContext('WORKBENCH_STARTUP').toContain(initialzerFn);
-    expect(TestBed.inject(WORKBENCH_POST_STARTUP, [])).withContext('WORKBENCH_POST_STARTUP').not.toContain(initialzerFn);
-  });
-
-  it('should register workbench initializer in phase "WORKBENCH_POST_STARTUP"', async () => {
-    const initialzerFn: WorkbenchInitializerFn = () => {
-      // noop
-    };
-
-    TestBed.configureTestingModule({
-      providers: [
-        provideWorkbenchInitializer(initialzerFn, {phase: WorkbenchStartupPhase.PostStartup}),
-      ],
-    });
-
-    expect(TestBed.inject(WORKBENCH_PRE_STARTUP, [])).withContext('WORKBENCH_PRE_STARTUP').not.toContain(initialzerFn);
-    expect(TestBed.inject(WORKBENCH_STARTUP, [])).withContext('WORKBENCH_STARTUP').not.toContain(initialzerFn);
-    expect(TestBed.inject(WORKBENCH_POST_STARTUP, [])).withContext('WORKBENCH_POST_STARTUP').toContain(initialzerFn);
-  });
-
-  it('should register microfrontend platform initializer in default phase "MICROFRONTEND_PLATFORM_POST_STARTUP"', async () => {
-    const initialzerFn: WorkbenchInitializerFn = () => {
-      // noop
-    };
-
-    TestBed.configureTestingModule({
-      providers: [
-        provideMicrofrontendPlatformInitializer(initialzerFn),
-      ],
-    });
-
-    expect(TestBed.inject(MICROFRONTEND_PLATFORM_PRE_STARTUP, [])).withContext('MICROFRONTEND_PLATFORM_PRE_STARTUP').not.toContain(initialzerFn);
-    expect(TestBed.inject(MICROFRONTEND_PLATFORM_POST_STARTUP, [])).withContext('MICROFRONTEND_PLATFORM_POST_STARTUP').toContain(initialzerFn);
-  });
-
-  it('should register microfrontend platform initializer in phase "MICROFRONTEND_PLATFORM_PRE_STARTUP"', async () => {
-    const initialzerFn: WorkbenchInitializerFn = () => {
-      // noop
-    };
-
-    TestBed.configureTestingModule({
-      providers: [
-        provideMicrofrontendPlatformInitializer(initialzerFn, {phase: MicrofrontendPlatformStartupPhase.PreStartup}),
-      ],
-    });
-
-    expect(TestBed.inject(MICROFRONTEND_PLATFORM_PRE_STARTUP, [])).withContext('MICROFRONTEND_PLATFORM_PRE_STARTUP').toContain(initialzerFn);
-    expect(TestBed.inject(MICROFRONTEND_PLATFORM_POST_STARTUP, [])).withContext('MICROFRONTEND_PLATFORM_POST_STARTUP').not.toContain(initialzerFn);
-  });
-
-  it('should register microfrontend platform initializer in phase "MICROFRONTEND_PLATFORM_POST_STARTUP"', async () => {
-    const initialzerFn: WorkbenchInitializerFn = () => {
-      // noop
-    };
-
-    TestBed.configureTestingModule({
-      providers: [
-        provideMicrofrontendPlatformInitializer(initialzerFn, {phase: MicrofrontendPlatformStartupPhase.PostStartup}),
-      ],
-    });
-
-    expect(TestBed.inject(MICROFRONTEND_PLATFORM_PRE_STARTUP, [])).withContext('MICROFRONTEND_PLATFORM_PRE_STARTUP').not.toContain(initialzerFn);
-    expect(TestBed.inject(MICROFRONTEND_PLATFORM_POST_STARTUP, [])).withContext('MICROFRONTEND_PLATFORM_POST_STARTUP').toContain(initialzerFn);
-  });
-
-  it('should run initializers in following order: WORKBENCH_PRE_STARTUP > WORKBENCH_STARTUP > WORKBENCH_POST_STARTUP', async () => {
+  it('should run initializers in following order: PreStartup > Startup > PostStartup', async () => {
     // Create initializer function spys.
     const workbenchPreStartupFn1 = createInitializerSpyFn({debugName: 'workbenchPreStartupFn1'});
     const workbenchPreStartupFn2 = createInitializerSpyFn({debugName: 'workbenchPreStartupFn2'});
 
-    const workbenchStartupFn1 = createInitializerSpyFn({debugName: 'workbenchStartupFn1'});
-    const workbenchStartupFn2 = createInitializerSpyFn({debugName: 'workbenchStartupFn2'});
+    const workbenchStartupFn1a = createInitializerSpyFn({debugName: 'workbenchStartupFn1a'});
+    const workbenchStartupFn1b = createInitializerSpyFn({debugName: 'workbenchStartupFn1b'});
+    const workbenchStartupFn2a = createInitializerSpyFn({debugName: 'workbenchStartupFn2a'});
+    const workbenchStartupFn2b = createInitializerSpyFn({debugName: 'workbenchStartupFn2b'});
 
     const workbenchPostStartupFn1 = createInitializerSpyFn({debugName: 'workbenchPostStartupFn1'});
     const workbenchPostStartupFn2 = createInitializerSpyFn({debugName: 'workbenchPostStartupFn2'});
@@ -185,12 +77,14 @@ describe('Workbench Startup', () => {
       providers: [
         provideWorkbenchForTest(),
         provideWorkbenchInitializer(workbenchPreStartupFn1, {phase: WorkbenchStartupPhase.PreStartup}),
-        provideWorkbenchInitializer(workbenchStartupFn1, {phase: WorkbenchStartupPhase.Startup}),
+        provideWorkbenchInitializer(workbenchStartupFn1a, {phase: WorkbenchStartupPhase.Startup}),
         provideWorkbenchInitializer(workbenchPostStartupFn1, {phase: WorkbenchStartupPhase.PostStartup}),
+        provideWorkbenchInitializer(workbenchStartupFn1b),
 
-        provideWorkbenchInitializer(workbenchPreStartupFn2, {phase: WorkbenchStartupPhase.PreStartup}),
-        provideWorkbenchInitializer(workbenchStartupFn2, {phase: WorkbenchStartupPhase.Startup}),
         provideWorkbenchInitializer(workbenchPostStartupFn2, {phase: WorkbenchStartupPhase.PostStartup}),
+        provideWorkbenchInitializer(workbenchPreStartupFn2, {phase: WorkbenchStartupPhase.PreStartup}),
+        provideWorkbenchInitializer(workbenchStartupFn2a, {phase: WorkbenchStartupPhase.Startup}),
+        provideWorkbenchInitializer(workbenchStartupFn2b),
       ],
     });
 
@@ -198,100 +92,57 @@ describe('Workbench Startup', () => {
     const startup = TestBed.inject(WorkbenchLauncher).launch();
     await expectAsync(startup).toBePending();
 
-    // Expect WORKBENCH_PRE_STARTUP functions to have been called in parallel.
-    expect(workbenchPreStartupFn1).toHaveBeenCalledOnceWith();
-    expect(workbenchPreStartupFn2).toHaveBeenCalledOnceWith();
+    // Expect PreStartup functions to have been called in parallel.
+    expect(workbenchPreStartupFn1).toHaveBeenCalledTimes(1);
+    expect(workbenchPreStartupFn2).toHaveBeenCalledTimes(1);
 
     // Expect subsequent startup functions not to have been called.
-    expect(workbenchStartupFn1).toHaveBeenCalledTimes(0);
-    expect(workbenchStartupFn2).toHaveBeenCalledTimes(0);
-    expect(workbenchPostStartupFn1).toHaveBeenCalledTimes(0);
-    expect(workbenchPostStartupFn2).toHaveBeenCalledTimes(0);
+    expect(workbenchStartupFn1a).not.toHaveBeenCalled();
+    expect(workbenchStartupFn1b).not.toHaveBeenCalled();
+    expect(workbenchStartupFn2a).not.toHaveBeenCalled();
+    expect(workbenchStartupFn2b).not.toHaveBeenCalled();
+    expect(workbenchPostStartupFn1).not.toHaveBeenCalled();
+    expect(workbenchPostStartupFn2).not.toHaveBeenCalled();
 
-    // Resolve WORKBENCH_PRE_STARTUP functions.
+    // Resolve PreStartup functions.
     workbenchPreStartupFn1.resolve();
     workbenchPreStartupFn2.resolve();
 
     // Expect startup to still be pending.
     await expectAsync(startup).toBePending();
 
-    // Expect WORKBENCH_STARTUP functions to have been called in parallel.
-    expect(workbenchStartupFn1).toHaveBeenCalledOnceWith();
-    expect(workbenchStartupFn2).toHaveBeenCalledOnceWith();
+    // Expect Startup functions to have been called in parallel.
+    expect(workbenchStartupFn1a).toHaveBeenCalledTimes(1);
+    expect(workbenchStartupFn1b).toHaveBeenCalledTimes(1);
+    expect(workbenchStartupFn2a).toHaveBeenCalledTimes(1);
+    expect(workbenchStartupFn2b).toHaveBeenCalledTimes(1);
 
     // Expect subsequent startup functions not to have been called.
-    expect(workbenchPostStartupFn1).toHaveBeenCalledTimes(0);
-    expect(workbenchPostStartupFn2).toHaveBeenCalledTimes(0);
+    expect(workbenchPostStartupFn1).not.toHaveBeenCalled();
+    expect(workbenchPostStartupFn2).not.toHaveBeenCalled();
 
-    // Resolve WORKBENCH_STARTUP functions.
-    workbenchStartupFn1.resolve();
-    workbenchStartupFn2.resolve();
+    // Resolve Startup functions.
+    workbenchStartupFn1a.resolve();
+    workbenchStartupFn1b.resolve();
+    workbenchStartupFn2a.resolve();
+    workbenchStartupFn2b.resolve();
 
     // Expect startup to still be pending.
     await expectAsync(startup).toBePending();
 
-    // Expect WORKBENCH_POST_STARTUP functions to have been called in parallel.
-    expect(workbenchPostStartupFn1).toHaveBeenCalledOnceWith();
-    expect(workbenchPostStartupFn2).toHaveBeenCalledOnceWith();
+    // Expect PostStartup functions to have been called in parallel.
+    expect(workbenchPostStartupFn1).toHaveBeenCalledTimes(1);
+    expect(workbenchPostStartupFn2).toHaveBeenCalledTimes(1);
 
-    // Resolve WORKBENCH_POST_STARTUP functions.
+    // Resolve PostStartup functions.
     workbenchPostStartupFn2.resolve();
     workbenchPostStartupFn1.resolve();
 
-    // Expect startup to still be resolved.
+    // Expect startup to be resolved.
     await expectAsync(startup).toBeResolved();
   });
 
-  it('should not run microfrontend initializers if microfrontend support is disabled', async () => {
-    // Create initializer function spys.
-    const microfrontendPlatformPreStartupFn = createInitializerSpyFn({debugName: 'microfrontendPlatformPreStartupFn'});
-    microfrontendPlatformPreStartupFn.resolve();
-
-    const microfrontendPlatformPostStartupFn = createInitializerSpyFn({debugName: 'microfrontendPlatformPostStartupFn'});
-    microfrontendPlatformPostStartupFn.resolve();
-
-    // Configure the workbench without microfrontend support.
-    TestBed.configureTestingModule({
-      providers: [
-        provideWorkbenchForTest(),
-        provideMicrofrontendPlatformInitializer(microfrontendPlatformPreStartupFn, {phase: MicrofrontendPlatformStartupPhase.PreStartup}),
-        provideMicrofrontendPlatformInitializer(microfrontendPlatformPostStartupFn, {phase: MicrofrontendPlatformStartupPhase.PostStartup}),
-      ],
-    });
-
-    // Start the workbench.
-    await TestBed.inject(WorkbenchLauncher).launch();
-
-    expect(microfrontendPlatformPreStartupFn).toHaveBeenCalledTimes(0);
-    expect(microfrontendPlatformPostStartupFn).toHaveBeenCalledTimes(0);
-  });
-
-  it('should not run microfrontend initializers if microfrontend support is enabled', async () => {
-    // Create initializer function spys.
-    const microfrontendPlatformPreStartupFn = createInitializerSpyFn({debugName: 'microfrontendPlatformPreStartupFn'});
-    microfrontendPlatformPreStartupFn.resolve();
-
-    const microfrontendPlatformPostStartupFn = createInitializerSpyFn({debugName: 'microfrontendPlatformPostStartupFn'});
-    microfrontendPlatformPostStartupFn.resolve();
-
-    // Configure the workbench without microfrontend support.
-    TestBed.configureTestingModule({
-      providers: [
-        provideWorkbenchForTest({microfrontendPlatform: {applications: []}}),
-        provideMicrofrontendPlatformInitializer(microfrontendPlatformPostStartupFn, {phase: MicrofrontendPlatformStartupPhase.PostStartup}),
-        provideMicrofrontendPlatformInitializer(microfrontendPlatformPreStartupFn, {phase: MicrofrontendPlatformStartupPhase.PreStartup}),
-      ],
-    });
-
-    // Start the workbench.
-    await TestBed.inject(WorkbenchLauncher).launch();
-
-    expect(microfrontendPlatformPreStartupFn).toHaveBeenCalledTimes(1);
-    expect(microfrontendPlatformPostStartupFn).toHaveBeenCalledTimes(1);
-    expect(microfrontendPlatformPreStartupFn).toHaveBeenCalledBefore(microfrontendPlatformPostStartupFn);
-  });
-
-  it('should run "WORKBENCH_PRE_STARTUP" function in injection context', async () => {
+  it('should run PreStartup function in injection context', async () => {
     let injector: Injector | undefined;
 
     TestBed.configureTestingModule({
@@ -305,7 +156,7 @@ describe('Workbench Startup', () => {
     expect(injector).toBeDefined();
   });
 
-  it('should run "WORKBENCH_STARTUP" function in injection context', async () => {
+  it('should run Startup function in injection context', async () => {
     let injector: Injector | undefined;
 
     TestBed.configureTestingModule({
@@ -319,7 +170,7 @@ describe('Workbench Startup', () => {
     expect(injector).toBeDefined();
   });
 
-  it('should run "WORKBENCH_POST_STARTUP" function in injection context', async () => {
+  it('should run PostStartup function in injection context', async () => {
     let injector: Injector | undefined;
 
     TestBed.configureTestingModule({
@@ -333,35 +184,7 @@ describe('Workbench Startup', () => {
     expect(injector).toBeDefined();
   });
 
-  it('should run "MICROFRONTEND_PLATFORM_PRE_STARTUP" function in injection context', async () => {
-    let injector: Injector | undefined;
-
-    TestBed.configureTestingModule({
-      providers: [
-        provideWorkbenchForTest({microfrontendPlatform: {applications: []}}),
-        provideMicrofrontendPlatformInitializer(() => void (injector = inject(Injector)), {phase: MicrofrontendPlatformStartupPhase.PreStartup}),
-      ],
-    });
-
-    await TestBed.inject(WorkbenchLauncher).launch();
-    expect(injector).toBeDefined();
-  });
-
-  it('should run "MICROFRONTEND_PLATFORM_POST_STARTUP" function in injection context', async () => {
-    let injector: Injector | undefined;
-
-    TestBed.configureTestingModule({
-      providers: [
-        provideWorkbenchForTest({microfrontendPlatform: {applications: []}}),
-        provideMicrofrontendPlatformInitializer(() => void (injector = inject(Injector)), {phase: MicrofrontendPlatformStartupPhase.PostStartup}),
-      ],
-    });
-
-    await TestBed.inject(WorkbenchLauncher).launch();
-    expect(injector).toBeDefined();
-  });
-
-  it('should run "WORKBENCH_PRE_STARTUP" function in Angular zone', async () => {
+  it('should run PreStartup function in Angular zone', async () => {
     let insideZone: boolean | undefined;
 
     TestBed.configureTestingModule({
@@ -375,7 +198,7 @@ describe('Workbench Startup', () => {
     expect(insideZone).toBeTrue();
   });
 
-  it('should run "WORKBENCH_STARTUP" function in Angular zone', async () => {
+  it('should run Startup function in Angular zone', async () => {
     let insideZone: boolean | undefined;
 
     TestBed.configureTestingModule({
@@ -389,41 +212,13 @@ describe('Workbench Startup', () => {
     expect(insideZone).toBeTrue();
   });
 
-  it('should run "WORKBENCH_POST_STARTUP" function in Angular zone', async () => {
+  it('should run PostStartup function in Angular zone', async () => {
     let insideZone: boolean | undefined;
 
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest(),
         provideWorkbenchInitializer(() => void (insideZone = NgZone.isInAngularZone()), {phase: WorkbenchStartupPhase.PostStartup}),
-      ],
-    });
-
-    await TestBed.inject(WorkbenchLauncher).launch();
-    expect(insideZone).toBeTrue();
-  });
-
-  it('should run "MICROFRONTEND_PLATFORM_PRE_STARTUP" function in Angular zone', async () => {
-    let insideZone: boolean | undefined;
-
-    TestBed.configureTestingModule({
-      providers: [
-        provideWorkbenchForTest({microfrontendPlatform: {applications: []}}),
-        provideMicrofrontendPlatformInitializer(() => void (insideZone = NgZone.isInAngularZone()), {phase: MicrofrontendPlatformStartupPhase.PreStartup}),
-      ],
-    });
-
-    await TestBed.inject(WorkbenchLauncher).launch();
-    expect(insideZone).toBeTrue();
-  });
-
-  it('should run "MICROFRONTEND_PLATFORM_POST_STARTUP" function in Angular zone', async () => {
-    let insideZone: boolean | undefined;
-
-    TestBed.configureTestingModule({
-      providers: [
-        provideWorkbenchForTest({microfrontendPlatform: {applications: []}}),
-        provideMicrofrontendPlatformInitializer(() => void (insideZone = NgZone.isInAngularZone()), {phase: MicrofrontendPlatformStartupPhase.PostStartup}),
       ],
     });
 
@@ -522,246 +317,6 @@ describe('Workbench Startup', () => {
 
     // Expect error to be logged.
     expect(errors).toContain(jasmine.stringMatching('Failed to load workbench perspective. Caused by:'));
-  });
-
-  // TODO [Angular 21] Remove tests (Legacy Workbench Provider Registration)
-  describe('Legacy Workbench Provider Registration', () => {
-
-    it('should run initializers in following order: WORKBENCH_PRE_STARTUP > WORKBENCH_STARTUP > WORKBENCH_POST_STARTUP', async () => {
-      // Create initializer function spys.
-      const workbenchPreStartupFn1 = createInitializerSpyFn({debugName: 'workbenchPreStartupFn1'});
-      const workbenchPreStartupFn2 = createInitializerSpyFn({debugName: 'workbenchPreStartupFn2'});
-
-      const workbenchStartupFn1 = createInitializerSpyFn({debugName: 'workbenchStartupFn1'});
-      const workbenchStartupFn2 = createInitializerSpyFn({debugName: 'workbenchStartupFn2'});
-
-      const workbenchPostStartupFn1 = createInitializerSpyFn({debugName: 'workbenchPostStartupFn1'});
-      const workbenchPostStartupFn2 = createInitializerSpyFn({debugName: 'workbenchPostStartupFn2'});
-
-      TestBed.configureTestingModule({
-        providers: [
-          provideWorkbenchForTest(),
-          {provide: WORKBENCH_PRE_STARTUP, useValue: workbenchPreStartupFn1, multi: true},
-          {provide: WORKBENCH_STARTUP, useValue: workbenchStartupFn1, multi: true},
-          {provide: WORKBENCH_POST_STARTUP, useValue: workbenchPostStartupFn1, multi: true},
-
-          {provide: WORKBENCH_PRE_STARTUP, useValue: workbenchPreStartupFn2, multi: true},
-          {provide: WORKBENCH_STARTUP, useValue: workbenchStartupFn2, multi: true},
-          {provide: WORKBENCH_POST_STARTUP, useValue: workbenchPostStartupFn2, multi: true},
-        ],
-      });
-
-      // Start the workbench.
-      const startup = TestBed.inject(WorkbenchLauncher).launch();
-      await expectAsync(startup).toBePending();
-
-      // Expect WORKBENCH_PRE_STARTUP functions to have been called in parallel.
-      expect(workbenchPreStartupFn1).toHaveBeenCalledOnceWith();
-      expect(workbenchPreStartupFn2).toHaveBeenCalledOnceWith();
-
-      // Expect subsequent startup functions not to have been called.
-      expect(workbenchStartupFn1).toHaveBeenCalledTimes(0);
-      expect(workbenchStartupFn2).toHaveBeenCalledTimes(0);
-      expect(workbenchPostStartupFn1).toHaveBeenCalledTimes(0);
-      expect(workbenchPostStartupFn2).toHaveBeenCalledTimes(0);
-
-      // Resolve WORKBENCH_PRE_STARTUP functions.
-      workbenchPreStartupFn1.resolve();
-      workbenchPreStartupFn2.resolve();
-
-      // Expect startup to still be pending.
-      await expectAsync(startup).toBePending();
-
-      // Expect WORKBENCH_STARTUP functions to have been called in parallel.
-      expect(workbenchStartupFn1).toHaveBeenCalledOnceWith();
-      expect(workbenchStartupFn2).toHaveBeenCalledOnceWith();
-
-      // Expect subsequent startup functions not to have been called.
-      expect(workbenchPostStartupFn1).toHaveBeenCalledTimes(0);
-      expect(workbenchPostStartupFn2).toHaveBeenCalledTimes(0);
-
-      // Resolve WORKBENCH_STARTUP functions.
-      workbenchStartupFn1.resolve();
-      workbenchStartupFn2.resolve();
-
-      // Expect startup to still be pending.
-      await expectAsync(startup).toBePending();
-
-      // Expect WORKBENCH_POST_STARTUP functions to have been called in parallel.
-      expect(workbenchPostStartupFn1).toHaveBeenCalledOnceWith();
-      expect(workbenchPostStartupFn2).toHaveBeenCalledOnceWith();
-
-      // Resolve WORKBENCH_POST_STARTUP functions.
-      workbenchPostStartupFn2.resolve();
-      workbenchPostStartupFn1.resolve();
-
-      // Expect startup to still be resolved.
-      await expectAsync(startup).toBeResolved();
-    });
-
-    it('should not run microfrontend initializers if microfrontend support is disabled', async () => {
-      // Create initializer function spys.
-      const microfrontendPlatformPreStartupFn = createInitializerSpyFn({debugName: 'microfrontendPlatformPreStartupFn'});
-      microfrontendPlatformPreStartupFn.resolve();
-
-      const microfrontendPlatformPostStartupFn = createInitializerSpyFn({debugName: 'microfrontendPlatformPostStartupFn'});
-      microfrontendPlatformPostStartupFn.resolve();
-
-      // Configure the workbench without microfrontend support.
-      TestBed.configureTestingModule({
-        providers: [
-          provideWorkbenchForTest(),
-          {provide: MICROFRONTEND_PLATFORM_PRE_STARTUP, useValue: microfrontendPlatformPreStartupFn, multi: true},
-          {provide: MICROFRONTEND_PLATFORM_POST_STARTUP, useValue: microfrontendPlatformPostStartupFn, multi: true},
-        ],
-      });
-
-      // Start the workbench.
-      await TestBed.inject(WorkbenchLauncher).launch();
-
-      expect(microfrontendPlatformPreStartupFn).toHaveBeenCalledTimes(0);
-      expect(microfrontendPlatformPostStartupFn).toHaveBeenCalledTimes(0);
-    });
-
-    it('should run "WORKBENCH_PRE_STARTUP" function in injection context', async () => {
-      let injector: Injector | undefined;
-
-      TestBed.configureTestingModule({
-        providers: [
-          provideWorkbenchForTest(),
-          {provide: WORKBENCH_PRE_STARTUP, useValue: () => injector = inject(Injector), multi: true},
-        ],
-      });
-
-      await TestBed.inject(WorkbenchLauncher).launch();
-      expect(injector).toBeDefined();
-    });
-
-    it('should run "WORKBENCH_STARTUP" function in injection context', async () => {
-      let injector: Injector | undefined;
-
-      TestBed.configureTestingModule({
-        providers: [
-          provideWorkbenchForTest(),
-          {provide: WORKBENCH_STARTUP, useValue: () => injector = inject(Injector), multi: true},
-        ],
-      });
-
-      await TestBed.inject(WorkbenchLauncher).launch();
-      expect(injector).toBeDefined();
-    });
-
-    it('should run "WORKBENCH_POST_STARTUP" function in injection context', async () => {
-      let injector: Injector | undefined;
-
-      TestBed.configureTestingModule({
-        providers: [
-          provideWorkbenchForTest(),
-          {provide: WORKBENCH_POST_STARTUP, useValue: () => injector = inject(Injector), multi: true},
-        ],
-      });
-
-      await TestBed.inject(WorkbenchLauncher).launch();
-      expect(injector).toBeDefined();
-    });
-
-    it('should run "MICROFRONTEND_PLATFORM_PRE_STARTUP" function in injection context', async () => {
-      let injector: Injector | undefined;
-
-      TestBed.configureTestingModule({
-        providers: [
-          provideWorkbenchForTest({microfrontendPlatform: {applications: []}}),
-          {provide: MICROFRONTEND_PLATFORM_PRE_STARTUP, useValue: () => injector = inject(Injector), multi: true},
-        ],
-      });
-
-      await TestBed.inject(WorkbenchLauncher).launch();
-      expect(injector).toBeDefined();
-    });
-
-    it('should run "MICROFRONTEND_PLATFORM_POST_STARTUP" function in injection context', async () => {
-      let injector: Injector | undefined;
-
-      TestBed.configureTestingModule({
-        providers: [
-          provideWorkbenchForTest({microfrontendPlatform: {applications: []}}),
-          {provide: MICROFRONTEND_PLATFORM_POST_STARTUP, useValue: () => injector = inject(Injector), multi: true},
-        ],
-      });
-
-      await TestBed.inject(WorkbenchLauncher).launch();
-      expect(injector).toBeDefined();
-    });
-
-    it('should run "WORKBENCH_PRE_STARTUP" function in Angular zone', async () => {
-      let insideZone: boolean | undefined;
-
-      TestBed.configureTestingModule({
-        providers: [
-          provideWorkbenchForTest(),
-          {provide: WORKBENCH_PRE_STARTUP, useValue: () => insideZone = NgZone.isInAngularZone(), multi: true},
-        ],
-      });
-
-      await TestBed.inject(WorkbenchLauncher).launch();
-      expect(insideZone).toBeTrue();
-    });
-
-    it('should run "WORKBENCH_STARTUP" function in Angular zone', async () => {
-      let insideZone: boolean | undefined;
-
-      TestBed.configureTestingModule({
-        providers: [
-          provideWorkbenchForTest(),
-          {provide: WORKBENCH_STARTUP, useValue: () => insideZone = NgZone.isInAngularZone(), multi: true},
-        ],
-      });
-
-      await TestBed.inject(WorkbenchLauncher).launch();
-      expect(insideZone).toBeTrue();
-    });
-
-    it('should run "WORKBENCH_POST_STARTUP" function in Angular zone', async () => {
-      let insideZone: boolean | undefined;
-
-      TestBed.configureTestingModule({
-        providers: [
-          provideWorkbenchForTest(),
-          {provide: WORKBENCH_POST_STARTUP, useValue: () => insideZone = NgZone.isInAngularZone(), multi: true},
-        ],
-      });
-
-      await TestBed.inject(WorkbenchLauncher).launch();
-      expect(insideZone).toBeTrue();
-    });
-
-    it('should run "MICROFRONTEND_PLATFORM_PRE_STARTUP" function in Angular zone', async () => {
-      let insideZone: boolean | undefined;
-
-      TestBed.configureTestingModule({
-        providers: [
-          provideWorkbenchForTest({microfrontendPlatform: {applications: []}}),
-          {provide: MICROFRONTEND_PLATFORM_PRE_STARTUP, useValue: () => insideZone = NgZone.isInAngularZone(), multi: true},
-        ],
-      });
-
-      await TestBed.inject(WorkbenchLauncher).launch();
-      expect(insideZone).toBeTrue();
-    });
-
-    it('should run "MICROFRONTEND_PLATFORM_POST_STARTUP" function in Angular zone', async () => {
-      let insideZone: boolean | undefined;
-
-      TestBed.configureTestingModule({
-        providers: [
-          provideWorkbenchForTest({microfrontendPlatform: {applications: []}}),
-          {provide: MICROFRONTEND_PLATFORM_POST_STARTUP, useValue: () => insideZone = NgZone.isInAngularZone(), multi: true},
-        ],
-      });
-
-      await TestBed.inject(WorkbenchLauncher).launch();
-      expect(insideZone).toBeTrue();
-    });
   });
 });
 

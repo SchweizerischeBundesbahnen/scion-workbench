@@ -10,7 +10,7 @@
 
 import {createEnvironmentInjector, EnvironmentInjector, EnvironmentProviders, inject, Injector, makeEnvironmentProviders} from '@angular/core';
 import {map} from 'rxjs';
-import {provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer.provider';
+import {provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
 import {WorkbenchClient} from '@scion/workbench-client';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {text} from '../../text/text';

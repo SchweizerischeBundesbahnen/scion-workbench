@@ -192,7 +192,7 @@ export abstract class WorkbenchConfig {
    * "SCION Microfrontend Platform DevTools".
    *
    * Typically, the host app provides API to integrated micro apps via the intent mechanism. Consider registering intent handlers
-   * under the DI token {@link MICROFRONTEND_PLATFORM_POST_STARTUP}.
+   * in an initializer function registered via {@link provideMicrofrontendPlatformInitializer}.
    */
   public abstract microfrontendPlatform?: MicrofrontendPlatformConfig | Type<MicrofrontendPlatformConfigLoader>;
 
