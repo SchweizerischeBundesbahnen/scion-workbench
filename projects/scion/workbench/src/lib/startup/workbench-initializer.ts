@@ -13,7 +13,7 @@ import {EnvironmentProviders, InjectionToken, Injector, makeEnvironmentProviders
 /**
  * Registers a function that is executed during the startup of the SCION Workbench.
  *
- * Initializers help to run initialization tasks (synchronous or asynchronous) during startup of the SCION Workbench.
+ * Initializers are used to run initialization tasks during startup of the SCION Workbench.
  * The workbench is fully started once all initializers have completed.
  *
  * Initializers can specify a phase for execution. Initializers in lower phases execute before initializers in higher phases.
@@ -31,17 +31,9 @@ import {EnvironmentProviders, InjectionToken, Injector, makeEnvironmentProviders
  * @return A set of dependency-injection providers to be registered in Angular.
  */
 export function provideWorkbenchInitializer(initializerFn: WorkbenchInitializerFn, options?: WorkbenchInitializerOptions): EnvironmentProviders {
+  const token = WORKBENCH_STARTUP_TOKENS.get(options?.phase ?? WorkbenchStartupPhase.Startup);
   return makeEnvironmentProviders([{
-    provide: (() => {
-      switch (options?.phase) {
-        case WorkbenchStartupPhase.PreStartup:
-          return WORKBENCH_PRE_STARTUP;
-        case WorkbenchStartupPhase.PostStartup:
-          return WORKBENCH_POST_STARTUP;
-        default:
-          return WORKBENCH_STARTUP;
-      }
-    })(),
+    provide: token,
     useValue: initializerFn,
     multi: true,
   }]);
@@ -82,7 +74,7 @@ export enum WorkbenchStartupPhase {
 /**
  * The signature of a function executed during the startup of the SCION Workbench.
  *
- * Initializers help to run initialization tasks (synchronous or asynchronous) during startup of the SCION Workbench.
+ * Initializers are used to run initialization tasks during startup of the SCION Workbench.
  * The workbench is fully started once all initializers have completed.
  *
  * Initializers are registered using the `provideWorkbenchInitializer()` function and can specify a phase for execution.
@@ -96,8 +88,7 @@ export enum WorkbenchStartupPhase {
  *
  * The function can call `inject` to get any required dependencies.
  *
- * ### Example:
- *
+ * @example - Registration of an initializer function
  * ```ts
  * import {provideWorkbench, provideWorkbenchInitializer} from '@scion/workbench';
  * import {bootstrapApplication} from '@angular/platform-browser';
@@ -115,101 +106,23 @@ export enum WorkbenchStartupPhase {
 export type WorkbenchInitializerFn = () => void | Promise<void>;
 
 /**
- * The signature of a class to hook into the startup of the SCION Workbench.
- *
- * The SCION Workbench defines a set of DI tokens called at defined points during startup, enabling the application's controlled initialization.
- *
- * Available DI tokens, in order of execution:
- * - {@link WORKBENCH_PRE_STARTUP}
- * - {@link WORKBENCH_STARTUP}
- * - {@link WORKBENCH_POST_STARTUP}
- *
- * ### Example:
- *
- * ```ts
- * import {provideWorkbench, WORKBENCH_STARTUP, WorkbenchInitializer} from '@scion/workbench';
- * import {bootstrapApplication} from '@angular/platform-browser';
- * import {Injectable} from '@angular/core';
- *
- * @Injectable()
- * export class Initializer implements WorkbenchInitializer {
- *   public async init(): Promise<void> {
- *     // initialize application
- *   }
- * }
- *
- * bootstrapApplication(AppComponent, {
- *   providers: [
- *     provideWorkbench(),
- *     {
- *       provide: WORKBENCH_STARTUP,
- *       multi: true,
- *       useClass: Initializer,
- *     },
- *   ],
- * });
- * ```
- * @see WORKBENCH_PRE_STARTUP
- * @see WORKBENCH_STARTUP
- * @see WORKBENCH_POST_STARTUP
- *
- * @deprecated since version 19.0.0-beta.3. Register an initializer function instead. The function can call `inject` to get required dependencies. See `WorkbenchInitializerFn` for an example. API will be removed in version 21.
+ * Runs workbench initializers in the given phase. Initializer functions can call `inject` to get required dependencies.
  */
-export interface WorkbenchInitializer {
-
-  /**
-   * This method is called during the startup of the SCION Workbench.
-   *
-   * The method can call `inject` to get required dependencies.
-   *
-   * @return A Promise blocking startup until it resolves.
-   */
-  init(): Promise<void>;
-}
-
-/**
- * DI token to register a {@link WorkbenchInitializerFn} as a multi-provider to hook into the startup process of the SCION Workbench.
- *
- * Initializers associated with this DI token are executed before starting the SCION Workbench.
- *
- * @see WorkbenchInitializerFn
- * @deprecated since version 19.0.0-beta.3. Register initializer using `provideWorkbenchInitializer` function. See `provideWorkbenchInitializer` for an example. API will be removed in version 21.
- */
-export const WORKBENCH_PRE_STARTUP = new InjectionToken<WorkbenchInitializerFn | WorkbenchInitializer | object>('WORKBENCH_PRE_STARTUP');
-
-/**
- * DI token to register a {@link WorkbenchInitializerFn} as a multi-provider to hook into the startup process of the SCION Workbench.
- *
- * Initializers associated with this DI token are executed after initializers of {@link WORKBENCH_PRE_STARTUP}.
- *
- * @see WorkbenchInitializerFn
- * @deprecated since version 19.0.0-beta.3. Register initializer using `provideWorkbenchInitializer` function. See `provideWorkbenchInitializer` for an example. API will be removed in version 21.
- */
-export const WORKBENCH_STARTUP = new InjectionToken<WorkbenchInitializerFn | WorkbenchInitializer | object>('WORKBENCH_STARTUP');
-
-/**
- * DI token to register a {@link WorkbenchInitializerFn} as a multi-provider to hook into the startup process of the SCION Workbench.
- *
- * Initializers associated with this DI token are executed after initializers of {@link WORKBENCH_STARTUP}.
- *
- * @see WorkbenchInitializerFn
- * @deprecated since version 19.0.0-beta.3. Register initializer using `provideWorkbenchInitializer` function. See `provideWorkbenchInitializer` for an example. API will be removed in version 21.
- */
-export const WORKBENCH_POST_STARTUP = new InjectionToken<WorkbenchInitializerFn | WorkbenchInitializer | object>('WORKBENCH_POST_STARTUP');
-
-/**
- * Runs workbench initializers associated with the given DI token. Initializer functions can call `inject` to get required dependencies.
- */
-export async function runWorkbenchInitializers(token: InjectionToken<WorkbenchInitializerFn | WorkbenchInitializer | object>, injector: Injector): Promise<void> {
-  const initializers = injector.get(token, [], {optional: true}) as Array<WorkbenchInitializerFn | WorkbenchInitializer | object>;
+export async function runWorkbenchInitializers(phase: WorkbenchStartupPhase, injector: Injector): Promise<void> {
+  const token = WORKBENCH_STARTUP_TOKENS.get(phase)!;
+  const initializers = injector.get<WorkbenchInitializerFn[]>(token, [], {optional: true});
   if (!initializers.length) {
     return;
   }
 
-  // Run and await initializer functions.
-  await Promise.all(initializers
-    .filter((initializer): initializer is WorkbenchInitializerFn | WorkbenchInitializer => typeof initializer === 'function' || typeof (initializer as Partial<WorkbenchInitializer>).init === 'function')
-    .reduce((acc, initializer) => runInInjectionContext(injector, () => {
-      return acc.concat(typeof initializer === 'function' ? initializer() : initializer.init());
-    }), new Array<void | Promise<void>>()));
+  // Run and await initializer functions in parallel.
+  await Promise.all(initializers.map(initializer => runInInjectionContext(injector, initializer)));
 }
+
+/**
+ * Associates Workbench startup phases with Workbench DI tokens.
+ */
+const WORKBENCH_STARTUP_TOKENS = new Map<WorkbenchStartupPhase, InjectionToken<WorkbenchInitializerFn>>()
+  .set(WorkbenchStartupPhase.PreStartup, new InjectionToken<WorkbenchInitializerFn>('WORKBENCH_PRE_STARTUP'))
+  .set(WorkbenchStartupPhase.Startup, new InjectionToken<WorkbenchInitializerFn>('WORKBENCH_STARTUP'))
+  .set(WorkbenchStartupPhase.PostStartup, new InjectionToken<WorkbenchInitializerFn>('WORKBENCH_POST_STARTUP'));

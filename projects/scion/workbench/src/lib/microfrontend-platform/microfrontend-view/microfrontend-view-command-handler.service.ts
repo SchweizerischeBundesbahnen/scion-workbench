@@ -17,7 +17,7 @@ import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {Translatable, ɵWorkbenchCommands} from '@scion/workbench-client';
 import {Subscription} from 'rxjs';
 import {MicrofrontendWorkbenchView} from './microfrontend-workbench-view.model';
-import {provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer.provider';
+import {provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
 import {createRemoteTranslatable} from '../text/remote-text-provider';
 
 @Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)

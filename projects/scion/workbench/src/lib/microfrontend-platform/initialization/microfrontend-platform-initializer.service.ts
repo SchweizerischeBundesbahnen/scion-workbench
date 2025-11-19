@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,8 +13,7 @@ import {CapabilityInterceptor, HostManifestInterceptor, IntentInterceptor, Micro
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Logger, LoggerNames} from '../../logging';
 import {NgZoneObservableDecorator} from './ng-zone-observable-decorator';
-import {MICROFRONTEND_PLATFORM_POST_STARTUP, MICROFRONTEND_PLATFORM_PRE_STARTUP} from '../microfrontend-platform-initializer.provider';
-import {runWorkbenchInitializers} from '../../startup/workbench-initializer';
+import {MicrofrontendPlatformStartupPhase, runMicrofrontendPlatformInitializers} from '../microfrontend-platform-initializer';
 import {MicrofrontendPlatformConfigLoader} from '../microfrontend-platform-config-loader';
 import {MicrofrontendViewIntentHandler} from '../microfrontend-view/microfrontend-view-intent-handler.interceptor';
 import {WorkbenchHostManifestInterceptor} from './workbench-host-manifest-interceptor.service';
@@ -66,8 +65,8 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
       scopeCheckDisabled: true,
     };
 
-    // Inject services registered under {MICROFRONTEND_PLATFORM_PRE_STARTUP} DI token.
-    await runWorkbenchInitializers(MICROFRONTEND_PLATFORM_PRE_STARTUP, this._injector);
+    // Run initializers in `PreStartup` phase.
+    await runMicrofrontendPlatformInitializers(MicrofrontendPlatformStartupPhase.PreStartup, this._injector);
 
     // Register beans of @scion/workbench-client.
     Beans.register(WorkbenchRouter, {useClass: ɵWorkbenchRouter});
@@ -115,10 +114,9 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
       Beans.register(CapabilityInterceptor, {useValue: this._viewCapabilityPreloadCapabilityInterceptor, multi: true});
     }
 
-    // Inject services registered under {MICROFRONTEND_PLATFORM_POST_STARTUP} DI token;
-    // must be done in runlevel 2, i.e., before activator microfrontends are installed.
+    // Run initializers in `PostStartup` phase; must be done in runlevel 2, i.e., before activator microfrontends are installed.
     Beans.registerInitializer({
-      useFunction: () => this._zone.run(() => runWorkbenchInitializers(MICROFRONTEND_PLATFORM_POST_STARTUP, this._injector)),
+      useFunction: () => this._zone.run(() => runMicrofrontendPlatformInitializers(MicrofrontendPlatformStartupPhase.PostStartup, this._injector)),
       runlevel: 2,
     });
 

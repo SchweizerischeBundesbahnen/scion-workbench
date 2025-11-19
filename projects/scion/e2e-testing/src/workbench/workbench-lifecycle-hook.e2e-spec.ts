@@ -17,20 +17,20 @@ test.describe('Workbench Lifecycle Hook', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     await expect.poll(() => consoleLogs.get({severity: 'debug', message: /WorkbenchLifecycleHookLogger/})).toEqual([
-      // WORKBENCH_PRE_STARTUP
-      `[WorkbenchLifecycleHookLogger][WORKBENCH_PRE_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
+      // WorkbenchStartupPhase.PreStartup
+      `[WorkbenchLifecycleHookLogger][WorkbenchStartupPhase.PreStartup] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
 
-      // WORKBENCH_STARTUP
-      `[WorkbenchLifecycleHookLogger][WORKBENCH_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
+      // WorkbenchStartupPhase.Startup
+      `[WorkbenchLifecycleHookLogger][WorkbenchStartupPhase.Startup] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
 
-      // MICROFRONTEND_PLATFORM_PRE_STARTUP
-      `[WorkbenchLifecycleHookLogger][MICROFRONTEND_PLATFORM_PRE_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
+      // MicrofrontendPlatformStartupPhase.PreStartup
+      `[WorkbenchLifecycleHookLogger][MicrofrontendPlatformStartupPhase.PreStartup] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
 
-      // MICROFRONTEND_PLATFORM_POST_STARTUP
-      `[WorkbenchLifecycleHookLogger][MICROFRONTEND_PLATFORM_POST_STARTUP] [microfrontendPlatformState=Starting, workbenchStarted=false]`,
+      // MicrofrontendPlatformStartupPhase.PostStartup
+      `[WorkbenchLifecycleHookLogger][MicrofrontendPlatformStartupPhase.PostStartup] [microfrontendPlatformState=Starting, workbenchStarted=false]`,
 
-      // WORKBENCH_POST_STARTUP
-      `[WorkbenchLifecycleHookLogger][WORKBENCH_POST_STARTUP] [microfrontendPlatformState=Started, workbenchStarted=false]`,
+      // WorkbenchStartupPhase.PostStartup
+      `[WorkbenchLifecycleHookLogger][WorkbenchStartupPhase.PostStartup] [microfrontendPlatformState=Started, workbenchStarted=false]`,
     ]);
   });
 
@@ -38,14 +38,14 @@ test.describe('Workbench Lifecycle Hook', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await expect.poll(() => consoleLogs.get({severity: 'debug', message: /WorkbenchLifecycleHookLogger/})).toEqual([
-      // WORKBENCH_PRE_STARTUP
-      `[WorkbenchLifecycleHookLogger][WORKBENCH_PRE_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
+      // WorkbenchStartupPhase.PreStartup
+      `[WorkbenchLifecycleHookLogger][WorkbenchStartupPhase.PreStartup] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
 
-      // WORKBENCH_STARTUP
-      `[WorkbenchLifecycleHookLogger][WORKBENCH_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
+      // WorkbenchStartupPhase.Startup
+      `[WorkbenchLifecycleHookLogger][WorkbenchStartupPhase.Startup] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
 
-      // WORKBENCH_POST_STARTUP
-      `[WorkbenchLifecycleHookLogger][WORKBENCH_POST_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
+      // WorkbenchStartupPhase.PostStartup
+      `[WorkbenchLifecycleHookLogger][WorkbenchStartupPhase.PostStartup] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
     ]);
   });
 });

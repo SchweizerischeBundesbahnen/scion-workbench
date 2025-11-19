@@ -14,7 +14,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {distinctUntilChanged, map, startWith} from 'rxjs/operators';
 import {tapFirst} from '@scion/toolkit/operators';
-import {provideMicrofrontendPlatformInitializer} from './microfrontend-platform-initializer.provider';
+import {provideMicrofrontendPlatformInitializer} from './microfrontend-platform-initializer';
 
 @Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class ManifestObjectCache {

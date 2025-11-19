@@ -15,7 +15,7 @@ import {WorkbenchCapabilities} from '@scion/workbench-client';
 import {STABLE_CAPABILITY_ID} from '../stable-capability-id-assigner.interceptor';
 import {MicrofrontendPartCapabilityValidator} from './microfrontend-part-capability-validator.interceptor';
 import {provideMicrofrontendPartRoute} from './microfrontend-part-routes';
-import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer.provider';
+import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
 
 /**
  * Provides a set of DI providers registering parts provided as part capabilities.

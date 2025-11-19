@@ -17,7 +17,7 @@ import {MicrofrontendPerspectiveCapabilityMigrator} from './microfrontend-perspe
 import {MicrofrontendPerspectiveCapabilityValidator} from './microfrontend-perspective-capability-validator.interceptor';
 import {WorkbenchCapabilities} from '@scion/workbench-client';
 import {STABLE_CAPABILITY_ID} from '../stable-capability-id-assigner.interceptor';
-import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer.provider';
+import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
 
 /**
  * Provides a set of DI providers registering perspectives provided as perspective capabilities.
