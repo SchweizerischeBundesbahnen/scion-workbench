@@ -18,7 +18,7 @@ import {RouterCommandsComponent} from '../../../router-commands/router-commands.
 import {MultiValueInputComponent} from '../../../multi-value-input/multi-value-input.component';
 import {UUID} from '@scion/toolkit/uuid';
 import {RecordComponent} from '../../../record/record.component';
-import {undefinedIfEmpty} from '../../../common/undefined-if-empty.util';
+import {prune} from '../../../common/prune.util';
 
 @Component({
   selector: 'app-navigate-views',
@@ -64,16 +64,16 @@ export class NavigateViewsComponent implements ControlValueAccessor, Validator {
     this.form.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => {
-        this._cvaChangeFn(this.form.controls.navigations.controls.map(navigationFormGroup => ({
+        this._cvaChangeFn(this.form.controls.navigations.controls.map(navigationFormGroup => prune({
           id: navigationFormGroup.controls.id.value,
           commands: navigationFormGroup.controls.commands.value,
           extras: ({
-            hint: undefinedIfEmpty(navigationFormGroup.controls.extras.controls.hint.value),
+            hint: navigationFormGroup.controls.extras.controls.hint.value || undefined,
             data: navigationFormGroup.controls.extras.controls.data.value,
             state: navigationFormGroup.controls.extras.controls.state.value,
             cssClass: navigationFormGroup.controls.extras.controls.cssClass.value,
           }),
-        })));
+        }, {pruneIfEmpty: true})!));
         this._cvaTouchedFn();
       });
   }

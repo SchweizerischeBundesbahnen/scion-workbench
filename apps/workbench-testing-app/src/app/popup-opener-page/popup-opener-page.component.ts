@@ -10,13 +10,12 @@
 
 import {Component, ElementRef, inject, Type, viewChild} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {DialogId, PartId, PopupId, PopupOrigin, PopupSize, ViewId, WorkbenchPopupService} from '@scion/workbench';
+import {DialogId, PartId, PopupId, PopupOrigin, ViewId, WorkbenchPopupService} from '@scion/workbench';
 import {PopupPageComponent} from '../popup-page/popup-page.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import {map, startWith} from 'rxjs/operators';
 import {Observable} from 'rxjs';
 import BlankTestPageComponent from '../test-pages/blank-test-page/blank-test-page.component';
-import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
 import {PopupPositionLabelPipe, Position} from './popup-position-label.pipe';
 import {stringifyError} from '../common/stringify-error.util';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
@@ -24,11 +23,11 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import InputFieldTestPageComponent from '../test-pages/input-field-test-page/input-field-test-page.component';
 import DialogOpenerPageComponent from '../dialog-opener-page/dialog-opener-page.component';
-import {Dictionaries} from '@scion/toolkit/util';
 import {parseTypedString} from '../common/parse-typed-value.util';
 import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import SizeTestPageComponent from '../test-pages/size-test-page/size-test-page.component';
 import {UUID} from '@scion/toolkit/uuid';
+import {prune} from '../common/prune.util';
 
 @Component({
   selector: 'app-popup-opener-page',
@@ -91,7 +90,7 @@ export default class PopupOpenerPageComponent {
     this.popupError = undefined;
     this.returnValue = undefined;
 
-    await this._popupService.open<string>({
+    await this._popupService.open<string>(prune({
       component: this.parsePopupComponentInput(),
       input: this.form.controls.input.value || undefined,
       anchor: this.form.controls.anchor.controls.position.value === 'element' ? this._openButton() : this._popupOrigin$,
@@ -101,16 +100,16 @@ export default class PopupOpenerPageComponent {
         onFocusLost: this.form.controls.closeStrategy.controls.onFocusLost.value,
         onEscape: this.form.controls.closeStrategy.controls.onEscape.value,
       },
-      size: undefinedIfEmpty(Dictionaries.withoutUndefinedEntries({
+      size: {
         width: this.form.controls.size.controls.width.value || undefined,
         height: this.form.controls.size.controls.height.value || undefined,
         minWidth: this.form.controls.size.controls.minWidth.value || undefined,
         maxWidth: this.form.controls.size.controls.maxWidth.value || undefined,
         minHeight: this.form.controls.size.controls.minHeight.value || undefined,
         maxHeight: this.form.controls.size.controls.maxHeight.value || undefined,
-      } satisfies PopupSize)),
+      },
       context: parseTypedString(this.form.controls.context.value, {undefinedIfEmpty: true}),
-    })
+    }, {pruneIfEmpty: true})!)
       .then(result => this.returnValue = result)
       .catch((error: unknown) => this.popupError = stringifyError(error) || 'Workbench Popup was closed with an error');
   }

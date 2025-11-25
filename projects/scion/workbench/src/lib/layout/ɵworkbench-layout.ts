@@ -25,6 +25,7 @@ import {Objects} from '../common/objects.util';
 import {RequireOne} from '../common/utility-types';
 import {readCssVariable} from '../common/dom.util';
 import {ActivationInstantProvider} from '../activation-instant.provider';
+import {prune} from '../common/prune.util';
 
 /**
  * @inheritDoc
@@ -1026,7 +1027,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       this._navigationStates.delete(part.id);
     }
 
-    part.navigation = Objects.withoutUndefinedEntries({
+    part.navigation = prune({
       id: UID.randomUID(),
       hint: extras?.hint,
       data: extras?.data,
@@ -1119,7 +1120,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       this._navigationStates.delete(view.id);
     }
 
-    view.navigation = Objects.withoutUndefinedEntries({
+    view.navigation = prune({
       id: UID.randomUID(),
       hint: extras?.hint,
       data: extras?.data,
