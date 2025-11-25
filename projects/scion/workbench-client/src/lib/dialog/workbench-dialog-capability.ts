@@ -21,8 +21,7 @@ import {Translatable} from '../text/workbench-text-provider.model';
  * Displayed on top of other content, a modal dialog blocks interaction with other parts of the application. A dialog can be context-modal
  * or application-modal. Dialogs are stacked per modality, with only the topmost dialog in each stack being interactive.
  *
- * The microfrontend can inject the {@link WorkbenchDialog} handle to interact with the dialog, such as setting the title, reading
- * parameters, or closing it.
+ * The microfrontend can inject the {@link WorkbenchDialog} handle to interact with the dialog.
  *
  * Dialogs provided by the workbench host application have a footer and resize to fit content. See the documentation of `WorkbenchDialogService`
  * in `@scion/workbench` for more information on adding actions to the footer.

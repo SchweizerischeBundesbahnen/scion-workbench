@@ -49,8 +49,7 @@ export abstract class WorkbenchDialogService {
    * @param qualifier - Identifies the dialog capability that provides the microfrontend to open in a dialog.
    * @param options - Controls the appearance and behavior of the dialog.
    * @returns Promise that resolves to the dialog result, if any, or that rejects if the dialog was closed with an error or couldn't be opened,
-   *          e.g., because of missing the intention or because no `dialog` capability matching the qualifier and visible to the application
-   *          was found.
+   *          e.g., because of missing the intention or because no `dialog` capability was found matching the qualifier and is visible to the application.
    *
    * @see WorkbenchDialogCapability
    * @see WorkbenchDialog
