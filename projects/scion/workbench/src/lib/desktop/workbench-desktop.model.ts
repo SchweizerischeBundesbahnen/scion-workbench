@@ -26,6 +26,7 @@ export class WorkbenchDesktop {
 
   private createPortal(): WbComponentPortal<DesktopSlotComponent> {
     return new WbComponentPortal(DesktopSlotComponent, {
+      debugName: 'DesktopSlotComponent',
       providers: [
         {provide: WorkbenchDesktop, useValue: this},
       ],

@@ -110,6 +110,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
    */
   private createPortal(): WbComponentPortal<ViewSlotComponent> {
     return new WbComponentPortal(ViewSlotComponent, {
+      debugName: `ViewSlotComponent [${this.id}]`,
       providers: [
         {provide: ɵWorkbenchView, useValue: this},
         {provide: WorkbenchView, useExisting: ɵWorkbenchView},
