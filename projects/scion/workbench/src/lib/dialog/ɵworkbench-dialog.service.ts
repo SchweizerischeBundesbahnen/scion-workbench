@@ -53,7 +53,7 @@ export class ɵWorkbenchDialogService implements WorkbenchDialogService {
     }
 
     // Create the dialog.
-    const dialog = this.createDialog<R>(component, invocationContext, options ?? {});
+    const dialog = this.createDialog(component, invocationContext, options ?? {});
     this._dialogRegistry.register(dialog.id, dialog);
 
     // Capture focused element to restore focus when closing the dialog.
@@ -74,7 +74,7 @@ export class ɵWorkbenchDialogService implements WorkbenchDialogService {
   /**
    * Creates the dialog handle.
    */
-  private createDialog<R>(component: ComponentType<unknown>, invocationContext: WorkbenchInvocationContext | null, options: WorkbenchDialogOptions): ɵWorkbenchDialog<R> {
+  private createDialog(component: ComponentType<unknown>, invocationContext: WorkbenchInvocationContext | null, options: WorkbenchDialogOptions): ɵWorkbenchDialog {
     // Construct the handle in an injection context that shares the dialog's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
     const dialogId = computeDialogId();
     const dialogInjector = Injector.create({
@@ -82,7 +82,7 @@ export class ɵWorkbenchDialogService implements WorkbenchDialogService {
       providers: [],
       name: `Workbench Dialog ${dialogId}`,
     });
-    return runInInjectionContext(dialogInjector, () => new ɵWorkbenchDialog<R>(dialogId, component, invocationContext, options));
+    return runInInjectionContext(dialogInjector, () => new ɵWorkbenchDialog(dialogId, component, invocationContext, options));
   }
 
   /**

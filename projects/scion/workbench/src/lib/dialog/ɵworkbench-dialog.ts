@@ -38,7 +38,7 @@ import {provideContextAwareServices} from '../context-aware-service-provider';
 import {WorkbenchInvocationContext} from '../invocation-context/invocation-context';
 
 /** @inheritDoc */
-export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Blockable, Blocking {
+export class ɵWorkbenchDialog implements WorkbenchDialog, Blockable, Blocking {
 
   /** Injector for the dialog; destroyed when the dialog is closed. */
   public readonly injector = inject(Injector) as DestroyableInjector;
@@ -56,7 +56,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   private readonly _cssClass = signal<string[]>([]);
 
   /** Result (or error) to be passed to the dialog opener. */
-  private _result: R | Error | undefined;
+  private _result: unknown | Error | undefined;
   private _componentRef = signal<ComponentRef<WorkbenchDialogComponent> | undefined>(undefined);
 
   public readonly blockedBy: Signal<ɵWorkbenchDialog | null>;
@@ -94,7 +94,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   /**
    * Waits for the dialog to close, resolving to its result or rejecting if closed with an error.
    */
-  public async waitForClose(): Promise<R | undefined> {
+  public async waitForClose<R>(): Promise<R | undefined> {
     // Wait for the overlay to be initially positioned to have a smooth slide-in animation.
     if (this.animate) {
       await firstValueFrom(fromResize$(this._overlayRef.hostElement));
@@ -113,13 +113,13 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
     // Wait for the dialog to close, resolving to its result or rejecting if closed with an error.
     return new Promise<R | undefined>((resolve, reject) => {
       this.injector.get(DestroyRef).onDestroy(() => {
-        this._result instanceof Error ? reject(this._result) : resolve(this._result);
+        this._result instanceof Error ? reject(this._result) : resolve(this._result as R);
       });
     });
   }
 
   /** @inheritDoc */
-  public close(result?: R | Error): void {
+  public close<R>(result?: R | Error): void {
     assertNotInReactiveContext(this.close, 'Call WorkbenchDialog.close() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
     // Prevent closing if blocked.

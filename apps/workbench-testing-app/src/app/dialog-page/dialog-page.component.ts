@@ -36,7 +36,7 @@ export class DialogPageComponent {
 
   private readonly _formBuilder = inject(NonNullableFormBuilder);
 
-  protected readonly dialog = inject(WorkbenchDialog) as WorkbenchDialog<string>;
+  protected readonly dialog = inject(WorkbenchDialog);
   protected readonly uuid = UUID.randomUUID();
 
   protected readonly form = this._formBuilder.group({

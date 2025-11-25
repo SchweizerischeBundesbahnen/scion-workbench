@@ -47,7 +47,7 @@ export default class DialogPageComponent {
   private readonly _formBuilder = inject(NonNullableFormBuilder);
 
   protected readonly route = inject(ActivatedRoute);
-  protected readonly dialog = inject<WorkbenchDialog<string>>(WorkbenchDialog);
+  protected readonly dialog = inject(WorkbenchDialog);
   protected readonly uuid = UUID.randomUUID();
   protected readonly focused = toSignal(inject(WorkbenchDialog).focused$, {initialValue: true});
 
