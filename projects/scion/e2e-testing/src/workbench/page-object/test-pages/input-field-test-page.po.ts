@@ -90,10 +90,11 @@ export class InputFieldTestPagePO implements WorkbenchViewPagePO, WorkbenchDialo
   public static async openInPopup(appPO: AppPO, workbenchNavigator: WorkbenchNavigator, popupOptions?: {closeOnFocusLost?: boolean}): Promise<InputFieldTestPagePO> {
     // Open the popup.
     const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-    await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: popupOptions?.closeOnFocusLost});
-    await popupOpenerPage.enterCssClass('input-field-test-page');
-    await popupOpenerPage.selectPopupComponent('input-field-test-page');
-    await popupOpenerPage.open();
+    await popupOpenerPage.open('input-field-test-page', {
+      anchor: 'element',
+      closeStrategy: {onFocusLost: popupOptions?.closeOnFocusLost},
+      cssClass: 'input-field-test-page',
+    });
 
     // Create the page object.
     const popup = appPO.popup({cssClass: 'input-field-test-page'});

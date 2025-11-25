@@ -6,42 +6,82 @@
       </sci-form-field>
     </section>
 
-    @if (popup.input) {
+    @if (input()) {
       <section>
-        <header>Input Data</header>
-        <output class="input e2e-input">
-          {{popup.input}}
-        </output>
+        <header>Input</header>
+        <output class="e2e-input">{{input()}}</output>
       </section>
     }
 
-    <section>
-      <header>Component Size</header>
+    <!-- Input of legacy Workbench Popup API -->
+    @if (legacyPopup.input) {
+      <section>
+        <header>Input (Legacy)</header>
+        <output class="e2e-input">{{legacyPopup.input}}</output>
+      </section>
+    }
 
-      <sci-form-field label="Min Height">
-        <input [formControl]="form.controls.minHeight" class="e2e-min-height">
-      </sci-form-field>
+    <sci-accordion class="e2e-component-size" variant="solid">
+      <ng-template sciAccordionItem [panel]="panel_component_size">
+        <header>Component Size</header>
+      </ng-template>
+      <ng-template #panel_component_size>
+        <sci-form-field label="Height">
+          <input [formControl]="form.controls.componentSize.controls.height" class="e2e-height">
+        </sci-form-field>
 
-      <sci-form-field label="Height">
-        <input [formControl]="form.controls.height" class="e2e-height">
-      </sci-form-field>
+        <sci-form-field label="Width">
+          <input [formControl]="form.controls.componentSize.controls.width" class="e2e-width">
+        </sci-form-field>
 
-      <sci-form-field label="Max Height">
-        <input [formControl]="form.controls.maxHeight" class="e2e-max-height">
-      </sci-form-field>
+        <sci-form-field label="Min Height">
+          <input [formControl]="form.controls.componentSize.controls.minHeight" class="e2e-min-height">
+        </sci-form-field>
 
-      <sci-form-field label="Min Width">
-        <input [formControl]="form.controls.minWidth" class="e2e-min-width">
-      </sci-form-field>
+        <sci-form-field label="Max Height">
+          <input [formControl]="form.controls.componentSize.controls.maxHeight" class="e2e-max-height">
+        </sci-form-field>
 
-      <sci-form-field label="Width">
-        <input [formControl]="form.controls.width" class="e2e-width">
-      </sci-form-field>
+        <sci-form-field label="Min Width">
+          <input [formControl]="form.controls.componentSize.controls.minWidth" class="e2e-min-width">
+        </sci-form-field>
 
-      <sci-form-field label="Max Width">
-        <input [formControl]="form.controls.maxWidth" class="e2e-max-width">
-      </sci-form-field>
-    </section>
+        <sci-form-field label="Max Width">
+          <input [formControl]="form.controls.componentSize.controls.maxWidth" class="e2e-max-width">
+        </sci-form-field>
+      </ng-template>
+    </sci-accordion>
+
+    <sci-accordion class="e2e-popup-size" variant="solid">
+      <ng-template sciAccordionItem [panel]="panel_popup_size">
+        <header>Popup Size</header>
+      </ng-template>
+      <ng-template #panel_popup_size>
+        <sci-form-field label="Height">
+          <input [formControl]="form.controls.popupSize.controls.height" class="e2e-height">
+        </sci-form-field>
+
+        <sci-form-field label="Width">
+          <input [formControl]="form.controls.popupSize.controls.width" class="e2e-width">
+        </sci-form-field>
+
+        <sci-form-field label="Min Height">
+          <input [formControl]="form.controls.popupSize.controls.minHeight" class="e2e-min-height">
+        </sci-form-field>
+
+        <sci-form-field label="Max Height">
+          <input [formControl]="form.controls.popupSize.controls.maxHeight" class="e2e-max-height">
+        </sci-form-field>
+
+        <sci-form-field label="Min Width">
+          <input [formControl]="form.controls.popupSize.controls.minWidth" class="e2e-min-width">
+        </sci-form-field>
+
+        <sci-form-field label="Max Width">
+          <input [formControl]="form.controls.popupSize.controls.maxWidth" class="e2e-max-width">
+        </sci-form-field>
+      </ng-template>
+    </sci-accordion>
 
     <sci-accordion class="return-value e2e-return-value" variant="solid">
       <ng-template sciAccordionItem [panel]="panel_return_value">

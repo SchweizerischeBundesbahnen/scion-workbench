@@ -1554,10 +1554,11 @@ test.describe('Focus Tracker', () => {
 
     // TEST: Open popup.
     const popupOpener = new PopupOpenerPagePO(appPO.view({viewId: 'view.1'}));
-    await popupOpener.selectPopupComponent('focus-test-page');
-    await popupOpener.enterCssClass('testee');
-    await popupOpener.enterCloseStrategy({closeOnFocusLost: false});
-    await popupOpener.open();
+    await popupOpener.open('focus-test-page', {
+      anchor: 'element',
+      closeStrategy: {onFocusLost: false},
+      cssClass: 'testee',
+    });
 
     const popupPage = new FocusTestPagePO(appPO.popup({cssClass: 'testee'}));
     const popupId = await popupPage.popup.getPopupId();
@@ -1604,10 +1605,11 @@ test.describe('Focus Tracker', () => {
 
     // Open popup.
     const popupOpener = new PopupOpenerPagePO(appPO.view({viewId: 'view.1'}));
-    await popupOpener.selectPopupComponent('focus-test-page');
-    await popupOpener.enterCssClass('testee');
-    await popupOpener.enterCloseStrategy({closeOnFocusLost: false});
-    await popupOpener.open();
+    await popupOpener.open('focus-test-page', {
+      anchor: 'element',
+      closeStrategy: {onFocusLost: false},
+      cssClass: 'testee',
+    });
 
     const popupPage = new FocusTestPagePO(appPO.popup({cssClass: 'testee'}));
     const popupId = await popupPage.popup.getPopupId();

@@ -9,8 +9,9 @@
  */
 
 export {WorkbenchPopupService} from './workbench-popup.service';
-export {WorkbenchPopupService as PopupService} from './workbench-popup.service'; // Legacy support
-export {PopupConfig, type CloseStrategy, type PopupSize} from './popup.config';
+export {PopupService} from './popup.service';
+export {PopupConfig} from './popup.config';
 export {type Point, type TopLeftPoint, type TopRightPoint, type BottomLeftPoint, type BottomRightPoint, type PopupOrigin} from './popup.origin';
-export {WorkbenchPopup} from './workbench-popup';
-export {WorkbenchPopup as Popup} from './workbench-popup'; // Legacy support
+export {WorkbenchPopup, type WorkbenchPopupSize} from './workbench-popup';
+export {Popup} from './popup';
+export {type WorkbenchPopupOptions, type CloseStrategy} from './workbench-popup.options';

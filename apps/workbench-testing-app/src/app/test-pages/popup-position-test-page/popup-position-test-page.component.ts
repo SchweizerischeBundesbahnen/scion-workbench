@@ -36,9 +36,6 @@ export default class PopupPositionTestPageComponent {
   private _openButton = viewChild.required<ElementRef<HTMLButtonElement>>('open_button');
 
   protected onOpen(): void {
-    void this._popupService.open<string>({
-      component: BlankTestPageComponent,
-      anchor: this._openButton(),
-    });
+    void this._popupService.open<string>(BlankTestPageComponent, {anchor: this._openButton()});
   }
 }
