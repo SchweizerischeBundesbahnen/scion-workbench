@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, inject, input} from '@angular/core';
+import {Component, inject, input} from '@angular/core';
 import {WorkbenchDialog, WorkbenchDialogActionDirective} from '@scion/workbench';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {UUID} from '@scion/toolkit/uuid';
@@ -29,6 +29,10 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
     SciCheckboxComponent,
     WorkbenchDialogActionDirective,
   ],
+  host: {
+    '[style.height]': 'form.controls.componentSize.controls.height.value',
+    '[style.width]': 'form.controls.componentSize.controls.width.value',
+  },
 })
 export class DialogPageComponent {
 
@@ -42,14 +46,14 @@ export class DialogPageComponent {
   protected readonly form = this._formBuilder.group({
     title: this._formBuilder.control(''),
     dialogSize: new FormGroup({
-      minHeight: this._formBuilder.control(''),
       height: this._formBuilder.control(''),
+      width: this._formBuilder.control(''),
+      minHeight: this._formBuilder.control(''),
       maxHeight: this._formBuilder.control(''),
       minWidth: this._formBuilder.control(''),
-      width: this._formBuilder.control(''),
       maxWidth: this._formBuilder.control(''),
     }),
-    contentSize: new FormGroup({
+    componentSize: new FormGroup({
       height: this._formBuilder.control(''),
       width: this._formBuilder.control(''),
     }),
@@ -63,16 +67,6 @@ export class DialogPageComponent {
     closeWithError: this._formBuilder.control(false),
     result: this._formBuilder.control(''),
   });
-
-  @HostBinding('style.--ɵapp-dialog-page-height')
-  protected get height(): string | undefined {
-    return this.form.controls.contentSize.controls.height.value || undefined;
-  }
-
-  @HostBinding('style.--ɵapp-dialog-page-width')
-  protected get width(): string | undefined {
-    return this.form.controls.contentSize.controls.width.value || undefined;
-  }
 
   constructor() {
     this.installPropertyUpdater();

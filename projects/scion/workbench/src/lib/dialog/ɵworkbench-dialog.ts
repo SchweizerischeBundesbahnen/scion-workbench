@@ -10,7 +10,7 @@
 
 import {BehaviorSubject, concatWith, delay, firstValueFrom, of, Subject, switchMap} from 'rxjs';
 import {assertNotInReactiveContext, ComponentRef, computed, DestroyableInjector, DestroyRef, effect, inject, Injector, Signal, signal, untracked} from '@angular/core';
-import {WorkbenchDialog, WorkbenchDialogSize, ɵWorkbenchDialogSize} from './workbench-dialog';
+import {WorkbenchDialog, WorkbenchDialogSize} from './workbench-dialog';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
 import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
 import {Overlay, OverlayRef} from '@angular/cdk/overlay';
@@ -407,5 +407,76 @@ export class ɵWorkbenchDialog implements WorkbenchDialog, Blockable, Blocking {
       this.injector.destroy();
       this._overlayRef.dispose();
     }
+  }
+}
+
+/** @inheritDoc */
+class ɵWorkbenchDialogSize implements WorkbenchDialogSize {
+
+  private readonly _height = signal<string | undefined>(undefined);
+  private readonly _width = signal<string | undefined>(undefined);
+  private readonly _minHeight = signal<string | undefined>(undefined);
+  private readonly _maxHeight = signal<string | undefined>(undefined);
+  private readonly _minWidth = signal<string | undefined>(undefined);
+  private readonly _maxWidth = signal<string | undefined>(undefined);
+
+  /** @inheritDoc */
+  public get height(): Signal<string | undefined> {
+    return this._height;
+  }
+
+  /** @inheritDoc */
+  public set height(height: string | undefined) {
+    untracked(() => this._height.set(height));
+  }
+
+  /** @inheritDoc */
+  public get width(): Signal<string | undefined> {
+    return this._width;
+  }
+
+  /** @inheritDoc */
+  public set width(width: string | undefined) {
+    untracked(() => this._width.set(width));
+  }
+
+  /** @inheritDoc */
+  public get minHeight(): Signal<string | undefined> {
+    return this._minHeight;
+  }
+
+  /** @inheritDoc */
+  public set minHeight(minHeight: string | undefined) {
+    untracked(() => this._minHeight.set(minHeight));
+  }
+
+  /** @inheritDoc */
+  public get maxHeight(): Signal<string | undefined> {
+    return this._maxHeight;
+  }
+
+  /** @inheritDoc */
+  public set maxHeight(maxHeight: string | undefined) {
+    untracked(() => this._maxHeight.set(maxHeight));
+  }
+
+  /** @inheritDoc */
+  public get minWidth(): Signal<string | undefined> {
+    return this._minWidth;
+  }
+
+  /** @inheritDoc */
+  public set minWidth(minWidth: string | undefined) {
+    untracked(() => this._minWidth.set(minWidth));
+  }
+
+  /** @inheritDoc */
+  public get maxWidth(): Signal<string | undefined> {
+    return this._maxWidth;
+  }
+
+  /** @inheritDoc */
+  public set maxWidth(maxWidth: string | undefined) {
+    untracked(() => this._maxWidth.set(maxWidth));
   }
 }

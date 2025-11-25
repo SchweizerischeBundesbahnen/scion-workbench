@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, inject} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {WorkbenchMessageBox} from '@scion/workbench-client';
 import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
@@ -39,6 +39,10 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
     SciAccordionItemDirective,
     SciKeyValueComponent,
   ],
+  host: {
+    '[style.height]': 'form.controls.height.value',
+    '[style.width]': 'form.controls.width.value',
+  },
 })
 export default class HostMessageBoxPageComponent {
 
@@ -52,14 +56,4 @@ export default class HostMessageBoxPageComponent {
     height: this._formBuilder.control(''),
     width: this._formBuilder.control(''),
   });
-
-  @HostBinding('style.width')
-  protected get width(): string {
-    return this.form.controls.width.value;
-  }
-
-  @HostBinding('style.height')
-  protected get height(): string {
-    return this.form.controls.height.value;
-  }
 }

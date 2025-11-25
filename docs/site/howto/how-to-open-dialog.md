@@ -154,7 +154,7 @@ const result = await dialogService.open(YourDialogComponent);
 ```
 
 ### How to Size the Dialog
-The dialog handle can be used to specify a preferred size, displaying scrollbar(s) if the component overflows. If no size is specified, the dialog has the size of the component.
+By default, the dialog adapts its size to the component size. Configure size constraints using the `WorkbenchDialog` handle.
 
 ```ts
 import {inject} from '@angular/core';

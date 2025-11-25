@@ -8,12 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, inject} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {WorkbenchDialog} from '@scion/workbench-client';
 import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
+import {FormGroup, FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {AsyncPipe, JsonPipe} from '@angular/common';
 import {SciKeyValueComponent} from '@scion/components.internal/key-value';
@@ -44,6 +44,10 @@ import {WorkbenchDialogActionDirective} from '@scion/workbench';
     SciCheckboxComponent,
     WorkbenchDialogActionDirective,
   ],
+  host: {
+    '[style.height]': 'form.controls.componentSize.controls.height.value',
+    '[style.width]': 'form.controls.componentSize.controls.width.value',
+  },
 })
 export default class HostDialogPageComponent {
 
@@ -55,21 +59,13 @@ export default class HostDialogPageComponent {
 
   protected readonly form = this._formBuilder.group({
     title: this._formBuilder.control(''),
-    height: this._formBuilder.control(''),
-    width: this._formBuilder.control(''),
+    componentSize: new FormGroup({
+      height: this._formBuilder.control(''),
+      width: this._formBuilder.control(''),
+    }),
     closeWithError: this._formBuilder.control(false),
     result: this._formBuilder.control(''),
   });
-
-  @HostBinding('style.width')
-  protected get width(): string {
-    return this.form.controls.width.value;
-  }
-
-  @HostBinding('style.height')
-  protected get height(): string {
-    return this.form.controls.height.value;
-  }
 
   constructor() {
     this.form.controls.title.valueChanges

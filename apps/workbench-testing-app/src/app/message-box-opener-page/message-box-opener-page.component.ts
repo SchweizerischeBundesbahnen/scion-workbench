@@ -79,7 +79,7 @@ export default class MessageBoxOpenerPageComponent {
     };
 
     if (this.isUseComponent()) {
-      return this._messageBoxService.open(this.parseComponentFromUI(), options);
+      return this._messageBoxService.open(this.readComponentFromUI(), options);
     }
     else {
       const message = parseTypedString<Translatable>(this.restoreLineBreaks(this.form.controls.message.value)) ?? null;
@@ -87,7 +87,7 @@ export default class MessageBoxOpenerPageComponent {
     }
   }
 
-  private parseComponentFromUI(): Type<unknown> {
+  private readComponentFromUI(): Type<unknown> {
     switch (this.form.controls.component.value) {
       case 'message-box-page':
         return MessageBoxPageComponent;

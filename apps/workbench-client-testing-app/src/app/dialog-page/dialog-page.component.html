@@ -17,11 +17,11 @@
     </ng-template>
     <ng-template #panel_size>
       <sci-form-field label="Height">
-        <input [formControl]="form.controls.height" class="e2e-height">
+        <input [formControl]="form.controls.componentSize.controls.height" class="e2e-height">
       </sci-form-field>
 
       <sci-form-field label="Width">
-        <input [formControl]="form.controls.width" class="e2e-width">
+        <input [formControl]="form.controls.componentSize.controls.width" class="e2e-width">
       </sci-form-field>
     </ng-template>
   </sci-accordion>
