@@ -19,11 +19,13 @@ import {PopupPO} from '../../popup.po';
 import {WorkbenchDialogOptions} from '@scion/workbench';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
 import {PartPO} from '../../part.po';
+import {WorkbenchDialogPagePO} from './workbench-dialog-page.po';
+import {WorkbenchPopupPagePO} from './workbench-popup-page.po';
 
 /**
  * Page object to interact with {@link DialogOpenerPageComponent}.
  */
-export class DialogOpenerPagePO implements WorkbenchViewPagePO {
+export class DialogOpenerPagePO implements WorkbenchViewPagePO, WorkbenchDialogPagePO, WorkbenchPopupPagePO {
 
   public readonly locator: Locator;
   public readonly returnValue: Locator;
@@ -37,45 +39,12 @@ export class DialogOpenerPagePO implements WorkbenchViewPagePO {
     this.openButton = this.locator.locator('button.e2e-open');
   }
 
-  public get view(): ViewPO {
-    if (this._locateBy instanceof ViewPO) {
-      return this._locateBy;
-    }
-    else {
-      throw Error('[PageObjectError] Test page not opened in a view.');
-    }
-  }
-
-  public get part(): PartPO {
-    if (this._locateBy instanceof PartPO) {
-      return this._locateBy;
-    }
-    else {
-      throw Error('[PageObjectError] Test page not opened in a part.');
-    }
-  }
-
-  public get popup(): PopupPO {
-    if (this._locateBy instanceof PopupPO) {
-      return this._locateBy;
-    }
-    else {
-      throw Error('[PageObjectError] Test page not opened in a popup.');
-    }
-  }
-
-  public get dialog(): DialogPO {
-    if (this._locateBy instanceof DialogPO) {
-      return this._locateBy;
-    }
-    else {
-      throw Error('[PageObjectError] Test page not opened in a dialog.');
-    }
-  }
-
   public async open(component: 'dialog-page' | 'dialog-opener-page' | 'popup-opener-page' | 'focus-test-page' | 'input-field-test-page' | 'size-test-page', options?: WorkbenchDialogOptions & DialogOpenerPageOptions): Promise<void> {
     if (options?.injector) {
       throw Error('[PageObjectError] PageObject does not support the option `injector`.');
+    }
+    if (options?.providers) {
+      throw Error('[PageObjectError] PageObject does not support the option `providers`.');
     }
 
     await this.locator.locator('select.e2e-component').selectOption(component);
@@ -130,6 +99,42 @@ export class DialogOpenerPagePO implements WorkbenchViewPagePO {
     for (let i = 0; i < (options?.count ?? 1); i++) {
       const dialog = new AppPO(this.locator.page()).dialog({cssClass: [`index-${i}`].concat(cssClasses)});
       await dialog.locator.waitFor({state: 'attached'});
+    }
+  }
+
+  public get view(): ViewPO {
+    if (this._locateBy instanceof ViewPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a view.');
+    }
+  }
+
+  public get part(): PartPO {
+    if (this._locateBy instanceof PartPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a part.');
+    }
+  }
+
+  public get popup(): PopupPO {
+    if (this._locateBy instanceof PopupPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a popup.');
+    }
+  }
+
+  public get dialog(): DialogPO {
+    if (this._locateBy instanceof DialogPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a dialog.');
     }
   }
 }

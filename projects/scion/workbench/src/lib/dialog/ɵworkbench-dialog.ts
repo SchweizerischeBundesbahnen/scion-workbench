@@ -260,6 +260,7 @@ export class ɵWorkbenchDialog implements WorkbenchDialog, Blockable, Blocking {
         {provide: WorkbenchDialog, useExisting: ɵWorkbenchDialog},
         {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchDialog},
         provideContextAwareServices(),
+        ...this._options.providers ?? [],
       ],
     });
     inject(DestroyRef).onDestroy(() => injector.destroy());
