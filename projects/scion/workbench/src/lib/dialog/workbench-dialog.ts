@@ -19,7 +19,7 @@ import {DialogId} from '../workbench.identifiers';
  *
  * Dialog inputs are available as input properties in the dialog component.
  */
-export abstract class WorkbenchDialog<R = unknown> {
+export abstract class WorkbenchDialog {
 
   /**
    * Unique identity of this dialog.
@@ -75,7 +75,7 @@ export abstract class WorkbenchDialog<R = unknown> {
   /**
    * Closes the dialog. Optionally, pass a result or an error to the dialog opener.
    */
-  public abstract close(result?: R | Error): void;
+  public abstract close<R>(result?: R | Error): void;
 }
 
 /**

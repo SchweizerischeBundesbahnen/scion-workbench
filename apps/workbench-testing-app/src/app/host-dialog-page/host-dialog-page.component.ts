@@ -50,7 +50,7 @@ export default class HostDialogPageComponent {
   private readonly _formBuilder = inject(NonNullableFormBuilder);
 
   protected readonly route = inject(ActivatedRoute);
-  protected readonly dialog = inject(WorkbenchDialog) as WorkbenchDialog<string>;
+  protected readonly dialog = inject(WorkbenchDialog);
   protected readonly uuid = UUID.randomUUID();
 
   protected readonly form = this._formBuilder.group({
