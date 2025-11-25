@@ -89,7 +89,7 @@ inject(WorkbenchMessageBoxService).open('Lorem ipsum dolor sit amet.', {
 ```
 
 ### How to Set the Severity of a Message Box
-A message can be displayed as info, warning or alert. The severity can be set via the options object.
+A message can be displayed as info, warning or error. The severity can be set via the options object.
 
 ```ts
 import {inject} from '@angular/core';

@@ -15,14 +15,14 @@ import {DialogId} from '../workbench.identifiers';
 /**
  * Handle to interact with a dialog opened via {@link WorkbenchDialogService}.
  *
- * The dialog component can inject this handle to interact with the dialog, such as setting the title or closing the dialog.
+ * The dialog component can inject this handle to interact with the dialog.
  *
  * Dialog inputs are available as input properties in the dialog component.
  */
 export abstract class WorkbenchDialog {
 
   /**
-   * Unique identity of this dialog.
+   * Identity of this dialog.
    */
   public abstract readonly id: DialogId;
 
