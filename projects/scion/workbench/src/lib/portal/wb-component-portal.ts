@@ -95,7 +95,7 @@ export class WbComponentPortal<T = unknown> {
 
     this._viewContainerRef.set(viewContainerRef);
     this._componentRef.update(componentRef => componentRef ?? createPortalComponent(this._componentType, {providers: this._options?.providers, injector: viewContainerRef.injector}));
-    this._logger.debug(() => 'Attaching portal', LoggerNames.LIFECYCLE, this._componentRef()!);
+    this._logger.debug(() => 'Attaching portal', LoggerNames.LIFECYCLE, this._options?.debugName ?? this._componentType.name);
     this._componentRef()!.changeDetectorRef.reattach();
     this._viewContainerRef()!.insert(this._componentRef()!.hostView);
     this._attached.set(true);
@@ -115,7 +115,7 @@ export class WbComponentPortal<T = unknown> {
       return;
     }
 
-    this._logger.debug(() => 'Detaching portal', LoggerNames.LIFECYCLE, this._componentRef()!);
+    this._logger.debug(() => 'Detaching portal', LoggerNames.LIFECYCLE, this._options?.debugName ?? this._componentType.name);
 
     (this._componentRef()!.instance as Partial<OnDetach>).onDetach?.();
     this._viewContainerRef()!.detach(this._viewContainerRef()!.indexOf(this._componentRef()!.hostView));
@@ -136,7 +136,7 @@ export class WbComponentPortal<T = unknown> {
   public destroy(): void {
     assertNotInReactiveContext(this.destroy);
 
-    this._logger.debug(() => 'Destroying portal', LoggerNames.LIFECYCLE, this._componentRef());
+    this._logger.debug(() => 'Destroying portal', LoggerNames.LIFECYCLE, this._options?.debugName ?? this._componentType.name);
     this._componentRef()?.destroy();
     this._componentRef.set(null);
     this._viewContainerRef.set(null);
@@ -152,6 +152,10 @@ export interface PortalOptions {
    * Providers registered with the injector for the instantiation of the component.
    */
   providers?: Provider[];
+  /**
+   * Optional name used in portal lifecycle logs.
+   */
+  debugName?: string;
 }
 
 /**

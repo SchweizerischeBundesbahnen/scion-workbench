@@ -111,6 +111,7 @@ export class ɵWorkbenchPart implements WorkbenchPart, Blockable {
    */
   private createPartPortal(): WbComponentPortal<MainAreaPartComponent | PartComponent> {
     return new WbComponentPortal<MainAreaPartComponent | PartComponent>(this.id === MAIN_AREA ? MainAreaPartComponent : PartComponent, {
+      debugName: `${this.id === MAIN_AREA ? 'MainAreaPartComponent' : 'PartComponent'} [${this.id}]`,
       providers: [
         {provide: ɵWorkbenchPart, useValue: this},
         {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
@@ -124,6 +125,7 @@ export class ɵWorkbenchPart implements WorkbenchPart, Blockable {
    */
   private createPartSlotPortal(): WbComponentPortal<PartSlotComponent> {
     return new WbComponentPortal(PartSlotComponent, {
+      debugName: `PartSlotComponent [${this.id}]`,
       providers: [
         {provide: ɵWorkbenchPart, useValue: this},
         {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
