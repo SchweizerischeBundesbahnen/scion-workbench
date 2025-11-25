@@ -77,7 +77,7 @@ export class MicrofrontendHostMessageBoxComponent {
   /**
    * Performs navigation in the named outlet, substituting path params if any. To clear navigation, pass `null` as the path.
    */
-  private navigate(path: string | null, extras?: {params?: Map<string, any>}): Promise<boolean> {
+  private navigate(path: string | null, extras?: {params?: Map<string, unknown>}): Promise<boolean> {
     path = Microfrontends.substituteNamedParameters(path, extras?.params);
 
     const outletCommands: Commands | null = (path !== null ? runInInjectionContext(this._injector, () => Routing.pathToCommands(path)) : null);

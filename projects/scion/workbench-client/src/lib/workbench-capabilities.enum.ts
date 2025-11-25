@@ -38,7 +38,7 @@ export enum WorkbenchCapabilities {
    */
   Popup = 'popup',
   /**
-   * Contributes a microfrontend for display in workbench dialog.
+   * Contributes a workbench dialog.
    *
    * A dialog is a visual element for focused interaction with the user, such as prompting the user for input or confirming actions.
    */

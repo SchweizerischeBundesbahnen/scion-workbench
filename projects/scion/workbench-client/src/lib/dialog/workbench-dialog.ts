@@ -23,10 +23,10 @@ import {Translatable} from '../text/workbench-text-provider.model';
  * @see WorkbenchDialogCapability
  * @see WorkbenchDialogService
  */
-export abstract class WorkbenchDialog<R = unknown> {
+export abstract class WorkbenchDialog {
 
   /**
-   * Represents the identity of this dialog.
+   * Identity of this dialog.
    */
   public abstract readonly id: DialogId;
 
@@ -36,7 +36,7 @@ export abstract class WorkbenchDialog<R = unknown> {
   public abstract readonly capability: WorkbenchDialogCapability;
 
   /**
-   * Parameters as passed by the dialog opener.
+   * Parameters passed to the microfrontend loaded into the dialog.
    */
   public abstract readonly params: Map<string, unknown>;
 
@@ -64,5 +64,5 @@ export abstract class WorkbenchDialog<R = unknown> {
   /**
    * Closes the dialog. Optionally, pass a result or an error to the dialog opener.
    */
-  public abstract close(result?: R | Error): void;
+  public abstract close<R>(result?: R | Error): void;
 }
