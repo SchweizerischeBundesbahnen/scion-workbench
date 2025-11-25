@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injector} from '@angular/core';
+import {Injector, Provider} from '@angular/core';
 import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 
 /**
@@ -17,9 +17,9 @@ import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 export interface WorkbenchDialogOptions {
 
   /**
-   * Optional data to pass to the dialog component. Inputs are available as input properties in the dialog component.
+   * Specifies data to pass to the dialog component. Inputs are available as input properties in the dialog component.
    *
-   * **Example:**
+   * @example - Reading inputs in the component
    * ```ts
    * public someInput = input.required<string>();
    * ```
@@ -48,11 +48,10 @@ export interface WorkbenchDialogOptions {
   context?: ViewId | PartId | DialogId | PopupId | Context | null;
 
   /**
-   * Sets the injector for the instantiation of the dialog component, giving control over the objects available
-   * for injection into the dialog component. If not specified, uses the application's root injector, or the view's
-   * injector if opened in the context of a view.
+   * Specifies the injector for the instantiation of the dialog, giving control over the objects available
+   * for injection in the dialog component. Defaults to the application's root injector.
    *
-   * **Example:**
+   * @example - Creating an injector with a DI token
    * ```ts
    * Injector.create({
    *   parent: ...,
@@ -63,6 +62,13 @@ export interface WorkbenchDialogOptions {
    * ```
    */
   injector?: Injector;
+
+  /**
+   * Specifies providers available for injection in the dialog component.
+   *
+   * Providers can inject {@link WorkbenchDialog} to interact with the dialog.
+   */
+  providers?: Provider[];
 
   /**
    * Specifies CSS class(es) to add to the dialog, e.g., to locate the dialog in tests.

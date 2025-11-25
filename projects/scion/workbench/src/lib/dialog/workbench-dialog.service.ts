@@ -101,8 +101,9 @@ export abstract class WorkbenchDialogService {
    *
    * By default, the dialog is modal to the calling context. Specify a different modality in {@link WorkbenchDialogOptions.modality}.
    *
-   * Data can be passed to the component as inputs via {@link WorkbenchDialogOptions.inputs} property or by providing a custom injector
-   * via {@link WorkbenchDialogOptions.injector} property. Dialog inputs are available as input properties in the dialog component.
+   * Data can be passed to the component as inputs via {@link WorkbenchDialogOptions.inputs} option. Inputs are available as input
+   * properties in the component. Alternatively, data can be passed for injection via a custom injector ({@link WorkbenchDialogOptions.injector})
+   * or providers ({@link WorkbenchDialogOptions.providers}).
    *
    * @param component - Specifies the component to display in the dialog.
    * @param options - Controls the appearance and behavior of the dialog.

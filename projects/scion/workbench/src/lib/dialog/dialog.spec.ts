@@ -147,22 +147,55 @@ describe('Dialog', () => {
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
-    // Create custom injector.
-    const diToken = new InjectionToken('token');
-    const injector = Injector.create({
-      parent: void TestBed.inject(EnvironmentInjector),
-      providers: [
-        {provide: diToken, useValue: 'value'},
-      ],
-    });
+    // Create DI token.
+    const TOKEN = new InjectionToken('TOKEN');
 
     // Open dialog.
-    void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent, {cssClass: 'testee', injector});
+    void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent, {
+      cssClass: 'testee',
+      injector: Injector.create({
+        parent: TestBed.inject(EnvironmentInjector),
+        providers: [
+          {provide: TOKEN, useValue: 'value'},
+        ],
+      }),
+    });
     await waitUntilStable();
 
     // Expect DI token to be found.
     const dialogComponent = getDialogComponent(fixture, SpecDialogComponent);
-    expect(dialogComponent.injector.get(diToken)).toEqual('value');
+    expect(dialogComponent.injector.get(TOKEN)).toEqual('value');
+  });
+
+  it('should allow for custom provider', async () => {
+    TestBed.configureTestingModule({
+      providers: [provideWorkbenchForTest()],
+    });
+
+    @Component({
+      selector: 'spec-dialog',
+      template: '',
+    })
+    class SpecDialogComponent {
+      public injector = inject(Injector);
+    }
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+
+    // Create DI token.
+    const TOKEN = new InjectionToken('TOKEN');
+
+    // Open dialog.
+    void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent, {
+      cssClass: 'testee',
+      providers: [{provide: TOKEN, useValue: 'value'}],
+    });
+    await waitUntilStable();
+
+    // Expect DI token to be found.
+    const dialogComponent = getDialogComponent(fixture, SpecDialogComponent);
+    expect(dialogComponent.injector.get(TOKEN)).toEqual('value');
   });
 
   it('should focus first focusable element', async () => {

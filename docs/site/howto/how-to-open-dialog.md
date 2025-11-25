@@ -77,18 +77,16 @@ dialogService.open(YourDialogComponent, {
 Dialog inputs are available as input properties in the dialog component.
 
 ```ts
-import {Component, Input} from '@angular/core';
+import {Component, input} from '@angular/core';
 
 @Component({...})
 export class YourDialogComponent {
-
-  @Input()
-  public firstname: string;
-
-  @Input()
-  public lastname: string;
+  firstname = input.required();
+  lastname = input.required();
 }
 ```
+
+Alternatively, data can be passed for injection via a custom injector (`WorkbenchDialogOptions.injector`) or providers (`WorkbenchDialogOptions.providers`).
 
 ### How to Set a Dialog Title 
 The dialog component can inject the `WorkbenchDialog` handle and set the title.
