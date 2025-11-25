@@ -24,11 +24,12 @@ import InputFieldTestPageComponent from '../test-pages/input-field-test-page/inp
 import SizeTestPageComponent from '../test-pages/size-test-page/size-test-page.component';
 import {UUID} from '@scion/toolkit/uuid';
 import {parseTypedString} from '../common/parse-typed-value.util';
+import {PopupSizeDirective} from '../popup-opener-page/popup-size.directive';
 
 @Component({
   selector: 'app-dialog-opener-page',
   templateUrl: './dialog-opener-page.component.html',
-  styleUrls: ['./dialog-opener-page.component.scss'],
+  styleUrl: './dialog-opener-page.component.scss',
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,
@@ -36,6 +37,7 @@ import {parseTypedString} from '../common/parse-typed-value.util';
     SciCheckboxComponent,
     MultiValueInputComponent,
   ],
+  hostDirectives: [{directive: PopupSizeDirective, inputs: ['size']}],
 })
 export default class DialogOpenerPageComponent {
 
@@ -76,7 +78,7 @@ export default class DialogOpenerPageComponent {
   }
 
   private openDialog(dialogService: WorkbenchDialogService, index: number): Promise<string | undefined> {
-    const component = this.parseComponentFromUI();
+    const component = this.readComponentFromUI();
     return dialogService.open<string | undefined>(component, {
       inputs: SciKeyValueFieldComponent.toDictionary(this.form.controls.options.controls.inputs) ?? undefined,
       modality: this.form.controls.options.controls.modality.value || undefined,
@@ -88,7 +90,7 @@ export default class DialogOpenerPageComponent {
       .catch((error: unknown) => this.dialogError = stringifyError(error) || 'Workbench Dialog was closed with an error');
   }
 
-  private parseComponentFromUI(): Type<DialogPageComponent | BlankTestPageComponent | DialogOpenerPageComponent> {
+  private readComponentFromUI(): Type<DialogPageComponent | BlankTestPageComponent | DialogOpenerPageComponent> {
     switch (this.form.controls.component.value) {
       case 'dialog-page':
         return DialogPageComponent;

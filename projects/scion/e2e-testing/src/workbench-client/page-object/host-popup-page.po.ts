@@ -9,7 +9,7 @@
  */
 
 import {PopupPO} from '../../popup.po';
-import {PopupSize, ViewId, WorkbenchPopupCapability, WorkbenchPopupReferrer} from '@scion/workbench-client';
+import {ViewId, WorkbenchPopupCapability, WorkbenchPopupReferrer} from '@scion/workbench-client';
 import {Params} from '@angular/router';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
@@ -84,7 +84,7 @@ export class HostPopupPagePO implements WorkbenchPopupPagePO {
     }
   }
 
-  public async enterComponentSize(size: PopupSize): Promise<void> {
+  public async enterComponentSize(size: WorkbenchPopupSize): Promise<void> {
     await this.locator.locator('input.e2e-width').fill(size.width ?? '');
     await this.locator.locator('input.e2e-height').fill(size.height ?? '');
     await this.locator.locator('input.e2e-min-width').fill(size.minWidth ?? '');
@@ -119,4 +119,13 @@ export class HostPopupPagePO implements WorkbenchPopupPagePO {
 
     await this.locator.locator('button.e2e-close').click();
   }
+}
+
+export interface WorkbenchPopupSize {
+  height?: string;
+  width?: string;
+  minHeight?: string;
+  maxHeight?: string;
+  minWidth?: string;
+  maxWidth?: string;
 }

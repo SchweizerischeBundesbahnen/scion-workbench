@@ -100,12 +100,12 @@ export class SizeTestPagePO implements WorkbenchViewPagePO, WorkbenchDialogPageP
 
     // Open popup.
     const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-    await popupOpenerPage.selectPopupComponent('size-test-page');
-    await popupOpenerPage.enterSize({minHeight: '100px', minWidth: '500px'});
-    await popupOpenerPage.enterCssClass(cssClass);
-    await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-    await (position === 'element' ? popupOpenerPage.enterPosition('element') : popupOpenerPage.enterPosition({top: 100, left: 100}));
-    await popupOpenerPage.open();
+    await popupOpenerPage.open('size-test-page', {
+      anchor: position === 'element' ? 'element' : {top: 100, left: 100},
+      size: {minHeight: '100px', minWidth: '500px'},
+      closeStrategy: {onFocusLost: false},
+      cssClass,
+    });
 
     const popup = appPO.popup({cssClass});
     return new SizeTestPagePO(popup);

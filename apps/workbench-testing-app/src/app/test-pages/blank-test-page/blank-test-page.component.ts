@@ -9,6 +9,7 @@
  */
 
 import {Component} from '@angular/core';
+import {PopupSizeDirective} from '../../popup-opener-page/popup-size.directive';
 
 /**
  * Component that does not display anything.
@@ -16,6 +17,7 @@ import {Component} from '@angular/core';
 @Component({
   selector: 'app-blank-test-page',
   template: 'Blank',
+  hostDirectives: [{directive: PopupSizeDirective, inputs: ['size']}],
 })
 export default class BlankTestPageComponent {
 }

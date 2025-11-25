@@ -15,6 +15,8 @@ import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 
 /**
  * Controls the appearance and behavior of a popup.
+ *
+ * @deprecated since version 21.0.0-beta.1. Replaced by `WorkbenchPopupOptions`. Use `WorkbenchPopupService` to open popups. Marked for removal in version 22.
  */
 export abstract class PopupConfig {
   /**
@@ -73,16 +75,18 @@ export abstract class PopupConfig {
      * Sets the component's attachment point in Angular's logical component tree (not the DOM tree used for rendering), effecting when
      * Angular checks the component for changes during a change detection cycle. If not set, inserts the component at the top level
      * in the component tree.
+     *
+     * @deprecated since version 21.0.0-beta.1. Marked for removal. No replacement as not required anymore.
      */
     viewContainerRef?: ViewContainerRef;
   };
   /**
-   * Hint where to align the popup relative to the popup anchor, unless there is not enough space available in that area. By default,
+   * Controls where to align the popup relative to the popup anchor, unless there is not enough space available in that area. By default,
    * if not specified, the popup opens north of the anchor.
    */
   public readonly align?: 'east' | 'west' | 'north' | 'south';
   /**
-   * Optional data to pass to the popup component. In the component, you can inject the popup handle {@link WorkbenchPopup} to read input data.
+   * Specifies data to pass to the popup component. In the component, you can inject the popup handle {@link WorkbenchPopup} to read input data.
    */
   public readonly input?: any;
   /**
@@ -92,7 +96,15 @@ export abstract class PopupConfig {
   /**
    * Specifies the preferred popup size. If not specified, the popup adjusts its size to the content size.
    */
-  public readonly size?: PopupSize;
+  public readonly size?: {
+    minHeight?: string;
+    height?: string;
+    maxHeight?: string;
+    minWidth?: string;
+    width?: string;
+    maxWidth?: string;
+  };
+
   /**
    * Specifies CSS class(es) to add to the popup, e.g., to locate the popup in tests.
    */
@@ -121,36 +133,6 @@ export interface CloseStrategy {
    * No return value will be passed to the popup opener.
    */
   onEscape?: boolean;
-}
-
-/**
- * Represents the preferred popup size as specified by the popup opener.
- */
-export interface PopupSize {
-  /**
-   * Specifies the min-height of the popup.
-   */
-  minHeight?: string;
-  /**
-   * Specifies the height of the popup.
-   */
-  height?: string;
-  /**
-   * Specifies the max-height of the popup.
-   */
-  maxHeight?: string;
-  /**
-   * Specifies the min-width of the popup.
-   */
-  minWidth?: string;
-  /**
-   * Specifies the width of the popup.
-   */
-  width?: string;
-  /**
-   * Specifies the max-width of the popup.
-   */
-  maxWidth?: string;
 }
 
 /**

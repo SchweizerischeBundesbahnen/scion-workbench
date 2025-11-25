@@ -1,8 +1,8 @@
 import {Blockable} from '../glass-pane/blockable';
-import {assertNotInReactiveContext, ComponentRef, computed, DestroyableInjector, DestroyRef, DOCUMENT, effect, ElementRef, inject, Injector, NgZone, Signal, signal, Type, untracked, ViewContainerRef} from '@angular/core';
+import {assertNotInReactiveContext, ComponentRef, computed, DestroyableInjector, DestroyRef, DOCUMENT, effect, ElementRef, inject, InjectionToken, Injector, NgZone, Signal, signal, untracked, WritableSignal} from '@angular/core';
 import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
-import {ComponentPortal} from '@angular/cdk/portal';
-import {PopupComponent} from './popup.component';
+import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
+import {WorkbenchPopupComponent} from './workbench-popup.component';
 import {boundingClientRect} from '@scion/components/dimension';
 import {fromEvent} from 'rxjs';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
@@ -19,45 +19,54 @@ import {coerceElement} from '@angular/cdk/coercion';
 import {PopupId} from '../workbench.identifiers';
 import {BottomLeftPoint, BottomRightPoint, Point, PopupOrigin, TopLeftPoint, TopRightPoint} from './popup.origin';
 import {constrainClientRect, setStyle} from '../common/dom.util';
-import {WorkbenchPopup} from './workbench-popup';
-import {PopupConfig, PopupSize} from './popup.config';
+import {WorkbenchPopup, WorkbenchPopupSize} from './workbench-popup';
 import {provideContextAwareServices} from '../context-aware-service-provider';
 import {WorkbenchInvocationContext} from '../invocation-context/invocation-context';
 import {ViewDragService} from '../view-dnd/view-drag.service';
+import {WorkbenchPopupOptions} from './workbench-popup.options';
+import {Popup} from './popup';
 
 /** @inheritDoc */
-export class ɵWorkbenchPopup<T = unknown, R = unknown> implements WorkbenchPopup<T, R>, Blockable {
+export class ɵWorkbenchPopup implements Popup, WorkbenchPopup, Blockable {
 
   /** Injector for the popup; destroyed when the popup is closed. */
   public readonly injector = inject(Injector) as DestroyableInjector;
 
   private readonly _overlayRef: OverlayRef;
   private readonly _focusMonitor = inject(WorkbenchFocusMonitor);
-  private readonly _portal: ComponentPortal<PopupComponent>;
-  private readonly _componentRef = signal<ComponentRef<PopupComponent> | undefined>(undefined);
+  private readonly _portal: ComponentPortal<WorkbenchPopupComponent>;
+  private readonly _componentRef = signal<ComponentRef<WorkbenchPopupComponent> | undefined>(undefined);
   private readonly _popupOrigin: Signal<DOMRect | undefined>;
+  private readonly _cssClass = signal<string[]>([]);
 
-  public readonly cssClasses: string[];
+  public readonly size: WorkbenchPopupSize;
   public readonly focused = computed(() => this._focusMonitor.activeElement()?.id === this.id);
   public readonly attached: Signal<boolean>;
   public readonly destroyed = signal<boolean>(false);
   public readonly bounds = boundingClientRect(computed(() => this._componentRef()?.location.nativeElement as HTMLElement | undefined));
   public readonly blockedBy: Signal<ɵWorkbenchDialog | null>;
-  public result: R | Error | undefined;
+  // TODO [Angular 22] Remove with Angular 22. Used for backward compatiblity.
+  public readonly input: unknown | undefined;
+  public result: unknown | Error | undefined;
 
-  constructor(public id: PopupId, public invocationContext: WorkbenchInvocationContext | null, private _config: PopupConfig) {
-    this._portal = this.createPortal(this._config);
+  constructor(public id: PopupId,
+              public component: ComponentType<unknown>,
+              public invocationContext: WorkbenchInvocationContext | null,
+              private _options: WorkbenchPopupOptions) {
+    this._portal = this.createPortal();
+    this.input = this._portal.injector?.get(LEGACY_POPUP_INPUT, undefined, {optional: true});
     this._popupOrigin = this.trackPopupOrigin();
+    this._cssClass.set(Arrays.coerce(this._options.cssClass));
+    this.size = new ɵWorkbenchPopupSize(this._options);
     this.blockedBy = inject(WorkbenchDialogRegistry).top(this.id);
     this.attached = this.monitorHostElementAttached();
-    this.cssClasses = Arrays.coerce(this._config.cssClass);
 
     const positionStrategy = inject(Overlay).position()
       .flexibleConnectedTo({x: 0, y: 0})
       .withFlexibleDimensions(false)
       .withLockedPosition(false) // If locked, the popup won't attempt to reposition itself if not enough space available.
       .withPositions(((): ConnectedPosition[] => {
-        switch (this._config.align ?? 'north') {
+        switch (this._options.align ?? 'north') {
           case 'north':
             return [NORTH, SOUTH, WEST, EAST];
           case 'south':
@@ -90,30 +99,31 @@ export class ɵWorkbenchPopup<T = unknown, R = unknown> implements WorkbenchPopu
   /**
    * Waits for the popup to close, resolving to its result or rejecting if closed with an error.
    */
-  public waitForClose(): Promise<R | undefined> {
+  public waitForClose<R>(): Promise<R | undefined> {
     return new Promise<R | undefined>((resolve, reject) => {
       this.injector.get(DestroyRef).onDestroy(() => {
-        this.result instanceof Error ? reject(this.result) : resolve(this.result);
+        this.result instanceof Error ? reject(this.result) : resolve(this.result as R);
       });
     });
   }
 
   /**
-   * Creates a portal to render {@link PopupComponent} in the popup's injection context.
+   * Creates a portal to render {@link WorkbenchPopupComponent} in the popup's injection context.
    */
-  private createPortal(config: PopupConfig): ComponentPortal<PopupComponent> {
+  private createPortal(): ComponentPortal<WorkbenchPopupComponent> {
     const injector = Injector.create({
-      parent: config.componentConstructOptions?.injector ?? inject(Injector),
+      parent: this._options.injector ?? inject(Injector),
       providers: [
         {provide: ɵWorkbenchPopup, useValue: this},
         {provide: WorkbenchPopup, useExisting: ɵWorkbenchPopup},
+        {provide: Popup, useExisting: ɵWorkbenchPopup},
         {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchPopup},
         provideContextAwareServices(),
-        ...[config.componentConstructOptions?.providers ?? []],
+        ...this._options.providers ?? [],
       ],
     });
     inject(DestroyRef).onDestroy(() => injector.destroy());
-    return new ComponentPortal(PopupComponent, null, injector);
+    return new ComponentPortal(WorkbenchPopupComponent, null, injector);
   }
 
   /**
@@ -184,7 +194,7 @@ export class ɵWorkbenchPopup<T = unknown, R = unknown> implements WorkbenchPopu
   private closeOnFocusLoss(popupElement: HTMLElement): void {
     const focusMonitor = inject(FocusMonitor);
 
-    if (this._config.closeStrategy?.onFocusLost ?? true) {
+    if (this._options.closeStrategy?.onFocusLost ?? true) {
       focusMonitor.monitor(popupElement, true)
         .pipe(
           filter((focusOrigin: FocusOrigin) => !focusOrigin),
@@ -200,7 +210,7 @@ export class ɵWorkbenchPopup<T = unknown, R = unknown> implements WorkbenchPopu
   private closeOnEscape(popupElement: HTMLElement): void {
     const zone = inject(NgZone);
 
-    if (this._config.closeStrategy?.onEscape ?? true) {
+    if (this._options.closeStrategy?.onEscape ?? true) {
       fromEvent<KeyboardEvent>(popupElement, 'keydown')
         .pipe(
           subscribeIn(fn => zone.runOutsideAngular(fn)),
@@ -263,8 +273,8 @@ export class ɵWorkbenchPopup<T = unknown, R = unknown> implements WorkbenchPopu
    * Creates a signal that tracks the position of the popup anchor.
    */
   private trackPopupOrigin(): Signal<DOMRect | undefined> {
-    if (this._config.anchor instanceof Element || this._config.anchor instanceof ElementRef) {
-      const anchor = coerceElement(this._config.anchor) as HTMLElement;
+    if (this._options.anchor instanceof Element || this._options.anchor instanceof ElementRef) {
+      const anchor = coerceElement(this._options.anchor) as HTMLElement;
       const anchorBounds = boundingClientRect(anchor);
 
       return computed(() => {
@@ -285,7 +295,7 @@ export class ɵWorkbenchPopup<T = unknown, R = unknown> implements WorkbenchPopu
     }
     else {
       const documentBounds = boundingClientRect(document.documentElement);
-      const anchorBounds = toSignal(Observables.coerce(this._config.anchor));
+      const anchorBounds = toSignal(Observables.coerce(this._options.anchor));
 
       return computed(() => {
         // Maintain position and size when detached to prevent flickering when attached again and to support for virtual scrolling in popup content.
@@ -306,12 +316,12 @@ export class ɵWorkbenchPopup<T = unknown, R = unknown> implements WorkbenchPopu
   }
 
   /** @inheritDoc */
-  public setResult(result?: R): void {
+  public setResult<R>(result?: R): void {
     this.result = result;
   }
 
   /** @inheritDoc */
-  public close(result?: R | Error): void {
+  public close<R>(result?: R | Error): void {
     assertNotInReactiveContext(this.close, 'Call WorkbenchPopup.close() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
     // Prevent closing if blocked.
@@ -324,21 +334,30 @@ export class ɵWorkbenchPopup<T = unknown, R = unknown> implements WorkbenchPopu
   }
 
   /** @inheritDoc */
-  public get input(): T | undefined {
-    return this._config.input as T | undefined;
+  public get cssClass(): Signal<string[]> {
+    return this._cssClass;
   }
 
   /** @inheritDoc */
-  public get size(): PopupSize | undefined {
-    return this._config.size;
+  public set cssClass(cssClass: string | string[]) {
+    untracked(() => this._cssClass.set(new Array<string>().concat(this._options.cssClass ?? []).concat(cssClass)));
   }
 
-  public get component(): Type<any> {
-    return this._config.component;
+  // TODO [Angular 22] Remove with Angular 22. Used for backward compatiblity.
+  public set cssClasses(cssClasses: string[]) {
+    this.cssClass = cssClasses;
   }
 
-  public get viewContainerRef(): ViewContainerRef | undefined {
-    return this._config.componentConstructOptions?.viewContainerRef;
+  // TODO [Angular 22] Remove with Angular 22. Used for backward compatiblity.
+  public get cssClasses(): string[] {
+    return this.cssClass();
+  }
+
+  /**
+   * Inputs passed to the popup.
+   */
+  public get inputs(): {[name: string]: unknown} | undefined {
+    return this._options.inputs;
   }
 
   /**
@@ -349,6 +368,87 @@ export class ɵWorkbenchPopup<T = unknown, R = unknown> implements WorkbenchPopu
       this.injector.destroy();
       this._overlayRef.dispose();
     }
+  }
+}
+
+/** @inheritDoc */
+class ɵWorkbenchPopupSize implements WorkbenchPopupSize {
+
+  private readonly _height: WritableSignal<string | undefined>;
+  private readonly _width: WritableSignal<string | undefined>;
+  private readonly _minHeight: WritableSignal<string | undefined>;
+  private readonly _maxHeight: WritableSignal<string | undefined>;
+  private readonly _minWidth: WritableSignal<string | undefined>;
+  private readonly _maxWidth: WritableSignal<string | undefined>;
+
+  constructor(options: WorkbenchPopupOptions) {
+    // Migrate deprecation analogous to `ɵWorkbenchDialogSize`.
+    this._height = signal<string | undefined>(options.size?.height);
+    this._width = signal<string | undefined>(options.size?.width);
+    this._minHeight = signal<string | undefined>(options.size?.minHeight);
+    this._maxHeight = signal<string | undefined>(options.size?.maxHeight);
+    this._minWidth = signal<string | undefined>(options.size?.minWidth);
+    this._maxWidth = signal<string | undefined>(options.size?.maxWidth);
+  }
+
+  /** @inheritDoc */
+  public get height(): Signal<string | undefined> {
+    return this._height;
+  }
+
+  /** @inheritDoc */
+  public set height(height: string | undefined) {
+    untracked(() => this._height.set(height));
+  }
+
+  /** @inheritDoc */
+  public get width(): Signal<string | undefined> {
+    return this._width;
+  }
+
+  /** @inheritDoc */
+  public set width(width: string | undefined) {
+    untracked(() => this._width.set(width));
+  }
+
+  /** @inheritDoc */
+  public get minHeight(): Signal<string | undefined> {
+    return this._minHeight;
+  }
+
+  /** @inheritDoc */
+  public set minHeight(minHeight: string | undefined) {
+    untracked(() => this._minHeight.set(minHeight));
+  }
+
+  /** @inheritDoc */
+  public get maxHeight(): Signal<string | undefined> {
+    return this._maxHeight;
+  }
+
+  /** @inheritDoc */
+  public set maxHeight(maxHeight: string | undefined) {
+    untracked(() => this._maxHeight.set(maxHeight));
+  }
+
+  /** @inheritDoc */
+  public get minWidth(): Signal<string | undefined> {
+    return this._minWidth;
+  }
+
+  /** @inheritDoc */
+  public set minWidth(minWidth: string | undefined) {
+    untracked(() => this._minWidth.set(minWidth));
+  }
+
+  /** @inheritDoc */
+  public get maxWidth(): Signal<string | undefined> {
+    return this._maxWidth;
+  }
+
+  /** @inheritDoc */
+  public set maxWidth(maxWidth: string | undefined) {
+    untracked(() => this._maxWidth.set(maxWidth));
   }
 }
 
@@ -402,3 +502,8 @@ function mapToPageCoordinates(origin: PopupOrigin, relativeTo: DOMRect): Point {
 function isEqualDomRect(a: DOMRect | undefined, b: DOMRect | undefined): boolean {
   return a?.top === b?.top && a?.right === b?.right && a?.bottom === b?.bottom && a?.left === b?.left;
 }
+
+/**
+ * TODO [Angular 22] Remove with Angular 22. Used for backward compatiblity.
+ */
+export const LEGACY_POPUP_INPUT = new InjectionToken<unknown>('LEGACY_POPUP_INPUT');

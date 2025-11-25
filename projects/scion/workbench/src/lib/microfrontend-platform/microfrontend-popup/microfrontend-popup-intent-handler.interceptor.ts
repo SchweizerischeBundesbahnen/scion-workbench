@@ -21,9 +21,9 @@ import {WorkbenchPopupService} from '../../popup/workbench-popup.service';
 import {PopupOrigin} from '../../popup/popup.origin';
 import {MicrofrontendHostPopupComponent} from '../microfrontend-host-popup/microfrontend-host-popup.component';
 import {isViewId, PopupId} from '../../workbench.identifiers';
-import {MicrofrontendPopupInput} from './microfrontend-popup-input';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {MicrofrontendWorkbenchView} from '../microfrontend-view/microfrontend-workbench-view.model';
+import {prune} from '../../common/prune.util';
 
 /**
  * Handles popup intents, instructing the workbench to open a popup with the microfrontend declared on the resolved capability.
@@ -91,27 +91,23 @@ export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
     const isHostProvider = capability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
     this._logger.debug(() => 'Handling microfrontend popup command', LoggerNames.MICROFRONTEND, command);
 
-    const popupInput: MicrofrontendPopupInput = {
-      capability,
-      params: message.intent.params ?? new Map<string, unknown>(),
-      referrer: this.getReferrer(command),
-      closeOnFocusLost: command.closeStrategy?.onFocusLost ?? true,
-    };
-
-    return this._popupService.open({
+    return this._popupService.open(isHostProvider ? MicrofrontendHostPopupComponent : MicrofrontendPopupComponent, prune({
       id: command.popupId,
-      component: isHostProvider ? MicrofrontendHostPopupComponent : MicrofrontendPopupComponent,
-      input: popupInput,
+      inputs: {
+        capability,
+        params: message.intent.params ?? new Map(),
+        referrer: this.getReferrer(command),
+        closeOnFocusLost: isHostProvider ? undefined : (command.closeStrategy?.onFocusLost ?? true),
+      },
       anchor: this.observePopupOrigin$(command),
       context: command.context,
       align: command.align,
-      size: capability.properties.size,
       closeStrategy: isHostProvider ? command.closeStrategy : {
         ...command.closeStrategy,
         onFocusLost: false, // Closing the popup on focus loss is handled in {MicrofrontendPopupComponent}
       },
       cssClass: Arrays.coerce(capability.properties.cssClass).concat(Arrays.coerce(command.cssClass)),
-    });
+    }));
   }
 
   /**

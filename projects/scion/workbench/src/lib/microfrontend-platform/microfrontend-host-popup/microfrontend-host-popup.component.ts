@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DestroyRef, inject, Injector, runInInjectionContext, StaticProvider} from '@angular/core';
-import {WorkbenchPopup} from '@scion/workbench-client';
+import {Component, computed, DestroyRef, effect, inject, Injector, input, runInInjectionContext, Signal, StaticProvider, untracked} from '@angular/core';
+import {WorkbenchPopup, WorkbenchPopupCapability, WorkbenchPopupReferrer} from '@scion/workbench-client';
 import {Routing} from '../../routing/routing.util';
 import {Commands} from '../../routing/routing.model';
 import {Router, RouterOutlet} from '@angular/router';
@@ -18,13 +18,14 @@ import {Microfrontends} from '../common/microfrontend.util';
 import {ANGULAR_ROUTER_MUTEX} from '../../executor/single-task-executor';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchPopup} from '../../popup/ɵworkbench-popup';
-import {MicrofrontendPopupInput} from '../microfrontend-popup/microfrontend-popup-input';
 
 /**
- * Displays the microfrontend of a popup capability provided by the host inside a workbench popup.
+ * Displays the microfrontend of a popup capability provided by the host.
  *
  * Unlike {@link MicrofrontendPopupComponent}, this component uses a `<router-outlet>` instead of a `<sci-router-outlet>`
- * because integrating the microfrontend directly via Angular router and not via iframe.
+ * to allow direct integration of the content provided by the workbench host application via the Angular router.
+ *
+ * This component is designed to be displayed in a workbench popup.
  */
 @Component({
   selector: 'wb-microfrontend-host-popup',
@@ -37,47 +38,85 @@ import {MicrofrontendPopupInput} from '../microfrontend-popup/microfrontend-popu
 })
 export class MicrofrontendHostPopupComponent {
 
+  public readonly capability = input.required<WorkbenchPopupCapability>();
+  public readonly params = input.required<Map<string, unknown>>();
+  public readonly referrer = input.required<WorkbenchPopupReferrer>();
+
   private readonly _injector = inject(Injector);
   private readonly _router = inject(Router);
   /** Mutex to serialize Angular Router navigation requests, preventing the cancellation of previously initiated asynchronous navigations. */
   private readonly _angularRouterMutex = inject(ANGULAR_ROUTER_MUTEX);
 
-  protected readonly popup = inject(ɵWorkbenchPopup) as ɵWorkbenchPopup<MicrofrontendPopupInput>;
-  protected readonly outletInjector: Injector;
+  protected readonly popup = inject(ɵWorkbenchPopup);
+  protected readonly outletInjector = this.computeOutletInjector();
 
   constructor() {
-    const {capability, params} = this.popup.input!;
-    this.outletInjector = Injector.create({
-      parent: this._injector,
-      providers: [provideWorkbenchPopupHandle(this.popup.input!)],
-    });
-
-    // Perform navigation in the named router outlet.
-    void this.navigate(capability.properties.path, {params}).then(success => {
-      if (!success) {
-        this.popup.close(Error('[PopupNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
-      }
-    });
+    this.setPopupSize();
+    this.navigateCapability();
 
     inject(DestroyRef).onDestroy(() => void this.navigate(null)); // Remove the outlet from the URL
+  }
+
+  private navigateCapability(): void {
+    effect(() => {
+      const capability = this.capability();
+      const params = this.params();
+
+      untracked(() => {
+        void this.navigate(capability.properties.path, {params}).then(success => {
+          if (!success) {
+            this.popup.close(Error('[PopupNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
+          }
+        });
+      });
+    });
   }
 
   /**
    * Performs navigation in the specified outlet, substituting path params if any. To clear navigation, pass `null` as the path.
    */
-  private navigate(path: string | null, extras?: {params?: Map<string, any>}): Promise<boolean> {
+  private navigate(path: string | null, extras?: {params?: Map<string, unknown>}): Promise<boolean> {
     path = Microfrontends.substituteNamedParameters(path, extras?.params);
 
     const outletCommands: Commands | null = (path !== null ? runInInjectionContext(this._injector, () => Routing.pathToCommands(path)) : null);
     const commands: Commands = [{outlets: {[this.popup.id]: outletCommands}}];
     return this._angularRouterMutex.submit(() => this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'preserve'}));
   }
+
+  private computeOutletInjector(): Signal<Injector> {
+    const injector = inject(Injector);
+
+    return computed(() => {
+      const capability = this.capability();
+      const params = this.params();
+      const referrer = this.referrer();
+
+      return untracked(() => Injector.create({
+        parent: injector,
+        providers: [provideWorkbenchPopupHandle(capability, params, referrer)],
+      }));
+    });
+  }
+
+  private setPopupSize(): void {
+    effect(() => {
+      const size = this.capability().properties.size;
+      untracked(() => {
+        this.popup.size.width = size?.width;
+        this.popup.size.height = size?.height;
+        this.popup.size.minWidth = size?.minWidth;
+        this.popup.size.maxWidth = size?.maxWidth;
+        this.popup.size.minHeight = size?.minHeight;
+        this.popup.size.maxHeight = size?.maxHeight;
+      });
+    });
+  }
 }
 
 /**
  * Provides the {WorkbenchPopup} handle to the routed component.
  */
-function provideWorkbenchPopupHandle(popupInput: MicrofrontendPopupInput): StaticProvider {
+function provideWorkbenchPopupHandle(capability: WorkbenchPopupCapability, params: Map<string, unknown>, referrer: WorkbenchPopupReferrer): StaticProvider {
   return {
     provide: WorkbenchPopup,
     useFactory: (): WorkbenchPopup => {
@@ -85,9 +124,9 @@ function provideWorkbenchPopupHandle(popupInput: MicrofrontendPopupInput): Stati
 
       return new class implements WorkbenchPopup {
         public readonly id = popup.id;
-        public readonly capability = popupInput.capability;
-        public readonly params = popupInput.params;
-        public readonly referrer = popupInput.referrer;
+        public readonly capability = capability;
+        public readonly params = params;
+        public readonly referrer = referrer;
         public readonly focused$ = toObservable(popup.focused, {injector: popup.injector});
 
         public setResult(result?: unknown): void {

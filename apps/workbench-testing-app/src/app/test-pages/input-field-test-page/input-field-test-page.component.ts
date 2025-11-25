@@ -10,12 +10,14 @@
 
 import {Component} from '@angular/core';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {PopupSizeDirective} from '../../popup-opener-page/popup-size.directive';
 
 @Component({
   selector: 'app-input-field-test-page',
   templateUrl: './input-field-test-page.component.html',
-  styleUrls: ['./input-field-test-page.component.scss'],
+  styleUrl: './input-field-test-page.component.scss',
   imports: [SciFormFieldComponent],
+  hostDirectives: [{directive: PopupSizeDirective, inputs: ['size']}],
 })
 export default class InputFieldTestPageComponent {
 }

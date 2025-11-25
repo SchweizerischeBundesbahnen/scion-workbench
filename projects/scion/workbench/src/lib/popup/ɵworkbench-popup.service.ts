@@ -9,12 +9,13 @@
  */
 
 import {ApplicationRef, assertNotInReactiveContext, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
-import {PopupConfig} from './popup.config';
 import {WorkbenchPopupRegistry} from './workbench-popup.registry';
 import {computePopupId} from '../workbench.identifiers';
 import {ɵWorkbenchPopup} from './ɵworkbench-popup';
 import {createInvocationContext, WorkbenchInvocationContext} from '../invocation-context/invocation-context';
 import {WorkbenchPopupService} from './workbench-popup.service';
+import {ComponentType} from '@angular/cdk/portal';
+import {WorkbenchPopupOptions} from './workbench-popup.options';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})
@@ -26,15 +27,15 @@ export class ɵWorkbenchPopupService implements WorkbenchPopupService {
   private readonly _zone = inject(NgZone);
 
   /** @inheritDoc */
-  public async open<R>(config: PopupConfig): Promise<R | undefined> {
+  public async open<R>(component: ComponentType<unknown>, options: WorkbenchPopupOptions): Promise<R | undefined> {
     assertNotInReactiveContext(this.open, 'Call WorkbenchPopupService.open() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
     // Ensure to run in Angular zone to display the popup even when called from outside the Angular zone.
     if (!NgZone.isInAngularZone()) {
-      return this._zone.run(() => this.open(config));
+      return this._zone.run(() => this.open(component, options));
     }
 
-    const popup = this.createPopup<R>(config);
+    const popup = this.createPopup(component, options);
     this._popupRegistry.register(popup.id, popup);
     try {
       return await popup.waitForClose();
@@ -47,22 +48,22 @@ export class ɵWorkbenchPopupService implements WorkbenchPopupService {
   /**
    * Creates the popup handle.
    */
-  private createPopup<R>(config: PopupConfig): ɵWorkbenchPopup<unknown, R> {
+  private createPopup(component: ComponentType<unknown>, options: WorkbenchPopupOptions): ɵWorkbenchPopup {
     // Construct the handle in an injection context that shares the popup's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
-    const popupId = config.id ?? computePopupId();
+    const popupId = options.id ?? computePopupId();
     const popupInjector = Injector.create({
       parent: this._rootInjector, // use root injector to be independent of service construction context
       providers: [],
       name: `Workbench Popup ${popupId}`,
     });
-    const invocationContext = createPopupInvocationContext(config, this._injector);
-    return runInInjectionContext(popupInjector, () => new ɵWorkbenchPopup<unknown, R>(popupId, invocationContext, config));
+    const invocationContext = createPopupInvocationContext(options, this._injector);
+    return runInInjectionContext(popupInjector, () => new ɵWorkbenchPopup(popupId, component, invocationContext, options));
   }
 }
 
 /**
  * Computes the popup's invocation context based on passsed options and injection context.
  */
-function createPopupInvocationContext(config: PopupConfig, injector: Injector): WorkbenchInvocationContext | null {
-  return createInvocationContext(config.context && (typeof config.context === 'object' ? config.context.viewId : config.context), {injector});
+function createPopupInvocationContext(options: WorkbenchPopupOptions, injector: Injector): WorkbenchInvocationContext | null {
+  return createInvocationContext(options.context && (typeof options.context === 'object' ? options.context.viewId : options.context), {injector});
 }
