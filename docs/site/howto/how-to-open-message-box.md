@@ -25,7 +25,7 @@ inject(WorkbenchMessageBoxService).open('Lorem ipsum dolor sit amet.');
 ### How to Display Structured Content
 To display structured content, pass a component instead of a string literal.
 
-Data can be passed to the component as inputs via the options object in the form of an object literal. Inputs are available as input properties in the component.
+Data can be passed to the message component as inputs in the message box options.
 
 ```ts
 import {inject} from '@angular/core';
@@ -33,25 +33,23 @@ import {WorkbenchMessageBoxService} from '@scion/workbench';
 
 const action = await inject(WorkbenchMessageBoxService).open(SomeComponent, {
   inputs: {
-    a: '...',
-    b: '...',
+    firstname: 'Firstname',
+    lastname: 'Lastname',
   }
 });
 ```
 
 ```ts
-import {Component, Input} from '@angular/core';
+import {Component, input} from '@angular/core';
 
 @Component({...})
 export class SomeComponent {
-
-  @Input({required: true})
-  public a!: string;
-
-  @Input()
-  public b?: string;
+  firstname = input.required();
+  lastname = input.required();
 }
 ```
+
+Alternatively, data can be passed for injection via a custom injector (`WorkbenchMessageBoxOptions.injector`) or providers (`WorkbenchMessageBoxOptions.providers`).
 
 ### How to Define Action Buttons
 Action buttons can be defined via the options object in the form of an object literal. Each property in the object literal represents a button, with the property value used as the button label. If not defining a button, the message box displays an OK button.

@@ -77,8 +77,9 @@ export abstract class WorkbenchMessageBoxService {
    *
    * By default, the message box is modal to the calling context. Specify a different modality in {@link WorkbenchMessageBoxOptions.modality}.
    *
-   * Data can be passed to the component as inputs via {@link WorkbenchMessageBoxOptions.inputs} property or by providing a custom injector
-   * via {@link WorkbenchMessageBoxOptions.injector} property. Inputs are available as input properties in the component.
+   * Data can be passed to the component as inputs via {@link WorkbenchMessageBoxOptions.inputs} option. Inputs are available as input
+   * properties in the component. Alternatively, data can be passed for injection via a custom injector ({@link WorkbenchMessageBoxOptions.injector})
+   * or providers ({@link WorkbenchMessageBoxOptions.providers}).
    *
    * @example
    * ```ts
