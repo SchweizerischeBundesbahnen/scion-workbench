@@ -11,7 +11,7 @@
 import {Locator} from '@playwright/test';
 import {MatcherReturnType} from 'playwright/types/test';
 import {MAIN_AREA} from '../workbench.model';
-import {retryOnError} from '../helper/testing.util';
+import {prune, retryOnError} from '../helper/testing.util';
 import {ActivityId, PartId, Translatable, ViewId} from '@scion/workbench';
 import {SASHBOX_SPLITTER_SIZE} from '../workbench/workbench-layout-constants';
 import {Objects} from '../helper/objects.util';
@@ -664,11 +664,7 @@ export class MTreeNode {
     Object.assign(this, treeNode);
     // If `useDefineForClassFields` TypeScript flag is enabled, all class members that are not explicitly set will be initialised to `undefined`.
     // In test expectations, only the explicitly set properties should be asserted. Therefore, `undefined` properties are deleted.
-    Object.keys(this).forEach(key => {
-      if (this[key as keyof this] === undefined) {
-        delete this[key as keyof this]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
-      }
-    });
+    prune(this);
   }
 }
 
@@ -687,11 +683,7 @@ export class MPart {
     Object.assign(this, part);
     // If `useDefineForClassFields` TypeScript flag is enabled, all class members that are not explicitly set will be initialised to `undefined`.
     // In test expectations, only the explicitly set properties should be asserted. Therefore, `undefined` properties are deleted.
-    Object.keys(this).forEach(key => {
-      if (this[key as keyof this] === undefined) {
-        delete this[key as keyof this]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
-      }
-    });
+    prune(this);
   }
 }
 

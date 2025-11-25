@@ -19,8 +19,8 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {RecordComponent} from '../../record/record.component';
 import {parseTypedString} from '../../common/parse-typed-value.util';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
-import {undefinedIfEmpty} from '../../common/undefined-if-empty.util';
 import {UUID} from '@scion/toolkit/uuid';
+import {prune} from '../../common/prune.util';
 
 @Component({
   selector: 'app-part-capability-properties',
@@ -67,7 +67,7 @@ export class PartCapabilityPropertiesComponent implements ControlValueAccessor, 
     this.form.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => {
-        this._cvaChangeFn({
+        this._cvaChangeFn(prune({
           path: parseTypedString(this.form.controls.path.value)!, // allow `undefined` to test capability validation,
           views: this.form.controls.views.controls.map((viewFormGroup: FormGroup<ViewFormGroup>): WorkbenchViewRef => ({
             qualifier: viewFormGroup.controls.qualifier.value!,
@@ -76,15 +76,15 @@ export class PartCapabilityPropertiesComponent implements ControlValueAccessor, 
             cssClass: viewFormGroup.controls.cssClass.value,
           })),
           title: parseTypedString(this.form.controls.title.value) || undefined,
-          extras: undefinedIfEmpty({
+          extras: {
             icon: parseTypedString(this.form.controls.extras.controls.icon.value) || undefined!,
             label: parseTypedString(this.form.controls.extras.controls.label.value) || undefined!,
             tooltip: parseTypedString(this.form.controls.extras.controls.tooltip.value) || undefined,
-          }),
+          },
           resolve: this.form.controls.resolve.value ?? undefined,
           showSplash: this.form.controls.showSplash.value ?? undefined,
           cssClass: this.form.controls.cssClass.value ?? undefined,
-        });
+        }, {pruneIfEmpty: true}));
         this._cvaTouchedFn();
       });
   }

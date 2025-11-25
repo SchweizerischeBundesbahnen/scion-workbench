@@ -8,9 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {withoutUndefinedEntries} from '../../helper/testing.util';
 import {PopupPO} from '../../popup.po';
-import {PopupSize, WorkbenchPopupCapability, WorkbenchPopupReferrer} from '@scion/workbench-client';
+import {PopupSize, ViewId, WorkbenchPopupCapability, WorkbenchPopupReferrer} from '@scion/workbench-client';
 import {Params} from '@angular/router';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Locator} from '@playwright/test';
@@ -19,6 +18,8 @@ import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendPopupPagePO} from '../../workbench/page-object/workbench-popup-page.po';
 import {AppPO} from '../../app.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
+import {prune} from '../../helper/testing.util';
+import {parseTypedString} from '../../helper/parse-typed-value.util';
 
 /**
  * Page object to interact with {@link PopupPageComponent}.
@@ -99,9 +100,9 @@ export class PopupPagePO implements MicrofrontendPopupPagePO {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-referrer'));
     await accordion.expand();
     try {
-      return withoutUndefinedEntries({
-        viewId: await accordion.itemLocator().locator('output.e2e-view-id').innerText(),
-        viewCapabilityId: await accordion.itemLocator().locator('output.e2e-view-capability-id').innerText(),
+      return prune({
+        viewId: parseTypedString(await accordion.itemLocator().locator('output.e2e-view-id').innerText()) as ViewId | undefined,
+        viewCapabilityId: parseTypedString<string>(await accordion.itemLocator().locator('output.e2e-view-capability-id').innerText()) as string | undefined,
       });
     }
     finally {

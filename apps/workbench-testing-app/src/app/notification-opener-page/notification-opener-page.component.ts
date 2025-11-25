@@ -17,7 +17,7 @@ import {stringifyError} from '../common/stringify-error.util';
 import {NotificationPageComponent} from '../notification-page/notification-page.component';
 import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import {UUID} from '@scion/toolkit/uuid';
-import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
+import {prune} from '../common/prune.util';
 
 @Component({
   selector: 'app-notification-opener-page',
@@ -54,16 +54,16 @@ export default class NotificationOpenerPageComponent {
   protected onNotificationShow(): void {
     this.notificationOpenError = undefined;
     try {
-      this._notificationService.notify({
+      this._notificationService.notify(prune({
         title: this.restoreLineBreaks(this.form.controls.title.value) || undefined,
         content: this.isUseComponent() ? this.parseComponentFromUI() : this.restoreLineBreaks(this.form.controls.content.value),
-        componentInput: (this.isUseComponent() ? undefinedIfEmpty(this.form.controls.componentInput.value) : undefined),
+        componentInput: (this.isUseComponent() ? (this.form.controls.componentInput.value || undefined) : undefined),
         severity: this.form.controls.severity.value || undefined,
         duration: this.parseDurationFromUI(),
         group: this.form.controls.group.value || undefined,
         groupInputReduceFn: this.isUseGroupInputReducer() ? concatInput : undefined,
         cssClass: this.form.controls.cssClass.value,
-      });
+      }, {pruneIfEmpty: true})!);
     }
     catch (error) {
       this.notificationOpenError = stringifyError(error) || 'Workbench Notification could not be opened';

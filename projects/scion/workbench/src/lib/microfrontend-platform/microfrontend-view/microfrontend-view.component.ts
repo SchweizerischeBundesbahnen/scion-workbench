@@ -33,10 +33,10 @@ import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfronten
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../../glass-pane/glass-pane.directive';
 import {MicrofrontendWorkbenchView} from './microfrontend-workbench-view.model';
 import {Microfrontends} from '../common/microfrontend.util';
-import {Objects} from '../../common/objects.util';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {rootEffect, toRootObservable} from '../../common/rxjs-interop.util';
 import {createRemoteTranslatable} from '../text/remote-text-provider';
+import {prune} from '../../common/prune.util';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -228,12 +228,12 @@ export class MicrofrontendViewComponent {
           const paramsHandling = request.body!.paramsHandling;
           const currentParams = this._route.snapshot.params;
           const newParams = Dictionaries.coerce(request.body!.params); // coerce params for backward compatibility
-          const mergedParams = Objects.withoutUndefinedEntries(paramsHandling === 'merge' ? {...currentParams, ...newParams} : newParams);
+          const mergedParams = prune(paramsHandling === 'merge' ? {...currentParams, ...newParams} : newParams);
           const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(mergedParams, viewCapability);
 
           return layout.navigateView(this.view.id, [urlParams], {
             relativeTo: this._route,
-            state: Objects.withoutUndefinedEntries({
+            state: prune({
               [MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS]: transientParams,
             }),
           });

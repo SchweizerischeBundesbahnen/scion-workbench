@@ -152,15 +152,33 @@ export function toMatrixNotation(object: Record<string, unknown> | null | undefi
 }
 
 /**
- * Returns a new {@link Record} with `undefined` and `<undefined>` values removed.
+ * Mutates the passed object by recursively deleting `undefined` properties, optionally also pruning empty objects.
+ *
+ * By default, empty objects are retained.
+ *
+ * @returns Pruned object or `undefined` depending on options.
  */
-export function withoutUndefinedEntries<T>(object: Record<string, T>): Record<string, T> {
-  return Object.entries(object).reduce((acc, [key, value]) => {
-    if (value !== undefined && (value as unknown) !== '<undefined>') {
-      acc[key] = value;
+export function prune<T>(object: T): T;
+export function prune<T>(object: T, options: {pruneIfEmpty: true}): T | undefined;
+export function prune<T>(object: T, options?: {pruneIfEmpty: boolean}): T | undefined;
+export function prune<T>(object: T, options?: {pruneIfEmpty: boolean}): T | undefined {
+  const pruneIfEmpty = options?.pruneIfEmpty ?? false;
+
+  if (object === null || object instanceof Map || object instanceof Set || Array.isArray(object)) {
+    return object;
+  }
+
+  if (typeof object === 'object') {
+    Object.entries(object).forEach(([key, value]) => {
+      if (prune(value, {pruneIfEmpty}) === undefined) {
+        delete (object as Record<string, unknown>)[key]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
+      }
+    });
+    if (!Object.keys(object).length && pruneIfEmpty) {
+      return undefined;
     }
-    return acc;
-  }, {} as Record<string, T>);
+  }
+  return object;
 }
 
 /**

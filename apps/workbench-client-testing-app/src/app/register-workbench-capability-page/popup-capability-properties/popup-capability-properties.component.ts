@@ -12,12 +12,12 @@ import {Component, forwardRef, inject} from '@angular/core';
 import {AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator} from '@angular/forms';
 import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {PopupSize, WorkbenchPopupCapability} from '@scion/workbench-client';
+import {WorkbenchPopupCapability} from '@scion/workbench-client';
 import {MultiValueInputComponent} from '../../multi-value-input/multi-value-input.component';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {parseTypedString} from '../../common/parse-typed-value.util';
-import {undefinedIfEmpty} from '../../common/undefined-if-empty.util';
+import {prune} from '../../common/prune.util';
 
 @Component({
   selector: 'app-popup-capability-properties',
@@ -60,20 +60,20 @@ export class PopupCapabilityPropertiesComponent implements ControlValueAccessor,
     this.form.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => {
-        this._cvaChangeFn({
+        this._cvaChangeFn(prune({
           path: parseTypedString(this.form.controls.path.value)!, // allow `undefined` to test capability validation
-          size: undefinedIfEmpty<PopupSize>({
+          size: {
             width: this.form.controls.size.controls.width.value || undefined,
             height: this.form.controls.size.controls.height.value || undefined,
             minWidth: this.form.controls.size.controls.minWidth.value || undefined,
             maxWidth: this.form.controls.size.controls.maxWidth.value || undefined,
             minHeight: this.form.controls.size.controls.minHeight.value || undefined,
             maxHeight: this.form.controls.size.controls.maxHeight.value || undefined,
-          }),
+          },
           showSplash: this.form.controls.showSplash.value ?? undefined,
           pinToDesktop: this.form.controls.pinToDesktop.value,
           cssClass: this.form.controls.cssClass.value ?? undefined,
-        });
+        }, {pruneIfEmpty: true})!);
         this._cvaTouchedFn();
       });
   }
