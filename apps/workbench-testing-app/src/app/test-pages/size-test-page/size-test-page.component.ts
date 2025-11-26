@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, inject, NgZone, signal} from '@angular/core';
+import {Component, ElementRef, inject, input, NgZone, signal} from '@angular/core';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {WorkbenchDialog} from '@scion/workbench';
 import {map, Observable, Subject} from 'rxjs';
-import {distinctUntilChanged, startWith} from 'rxjs/operators';
+import {distinctUntilChanged, filter, startWith} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {observeIn} from '@scion/toolkit/operators';
 import {PopupSizeDirective} from '../../popup-opener-page/popup-size.directive';
@@ -26,7 +26,12 @@ import {PopupSizeDirective} from '../../popup-opener-page/popup-size.directive';
 })
 export default class SizeTestPageComponent {
 
-  protected sizes = signal<string[]>([]);
+  /**
+   * Controls if to capture size changes only if visible.
+   */
+  protected readonly captureIfVisibleOnly = input(false);
+
+  protected readonly sizes = signal<string[]>([]);
 
   constructor() {
     const dialog = inject(WorkbenchDialog, {optional: true});
@@ -36,8 +41,12 @@ export default class SizeTestPageComponent {
       dialog.size.minWidth = '500px';
     }
 
+    const host = inject(ElementRef).nativeElement as HTMLElement;
     boundingClientRect$(inject(ElementRef) as ElementRef<HTMLElement>)
-      .pipe(takeUntilDestroyed())
+      .pipe(
+        filter(() => !this.captureIfVisibleOnly() || host.checkVisibility({visibilityProperty: true})),
+        takeUntilDestroyed(),
+      )
       .subscribe(({x, y, width, height}) => {
         this.sizes.update(array => array.concat(`x=${x}, y=${y}, width=${width}, height=${height}`));
       });

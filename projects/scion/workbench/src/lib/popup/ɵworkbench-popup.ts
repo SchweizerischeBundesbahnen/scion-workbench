@@ -85,10 +85,12 @@ export class ɵWorkbenchPopup implements Popup, WorkbenchPopup, Blockable {
     const popupElement = componentRef.location.nativeElement as HTMLElement;
     this._componentRef.set(componentRef);
 
-    this.focus(popupElement);
+    // Make the popup focusable to request focus.
+    popupElement.setAttribute('tabindex', '-1');
+
     this.stickToAnchor(positionStrategy);
     this.repositionOnResize();
-    this.bindToHostElement();
+    this.bindToHostElement(popupElement);
     this.closeOnHostDestroy();
     this.closeOnFocusLoss(popupElement);
     this.closeOnEscape(popupElement);
@@ -137,13 +139,6 @@ export class ɵWorkbenchPopup implements Popup, WorkbenchPopup, Blockable {
       scrollStrategy: inject(Overlay).scrollStrategies.noop(),
       disposeOnNavigation: true,
     });
-  }
-
-  private focus(popupElement: HTMLElement): void {
-    // Make the popup focusable to request focus.
-    popupElement.setAttribute('tabindex', '-1');
-    // Request focus to not close the popup when it opens (if using the 'onFocusLost' strategy).
-    inject(FocusMonitor).focusVia(popupElement, 'program');
   }
 
   /**
@@ -195,12 +190,17 @@ export class ɵWorkbenchPopup implements Popup, WorkbenchPopup, Blockable {
     const focusMonitor = inject(FocusMonitor);
 
     if (this._options.closeStrategy?.onFocusLost ?? true) {
-      focusMonitor.monitor(popupElement, true)
-        .pipe(
-          filter((focusOrigin: FocusOrigin) => !focusOrigin),
-          takeUntilDestroyed(),
-        )
-        .subscribe(() => this.close(this.result));
+      effect(onCleanup => {
+        if (!this.attached() || !this._popupOrigin()) {
+          return;
+        }
+        untracked(() => {
+          const subscription = focusMonitor.monitor(popupElement, true)
+            .pipe(filter((focusOrigin: FocusOrigin) => !focusOrigin))
+            .subscribe(() => this.close(this.result));
+          onCleanup(() => subscription.unsubscribe());
+        });
+      });
     }
   }
 
@@ -238,19 +238,22 @@ export class ɵWorkbenchPopup implements Popup, WorkbenchPopup, Blockable {
   /**
    * Binds this popup to its workbench host element, displaying it only when the host element is attached.
    */
-  private bindToHostElement(): void {
+  private bindToHostElement(popupElement: HTMLElement): void {
     const zone = inject(NgZone);
     const document = inject(DOCUMENT);
     const viewDragService = inject(ViewDragService);
 
-    let activeElement: HTMLElement | undefined;
+    let activeElement = popupElement;
+
+    // Compute visibility as separate signal to only run the effect on visibility change.
+    const visible = computed(() => this.attached() && !!this._popupOrigin() && !viewDragService.dragging());
 
     effect(() => {
-      const visible = this.attached() && !viewDragService.dragging();
+      const isVisible = visible();
       untracked(() => {
-        if (visible) {
+        if (isVisible) {
           setStyle(this._overlayRef.overlayElement, {visibility: null});
-          activeElement?.focus();
+          activeElement.focus();
         }
         else {
           setStyle(this._overlayRef.overlayElement, {visibility: 'hidden'}); // Hide via `visibility` instead of `display` property to retain the size.
@@ -265,7 +268,7 @@ export class ɵWorkbenchPopup implements Popup, WorkbenchPopup, Blockable {
         takeUntilDestroyed(),
       )
       .subscribe(() => {
-        activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : undefined;
+        activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : popupElement;
       });
   }
 

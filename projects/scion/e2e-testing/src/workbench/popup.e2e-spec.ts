@@ -310,6 +310,32 @@ test.describe('Workbench Popup', () => {
     await expect(popupPage.input).toHaveText('TEST INPUT');
   });
 
+  /**
+   * Tests that the popup is rendered at the specified position on first rendering, not initially at position 0/0.
+   */
+  test('should render popup at specified position on first rendering', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open popup.
+    const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+    await popupOpenerPage.open('size-test-page', {
+      anchor: {top: 300, left: 400},
+      inputs: {captureIfVisibleOnly: true},
+      delayAnchorCoordinates: 1000,
+      size: {width: '500px', height: '200px'},
+      context: null,
+      cssClass: 'testee',
+    });
+
+    const popup = appPO.popup({cssClass: 'testee'});
+    const popupPage = new SizeTestPagePO(popup);
+    await expectPopup(popupPage).toBeVisible();
+    await expectPopup(popupPage).toHavePosition('north', 'viewport', {top: 300, left: 400});
+
+    // Expect single positioning.
+    await expect.poll(() => popupPage.getRecordedSizeChanges()).toHaveLength(1);
+  });
+
   test.describe('Popup Result', () => {
     test('should allow closing the popup and returning a value to the popup opener', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
