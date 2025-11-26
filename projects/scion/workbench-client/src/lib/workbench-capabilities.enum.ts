@@ -32,9 +32,9 @@ export enum WorkbenchCapabilities {
    */
   Perspective = 'perspective',
   /**
-   * Contributes a microfrontend for display in workbench popup.
+   * Contributes a workbench popup.
    *
-   * A popup is a visual workbench component for displaying content above other content.
+   * A popup is a visual workbench element for displaying content above other content.
    */
   Popup = 'popup',
   /**

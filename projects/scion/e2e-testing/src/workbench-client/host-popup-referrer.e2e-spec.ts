@@ -27,9 +27,10 @@ test.describe('Workbench Host Popup', () => {
       await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPage.enterQualifier({component: 'host-popup'});
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open({component: 'host-popup'}, {
+        anchor: 'element',
+        cssClass: 'testee',
+      });
 
       const popup = appPO.popup({cssClass: 'testee'});
       const popupPage = new HostPopupPagePO(popup);
@@ -52,11 +53,13 @@ test.describe('Workbench Host Popup', () => {
       const startPageViewId = await startPage.view.getViewId();
 
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPage.enterQualifier({component: 'host-popup'});
-      await popupOpenerPage.enterContext(startPageViewId);
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.open({waitUntilAttached: false});
+      await popupOpenerPage.open({component: 'host-popup'}, {
+        anchor: 'element',
+        context: startPageViewId,
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'testee',
+        waitUntilAttached: false,
+      });
 
       await startPage.view.tab.click();
 
@@ -78,11 +81,13 @@ test.describe('Workbench Host Popup', () => {
       const microfrontendViewId = await microfrontendViewPage.view.getViewId();
 
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPage.enterQualifier({component: 'host-popup'});
-      await popupOpenerPage.enterContext(microfrontendViewId);
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.open({waitUntilAttached: false});
+      await popupOpenerPage.open({component: 'host-popup'}, {
+        anchor: 'element',
+        context: microfrontendViewId,
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'testee',
+        waitUntilAttached: false,
+      });
 
       await microfrontendViewPage.view.tab.click();
 
@@ -104,10 +109,11 @@ test.describe('Workbench Host Popup', () => {
       await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPage.enterQualifier({component: 'host-popup'});
-      await popupOpenerPage.enterContext(null);
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open({component: 'host-popup'}, {
+        anchor: 'element',
+        context: null,
+        cssClass: 'testee',
+      });
 
       const popup = appPO.popup({cssClass: 'testee'});
       const popupPage = new HostPopupPagePO(popup);

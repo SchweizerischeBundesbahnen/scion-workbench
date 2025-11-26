@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, rejectWhenAttached, waitForCondition, waitUntilBoundingBoxStable} from '../../helper/testing.util';
+import {coerceArray, rejectWhenAttached, waitForCondition, waitUntilBoundingBoxStable, waitUntilStable} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {Qualifier} from '@scion/microfrontend-platform';
@@ -18,7 +18,7 @@ import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
-import {BottomLeftPoint, BottomRightPoint, DialogId, PartId, PopupId, TopLeftPoint, TopRightPoint, ViewId} from '@scion/workbench-client';
+import {BottomLeftPoint, BottomRightPoint, CloseStrategy, DialogId, PartId, PopupId, TopLeftPoint, TopRightPoint, ViewId, WorkbenchPopupOptions} from '@scion/workbench-client';
 import {PartPO} from '../../part.po';
 
 /**
@@ -44,82 +44,92 @@ export class PopupOpenerPagePO implements MicrofrontendViewPagePO {
     this.openButton = this.locator.locator('button.e2e-open');
   }
 
-  public async enterQualifier(qualifier: Qualifier): Promise<void> {
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
-    await keyValueField.clear();
-    await keyValueField.addEntries(qualifier);
-  }
+  public async open(qualifier: Qualifier, options: PopupOpenerPageOptions & Omit<WorkbenchPopupOptions, 'anchor'>): Promise<void> {
+    // Enter qualifier.
+    const qualifierField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
+    await qualifierField.clear();
+    await qualifierField.addEntries(qualifier);
 
-  public async enterParams(params: Record<string, string>): Promise<void> {
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-params'));
-    await keyValueField.clear();
-    await keyValueField.addEntries(params);
+    // Enter parameters.
+    const paramsField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-params'));
+    await paramsField.clear();
+    await paramsField.addEntries(options.params ?? {});
+
+    // Enter anchor.
+    if (options.anchor === 'element') {
+      await this.locator.locator('select.e2e-position').selectOption('element');
+    }
+    else {
+      await this.enterPosition(options.anchor);
+    }
+
+    // Enter align.
+    await this.locator.locator('select.e2e-align').selectOption(options.align ?? '');
+
+    // Enter context.
+    const context = options.context && (typeof options.context === 'object' ? options.context.viewId : options.context);
+    await this.locator.locator('input.e2e-context').fill(context || (context === null ? '<null>' : '<undefined>'));
+
+    // Enter CSS classes.
+    await this.locator.locator('input.e2e-class').fill(coerceArray(options.cssClass).join(' '));
+
+    // Enter close strategy.
+    await this.enterCloseStrategy(options.closeStrategy ?? {});
+
+    // Open popup.
+    const popupCount = await this._appPO.popups.count();
+    await this.openButton.click();
+
+    if (options.waitUntilAttached ?? true) {
+      // Evaluate the response: resolve the promise on success, or reject it on error.
+      await Promise.race([
+        this.waitUntilPopupAttached(popupCount),
+        rejectWhenAttached(this.error),
+      ]);
+    }
   }
 
   public async enterPosition(position: 'element' | TopLeftPoint | TopRightPoint | BottomLeftPoint | BottomRightPoint): Promise<void> {
-    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-anchor'));
-    await accordion.expand();
-    try {
-      if (position === 'element') {
-        await this.locator.locator('select.e2e-position').selectOption('element');
-        return;
-      }
-      const topLeft = position as Partial<TopLeftPoint>;
-      if (topLeft.top !== undefined && topLeft.left !== undefined) {
-        await this.locator.locator('select.e2e-position').selectOption('top-left');
-        await this.locator.locator('input.e2e-position-vertical').fill(`${topLeft.top}`);
-        await this.locator.locator('input.e2e-position-horizontal').fill(`${topLeft.left}`);
-        return;
-      }
-      const topRight = position as Partial<TopRightPoint>;
-      if (topRight.top !== undefined && topRight.right !== undefined) {
-        await this.locator.locator('select.e2e-position').selectOption('top-right');
-        await this.locator.locator('input.e2e-position-vertical').fill(`${topRight.top}`);
-        await this.locator.locator('input.e2e-position-horizontal').fill(`${topRight.right}`);
-        return;
-      }
-      const bottomLeft = position as Partial<BottomLeftPoint>;
-      if (bottomLeft.bottom !== undefined && bottomLeft.left !== undefined) {
-        await this.locator.locator('select.e2e-position').selectOption('bottom-left');
-        await this.locator.locator('input.e2e-position-vertical').fill(`${bottomLeft.bottom}`);
-        await this.locator.locator('input.e2e-position-horizontal').fill(`${bottomLeft.left}`);
-        return;
-      }
-      const bottomRight = position as Partial<BottomRightPoint>;
-      if (bottomRight.bottom !== undefined && bottomRight.right !== undefined) {
-        await this.locator.locator('select.e2e-position').selectOption('bottom-right');
-        await this.locator.locator('input.e2e-position-vertical').fill(`${bottomRight.bottom}`);
-        await this.locator.locator('input.e2e-position-horizontal').fill(`${bottomRight.right}`);
-        return;
-      }
-      throw Error('[PopupOriginError] Illegal popup origin; must be "Element", "Point", "TopLeftPoint", "TopRightPoint", "BottomLeftPoint" or "BottomRightPoint".');
+    const topLeft = position as Partial<TopLeftPoint>;
+    if (topLeft.top !== undefined && topLeft.left !== undefined) {
+      await this.locator.locator('select.e2e-position').selectOption('top-left');
+      await this.locator.locator('input.e2e-position-vertical').fill(`${topLeft.top}`);
+      await this.locator.locator('input.e2e-position-horizontal').fill(`${topLeft.left}`);
+      return;
     }
-    finally {
-      await accordion.collapse();
+    const topRight = position as Partial<TopRightPoint>;
+    if (topRight.top !== undefined && topRight.right !== undefined) {
+      await this.locator.locator('select.e2e-position').selectOption('top-right');
+      await this.locator.locator('input.e2e-position-vertical').fill(`${topRight.top}`);
+      await this.locator.locator('input.e2e-position-horizontal').fill(`${topRight.right}`);
+      return;
     }
+    const bottomLeft = position as Partial<BottomLeftPoint>;
+    if (bottomLeft.bottom !== undefined && bottomLeft.left !== undefined) {
+      await this.locator.locator('select.e2e-position').selectOption('bottom-left');
+      await this.locator.locator('input.e2e-position-vertical').fill(`${bottomLeft.bottom}`);
+      await this.locator.locator('input.e2e-position-horizontal').fill(`${bottomLeft.left}`);
+      return;
+    }
+    const bottomRight = position as Partial<BottomRightPoint>;
+    if (bottomRight.bottom !== undefined && bottomRight.right !== undefined) {
+      await this.locator.locator('select.e2e-position').selectOption('bottom-right');
+      await this.locator.locator('input.e2e-position-vertical').fill(`${bottomRight.bottom}`);
+      await this.locator.locator('input.e2e-position-horizontal').fill(`${bottomRight.right}`);
+      return;
+    }
+    throw Error('[PopupOriginError] Illegal popup origin; must be "Element", "Point", "TopLeftPoint", "TopRightPoint", "BottomLeftPoint" or "BottomRightPoint".');
   }
 
-  public async enterContext(context: ViewId | PartId | DialogId | PopupId | null | undefined): Promise<void> {
-    await this.locator.locator('input.e2e-context').fill(context || (context === null ? '<null>' : '<undefined>'));
-  }
-
-  public async selectAlign(align: 'east' | 'west' | 'north' | 'south'): Promise<void> {
-    await this.locator.locator('select.e2e-align').selectOption(align);
-  }
-
-  public async enterCssClass(cssClass: string | string[]): Promise<void> {
-    await this.locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
-  }
-
-  public async enterCloseStrategy(options: {closeOnFocusLost?: boolean; closeOnEscape?: boolean}): Promise<void> {
+  private async enterCloseStrategy(options: CloseStrategy): Promise<void> {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-close-strategy'));
     await accordion.expand();
     try {
-      if (options.closeOnFocusLost !== undefined) {
-        await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-close-on-focus-lost')).toggle(options.closeOnFocusLost);
+      if (options.onFocusLost !== undefined) {
+        await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-close-on-focus-lost')).toggle(options.onFocusLost);
       }
-      if (options.closeOnEscape !== undefined) {
-        await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-close-on-escape')).toggle(options.closeOnEscape);
+      if (options.onEscape !== undefined) {
+        await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-close-on-escape')).toggle(options.onEscape);
       }
     }
     finally {
@@ -127,29 +137,14 @@ export class PopupOpenerPagePO implements MicrofrontendViewPagePO {
     }
   }
 
-  public async expandAnchorPanel(): Promise<void> {
-    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-anchor'));
+  public async expandPanel(): Promise<void> {
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-close-strategy'));
     await accordion.expand();
   }
 
-  public async collapseAnchorPanel(): Promise<void> {
-    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-anchor'));
+  public async collapsePanel(): Promise<void> {
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-close-strategy'));
     await accordion.collapse();
-  }
-
-  public async open(options?: {waitUntilAttached?: boolean}): Promise<void> {
-    const popupCount = await this._appPO.popups.count();
-    await this.locator.locator('button.e2e-open').click();
-
-    if (!(options?.waitUntilAttached ?? true)) {
-      return;
-    }
-
-    // Evaluate the response: resolve the promise on success, or reject it on error.
-    await Promise.race([
-      this.waitUntilPopupAttached(popupCount),
-      rejectWhenAttached(this.error),
-    ]);
   }
 
   private async waitUntilPopupAttached(prevPopupCount: number): Promise<void> {
@@ -169,6 +164,20 @@ export class PopupOpenerPagePO implements MicrofrontendViewPagePO {
     await waitUntilBoundingBoxStable(popup.locator);
 
     // Wait for the popup to have focus.
-    await waitForCondition(async () => (await this._appPO.focusOwner()) === await popup.getPopupId());
+    await waitUntilStable(async () => (await this._appPO.focusOwner()) === await popup.getPopupId());
   }
+}
+
+/**
+ * Controls opening of a popup.
+ */
+export interface PopupOpenerPageOptions {
+  /**
+   * Controls if to wait for the popup to display.
+   */
+  waitUntilAttached?: boolean;
+  /**
+   * @see WorkbenchPopupOptions.anchor
+   */
+  anchor: 'element' | TopLeftPoint | TopRightPoint | BottomLeftPoint | BottomRightPoint;
 }

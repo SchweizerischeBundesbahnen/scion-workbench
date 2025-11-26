@@ -12,28 +12,28 @@
   <section class="component-size">
     <header>Component Size</header>
 
-    <sci-form-field label="Min Height">
-      <input [formControl]="form.controls.minHeight" class="e2e-min-height">
-    </sci-form-field>
-
     <sci-form-field label="Height">
-      <input [formControl]="form.controls.height" class="e2e-height">
-    </sci-form-field>
-
-    <sci-form-field label="Max Height">
-      <input [formControl]="form.controls.maxHeight" class="e2e-max-height">
-    </sci-form-field>
-
-    <sci-form-field label="Min Width">
-      <input [formControl]="form.controls.minWidth" class="e2e-min-width">
+      <input [formControl]="form.controls.componentSize.controls.height" class="e2e-height">
     </sci-form-field>
 
     <sci-form-field label="Width">
-      <input [formControl]="form.controls.width" class="e2e-width">
+      <input [formControl]="form.controls.componentSize.controls.width" class="e2e-width">
+    </sci-form-field>
+
+    <sci-form-field label="Min Height">
+      <input [formControl]="form.controls.componentSize.controls.minHeight" class="e2e-min-height">
+    </sci-form-field>
+
+    <sci-form-field label="Max Height">
+      <input [formControl]="form.controls.componentSize.controls.maxHeight" class="e2e-max-height">
+    </sci-form-field>
+
+    <sci-form-field label="Min Width">
+      <input [formControl]="form.controls.componentSize.controls.minWidth" class="e2e-min-width">
     </sci-form-field>
 
     <sci-form-field label="Max Width">
-      <input [formControl]="form.controls.maxWidth" class="e2e-max-width">
+      <input [formControl]="form.controls.componentSize.controls.maxWidth" class="e2e-max-width">
     </sci-form-field>
   </section>
 

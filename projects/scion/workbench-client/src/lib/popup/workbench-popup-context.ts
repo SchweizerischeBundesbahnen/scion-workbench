@@ -22,7 +22,7 @@ import {PopupId} from '../workbench.identifiers';
  */
 export interface ɵPopupContext {
   popupId: PopupId;
-  params: Map<string, any>;
+  params: Map<string, unknown>;
   capability: WorkbenchPopupCapability;
   /** @deprecated since version 1.0.0-beta.34. No replacement. Marked for removal. */
   referrer: WorkbenchPopupReferrer;

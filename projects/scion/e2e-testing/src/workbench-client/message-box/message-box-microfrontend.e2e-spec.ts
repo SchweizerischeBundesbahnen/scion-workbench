@@ -234,9 +234,10 @@ test.describe('Workbench Message Box Microfrontend', () => {
 
       // Open popup.
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPage.enterQualifier({component: 'message-box-opener'});
-      await popupOpenerPage.enterCssClass('message-box-opener');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open({component: 'message-box-opener'}, {
+        anchor: 'element',
+        cssClass: 'message-box-opener',
+      });
 
       // Open message box from popup.
       const messageBoxOpenerPage = new MessageBoxOpenerPagePO(appPO, {cssClass: 'message-box-opener'});
@@ -275,9 +276,10 @@ test.describe('Workbench Message Box Microfrontend', () => {
 
       // Open popup.
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPage.enterQualifier({component: 'message-box-opener'});
-      await popupOpenerPage.enterCssClass('message-box-opener');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open({component: 'message-box-opener'}, {
+        anchor: 'element',
+        cssClass: 'message-box-opener',
+      });
 
       // Open message box from popup.
       const messageBoxOpenerPage = new MessageBoxOpenerPagePO(appPO, {cssClass: 'message-box-opener'});
