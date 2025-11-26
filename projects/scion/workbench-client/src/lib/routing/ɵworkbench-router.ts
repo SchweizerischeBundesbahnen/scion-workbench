@@ -17,6 +17,7 @@ import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {lastValueFrom} from 'rxjs';
 import {Empty} from '../common/utility-types';
 import {WorkbenchNavigationExtras, WorkbenchRouter} from './workbench-router';
+import {PartId} from '../workbench.identifiers';
 
 /**
  * @ignore
@@ -30,17 +31,20 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
       return this.updateViewParams(extras);
     }
     else {
-      return this.issueViewIntent(qualifier, extras);
+      return this.navigateView(qualifier, extras);
     }
   }
 
-  private async issueViewIntent(qualifier: Qualifier, extras?: WorkbenchNavigationExtras): Promise<boolean> {
-    const navigationExtras: WorkbenchNavigationExtras = {
-      ...extras,
-      params: undefined, // included in the intent
-      paramsHandling: undefined, // only applicable for self-navigation
+  private async navigateView(qualifier: Qualifier, extras?: WorkbenchNavigationExtras): Promise<boolean> {
+    const command: ɵWorkbenchNavigateCommand = {
+      target: extras?.target,
+      partId: extras?.partId,
+      activate: extras?.activate,
+      close: extras?.close,
+      position: extras?.position,
+      cssClass: extras?.cssClass,
     };
-    const navigate$ = Beans.get(IntentClient).request$<boolean>({type: WorkbenchCapabilities.View, qualifier, params: Maps.coerce(extras?.params)}, navigationExtras);
+    const navigate$ = Beans.get(IntentClient).request$<boolean>({type: WorkbenchCapabilities.View, qualifier, params: Maps.coerce(extras?.params)}, command);
     try {
       return await lastValueFrom(navigate$.pipe(mapToBody()));
     }
@@ -77,6 +81,21 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
     }
     return false;
   }
+}
+
+/**
+ * Command object for instructing the Workbench Router to navigate a view.
+ *
+ * @docs-private Not public API. For internal use only.
+ * @ignore
+ */
+export interface ɵWorkbenchNavigateCommand {
+  target?: string | 'blank' | 'auto';
+  partId?: PartId | string;
+  activate?: boolean;
+  close?: boolean;
+  position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view';
+  cssClass?: string | string[];
 }
 
 /**

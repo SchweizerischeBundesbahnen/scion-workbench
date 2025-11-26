@@ -22,6 +22,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {parseTypedObject} from '../common/parse-typed-value.util';
 import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import {UUID} from '@scion/toolkit/uuid';
+import {prune} from '../common/prune.util';
 
 @Component({
   selector: 'app-router-page',
@@ -98,7 +99,7 @@ export default class RouterPageComponent {
 
   private readExtrasFromUI(): WorkbenchNavigationExtras {
     const extras = this.form.controls.extras.controls;
-    return {
+    return prune({
       queryParams: SciKeyValueFieldComponent.toDictionary(extras.queryParams),
       activate: extras.activate.value,
       close: extras.close.value,
@@ -109,7 +110,7 @@ export default class RouterPageComponent {
       data: parseTypedObject(SciKeyValueFieldComponent.toDictionary(extras.data)) ?? undefined,
       state: parseTypedObject(SciKeyValueFieldComponent.toDictionary(extras.state)) ?? undefined,
       cssClass: extras.cssClass.value,
-    };
+    });
   }
 
   private resetForm(): void {

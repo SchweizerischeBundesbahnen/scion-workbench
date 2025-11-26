@@ -10,7 +10,7 @@
 
 import {Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {inject, Injectable} from '@angular/core';
-import {WorkbenchCapabilities, WorkbenchNavigationExtras, WorkbenchViewCapability} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchViewCapability, ɵWorkbenchNavigateCommand} from '@scion/workbench-client';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {MicrofrontendViewRoutes} from './microfrontend-view-routes';
 import {Logger, LoggerNames} from '../../logging';
@@ -37,38 +37,38 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
    */
   public intercept(intentMessage: IntentMessage, next: Handler<IntentMessage>): Promise<void> {
     if (intentMessage.intent.type === WorkbenchCapabilities.View) {
-      return this.consumeViewIntent(intentMessage as IntentMessage<WorkbenchNavigationExtras | undefined>);
+      return this.consumeViewIntent(intentMessage as IntentMessage<ɵWorkbenchNavigateCommand | undefined>);
     }
     else {
       return next.handle(intentMessage);
     }
   }
 
-  private async consumeViewIntent(message: IntentMessage<WorkbenchNavigationExtras | undefined>): Promise<void> {
+  private async consumeViewIntent(message: IntentMessage<ɵWorkbenchNavigateCommand | undefined>): Promise<void> {
     const replyTo = message.headers.get(MessageHeaders.ReplyTo) as string;
     const success = await this.navigate(message);
     await Beans.get(MessageClient).publish(replyTo, success, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)});
   }
 
-  private async navigate(message: IntentMessage<WorkbenchNavigationExtras | undefined>): Promise<boolean> {
-    const viewCapability = message.capability as WorkbenchViewCapability;
-    const extras: WorkbenchNavigationExtras = message.body ?? {};
+  private async navigate(message: IntentMessage<ɵWorkbenchNavigateCommand | undefined>): Promise<boolean> {
+    const capability = message.capability as WorkbenchViewCapability;
+    const command: ɵWorkbenchNavigateCommand = message.body ?? {};
 
     const intentParams = prune(Dictionaries.coerce(message.intent.params));
-    const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(intentParams, viewCapability);
-    const targets = this.resolveTargets(message, extras);
-    const commands = extras.close ? [] : MicrofrontendViewRoutes.createMicrofrontendNavigateCommands(viewCapability.metadata!.id, urlParams);
-    const partId = extras.close ? undefined : extras.partId;
+    const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(intentParams, capability);
+    const targets = this.resolveTargets(message, command);
+    const microfrontendViewCommands = command.close ? [] : MicrofrontendViewRoutes.createMicrofrontendNavigateCommands(capability.metadata!.id, urlParams);
+    const partId = command.close ? undefined : command.partId;
 
-    this._logger.debug(() => `Navigating to: ${viewCapability.properties.path}`, LoggerNames.MICROFRONTEND_ROUTING, commands, viewCapability, transientParams);
+    this._logger.debug(() => `Navigating to: ${capability.properties.path}`, LoggerNames.MICROFRONTEND_ROUTING, microfrontendViewCommands, capability, transientParams);
     const navigations = await Promise.all(targets.map(target => {
-      return this._workbenchRouter.navigate(commands, {
+      return this._workbenchRouter.navigate(microfrontendViewCommands, {
         target,
         partId,
-        activate: extras.activate,
-        close: extras.close,
-        position: extras.position,
-        cssClass: extras.cssClass,
+        activate: command.activate,
+        close: command.close,
+        position: command.position,
+        cssClass: command.cssClass,
         state: prune({
           [MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS]: transientParams,
         }),
@@ -80,18 +80,18 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
   /**
    * Resolves the target(s) for this navigation.
    */
-  private resolveTargets(intentMessage: IntentMessage, extras: WorkbenchNavigationExtras): string[] {
+  private resolveTargets(intentMessage: IntentMessage, command: ɵWorkbenchNavigateCommand): string[] {
     // Closing a microfrontend view by viewId is not allowed, as this would violate the concept of intent-based view navigation.
-    if (extras.close && extras.target) {
-      throw Error(`[NavigateError] The target must be empty if closing a view [target=${(extras.target)}]`);
+    if (command.close && command.target) {
+      throw Error(`[NavigateError] The target must be empty if closing a view [target=${(command.target)}]`);
     }
-    if (extras.close) {
-      return this.findViews(intentMessage, extras, {matchWildcardParams: true}) ?? [];
+    if (command.close) {
+      return this.findViews(intentMessage, command, {matchWildcardParams: true}) ?? [];
     }
-    if (!extras.target || extras.target === 'auto') {
-      return this.findViews(intentMessage, extras, {matchWildcardParams: false}) ?? ['blank'];
+    if (!command.target || command.target === 'auto') {
+      return this.findViews(intentMessage, command, {matchWildcardParams: false}) ?? ['blank'];
     }
-    return [extras.target];
+    return [command.target];
   }
 
   /**
@@ -101,13 +101,13 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
    *
    * Allows matching wildcard parameters by setting the option `matchWildcardParams` to `true`.
    */
-  private findViews(intentMessage: IntentMessage, extras: WorkbenchNavigationExtras, options: {matchWildcardParams: boolean}): string[] | null {
+  private findViews(intentMessage: IntentMessage, command: ɵWorkbenchNavigateCommand, options: {matchWildcardParams: boolean}): string[] | null {
     const requiredParams = intentMessage.capability.params?.filter(param => param.required) ?? [];
 
     const viewIds = this._layout()
       .views({
-        peripheral: extras.partId ? undefined : false,
-        partId: extras.partId,
+        peripheral: command.partId ? undefined : false,
+        partId: command.partId,
       })
       .filter(mView => {
         const url = this._layout().urlSegments({outlet: mView.id});

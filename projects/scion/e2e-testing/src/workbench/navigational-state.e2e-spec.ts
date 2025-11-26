@@ -83,7 +83,6 @@ test.describe('Navigational State', () => {
         state4: 'true [boolean]',
         state5: 'false [boolean]',
         state6: 'null [null]',
-        state7: 'undefined [undefined]',
       });
     });
 
