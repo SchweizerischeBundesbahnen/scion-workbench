@@ -16,6 +16,8 @@ import {Translatable} from '../text/workbench-text-provider.model';
  *
  * A notification is a closable message that appears in the upper-right corner and disappears automatically after a few seconds.
  * It informs the user of a system event, e.g., that a task has been completed or an error has occurred.
+ *
+ * @deprecated since version 21.0.0-beta.1. Replaced by `WorkbenchNotification`. Marked for removal in version 22.
  */
 export abstract class Notification<T = any> {
 

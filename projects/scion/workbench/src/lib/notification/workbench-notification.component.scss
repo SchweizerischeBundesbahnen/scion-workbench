@@ -7,19 +7,18 @@
   font-size: 1rem;
   border-radius: var(--sci-corner);
   box-shadow: var(--sci-elevation) var(--sci-static-color-black);
-  width: var(--sci-workbench-notification-width);
   border-left: var(--sci-workbench-notification-severity-indicator-size) solid transparent;
   position: relative; // positioning context
 
-  &.info {
+  &[data-severity="info"] {
     border-left-color: var(--sci-color-accent);
   }
 
-  &.warn {
+  &[data-severity="warn"] {
     border-left-color: var(--sci-color-notice);
   }
 
-  &.error {
+  &[data-severity="error"] {
     border-left-color: var(--sci-color-negative);
   }
 

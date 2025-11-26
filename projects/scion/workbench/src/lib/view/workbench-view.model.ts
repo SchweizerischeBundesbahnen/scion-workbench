@@ -28,7 +28,7 @@ import {Translatable} from '../text/workbench-text-provider.model';
 export abstract class WorkbenchView {
 
   /**
-   * Unique identity of this view.
+   * Identity of this view.
    *
    * @see alternativeId
    */

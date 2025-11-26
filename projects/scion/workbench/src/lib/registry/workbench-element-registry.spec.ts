@@ -48,10 +48,10 @@ describe('WorkbenchElementRegistry', () => {
     expect(registry.get('3')).toEqual({id: '3'});
   });
 
-  it('should replace an existing element', () => {
+  it('should replace element', () => {
     const log = new Array<string>();
     const registry = TestBed.runInInjectionContext(() => new WorkbenchElementRegistry<string, TestElement>({
-      onUnregister: element => log.push(`Element "${element.id}" unregistered.`),
+      onUnregister: element => log.push(`Element "${element.id}" unregistered. [containedInRegistry=${registry.has(element.id)}]`),
     }));
 
     registry.register('1', {id: '1', version: 1});
@@ -63,7 +63,26 @@ describe('WorkbenchElementRegistry', () => {
     registry.register('2', {id: '2', version: 2});
     expect(registry.elements()).toEqual([{id: '1', version: 1}, {id: '2', version: 2}, {id: '3', version: 1}]);
 
-    expect(log).toEqual(['Element "2" unregistered.']);
+    expect(log).toEqual(['Element "2" unregistered. [containedInRegistry=false]']);
+  });
+
+  it('should replace different element', () => {
+    const log = new Array<string>();
+
+    const registry = TestBed.runInInjectionContext(() => new WorkbenchElementRegistry<string, TestElement>({
+      onUnregister: element => log.push(`Element "${element.id}" unregistered. [containedInRegistry=${registry.has(element.id)}]`),
+    }));
+
+    registry.register('1', {id: '1'});
+    registry.register('2', {id: '2'});
+    registry.register('3', {id: '3'});
+    expect(log).toEqual([]);
+
+    // Replace element 2 by element 4.
+    registry.replace('2', {key: '4', element: {id: '4'}});
+    expect(registry.elements()).toEqual([{id: '1'}, {id: '4'}, {id: '3'}]);
+
+    expect(log).toEqual(['Element "2" unregistered. [containedInRegistry=false]']);
   });
 
   it('should return `null` if element is not registered', () => {

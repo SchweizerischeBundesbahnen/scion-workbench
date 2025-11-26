@@ -74,7 +74,7 @@ export class WorkbenchNavigator {
       }
       case NotificationOpenerPagePO: {
         await startPage.openWorkbenchView('e2e-test-notification-opener');
-        return new NotificationOpenerPagePO(this._appPO, {viewId, cssClass: 'e2e-test-notification-opener'});
+        return new NotificationOpenerPagePO(this._appPO.view({viewId, cssClass: 'e2e-test-notification-opener'}));
       }
       case PopupOpenerPagePO: {
         await startPage.openWorkbenchView('e2e-test-popup-opener');

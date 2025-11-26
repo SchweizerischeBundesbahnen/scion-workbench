@@ -71,14 +71,16 @@ export class NotificationOpenerPagePO implements MicrofrontendViewPagePO {
     await this.locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
   }
 
-  public async open(): Promise<void> {
+  public async open(options?: {waitUntilAttached?: boolean}): Promise<void> {
     await this.locator.locator('button.e2e-show').click();
 
-    // Evaluate the response: resolve the promise on success, or reject it on error.
-    return Promise.race([
-      this.waitUntilNotificationAttached(),
-      rejectWhenAttached(this.error),
-    ]);
+    if (options?.waitUntilAttached ?? true) {
+      // Evaluate the response: resolve the promise on success, or reject it on error.
+      return Promise.race([
+        this.waitUntilNotificationAttached(),
+        rejectWhenAttached(this.error),
+      ]);
+    }
   }
 
   private async waitUntilNotificationAttached(): Promise<void> {

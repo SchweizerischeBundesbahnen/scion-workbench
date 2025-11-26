@@ -16,7 +16,7 @@ import {provideConfirmWorkbenchStartup} from './workbench/confirm-workbench-star
 import {provideThrottleCapabilityLookupInterceptor} from './workbench/throttle-capability-lookup';
 import {provideWorkbenchLifecycleHookLoggers} from './workbench/workbench-lifecycle-hook-loggers';
 import {provideDevToolsInterceptor} from './devtools/devtools-capability-interceptor';
-import {provideCustomNotificationIntentHandler} from './notification-page/notification-page-intent-handler';
+import {provideHostNotificationIntentHandler} from './notification-page/host-notification-intent-handler';
 import {environment} from '../environments/environment';
 import {provideAnimations, provideNoopAnimations} from '@angular/platform-browser/animations';
 import {provideWorkbench, provideWorkbenchInitializer} from '@scion/workbench';
@@ -40,7 +40,7 @@ export const appConfig: ApplicationConfig = {
     provideMainAreaInitialPartId(),
     provideWorkbenchLifecycleHookLoggers(),
     provideDevToolsInterceptor(),
-    provideCustomNotificationIntentHandler(),
+    provideHostNotificationIntentHandler(),
     provideWorkbenchInitializer(() => void inject(ActiveWorkbenchElementCollector)),
     provideAnimationsIfEnabled(),
     provideValueFromStorage(),

@@ -8,145 +8,70 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertNotInReactiveContext, DOCUMENT, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
-import {BehaviorSubject, fromEvent, Observable} from 'rxjs';
-import {ɵNotification} from './ɵnotification';
+import {inject, Injectable} from '@angular/core';
 import {NotificationConfig} from './notification.config';
-import {filter, map} from 'rxjs/operators';
-import {observeIn, subscribeIn} from '@scion/toolkit/operators';
-import {Arrays} from '@scion/toolkit/util';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Translatable} from '../text/workbench-text-provider.model';
+import {LEGACY_NOTIFICATION_INPUT} from './ɵnotification';
+import {ɵWorkbenchNotificationService} from './ɵworkbench-notification.service';
+import {prune} from '../common/prune.util';
 
 /**
- * Allows displaying a notification to the user.
+ * Shows a notification.
  *
- * A notification is a closable message that appears in the upper-right corner and disappears automatically after a few seconds.
- * It informs the user of a system event, e.g., that a task has been completed or an error has occurred.
+ * A notification is a closable message displayed in the upper-right corner that disappears after a few seconds unless hovered.
+ * It informs about system events, task completion or errors. The severity indicates importance or urgency.
  *
- * Multiple notifications are stacked vertically. Notifications can be grouped. For each group, only the last notification is
- * displayed.
+ * Notifications can be grouped. Only the most recent notification within a group is displayed.
  *
- * To display structured content, consider passing a component to {@link NotificationConfig#content} instead of plain text.
+ * Content can be plain text or structured. Pressing Escape closes the notification.
+ *
+ * @deprecated since version 21.0.0-beta.1. Use `WorkbenchNotificationService` to show notifications. Marked for removal in version 22.
  */
 @Injectable({providedIn: 'root'})
 export class NotificationService {
 
-  private readonly _zone = inject(NgZone);
-  private readonly _injector = inject(Injector);
-  private readonly _document = inject(DOCUMENT);
-  private readonly _notifications$ = new BehaviorSubject<ɵNotification[]>([]);
-
-  constructor() {
-    this.installEscapeHandler();
-  }
+  private readonly _notificationService = inject(ɵWorkbenchNotificationService);
 
   /**
-   * Presents the user with a notification that is displayed in the upper-right corner based on the given config.
+   * Displays the specified text or component as workbench notification.
    *
-   * To display structured content, consider passing a component to {@link NotificationConfig#content}.
+   * @param notification - Configures content and appearance of the notification.
    *
-   * ### Usage:
-   * ```typescript
-   * notificationService.notify({
-   *   content: 'Task scheduled for execution.',
-   *   severity: 'info',
-   *   duration: 'short',
-   * });
-   * ```
-   *
-   * @param  notification - Configures the content and appearance of the notification.
+   * @deprecated since version 21.0.0-beta.1. Use `WorkbenchNotificationService` to show notifications. Marked for removal in version 22.
    */
   public notify(notification: Translatable | NotificationConfig): void {
-    assertNotInReactiveContext(this.notify, 'Call NotificationService.notify() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-
-    // Ensure to run in Angular zone to display the notification even when called from outside the Angular zone, e.g. from an error handler.
-    if (!NgZone.isInAngularZone()) {
-      this._zone.run(() => this.notify(notification));
-      return;
+    if (typeof notification === 'string') {
+      this._notificationService.show(notification);
     }
+    else {
+      this._notificationService.show(notification.content, prune({
+        title: notification.title,
+        injector: notification.componentConstructOptions?.injector,
+        inputs: {[LEGACY_NOTIFICATION_INPUT]: notification.componentInput},
+        severity: notification.severity,
+        duration: migrateDuration(notification),
+        group: notification.group,
+        groupInputReduceFn: migrateGroupInputReduceFn(notification),
+        cssClass: notification.cssClass,
+      }));
+    }
+  }
+}
 
-    const config: NotificationConfig = typeof notification === 'string' ? {content: notification} : notification;
-    this.addNotification(config);
+function migrateDuration(config: NotificationConfig): 'short' | 'medium' | 'long' | 'infinite' | number | undefined {
+  if (typeof config.duration === 'number') {
+    return config.duration * 1000;
+  }
+  return config.duration;
+}
+
+function migrateGroupInputReduceFn(config: NotificationConfig): ((prevInput: {[name: string]: unknown}, currInput: {[name: string]: unknown}) => {[name: string]: unknown}) | undefined {
+  if (!config.groupInputReduceFn) {
+    return undefined;
   }
 
-  private addNotification(config: NotificationConfig): void {
-    const notifications = [...this.notifications];
-    const {index, notification} = this.constructNotification(config, notifications);
-    notifications.splice(index, 1, notification);
-    this._notifications$.next(notifications);
-  }
-
-  /**
-   * Constructs the notification based on the given config and computes its insertion index.
-   */
-  private constructNotification(config: NotificationConfig, notifications: ɵNotification[]): {notification: ɵNotification; index: number} {
-    config = {...config};
-
-    return runInInjectionContext(this._injector, () => {
-      // Check whether the notification belongs to a group. If so, replace any present notification of that group.
-      const group = config.group;
-      if (!group) {
-        return {
-          notification: new ɵNotification(config),
-          index: notifications.length,
-        };
-      }
-
-      // Check whether there is a notification of the same group present.
-      const index = notifications.findIndex(it => it.config.group === group);
-      if (index === -1) {
-        return {
-          notification: new ɵNotification(config),
-          index: notifications.length,
-        };
-      }
-
-      // Reduce the notification's input, if specified a reducer.
-      if (config.groupInputReduceFn) {
-        config.componentInput = config.groupInputReduceFn(notifications[index]!.input, config.componentInput);
-      }
-
-      return {
-        notification: new ɵNotification(config),
-        index: index,
-      };
-    });
-  }
-
-  private get notifications(): ɵNotification[] {
-    return this._notifications$.value;
-  }
-
-  /**
-   * @internal
-   */
-  public closeNotification(notification: ɵNotification): void {
-    this._notifications$.next(this.notifications.filter(it => it !== notification));
-  }
-
-  /**
-   * @internal
-   */
-  public get notifications$(): Observable<ɵNotification[]> {
-    return this._notifications$;
-  }
-
-  /**
-   * Installs a keystroke listener to close the last notification when the user presses the escape keystroke.
-   */
-  private installEscapeHandler(): void {
-    fromEvent<KeyboardEvent>(this._document, 'keydown')
-      .pipe(
-        subscribeIn(fn => this._zone.runOutsideAngular(fn)),
-        filter((event: KeyboardEvent) => event.key === 'Escape'),
-        map(() => Arrays.last(this.notifications)),
-        filter((notification): notification is ɵNotification => !!notification),
-        observeIn(fn => this._zone.run(fn)),
-        takeUntilDestroyed(),
-      )
-      .subscribe(lastNotification => {
-        this.closeNotification(lastNotification);
-      });
-  }
+  return (prevInput, currInput) => {
+    const result = config.groupInputReduceFn!(prevInput[LEGACY_NOTIFICATION_INPUT], currInput[LEGACY_NOTIFICATION_INPUT]) as unknown;
+    return {[LEGACY_NOTIFICATION_INPUT]: result};
+  };
 }

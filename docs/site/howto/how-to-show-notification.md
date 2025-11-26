@@ -5,24 +5,132 @@
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Notification
 
-A notification is a closable message that appears in the upper-right corner and disappears automatically after a few seconds. It informs the user of a system event, e.g., that a task has been completed or an error has occurred. Multiple notifications are stacked vertically. Notifications can be grouped. For each group, only the last notification is displayed.
+A notification is a closable message displayed in the upper-right corner that disappears after a few seconds unless hovered.
+It informs about system events, task completion or errors. The severity indicates importance or urgency.
 
 ### How to Show a Notification
-To show a notification, inject `NotificationService` and invoke the `notify` method, passing a `Notification` options object to control the appearance of the notification, like its severity, its content and show duration.
+To show a text notification, inject `WorkbenchNotificationService` and invoke the `show` method, passing the text to display.
 
 ```ts
 import {inject} from '@angular/core';
-import {NotificationService} from '@scion/workbench';
+import {WorkbenchNotificationService} from '@scion/workbench';
 
-const notificationService = inject(NotificationService);
-notificationService.notify({
-  content: 'Person successfully created',
-  severity: 'info',
-  duration: 'medium',
+inject(WorkbenchNotificationService).show('Task completed');
+```
+
+### How to Display Structured Content
+To display structured content, pass a component instead of a string literal.
+
+Data can be passed to the notification component as inputs in the notification options.
+
+```ts
+import {inject} from '@angular/core';
+import {WorkbenchNotificationService} from '@scion/workbench';
+
+const notificationService = inject(WorkbenchNotificationService);
+notificationService.show(SomeComponent, {
+  inputs: {
+    firstname: 'Firstname',
+    lastname: 'Lastname',
+  },
 });
 ```
 
-To display structured content, consider passing a component to `NotificationConfig.content` instead of plain text.
+```ts
+import {Component, input} from '@angular/core';
+
+@Component({...})
+export class SomeComponent {
+  firstname = input.required();
+  lastname = input.required();
+}
+```
+
+Alternatively, data can be passed for injection via a custom injector (`WorkbenchNotificationOptions.injector`) or providers (`WorkbenchNotificationOptions.providers`).
+
+### How to Set the Severity of a Notification
+A notification can be displayed as info, warning or error. The severity can be set via the options object.
+
+```ts
+import {inject} from '@angular/core';
+import {WorkbenchNotificationService} from '@scion/workbench';
+
+inject(WorkbenchNotificationService).show('Task failed to complete.', {
+  severity: 'error',
+});
+```
+
+### How to Set a Title
+A notification can have a title. The title is specified via the options object.
+
+```ts
+import {inject} from '@angular/core';
+import {WorkbenchNotificationService} from '@scion/workbench';
+
+inject(WorkbenchNotificationService).show('Task has completed.', {
+  title: 'Task Completion',
+});
+```
+
+### How to Group Notifications
+Notifications can be grouped. Only the most recent notification within a group is displayed.
+
+```ts
+import {inject} from '@angular/core';
+import {WorkbenchNotificationService} from '@scion/workbench';
+
+inject(WorkbenchNotificationService).show('Network connection interrupted.', {
+  group: 'connectivity',
+});
+```
+
+A new notification replaces the previous notification of the same group.
+
+```ts
+import {inject} from '@angular/core';
+import {WorkbenchNotificationService} from '@scion/workbench';
+
+inject(WorkbenchNotificationService).show('Network connection established.', {
+  group: 'connectivity',
+});
+```
+
+Configuring a reducer function enables aggregation of input values of notifications of the same group. 
+The reducer is invoked with inputs of the previous notification, if still displaying, and inputs of the new notification. The returned input is passed to the new notification.
+
+```ts
+import {inject} from '@angular/core';
+import {WorkbenchNotificationService} from '@scion/workbench';
+import {ErrorNotificationComponent} from './dummy/error-notification.component';
+
+inject(WorkbenchNotificationService).show(ErrorNotificationComponent, {
+  group: 'error',
+  groupInputReduceFn: (prevInput, currInput) => {
+    const count = (prevInput['count'] ?? 0) as number;
+    return {...currInput, count: count + 1};
+  },
+});
+```
+
+Aggregated input is available as input properties in the component. 
+
+```ts
+import {Component, input} from '@angular/core';
+
+@Component({
+  selector: 'app-error-notification',
+  template: '{{count()}} errors occurred.',
+})
+export class ErrorNotificationComponent {
+  count = input(0);
+}
+```
+
+### How to Change the Default Look of a Notification
+The following CSS variables can be set to customize the default look of a notification.
+
+- `--sci-workbench-notification-width`
+- `--sci-workbench-notification-severity-indicator-size`
 
 [menu-how-to]: /docs/site/howto/how-to.md
 

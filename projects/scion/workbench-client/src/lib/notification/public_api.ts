@@ -12,3 +12,4 @@ export {type WorkbenchNotificationCapability} from './workbench-notification-cap
 export {WorkbenchNotificationService} from './workbench-notification-service';
 export {ɵWorkbenchNotificationService} from './ɵworkbench-notification-service';
 export {type WorkbenchNotificationConfig} from './workbench-notification.config';
+export {type ɵWorkbenchNotificationCommand, eNOTIFICATION_MESSAGE_PARAM} from './workbench-notification-command';

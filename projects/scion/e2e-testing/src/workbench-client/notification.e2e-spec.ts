@@ -10,7 +10,6 @@
 
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
-import {NotificationPagePO} from '../notification-page.po';
 import {TextNotificationPagePO} from '../text-notification-page.po';
 import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
 import {expectNotification} from '../matcher/notification-matcher';
@@ -307,173 +306,51 @@ test.describe('Workbench Notification', () => {
   });
 
   test.describe('Custom Notification Provider', () => {
-    test('should allow opening notifications of other notification providers than the built-in text notification provider', async ({appPO, microfrontendNavigator}) => {
+
+    test('should show custom host notification', async ({appPO, microfrontendNavigator, consoleLogs}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
-      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'notification-page'}});
+      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'host-notification'}});
 
-      // display the notification
+      // Display the notification.
       const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      await notificationOpenerPage.enterQualifier({component: 'notification-page'});
-      await notificationOpenerPage.enterCssClass('testee');
-      await notificationOpenerPage.enterParams({param1: 'PARAM 1'});
-      await notificationOpenerPage.open();
-
-      const notification = appPO.notification({cssClass: 'testee'});
-      const notificationPage = new NotificationPagePO(notification);
-
-      await expectNotification(notificationPage).toBeVisible();
-    });
-
-    test('should allow passing a custom input to the notification box', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'notification-page'}});
-
-      // display the notification
-      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      await notificationOpenerPage.enterQualifier({component: 'notification-page'});
-      await notificationOpenerPage.enterCssClass('testee');
-      await notificationOpenerPage.enterContent('Notification');
-      await notificationOpenerPage.enterParams({param1: 'PARAM 1', param2: 'PARAM 2'});
-      await notificationOpenerPage.open();
-
-      const notification = appPO.notification({cssClass: 'testee'});
-      const notificationPage = new NotificationPagePO(notification);
-
-      await expectNotification(notificationPage).toBeVisible();
-      await expect.poll(() => notificationPage.getInputAsKeyValueObject()).toMatchObject({
-        'component': 'notification-page', // qualifier
-        '$implicit': 'Notification', // content
-        'param1': 'PARAM 1', // params
-        'param2': 'PARAM 2', // params
-        'ɵAPP_SYMBOLIC_NAME': 'workbench-client-testing-app1', // headers
-        'ɵREPLY_TO': expect.any(String),
-      });
-    });
-
-    test('should allow controlling notification settings', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'notification-page'}});
-
-      // display the notification
-      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      await notificationOpenerPage.enterQualifier({component: 'notification-page'});
-      await notificationOpenerPage.enterCssClass('testee');
-      await notificationOpenerPage.enterTitle('TITLE');
+      await notificationOpenerPage.enterQualifier({component: 'host-notification'});
+      await notificationOpenerPage.enterParams({param1: 'value1', param2: 'value2'});
+      await notificationOpenerPage.enterTitle('title');
       await notificationOpenerPage.selectSeverity('warn');
-      await notificationOpenerPage.enterParams({param1: 'PARAM 1', param2: 'PARAM 2'});
-      await notificationOpenerPage.open();
+      await notificationOpenerPage.selectDuration('long');
+      await notificationOpenerPage.enterGroup('group');
+      await notificationOpenerPage.enterCssClass('class');
+      await notificationOpenerPage.open({waitUntilAttached: false});
 
-      const notification = appPO.notification({cssClass: 'testee'});
-      const notificationPage = new NotificationPagePO(notification);
-
-      await expectNotification(notificationPage).toBeVisible();
-      await expect.poll(() => notification.getSeverity()).toEqual('warn');
-      await expect(notification.title).toHaveText('TITLE');
-    });
-
-    test('should open separate notifications if not specifying a group', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'notification-page'}});
-
-      // display the first notification
-      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      await notificationOpenerPage.enterQualifier({component: 'notification-page'});
-      await notificationOpenerPage.enterParams({param1: 'PARAM 1'});
-      await notificationOpenerPage.enterCssClass('testee-1');
-      await notificationOpenerPage.open();
-
-      // display another notification
-      await notificationOpenerPage.enterCssClass('testee-2');
-      await notificationOpenerPage.open();
-
-      await expect(appPO.notifications).toHaveCount(2);
+      await expect.poll(() => consoleLogs.get({severity: 'info'})).toContainEqual(
+        expect.stringContaining('[HostNotification] command=[title=title, severity=warn, duration=long, group=group, cssClass=class, params=[param1=value1,param2=value2]]'),
+      );
     });
 
     test('should throw when not passing params required by the notification provider', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
-      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'notification-page'}});
+      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'host-notification'}});
 
-      // display the notification
+      // Display the notification.
       const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      await notificationOpenerPage.enterQualifier({component: 'notification-page'});
-      await notificationOpenerPage.enterCssClass('testee');
-      await expect(notificationOpenerPage.open()).rejects.toThrow(/IntentParamValidationError/);
+      await notificationOpenerPage.enterQualifier({component: 'host-notification'});
+      const notification = notificationOpenerPage.open();
+      await expect(notification).rejects.toThrow(/IntentParamValidationError/);
     });
 
     test('should throw when passing params not specified by the notification provider', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
-      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'notification-page'}});
+      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'host-notification'}});
 
-      // display the notification
+      // Display the notification.
       const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      await notificationOpenerPage.enterQualifier({component: 'notification-page'});
-      await notificationOpenerPage.enterCssClass('testee');
-      await notificationOpenerPage.enterParams({xyz: 'XYZ'});
-      await expect(notificationOpenerPage.open()).rejects.toThrow(/IntentParamValidationError/);
-    });
-
-    test('should allow reducing params of notifications in the same group', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'notification-page'}});
-
-      const notificationPage1 = new NotificationPagePO(appPO.notification({cssClass: 'testee-1'}));
-      const notificationPage2 = new NotificationPagePO(appPO.notification({cssClass: 'testee-2'}));
-      const notificationPage3 = new NotificationPagePO(appPO.notification({cssClass: 'testee-3'}));
-      const notificationPage4 = new NotificationPagePO(appPO.notification({cssClass: 'testee-4'}));
-      const notificationPage5 = new NotificationPagePO(appPO.notification({cssClass: 'testee-5'}));
-      const notificationPage6 = new NotificationPagePO(appPO.notification({cssClass: 'testee-6'}));
-
-      // display the notifications of group-1
-      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      await notificationOpenerPage.enterQualifier({component: 'notification-page'});
-      await notificationOpenerPage.enterCssClass('testee-1');
-      await notificationOpenerPage.enterParams({param1: 'PARAM 1'});
-      await notificationOpenerPage.enterGroup('group-1');
-      await notificationOpenerPage.open();
-
-      await expectNotification(notificationPage1).toBeVisible();
-      await expect(appPO.notifications).toHaveCount(1);
-      await expect.poll(() => notificationPage1.getInputAsKeyValueObject()).not.toMatchObject({'count': expect.any(String)});
-
-      await notificationOpenerPage.enterCssClass('testee-2');
-      await notificationOpenerPage.open();
-      await expectNotification(notificationPage2).toBeVisible();
-      await expect(appPO.notifications).toHaveCount(1);
-      await expect.poll(() => notificationPage2.getInputAsKeyValueObject()).toMatchObject({'count': 2});
-
-      await notificationOpenerPage.enterCssClass('testee-3');
-      await notificationOpenerPage.open();
-      await expectNotification(notificationPage3).toBeVisible();
-      await expect(appPO.notifications).toHaveCount(1);
-      await expect.poll(() => notificationPage3.getInputAsKeyValueObject()).toMatchObject({'count': 3});
-
-      // display the notifications of group-2
-      await notificationOpenerPage.enterGroup('group-2');
-      await notificationOpenerPage.enterCssClass('testee-4');
-      await notificationOpenerPage.open();
-
-      await expectNotification(notificationPage4).toBeVisible();
-      await expect(appPO.notifications).toHaveCount(2);
-      await expect.poll(() => notificationPage4.getInputAsKeyValueObject()).not.toMatchObject({'count': expect.any(String)});
-
-      await notificationOpenerPage.enterCssClass('testee-5');
-      await notificationOpenerPage.open();
-      await expectNotification(notificationPage5).toBeVisible();
-      await expect(appPO.notifications).toHaveCount(2);
-      await expect.poll(() => notificationPage5.getInputAsKeyValueObject()).toMatchObject({'count': 2});
-
-      await notificationOpenerPage.enterCssClass('testee-6');
-      await notificationOpenerPage.open();
-      await expectNotification(notificationPage6).toBeVisible();
-      await expect(appPO.notifications).toHaveCount(2);
-      await expect.poll(() => notificationPage6.getInputAsKeyValueObject()).toMatchObject({'count': 3});
+      await notificationOpenerPage.enterQualifier({component: 'host-notification'});
+      await notificationOpenerPage.enterParams({param: 'value'});
+      const notification = notificationOpenerPage.open();
+      await expect(notification).rejects.toThrow(/IntentParamValidationError/);
     });
   });
 });

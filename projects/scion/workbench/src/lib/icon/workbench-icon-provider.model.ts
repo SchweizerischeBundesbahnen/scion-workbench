@@ -40,7 +40,7 @@ export interface WorkbenchIconDescriptor {
    */
   component: ComponentType<unknown>;
   /**
-   * Optional data to pass to the component. Inputs are available as input properties in the component.
+   * Specifies data to pass to the component. Inputs are available as input properties in the component.
    *
    * ```ts
    * @Component({...})

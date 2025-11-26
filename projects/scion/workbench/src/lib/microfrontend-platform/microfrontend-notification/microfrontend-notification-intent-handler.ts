@@ -10,33 +10,36 @@
 
 import {EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
 import {IntentClient, MessageHeaders} from '@scion/microfrontend-platform';
-import {Translatable, WorkbenchCapabilities, WorkbenchNotificationConfig} from '@scion/workbench-client';
+import {eNOTIFICATION_MESSAGE_PARAM, Translatable, WorkbenchCapabilities, WorkbenchNotificationConfig, ɵWorkbenchNotificationCommand} from '@scion/workbench-client';
 import {Logger, LoggerNames} from '../../logging';
-import {NotificationService} from '../../notification/notification.service';
 import {provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
 import {createRemoteTranslatable} from '../text/remote-text-provider';
+import {WorkbenchNotificationService} from '../../notification/workbench-notification.service';
+import {prune} from '../../common/prune.util';
 
 /**
  * Installs an intent handler to show text notifications.
  */
 function installNotificationIntentHandler(): void {
   const intentClient = inject(IntentClient);
-  const notificationService = inject(NotificationService);
+  const notificationService = inject(WorkbenchNotificationService);
   const logger = inject(Logger);
 
-  intentClient.onIntent<WorkbenchNotificationConfig, void>({type: WorkbenchCapabilities.Notification, qualifier: {}}, message => {
-    const config = message.body;
-    const referrer = message.headers.get(MessageHeaders.AppSymbolicName) as string;
+  intentClient.onIntent<ɵWorkbenchNotificationCommand | WorkbenchNotificationConfig, void>({type: WorkbenchCapabilities.Notification, qualifier: {}}, request => {
+    const command: ɵWorkbenchNotificationCommand | WorkbenchNotificationConfig = request.body!;
+    const referrer = request.headers.get(MessageHeaders.AppSymbolicName) as string;
+    const isLegacyApi = !request.intent.params?.has(eNOTIFICATION_MESSAGE_PARAM);
+    const message = (isLegacyApi ? (command as WorkbenchNotificationConfig).content : request.intent.params?.get(eNOTIFICATION_MESSAGE_PARAM)) as Translatable | undefined ?? '';
 
-    logger.debug(() => 'Showing notification', LoggerNames.MICROFRONTEND, config);
-    notificationService.notify({
-      title: createRemoteTranslatable(config?.title, {appSymbolicName: referrer}),
-      content: createRemoteTranslatable(config?.content as Translatable | undefined, {appSymbolicName: referrer}) ?? '',
-      severity: config?.severity,
-      duration: config?.duration,
-      group: config?.group,
-      cssClass: config?.cssClass,
-    });
+    logger.debug(() => 'Showing notification', LoggerNames.MICROFRONTEND, command);
+
+    notificationService.show(createRemoteTranslatable(message, {appSymbolicName: referrer}), prune({
+      title: createRemoteTranslatable(command.title, {appSymbolicName: referrer}),
+      severity: command.severity,
+      duration: isLegacyApi && typeof command.duration === 'number' ? command.duration * 1000 : command.duration,
+      group: command.group,
+      cssClass: command.cssClass,
+    }));
   });
 }
 

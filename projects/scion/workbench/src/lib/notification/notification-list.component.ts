@@ -8,42 +8,23 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {animate, AnimationMetadata, style, transition, trigger} from '@angular/animations';
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
-import {NotificationService} from './notification.service';
-import {NotificationComponent} from './notification.component';
-import {AsyncPipe, NgClass} from '@angular/common';
-import {NotificationCssClassesPipe} from './notification-css-classes.pipe';
+import {Component, inject, Signal} from '@angular/core';
+import {WorkbenchNotificationRegistry} from './workbench-notification.registry';
+import {ɵWorkbenchNotification} from './ɵworkbench-notification';
+import {WorkbenchNotificationComponent} from './workbench-notification.component';
 
 /**
- * Displays notifications on the right side.  Multiple notifications are stacked vertically.
+ * Displays notifications on the right side, stacked vertically.
  */
 @Component({
   selector: 'wb-notification-list',
   templateUrl: './notification-list.component.html',
-  styleUrls: ['./notification-list.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  styleUrl: './notification-list.component.scss',
   imports: [
-    AsyncPipe,
-    NgClass,
-    NotificationComponent,
-    NotificationCssClassesPipe,
+    WorkbenchNotificationComponent,
   ],
-  animations: [trigger('notification-enter-or-leave', NotificationListComponent.provideAnimation())],
 })
 export class NotificationListComponent {
 
-  protected readonly notifications$ = inject(NotificationService).notifications$;
-
-  /**
-   * Returns animation metadata to slide-in a new notification, and to fade-out upon dismiss.
-   */
-  private static provideAnimation(): AnimationMetadata[] {
-    return [
-      transition(':enter', [
-        style({opacity: 0, left: '100%'}),
-        animate('.3s ease-out', style({opacity: 1, left: 0})),
-      ]),
-    ];
-  }
+  protected readonly notifications: Signal<ɵWorkbenchNotification[]> = inject(WorkbenchNotificationRegistry).elements;
 }
