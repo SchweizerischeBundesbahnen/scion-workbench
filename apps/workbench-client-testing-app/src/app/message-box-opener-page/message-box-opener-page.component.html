@@ -4,9 +4,9 @@
       <sci-key-value-field [keyValueFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"/>
     </sci-form-field>
 
-    @if (isEmptyQualifier) {
-      <sci-form-field label="Message">
-        <input [formControl]="form.controls.message" [attr.list]="nullList" class="e2e-message">
+    @if (isEmptyQualifier()) {
+      <sci-form-field label="Text">
+        <input [formControl]="form.controls.text" [attr.list]="nullList" class="e2e-text">
       </sci-form-field>
     } @else {
       <sci-form-field label="Params">
@@ -61,15 +61,15 @@
   Open message box
 </button>
 
-@if (closeAction) {
+@if (closeAction()) {
   <output class="close-action e2e-close-action">
-    {{closeAction}}
+    {{closeAction()}}
   </output>
 }
 
-@if (openError) {
+@if (openError()) {
   <output class="open-error e2e-open-error">
-    {{openError}}
+    {{openError()}}
   </output>
 }
 

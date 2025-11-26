@@ -50,22 +50,23 @@ export class MessageBoxOpenerPagePO implements MicrofrontendViewPagePO, Microfro
   public async open(message: Translatable | null, options?: WorkbenchMessageBoxOptions): Promise<void>;
   public async open(qualifier: Qualifier, options?: WorkbenchMessageBoxOptions): Promise<void>;
   public async open(content: Translatable | null | Qualifier, options?: WorkbenchMessageBoxOptions): Promise<void> {
+    const qualifierField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
+    await qualifierField.clear();
+
     if (content === null) {
-      await this.locator.locator('input.e2e-message').fill('<null>');
+      await this.locator.locator('input.e2e-text').fill('<null>');
     }
     else if (typeof content === 'string') {
-      await this.locator.locator('input.e2e-message').fill(content);
+      await this.locator.locator('input.e2e-text').fill(content);
     }
     else {
-      const qualifierKeyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
-      await qualifierKeyValueField.clear();
-      await qualifierKeyValueField.addEntries(content);
+      await qualifierField.addEntries(content);
     }
 
     if (options?.params) {
-      const paramsKeyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-params'));
-      await paramsKeyValueField.clear();
-      await paramsKeyValueField.addEntries(options.params);
+      const paramsField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-params'));
+      await paramsField.clear();
+      await paramsField.addEntries(options.params);
     }
 
     if (options?.title) {

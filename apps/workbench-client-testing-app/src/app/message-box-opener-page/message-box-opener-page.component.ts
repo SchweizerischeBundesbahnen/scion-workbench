@@ -8,18 +8,19 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {Component, computed, inject, signal, Signal} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {DialogId, PartId, PopupId, Translatable, ViewId, WorkbenchMessageBoxOptions, WorkbenchMessageBoxService} from '@scion/workbench-client';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {stringifyError} from '../common/stringify-error.util';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {toSignal} from '@angular/core/rxjs-interop';
 import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import {parseTypedString} from '../common/parse-typed-value.util';
 import {UUID} from '@scion/toolkit/uuid';
 import {MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
+import {prune} from '../common/prune.util';
 
 @Component({
   selector: 'app-message-box-opener-page',
@@ -40,7 +41,7 @@ export default class MessageBoxOpenerPageComponent {
 
   protected readonly form = this._formBuilder.group({
     qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
-    message: this._formBuilder.control(''),
+    text: this._formBuilder.control(''),
     options: this._formBuilder.group({
       params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
       title: this._formBuilder.control(''),
@@ -53,32 +54,32 @@ export default class MessageBoxOpenerPageComponent {
     }),
   });
 
-  protected isEmptyQualifier = true;
-  protected openError: string | undefined;
-  protected closeAction: string | undefined;
+  protected readonly isEmptyQualifier: Signal<boolean>;
+  protected readonly openError = signal<string | undefined>(undefined);
+  protected readonly closeAction = signal<string | undefined>(undefined);
 
   protected readonly nullList = `autocomplete-null-${UUID.randomUUID()}`;
 
   constructor() {
     MicrofrontendPlatformClient.signalReady();
-    this.installEmptyQualifierDetector();
+    this.isEmptyQualifier = this.computeIfEmptyQualifier();
   }
 
   protected onMessageBoxOpen(): void {
-    this.openError = undefined;
-    this.closeAction = undefined;
+    this.openError.set(undefined);
+    this.closeAction.set(undefined);
 
     const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier);
     if (qualifier) {
       this._messageBoxService.open(qualifier, this.readOptions())
-        .then(closeAction => this.closeAction = closeAction)
-        .catch((error: unknown) => this.openError = stringifyError(error));
+        .then(closeAction => this.closeAction.set(closeAction))
+        .catch((error: unknown) => this.openError.set(stringifyError(error)));
     }
     else {
-      const message = parseTypedString<Translatable>(this.restoreLineBreaks(this.form.controls.message.value)) ?? null;
+      const message = parseTypedString<Translatable>(restoreLineBreaks(this.form.controls.text.value)) ?? null;
       this._messageBoxService.open(message, this.readOptions())
-        .then(closeAction => this.closeAction = closeAction)
-        .catch((error: unknown) => this.openError = stringifyError(error));
+        .then(closeAction => this.closeAction.set(closeAction))
+        .catch((error: unknown) => this.openError.set(stringifyError(error)));
     }
   }
 
@@ -87,8 +88,8 @@ export default class MessageBoxOpenerPageComponent {
    */
   private readOptions(): WorkbenchMessageBoxOptions {
     const options = this.form.controls.options.controls;
-    return {
-      title: options.title.value.replace(/\\n/g, '\n') || undefined, // restore line breaks as sanitized by the user agent
+    return prune({
+      title: restoreLineBreaks(options.title.value) || undefined,
       params: SciKeyValueFieldComponent.toDictionary(options.params) ?? undefined,
       actions: SciKeyValueFieldComponent.toDictionary(options.actions) ?? undefined,
       severity: options.severity.value || undefined,
@@ -96,24 +97,21 @@ export default class MessageBoxOpenerPageComponent {
       context: parseTypedString(options.context.value, {undefinedIfEmpty: true}),
       contentSelectable: options.contentSelectable.value || undefined,
       cssClass: options.cssClass.value,
-    };
+    });
   }
 
   /**
-   * Detects if the qualifier is empty.
+   * Computes whether the qualifier is empty.
    */
-  private installEmptyQualifierDetector(): void {
-    this.form.controls.qualifier.valueChanges
-      .pipe(takeUntilDestroyed())
-      .subscribe(qualifier => {
-        this.isEmptyQualifier = !qualifier.length;
-      });
+  private computeIfEmptyQualifier(): Signal<boolean> {
+    const qualifier = toSignal(this.form.controls.qualifier.valueChanges, {initialValue: this.form.controls.qualifier.value});
+    return computed(() => !qualifier().length);
   }
+}
 
-  /**
-   * Restores line breaks as sanitized by the user agent.
-   */
-  private restoreLineBreaks(value: string): string {
-    return value.replace(/\\n/g, '\n');
-  }
+/**
+ * Restores line breaks as sanitized by the user agent.
+ */
+function restoreLineBreaks(value: string): string {
+  return value.replace(/\\n/g, '\n');
 }
