@@ -28,9 +28,10 @@ test.describe('Workbench Popup Capability', () => {
 
     // open the popup
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'testee'});
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.open();
+    await popupOpenerPage.open({component: 'testee'}, {
+      anchor: 'element',
+      cssClass: 'testee',
+    });
 
     const popup = appPO.popup({cssClass: 'testee'});
     const popupPage = new PopupPagePO(popup);

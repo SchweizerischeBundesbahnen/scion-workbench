@@ -68,10 +68,11 @@ test.describe('Workbench View Tab', () => {
 
     // Open test popup.
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'input-field'});
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-    await popupOpenerPage.open();
+    await popupOpenerPage.open({component: 'input-field'}, {
+      anchor: 'element',
+      closeStrategy: {onFocusLost: false},
+      cssClass: 'testee',
+    });
 
     const testPage = new InputFieldTestPagePO(appPO, {cssClass: 'testee'});
 

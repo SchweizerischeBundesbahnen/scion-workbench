@@ -31,10 +31,11 @@ test.describe('Popup', () => {
 
     // Open the popup.
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'testee'});
-    await popupOpenerPage.enterParams({id: '123'});
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.open();
+    await popupOpenerPage.open({component: 'testee'}, {
+      anchor: 'element',
+      params: {id: '123'},
+      cssClass: 'testee',
+    });
 
     const popup = appPO.popup({cssClass: 'testee'});
     const popupPage = new PopupPagePO(popup);
@@ -65,10 +66,11 @@ test.describe('Popup', () => {
 
     // Open the popup.
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'testee'});
-    await popupOpenerPage.enterParams({seg1: 'SEG1', seg3: 'SEG3', mp1: 'MP1', mp2: 'MP2', qp1: 'QP1', qp2: 'QP2', fragment: 'FRAGMENT'});
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.open();
+    await popupOpenerPage.open({component: 'testee'}, {
+      anchor: 'element',
+      params: {seg1: 'SEG1', seg3: 'SEG3', mp1: 'MP1', mp2: 'MP2', qp1: 'QP1', qp2: 'QP2', fragment: 'FRAGMENT'},
+      cssClass: 'testee',
+    });
 
     const popup = appPO.popup({cssClass: 'testee'});
     const popupPage = new PopupPagePO(popup);

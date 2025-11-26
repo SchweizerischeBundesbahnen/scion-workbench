@@ -27,7 +27,7 @@ import {WorkbenchPopup} from './workbench-popup';
 export class ɵWorkbenchPopup implements WorkbenchPopup {
 
   public readonly id: PopupId;
-  public readonly params: Map<string, any>;
+  public readonly params: Map<string, unknown>;
   public readonly capability: WorkbenchPopupCapability;
   public readonly referrer: WorkbenchPopupReferrer;
   public readonly focused$: Observable<boolean>;

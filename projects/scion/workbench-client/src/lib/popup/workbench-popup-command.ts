@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {CloseStrategy} from './workbench-popup.config';
 import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 
 /**
@@ -20,7 +19,10 @@ import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 export interface ɵWorkbenchPopupCommand {
   popupId: PopupId;
   align?: 'east' | 'west' | 'north' | 'south';
-  closeStrategy?: CloseStrategy;
+  closeStrategy?: {
+    onFocusLost?: boolean;
+    onEscape?: boolean;
+  };
   cssClass?: string | string[];
   context?: ViewId | PartId | DialogId | PopupId | Context | null;
 }

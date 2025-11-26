@@ -58,20 +58,22 @@ export default class PopupOpenerPageComponent {
         value: this._formBuilder.control('app1'),
       }),
     ], Validators.required),
-    params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
-    anchor: this._formBuilder.group({
-      position: this._formBuilder.control<Position | 'element'>('element', Validators.required),
-      verticalPosition: this._formBuilder.control(0, Validators.required),
-      horizontalPosition: this._formBuilder.control(0, Validators.required),
-      width: this._formBuilder.control<number | undefined>(undefined),
-      height: this._formBuilder.control<number | undefined>(undefined),
-    }),
-    context: this._formBuilder.control<ViewId | PartId | DialogId | PopupId | '<null>' | ''>(''),
-    align: this._formBuilder.control<'east' | 'west' | 'north' | 'south' | ''>(''),
-    cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
-    closeStrategy: this._formBuilder.group({
-      onFocusLost: this._formBuilder.control(true),
-      onEscape: this._formBuilder.control(true),
+    options: this._formBuilder.group({
+      params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
+      anchor: this._formBuilder.group({
+        position: this._formBuilder.control<Position | 'element'>('element', Validators.required),
+        verticalPosition: this._formBuilder.control(0, Validators.required),
+        horizontalPosition: this._formBuilder.control(0, Validators.required),
+        width: this._formBuilder.control<number | undefined>(undefined),
+        height: this._formBuilder.control<number | undefined>(undefined),
+      }),
+      align: this._formBuilder.control<'east' | 'west' | 'north' | 'south' | ''>(''),
+      context: this._formBuilder.control<ViewId | PartId | DialogId | PopupId | '<null>' | ''>(''),
+      cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
+      closeStrategy: this._formBuilder.group({
+        onFocusLost: this._formBuilder.control(true),
+        onEscape: this._formBuilder.control(true),
+      }),
     }),
   });
 
@@ -85,71 +87,73 @@ export default class PopupOpenerPageComponent {
     this._popupOrigin$ = this.observePopupOrigin$();
   }
 
-  protected async onPopupOpen(): Promise<void> {
+  protected async onOpen(): Promise<void> {
     const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!;
-    const params = SciKeyValueFieldComponent.toDictionary(this.form.controls.params);
+    const options = this.form.controls.options.controls;
+    const params = SciKeyValueFieldComponent.toDictionary(options.params);
 
     this.popupError = undefined;
     this.returnValue = undefined;
 
     await this._popupService.open<string>(qualifier, {
       params: params ?? undefined,
-      anchor: this.form.controls.anchor.controls.position.value === 'element' ? this._openButton().nativeElement : this._popupOrigin$,
-      align: this.form.controls.align.value || undefined,
+      anchor: options.anchor.controls.position.value === 'element' ? this._openButton().nativeElement : this._popupOrigin$,
+      align: options.align.value || undefined,
       closeStrategy: undefinedIfEmpty<CloseStrategy>({
-        onFocusLost: this.form.controls.closeStrategy.controls.onFocusLost.value,
-        onEscape: this.form.controls.closeStrategy.controls.onEscape.value,
+        onFocusLost: options.closeStrategy.controls.onFocusLost.value,
+        onEscape: options.closeStrategy.controls.onEscape.value,
       }),
-      cssClass: this.form.controls.cssClass.value,
-      context: parseTypedString(this.form.controls.context.value, {undefinedIfEmpty: true}),
+      cssClass: options.cssClass.value,
+      context: parseTypedString(options.context.value, {undefinedIfEmpty: true}),
     })
       .then(result => this.returnValue = result)
       .catch((error: unknown) => this.popupError = stringifyError(error) || 'Popup was closed with an error');
   }
 
   private observePopupOrigin$(): Observable<PopupOrigin> {
-    return this.form.controls.anchor.valueChanges
+    return this.form.controls.options.controls.anchor.valueChanges
       .pipe(
         startWith(undefined as void),
         map((): PopupOrigin => {
-          switch (this.form.controls.anchor.controls.position.value) {
+          const anchor = this.form.controls.options.controls.anchor.controls;
+          switch (anchor.position.value) {
             case 'top-left':
               return {
-                top: this.form.controls.anchor.controls.verticalPosition.value,
-                left: this.form.controls.anchor.controls.horizontalPosition.value,
-                width: this.form.controls.anchor.controls.width.value,
-                height: this.form.controls.anchor.controls.height.value,
+                top: anchor.verticalPosition.value,
+                left: anchor.horizontalPosition.value,
+                width: anchor.width.value,
+                height: anchor.height.value,
               };
             case 'top-right':
               return {
-                top: this.form.controls.anchor.controls.verticalPosition.value,
-                right: this.form.controls.anchor.controls.horizontalPosition.value,
-                width: this.form.controls.anchor.controls.width.value,
-                height: this.form.controls.anchor.controls.height.value,
+                top: anchor.verticalPosition.value,
+                right: anchor.horizontalPosition.value,
+                width: anchor.width.value,
+                height: anchor.height.value,
               };
             case 'bottom-left':
               return {
-                bottom: this.form.controls.anchor.controls.verticalPosition.value,
-                left: this.form.controls.anchor.controls.horizontalPosition.value,
-                width: this.form.controls.anchor.controls.width.value,
-                height: this.form.controls.anchor.controls.height.value,
+                bottom: anchor.verticalPosition.value,
+                left: anchor.horizontalPosition.value,
+                width: anchor.width.value,
+                height: anchor.height.value,
               };
             case 'bottom-right':
               return {
-                bottom: this.form.controls.anchor.controls.verticalPosition.value,
-                right: this.form.controls.anchor.controls.horizontalPosition.value,
-                width: this.form.controls.anchor.controls.width.value,
-                height: this.form.controls.anchor.controls.height.value,
+                bottom: anchor.verticalPosition.value,
+                right: anchor.horizontalPosition.value,
+                width: anchor.width.value,
+                height: anchor.height.value,
               };
             case 'point':
               return {
-                x: this.form.controls.anchor.controls.horizontalPosition.value,
-                y: this.form.controls.anchor.controls.verticalPosition.value,
-                width: this.form.controls.anchor.controls.width.value,
-                height: this.form.controls.anchor.controls.height.value,
+                x: anchor.horizontalPosition.value,
+                y: anchor.verticalPosition.value,
+                width: anchor.width.value,
+                height: anchor.height.value,
               };
             default: {
-              throw Error(`Invalid popup origin specified: ${this.form.controls.anchor.controls.position.value}`);
+              throw Error(`Invalid popup origin specified: ${anchor.position.value}`);
             }
           }
         }),

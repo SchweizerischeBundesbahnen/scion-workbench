@@ -9,7 +9,7 @@
  */
 
 import {PopupPO} from '../../popup.po';
-import {PopupSize, ViewId, WorkbenchPopupCapability, WorkbenchPopupReferrer} from '@scion/workbench-client';
+import {ViewId, WorkbenchPopupCapability, WorkbenchPopupReferrer} from '@scion/workbench-client';
 import {Params} from '@angular/router';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Locator} from '@playwright/test';
@@ -110,7 +110,7 @@ export class PopupPagePO implements MicrofrontendPopupPagePO {
     }
   }
 
-  public async enterComponentSize(size: PopupSize): Promise<void> {
+  public async enterComponentSize(size: WorkbenchPopupSize): Promise<void> {
     await this.locator.locator('input.e2e-width').fill(size.width ?? '');
     await this.locator.locator('input.e2e-height').fill(size.height ?? '');
     await this.locator.locator('input.e2e-min-width').fill(size.minWidth ?? '');
@@ -159,4 +159,13 @@ export class PopupPagePO implements MicrofrontendPopupPagePO {
   public async waitForFocusOut(): Promise<void> {
     await this._hasFocusLocator.waitFor({state: 'detached'});
   }
+}
+
+export interface WorkbenchPopupSize {
+  height?: string;
+  width?: string;
+  minHeight?: string;
+  maxHeight?: string;
+  minWidth?: string;
+  maxWidth?: string;
 }
