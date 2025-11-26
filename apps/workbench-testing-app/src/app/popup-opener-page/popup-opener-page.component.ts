@@ -13,8 +13,8 @@ import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from
 import {DialogId, PartId, PopupId, PopupOrigin, PopupService, ViewId, WorkbenchPopupService} from '@scion/workbench';
 import {PopupPageComponent} from '../popup-page/popup-page.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
-import {map, startWith} from 'rxjs/operators';
-import {Observable} from 'rxjs';
+import {map, startWith, switchMap} from 'rxjs/operators';
+import {Observable, of, timer} from 'rxjs';
 import BlankTestPageComponent from '../test-pages/blank-test-page/blank-test-page.component';
 import {PopupPositionLabelPipe, Position} from './popup-position-label.pipe';
 import {stringifyError} from '../common/stringify-error.util';
@@ -53,7 +53,6 @@ export default class PopupOpenerPageComponent {
   private readonly _legacyPopupService = inject(PopupService);
   private readonly _formBuilder = inject(NonNullableFormBuilder);
   private readonly _openButton = viewChild.required<ElementRef<HTMLButtonElement>>('open_button');
-  private readonly _popupOrigin$: Observable<PopupOrigin>;
 
   protected readonly form = this._formBuilder.group({
     component: this._formBuilder.control('popup-page', Validators.required),
@@ -64,6 +63,7 @@ export default class PopupOpenerPageComponent {
         horizontalPosition: this._formBuilder.control(0, Validators.required),
         width: this._formBuilder.control<number | undefined>(undefined),
         height: this._formBuilder.control<number | undefined>(undefined),
+        delay: this._formBuilder.control(0),
       }),
       align: this._formBuilder.control<'east' | 'west' | 'north' | 'south' | ''>(''),
       inputs: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
@@ -91,10 +91,6 @@ export default class PopupOpenerPageComponent {
 
   protected readonly nullList = `autocomplete-null-${UUID.randomUUID()}`;
 
-  constructor() {
-    this._popupOrigin$ = this.observePopupOrigin$();
-  }
-
   protected async onOpen(): Promise<void> {
     this.popupError = undefined;
     this.returnValue = undefined;
@@ -104,7 +100,7 @@ export default class PopupOpenerPageComponent {
       await this._legacyPopupService.open<string>(prune({
         component: this.readComponentFromUI(),
         input: options.inputLegacy.value || undefined,
-        anchor: options.anchor.controls.position.value === 'element' ? this._openButton() : this._popupOrigin$,
+        anchor: options.anchor.controls.position.value === 'element' ? this._openButton() : this.observePopupOrigin$(),
         align: options.align.value || undefined,
         cssClass: options.cssClass.value,
         closeStrategy: {
@@ -139,7 +135,7 @@ export default class PopupOpenerPageComponent {
             maxHeight: this.form.controls.size.controls.maxHeight.value || undefined,
           },
         },
-        anchor: options.anchor.controls.position.value === 'element' ? this._openButton() : this._popupOrigin$,
+        anchor: options.anchor.controls.position.value === 'element' ? this._openButton() : this.observePopupOrigin$(),
         align: options.align.value || undefined,
         cssClass: options.cssClass.value,
         closeStrategy: {
@@ -178,6 +174,10 @@ export default class PopupOpenerPageComponent {
     return this.form.controls.options.controls.anchor.valueChanges
       .pipe(
         startWith(undefined as void),
+        switchMap(() => {
+          const delay = this.form.controls.options.controls.anchor.controls.delay.value;
+          return delay ? timer(delay) : of(undefined);
+        }),
         map((): PopupOrigin => {
           const anchor = this.form.controls.options.controls.anchor.controls;
           switch (anchor.position.value) {

@@ -89,6 +89,11 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO, WorkbenchDialogPa
     // Enter size.
     await this.enterSize(options.size ?? {});
 
+    // Control if to delay the reporting of anchor coordinates.
+    if (options.anchor !== 'element') {
+      await this.locator.locator('input.e2e-anchor-delay').fill(`${options.delayAnchorCoordinates ?? ''}`);
+    }
+
     // Open popup.
     await this.openButton.click();
 
@@ -241,6 +246,10 @@ export interface PopupOpenerPageOptions {
    * Controls at which size to open the popup.
    */
   size?: WorkbenchPopupSize;
+  /**
+   * Delays the reporting of anchor coordinates [ms].
+   */
+  delayAnchorCoordinates?: number;
 }
 
 export interface WorkbenchPopupSize {
