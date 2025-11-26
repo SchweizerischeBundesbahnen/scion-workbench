@@ -14,8 +14,6 @@ import {WorkbenchNotificationPagePO} from './workbench/page-object/workbench-not
 
 /**
  * Page object to interact with the built-in workbench notification displaying a text.
- *
- * @see TextNotificationComponent
  */
 export class TextNotificationPagePO implements WorkbenchNotificationPagePO {
 
@@ -23,7 +21,7 @@ export class TextNotificationPagePO implements WorkbenchNotificationPagePO {
   public readonly text: Locator;
 
   constructor(public notification: NotificationPO) {
-    this.locator = this.notification.locator.locator('wb-text-notification');
+    this.locator = this.notification.locator.locator('span.e2e-message');
     this.text = this.locator;
   }
 }

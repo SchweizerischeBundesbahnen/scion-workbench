@@ -27,17 +27,7 @@ export class NotificationPO {
   }
 
   public async getSeverity(): Promise<'info' | 'warn' | 'error' | null> {
-    const cssClasses = await getCssClasses(this.locator);
-    if (cssClasses.includes('e2e-severity-info')) {
-      return 'info';
-    }
-    else if (cssClasses.includes('e2e-severity-warn')) {
-      return 'warn';
-    }
-    else if (cssClasses.includes('e2e-severity-error')) {
-      return 'error';
-    }
-    return null;
+    return await this.locator.getAttribute('data-severity') as 'info' | 'warn' | 'error' | null;
   }
 
   public async hover(): Promise<void> {
@@ -45,7 +35,7 @@ export class NotificationPO {
   }
 
   public async close(): Promise<void> {
-    await this.locator.locator('.e2e-close').click();
+    await this.locator.locator('button.e2e-close').click();
   }
 
   public getCssClasses(): Promise<string[]> {

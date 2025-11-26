@@ -13,13 +13,9 @@ import {ComponentType} from '@angular/cdk/portal';
 import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
- * Configures the content and appearance of a notification presented to the user.
+ * Controls the appearance and behavior of a notification.
  *
- * A notification is a closable message that appears in the upper-right corner and disappears automatically after a few seconds.
- * It informs the user of a system event, e.g., that a task has been completed or an error has occurred.
- *
- * Multiple notifications are stacked vertically. Notifications can be grouped. For each group, only the last notification is
- * displayed at any given time.
+ * @deprecated since version 21.0.0-beta.1. Replaced by `WorkbenchNotificationOptions`. Use `WorkbenchNotificationService` to show notifications. Marked for removal in version 22.
  */
 export interface NotificationConfig {
 
@@ -68,7 +64,7 @@ export interface NotificationConfig {
   };
 
   /**
-   * Optional data to pass to the notification component. In the component, you can inject the notification handle {@link Notification} to
+   * Specifies data to pass to the notification component. In the component, you can inject the notification handle {@link Notification} to
    * read input data. Use only in combination with a custom notification component, has no effect otherwise.
    */
   componentInput?: unknown;

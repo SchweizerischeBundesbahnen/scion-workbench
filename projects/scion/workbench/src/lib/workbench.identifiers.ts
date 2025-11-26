@@ -51,6 +51,11 @@ export type DialogId = `${typeof DIALOG_ID_PREFIX}${string}`;
 export type PopupId = `${typeof POPUP_ID_PREFIX}${string}`;
 
 /**
+ * Format of a notification identifier.
+ */
+export type NotificationId = `${typeof NOTIFICATION_ID_PREFIX}${string}`;
+
+/**
  * Format of an activity identifier.
  *
  * Each activity is assigned a unique identifier (e.g., `activity.9fdf7ab4`, `activity.c6485225`, etc.).
@@ -158,6 +163,13 @@ export function computePopupId(): PopupId {
 }
 
 /**
+ * Computes a unique notification id.
+ */
+export function computeNotificationId(): NotificationId {
+  return `${NOTIFICATION_ID_PREFIX}${UID.randomUID()}`;
+}
+
+/**
  * Computes a unique activity id.
  */
 export function computeActivityId(): ActivityId {
@@ -216,6 +228,13 @@ export const ACTIVITY_ID_PREFIX = 'activity.';
  * @see DialogId
  */
 const DIALOG_ID_PREFIX = 'dialog.';
+
+/**
+ * Represents the id prefix of notifications.
+ *
+ * @see NotificationId
+ */
+const NOTIFICATION_ID_PREFIX = 'notification.';
 
 /**
  * Represents the id prefix of popups.

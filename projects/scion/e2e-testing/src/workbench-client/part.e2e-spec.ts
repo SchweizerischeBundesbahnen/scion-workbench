@@ -409,9 +409,7 @@ test.describe('Workbench Part', () => {
 
     // Open notification.
     const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
-    await notificationOpenerPage.enterCssClass('testee');
-    await notificationOpenerPage.enterContent('Notification');
-    await notificationOpenerPage.open();
+    await notificationOpenerPage.show('Notification', {cssClass: 'testee'});
     const notification = appPO.notification({cssClass: 'testee'});
 
     // Expect notification to be visible.

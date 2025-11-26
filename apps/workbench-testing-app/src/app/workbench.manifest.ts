@@ -7,15 +7,16 @@ import {Capability, Manifest} from '@scion/microfrontend-platform';
 export const workbenchManifest: Manifest = {
   name: 'Workbench Host App',
   capabilities: [
+    // TODO [#271]: Remove this notification capability when implemented the issue #271
     {
       type: WorkbenchCapabilities.Notification,
-      qualifier: {component: 'notification-page'},
+      qualifier: {component: 'host-notification'},
       private: false,
       params: [
         {name: 'param1', required: true},
         {name: 'param2', required: false},
       ],
-      description: 'Allows interacting with a notification.',
+      description: 'Logs host notification intents',
     } satisfies Capability,
     // TODO [#271]: Remove this popup capability when implemented the issue #271
     {

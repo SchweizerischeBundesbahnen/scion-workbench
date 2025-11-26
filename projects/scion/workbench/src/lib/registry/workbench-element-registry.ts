@@ -45,24 +45,35 @@ export class WorkbenchElementRegistry<KEY, T> {
    * Registers an element under given key, replacing any previously registered element with the same key.
    */
   public register(key: KEY, element: T): void {
+    this.replace(key, {key, element});
+  }
+
+  /**
+   * Registers an element under given key, replacing any previously registered element with the specified key.
+   *
+   * @param key - Specifies the key of the element to replace by {@link replaceBy}.
+   * @param replaceBy - Specifies the element to replace another element.
+   */
+  public replace(key: KEY, replaceBy: {key: KEY; element: T}): void {
     const prevElement = this._elementById.get(key);
 
     // Unregister previous element, if any.
     if (prevElement) {
+      this._elementById.delete(key);
       this._onUnregister?.(prevElement);
     }
 
     // Add to Map.
-    this._elementById.set(key, element);
+    this._elementById.set(replaceBy.key, replaceBy.element);
 
     // Add to Signal.
     this._elements.update(elements => {
       const copy = [...elements];
       if (prevElement) {
-        copy.splice(copy.indexOf(prevElement), 1, element); // Replace element.
+        copy.splice(copy.indexOf(prevElement), 1, replaceBy.element); // Replace element.
       }
       else {
-        copy.push(element); // Append element.
+        copy.push(replaceBy.element); // Append element.
       }
       return copy;
     });

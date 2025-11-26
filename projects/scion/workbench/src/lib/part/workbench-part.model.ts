@@ -27,7 +27,7 @@ import {Translatable} from '../text/workbench-text-provider.model';
 export abstract class WorkbenchPart {
 
   /**
-   * Unique identity of this part.
+   * Identity of this part.
    */
   public abstract readonly id: PartId;
 

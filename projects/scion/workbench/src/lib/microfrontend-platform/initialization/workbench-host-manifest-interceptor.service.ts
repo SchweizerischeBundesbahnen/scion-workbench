@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HostManifestInterceptor, Intention, Manifest} from '@scion/microfrontend-platform';
-import {eMESSAGE_BOX_MESSAGE_PARAM, WorkbenchCapabilities, WorkbenchMessageBoxCapability, WorkbenchNotificationCapability} from '@scion/workbench-client';
+import {eMESSAGE_BOX_MESSAGE_PARAM, eNOTIFICATION_MESSAGE_PARAM, WorkbenchCapabilities, WorkbenchMessageBoxCapability, WorkbenchNotificationCapability} from '@scion/workbench-client';
 import {TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY, TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY_PROPERTY, TEXT_MESSAGE_BOX_CAPABILITY_ROUTE} from '../microfrontend-host-message-box/text-message/text-message.component';
 
 /**
@@ -76,8 +76,15 @@ function provideBuiltInTextNotificationCapability(): WorkbenchNotificationCapabi
   return {
     type: WorkbenchCapabilities.Notification,
     qualifier: {},
+    params: [
+      {
+        name: eNOTIFICATION_MESSAGE_PARAM,
+        required: false,
+        description: 'Text to display in the notification.',
+      },
+    ],
     private: false,
-    description: 'Displays a text notification to the user.',
+    description: 'Displays a text notification.',
   };
 }
 
@@ -94,13 +101,14 @@ function provideBuiltInTextMessageBoxCapability(): WorkbenchMessageBoxCapability
       {
         name: eMESSAGE_BOX_MESSAGE_PARAM,
         required: false,
-        description: 'Text to display to the user.',
-      }],
+        description: 'Text to display in the message box.',
+      },
+    ],
     properties: {
       path: TEXT_MESSAGE_BOX_CAPABILITY_ROUTE,
       [TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY_PROPERTY]: TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY,
     },
     private: false,
-    description: 'Displays a text message to the user.',
+    description: 'Displays a text message.',
   };
 }

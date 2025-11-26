@@ -3,7 +3,7 @@ import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testi
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {WorkbenchComponent} from '../workbench.component';
-import {NotificationService} from './notification.service';
+import {WorkbenchNotificationService} from './workbench-notification.service';
 
 describe('Notification', () => {
 
@@ -20,11 +20,11 @@ describe('Notification', () => {
     await waitUntilWorkbenchStarted();
 
     // Show notification.
-    TestBed.inject(NotificationService).notify({content: '%notification', cssClass: 'testee'});
+    TestBed.inject(WorkbenchNotificationService).show('%notification', {cssClass: 'testee'});
     await waitUntilStable();
 
     // Expect notification to be translated.
-    const notificationElement = document.querySelector<HTMLElement>('wb-notification.testee wb-text-notification')!;
+    const notificationElement = document.querySelector<HTMLElement>('wb-notification.testee span.e2e-message')!;
     expect(notificationElement.innerText).toEqual('NOTIFICATION (translated)');
   });
 
@@ -41,7 +41,7 @@ describe('Notification', () => {
     await waitUntilWorkbenchStarted();
 
     // Show notification.
-    TestBed.inject(NotificationService).notify({content: 'notification', title: '%title', cssClass: 'testee'});
+    TestBed.inject(WorkbenchNotificationService).show('notification', {title: '%title', cssClass: 'testee'});
     await waitUntilStable();
 
     // Expect notification title to be translated.

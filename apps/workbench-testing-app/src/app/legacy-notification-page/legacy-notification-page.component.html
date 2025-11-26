@@ -1,6 +1,6 @@
-@if (input()) {
+@if (notification.input) {
   <sci-form-field label="Input" direction="column">
-    <output class="e2e-input input">{{input()}}</output>
+    <output class="e2e-input input">{{notification.input | appStringify}}</output>
   </sci-form-field>
 }
 

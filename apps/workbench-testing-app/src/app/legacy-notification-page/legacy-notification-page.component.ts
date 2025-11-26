@@ -8,32 +8,35 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, input} from '@angular/core';
-import {WorkbenchNotification} from '@scion/workbench';
+import {Component, inject} from '@angular/core';
+import {Notification} from '@scion/workbench';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
+import {StringifyPipe} from '../common/stringify.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {filter} from 'rxjs/operators';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import {UUID} from '@scion/toolkit/uuid';
 
+/**
+ * TODO [Angular 22] Remove with Angular 22. Used for backward compatiblity.
+ */
 @Component({
   selector: 'app-notification-page',
-  templateUrl: './notification-page.component.html',
-  styleUrls: ['./notification-page.component.scss'],
+  templateUrl: './legacy-notification-page.component.html',
+  styleUrl: './legacy-notification-page.component.scss',
   imports: [
     ReactiveFormsModule,
+    StringifyPipe,
     SciFormFieldComponent,
     MultiValueInputComponent,
   ],
 })
-export class NotificationPageComponent {
-
-  public readonly input = input<string>();
+export class LegacyNotificationPageComponent {
 
   private readonly _formBuilder = inject(NonNullableFormBuilder);
 
-  protected readonly notification = inject(WorkbenchNotification);
+  protected readonly notification = inject(Notification);
   protected readonly durationList = `duration-list-${UUID.randomUUID()}`;
 
   protected readonly form = this._formBuilder.group({
@@ -47,7 +50,7 @@ export class NotificationPageComponent {
     this.form.controls.title.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(title => {
-        this.notification.title = title || undefined;
+        this.notification.setTitle(title || undefined);
       });
 
     this.form.controls.severity.valueChanges
@@ -56,7 +59,7 @@ export class NotificationPageComponent {
         takeUntilDestroyed(),
       )
       .subscribe(severity => {
-        this.notification.severity = severity;
+        this.notification.setSeverity(severity);
       });
 
     this.form.controls.duration.valueChanges
@@ -65,13 +68,13 @@ export class NotificationPageComponent {
         takeUntilDestroyed(),
       )
       .subscribe(duration => {
-        this.notification.duration = this.readDurationFromUI(duration);
+        this.notification.setDuration(this.readDurationFromUI(duration));
       });
 
     this.form.controls.cssClass.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(cssClass => {
-        this.notification.cssClass = cssClass || [];
+        this.notification.setCssClass(cssClass || []);
       });
   }
 
