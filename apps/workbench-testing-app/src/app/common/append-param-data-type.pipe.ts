@@ -24,7 +24,7 @@ import {Pipe, PipeTransform} from '@angular/core';
 @Pipe({name: 'appAppendParamDataType'})
 export class AppendParamDataTypePipe implements PipeTransform {
 
-  public transform(params: Record<string, unknown> | Map<string, unknown> | ReadonlyMap<string, unknown>): Record<string, string> | Map<string, unknown> {
+  public transform(params: Record<string, unknown> | Map<string, unknown>): Record<string, string> | Map<string, unknown> {
     if (params instanceof Map) {
       return new Map(transformEntries(Array.from(params.entries())));
     }
