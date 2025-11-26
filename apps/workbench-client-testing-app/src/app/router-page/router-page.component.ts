@@ -18,6 +18,7 @@ import {parseTypedObject} from '../common/parse-typed-value.util';
 import {UUID} from '@scion/toolkit/uuid';
 import {stringifyError} from '../common/stringify-error.util';
 import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
+import {prune} from '../common/prune.util';
 
 @Component({
   selector: 'app-router-page',
@@ -62,15 +63,15 @@ export default class RouterPageComponent {
     const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!;
     const params = parseTypedObject(SciKeyValueFieldComponent.toDictionary(this.form.controls.params));
 
-    const extras: WorkbenchNavigationExtras = {
+    const extras: WorkbenchNavigationExtras = prune({
       activate: this.form.controls.activate.value,
       close: this.form.controls.close.value,
       target: this.form.controls.target.value || undefined,
       partId: this.form.controls.partId.value || undefined,
       position: coercePosition(this.form.controls.position.value),
       params: params ?? undefined,
-      cssClass: this.form.controls.cssClass.value,
-    };
+      cssClass: this.form.controls.cssClass.value ?? undefined,
+    });
     await this._router.navigate(qualifier, extras)
       .then(success => success ? Promise.resolve() : Promise.reject(Error('Navigation failed')))
       .then(() => this.resetForm())

@@ -9,7 +9,6 @@
  */
 
 import {Qualifier} from '@scion/microfrontend-platform';
-import {Dictionary} from '@scion/toolkit/util';
 import {Empty} from '../common/utility-types';
 import {PartId} from '../workbench.identifiers';
 
@@ -54,7 +53,7 @@ export interface WorkbenchNavigationExtras {
    *
    * The view can declare mandatory and optional parameters. No additional parameters are allowed. Refer to the documentation of the capability for more information.
    */
-  params?: Map<string, any> | Dictionary;
+  params?: Map<string, unknown> | {[param: string]: unknown};
   /**
    * Instructs the workbench router how to handle params in self-navigation.
    *

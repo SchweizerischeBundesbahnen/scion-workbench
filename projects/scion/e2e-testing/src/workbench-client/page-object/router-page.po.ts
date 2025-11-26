@@ -18,7 +18,6 @@ import {coerceArray, rejectWhenAttached} from '../../helper/testing.util';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
 import {ViewId, WorkbenchNavigationExtras} from '@scion/workbench-client';
-import {Dictionary} from '@scion/toolkit/util';
 
 /**
  * Page object to interact with {@link RouterPageComponent} of workbench-client testing app.
@@ -76,7 +75,7 @@ export class RouterPagePO implements MicrofrontendViewPagePO {
     await this.locator.locator('input.e2e-part-id').fill(partId ?? '');
   }
 
-  private async enterParams(params?: Map<string, any> | Dictionary): Promise<void> {
+  private async enterParams(params?: Map<string, unknown> | {[param: string]: unknown}): Promise<void> {
     const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-params'));
     await keyValueField.clear();
     await keyValueField.addEntries(params ?? {});

@@ -10,4 +10,4 @@
 
 export {WorkbenchRouter, type WorkbenchNavigationExtras} from './workbench-router';
 export {ɵWorkbenchRouter} from './ɵworkbench-router';
-export {type ɵViewParamsUpdateCommand, ɵMicrofrontendRouteParams} from './ɵworkbench-router';
+export {type ɵViewParamsUpdateCommand, type ɵWorkbenchNavigateCommand, ɵMicrofrontendRouteParams} from './ɵworkbench-router';
