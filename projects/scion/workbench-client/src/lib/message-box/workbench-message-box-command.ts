@@ -41,3 +41,11 @@ interface Context {
    */
   viewId?: ViewId | null;
 }
+
+/**
+ * Parameter name for the message displayed in the built-in text {@link WorkbenchMessageBoxCapability}.
+ *
+ * @docs-private Not public API. For internal use only.
+ * @ignore
+ */
+export const eMESSAGE_BOX_MESSAGE_PARAM = 'message';

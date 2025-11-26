@@ -14,11 +14,10 @@ import {Beans} from '@scion/toolkit/bean-manager';
 import {Defined, Maps} from '@scion/toolkit/util';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {catchError, firstValueFrom, throwError} from 'rxjs';
-import {eMESSAGE_BOX_MESSAGE_PARAM} from './workbench-message-box-capability';
+import {eMESSAGE_BOX_MESSAGE_PARAM, ɵWorkbenchMessageBoxCommand} from './workbench-message-box-command';
 import {WorkbenchMessageBoxService} from './workbench-message-box-service';
 import {Translatable} from '../text/workbench-text-provider.model';
 import {WORKBENCH_ELEMENT, WorkbenchElement} from '../workbench.model';
-import {ɵWorkbenchMessageBoxCommand} from './workbench-message-box-command';
 
 /**
  * @ignore

@@ -47,7 +47,7 @@ export abstract class WorkbenchMessageBoxService {
    *
    * By default, the message box is modal to the calling context. Specify a different modality in {@link WorkbenchMessageBoxOptions.modality}.
    *
-   * @note - Calling this method requires the intention `{"type": "messagebox"}`.
+   * This method requires the intention `{"type": "messagebox"}`.
    *
    * @param message - Specifies the text to display, if any.
    *                  Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
@@ -66,7 +66,7 @@ export abstract class WorkbenchMessageBoxService {
    * @param options - Controls the appearance and behavior of the message box.
    * @returns Promise that resolves to the key of the action button that the user clicked to close the message box,
    *          or that rejects if the message box couldn't be opened, e.g., because of missing the intention or because no `messagebox`
-   *          capability matching the qualifier and visible to the application was found.
+   *          capability was found matching the qualifier and is visible to the application.
    *
    * @see WorkbenchMessageBoxCapability
    * @see WorkbenchMessageBox

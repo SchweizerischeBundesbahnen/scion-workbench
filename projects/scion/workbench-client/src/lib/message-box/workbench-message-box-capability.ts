@@ -125,8 +125,3 @@ export interface WorkbenchMessageBoxSize {
    */
   maxWidth?: string;
 }
-
-/**
- * Parameter name for the message displayed in the built-in text {@link WorkbenchMessageBoxCapability}.
- */
-export const eMESSAGE_BOX_MESSAGE_PARAM = 'message';
