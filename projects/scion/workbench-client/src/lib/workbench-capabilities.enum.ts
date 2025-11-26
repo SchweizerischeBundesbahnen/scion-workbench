@@ -44,7 +44,7 @@ export enum WorkbenchCapabilities {
    */
   Dialog = 'dialog',
   /**
-   * Contributes a message box in the host app.
+   * Contributes a workbench message box.
    *
    * A message box is a standardized dialog for presenting a message to the user, such as an info, warning or alert,
    * or for prompting the user for confirmation.
