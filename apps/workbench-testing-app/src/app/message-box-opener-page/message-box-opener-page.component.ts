@@ -20,6 +20,7 @@ import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.c
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import {UUID} from '@scion/toolkit/uuid';
 import {parseTypedString} from '../common/parse-typed-value.util';
+import {prune} from '../common/prune.util';
 
 @Component({
   selector: 'app-message-box-opener-page',
@@ -41,7 +42,7 @@ export default class MessageBoxOpenerPageComponent {
 
   protected readonly form = this._formBuilder.group({
     component: this._formBuilder.control(''),
-    message: this._formBuilder.control(''),
+    text: this._formBuilder.control(''),
     options: this._formBuilder.group({
       title: this._formBuilder.control(''),
       actions: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
@@ -67,22 +68,22 @@ export default class MessageBoxOpenerPageComponent {
   }
 
   private openMessageBox(): Promise<string> {
-    const options: WorkbenchMessageBoxOptions = {
-      title: this.restoreLineBreaks(this.form.controls.options.controls.title.value) || undefined,
+    const options: WorkbenchMessageBoxOptions = prune({
+      title: restoreLineBreaks(this.form.controls.options.controls.title.value) || undefined,
       actions: SciKeyValueFieldComponent.toDictionary(this.form.controls.options.controls.actions) ?? undefined,
       severity: this.form.controls.options.controls.severity.value || undefined,
       modality: this.form.controls.options.controls.modality.value || undefined,
       context: parseTypedString(this.form.controls.options.controls.context.value, {undefinedIfEmpty: true}),
       contentSelectable: this.form.controls.options.controls.contentSelectable.value || undefined,
       inputs: SciKeyValueFieldComponent.toDictionary(this.form.controls.options.controls.inputs) ?? undefined,
-      cssClass: this.form.controls.options.controls.cssClass.value,
-    };
+      cssClass: this.form.controls.options.controls.cssClass.value ?? undefined,
+    });
 
     if (this.isUseComponent()) {
       return this._messageBoxService.open(this.readComponentFromUI(), options);
     }
     else {
-      const message = parseTypedString<Translatable>(this.restoreLineBreaks(this.form.controls.message.value)) ?? null;
+      const message = parseTypedString<Translatable>(restoreLineBreaks(this.form.controls.text.value)) ?? null;
       return this._messageBoxService.open(message, options);
     }
   }
@@ -101,11 +102,11 @@ export default class MessageBoxOpenerPageComponent {
   protected isUseComponent(): boolean {
     return !!this.form.controls.component.value;
   }
+}
 
-  /**
-   * Restores line breaks as sanitized by the user agent.
-   */
-  private restoreLineBreaks(value: string): string {
-    return value.replace(/\\n/g, '\n');
-  }
+/**
+ * Restores line breaks as sanitized by the user agent.
+ */
+function restoreLineBreaks(value: string): string {
+  return value.replace(/\\n/g, '\n');
 }

@@ -51,7 +51,7 @@ export class MessageBoxOpenerPagePO implements WorkbenchViewPagePO {
       await this.locator.locator('select.e2e-component').selectOption(componentMatch.groups!['component']!);
     }
     else {
-      await this.locator.locator('input.e2e-message').fill(content ?? '<null>');
+      await this.locator.locator('input.e2e-text').fill(content ?? '<null>');
     }
 
     if (options?.inputs) {
