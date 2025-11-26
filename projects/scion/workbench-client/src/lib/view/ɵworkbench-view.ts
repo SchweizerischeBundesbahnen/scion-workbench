@@ -40,11 +40,11 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
   public active$: Observable<boolean>;
   public focused$: Observable<boolean>;
   public partId$: Observable<PartId>;
-  public params$: Observable<ReadonlyMap<string, any>>;
+  public params$: Observable<Map<string, unknown>>;
   public capability$: Observable<WorkbenchViewCapability>;
   public whenProperties: Promise<void>;
   public snapshot: ViewSnapshot = {
-    params: new Map<string, any>(),
+    params: new Map<string, unknown>(),
     partId: undefined!,
     active: false,
     focused: false,
@@ -55,7 +55,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
     this._beforeUnload$ = Beans.get(MessageClient).observe$<void>(ɵWorkbenchCommands.viewUnloadingTopic(this.id))
       .pipe(map(() => undefined), shareReplay({refCount: false, bufferSize: 1}));
 
-    this.params$ = Beans.get(MessageClient).observe$<Map<string, any>>(ɵWorkbenchCommands.viewParamsTopic(this.id))
+    this.params$ = Beans.get(MessageClient).observe$<Map<string, unknown>>(ɵWorkbenchCommands.viewParamsTopic(this.id))
       .pipe(
         mapToBody(),
         shareReplay({refCount: false, bufferSize: 1}),

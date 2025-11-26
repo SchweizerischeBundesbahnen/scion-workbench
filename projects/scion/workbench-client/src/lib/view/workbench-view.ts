@@ -54,7 +54,7 @@ export abstract class WorkbenchView {
    * The Observable completes when navigating to a microfrontend of another application, but not when navigating to a different microfrontend
    * of the same application.
    */
-  public abstract readonly params$: Observable<ReadonlyMap<string, any>>;
+  public abstract readonly params$: Observable<Map<string, unknown>>;
 
   /**
    * The current snapshot of this view.
@@ -188,7 +188,7 @@ export interface ViewSnapshot {
   /**
    * Parameters passed to the microfrontend loaded into the view.
    */
-  params: ReadonlyMap<string, any>;
+  params: Map<string, unknown>;
   /**
    * The identity of the part that contains the view.
    */
