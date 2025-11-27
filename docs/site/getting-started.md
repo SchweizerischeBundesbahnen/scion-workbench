@@ -21,6 +21,9 @@ The application includes the following features:
 - The source code of the application can be found <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/apps/workbench-getting-started-app/src">here</a>.
 ***
 
+> [!CAUTION]
+> `@scion/workbench` does not support zoneless. Support is planned for 2026.  
+
 <details>
     <summary><strong>Create New Angular Application</strong></summary>
     <br>
@@ -28,7 +31,7 @@ The application includes the following features:
 Run the following command to create a new Angular application.
 
 ```console
-ng new workbench-getting-started --routing=false --style=scss --ssr=false --skip-tests
+ng new workbench-getting-started --routing=false --style=scss --ssr=false --zoneless=false --skip-tests
 ```
 
 </details>
@@ -52,7 +55,7 @@ npm install @scion/workbench @scion/workbench-client @scion/toolkit @scion/compo
 Add `provideWorkbench()` to the list of providers in your `app.config.ts`. Added lines are marked with `[+]`.
 
 ```ts
-    import {ApplicationConfig} from '@angular/core';
+    import {ApplicationConfig, provideZoneChangeDetection} from '@angular/core';
 [+] import {provideWorkbench} from '@scion/workbench';
 [+] import {provideRouter, withComponentInputBinding} from '@angular/router';
 [+] import {provideAnimations} from '@angular/platform-browser/animations';
@@ -62,6 +65,7 @@ Add `provideWorkbench()` to the list of providers in your `app.config.ts`. Added
 [+]     provideWorkbench(),
 [+]     provideRouter([], withComponentInputBinding()),
 [+]     provideAnimations(), // required by the SCION Workbench
+[+]     provideZoneChangeDetection(), // provide zone change detection until `@scion/workbench` supports zoneless
       ],
     };
 ```

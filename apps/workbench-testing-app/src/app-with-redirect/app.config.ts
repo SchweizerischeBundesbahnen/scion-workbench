@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationConfig} from '@angular/core';
+import {ApplicationConfig, provideZoneChangeDetection} from '@angular/core';
 import {provideRouter, withHashLocation} from '@angular/router';
 import {routes} from './app.routes';
 import {provideAnimations} from '@angular/platform-browser/animations';
@@ -33,6 +33,7 @@ export const AppWithRedirect = {
             provideWorkbench(workbenchConfig),
             provideRouter(routes(options), withHashLocation()),
             provideAnimations(),
+            provideZoneChangeDetection(),
           ],
         };
       case 'workbench-after-router':
@@ -41,6 +42,7 @@ export const AppWithRedirect = {
             provideRouter(routes(options), withHashLocation()),
             provideWorkbench(workbenchConfig),
             provideAnimations(),
+            provideZoneChangeDetection(),
           ],
         };
       default: {

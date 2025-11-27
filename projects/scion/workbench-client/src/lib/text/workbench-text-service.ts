@@ -61,5 +61,5 @@ export abstract class WorkbenchTextService {
    *         Localized texts are emitted in the current language, and each time when the language changes.
    *         If an error occurs, the observable emits the passed translation key and then completes. The error is not propagated.
    */
-  public abstract text$(translatable: Translatable | undefined, options: {provider: string; params?: Record<string, unknown> | Map<string, unknown>; ttl?: number}): Observable<string | undefined>; // eslint-disable-line @typescript-eslint/unified-signatures
+  public abstract text$(translatable: Translatable | undefined, options: {provider: string; params?: Record<string, unknown> | Map<string, unknown>; ttl?: number}): Observable<string | undefined>;
 }

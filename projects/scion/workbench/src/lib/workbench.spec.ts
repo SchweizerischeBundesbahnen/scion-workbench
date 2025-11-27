@@ -14,7 +14,7 @@ import {WorkbenchLauncher} from './startup/workbench-launcher.service';
 import {provideWorkbenchForTest} from './testing/workbench.provider';
 import {waitUntilWorkbenchStarted} from './testing/testing.util';
 import {Arrays} from '@scion/toolkit/util';
-import {Component} from '@angular/core';
+import {Component, provideZonelessChangeDetection} from '@angular/core';
 import {By} from '@angular/platform-browser';
 
 describe('Workbench', () => {
@@ -27,6 +27,16 @@ describe('Workbench', () => {
   it(`should error if not calling 'provideWorkbench()' before starting the workbench`, () => {
     TestBed.configureTestingModule({});
     expect(() => TestBed.inject(WorkbenchLauncher).launch()).toThrowError(`[WorkbenchError] Missing required workbench providers. Did you forget to call 'provideWorkbench()' in the providers array of 'bootstrapApplication' or the root 'NgModule'?`);
+  });
+
+  it('should error if starting the workbench zoneless', () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideZonelessChangeDetection(),
+      ],
+    });
+    expect(() => TestBed.inject(WorkbenchLauncher).launch()).toThrowError(`[WorkbenchError] SCION Workbench does not support zoneless. Add 'provideZoneChangeDetection()' to the list of providers in your app.config.ts or main.ts. Support is planned for 2026.`);
   });
 
   /**

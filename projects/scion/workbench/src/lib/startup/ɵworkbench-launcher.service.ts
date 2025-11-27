@@ -9,7 +9,7 @@
  */
 
 import {WorkbenchConfig} from '../workbench-config';
-import {assertNotInReactiveContext, computed, inject, Injectable, Injector, NgZone, signal} from '@angular/core';
+import {assertNotInReactiveContext, computed, inject, Injectable, Injector, NgZone, signal, ɵZONELESS_ENABLED} from '@angular/core';
 import {runWorkbenchInitializers, WorkbenchStartupPhase} from './workbench-initializer';
 import {Logger, LoggerNames} from '../logging';
 import {WorkbenchLauncher} from './workbench-launcher.service';
@@ -29,6 +29,10 @@ export class ɵWorkbenchLauncher implements WorkbenchLauncher {
     const workbenchConfig = inject(WorkbenchConfig, {optional: true});
     if (!workbenchConfig) {
       throw Error(`[WorkbenchError] Missing required workbench providers. Did you forget to call 'provideWorkbench()' in the providers array of 'bootstrapApplication' or the root 'NgModule'?`);
+    }
+
+    if (inject(ɵZONELESS_ENABLED, {optional: true})) {
+      throw Error(`[WorkbenchError] SCION Workbench does not support zoneless. Add 'provideZoneChangeDetection()' to the list of providers in your app.config.ts or main.ts. Support is planned for 2026.`);
     }
 
     // Do not inject dependencies before the above check to avoid `NullInjectorError` error.

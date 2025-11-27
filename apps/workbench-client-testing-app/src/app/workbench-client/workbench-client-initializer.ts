@@ -39,7 +39,7 @@ export async function runWorkbenchClientInitializers(phase: WorkbenchClientStart
   }
 
   // Run and await initializer functions in parallel.
-  await Promise.all(initializers.map(initializer => runInInjectionContext(injector, initializer)));
+  await Promise.all(initializers.map(initializer => runInInjectionContext(injector, initializer))); // eslint-disable-line @typescript-eslint/await-thenable
 }
 
 /**

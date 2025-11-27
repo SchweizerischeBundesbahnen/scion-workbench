@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationConfig} from '@angular/core';
+import {ApplicationConfig, provideZoneChangeDetection} from '@angular/core';
 import {MAIN_AREA, provideWorkbench, WorkbenchLayoutFactory} from '@scion/workbench';
 import {provideRouter, withComponentInputBinding, withHashLocation} from '@angular/router';
 import {provideAnimations} from '@angular/platform-browser/animations';
@@ -32,5 +32,6 @@ export const appConfig: ApplicationConfig = {
       {path: 'todos/:id', loadComponent: () => import('./todo/todo.component')},
     ], withComponentInputBinding(), withHashLocation()),
     provideAnimations(),
+    provideZoneChangeDetection(),
   ],
 };
