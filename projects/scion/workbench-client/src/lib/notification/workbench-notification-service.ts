@@ -11,29 +11,19 @@
 import {Qualifier} from '@scion/microfrontend-platform';
 import {WorkbenchNotificationConfig} from './workbench-notification.config';
 import {Translatable} from '../text/workbench-text-provider.model';
+import {WorkbenchNotificationOptions} from './workbench-notification.options';
 
 /**
- * Allows displaying a notification to the user.
+ * Shows a notification.
  *
- * A notification is a closable message that appears in the upper-right corner and disappears automatically after a few seconds.
- * It informs the user of a system event, e.g., that a task has been completed or an error has occurred.
+ * A notification is a closable message displayed in the upper-right corner that disappears after a few seconds unless hovered.
+ * It informs about system events, task completion or errors. The severity indicates importance or urgency.
  *
- * Multiple notifications are stacked vertically. Notifications can be grouped. For each group, only the last notification is
- * displayed at any given time.
+ * Notifications can be grouped. Only the most recent notification within a group is displayed.
  *
- * The built-in notification supports the display of a plain text message and is available as 'notification' capability without a qualifier.
- * Other notification capabilities can be contributed in the host app, e.g., to display structured content or to provide out-of-the-box
+ * The built-in notification supports the display of a plain text message.
+ * Other notification capabilities can be contributed by the host app, e.g., to display structured content or to provide out-of-the-box
  * notification templates. The use of a qualifier distinguishes different notification providers.
- *
- * Applications need to declare an intention in their application manifest for displaying a notification to the user, as illustrated below:
- *
- * ```json
- * {
- *   "intentions": [
- *     { "type": "notification" }
- *   ]
- * }
- * ```
  *
  * @see WorkbenchNotificationCapability
  * @category Notification
@@ -41,17 +31,38 @@ import {Translatable} from '../text/workbench-text-provider.model';
 export abstract class WorkbenchNotificationService {
 
   /**
-   * Presents the user with a notification that is displayed in the upper-right corner based on the given qualifier.
+   * Displays the specified message as workbench notification.
    *
-   * The qualifier identifies the provider to display the notification. The build-in notification to display a plain text message requires
-   * no qualifier.
+   * This method requires the intention `{"type": "notification"}`.
    *
-   * @param  notification - Configures the content and appearance of the notification.
-   * @param  qualifier - Identifies the notification provider.
-   *
-   * @return Promise that resolves when displaying the notification, or that rejects if displaying the notification failed, e.g., if missing
-   *         the notification intention, or because no notification provider could be found that provides a notification under the specified
-   *         qualifier.
+   * @param message - Specifies the text to display.
+   *                  Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   * @param options - Controls the appearance and behavior of the notification.
+   * @returns Promise that resolves when the notification is displayed, or that rejects otherwise, e.g., because of missing the intention.
    */
-  public abstract show(notification: Translatable | WorkbenchNotificationConfig, qualifier?: Qualifier): Promise<void>;
+  public abstract show(message: Translatable, options?: WorkbenchNotificationOptions): Promise<void>;
+
+  /**
+   * Displays the microfrontend of a `notification` capability as workbench notification based on the given qualifier and options.
+   *
+   * @param qualifier - Identifies the `notification` capability that provides the microfrontend to show as workbench notification.
+   * @param options - Controls the appearance and behavior of the notification.
+   * @returns Promise that resolves when the notification is displayed, or that rejects otherwise, e.g., because of missing the intention
+   *          or because no `notification` capability was found matching the qualifier and is visible to the application.
+   *
+   * @see WorkbenchMessageBoxCapability
+   * @see WorkbenchMessageBox
+   */
+  public abstract show(qualifier: Qualifier, options?: WorkbenchNotificationOptions): Promise<void>;
+
+  /**
+   * Displays the specified message as workbench notification.
+   *
+   * @param notification - Configures content and appearance of the notification.
+   * @param qualifier - Identifies the `notification` capability that provides the microfrontend to show as workbench notification.
+   * @returns Promise that resolves when the notification is displayed or that rejects if the intention is missing or no matching `notification` capability is found.
+   *
+   * @deprecated since version 1.0.0-beta.36. Pass text or qualifier as first argument. Marked for removal.
+   */
+  public abstract show(notification: WorkbenchNotificationConfig, qualifier?: Qualifier): Promise<void>;
 }

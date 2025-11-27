@@ -16,7 +16,8 @@ import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../view.po';
-import {Translatable, ViewId} from '@scion/workbench-client';
+import {Translatable, ViewId, WorkbenchNotificationOptions} from '@scion/workbench-client';
+import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 
 /**
  * Page object to interact with {@link NotificationOpenerPageComponent}.
@@ -35,43 +36,49 @@ export class NotificationOpenerPagePO implements MicrofrontendViewPagePO {
     this.error = this.locator.locator('output.e2e-notification-open-error');
   }
 
-  public async enterQualifier(qualifier: Qualifier): Promise<void> {
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
-    await keyValueField.clear();
-    await keyValueField.addEntries(qualifier);
-  }
+  public async show(message: Translatable, options?: NotificationOpenerPageOptions & WorkbenchNotificationOptions): Promise<void>;
+  public async show(qualifier: Qualifier, options?: NotificationOpenerPageOptions & WorkbenchNotificationOptions): Promise<void>;
+  public async show(content: Translatable | Qualifier, options?: NotificationOpenerPageOptions & WorkbenchNotificationOptions): Promise<void> {
+    // Select API.
+    const legacyAPI = options?.legacyAPI;
+    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-legacy-api')).toggle(legacyAPI?.enabled ?? false);
+    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-legacy-api-text-as-confg')).toggle(legacyAPI?.textAsConfig ?? true);
 
-  public async enterParams(params: Record<string, string>): Promise<void> {
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-params'));
-    await keyValueField.clear();
-    await keyValueField.addEntries(params);
-  }
+    // Clear qualifier.
+    const qualifierField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
+    await qualifierField.clear();
 
-  public async enterTitle(title: Translatable): Promise<void> {
-    await this.locator.locator('input.e2e-title').fill(title);
-  }
+    // Enter text or qualifier.
+    if (typeof content === 'string') {
+      await this.locator.locator('input.e2e-text').fill(content);
+    }
+    else {
+      await qualifierField.addEntries(content);
+    }
 
-  public async enterContent(content: Translatable): Promise<void> {
-    await this.locator.locator('input.e2e-content').fill(content);
-  }
+    // Enter params.
+    if (options?.params) {
+      const paramsField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-params'));
+      await paramsField.clear();
+      await paramsField.addEntries(options.params ?? {});
+    }
 
-  public async selectSeverity(severity: 'info' | 'warn' | 'error'): Promise<void> {
-    await this.locator.locator('select.e2e-severity').selectOption(severity);
-  }
+    // Enter title.
+    await this.locator.locator('input.e2e-title').fill(options?.title ?? '');
 
-  public async selectDuration(duration: 'short' | 'medium' | 'long' | 'infinite' | number): Promise<void> {
-    await this.locator.locator('input.e2e-duration').fill(`${duration}`);
-  }
+    // Enter severity.
+    await this.locator.locator('select.e2e-severity').selectOption(options?.severity ?? '');
 
-  public async enterGroup(group: string): Promise<void> {
-    await this.locator.locator('input.e2e-group').fill(group);
-  }
+    // Enter duration.
+    await this.locator.locator('input.e2e-duration').fill(`${options?.duration ?? ''}`);
 
-  public async enterCssClass(cssClass: string | string[]): Promise<void> {
-    await this.locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
-  }
+    // Enter group.
+    await this.locator.locator('input.e2e-group').fill(options?.group ?? '');
 
-  public async open(options?: {waitUntilAttached?: boolean}): Promise<void> {
+    // Enter CSS class.
+    await this.locator.locator('input.e2e-class').fill(coerceArray(options?.cssClass).join(' '));
+
+    // Open notification.
     await this.locator.locator('button.e2e-show').click();
 
     if (options?.waitUntilAttached ?? true) {
@@ -93,4 +100,23 @@ export class NotificationOpenerPagePO implements MicrofrontendViewPagePO {
     await this.locator.click();
     await this.locator.press('Escape');
   }
+}
+
+/**
+ * Controls opening of a notification.
+ */
+export interface NotificationOpenerPageOptions {
+  /**
+   * Controls if to wait for the notification to display.
+   */
+  waitUntilAttached?: boolean;
+  /**
+   * Controls if to use the legacy Workbench Notification API.
+   *
+   * TODO [Angular 22] Remove with Angular 22. Used for backward compatiblity.
+   */
+  legacyAPI?: {
+    enabled: true;
+    textAsConfig: boolean;
+  };
 }

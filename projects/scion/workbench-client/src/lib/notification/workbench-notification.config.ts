@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Dictionary} from '@scion/toolkit/util';
 import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
@@ -21,6 +20,7 @@ import {Translatable} from '../text/workbench-text-provider.model';
  * displayed at any given time.
  *
  * @category Notification
+ * @deprecated since version 1.0.0-beta.36. Replaced by `WorkbenchNotificationOptions`. Marked for removal.
  */
 export interface WorkbenchNotificationConfig {
 
@@ -44,7 +44,7 @@ export interface WorkbenchNotificationConfig {
    *
    * The notification can declare mandatory and optional parameters. No additional parameters are allowed. Refer to the documentation of the capability for more information.
    */
-  params?: Map<string, any> | Dictionary;
+  params?: Map<string, unknown> | {[param: string]: unknown};
 
   /**
    * Specifies the severity of the notification. Defaults to `info`.

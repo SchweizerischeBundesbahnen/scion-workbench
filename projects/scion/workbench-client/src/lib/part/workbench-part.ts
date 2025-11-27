@@ -24,7 +24,7 @@ import {WorkbenchPartCapability} from './workbench-part-capability';
 export abstract class WorkbenchPart {
 
   /**
-   * Unique identity of this part.
+   * Identity of this part.
    */
   public abstract readonly id: PartId;
 
@@ -43,7 +43,7 @@ export abstract class WorkbenchPart {
   public abstract readonly capability: WorkbenchPartCapability;
 
   /**
-   * Parameters of the microfrontend loaded into the part.
+   * Parameters passed to the microfrontend loaded into the part.
    */
   public abstract readonly params: Map<string, unknown>;
 

@@ -3524,10 +3524,7 @@ test.describe('Text Provider', () => {
 
       // Open test notification.
       const notificationOpener = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      await notificationOpener.enterTitle('Title');
-      await notificationOpener.enterContent('Notification');
-      await notificationOpener.enterCssClass('testee');
-      await notificationOpener.open();
+      await notificationOpener.show('Notification', {title: 'Title', cssClass: 'testee'});
       const notification = appPO.notification({cssClass: 'testee'});
       const textNotificationBoxPage = new TextNotificationPagePO(notification);
 
@@ -3598,10 +3595,7 @@ test.describe('Text Provider', () => {
       const notificationOpenerApp1 = new NotificationOpenerPagePO(appPO, {cssClass: 'notification-opener-app1'});
 
       // Open test notification.
-      await notificationOpenerApp1.enterTitle('%notification.title');
-      await notificationOpenerApp1.enterContent('%notification.message');
-      await notificationOpenerApp1.enterCssClass('testee');
-      await notificationOpenerApp1.open();
+      await notificationOpenerApp1.show('%notification.message', {title: '%notification.title', cssClass: 'testee'});
       const notification = appPO.notification({cssClass: 'testee'});
       const textNotificationPage = new TextNotificationPagePO(notification);
 
