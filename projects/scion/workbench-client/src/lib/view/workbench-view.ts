@@ -26,7 +26,7 @@ import {Translatable} from '../text/workbench-text-provider.model';
 export abstract class WorkbenchView {
 
   /**
-   * Unique identity of this view.
+   * Identity of this view.
    */
   public abstract readonly id: ViewId;
 
@@ -48,7 +48,7 @@ export abstract class WorkbenchView {
   public abstract readonly capability$: Observable<WorkbenchViewCapability>;
 
   /**
-   * Parameters of the microfrontend loaded into the view.
+   * Parameters passed to the microfrontend loaded into the view.
    *
    * Upon subscription, emits the microfrontend's parameters, and then emits continuously when the parameters change.
    * The Observable completes when navigating to a microfrontend of another application, but not when navigating to a different microfrontend
@@ -186,7 +186,7 @@ export interface ViewSnapshot {
    */
   capability: WorkbenchViewCapability;
   /**
-   * Parameters of the microfrontend loaded into the view.
+   * Parameters passed to the microfrontend loaded into the view.
    */
   params: ReadonlyMap<string, any>;
   /**

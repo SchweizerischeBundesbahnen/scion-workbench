@@ -15,6 +15,12 @@
       border: 1px solid var(--sci-color-border);
       border-radius: var(--sci-corner);
       padding: 1em;
+
+      // TODO [Angular 22] Remove with Angular 22. Used for backward compatiblity.
+      > header {
+        margin-bottom: 1em;
+        font-weight: bold;
+      }
     }
   }
 

@@ -4,22 +4,24 @@
       <sci-key-value-field [keyValueFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"/>
     </sci-form-field>
 
-    <sci-form-field label="Params">
-      <sci-key-value-field [keyValueFormArray]="form.controls.params" [addable]="true" [removable]="true" class="e2e-params"/>
-    </sci-form-field>
+    @if (isEmptyQualifier()) {
+      <sci-form-field label="Notification">
+        <input [formControl]="form.controls.text" class="e2e-text">
+      </sci-form-field>
+    } @else {
+      <sci-form-field label="Params">
+        <sci-key-value-field [keyValueFormArray]="form.controls.options.controls.params" [addable]="true" [removable]="true" class="e2e-params"/>
+      </sci-form-field>
+    }
   </section>
 
   <section>
     <sci-form-field label="Title">
-      <input [formControl]="form.controls.title" class="e2e-title">
-    </sci-form-field>
-
-    <sci-form-field label="Content">
-      <input [formControl]="form.controls.content" class="e2e-content">
+      <input [formControl]="form.controls.options.controls.title" class="e2e-title">
     </sci-form-field>
 
     <sci-form-field label="Severity">
-      <select [formControl]="form.controls.severity" class="e2e-severity">
+      <select [formControl]="form.controls.options.controls.severity" class="e2e-severity">
         <option value="info">info</option>
         <option value="warn">warn</option>
         <option value="error">error</option>
@@ -28,7 +30,7 @@
     </sci-form-field>
 
     <sci-form-field label="Duration">
-      <input [formControl]="form.controls.duration" [attr.list]="durationList" class="e2e-duration">
+      <input [formControl]="form.controls.options.controls.duration" [attr.list]="durationList" class="e2e-duration">
       <datalist [attr.id]="durationList">
         <option value="short">short</option>
         <option value="medium">medium</option>
@@ -39,11 +41,21 @@
     </sci-form-field>
 
     <sci-form-field label="Group">
-      <input [formControl]="form.controls.group" class="e2e-group">
+      <input [formControl]="form.controls.options.controls.group" class="e2e-group">
     </sci-form-field>
 
     <sci-form-field label="CSS Class(es)">
-      <app-multi-value-input [formControl]="form.controls.cssClass"  [placeholder]="'class-1 class-2'" class="e2e-class"/>
+      <app-multi-value-input [formControl]="form.controls.options.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
+    </sci-form-field>
+  </section>
+
+  <section>
+    <header>Legacy API</header>
+    <sci-form-field label="Enabled">
+      <sci-checkbox [formControl]="form.controls.legacyAPI.controls.enabled" class="e2e-legacy-api"/>
+    </sci-form-field>
+    <sci-form-field label="Text as Config">
+      <sci-checkbox [formControl]="form.controls.legacyAPI.controls.textAsConfig" class="e2e-legacy-api-text-as-confg"/>
     </sci-form-field>
   </section>
 </form>
@@ -52,8 +64,8 @@
   Show notification
 </button>
 
-@if (notificationOpenError) {
+@if (notificationOpenError()) {
   <output class="notification-open-error e2e-notification-open-error">
-    {{notificationOpenError}}
+    {{notificationOpenError()}}
   </output>
 }

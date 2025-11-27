@@ -51,10 +51,10 @@ export enum WorkbenchCapabilities {
    */
   MessageBox = 'messagebox',
   /**
-   * Contributes a notification in the host app.
+   * Contributes a workbench notification.
    *
-   * A notification appears in the upper-right corner and disappears automatically after a few seconds.
-   * It informs the user of a system event, e.g., that a task has been completed or an error has occurred.
+   * A notification is a closable message displayed in the upper-right corner that disappears after a few seconds unless hovered.
+   * It informs about system events, task completion or errors. The severity indicates importance or urgency.
    */
   Notification = 'notification',
   /**
