@@ -27,6 +27,7 @@ import {MicrofrontendViewCapabilityValidator} from '../microfrontend-view/microf
 import {StableCapabilityIdAssigner} from '../stable-capability-id-assigner.interceptor';
 import {MicrofrontendMessageBoxCapabilityValidator} from '../microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
 import {ViewCapabilityPreloadCapabilityInterceptor} from './view-capability-preload-capability-interceptor.service';
+import {MicrofrontendViewTransientParameterDeprecationLogger} from '../microfrontend-view/microfrontend-view-transient-parameter-deprecation-logger.interceptor';
 
 /**
  * Initializes and starts the SCION Microfrontend Platform in host mode.
@@ -42,6 +43,7 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
   private readonly _dialogIntentHandler = inject(MicrofrontendDialogIntentHandler);
   private readonly _messageBoxIntentHandler = inject(MicrofrontendMessageBoxIntentHandler);
   private readonly _viewCapabilityValidator = inject(MicrofrontendViewCapabilityValidator);
+  private readonly _viewTransientParameterDeprecationLogger = inject(MicrofrontendViewTransientParameterDeprecationLogger);
   private readonly _popupCapabilityValidator = inject(MicrofrontendPopupCapabilityValidator);
   private readonly _dialogCapabilityValidator = inject(MicrofrontendDialogCapabilityValidator);
   private readonly _messageBoxCapabilityValidator = inject(MicrofrontendMessageBoxCapabilityValidator);
@@ -96,6 +98,9 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
 
     // Register view capability interceptor to assert required view capability properties.
     Beans.register(CapabilityInterceptor, {useValue: this._viewCapabilityValidator, multi: true});
+
+    // Register view capability interceptor to log usage of deprecated transient parameters.
+    Beans.register(CapabilityInterceptor, {useValue: this._viewTransientParameterDeprecationLogger, multi: true});
 
     // Register popup capability interceptor to assert required popup capability properties.
     Beans.register(CapabilityInterceptor, {useValue: this._popupCapabilityValidator, multi: true});

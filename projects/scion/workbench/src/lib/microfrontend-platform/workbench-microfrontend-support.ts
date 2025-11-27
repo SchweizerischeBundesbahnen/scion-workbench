@@ -43,6 +43,7 @@ import {provideHostTextProvider} from './text/host-text-provider';
 import {ViewCapabilityPreloadCapabilityInterceptor} from './initialization/view-capability-preload-capability-interceptor.service';
 import {provideMicrofrontendPerspective} from './microfrontend-perspective/microfrontend-perspective.provider';
 import {provideMicrofrontendPart} from './microfrontend-part/microfrontend-part.provider';
+import {MicrofrontendViewTransientParameterDeprecationLogger} from './microfrontend-view/microfrontend-view-transient-parameter-deprecation-logger.interceptor';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -61,6 +62,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     provideMicrofrontendPart(),
     provideManifestObjectCache(),
     MicrofrontendViewIntentHandler,
+    MicrofrontendViewTransientParameterDeprecationLogger,
     MicrofrontendPopupIntentHandler,
     MicrofrontendDialogIntentHandler,
     MicrofrontendMessageBoxIntentHandler,

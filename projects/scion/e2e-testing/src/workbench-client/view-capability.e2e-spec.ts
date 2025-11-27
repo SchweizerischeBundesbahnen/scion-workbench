@@ -84,4 +84,71 @@ test.describe('Workbench View Capability', () => {
     });
     expect(capability.properties.path).toEqual('');
   });
+
+  /**
+   * TODO [Angular 22] Remove with Angular 22.
+   */
+  test('should log deprecation warning if using transient view parameter [transient=true]', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    await test.step('Registering view capability with transient parameter', async () => {
+      consoleLogs.clear();
+      const capability = await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+        type: 'view',
+        qualifier: {component: 'testee-1'},
+        params: [
+          {name: 'param', transient: true, required: false},
+        ],
+        properties: {
+          path: 'path/to/view',
+        },
+      });
+      expect(capability).toBeDefined();
+
+      // Expect deprecation warning to be logged.
+      await expect.poll(() => consoleLogs.get({severity: 'warning', message: /Deprecation/})).toEqual(expect.arrayContaining([
+        expect.stringContaining(`[Deprecation][workbench-client-testing-app1] Transient view parameter 'param' in view capability 'component=testee-1' detected. Transient parameters are deprecated and will be removed in SCION Workbench version 22. No replacement. Instead, send large data as retained message to a random topic and pass the topic as parameter. After receiving the data, the view should delete the retained message to free resources.`),
+      ]));
+    });
+
+    await test.step('Registering view capability with transient parameter [transient=false]', async () => {
+      consoleLogs.clear();
+      const capability = await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+        type: 'view',
+        qualifier: {component: 'testee-1'},
+        params: [
+          {name: 'param', transient: false, required: false},
+        ],
+        properties: {
+          path: 'path/to/view',
+        },
+      });
+      expect(capability).toBeDefined();
+
+      // Expect deprecation warning to be logged.
+      await expect.poll(() => consoleLogs.get({severity: 'warning', message: /Deprecation/})).toEqual(expect.arrayContaining([
+        expect.stringContaining(`[Deprecation][workbench-client-testing-app1] Transient view parameter 'param' in view capability 'component=testee-1' detected. Transient parameters are deprecated and will be removed in SCION Workbench version 22. No replacement. Instead, send large data as retained message to a random topic and pass the topic as parameter. After receiving the data, the view should delete the retained message to free resources.`),
+      ]));
+    });
+
+    await test.step('Registering view capability without transient parameter', async () => {
+      consoleLogs.clear();
+      const capability = await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+        type: 'view',
+        qualifier: {component: 'testee-1'},
+        params: [
+          {name: 'param', required: false},
+        ],
+        properties: {
+          path: 'path/to/view',
+        },
+      });
+      expect(capability).toBeDefined();
+
+      // Expect no deprecation warning to be logged.
+      await expect.poll(() => consoleLogs.get({severity: 'warning', message: /Deprecation/})).toEqual(expect.not.arrayContaining([
+        expect.stringContaining(`[Deprecation][workbench-client-testing-app1] Transient view parameter 'param' in view capability 'component=testee-1' detected. Transient parameters are deprecated and will be removed in SCION Workbench version 22. No replacement. Instead, send large data as retained message to a random topic and pass the topic as parameter. After receiving the data, the view should delete the retained message to free resources.`),
+      ]));
+    });
+  });
 });

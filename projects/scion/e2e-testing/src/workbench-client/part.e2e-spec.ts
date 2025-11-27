@@ -556,8 +556,8 @@ test.describe('Workbench Part', () => {
 
     // Expect part to display "Not Found" page.
     await expectWorkbenchPart(part).toDisplayComponent(PageNotFoundPagePO.selector);
-    await expect.poll(() => consoleLogs.get({severity: 'warning'})).toEqual([
+    await expect.poll(() => consoleLogs.get({severity: 'warning'})).toEqual(expect.arrayContaining([
       `[workbench:microfrontend/routing] [NullCapabilityError] No application found to provide a part capability of id '${testeePartCapability.metadata!.id}'. Maybe, the requested part is not public API or the providing application not available.`,
-    ]);
+    ]));
   });
 });
