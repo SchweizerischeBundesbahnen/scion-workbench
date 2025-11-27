@@ -38,7 +38,7 @@ export default defineConfig({
       port: 4300,
       reuseExistingServer: false,
     },
-    // TODO [Angular 21] remove when `@angular-devkit/build-angular:browser` builder is deprecated
+    // TODO [Angular 22] remove when `@angular-devkit/build-angular:browser` builder is deprecated
     {
       command: 'npm run workbench-testing-app:basehref-webpack:dist-serve',
       port: 4400,
