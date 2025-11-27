@@ -69,6 +69,8 @@ jobs:
         with:
           name: workbench-client-api
           path: dist/workbench-client-api
+      - name: 'Building Playwright E2E Tests'
+        run: npm run e2e:build
   lint:
     name: 'Linting'
     needs: build-libs

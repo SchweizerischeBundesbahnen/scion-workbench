@@ -69,6 +69,7 @@
     "workbench-client-testing-app:4202:serve": "ng serve workbench-client-testing-app --port 4202",
     "workbench-client-testing-app:4202:dist-serve": "serve dist/workbench-client-testing-app-ci/browser -p 4202 --config ../../../apps/workbench-client-testing-app/vercel-test-server.config.json --no-request-logging",
 
+    "e2e:build": "tsc -p projects/scion/e2e-testing/tsconfig.json",
     "e2e:run": "cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test --config projects/scion/e2e-testing/playwright.config.ts",
     "e2e:debug": "cross-env PLAYWRIGHT_BROWSERS_PATH=0 PWDEBUG=1 playwright test --config projects/scion/e2e-testing/playwright.config.ts",
     "e2e:lint": "ng lint e2e-testing"
