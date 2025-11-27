@@ -210,6 +210,8 @@ export interface ViewParamDefinition extends ParamDefinition {
    *
    * Transient parameters are not persistent, they are only added to the browser's session history to support back/forward browser navigation.
    * Microfrontends must be able to restore state without relying on transient parameters.
+   *
+   * @deprecated since version 1.0.0-beta.36. Marked for removal. No replacement. Instead, send large data as retained message to a random topic and pass the topic as parameter. After receiving the data, the view should delete the retained message to free resources.
    */
   transient?: boolean;
   /**
