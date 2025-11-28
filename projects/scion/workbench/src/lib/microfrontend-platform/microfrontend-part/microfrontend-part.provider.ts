@@ -12,7 +12,7 @@ import {EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/c
 import {Beans} from '@scion/toolkit/bean-manager';
 import {CapabilityInterceptor} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '@scion/workbench-client';
-import {STABLE_CAPABILITY_ID} from '../stable-capability-id-assigner.interceptor';
+import {provideStableCapabilityId} from '../stable-capability-id-assigner.provider';
 import {MicrofrontendPartCapabilityValidator} from './microfrontend-part-capability-validator.interceptor';
 import {provideMicrofrontendPartRoute} from './microfrontend-part-routes';
 import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
@@ -24,7 +24,7 @@ export function provideMicrofrontendPart(): EnvironmentProviders {
   return makeEnvironmentProviders([
     MicrofrontendPartCapabilityValidator,
     provideMicrofrontendPartRoute(),
-    {provide: STABLE_CAPABILITY_ID, useValue: WorkbenchCapabilities.Part, multi: true},
+    provideStableCapabilityId(WorkbenchCapabilities.Part),
     provideMicrofrontendPlatformInitializer(onPreStartup, {phase: MicrofrontendPlatformStartupPhase.PreStartup}),
   ]);
 

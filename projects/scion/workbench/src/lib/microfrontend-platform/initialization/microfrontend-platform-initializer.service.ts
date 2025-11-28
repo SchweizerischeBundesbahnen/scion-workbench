@@ -15,7 +15,6 @@ import {Logger, LoggerNames} from '../../logging';
 import {NgZoneObservableDecorator} from './ng-zone-observable-decorator';
 import {MicrofrontendPlatformStartupPhase, runMicrofrontendPlatformInitializers} from '../microfrontend-platform-initializer';
 import {MicrofrontendPlatformConfigLoader} from '../microfrontend-platform-config-loader';
-import {MicrofrontendViewIntentHandler} from '../microfrontend-view/microfrontend-view-intent-handler.interceptor';
 import {WorkbenchHostManifestInterceptor} from './workbench-host-manifest-interceptor.service';
 import {MicrofrontendPopupIntentHandler} from '../microfrontend-popup/microfrontend-popup-intent-handler.interceptor';
 import {MicrofrontendPopupCapabilityValidator} from '../microfrontend-popup/microfrontend-popup-capability-validator.interceptor';
@@ -23,11 +22,7 @@ import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificatio
 import {MicrofrontendMessageBoxIntentHandler} from '../microfrontend-message-box/microfrontend-message-box-intent-handler.interceptor';
 import {MicrofrontendDialogIntentHandler} from '../microfrontend-dialog/microfrontend-dialog-intent-handler.interceptor';
 import {MicrofrontendDialogCapabilityValidator} from '../microfrontend-dialog/microfrontend-dialog-capability-validator.interceptor';
-import {MicrofrontendViewCapabilityValidator} from '../microfrontend-view/microfrontend-view-capability-validator.interceptor';
-import {StableCapabilityIdAssigner} from '../stable-capability-id-assigner.interceptor';
 import {MicrofrontendMessageBoxCapabilityValidator} from '../microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
-import {ViewCapabilityPreloadCapabilityInterceptor} from './view-capability-preload-capability-interceptor.service';
-import {MicrofrontendViewTransientParameterDeprecationLogger} from '../microfrontend-view/microfrontend-view-transient-parameter-deprecation-logger.interceptor';
 
 /**
  * Initializes and starts the SCION Microfrontend Platform in host mode.
@@ -38,17 +33,12 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
   private readonly _microfrontendPlatformConfigLoader = inject(MicrofrontendPlatformConfigLoader);
   private readonly _hostManifestInterceptor = inject(WorkbenchHostManifestInterceptor);
   private readonly _ngZoneObservableDecorator = inject(NgZoneObservableDecorator);
-  private readonly _viewIntentHandler = inject(MicrofrontendViewIntentHandler);
   private readonly _popupIntentHandler = inject(MicrofrontendPopupIntentHandler);
   private readonly _dialogIntentHandler = inject(MicrofrontendDialogIntentHandler);
   private readonly _messageBoxIntentHandler = inject(MicrofrontendMessageBoxIntentHandler);
-  private readonly _viewCapabilityValidator = inject(MicrofrontendViewCapabilityValidator);
-  private readonly _viewTransientParameterDeprecationLogger = inject(MicrofrontendViewTransientParameterDeprecationLogger);
   private readonly _popupCapabilityValidator = inject(MicrofrontendPopupCapabilityValidator);
   private readonly _dialogCapabilityValidator = inject(MicrofrontendDialogCapabilityValidator);
   private readonly _messageBoxCapabilityValidator = inject(MicrofrontendMessageBoxCapabilityValidator);
-  private readonly _stableCapabilityIdAssigner = inject(StableCapabilityIdAssigner);
-  private readonly _viewCapabilityPreloadCapabilityInterceptor = inject(ViewCapabilityPreloadCapabilityInterceptor);
   private readonly _injector = inject(Injector);
   private readonly _zone = inject(NgZone);
   private readonly _logger = inject(Logger);
@@ -84,9 +74,6 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
     // Synchronize emissions of Observables exposed by the SCION Microfrontend Platform with the Angular zone.
     Beans.register(ObservableDecorator, {useValue: this._ngZoneObservableDecorator});
 
-    // Register view intent interceptor to open the corresponding view.
-    Beans.register(IntentInterceptor, {useValue: this._viewIntentHandler, multi: true});
-
     // Register popup intent interceptor to open the corresponding popup.
     Beans.register(IntentInterceptor, {useValue: this._popupIntentHandler, multi: true});
 
@@ -96,12 +83,6 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
     // Register message box intent interceptor to open the corresponding message box.
     Beans.register(IntentInterceptor, {useValue: this._messageBoxIntentHandler, multi: true});
 
-    // Register view capability interceptor to assert required view capability properties.
-    Beans.register(CapabilityInterceptor, {useValue: this._viewCapabilityValidator, multi: true});
-
-    // Register view capability interceptor to log usage of deprecated transient parameters.
-    Beans.register(CapabilityInterceptor, {useValue: this._viewTransientParameterDeprecationLogger, multi: true});
-
     // Register popup capability interceptor to assert required popup capability properties.
     Beans.register(CapabilityInterceptor, {useValue: this._popupCapabilityValidator, multi: true});
 
@@ -110,14 +91,6 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
 
     // Register message box capability interceptor to assert required capability properties.
     Beans.register(CapabilityInterceptor, {useValue: this._messageBoxCapabilityValidator, multi: true});
-
-    // Register capability interceptor to assign capabilities a stable identifier based on `STABLE_ID_CAPABILITY_TYPES` DI token.
-    Beans.register(CapabilityInterceptor, {useValue: this._stableCapabilityIdAssigner, multi: true});
-
-    // Register view capability interceptor to preload inactive microfrontend views not defining the `lazy` property to maintain compatibility with applications setting view titles and headings in view microfrontends.
-    if (this.config.preloadInactiveViews) {
-      Beans.register(CapabilityInterceptor, {useValue: this._viewCapabilityPreloadCapabilityInterceptor, multi: true});
-    }
 
     // Run initializers in `PostStartup` phase; must be done in runlevel 2, i.e., before activator microfrontends are installed.
     Beans.registerInitializer({

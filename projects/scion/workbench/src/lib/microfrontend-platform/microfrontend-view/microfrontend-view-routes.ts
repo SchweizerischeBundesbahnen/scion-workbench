@@ -10,7 +10,7 @@
 
 import {CanMatchFn, Params, Route, UrlMatcher, UrlMatchResult, UrlSegment, UrlSegmentGroup} from '@angular/router';
 import {WorkbenchViewCapability, ɵMicrofrontendRouteParams} from '@scion/workbench-client';
-import {inject, Injector} from '@angular/core';
+import {EnvironmentProviders, inject, Injector, makeEnvironmentProviders} from '@angular/core';
 import {Commands} from '../../routing/routing.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {isViewOutlet} from '../../workbench.identifiers';
@@ -18,6 +18,8 @@ import {WorkbenchRouteData} from '../../routing/workbench-route-data';
 import {MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {canMatchWorkbenchView} from '../../routing/workbench-route-guards';
+import {WORKBENCH_ROUTE} from '../../workbench.constants';
+import {MicrofrontendViewComponent} from './microfrontend-view.component';
 
 /**
  * Provides functions and constants specific to microfrontend routes.
@@ -147,3 +149,20 @@ export const MicrofrontendViewRoutes = {
     return inject(ManifestObjectCache).hasCapability(microfrontendURL.capabilityId);
   }) satisfies CanMatchFn,
 } as const;
+
+/**
+ * Provides the route for integrating microfrontend views.
+ */
+export function provideMicrofrontendViewRoute(): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    {
+      provide: WORKBENCH_ROUTE,
+      multi: true,
+      useFactory: (): Route => ({
+        matcher: MicrofrontendViewRoutes.provideMicrofrontendRouteMatcher(),
+        component: MicrofrontendViewComponent,
+        canMatch: [MicrofrontendViewRoutes.canMatchMicrofrontendView], // use a single matcher because Angular evaluates matchers in parallel
+      }),
+    },
+  ]);
+}

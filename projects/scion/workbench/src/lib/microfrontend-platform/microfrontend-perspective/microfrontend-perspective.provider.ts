@@ -16,7 +16,7 @@ import {MicrofrontendPerspectiveIntentHandler} from './microfrontend-perspective
 import {MicrofrontendPerspectiveCapabilityMigrator} from './microfrontend-perspective-capability-migrator.interceptor';
 import {MicrofrontendPerspectiveCapabilityValidator} from './microfrontend-perspective-capability-validator.interceptor';
 import {WorkbenchCapabilities} from '@scion/workbench-client';
-import {STABLE_CAPABILITY_ID} from '../stable-capability-id-assigner.interceptor';
+import {provideStableCapabilityId} from '../stable-capability-id-assigner.provider';
 import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
 
 /**
@@ -28,7 +28,7 @@ export function provideMicrofrontendPerspective(): EnvironmentProviders {
     MicrofrontendPerspectiveCapabilityMigrator,
     MicrofrontendPerspectiveCapabilityValidator,
     MicrofrontendPerspectiveIntentHandler,
-    {provide: STABLE_CAPABILITY_ID, useValue: WorkbenchCapabilities.Perspective, multi: true},
+    provideStableCapabilityId(WorkbenchCapabilities.Perspective),
     provideMicrofrontendPlatformInitializer(onPreStartup, {phase: MicrofrontendPlatformStartupPhase.PreStartup}),
     provideMicrofrontendPlatformInitializer(onPostStartup, {phase: MicrofrontendPlatformStartupPhase.PostStartup}),
   ]);
