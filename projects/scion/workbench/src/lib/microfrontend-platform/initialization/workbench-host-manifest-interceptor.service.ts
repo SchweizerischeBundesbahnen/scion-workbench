@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HostManifestInterceptor, Intention, Manifest} from '@scion/microfrontend-platform';
-import {eMESSAGE_BOX_MESSAGE_PARAM, eNOTIFICATION_MESSAGE_PARAM, WorkbenchCapabilities, WorkbenchMessageBoxCapability, WorkbenchNotificationCapability} from '@scion/workbench-client';
+import {eMESSAGE_BOX_MESSAGE_PARAM, WorkbenchCapabilities, WorkbenchMessageBoxCapability} from '@scion/workbench-client';
 import {TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY, TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY_PROPERTY, TEXT_MESSAGE_BOX_CAPABILITY_ROUTE} from '../microfrontend-host-message-box/text-message/text-message.component';
 
 /**
@@ -21,7 +21,6 @@ export class WorkbenchHostManifestInterceptor implements HostManifestInterceptor
     hostManifest.capabilities = [
       ...hostManifest.capabilities ?? [],
       provideBuiltInTextMessageBoxCapability(),
-      provideBuiltInTextNotificationCapability(),
     ];
   }
 }
@@ -53,27 +52,6 @@ export function provideTextProviderIntention(): Intention {
   return {
     type: WorkbenchCapabilities.TextProvider,
     qualifier: {provider: '*'},
-  };
-}
-
-/**
- * Provides the built-in notification capability to display text.
- *
- * @see MicrofrontendNotificationIntentHandler
- */
-function provideBuiltInTextNotificationCapability(): WorkbenchNotificationCapability {
-  return {
-    type: WorkbenchCapabilities.Notification,
-    qualifier: {},
-    params: [
-      {
-        name: eNOTIFICATION_MESSAGE_PARAM,
-        required: false,
-        description: 'Text to display in the notification.',
-      },
-    ],
-    private: false,
-    description: 'Displays a text notification.',
   };
 }
 

@@ -16,7 +16,6 @@ import {Beans} from '@scion/toolkit/bean-manager';
 import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter, WorkbenchTextService} from '@scion/workbench-client';
 import {NgZoneObservableDecorator} from './initialization/ng-zone-observable-decorator';
 import {WorkbenchConfig} from '../workbench-config';
-import {provideNotificationIntentHandler} from './microfrontend-notification/microfrontend-notification-intent-handler';
 import {MicrofrontendPopupIntentHandler} from './microfrontend-popup/microfrontend-popup-intent-handler.interceptor';
 import {WorkbenchHostManifestInterceptor} from './initialization/workbench-host-manifest-interceptor.service';
 import {Route} from '@angular/router';
@@ -37,6 +36,7 @@ import {provideHostTextProvider} from './text/host-text-provider';
 import {provideMicrofrontendPerspective} from './microfrontend-perspective/microfrontend-perspective.provider';
 import {provideMicrofrontendPart} from './microfrontend-part/microfrontend-part.provider';
 import {provideMicrofrontendView} from './microfrontend-view/microfrontend-view.provider';
+import {provideMicrofrontendNotification} from './microfrontend-notification/microfrontend-notification.provider';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -49,10 +49,10 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
   return makeEnvironmentProviders([
     provideMicrofrontendPlatformHost(),
     provideMicrofrontendPlatformConfig(workbenchConfig),
-    provideNotificationIntentHandler(),
     provideMicrofrontendPerspective(),
     provideMicrofrontendPart(),
     provideMicrofrontendView(),
+    provideMicrofrontendNotification(),
     provideManifestObjectCache(),
     MicrofrontendPopupIntentHandler,
     MicrofrontendDialogIntentHandler,
