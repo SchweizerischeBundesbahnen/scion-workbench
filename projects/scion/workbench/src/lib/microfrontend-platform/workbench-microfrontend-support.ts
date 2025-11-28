@@ -20,8 +20,6 @@ import {MicrofrontendPopupIntentHandler} from './microfrontend-popup/microfronte
 import {WorkbenchHostManifestInterceptor} from './initialization/workbench-host-manifest-interceptor.service';
 import {Route} from '@angular/router';
 import {MicrofrontendPopupCapabilityValidator} from './microfrontend-popup/microfrontend-popup-capability-validator.interceptor';
-import {MicrofrontendDialogIntentHandler} from './microfrontend-dialog/microfrontend-dialog-intent-handler.interceptor';
-import {MicrofrontendDialogCapabilityValidator} from './microfrontend-dialog/microfrontend-dialog-capability-validator.interceptor';
 import {MicrofrontendMessageBoxIntentHandler} from './microfrontend-message-box/microfrontend-message-box-intent-handler.interceptor';
 import {MicrofrontendMessageBoxCapabilityValidator} from './microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
 import {canMatchWorkbenchDialog} from '../routing/workbench-route-guards';
@@ -37,6 +35,7 @@ import {provideMicrofrontendPerspective} from './microfrontend-perspective/micro
 import {provideMicrofrontendPart} from './microfrontend-part/microfrontend-part.provider';
 import {provideMicrofrontendView} from './microfrontend-view/microfrontend-view.provider';
 import {provideMicrofrontendNotification} from './microfrontend-notification/microfrontend-notification.provider';
+import {provideMicrofrontendDialog} from './microfrontend-dialog/microfrontend-dialog.provider';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -52,13 +51,12 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     provideMicrofrontendPerspective(),
     provideMicrofrontendPart(),
     provideMicrofrontendView(),
+    provideMicrofrontendDialog(),
     provideMicrofrontendNotification(),
     provideManifestObjectCache(),
     MicrofrontendPopupIntentHandler,
-    MicrofrontendDialogIntentHandler,
     MicrofrontendMessageBoxIntentHandler,
     MicrofrontendPopupCapabilityValidator,
-    MicrofrontendDialogCapabilityValidator,
     MicrofrontendMessageBoxCapabilityValidator,
     NgZoneObservableDecorator,
     WorkbenchHostManifestInterceptor,

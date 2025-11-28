@@ -20,8 +20,6 @@ import {MicrofrontendPopupIntentHandler} from '../microfrontend-popup/microfront
 import {MicrofrontendPopupCapabilityValidator} from '../microfrontend-popup/microfrontend-popup-capability-validator.interceptor';
 import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter, WorkbenchTextService, ɵWorkbenchDialogService, ɵWorkbenchMessageBoxService, ɵWorkbenchNotificationService, ɵWorkbenchPopupService, ɵWorkbenchRouter, ɵWorkbenchTextService} from '@scion/workbench-client';
 import {MicrofrontendMessageBoxIntentHandler} from '../microfrontend-message-box/microfrontend-message-box-intent-handler.interceptor';
-import {MicrofrontendDialogIntentHandler} from '../microfrontend-dialog/microfrontend-dialog-intent-handler.interceptor';
-import {MicrofrontendDialogCapabilityValidator} from '../microfrontend-dialog/microfrontend-dialog-capability-validator.interceptor';
 import {MicrofrontendMessageBoxCapabilityValidator} from '../microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
 
 /**
@@ -34,10 +32,8 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
   private readonly _hostManifestInterceptor = inject(WorkbenchHostManifestInterceptor);
   private readonly _ngZoneObservableDecorator = inject(NgZoneObservableDecorator);
   private readonly _popupIntentHandler = inject(MicrofrontendPopupIntentHandler);
-  private readonly _dialogIntentHandler = inject(MicrofrontendDialogIntentHandler);
   private readonly _messageBoxIntentHandler = inject(MicrofrontendMessageBoxIntentHandler);
   private readonly _popupCapabilityValidator = inject(MicrofrontendPopupCapabilityValidator);
-  private readonly _dialogCapabilityValidator = inject(MicrofrontendDialogCapabilityValidator);
   private readonly _messageBoxCapabilityValidator = inject(MicrofrontendMessageBoxCapabilityValidator);
   private readonly _injector = inject(Injector);
   private readonly _zone = inject(NgZone);
@@ -77,17 +73,11 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
     // Register popup intent interceptor to open the corresponding popup.
     Beans.register(IntentInterceptor, {useValue: this._popupIntentHandler, multi: true});
 
-    // Register dialog intent interceptor to open the corresponding dialog.
-    Beans.register(IntentInterceptor, {useValue: this._dialogIntentHandler, multi: true});
-
     // Register message box intent interceptor to open the corresponding message box.
     Beans.register(IntentInterceptor, {useValue: this._messageBoxIntentHandler, multi: true});
 
     // Register popup capability interceptor to assert required popup capability properties.
     Beans.register(CapabilityInterceptor, {useValue: this._popupCapabilityValidator, multi: true});
-
-    // Register dialog capability interceptor to assert required dialog capability properties.
-    Beans.register(CapabilityInterceptor, {useValue: this._dialogCapabilityValidator, multi: true});
 
     // Register message box capability interceptor to assert required capability properties.
     Beans.register(CapabilityInterceptor, {useValue: this._messageBoxCapabilityValidator, multi: true});
