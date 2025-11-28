@@ -19,8 +19,6 @@ import {WorkbenchHostManifestInterceptor} from './workbench-host-manifest-interc
 import {MicrofrontendPopupIntentHandler} from '../microfrontend-popup/microfrontend-popup-intent-handler.interceptor';
 import {MicrofrontendPopupCapabilityValidator} from '../microfrontend-popup/microfrontend-popup-capability-validator.interceptor';
 import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter, WorkbenchTextService, ɵWorkbenchDialogService, ɵWorkbenchMessageBoxService, ɵWorkbenchNotificationService, ɵWorkbenchPopupService, ɵWorkbenchRouter, ɵWorkbenchTextService} from '@scion/workbench-client';
-import {MicrofrontendMessageBoxIntentHandler} from '../microfrontend-message-box/microfrontend-message-box-intent-handler.interceptor';
-import {MicrofrontendMessageBoxCapabilityValidator} from '../microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
 
 /**
  * Initializes and starts the SCION Microfrontend Platform in host mode.
@@ -32,9 +30,7 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
   private readonly _hostManifestInterceptor = inject(WorkbenchHostManifestInterceptor);
   private readonly _ngZoneObservableDecorator = inject(NgZoneObservableDecorator);
   private readonly _popupIntentHandler = inject(MicrofrontendPopupIntentHandler);
-  private readonly _messageBoxIntentHandler = inject(MicrofrontendMessageBoxIntentHandler);
   private readonly _popupCapabilityValidator = inject(MicrofrontendPopupCapabilityValidator);
-  private readonly _messageBoxCapabilityValidator = inject(MicrofrontendMessageBoxCapabilityValidator);
   private readonly _injector = inject(Injector);
   private readonly _zone = inject(NgZone);
   private readonly _logger = inject(Logger);
@@ -73,14 +69,8 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
     // Register popup intent interceptor to open the corresponding popup.
     Beans.register(IntentInterceptor, {useValue: this._popupIntentHandler, multi: true});
 
-    // Register message box intent interceptor to open the corresponding message box.
-    Beans.register(IntentInterceptor, {useValue: this._messageBoxIntentHandler, multi: true});
-
     // Register popup capability interceptor to assert required popup capability properties.
     Beans.register(CapabilityInterceptor, {useValue: this._popupCapabilityValidator, multi: true});
-
-    // Register message box capability interceptor to assert required capability properties.
-    Beans.register(CapabilityInterceptor, {useValue: this._messageBoxCapabilityValidator, multi: true});
 
     // Run initializers in `PostStartup` phase; must be done in runlevel 2, i.e., before activator microfrontends are installed.
     Beans.registerInitializer({

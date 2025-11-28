@@ -18,17 +18,11 @@ import {NgZoneObservableDecorator} from './initialization/ng-zone-observable-dec
 import {WorkbenchConfig} from '../workbench-config';
 import {MicrofrontendPopupIntentHandler} from './microfrontend-popup/microfrontend-popup-intent-handler.interceptor';
 import {WorkbenchHostManifestInterceptor} from './initialization/workbench-host-manifest-interceptor.service';
-import {Route} from '@angular/router';
 import {MicrofrontendPopupCapabilityValidator} from './microfrontend-popup/microfrontend-popup-capability-validator.interceptor';
-import {MicrofrontendMessageBoxIntentHandler} from './microfrontend-message-box/microfrontend-message-box-intent-handler.interceptor';
-import {MicrofrontendMessageBoxCapabilityValidator} from './microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
-import {canMatchWorkbenchDialog} from '../routing/workbench-route-guards';
-import {TEXT_MESSAGE_BOX_CAPABILITY_ROUTE} from './microfrontend-host-message-box/text-message/text-message.component';
 import {provideManifestObjectCache} from './manifest-object-cache.service';
 import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform-config-loader';
 import {provideWorkbenchInitializer} from '../startup/workbench-initializer';
 import {Defined} from '@scion/toolkit/util';
-import {WORKBENCH_ROUTE} from '../workbench.constants';
 import {provideRemoteTextProvider} from './text/remote-text-provider';
 import {provideHostTextProvider} from './text/host-text-provider';
 import {provideMicrofrontendPerspective} from './microfrontend-perspective/microfrontend-perspective.provider';
@@ -36,6 +30,7 @@ import {provideMicrofrontendPart} from './microfrontend-part/microfrontend-part.
 import {provideMicrofrontendView} from './microfrontend-view/microfrontend-view.provider';
 import {provideMicrofrontendNotification} from './microfrontend-notification/microfrontend-notification.provider';
 import {provideMicrofrontendDialog} from './microfrontend-dialog/microfrontend-dialog.provider';
+import {provideMicrofrontendMessageBox} from './microfrontend-message-box/microfrontend-message-box.provider';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -52,15 +47,13 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     provideMicrofrontendPart(),
     provideMicrofrontendView(),
     provideMicrofrontendDialog(),
+    provideMicrofrontendMessageBox(),
     provideMicrofrontendNotification(),
     provideManifestObjectCache(),
     MicrofrontendPopupIntentHandler,
-    MicrofrontendMessageBoxIntentHandler,
     MicrofrontendPopupCapabilityValidator,
-    MicrofrontendMessageBoxCapabilityValidator,
     NgZoneObservableDecorator,
     WorkbenchHostManifestInterceptor,
-    provideBuiltInTextMessageBoxCapabilityRoute(),
     provideMicrofrontendPlatformBeans(),
     provideWorkbenchClientBeans(),
     provideRemoteTextProvider(),
@@ -118,23 +111,6 @@ function provideWorkbenchClientBeans(): EnvironmentProviders {
     {provide: WorkbenchMessageBoxService, useFactory: () => Beans.get(WorkbenchMessageBoxService)},
     {provide: WorkbenchNotificationService, useFactory: () => Beans.get(WorkbenchNotificationService)},
     {provide: WorkbenchTextService, useFactory: () => Beans.get(WorkbenchTextService)},
-  ]);
-}
-
-/**
- * Provides the route for the built-in {@link WorkbenchMessageBoxCapability}.
- */
-function provideBuiltInTextMessageBoxCapabilityRoute(): EnvironmentProviders {
-  return makeEnvironmentProviders([
-    {
-      provide: WORKBENCH_ROUTE,
-      multi: true,
-      useValue: {
-        path: TEXT_MESSAGE_BOX_CAPABILITY_ROUTE,
-        loadComponent: () => import('./microfrontend-host-message-box/text-message/text-message.component'),
-        canMatch: [canMatchWorkbenchDialog(true)],
-      } satisfies Route,
-    },
   ]);
 }
 

@@ -40,10 +40,6 @@ export default class TextMessageComponent {
 }
 
 /**
- * Route for the built-in text message box capability provided by the workbench host application.
- */
-export const TEXT_MESSAGE_BOX_CAPABILITY_ROUTE = '~/messagebox';
-/**
  * Property to identify the built-in text message box capability.
  */
 export const TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY_PROPERTY = 'ɵidentity';
