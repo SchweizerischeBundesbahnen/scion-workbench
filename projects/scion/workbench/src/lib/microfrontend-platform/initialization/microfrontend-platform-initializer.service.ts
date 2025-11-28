@@ -9,13 +9,12 @@
  */
 
 import {inject, Injectable, Injector, NgZone, OnDestroy} from '@angular/core';
-import {CapabilityInterceptor, HostManifestInterceptor, IntentInterceptor, MicrofrontendPlatform, MicrofrontendPlatformConfig, MicrofrontendPlatformHost, ObservableDecorator} from '@scion/microfrontend-platform';
+import {CapabilityInterceptor, IntentInterceptor, MicrofrontendPlatform, MicrofrontendPlatformConfig, MicrofrontendPlatformHost, ObservableDecorator} from '@scion/microfrontend-platform';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Logger, LoggerNames} from '../../logging';
 import {NgZoneObservableDecorator} from './ng-zone-observable-decorator';
 import {MicrofrontendPlatformStartupPhase, runMicrofrontendPlatformInitializers} from '../microfrontend-platform-initializer';
 import {MicrofrontendPlatformConfigLoader} from '../microfrontend-platform-config-loader';
-import {WorkbenchHostManifestInterceptor} from './workbench-host-manifest-interceptor.service';
 import {MicrofrontendPopupIntentHandler} from '../microfrontend-popup/microfrontend-popup-intent-handler.interceptor';
 import {MicrofrontendPopupCapabilityValidator} from '../microfrontend-popup/microfrontend-popup-capability-validator.interceptor';
 import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter, WorkbenchTextService, ɵWorkbenchDialogService, ɵWorkbenchMessageBoxService, ɵWorkbenchNotificationService, ɵWorkbenchPopupService, ɵWorkbenchRouter, ɵWorkbenchTextService} from '@scion/workbench-client';
@@ -27,7 +26,6 @@ import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificatio
 export class MicrofrontendPlatformInitializer implements OnDestroy {
 
   private readonly _microfrontendPlatformConfigLoader = inject(MicrofrontendPlatformConfigLoader);
-  private readonly _hostManifestInterceptor = inject(WorkbenchHostManifestInterceptor);
   private readonly _ngZoneObservableDecorator = inject(NgZoneObservableDecorator);
   private readonly _popupIntentHandler = inject(MicrofrontendPopupIntentHandler);
   private readonly _popupCapabilityValidator = inject(MicrofrontendPopupCapabilityValidator);
@@ -59,9 +57,6 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
     Beans.register(WorkbenchPopupService, {useClass: ɵWorkbenchPopupService});
     Beans.register(WorkbenchNotificationService, {useClass: ɵWorkbenchNotificationService});
     Beans.register(WorkbenchTextService, {useClass: ɵWorkbenchTextService});
-
-    // Register host manifest interceptor for the workbench to register workbench-specific intentions and capabilities.
-    Beans.register(HostManifestInterceptor, {useValue: this._hostManifestInterceptor, multi: true});
 
     // Synchronize emissions of Observables exposed by the SCION Microfrontend Platform with the Angular zone.
     Beans.register(ObservableDecorator, {useValue: this._ngZoneObservableDecorator});

@@ -18,7 +18,7 @@ import {WorkbenchMessageBoxService} from '../../message-box/workbench-message-bo
 import {Arrays} from '@scion/toolkit/util';
 import {MicrofrontendHostMessageBoxComponent} from '../microfrontend-host-message-box/microfrontend-host-message-box.component';
 import {MicrofrontendMessageBoxComponent} from './microfrontend-message-box.component';
-import {createRemoteTranslatable} from '../text/remote-text-provider';
+import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provider';
 
 /**
  * Handles messagebox intents, instructing the workbench to open a message box with the microfrontend declared on the resolved capability.

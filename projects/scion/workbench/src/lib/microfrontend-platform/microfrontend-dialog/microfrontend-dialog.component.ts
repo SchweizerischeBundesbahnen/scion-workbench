@@ -18,7 +18,7 @@ import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
 import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog';
 import {Microfrontends} from '../common/microfrontend.util';
-import {createRemoteTranslatable} from '../text/remote-text-provider';
+import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provider';
 
 /**
  * Displays the microfrontend of a given {@link WorkbenchDialogCapability}.

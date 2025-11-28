@@ -17,20 +17,18 @@ import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificatio
 import {NgZoneObservableDecorator} from './initialization/ng-zone-observable-decorator';
 import {WorkbenchConfig} from '../workbench-config';
 import {MicrofrontendPopupIntentHandler} from './microfrontend-popup/microfrontend-popup-intent-handler.interceptor';
-import {WorkbenchHostManifestInterceptor} from './initialization/workbench-host-manifest-interceptor.service';
 import {MicrofrontendPopupCapabilityValidator} from './microfrontend-popup/microfrontend-popup-capability-validator.interceptor';
 import {provideManifestObjectCache} from './manifest-object-cache.service';
 import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform-config-loader';
 import {provideWorkbenchInitializer} from '../startup/workbench-initializer';
 import {Defined} from '@scion/toolkit/util';
-import {provideRemoteTextProvider} from './text/remote-text-provider';
-import {provideHostTextProvider} from './text/host-text-provider';
 import {provideMicrofrontendPerspective} from './microfrontend-perspective/microfrontend-perspective.provider';
 import {provideMicrofrontendPart} from './microfrontend-part/microfrontend-part.provider';
 import {provideMicrofrontendView} from './microfrontend-view/microfrontend-view.provider';
 import {provideMicrofrontendNotification} from './microfrontend-notification/microfrontend-notification.provider';
 import {provideMicrofrontendDialog} from './microfrontend-dialog/microfrontend-dialog.provider';
 import {provideMicrofrontendMessageBox} from './microfrontend-message-box/microfrontend-message-box.provider';
+import {provideMicrofrontendText} from './microfrontend-text/microfrontend-text.provider';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -49,15 +47,13 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     provideMicrofrontendDialog(),
     provideMicrofrontendMessageBox(),
     provideMicrofrontendNotification(),
+    provideMicrofrontendText(),
     provideManifestObjectCache(),
     MicrofrontendPopupIntentHandler,
     MicrofrontendPopupCapabilityValidator,
     NgZoneObservableDecorator,
-    WorkbenchHostManifestInterceptor,
     provideMicrofrontendPlatformBeans(),
     provideWorkbenchClientBeans(),
-    provideRemoteTextProvider(),
-    provideHostTextProvider(),
   ]);
 }
 

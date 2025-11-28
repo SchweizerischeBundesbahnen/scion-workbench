@@ -13,7 +13,7 @@ import {IntentClient, MessageHeaders} from '@scion/microfrontend-platform';
 import {eNOTIFICATION_MESSAGE_PARAM, Translatable, WorkbenchCapabilities, WorkbenchNotificationConfig, ɵWorkbenchNotificationCommand} from '@scion/workbench-client';
 import {Logger, LoggerNames} from '../../logging';
 import {provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
-import {createRemoteTranslatable} from '../text/remote-text-provider';
+import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provider';
 import {WorkbenchNotificationService} from '../../notification/workbench-notification.service';
 import {prune} from '../../common/prune.util';
 
