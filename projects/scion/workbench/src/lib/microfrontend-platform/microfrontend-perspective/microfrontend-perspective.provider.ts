@@ -11,31 +11,40 @@
 import {EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
 import {MicrofrontendPerspectiveInstaller} from './microfrontend-perspective-installer.service';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {CapabilityInterceptor, IntentInterceptor} from '@scion/microfrontend-platform';
+import {CapabilityInterceptor, HostManifestInterceptor, IntentInterceptor} from '@scion/microfrontend-platform';
 import {MicrofrontendPerspectiveIntentHandler} from './microfrontend-perspective-intent-handler.interceptor';
 import {MicrofrontendPerspectiveCapabilityMigrator} from './microfrontend-perspective-capability-migrator.interceptor';
 import {MicrofrontendPerspectiveCapabilityValidator} from './microfrontend-perspective-capability-validator.interceptor';
 import {WorkbenchCapabilities} from '@scion/workbench-client';
-import {STABLE_CAPABILITY_ID} from '../stable-capability-id-assigner.interceptor';
+import {provideStableCapabilityId} from '../stable-capability-id-assigner.provider';
 import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
+import {MicrofrontendPerspectiveIntentionProvider} from './microfrontend-perspective-intention-provider.interceptor';
 
 /**
- * Provides a set of DI providers registering perspectives provided as perspective capabilities.
+ * Provides a set of DI providers enabling microfrontend perspective support.
+ *
+ * @see WorkbenchPerspectiveCapability
  */
 export function provideMicrofrontendPerspective(): EnvironmentProviders {
   return makeEnvironmentProviders([
+    MicrofrontendPerspectiveIntentionProvider,
     MicrofrontendPerspectiveInstaller,
     MicrofrontendPerspectiveCapabilityMigrator,
     MicrofrontendPerspectiveCapabilityValidator,
     MicrofrontendPerspectiveIntentHandler,
-    {provide: STABLE_CAPABILITY_ID, useValue: WorkbenchCapabilities.Perspective, multi: true},
+    provideStableCapabilityId(WorkbenchCapabilities.Perspective),
     provideMicrofrontendPlatformInitializer(onPreStartup, {phase: MicrofrontendPlatformStartupPhase.PreStartup}),
     provideMicrofrontendPlatformInitializer(onPostStartup, {phase: MicrofrontendPlatformStartupPhase.PostStartup}),
   ]);
 
   function onPreStartup(): void {
+    // Add perspective intention to the host manifest for the workbench to read perspective capabilities.
+    Beans.register(HostManifestInterceptor, {useValue: inject(MicrofrontendPerspectiveIntentionProvider), multi: true});
+    // Migrate deprecated perspective capabilities to the new perspective capability model.
     Beans.register(CapabilityInterceptor, {useValue: inject(MicrofrontendPerspectiveCapabilityMigrator), multi: true});
+    // Register perspective capability validator.
     Beans.register(CapabilityInterceptor, {useValue: inject(MicrofrontendPerspectiveCapabilityValidator), multi: true});
+    // Register perspective intent handler.
     Beans.register(IntentInterceptor, {useValue: inject(MicrofrontendPerspectiveIntentHandler), multi: true});
   }
 

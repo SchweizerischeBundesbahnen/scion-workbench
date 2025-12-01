@@ -13,7 +13,7 @@ import {eMESSAGE_BOX_MESSAGE_PARAM, WorkbenchMessageBox} from '@scion/workbench-
 import {UUID} from '@scion/toolkit/uuid';
 import {Translatable} from '../../../text/workbench-text-provider.model';
 import {TextPipe} from '../../../text/text.pipe';
-import {createRemoteTranslatable} from '../../text/remote-text-provider';
+import {createRemoteTranslatable} from '../../microfrontend-text/remote-text-provider';
 
 /**
  * Displays the text message for the built-in message box capability.
@@ -39,10 +39,6 @@ export default class TextMessageComponent {
   }
 }
 
-/**
- * Route for the built-in text message box capability provided by the workbench host application.
- */
-export const TEXT_MESSAGE_BOX_CAPABILITY_ROUTE = '~/messagebox';
 /**
  * Property to identify the built-in text message box capability.
  */

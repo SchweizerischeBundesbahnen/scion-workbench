@@ -35,7 +35,7 @@ import {MicrofrontendWorkbenchView} from './microfrontend-workbench-view.model';
 import {Microfrontends} from '../common/microfrontend.util';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {rootEffect, toRootObservable} from '../../common/rxjs-interop.util';
-import {createRemoteTranslatable} from '../text/remote-text-provider';
+import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provider';
 import {prune} from '../../common/prune.util';
 
 /**
