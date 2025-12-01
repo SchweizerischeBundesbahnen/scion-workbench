@@ -17,7 +17,7 @@ import {text} from '../../text/text';
 import {finalize} from 'rxjs/operators';
 
 /**
- * Registers a text provider for micro apps to request texts of the host app.
+ * Registers a text provider for micro apps to request texts from the host app.
  */
 export function provideHostTextProvider(): EnvironmentProviders {
   return makeEnvironmentProviders([

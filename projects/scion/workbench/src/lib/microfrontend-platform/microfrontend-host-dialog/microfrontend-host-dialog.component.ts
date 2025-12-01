@@ -21,7 +21,7 @@ import {ANGULAR_ROUTER_MUTEX} from '../../executor/single-task-executor';
 import {Observables} from '@scion/toolkit/util';
 import {takeUntil} from 'rxjs/operators';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
-import {createRemoteTranslatable} from '../text/remote-text-provider';
+import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provider';
 
 /**
  * Displays the microfrontend of a dialog capability provided by the host.

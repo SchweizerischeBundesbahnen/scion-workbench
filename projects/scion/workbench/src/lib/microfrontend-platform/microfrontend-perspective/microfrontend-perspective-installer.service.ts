@@ -21,7 +21,7 @@ import {Logger, LoggerNames} from '../../logging';
 import {Objects} from '../../common/objects.util';
 import {WorkbenchPerspectiveData} from './workbench-perspective-data';
 import {computeViewId} from '../../workbench.identifiers';
-import {createRemoteTranslatable} from '../text/remote-text-provider';
+import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provider';
 import {MicrofrontendPartNavigationData} from '../microfrontend-part/microfrontend-part-navigation-data';
 import {Arrays} from '@scion/toolkit/util';
 import {Translatable} from '../../text/workbench-text-provider.model';
