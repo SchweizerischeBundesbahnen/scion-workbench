@@ -22,16 +22,16 @@ import {PopupOrigin} from '../../popup/popup.origin';
 import {MicrofrontendHostPopupComponent} from '../microfrontend-host-popup/microfrontend-host-popup.component';
 import {isViewId, PopupId} from '../../workbench.identifiers';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
-import {MicrofrontendWorkbenchView} from '../microfrontend-view/microfrontend-workbench-view.model';
 import {prune} from '../../common/prune.util';
+import {MICROFRONTEND_VIEW_NAVIGATION_HINT} from '../microfrontend-view/microfrontend-view-routes';
+import {MicrofrontendViewNavigationData} from '../microfrontend-view/microfrontend-view-navigation-data';
 
 /**
- * Handles popup intents, instructing the workbench to open a popup with the microfrontend declared on the resolved capability.
+ * Handles popup intents, opening a popup based on resolved capability.
  *
  * Microfrontends of the host are displayed in {@link MicrofrontendHostPopupComponent}, microfrontends of other applications in {@link MicrofrontendPopupComponent}.
  *
- * Popup intents are handled in this interceptor and are not transported to the providing application, enabling support for applications
- * that are not connected to the SCION Workbench.
+ * Popup intents are handled in this interceptor and are not transported to the providing application to support applications not connected to the SCION Workbench.
  */
 @Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
@@ -129,7 +129,13 @@ export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
     const view = this._viewRegistry.get(context);
     return {
       viewId: view.id,
-      viewCapabilityId: view.adapt(MicrofrontendWorkbenchView)?.capability.metadata!.id,
+      viewCapabilityId: (() => {
+        const navigation = view.navigation();
+        if (navigation?.hint === MICROFRONTEND_VIEW_NAVIGATION_HINT) {
+          return (navigation.data as unknown as MicrofrontendViewNavigationData).capabilityId;
+        }
+        return undefined;
+      })(),
     };
   }
 }

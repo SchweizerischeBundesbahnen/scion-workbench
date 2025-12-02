@@ -55,9 +55,9 @@ export class MessageBoxOpenerPagePO implements WorkbenchViewPagePO {
     }
 
     if (options?.inputs) {
-      const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-inputs'));
-      await keyValueField.clear();
-      await keyValueField.addEntries(options.inputs);
+      const inputsField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-inputs'));
+      await inputsField.clear();
+      await inputsField.addEntries(options.inputs);
     }
 
     if (options?.title) {
@@ -65,9 +65,9 @@ export class MessageBoxOpenerPagePO implements WorkbenchViewPagePO {
     }
 
     if (options?.actions) {
-      const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-actions'));
-      await keyValueField.clear();
-      await keyValueField.addEntries(options.actions);
+      const actionsField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-actions'));
+      await actionsField.clear();
+      await actionsField.addEntries(options.actions);
     }
 
     if (options?.severity) {

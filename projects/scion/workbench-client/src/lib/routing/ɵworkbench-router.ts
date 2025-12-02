@@ -54,11 +54,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
   }
 
   private async updateViewParams(extras?: WorkbenchNavigationExtras): Promise<boolean> {
-    const viewCapabilityId = Beans.get(WorkbenchView).snapshot.params.get(ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID) as string | undefined;
-    if (viewCapabilityId === undefined) {
-      return false; // Params cannot be updated until the loading of the view is completed
-    }
-
+    const viewCapabilityId = Beans.get(WorkbenchView).snapshot.capability.metadata!.id;
     const command: ɵViewParamsUpdateCommand = {
       params: Dictionaries.coerce(extras?.params),
       paramsHandling: extras?.paramsHandling,
@@ -84,7 +80,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
 }
 
 /**
- * Command object for instructing the Workbench Router to navigate a view.
+ * Command object to navigate a view.
  *
  * @docs-private Not public API. For internal use only.
  * @ignore
@@ -99,7 +95,7 @@ export interface ɵWorkbenchNavigateCommand {
 }
 
 /**
- * Command object for instructing the Workbench Router to update view params in self-navigation.
+ * Command object to update view params in self-navigation.
  *
  * @docs-private Not public API. For internal use only.
  * @ignore
@@ -113,17 +109,4 @@ export interface ɵViewParamsUpdateCommand {
    * @see WorkbenchNavigationExtras#paramsHandling
    */
   paramsHandling?: 'merge' | 'replace';
-}
-
-/**
- * Named parameters used in microfrontend routes.
- *
- * @docs-private Not public API. For internal use only.
- * @ignore
- */
-export enum ɵMicrofrontendRouteParams {
-  /**
-   * Named path segment in the microfrontend route representing the view capability for which to embed its microfrontend.
-   */
-  ɵVIEW_CAPABILITY_ID = 'ɵViewCapabilityId',
 }

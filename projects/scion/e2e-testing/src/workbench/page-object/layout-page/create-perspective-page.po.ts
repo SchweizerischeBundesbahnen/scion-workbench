@@ -51,9 +51,9 @@ export class CreatePerspectivePagePO {
   }
 
   private async enterData(data: {[key: string]: any} | undefined): Promise<void> {
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-data'));
-    await keyValueField.clear();
-    await keyValueField.addEntries(data ?? {});
+    const dataField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-data'));
+    await dataField.clear();
+    await dataField.addEntries(data ?? {});
   }
 }
 

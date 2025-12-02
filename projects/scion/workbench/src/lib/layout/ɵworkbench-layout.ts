@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {MPart, MPartGrid, MTreeNode, MView, WorkbenchGrids, ɵMPartGrid} from './workbench-grid.model';
+import {MPart, MPartGrid, MTreeNode, MView, WorkbenchGrids} from './workbench-grid.model';
 import {UID} from '../common/uid.util';
 import {DockedPartExtras, DockingArea, MAIN_AREA, MAIN_AREA_ALTERNATIVE_ID, PartExtras, ReferencePart, WorkbenchLayout} from './workbench-layout';
 import {LayoutSerializationFlags, WorkbenchLayoutSerializer} from './workbench-layout-serializer.service';
@@ -51,14 +51,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @see WorkbenchLayoutConstructConfig
    */
   constructor(config?: WorkbenchLayoutConstructConfig) {
-    this._grids = {
-      main: coerceMPartGrid(config?.grids?.main, {default: createDefaultMainGrid}),
-      mainArea: coerceMPartGrid(config?.grids?.mainArea, {default: createDefaultMainAreaGrid}),
-      ...WorkbenchLayouts.pickActivityGrids(config?.grids, grid => coerceMPartGrid(grid)),
-    };
-
-    this._activityLayout = coerceMActivityLayout(config?.activityLayout, {default: createDefaultActivityLayout});
-    this._outlets = new Map(Objects.entries(coerceOutlets(config?.outlets)));
+    ({activityLayout: this._activityLayout, grids: this._grids, outlets: this._outlets} = deserializeLayout(config));
     this._navigationStates = new Map(Objects.entries(config?.navigationStates ?? {}));
     this.perspectiveId = config?.perspectiveId;
     this.assertGrids();
@@ -1542,11 +1535,33 @@ function createDefaultMainAreaGrid(): MPartGrid {
 }
 
 /**
- * Coerces {@link MActivityLayout}, applying necessary migrations if the serialized layout is outdated.
+ * Deserializes the workbench layout from the given configuration.
  */
-function coerceMActivityLayout(layout: string | MActivityLayout | undefined, options: {default: () => MActivityLayout}): MActivityLayout {
+function deserializeLayout(config?: WorkbenchLayoutConstructConfig): {activityLayout: MActivityLayout; grids: WorkbenchGrids; outlets: Map<WorkbenchOutlet, UrlSegment[]>} {
+  // Deserialize and migrate outlets.
+  const outlets = deserializeOutlets(config?.outlets) ?? new Map<WorkbenchOutlet, UrlSegment[]>();
+
+  // Deserialize and migrate the activity layout.
+  const activityLayout = deserializeActivityLayout(config?.activityLayout) ?? createDefaultActivityLayout();
+
+  // Deserialize and migrate grids.
+  const grids = {
+    main: deserializeGrid(config?.grids?.main) ?? createDefaultMainGrid(),
+    mainArea: deserializeGrid(config?.grids?.mainArea) ?? createDefaultMainAreaGrid(),
+    ...WorkbenchLayouts.pickActivityGrids(config?.grids, grid => deserializeGrid(grid)),
+  };
+
+  return {activityLayout, grids, outlets};
+}
+
+/**
+ * Deserializes specified {@link MActivityLayout} if serialized, applying necessary migrations if the serialized layout is outdated.
+ *
+ * @return Deserialized activity layout, or `undefined` if no layout is passed or deserialization fails.
+ */
+function deserializeActivityLayout(layout: string | MActivityLayout | undefined): MActivityLayout | undefined {
   if (!layout) {
-    return options.default();
+    return undefined;
   }
   if (typeof layout === 'object') {
     return layout;
@@ -1557,18 +1572,18 @@ function coerceMActivityLayout(layout: string | MActivityLayout | undefined, opt
   }
   catch (error) {
     inject(Logger).error('[WorkbenchSerializeError] Failed to deserialize "MActivityLayout". Please clear your browser storage and reload the application.', error);
-    return options.default();
+    return undefined;
   }
 }
 
 /**
- * Coerces {@link MPartGrid}, applying necessary migrations if the serialized grid is outdated.
+ * Deserializes specified {@link MPartGrid} if serialized, applying necessary migrations if the serialized grid is outdated.
+ *
+ * @return Deserialized grid, or `undefined` if no grid is passed or deserialization fails.
  */
-function coerceMPartGrid(grid: string | MPartGrid | undefined): ɵMPartGrid | undefined;
-function coerceMPartGrid(grid: string | MPartGrid | undefined, options: {default: () => MPartGrid}): ɵMPartGrid;
-function coerceMPartGrid(grid: string | MPartGrid | undefined, options?: {default: () => MPartGrid}): ɵMPartGrid | undefined {
+function deserializeGrid(grid: string | MPartGrid | undefined): MPartGrid | undefined {
   if (!grid) {
-    return options?.default();
+    return undefined;
   }
   if (typeof grid === 'object') {
     return grid;
@@ -1579,20 +1594,22 @@ function coerceMPartGrid(grid: string | MPartGrid | undefined, options?: {defaul
   }
   catch (error) {
     inject(Logger).error('[WorkbenchSerializeError] Failed to deserialize "MPartGrid". Please clear your browser storage and reload the application.', error);
-    return options?.default ? {...options.default(), migrated: true} : undefined;
+    return undefined;
   }
 }
 
 /**
- * Coerces {@link Outlets}, applying necessary migrations if the serialized outlets are outdated.
+ * Deserializes specified {@link Outlets} if serialized, applying necessary migrations if the serialized outlets are outdated.
+ *
+ * @return Deserialized outlets, or `undefined` if no outlets are passed or deserialization fails.
  */
-function coerceOutlets(outlets: string | Outlets | undefined): Outlets {
+function deserializeOutlets(outlets: string | Outlets | undefined): Map<WorkbenchOutlet, UrlSegment[]> | undefined {
   if (!outlets) {
-    return {};
+    return undefined;
   }
 
   if (typeof outlets === 'object') {
-    return outlets;
+    return new Map(Objects.entries(outlets));
   }
 
   try {
@@ -1600,7 +1617,7 @@ function coerceOutlets(outlets: string | Outlets | undefined): Outlets {
   }
   catch (error) {
     inject(Logger).error('[WorkbenchSerializeError] Failed to deserialize "Outlets". Please clear your browser storage and reload the application.', error);
-    return {};
+    return undefined;
   }
 }
 
