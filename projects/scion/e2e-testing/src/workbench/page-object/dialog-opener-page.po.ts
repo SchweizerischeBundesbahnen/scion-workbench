@@ -50,9 +50,9 @@ export class DialogOpenerPagePO implements WorkbenchViewPagePO, WorkbenchDialogP
     await this.locator.locator('select.e2e-component').selectOption(component);
 
     if (options?.inputs) {
-      const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-inputs'));
-      await keyValueField.clear();
-      await keyValueField.addEntries(options.inputs);
+      const inputsField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-inputs'));
+      await inputsField.clear();
+      await inputsField.addEntries(options.inputs);
     }
 
     if (options?.modality) {

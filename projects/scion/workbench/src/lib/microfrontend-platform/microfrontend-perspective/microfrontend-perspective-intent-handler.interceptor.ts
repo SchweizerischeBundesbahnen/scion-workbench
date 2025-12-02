@@ -16,7 +16,7 @@ import {Beans} from '@scion/toolkit/bean-manager';
 import {WorkbenchService} from '../../workbench.service';
 
 /**
- * Handles perspective intents, instructing the workbench to switch perspective.
+ * Handles perspective intents, switching to resolved capability.
  */
 @Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendPerspectiveIntentHandler implements IntentInterceptor {

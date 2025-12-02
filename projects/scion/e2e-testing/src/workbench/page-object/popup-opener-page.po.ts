@@ -71,9 +71,9 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO, WorkbenchDialogPa
       await this.locator.locator('input.e2e-input').fill(options.inputLegacy ?? '');
     }
     else {
-      const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-inputs'));
-      await keyValueField.clear();
-      await keyValueField.addEntries(options.inputs ?? {});
+      const inputsField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-inputs'));
+      await inputsField.clear();
+      await inputsField.addEntries(options.inputs ?? {});
     }
 
     // Enter context.

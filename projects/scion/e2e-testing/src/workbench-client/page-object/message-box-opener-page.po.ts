@@ -74,9 +74,9 @@ export class MessageBoxOpenerPagePO implements MicrofrontendViewPagePO, Microfro
     }
 
     if (options?.actions) {
-      const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-actions'));
-      await keyValueField.clear();
-      await keyValueField.addEntries(options.actions);
+      const actionsField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-actions'));
+      await actionsField.clear();
+      await actionsField.addEntries(options.actions);
     }
 
     if (options?.severity) {

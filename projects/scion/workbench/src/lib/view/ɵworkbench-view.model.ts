@@ -17,7 +17,7 @@ import {WorkbenchView, WorkbenchViewNavigation} from './workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {WbComponentPortal} from '../portal/wb-component-portal';
-import {AbstractType, afterRenderEffect, assertNotInReactiveContext, computed, DestroyableInjector, effect, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, Type, untracked} from '@angular/core';
+import {afterRenderEffect, assertNotInReactiveContext, computed, DestroyableInjector, effect, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, untracked} from '@angular/core';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
@@ -55,8 +55,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _viewDragService = inject(ViewDragService);
   private readonly _focusMonitor = inject(WorkbenchFocusMonitor);
   private readonly _logger = inject(Logger);
-
-  private readonly _adapters = new Map<Type<unknown> | AbstractType<unknown>, unknown>();
 
   private readonly _title = signal<Translatable | null>(null);
   private readonly _heading = signal<Translatable | null>(null);
@@ -345,30 +343,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
         }
       },
     };
-  }
-
-  /**
-   * Registers an adapter for this view, replacing any previously registered adapter of the same type.
-   *
-   * Adapters enable loosely coupled extension of an object, allowing one object to be adapted to another.
-   */
-  public registerAdapter<T>(adapterType: AbstractType<T> | Type<T>, object: T): void {
-    this._adapters.set(adapterType, object);
-  }
-
-  /**
-   * Unregisters the given adapter. Has no effect if not registered.
-   */
-  public unregisterAdapter(adapterType: AbstractType<unknown> | Type<unknown>): void {
-    this._adapters.delete(adapterType);
-  }
-
-  /**
-   * Adapts this object to the specified type. Returns `null` if no such object can be found.
-   */
-  public adapt<T>(adapterType: AbstractType<T> | Type<T>): T | null {
-    const adapter = this._adapters.get(adapterType);
-    return adapter ? adapter as T : null;
   }
 
   public get destroyed(): Signal<boolean> {
