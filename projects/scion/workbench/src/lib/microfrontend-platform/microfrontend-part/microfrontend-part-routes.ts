@@ -21,7 +21,7 @@ import {canMatchWorkbenchPart} from '../../routing/workbench-route-guards';
 import {PartId} from '../../workbench.identifiers';
 
 /**
- * Hint passed to the navigation when navigating a part microfrontend.
+ * Hint passed to the navigation when navigating a microfrontend part.
  */
 export const MICROFRONTEND_PART_NAVIGATION_HINT = 'scion.workbench.microfrontend-part';
 

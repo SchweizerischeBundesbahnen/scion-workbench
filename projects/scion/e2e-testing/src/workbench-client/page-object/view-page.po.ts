@@ -154,9 +154,9 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-self-navigation'));
     await accordion.expand();
     try {
-      const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-accordion.e2e-self-navigation').locator('sci-key-value-field.e2e-params'));
-      await keyValueField.clear();
-      await keyValueField.addEntries(params);
+      const paramsField = new SciKeyValueFieldPO(this.locator.locator('sci-accordion.e2e-self-navigation').locator('sci-key-value-field.e2e-params'));
+      await paramsField.clear();
+      await paramsField.addEntries(params);
       await this.locator.locator('sci-accordion.e2e-self-navigation').locator('select.e2e-param-handling').selectOption(options?.paramsHandling ?? '');
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-navigate-per-param')).toggle(options?.navigatePerParam ?? false);
       await this.locator.locator('sci-accordion.e2e-self-navigation').locator('button.e2e-navigate-self').click();

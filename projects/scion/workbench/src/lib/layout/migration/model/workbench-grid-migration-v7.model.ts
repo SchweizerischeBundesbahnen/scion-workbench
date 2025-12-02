@@ -29,6 +29,7 @@ export interface MTreeNodeV7 {
 export interface MPartGridV7 {
   root: MTreeNodeV7 | MPartV7;
   activePartId: PartIdV7;
+  referencePartId?: PartIdV7;
 }
 
 export interface MViewV7 {

@@ -12,18 +12,18 @@ import {Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders
 import {inject, Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchViewCapability, ɵWorkbenchNavigateCommand} from '@scion/workbench-client';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
-import {MicrofrontendViewRoutes} from './microfrontend-view-routes';
+import {MICROFRONTEND_VIEW_NAVIGATION_HINT, MICROFRONTEND_VIEW_STATE_TRANSIENT_PARAMS, splitMicrofrontendViewParams} from './microfrontend-view-routes';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Dictionaries} from '@scion/toolkit/util';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {prune} from '../../common/prune.util';
+import {MicrofrontendViewNavigationData} from './microfrontend-view-navigation-data';
 
 /**
- * Handles microfrontend view intents, instructing the workbench to navigate to the microfrontend of the resolved capability.
+ * Handles view intents, opening or activating views based on resolved capability and passed parameters.
  *
- * View intents are handled in this interceptor and are not transported to the providing application, enabling support for applications
- * that are not connected to the SCION Workbench.
+ * View intents are handled in this interceptor and are not transported to the providing application to support applications not connected to the SCION Workbench.
  */
 @Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendViewIntentHandler implements IntentInterceptor {
@@ -55,24 +55,27 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
     const command: ɵWorkbenchNavigateCommand = message.body ?? {};
 
     const intentParams = prune(Dictionaries.coerce(message.intent.params));
-    const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(intentParams, capability);
+    const {params, transientParams} = splitMicrofrontendViewParams(intentParams, capability);
     const targets = this.resolveTargets(message, command);
-    const microfrontendViewCommands = command.close ? [] : MicrofrontendViewRoutes.createMicrofrontendNavigateCommands(capability.metadata!.id, urlParams);
-    const partId = command.close ? undefined : command.partId;
 
-    this._logger.debug(() => `Navigating to: ${capability.properties.path}`, LoggerNames.MICROFRONTEND_ROUTING, microfrontendViewCommands, capability, transientParams);
+    this._logger.debug(() => `Navigating to: ${capability.properties.path}`, LoggerNames.MICROFRONTEND_ROUTING, capability, params, transientParams);
     const navigations = await Promise.all(targets.map(target => {
-      return this._workbenchRouter.navigate(microfrontendViewCommands, {
+      return this._workbenchRouter.navigate([], prune({
         target,
-        partId,
+        partId: command.close ? undefined : command.partId,
         activate: command.activate,
         close: command.close,
         position: command.position,
         cssClass: command.cssClass,
-        state: prune({
-          [MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS]: transientParams,
-        }),
-      });
+        hint: command.close ? undefined : MICROFRONTEND_VIEW_NAVIGATION_HINT,
+        data: command.close ? undefined : {
+          capabilityId: capability.metadata!.id,
+          params,
+        } satisfies MicrofrontendViewNavigationData,
+        state: {
+          [MICROFRONTEND_VIEW_STATE_TRANSIENT_PARAMS]: Object.keys(transientParams).length ? transientParams : undefined,
+        },
+      }));
     }));
     return navigations.every(Boolean);
   }
@@ -110,21 +113,21 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
         partId: command.partId,
       })
       .filter(mView => {
-        const url = this._layout().urlSegments({outlet: mView.id});
-        const microfrontendURL = MicrofrontendViewRoutes.parseMicrofrontendURL(url);
-        if (!microfrontendURL) {
-          return false;
+        // Test if a microfrontend view.
+        if (mView.navigation?.hint !== MICROFRONTEND_VIEW_NAVIGATION_HINT) {
+          return;
         }
 
-        // Test whether the capability matches.
-        if (microfrontendURL.capabilityId !== intentMessage.capability.metadata!.id) {
+        // Test if the capability matches.
+        const navigation = mView.navigation.data as unknown as MicrofrontendViewNavigationData;
+        if (navigation.capabilityId !== intentMessage.capability.metadata!.id) {
           return false;
         }
 
         // Test whether all "navigational" params match.
         return requiredParams.every(({name}) => {
-          const newParamValue = intentMessage.intent.params!.get(name) as unknown;
-          return (options.matchWildcardParams && newParamValue === '*') || newParamValue === microfrontendURL.params[name];
+          const intentParamValue = intentMessage.intent.params!.get(name) as unknown;
+          return (options.matchWildcardParams && intentParamValue === '*') || intentParamValue === navigation.params[name];
         });
 
       })
