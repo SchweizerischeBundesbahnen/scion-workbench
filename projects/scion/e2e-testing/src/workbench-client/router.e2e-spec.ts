@@ -837,6 +837,73 @@ test.describe('Workbench Router', () => {
     await expectView(testeeViewPage).toBeActive();
   });
 
+  test('should match view based on parameter data type', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      params: [
+        {name: 'booleanParam', required: true},
+        {name: 'stringParam', required: true},
+        {name: 'numberParam', required: true},
+      ],
+      properties: {
+        path: 'test-view',
+      },
+    });
+
+    // Open view.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {
+      target: 'view.1',
+      params: {
+        booleanParam: '<boolean>true</boolean>',
+        stringParam: '<string>value</string>',
+        numberParam: '<number>42</number>',
+      },
+    });
+
+    // Expect view to be opened.
+    const testee = new ViewPagePO(appPO, {viewId: 'view.1'});
+    await expectView(testee).toBeActive();
+    await expect(appPO.views()).toHaveCount(2);
+
+    await test.step('Navigate with identical parameter types', async () => {
+      await routerPage.view.tab.click();
+      await routerPage.navigate({component: 'testee'}, {
+        params: {
+          booleanParam: '<boolean>true</boolean>',
+          stringParam: '<string>value</string>',
+          numberParam: '<number>42</number>',
+        },
+      });
+
+      // Expect view to be activated.
+      await expectView(testee).toBeActive();
+
+      // Expect no new view to be opened.
+      await expect(appPO.views()).toHaveCount(2);
+    });
+
+    await test.step('Navigate with different parameter types', async () => {
+      await routerPage.view.tab.click();
+      await routerPage.navigate({component: 'testee'}, {
+        params: {
+          booleanParam: '<string>true</string>',
+          stringParam: '<string>value</string>',
+          numberParam: '<string>42</string>',
+        },
+      });
+
+      // Expect view not to be active.
+      await expectView(testee).toBeInactive();
+
+      // Expect new view to be opened.
+      await expect(appPO.views()).toHaveCount(3);
+    });
+  });
+
   test('should display "Not Found" page if missing the view provider', async ({appPO, microfrontendNavigator, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
@@ -2100,7 +2167,7 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => view1.getInfo()).toMatchObject(
       {
         partId: 'part.left',
-        routeParams: {state: '1'},
+        navigationData: {'params.state': '1'},
       } satisfies Partial<ViewInfo>,
     );
     await expect(appPO.views()).toHaveCount(2);
@@ -2116,14 +2183,14 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => view1.getInfo()).toMatchObject(
       {
         partId: 'part.left',
-        routeParams: {state: '1'},
+        navigationData: {'params.state': '1'},
       } satisfies Partial<ViewInfo>,
     );
     // Expect view to be opened in the right part.
     await expect.poll(() => view2.getInfo()).toMatchObject(
       {
         partId: 'part.right',
-        routeParams: {state: '2'},
+        navigationData: {'params.state': '2'},
       } satisfies Partial<ViewInfo>,
     );
     await expect(appPO.views()).toHaveCount(3);
@@ -2139,14 +2206,14 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => view1.getInfo()).toMatchObject(
       {
         partId: 'part.left',
-        routeParams: {state: '3'},
+        navigationData: {'params.state': '3'},
       } satisfies Partial<ViewInfo>,
     );
     // Expect view in the right part not to be navigated.
     await expect.poll(() => view2.getInfo()).toMatchObject(
       {
         partId: 'part.right',
-        routeParams: {state: '2'},
+        navigationData: {'params.state': '2'},
       } satisfies Partial<ViewInfo>,
     );
     await expect(appPO.views()).toHaveCount(3);
@@ -2163,21 +2230,21 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => view1.getInfo()).toMatchObject(
       {
         partId: 'part.left',
-        routeParams: {state: '3'},
+        navigationData: {'params.state': '3'},
       } satisfies Partial<ViewInfo>,
     );
     // Expect view in the right part not to be navigated.
     await expect.poll(() => view2.getInfo()).toMatchObject(
       {
         partId: 'part.right',
-        routeParams: {state: '2'},
+        navigationData: {'params.state': '2'},
       } satisfies Partial<ViewInfo>,
     );
     // Expect view to be opened in the right part.
     await expect.poll(() => view3.getInfo()).toMatchObject(
       {
         partId: 'part.right',
-        routeParams: {state: '4'},
+        navigationData: {'params.state': '4'},
       } satisfies Partial<ViewInfo>,
     );
     await expect(appPO.views()).toHaveCount(4);
@@ -2421,7 +2488,7 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.getInfo()).toMatchObject(
       {
         viewId: 'view.101',
-        routeParams: {navigated: 'true'},
+        navigationData: {'params.navigated': 'true'},
       } satisfies Partial<ViewInfo>,
     );
 
@@ -2429,7 +2496,7 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => appPO.view({viewId: 'view.102'}).tab.getInfo()).toMatchObject(
       {
         viewId: 'view.102',
-        routeParams: {navigated: 'false'},
+        navigationData: {'params.navigated': 'false'},
       } satisfies Partial<ViewInfo>,
     );
   });
@@ -2477,7 +2544,7 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.getInfo()).toMatchObject(
       {
         viewId: 'view.101',
-        routeParams: {navigated: 'false'},
+        navigationData: {'params.navigated': 'false'},
       } satisfies Partial<ViewInfo>,
     );
 
@@ -2485,7 +2552,7 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => appPO.view({viewId: 'view.102'}).tab.getInfo()).toMatchObject(
       {
         viewId: 'view.102',
-        routeParams: {navigated: 'true'},
+        navigationData: {'params.navigated': 'true'},
       } satisfies Partial<ViewInfo>,
     );
   });
@@ -2533,7 +2600,7 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.getInfo()).toMatchObject(
       {
         viewId: 'view.101',
-        routeParams: {navigated: 'false'},
+        navigationData: {'params.navigated': 'false'},
       } satisfies Partial<ViewInfo>,
     );
 
@@ -2541,7 +2608,7 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => appPO.view({viewId: 'view.102'}).tab.getInfo()).toMatchObject(
       {
         viewId: 'view.102',
-        routeParams: {navigated: 'true'},
+        navigationData: {'params.navigated': 'true'},
       } satisfies Partial<ViewInfo>,
     );
   });

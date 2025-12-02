@@ -9,7 +9,7 @@
  */
 
 /**
- * Data passed to the navigation when navigating a part microfrontend.
+ * Data passed to the navigation when navigating a microfrontend part.
  */
 export interface MicrofrontendPartNavigationData {
   capabilityId: string;

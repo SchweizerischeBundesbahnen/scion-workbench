@@ -69,8 +69,8 @@ export class NavigatePartsComponent implements ControlValueAccessor, Validator {
           commands: navigationFormGroup.controls.commands.value,
           extras: ({
             hint: navigationFormGroup.controls.extras.controls.hint.value || undefined,
-            data: navigationFormGroup.controls.extras.controls.data.value,
-            state: navigationFormGroup.controls.extras.controls.state.value,
+            data: navigationFormGroup.controls.extras.controls.data.value ?? undefined,
+            state: navigationFormGroup.controls.extras.controls.state.value ?? undefined,
             cssClass: navigationFormGroup.controls.extras.controls.cssClass.value,
           }),
         }, {pruneIfEmpty: true})!));

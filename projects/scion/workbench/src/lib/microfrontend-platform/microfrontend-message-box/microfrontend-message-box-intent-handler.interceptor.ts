@@ -21,12 +21,11 @@ import {MicrofrontendMessageBoxComponent} from './microfrontend-message-box.comp
 import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provider';
 
 /**
- * Handles messagebox intents, instructing the workbench to open a message box with the microfrontend declared on the resolved capability.
+ * Handles messagebox intents, opening a message box based on resolved capability.
  *
  * Microfrontends of the host are displayed in {@link MicrofrontendHostMessageBoxComponent}, microfrontends of other applications in {@link MicrofrontendMessageBoxComponent}.
  *
- * Message box intents are handled in this interceptor and are not transported to the providing application, enabling support for applications
- * that are not connected to the SCION Workbench.
+ * Messagebox intents are handled in this interceptor and are not transported to the providing application to support applications not connected to the SCION Workbench.
  */
 @Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendMessageBoxIntentHandler implements IntentInterceptor {

@@ -35,16 +35,6 @@ export interface MPartGrid {
 }
 
 /**
- * {@link MPartGrid} with additional fields not serialized into the URL.
- */
-export interface ɵMPartGrid extends MPartGrid {
-  /**
-   * Indicates if this grid was migrated from an older version.
-   */
-  migrated?: true;
-}
-
-/**
  * Represents a node in the grid.
  *
  * A node contains two children, which are either a {@link MPart} or a {@link MTreeNode}, respectively.
@@ -156,7 +146,7 @@ export interface MView {
 /**
  * Grids referenced in the workbench layout.
  */
-export interface WorkbenchGrids<T = ɵMPartGrid> {
+export interface WorkbenchGrids<T = MPartGrid> {
   /**
    * Reference to the "root" grid of the workbench layout.
    */

@@ -18,17 +18,17 @@ import {IFRAME_OVERLAY_HOST} from '../../workbench-element-references';
 import {serializeExecution} from '../../common/operators';
 import {NgComponentOutlet} from '@angular/common';
 import {ContentAsOverlayComponent, ContentAsOverlayConfig} from '../../content-projection/content-as-overlay.component';
-import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
 import {Microfrontends} from '../common/microfrontend.util';
-import {rootEffect} from '../../common/rxjs-interop.util';
+import {rootEffect, toRootObservable} from '../../common/rxjs-interop.util';
 import {ɵWorkbenchPart} from '../../part/ɵworkbench-part.model';
 import {MicrofrontendPartNavigationData} from './microfrontend-part-navigation-data';
 import {Router} from '@angular/router';
-import {pairwise} from 'rxjs';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../../glass-pane/glass-pane.directive';
 import {WorkbenchPart} from '../../part/workbench-part.model';
+import {filter} from 'rxjs/operators';
 
 /**
  * Embeds the microfrontend of a part capability.
@@ -52,7 +52,6 @@ export class MicrofrontendPartComponent {
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _outletRouter = inject(OutletRouter);
   private readonly _manifestService = inject(ManifestService);
-  private readonly _manifestObjectCache = inject(ManifestObjectCache);
   private readonly _messageClient = inject(MessageClient);
   private readonly _logger = inject(Logger);
   private readonly _router = inject(Router);
@@ -83,16 +82,17 @@ export class MicrofrontendPartComponent {
   }
 
   private installNavigator(): void {
-    toObservable(this.navigationContext)
+    // Use a root effect to emit even if detached from change detection.
+    toRootObservable(this.navigationContext)
       .pipe(
-        pairwise(),
-        serializeExecution(([prevContext, context]) => this.onNavigate(prevContext, context!)),
+        filter(Boolean),
+        serializeExecution(context => this.onNavigate(context)),
         takeUntilDestroyed(),
       )
       .subscribe();
   }
 
-  private async onNavigate(prevContext: NavigationContext | undefined, context: NavigationContext): Promise<void> {
+  private async onNavigate(context: NavigationContext): Promise<void> {
     if (!context.capability) {
       this._logger.warn(() => `[NullCapabilityError] No application found to provide a part capability of id '${context.capabilityId}'. Maybe, the requested part is not public API or the providing application not available.`, LoggerNames.MICROFRONTEND_ROUTING);
       this.unload();
@@ -114,7 +114,7 @@ export class MicrofrontendPartComponent {
       relativeTo: application.baseUrl,
       params: params,
       pushStateToSessionHistoryStack: false,
-      showSplash: prevContext?.capabilityId !== context.capabilityId ? capability.properties?.showSplash : false,
+      showSplash: context.prevCapability?.metadata!.id !== context.capabilityId ? capability.properties?.showSplash : false,
     });
   }
 
@@ -176,14 +176,20 @@ export class MicrofrontendPartComponent {
    */
   private computeNavigationContext(): Signal<NavigationContext | undefined> {
     const context = signal<NavigationContext | undefined>(undefined);
+    const manifestObjectCache = inject(ManifestObjectCache);
 
     // Run as root effect to run even if the parent component is detached from change detection (e.g., if the part is not visible).
     rootEffect(onCleanup => {
       const {capabilityId, params} = this.part.navigation()!.data as unknown as MicrofrontendPartNavigationData;
 
       untracked(() => {
-        const subscription = this._manifestObjectCache.observeCapability$<WorkbenchPartCapability>(capabilityId).subscribe(capability => {
-          context.set({capabilityId, capability, params: Maps.coerce(params)});
+        const subscription = manifestObjectCache.observeCapability$<WorkbenchPartCapability>(capabilityId).subscribe(capability => {
+          context.update(prevContext => ({
+            capabilityId,
+            capability: capability ?? undefined,
+            prevCapability: prevContext?.capability,
+            params: Maps.coerce(params),
+          }));
         });
         onCleanup(() => subscription.unsubscribe());
       });
@@ -224,6 +230,7 @@ function configureMicrofrontendGlassPane(): Provider[] {
  */
 interface NavigationContext {
   capabilityId: string;
-  capability: WorkbenchPartCapability | null;
+  capability?: WorkbenchPartCapability;
+  prevCapability?: WorkbenchPartCapability;
   params: Map<string, unknown>;
 }

@@ -44,6 +44,74 @@ test.describe('Workbench Router', () => {
     });
   });
 
+  test('should preserve data type of params', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      params: [
+        {
+          name: 'param1',
+          required: false,
+        },
+        {
+          name: 'param2',
+          required: false,
+        },
+        {
+          name: 'param3',
+          required: false,
+        },
+        {
+          name: 'param4',
+          required: false,
+        },
+        {
+          name: 'param5',
+          required: false,
+        },
+        {
+          name: 'param6',
+          required: false,
+        },
+        {
+          name: 'param7',
+          required: false,
+        },
+      ],
+      properties: {
+        path: 'test-view',
+      },
+    });
+
+    // Navigate to view.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {
+      target: 'view.1',
+      params: {
+        param1: 'value',
+        param2: '<number>0</number>',
+        param3: '<number>2</number>',
+        param4: '<boolean>true</boolean>',
+        param5: '<boolean>false</boolean>',
+        param6: '<null>',
+        param7: '<undefined>',
+      },
+    });
+
+    // Expect params to have actual data type.
+    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.1'});
+    await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
+      param1: 'value',
+      param2: '0 [number]',
+      param3: '2 [number]',
+      param4: 'true [boolean]',
+      param5: 'false [boolean]',
+      param6: 'null [null]',
+    });
+  });
+
   test('should substitute named URL segments with values from the params', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
@@ -162,7 +230,7 @@ test.describe('Workbench Router', () => {
 
     // expect the optional parameter with value `null` to be contained in view params
     await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
-      id: 'null',
+      id: 'null [null]',
     });
   });
 
@@ -414,7 +482,7 @@ test.describe('Workbench Router', () => {
       // expect the view's params to be updated
       await expect.poll(() => viewPage.getViewParams()).toMatchObject({
         param1: 'PARAM 1',
-        param2: 'null',
+        param2: 'null [null]',
         param3: 'PARAM 3',
       });
     });
@@ -432,7 +500,7 @@ test.describe('Workbench Router', () => {
       // expect the view's params to be updated
       await expect.poll(() => viewPage.getViewParams()).toMatchObject({
         param1: 'PARAM 1',
-        param2: 'null',
+        param2: 'null [null]',
         param3: 'PARAM 3',
       });
     });

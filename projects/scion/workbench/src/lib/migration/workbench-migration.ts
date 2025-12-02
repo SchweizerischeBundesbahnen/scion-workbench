@@ -9,12 +9,15 @@
  */
 
 /**
- * Represents a migration to migrate a workbench element to the next version.
+ * Represents a migration to migrate serialized workbench data to the next version.
  */
-export interface WorkbenchMigration {
+export interface WorkbenchMigration<CONTEXT = void> {
 
   /**
    * Migrates serialized workbench data to the next version.
+   *
+   * Depending on the migration, a context is passed to read and migrate referenced data,
+   * such as referenced outlets when migrating a workbench grid.
    */
-  migrate(json: string): string;
+  migrate(json: string, context: CONTEXT): string;
 }

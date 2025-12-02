@@ -1,3 +1,5 @@
+@let capability = navigationContext()?.capability;
+
 <wb-content-as-overlay [config]="overlayConfig">
   <div class="microfrontend-view"
        [class.workbench-drag]="workbenchLayoutService.dragging()"
@@ -5,8 +7,8 @@
        wbGlassPane>
     <sci-router-outlet #router_outlet
                        [name]="view.id"
-                       [attr.data-capabilityid]="capability()?.metadata!.id"
-                       [attr.data-app]="capability()?.metadata!.appSymbolicName"
+                       [attr.data-capabilityid]="capability?.metadata!.id"
+                       [attr.data-app]="capability?.metadata!.appSymbolicName"
                        [keystrokes]="keystrokesToBubble()"
                        [class]="view.classList.asList()"
                        (focuswithin)="onFocusWithin($event)">

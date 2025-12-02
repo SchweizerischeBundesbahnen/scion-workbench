@@ -16,15 +16,18 @@ import {WorkbenchView} from '../../view/workbench-view.model';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {Translatable, ɵWorkbenchCommands} from '@scion/workbench-client';
 import {Subscription} from 'rxjs';
-import {MicrofrontendWorkbenchView} from './microfrontend-workbench-view.model';
 import {provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
 import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provider';
+import {MICROFRONTEND_VIEW_NAVIGATION_HINT} from './microfrontend-view-routes';
+import {ManifestObjectCache} from '../manifest-object-cache.service';
+import {MicrofrontendViewNavigationData} from './microfrontend-view-navigation-data';
 
 @Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 class MicrofrontendViewCommandHandler implements OnDestroy {
 
   private readonly _messageClient = inject(MessageClient);
   private readonly _viewRegistry = inject(WorkbenchViewRegistry);
+  private readonly _manifestObjectCache = inject(ManifestObjectCache);
   private readonly _logger = inject(Logger);
   private readonly _subscriptions = new Set<Subscription>();
 
@@ -103,9 +106,18 @@ class MicrofrontendViewCommandHandler implements OnDestroy {
    * thus preventing other apps from updating other apps' views.
    */
   private runIfPrivileged(viewId: ViewId, message: Message, runnable: (view: WorkbenchView) => void): void {
-    const view = this._viewRegistry.get(viewId);
     const sender = message.headers.get(MessageHeaders.AppSymbolicName) as string;
-    if (view.adapt(MicrofrontendWorkbenchView)?.capability.metadata!.appSymbolicName === sender) {
+    const view = this._viewRegistry.get(viewId);
+
+    // Test if a microfrontend view.
+    if (view.navigation()?.hint !== MICROFRONTEND_VIEW_NAVIGATION_HINT) {
+      return;
+    }
+
+    // Test if provided by the requesting application.
+    const {capabilityId} = view.navigation()!.data as unknown as MicrofrontendViewNavigationData;
+    const capability = this._manifestObjectCache.getCapability(capabilityId);
+    if (capability.metadata!.appSymbolicName === sender) {
       runnable(view);
     }
     else {

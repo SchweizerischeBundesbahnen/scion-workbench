@@ -14,9 +14,11 @@ import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 import {MAIN_AREA, MAIN_AREA_ALTERNATIVE_ID} from '../workbench.model';
 import {expectView} from '../matcher/view-matcher';
 import {ViewPagePO} from './page-object/view-page.po';
+import {ViewPagePO as MicrofrontendViewPagePO} from '../workbench-client/page-object/view-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
 import {ViewInfo} from './page-object/view-info-dialog.po';
 import {throwError} from '../helper/testing.util';
+import {WorkbenchViewNavigationE2E} from '../workbench-accessor';
 
 test.describe('Workbench Layout Migration', () => {
 
@@ -390,5 +392,126 @@ test.describe('Workbench Layout Migration', () => {
 
     expect((await appPO.workbench.part({partId: 'part.activity-1'})).navigation.path).toEqual('test-part');
     expect((await appPO.workbench.part({partId: 'part.activity-2'})).navigation.path).toEqual('test-part');
+  });
+
+  /**
+   * Tests that microfrontend view navigations (~/capabilityId) are migrated to empty-path hint-based navigations.
+   *
+   * ## Given Layout in Version 7:
+   *
+   * Reference Layout:
+   * +----------------+
+   * |   MAIN AREA    |
+   * +----------------+
+   *
+   * User Layout:
+   * +-------------------------------+ +----------------+
+   * | Activity: activity.1          | |   MAIN AREA    |
+   * | Part: part.activity-1         | |                |
+   * | Views: view.1                 | | view.2, view.3 |
+   * +-------------------------------+ +----------------+
+   * view.1: path: '~/a538d2a', navigation: {}
+   * view.2: path: '~/a538d2a', navigation: {}
+   * view.3: path: 'test-view', navigation: {}
+   *
+   * ## Migrated Layout:
+   *
+   * Reference Layout:
+   * +----------------+
+   * |   MAIN AREA    |
+   * +----------------+
+   *
+   * User Layout:
+   * +-------------------------------+ +----------------+
+   * | Activity: activity.1          | |   MAIN AREA    |
+   * | Part: part.activity-1         | |                |
+   * | Views: view.1                 | | view.2, view.3 |
+   * +-------------------------------+ +----------------+
+   * view.1: path: '', navigation: {hint: 'scion.workbench.microfrontend-view', data: {capabilityId: 'a538d2a'}}
+   * view.2: path: '', navigation: {hint: 'scion.workbench.microfrontend-view', data: {capabilityId: 'a538d2a'}}
+   * view.3: path: 'test-view', navigation: {}
+   *
+   * @see WorkbenchGridMigrationV8
+   */
+  test('should migrate workbench layout v7 to the latest version', async ({appPO}) => {
+    await appPO.navigateTo({
+      url: '#/(view.1:~/a538d2a//view.2:~/a538d2a//view.3:test-view)?main_area=eyJyb290Ijp7InR5cGUiOiJNUGFydCIsImlkIjoicGFydC4yNzNiNTIyYiIsInZpZXdzIjpbeyJpZCI6InZpZXcuMiIsImFjdGl2YXRpb25JbnN0YW50IjoxNzY0OTM5NTMwMDQxLCJuYXZpZ2F0aW9uIjp7ImlkIjoiZjVmMTM5YTUifX0seyJpZCI6InZpZXcuMyIsImFjdGl2YXRpb25JbnN0YW50IjoxNzY0OTM5NTMwMDQwLCJuYXZpZ2F0aW9uIjp7ImlkIjoiNjUwYjJmNmYifX1dLCJhY3RpdmVWaWV3SWQiOiJ2aWV3LjIiLCJzdHJ1Y3R1cmFsIjpmYWxzZSwiYWN0aXZhdGlvbkluc3RhbnQiOjE3NjQ5Mzk1MzAwNDF9LCJhY3RpdmVQYXJ0SWQiOiJwYXJ0LjI3M2I1MjJiIn0vLzc=',
+      microfrontendSupport: true,
+      localStorage: {
+        'scion.workbench.perspective': 'e2e-perspective-with-main-area',
+        'scion.workbench.perspectives.e2e-perspective-with-main-area': 'eyJyZWZlcmVuY2VMYXlvdXQiOnsiZ3JpZHMiOnsibWFpbiI6ImV5SnliMjkwSWpwN0luUjVjR1VpT2lKTlVHRnlkQ0lzSW1sa0lqb2ljR0Z5ZEM1dFlXbHVMV0Z5WldFaUxDSmhiSFJsY201aGRHbDJaVWxrSWpvaWJXRnBiaTFoY21WaElpd2lkbWxsZDNNaU9sdGRMQ0p6ZEhKMVkzUjFjbUZzSWpwMGNuVmxmU3dpWVdOMGFYWmxVR0Z5ZEVsa0lqb2ljR0Z5ZEM1dFlXbHVMV0Z5WldFaWZTOHZOdz09In0sImFjdGl2aXR5TGF5b3V0IjoiZXlKMGIyOXNZbUZ5Y3lJNmV5SnNaV1owVkc5d0lqcDdJbUZqZEdsMmFYUnBaWE1pT2x0ZGZTd2liR1ZtZEVKdmRIUnZiU0k2ZXlKaFkzUnBkbWwwYVdWeklqcGJYWDBzSW5KcFoyaDBWRzl3SWpwN0ltRmpkR2wyYVhScFpYTWlPbHRkZlN3aWNtbG5hSFJDYjNSMGIyMGlPbnNpWVdOMGFYWnBkR2xsY3lJNlcxMTlMQ0ppYjNSMGIyMU1aV1owSWpwN0ltRmpkR2wyYVhScFpYTWlPbHRkZlN3aVltOTBkRzl0VW1sbmFIUWlPbnNpWVdOMGFYWnBkR2xsY3lJNlcxMTlmU3dpY0dGdVpXeHpJanA3SW14bFpuUWlPbnNpZDJsa2RHZ2lPak13TUN3aWNtRjBhVzhpT2pBdU5YMHNJbkpwWjJoMElqcDdJbmRwWkhSb0lqb3pNREFzSW5KaGRHbHZJam93TGpWOUxDSmliM1IwYjIwaU9uc2lhR1ZwWjJoMElqb3lOVEFzSW5KaGRHbHZJam93TGpWOWZYMHZMekU9Iiwib3V0bGV0cyI6Int9In0sInVzZXJMYXlvdXQiOnsiZ3JpZHMiOnsibWFpbiI6ImV5SnliMjkwSWpwN0luUjVjR1VpT2lKTlVHRnlkQ0lzSW1sa0lqb2ljR0Z5ZEM1dFlXbHVMV0Z5WldFaUxDSmhiSFJsY201aGRHbDJaVWxrSWpvaWJXRnBiaTFoY21WaElpd2lkbWxsZDNNaU9sdGRMQ0p6ZEhKMVkzUjFjbUZzSWpwMGNuVmxmU3dpWVdOMGFYWmxVR0Z5ZEVsa0lqb2ljR0Z5ZEM1dFlXbHVMV0Z5WldFaWZTOHZOdz09IiwiYWN0aXZpdHkuMSI6ImV5SnliMjkwSWpwN0luUjVjR1VpT2lKTlVHRnlkQ0lzSW1sa0lqb2ljR0Z5ZEM1aFkzUnBkbWwwZVMweElpd2lkR2wwYkdVaU9pSkJZM1JwZG1sMGVTSXNJblpwWlhkeklqcGJleUpwWkNJNkluWnBaWGN1TVNJc0ltRmpkR2wyWVhScGIyNUpibk4wWVc1MElqb3hOelkwT1RNNU1UQXpOekl5TENKdVlYWnBaMkYwYVc5dUlqcDdJbWxrSWpvaU1HVTJPREprWXpZaWZYMWRMQ0poWTNScGRtVldhV1YzU1dRaU9pSjJhV1YzTGpFaUxDSnpkSEoxWTNSMWNtRnNJanAwY25WbExDSmhZM1JwZG1GMGFXOXVTVzV6ZEdGdWRDSTZNVGMyTkRrek9URXdNemN5TVgwc0ltRmpkR2wyWlZCaGNuUkpaQ0k2SW5CaGNuUXVZV04wYVhacGRIa3RNU0lzSW5KbFptVnlaVzVqWlZCaGNuUkpaQ0k2SW5CaGNuUXVZV04wYVhacGRIa3RNU0o5THk4MyJ9LCJhY3Rpdml0eUxheW91dCI6ImV5SjBiMjlzWW1GeWN5STZleUpzWldaMFZHOXdJanA3SW1GamRHbDJhWFJwWlhNaU9sdDdJbWxrSWpvaVlXTjBhWFpwZEhrdU1TSXNJbWxqYjI0aU9pSm1iMnhrWlhJaUxDSnNZV0psYkNJNklrRmpkR2wyYVhSNUlpd2lkRzl2YkhScGNDSTZJa0ZqZEdsMmFYUjVJaXdpWTNOelEyeGhjM01pT201MWJHeDlYU3dpWVdOMGFYWmxRV04wYVhacGRIbEpaQ0k2SW1GamRHbDJhWFI1TGpFaWZTd2liR1ZtZEVKdmRIUnZiU0k2ZXlKaFkzUnBkbWwwYVdWeklqcGJYWDBzSW5KcFoyaDBWRzl3SWpwN0ltRmpkR2wyYVhScFpYTWlPbHRkZlN3aWNtbG5hSFJDYjNSMGIyMGlPbnNpWVdOMGFYWnBkR2xsY3lJNlcxMTlMQ0ppYjNSMGIyMU1aV1owSWpwN0ltRmpkR2wyYVhScFpYTWlPbHRkZlN3aVltOTBkRzl0VW1sbmFIUWlPbnNpWVdOMGFYWnBkR2xsY3lJNlcxMTlmU3dpY0dGdVpXeHpJanA3SW14bFpuUWlPbnNpZDJsa2RHZ2lPak13TUN3aWNtRjBhVzhpT2pBdU5YMHNJbkpwWjJoMElqcDdJbmRwWkhSb0lqb3pNREFzSW5KaGRHbHZJam93TGpWOUxDSmliM1IwYjIwaU9uc2lhR1ZwWjJoMElqb3lOVEFzSW5KaGRHbHZJam93TGpWOWZYMHZMekU9Iiwib3V0bGV0cyI6IntcInZpZXcuMVwiOlt7XCJwYXRoXCI6XCJ+XCIsXCJwYXJhbWV0ZXJzXCI6e319LHtcInBhdGhcIjpcImE1MzhkMmFcIixcInBhcmFtZXRlcnNcIjp7fX1dfSJ9fS8vNg==',
+      },
+    });
+
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activities: [{id: 'activity.1'}],
+            activeActivityId: 'activity.1',
+          },
+        },
+      },
+      grids: {
+        main: {
+          root: new MPart({id: MAIN_AREA}),
+          activePartId: MAIN_AREA,
+        },
+        mainArea: {
+          root: new MPart({
+            views: [{id: 'view.2'}, {id: 'view.3'}],
+            activeViewId: 'view.2',
+          }),
+        },
+        'activity.1': {
+          root: new MPart({
+            id: 'part.activity-1',
+            views: [
+              {
+                id: 'view.1',
+              },
+            ],
+            activeViewId: 'view.1',
+          }),
+          activePartId: 'part.activity-1',
+          referencePartId: 'part.activity-1',
+        },
+      },
+    });
+
+    // Assert view content.
+    const viewPage1 = new MicrofrontendViewPagePO(appPO, {viewId: 'view.1'});
+    const viewPage2 = new MicrofrontendViewPagePO(appPO, {viewId: 'view.2'});
+    const viewPage3 = new ViewPagePO(appPO, {viewId: 'view.3'});
+
+    await expectView(viewPage1).toBeActive();
+    await expectView(viewPage2).toBeActive();
+    await expectView(viewPage3).toBeInactive();
+
+    await viewPage3.view.tab.click();
+    await expectView(viewPage3).toBeActive();
+
+    // Assert no outlets.
+    expect((await appPO.workbench.view({viewId: 'view.1'})).navigation).toEqual(expect.objectContaining({
+      path: '',
+      hint: 'scion.workbench.microfrontend-view',
+      data: {
+        capabilityId: 'a538d2a',
+        params: {},
+      },
+    } satisfies WorkbenchViewNavigationE2E));
+
+    expect((await appPO.workbench.view({viewId: 'view.2'})).navigation).toEqual(expect.objectContaining({
+      path: '',
+      hint: 'scion.workbench.microfrontend-view',
+      data: {
+        capabilityId: 'a538d2a',
+        params: {},
+      },
+    } satisfies WorkbenchViewNavigationE2E));
+
+    expect((await appPO.workbench.view({viewId: 'view.3'})).navigation).toEqual(expect.objectContaining({
+      path: 'test-view',
+    } satisfies WorkbenchViewNavigationE2E));
   });
 });

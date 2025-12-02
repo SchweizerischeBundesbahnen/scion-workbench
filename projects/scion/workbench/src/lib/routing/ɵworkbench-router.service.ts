@@ -95,7 +95,8 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
       extras = createNavigationExtras({newLayout, currentLayout}, extras);
 
       // Perform the navigation.
-      const currentOutlets = currentLayout.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true});
+      const urlTree = this._router.parseUrl(this._router.url); // Read outlets from the current URL and not the current layout to update or remove migrated outlets.
+      const currentOutlets = Object.fromEntries(Routing.parseOutlets(urlTree, {part: true, view: true}));
       const newOutlets = newLayout.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true});
       const commands: Commands = computeNavigationCommands(currentOutlets, newOutlets);
       if (!await this._angularRouterMutex.submit(() => this._router.navigate(commands, extras))) {

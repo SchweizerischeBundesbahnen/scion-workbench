@@ -10,4 +10,4 @@
 
 export {type WorkbenchViewCapability, type ViewParamDefinition} from './workbench-view-capability';
 export {WorkbenchView, type CanCloseFn, type CanCloseRef, type ViewSnapshot} from './workbench-view';
-export {ɵVIEW_ID_CONTEXT_KEY, ɵWorkbenchView} from './ɵworkbench-view';
+export {ɵVIEW_ID_CONTEXT_KEY, ɵVIEW_CAPABILITY_ID_PARAM_NAME, ɵWorkbenchView} from './ɵworkbench-view';

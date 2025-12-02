@@ -16,7 +16,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MAIN_AREA, MAIN_AREA_ALTERNATIVE_ID, WorkbenchLayout} from '../../layout/workbench-layout';
 import {firstValueFrom} from 'rxjs';
 import {WorkbenchLayoutFactory} from '../../layout/workbench-layout.factory';
-import {MicrofrontendViewRoutes} from '../microfrontend-view/microfrontend-view-routes';
+import {MICROFRONTEND_VIEW_NAVIGATION_HINT} from '../microfrontend-view/microfrontend-view-routes';
 import {Logger, LoggerNames} from '../../logging';
 import {Objects} from '../../common/objects.util';
 import {WorkbenchPerspectiveData} from './workbench-perspective-data';
@@ -27,6 +27,7 @@ import {Arrays} from '@scion/toolkit/util';
 import {Translatable} from '../../text/workbench-text-provider.model';
 import {MICROFRONTEND_PART_NAVIGATION_HINT} from '../microfrontend-part/microfrontend-part-routes';
 import {Params, ParamValidator} from './param-validator';
+import {MicrofrontendViewNavigationData} from '../microfrontend-view/microfrontend-view-navigation-data';
 
 /**
  * Registers perspectives provided as workbench perspective capabilities.
@@ -238,12 +239,17 @@ export class MicrofrontendPerspectiveInstaller {
     }
 
     // Add and navigate view.
-    const commands = MicrofrontendViewRoutes.createMicrofrontendNavigateCommands(viewCapability.metadata!.id, params);
     const viewId = computeViewId();
-
     return layout
-      .addView(viewId, {partId: partRef.id, activateView: viewRef.active})
-      .navigateView(viewId, commands, {cssClass: [...Arrays.coerce(viewCapability.properties.cssClass), ...Arrays.coerce(viewRef.cssClass)]});
+      .addView(viewId, {partId: partRef.id, activateView: viewRef.active, cssClass: viewRef.cssClass})
+      .navigateView(viewId, [], {
+        hint: MICROFRONTEND_VIEW_NAVIGATION_HINT,
+        data: {
+          capabilityId: viewCapability.metadata!.id,
+          params,
+        } satisfies MicrofrontendViewNavigationData,
+        cssClass: viewCapability.properties.cssClass,
+      });
   }
 
   /**

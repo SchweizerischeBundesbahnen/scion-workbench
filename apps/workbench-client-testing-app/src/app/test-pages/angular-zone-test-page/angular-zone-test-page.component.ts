@@ -11,7 +11,7 @@ import {Component, inject, NgZone} from '@angular/core';
 import {NgTemplateOutlet} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {WorkbenchPartCapability, ɵMicrofrontendRouteParams, ɵWorkbenchCommands, ɵWorkbenchPart, ɵWorkbenchView} from '@scion/workbench-client';
+import {WorkbenchPartCapability, ɵVIEW_CAPABILITY_ID_PARAM_NAME, ɵWorkbenchCommands, ɵWorkbenchPart, ɵWorkbenchView} from '@scion/workbench-client';
 import {take} from 'rxjs/operators';
 import {ManifestService, MessageClient} from '@scion/microfrontend-platform';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
@@ -101,11 +101,11 @@ export default class AngularZoneTestPageComponent {
     const viewParamsTopic = ɵWorkbenchCommands.viewParamsTopic('view.1');
 
     // Simulate first emission
-    await Beans.get(MessageClient).publish(viewParamsTopic, new Map().set(ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID, viewCapabilityId1));
+    await Beans.get(MessageClient).publish(viewParamsTopic, new Map().set(ɵVIEW_CAPABILITY_ID_PARAM_NAME, viewCapabilityId1));
     //  Wait until received first emission
     await firstValueFrom(this._workbenchView.capability$);
     // Simulate second emission
-    await Beans.get(MessageClient).publish(viewParamsTopic, new Map().set(ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID, viewCapabilityId2));
+    await Beans.get(MessageClient).publish(viewParamsTopic, new Map().set(ɵVIEW_CAPABILITY_ID_PARAM_NAME, viewCapabilityId2));
   }
 
   private async testWorkbenchViewParams(model: TestCaseModel): Promise<void> {

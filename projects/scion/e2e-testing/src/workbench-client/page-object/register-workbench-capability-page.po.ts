@@ -61,9 +61,9 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     await this.locator.locator('select.e2e-type').selectOption(capability.type);
 
     // Capability Qualifier
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
-    await keyValueField.clear();
-    await keyValueField.addEntries(capability.qualifier);
+    const qualifierField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
+    await qualifierField.clear();
+    await qualifierField.addEntries(capability.qualifier);
 
     // Capability Params
     await this.enterParams(capability);
@@ -133,9 +133,9 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
 
   private async enterPerspectiveCapabilityProperties(capability: WorkbenchPerspectiveCapability): Promise<void> {
     // Enter perspective data.
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-data'));
-    await keyValueField.clear();
-    await keyValueField.addEntries(capability.properties.data ?? {});
+    const dataField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-data'));
+    await dataField.clear();
+    await dataField.addEntries(capability.properties.data ?? {});
 
     await this.enterParts(capability);
     await this.enterDockedParts(capability);

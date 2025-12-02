@@ -52,9 +52,9 @@ export class RouterPagePO implements MicrofrontendViewPagePO {
   }
 
   private async enterQualifier(qualifier: Qualifier): Promise<void> {
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
-    await keyValueField.clear();
-    await keyValueField.addEntries(qualifier);
+    const qualifierField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
+    await qualifierField.clear();
+    await qualifierField.addEntries(qualifier);
   }
 
   private async enterExtras(extras: WorkbenchNavigationExtras | undefined): Promise<void> {
@@ -76,9 +76,9 @@ export class RouterPagePO implements MicrofrontendViewPagePO {
   }
 
   private async enterParams(params?: Map<string, unknown> | {[param: string]: unknown}): Promise<void> {
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-params'));
-    await keyValueField.clear();
-    await keyValueField.addEntries(params ?? {});
+    const paramsField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-params'));
+    await paramsField.clear();
+    await paramsField.addEntries(params ?? {});
   }
 
   private async checkActivate(check?: boolean): Promise<void> {
