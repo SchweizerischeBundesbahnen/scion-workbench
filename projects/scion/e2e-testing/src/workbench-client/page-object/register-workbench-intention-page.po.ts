@@ -55,10 +55,10 @@ export class RegisterWorkbenchIntentionPagePO implements MicrofrontendViewPagePO
   }
 
   private async enterQualifier(qualifier: Qualifier | undefined): Promise<void> {
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
-    await keyValueField.clear();
+    const qualifierField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
+    await qualifierField.clear();
     if (qualifier && Object.keys(qualifier).length) {
-      await keyValueField.addEntries(qualifier);
+      await qualifierField.addEntries(qualifier);
     }
   }
 }

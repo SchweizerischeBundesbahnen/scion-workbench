@@ -9,7 +9,7 @@
  */
 
 import {inject, Injectable} from '@angular/core';
-import {MPart, MPartGrid, MTreeNode, WorkbenchGrids, ɵMPartGrid} from './workbench-grid.model';
+import {MPart, MPartGrid, MTreeNode, WorkbenchGrids} from './workbench-grid.model';
 import {Outlets} from '../routing/routing.model';
 import {UrlSegment} from '@angular/router';
 import {WorkbenchMigrator} from '../migration/workbench-migrator';
@@ -30,6 +30,33 @@ import {WorkbenchLayouts} from './workbench-layouts.util';
 import {WorkbenchLayoutMigrationV6} from './migration/workbench-layout-migration-v6.service';
 import {throwError} from '../common/throw-error.util';
 import {Objects} from '../common/objects.util';
+
+/**
+ * Represents the current version of the workbench layout.
+ *
+ * Increment this version and write a migrator when introducing a breaking layout model change.
+ *
+ * @see WorkbenchMigrator
+ */
+const WORKBENCH_LAYOUT_VERSION = 6;
+
+/**
+ * Represents the current version of the workbench grid model.
+ *
+ * Increment this version and write a migrator when introducing a breaking grid model change.
+ *
+ * @see WorkbenchMigrator
+ */
+const WORKBENCH_GRID_VERSION = 7;
+
+/**
+ * Represents the current version of the workbench activity model.
+ *
+ * Increment this version and write a migrator when introducing a breaking activity model change.
+ *
+ * @see WorkbenchMigrator
+ */
+const WORKBENCH_ACTIVITY_LAYOUT_VERSION = 1;
 
 /**
  * Serializes and deserializes a base64-encoded JSON into a {@link MPartGrid}.
@@ -122,7 +149,7 @@ export class WorkbenchLayoutSerializer {
   /**
    * Deserializes the given base64-serialized grid, applying necessary migrations if the serialized grid is outdated.
    */
-  public deserializeGrid(serialized: string): ɵMPartGrid {
+  public deserializeGrid(serialized: string): MPartGrid {
     const {json, version} = parseVersion(window.atob(serialized));
     const migratedJsonGrid = this._workbenchGridMigrator.migrate(json, {from: version, to: WORKBENCH_GRID_VERSION});
 
@@ -168,7 +195,7 @@ export class WorkbenchLayoutSerializer {
       }
     }
 
-    return (version < WORKBENCH_GRID_VERSION) ? {...grid, migrated: true} : grid;
+    return grid;
   }
 
   /**
@@ -212,42 +239,14 @@ export class WorkbenchLayoutSerializer {
   /**
    * Deserializes the given outlets.
    */
-  public deserializeOutlets(serialized: string): Outlets {
+  public deserializeOutlets(serialized: string): Map<WorkbenchOutlet, UrlSegment[]> {
     const outlets = JSON.parse(serialized) as {[outlet: WorkbenchOutlet]: MUrlSegment[]};
 
-    return Object.fromEntries(Object.entries(outlets)
-      .map(([outlet, segments]: [string, MUrlSegment[]]): [string, UrlSegment[]] => {
-        return [outlet, segments.map(segment => new UrlSegment(segment.path, segment.parameters))];
-      }));
+    return new Map(Objects.entries(outlets).map(([outlet, segments]) => {
+      return [outlet, segments.map(segment => new UrlSegment(segment.path, segment.parameters))];
+    }));
   }
 }
-
-/**
- * Represents the current version of the workbench layout.
- *
- * Increment this version and write a migrator when introducing a breaking change.
- *
- * @see WorkbenchMigrator
- */
-const WORKBENCH_LAYOUT_VERSION = 6;
-
-/**
- * Represents the current version of the workbench grid model.
- *
- * Increment this version and write a migrator when introducing a breaking layout model change.
- *
- * @see WorkbenchMigrator
- */
-const WORKBENCH_GRID_VERSION = 7;
-
-/**
- * Represents the current version of the workbench activity layout model.
- *
- * Increment this version and write a migrator when introducing a breaking layout model change.
- *
- * @see WorkbenchMigrator
- */
-const WORKBENCH_ACTIVITY_LAYOUT_VERSION = 1;
 
 /**
  * Represents a segment in the URL.

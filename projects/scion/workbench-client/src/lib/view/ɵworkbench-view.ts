@@ -19,7 +19,6 @@ import {CanCloseFn, CanCloseRef, ViewSnapshot, WorkbenchView} from './workbench-
 import {decorateObservable} from '../observable-decorator';
 import {PartId, ViewId} from '../workbench.identifiers';
 import {Translatable} from '../text/workbench-text-provider.model';
-import {ɵMicrofrontendRouteParams} from '../routing/ɵworkbench-router';
 
 export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
 
@@ -65,7 +64,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
 
     this.capability$ = this.params$
       .pipe(
-        map(params => params.get(ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID) as string),
+        map(params => params.get(ɵVIEW_CAPABILITY_ID_PARAM_NAME) as string),
         lookupViewCapabilityAndShareReplay(),
         decorateObservable(),
         takeUntil(this._beforeUnload$),
@@ -118,7 +117,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
     // Do NOT use `capability$` observable to detect capability change, as its lookup is asynchronous.
     this.params$
       .pipe(
-        map(params => params.get(ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID) as string),
+        map(params => params.get(ɵVIEW_CAPABILITY_ID_PARAM_NAME) as string),
         distinctUntilChanged(),
         skip(1), // skip the initial navigation
         takeUntil(merge(this._beforeUnload$, this._destroy$)),
@@ -201,13 +200,21 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
 }
 
 /**
- * Context key to retrieve the view ID for microfrontends embedded in the context of a workbench view.
+ * Context key for obtaining the view ID using {@link ContextService}.
  *
  * @docs-private Not public API. For internal use only.
  * @ignore
  * @see {@link ContextService}
  */
 export const ɵVIEW_ID_CONTEXT_KEY = 'ɵworkbench.view.id';
+
+/**
+ * Parameter name for obtaining the capability id in a microfrontend view.
+ *
+ * @docs-private Not public API. For internal use only.
+ * @ignore
+ */
+export const ɵVIEW_CAPABILITY_ID_PARAM_NAME = 'ɵViewCapabilityId';
 
 /**
  * Looks up the corresponding view capability for each capability id emitted by the source Observable.

@@ -50,9 +50,7 @@ export class WorkbenchAuxiliaryRouteInstaller {
         component: ɵEmptyOutletComponent,
         children: [
           // Add workbench-specific routes.
-          ...this._workbenchRoutes
-            // Provide outlet for {@link UrlMatcher} as not called inside a route's injection context.
-            .map(route => ({...route, data: {...route.data, [WorkbenchRouteData.ɵoutlet]: outlet}})),
+          ...this._workbenchRoutes,
           // Add application-specific routes.
           ...this._router.config
             // Filter primary routes.

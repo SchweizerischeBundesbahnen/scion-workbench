@@ -85,15 +85,15 @@ export class RouterPagePO implements WorkbenchViewPagePO {
   }
 
   private async enterData(data?: NavigationData): Promise<void> {
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-data'));
-    await keyValueField.clear();
-    await keyValueField.addEntries(data ?? {});
+    const dataField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-data'));
+    await dataField.clear();
+    await dataField.addEntries(data ?? {});
   }
 
   private async enterState(state?: NavigationState): Promise<void> {
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-state'));
-    await keyValueField.clear();
-    await keyValueField.addEntries(state ?? {});
+    const stateField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-state'));
+    await stateField.clear();
+    await stateField.addEntries(state ?? {});
   }
 
   private async checkActivate(check?: boolean): Promise<void> {
