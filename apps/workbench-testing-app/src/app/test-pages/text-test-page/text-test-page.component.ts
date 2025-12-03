@@ -12,7 +12,7 @@ import {Component, inject} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {UUID} from '@scion/toolkit/uuid';
-import {parseTypedString} from '../../common/parse-typed-value.util';
+import {parseTypedString} from 'workbench-testing-app-common';
 import {APP_IDENTITY} from '@scion/microfrontend-platform';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {SESSION_STORAGE} from '../../session.storage';

@@ -11,19 +11,17 @@
 import {ApplicationRef, Component, inject, Type} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {DialogId, PartId, PopupId, ViewId, WorkbenchDialogService} from '@scion/workbench';
-import {stringifyError} from '../common/stringify-error.util';
+import {MultiValueInputComponent, parseTypedString, stringifyError} from 'workbench-testing-app-common';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {DialogPageComponent} from '../dialog-page/dialog-page.component';
-import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import BlankTestPageComponent from '../test-pages/blank-test-page/blank-test-page.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import PopupOpenerPageComponent from '../popup-opener-page/popup-opener-page.component';
 import InputFieldTestPageComponent from '../test-pages/input-field-test-page/input-field-test-page.component';
 import SizeTestPageComponent from '../test-pages/size-test-page/size-test-page.component';
 import {UUID} from '@scion/toolkit/uuid';
-import {parseTypedString} from '../common/parse-typed-value.util';
 import {PopupSizeDirective} from '../popup-opener-page/popup-size.directive';
 import {LargeTestPageComponent} from '../test-pages/large-test-page/large-test-page.component';
 
