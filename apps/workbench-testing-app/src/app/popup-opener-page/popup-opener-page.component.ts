@@ -17,18 +17,15 @@ import {map, startWith, switchMap} from 'rxjs/operators';
 import {Observable, of, timer} from 'rxjs';
 import BlankTestPageComponent from '../test-pages/blank-test-page/blank-test-page.component';
 import {PopupPositionLabelPipe, Position} from './popup-position-label.pipe';
-import {stringifyError} from '../common/stringify-error.util';
+import {MultiValueInputComponent, parseTypedString, prune, stringifyError} from 'workbench-testing-app-common';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import InputFieldTestPageComponent from '../test-pages/input-field-test-page/input-field-test-page.component';
 import DialogOpenerPageComponent from '../dialog-opener-page/dialog-opener-page.component';
-import {parseTypedString} from '../common/parse-typed-value.util';
-import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import SizeTestPageComponent from '../test-pages/size-test-page/size-test-page.component';
 import {UUID} from '@scion/toolkit/uuid';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
-import {prune} from '../common/prune.util';
 import {PopupSizeDirective} from './popup-size.directive';
 
 @Component({

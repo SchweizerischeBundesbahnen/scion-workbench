@@ -16,7 +16,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {MAIN_AREA, Translatable} from '@scion/workbench';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {UUID} from '@scion/toolkit/uuid';
-import {MultiValueInputComponent} from '../../../multi-value-input/multi-value-input.component';
+import {MultiValueInputComponent} from 'workbench-testing-app-common';
 
 @Component({
   selector: 'app-add-parts',

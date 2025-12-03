@@ -16,15 +16,13 @@ import {UUID} from '@scion/toolkit/uuid';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {Arrays} from '@scion/toolkit/util';
 import {AsyncPipe} from '@angular/common';
-import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
+import {AppendParamDataTypePipe, MultiValueInputComponent, NullIfEmptyPipe} from 'workbench-testing-app-common';
 import {JoinPipe} from '../common/join.pipe';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
-import {AppendParamDataTypePipe} from '../common/append-param-data-type.pipe';
-import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import {rootEffect} from '../common/root-effect';
 
 @Component({
