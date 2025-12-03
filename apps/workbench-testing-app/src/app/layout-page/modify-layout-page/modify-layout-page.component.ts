@@ -15,11 +15,10 @@ import {NavigateViewsComponent, NavigationDescriptor} from '../tables/navigate-v
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {SettingsService} from '../../settings.service';
 import {WorkbenchPart, WorkbenchRouter, WorkbenchService, WorkbenchView} from '@scion/workbench';
-import {stringifyError} from '../../common/stringify-error.util';
+import {MultiValueInputComponent, stringifyError} from 'workbench-testing-app-common';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {NavigatePartsComponent} from '../tables/navigate-parts/navigate-parts.component';
 import {AddDockedPartsComponent, DockedPartDescriptor} from '../tables/add-docked-parts/add-docked-parts.component';
-import {MultiValueInputComponent} from '../../multi-value-input/multi-value-input.component';
 
 @Component({
   selector: 'app-modify-layout-page',

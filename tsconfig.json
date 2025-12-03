@@ -22,6 +22,12 @@
       ],
       "@scion/workbench-client": [
         "./dist/scion/workbench-client"
+      ],
+      "workbench-testing-app-common": [
+        "./dist/workbench-testing-app-common"
+      ],
+      "workbench-client-testing-app-common": [
+        "./dist/workbench-client-testing-app-common"
       ]
     }
     /*
@@ -61,7 +67,13 @@
     //      //      ],
     //      //      "@scion/microfrontend-platform": [
     //      //        "./src-lib/@scion/microfrontend-platform/src/public-api"
-    //      //      ]
+    //      //      ],
+    //      "workbench-testing-app-common": [
+    //        "./apps/workbench-testing-app-common/src/public-api"
+    //      ],
+    //      "workbench-client-testing-app-common": [
+    //        "./apps/workbench-client-testing-app-common/src/public-api"
+    //      ],
     //    }
   },
   "angularCompilerOptions": {
@@ -89,6 +101,12 @@
     },
     {
       "path": "./apps/workbench-client-testing-app/tsconfig.app.json"
+    },
+    {
+      "path": "./apps/workbench-testing-app-common/tsconfig.lib.json"
+    },
+    {
+      "path": "./apps/workbench-client-testing-app-common/tsconfig.lib.json"
     },
     {
       "path": "./apps/workbench-getting-started-app/tsconfig.app.json"

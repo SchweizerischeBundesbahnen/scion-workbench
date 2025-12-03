@@ -45,6 +45,12 @@
     "workbench-getting-started-app:lint": "ng lint workbench-getting-started-app",
     "workbench-getting-started-app:serve": "ng serve workbench-getting-started-app --port 4500",
 
+    "workbench-testing-app-common:build": "ng build --configuration production workbench-testing-app-common",
+    "workbench-testing-app-common:lint": "ng lint workbench-testing-app-common",
+
+    "workbench-client-testing-app-common:build": "ng build --configuration production workbench-client-testing-app-common",
+    "workbench-client-testing-app-common:lint": "ng lint workbench-client-testing-app-common",
+
     "workbench-testing-app:build": "ng build workbench-testing-app --configuration=development",
     "workbench-testing-app:vercel-latest:build": "ng build workbench-testing-app --configuration=production-vercel-latest",
     "workbench-testing-app:vercel-release:build": "ng build workbench-testing-app --configuration=production-vercel-release",
