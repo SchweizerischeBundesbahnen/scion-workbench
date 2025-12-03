@@ -101,7 +101,7 @@ export class WorkbenchUrlObserver {
    */
   private createWorkbenchNavigationContext(url: string): WorkbenchNavigationContext {
     const urlTree = this._router.parseUrl(url);
-    const workbenchNavigationalState = WorkbenchNavigationalStates.fromNavigation(this._router.getCurrentNavigation()!);
+    const workbenchNavigationalState = WorkbenchNavigationalStates.fromNavigation(this._router.currentNavigation()!);
     const previousLayout = this._workbenchLayoutService.hasLayout() ? this._workbenchLayoutService.layout() : null;
     const previousUrl = this._router.parseUrl(this._router.url); // Browser URL is only updated after successful navigation
 
@@ -122,7 +122,7 @@ export class WorkbenchUrlObserver {
           }
 
           // Do not fall back to the current layout if the navigation was triggered from outside the Angular Router, i.e., the browser back/forward buttons.
-          const isExternalNavigation = this._router.getCurrentNavigation()!.trigger === 'popstate';
+          const isExternalNavigation = this._router.currentNavigation()!.trigger === 'popstate';
           if (isExternalNavigation) {
             return undefined;
           }

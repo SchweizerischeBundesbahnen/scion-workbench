@@ -151,7 +151,7 @@ export const Routing = {
     //
     // If a navigation is currently in progress, start immediately, allowing subscriptions even during ongoing navigation, such as after the navigation
     // has started.
-    return iif(() => !router.getCurrentNavigation(), onNavigationStart$, onNavigationStart$.pipe(startWith(undefined)))
+    return iif(() => !router.currentNavigation(), onNavigationStart$, onNavigationStart$.pipe(startWith(undefined)))
       .pipe(
         // Subscribe to the outlet's `ActivationStart` (and also `ActivationEnd` if the `emitOn` option is set to `always`).
         switchMap(() => options.emitOn === 'always' ? race(onActivationStart$, onActivationEnd$.pipe(take(1))) : onActivationStart$),
