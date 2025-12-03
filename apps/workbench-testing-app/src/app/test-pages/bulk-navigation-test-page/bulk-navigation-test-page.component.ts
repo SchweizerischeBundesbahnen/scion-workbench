@@ -12,7 +12,7 @@ import {Component, inject} from '@angular/core';
 import {WorkbenchRouter} from '@scion/workbench';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
-import {MultiValueInputComponent} from '../../multi-value-input/multi-value-input.component';
+import {MultiValueInputComponent} from 'workbench-testing-app-common';
 
 @Component({
   selector: 'app-bulk-navigation-test-page',

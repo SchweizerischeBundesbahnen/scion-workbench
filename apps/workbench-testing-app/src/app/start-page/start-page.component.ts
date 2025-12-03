@@ -18,7 +18,7 @@ import {PRIMARY_OUTLET, Route, Router, Routes} from '@angular/router';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {SciFilterFieldComponent} from '@scion/components.internal/filter-field';
 import {AsyncPipe, NgClass} from '@angular/common';
-import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
+import {NullIfEmptyPipe} from 'workbench-testing-app-common';
 import {FilterPipe} from '../common/filter.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ArrayConcatPipe} from '../common/array-concat.pipe';

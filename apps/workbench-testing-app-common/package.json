@@ -1,0 +1,8 @@
+{
+  "name": "workbench-testing-app-common",
+  "description": "Provides utilities and non-microfrontend components for use in `workbench-testing-app` and `workbench-client-testing-app`.",
+  "dependencies": {
+    "tslib": "^2.6.0"
+  },
+  "sideEffects": false
+}

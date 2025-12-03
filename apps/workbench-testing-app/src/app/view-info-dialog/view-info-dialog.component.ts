@@ -14,10 +14,9 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {JoinPipe} from '../common/join.pipe';
 import {SciKeyValueComponent} from '@scion/components.internal/key-value';
-import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
+import {NullIfEmptyPipe, parseTypedString} from 'workbench-testing-app-common';
 import {FormsModule} from '@angular/forms';
 import {UUID} from '@scion/toolkit/uuid';
-import {parseTypedString} from '../common/parse-typed-value.util';
 
 @Component({
   selector: 'app-view-info-dialog',
