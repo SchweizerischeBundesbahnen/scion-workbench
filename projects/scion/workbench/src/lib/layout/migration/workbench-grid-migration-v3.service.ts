@@ -94,7 +94,7 @@ export class WorkbenchGridMigrationV3 implements WorkbenchMigration {
   }
 
   private getCurrentUrl(): UrlTree {
-    return this._router.getCurrentNavigation()?.initialUrl ?? this._router.parseUrl(this._router.url);
+    return this._router.currentNavigation()?.initialUrl ?? this._router.parseUrl(this._router.url);
   }
 }
 

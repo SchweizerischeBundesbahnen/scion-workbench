@@ -55,7 +55,7 @@ class ɵLocation extends Location {
    * Indicates whether the current navigation is a workbench navigation performed through the workbench router.
    */
   private isWorkbenchNavigation(): boolean {
-    const currentNavigation = this.router?.getCurrentNavigation() ?? null;
+    const currentNavigation = this.router?.currentNavigation() ?? null;
     return currentNavigation !== null && WorkbenchNavigationalStates.fromNavigation(currentNavigation) !== null;
   }
 
