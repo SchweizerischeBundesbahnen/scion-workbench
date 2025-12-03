@@ -13,7 +13,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {Router} from '@angular/router';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {RouterCommandsComponent} from '../../router-commands/router-commands.component';
-import {stringifyError} from '../../common/stringify-error.util';
+import {stringifyError} from 'workbench-testing-app-common';
 import {SettingsService} from '../../settings.service';
 import {Commands} from '@scion/workbench';
 

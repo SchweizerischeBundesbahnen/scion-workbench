@@ -10,20 +10,17 @@
 
 import {Component, computed, inject, Signal} from '@angular/core';
 import {Translatable, WorkbenchPart, WorkbenchPartActionDirective} from '@scion/workbench';
-import {AppendParamDataTypePipe} from '../common/append-param-data-type.pipe';
+import {AppendParamDataTypePipe, MultiValueInputComponent, NullIfEmptyPipe, parseTypedString} from 'workbench-testing-app-common';
 import {AsyncPipe} from '@angular/common';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {JoinPipe} from '../common/join.pipe';
-import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
 import {Arrays} from '@scion/toolkit/util';
-import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
-import {parseTypedString} from '../common/parse-typed-value.util';
 
 @Component({
   selector: 'app-part-page',

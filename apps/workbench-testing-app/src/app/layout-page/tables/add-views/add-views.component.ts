@@ -14,7 +14,7 @@ import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDA
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
-import {MultiValueInputComponent} from '../../../multi-value-input/multi-value-input.component';
+import {MultiValueInputComponent} from 'workbench-testing-app-common';
 import {UUID} from '@scion/toolkit/uuid';
 
 @Component({

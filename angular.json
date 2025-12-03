@@ -444,6 +444,36 @@
         }
       }
     },
+    "workbench-testing-app-common": {
+      "projectType": "library",
+      "root": "apps/workbench-testing-app-common",
+      "sourceRoot": "apps/workbench-testing-app-common/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "apps/workbench-testing-app-common/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "apps/workbench-testing-app-common/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/workbench-testing-app-common/**/*.ts",
+              "apps/workbench-testing-app-common/**/*.html"
+            ],
+            "eslintConfig": "apps/workbench-testing-app-common/eslint.config.js"
+          }
+        }
+      }
+    },
     "workbench-client-testing-app": {
       "projectType": "application",
       "schematics": {
@@ -582,6 +612,36 @@
               "apps/workbench-client-testing-app/**/*.html"
             ],
             "eslintConfig": "apps/workbench-client-testing-app/eslint.config.js"
+          }
+        }
+      }
+    },
+    "workbench-client-testing-app-common": {
+      "projectType": "library",
+      "root": "apps/workbench-client-testing-app-common",
+      "sourceRoot": "apps/workbench-client-testing-app-common/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "apps/workbench-client-testing-app-common/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "apps/workbench-client-testing-app-common/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/workbench-client-testing-app-common/**/*.ts",
+              "apps/workbench-client-testing-app-common/**/*.html"
+            ],
+            "eslintConfig": "apps/workbench-client-testing-app-common/eslint.config.js"
           }
         }
       }

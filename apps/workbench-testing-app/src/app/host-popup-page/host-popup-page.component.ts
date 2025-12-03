@@ -16,7 +16,7 @@ import {AsyncPipe, JsonPipe} from '@angular/common';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
+import {NullIfEmptyPipe} from 'workbench-testing-app-common';
 import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
