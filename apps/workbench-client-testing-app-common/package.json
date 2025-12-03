@@ -1,0 +1,7 @@
+{
+  "name": "workbench-client-testing-app-common",
+  "dependencies": {
+    "tslib": "^2.6.0"
+  },
+  "sideEffects": false
+}

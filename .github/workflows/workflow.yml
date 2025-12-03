@@ -62,6 +62,20 @@ jobs:
         with:
           name: workbench-dist
           path: dist/scion/workbench
+      - name: 'Building workbench-testing-app-common'
+        run: npm run workbench-testing-app-common:build
+      - name: 'Uploading dist/workbench-testing-app-common'
+        uses: actions/upload-artifact@v4
+        with:
+          name: workbench-testing-app-common-dist
+          path: dist/workbench-testing-app-common
+      - name: 'Building workbench-client-testing-app-common'
+        run: npm run workbench-client-testing-app-common:build
+      - name: 'Uploading dist/workbench-client-testing-app-common'
+        uses: actions/upload-artifact@v4
+        with:
+          name: workbench-client-testing-app-common-dist
+          path: dist/workbench-client-testing-app-common
       - name: 'Building TypeDoc for @scion/workbench-client'
         run: npm run workbench-client:typedoc
       - name: 'Uploading dist/workbench-client-api'
@@ -90,6 +104,16 @@ jobs:
         with:
           name: workbench-client-dist
           path: dist/scion/workbench-client
+      - name: 'Downloading dist/workbench-testing-app-common'
+        uses: actions/download-artifact@v4
+        with:
+          name: workbench-testing-app-common-dist
+          path: dist/workbench-testing-app-common
+      - name: 'Downloading dist/workbench-client-testing-app-common'
+        uses: actions/download-artifact@v4
+        with:
+          name: workbench-client-testing-app-common-dist
+          path: dist/workbench-client-testing-app-common
       - name: 'Restoring NPM modules from cache'
         uses: actions/cache@v4
         with:
@@ -141,6 +165,16 @@ jobs:
         with:
           name: workbench-client-dist
           path: dist/scion/workbench-client
+      - name: 'Downloading dist/workbench-testing-app-common'
+        uses: actions/download-artifact@v4
+        with:
+          name: workbench-testing-app-common-dist
+          path: dist/workbench-testing-app-common
+      - name: 'Downloading dist/workbench-client-testing-app-common'
+        uses: actions/download-artifact@v4
+        with:
+          name: workbench-client-testing-app-common-dist
+          path: dist/workbench-client-testing-app-common
       - name: 'Building ${{ matrix.app.name }}'
         run: ${{ matrix.app.cmd }}
       - uses: actions/upload-artifact@v4

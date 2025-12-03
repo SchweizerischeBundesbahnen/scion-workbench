@@ -14,7 +14,7 @@ import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
+import {NullIfEmptyPipe} from 'workbench-testing-app-common';
 import {AsyncPipe, JsonPipe} from '@angular/common';
 import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
