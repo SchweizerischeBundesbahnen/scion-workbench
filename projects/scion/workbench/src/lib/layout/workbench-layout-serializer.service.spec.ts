@@ -11,7 +11,6 @@
 import {TestBed} from '@angular/core/testing';
 import {ɵWorkbenchLayoutFactory} from './ɵworkbench-layout.factory';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
-import {ɵMPartGrid} from './workbench-grid.model';
 import {MAIN_AREA} from './workbench-layout';
 import {any, MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 
@@ -127,25 +126,6 @@ describe('WorkbenchLayoutSerializer', () => {
     // Expect part id to still be serialized.
     expect(deserializedLayout.part({partId: 'part.left'}).id).not.toBeUndefined();
     expect(deserializedLayout.part({partId: 'part.right'}).id).not.toBeUndefined();
-  });
-
-  it('should not serialize "grid.migrated" field', () => {
-    const layout = TestBed.inject(ɵWorkbenchLayoutFactory).addPart(MAIN_AREA);
-
-    (layout.grids.main as Mutable<ɵMPartGrid>).migrated = true;
-    (layout.grids.mainArea as Mutable<ɵMPartGrid>).migrated = true;
-
-    // Expect "migrated" flag to be set.
-    expect(layout.grids.main.migrated).toBeTrue();
-    expect(layout.grids.mainArea.migrated).toBeTrue();
-
-    // Serialize layout.
-    const serializedLayout = layout.serialize();
-    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({grids: serializedLayout.grids});
-
-    // Expect "migrated" flag not to be serialized.
-    expect(deserializedLayout.grids.main.migrated).toBeUndefined();
-    expect(deserializedLayout.grids.mainArea.migrated).toBeUndefined();
   });
 
   it('should serialize part identifiers into logical identifiers based on their order in the layout', async () => {
@@ -329,7 +309,3 @@ describe('WorkbenchLayoutSerializer', () => {
     });
   });
 });
-
-type Mutable<T> = {
-  -readonly [P in keyof T]: T[P];
-};

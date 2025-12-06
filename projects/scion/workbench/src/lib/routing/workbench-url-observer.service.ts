@@ -78,7 +78,6 @@ export class WorkbenchUrlObserver {
     this.unregisterRemovedWorkbenchParts();
     this.unregisterRemovedWorkbenchViews();
     this.applyWorkbenchLayout();
-    this.migrateURL();
     this._workbenchRouter.getCurrentNavigationContext().runPostNavigationActions();
     this._workbenchRouter.setCurrentNavigationContext(null);
   }
@@ -289,17 +288,6 @@ export class WorkbenchUrlObserver {
     const {layout} = this._workbenchRouter.getCurrentNavigationContext();
     this._workbenchLayoutService.setLayout(layout);
     this._logger.debug(() => 'Applied workbench layout', LoggerNames.ROUTING, layout);
-  }
-
-  /**
-   * Updates the URL if the layout has been migrated from an outdated version.
-   */
-  private migrateURL(): void {
-    const layout = this._workbenchRouter.getCurrentNavigationContext().layout;
-    if (layout.grids.mainArea.migrated) {
-      // Update the URL with the migrated URL and clear existing query params, for example, if the layout query parameter has been renamed.
-      void this._workbenchRouter.navigate(layout => layout, {queryParamsHandling: null, replaceUrl: true});
-    }
   }
 
   private installRouterEventListeners(): void {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,46 +8,46 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export interface MPartV7 {
+export interface MPartV8 {
   type: 'MPart';
-  id: PartIdV7;
+  id: PartIdV8;
   alternativeId?: string;
-  views: MViewV7[];
-  activeViewId?: ViewIdV7;
+  views: MViewV8[];
+  activeViewId?: ViewIdV8;
   structural: boolean;
 }
 
-export interface MTreeNodeV7 {
+export interface MTreeNodeV8 {
   type: 'MTreeNode';
   id: string;
-  child1: MTreeNodeV7 | MPartV7;
-  child2: MTreeNodeV7 | MPartV7;
+  child1: MTreeNodeV8 | MPartV8;
+  child2: MTreeNodeV8 | MPartV8;
   ratio: number;
   direction: 'column' | 'row';
 }
 
-export interface MPartGridV7 {
-  root: MTreeNodeV7 | MPartV7;
-  activePartId: PartIdV7;
-  referencePartId?: PartIdV7;
+export interface MPartGridV8 {
+  root: MTreeNodeV8 | MPartV8;
+  activePartId: PartIdV8;
+  referencePartId?: PartIdV8;
 }
 
-export interface MViewV7 {
-  id: ViewIdV7;
+export interface MViewV8 {
+  id: ViewIdV8;
   alternativeId?: string;
   cssClass?: string[];
   markedForRemoval?: true;
   navigation?: {
     id: string;
     hint?: string;
-    data?: NavigationDataV7;
+    data?: NavigationDataV8;
     cssClass?: string[];
   };
 }
 
-export interface NavigationDataV7 {
+export interface NavigationDataV8 {
   [key: string]: unknown;
 }
 
-export type PartIdV7 = `part.${string}`;
-export type ViewIdV7 = `view.${string}`;
+export type PartIdV8 = `part.${string}`;
+export type ViewIdV8 = `view.${string}`;

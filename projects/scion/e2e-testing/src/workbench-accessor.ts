@@ -78,6 +78,7 @@ export class WorkbenchAccessor {
           navigation: {
             path: part.navigation()?.path.join('/'),
             hint: part.navigation()?.hint,
+            data: part.navigation()?.data,
             state: part.navigation()?.state,
           },
         }));
@@ -108,6 +109,7 @@ export class WorkbenchAccessor {
           navigation: {
             path: view.navigation()?.path.join('/'),
             hint: view.navigation()?.hint,
+            data: view.navigation()?.data,
             state: view.navigation()?.state,
           },
         }));
@@ -181,11 +183,13 @@ export interface WorkbenchViewE2E {
 export interface WorkbenchPartNavigationE2E {
   path?: string;
   hint?: string;
+  data?: Record<string, unknown>;
   state?: Record<string, unknown>;
 }
 
 export interface WorkbenchViewNavigationE2E {
   path?: string;
   hint?: string;
+  data?: Record<string, unknown>;
   state?: Record<string, unknown>;
 }
