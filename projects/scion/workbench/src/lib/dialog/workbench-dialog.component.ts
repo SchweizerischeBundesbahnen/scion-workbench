@@ -198,7 +198,7 @@ export class WorkbenchDialogComponent {
     this.headerHeight.set(`${dimension.offsetHeight}px`);
   }
 
-  protected onDialogHeaderMouseDown(): void {
+  protected onDialogMouseDown(): void {
     // Focus the dialog on `mousedown`. The `wbMovable` directive on the header calls `preventDefault()` during `mousedown`,
     // which prevents a `focusin` event from firing and so the workbench focus owner would not be updated. Calling `focus()`
     // ensures the dialog becomes the active/focused element.
