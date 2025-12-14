@@ -2,7 +2,7 @@
      [class.blinking]="dialog.blinking$ | async"
      [tabindex]="-1"
      wbMovable [wbHandle]="header" (wbMovableMove)="onMove($event)"
-     (mousedown)="onDialogHeaderMouseDown()"
+     (mousedown)="onDialogMouseDown()"
      wbResizable [wbResizableEnabled]="dialog.resizable()" (wbResizableResize)="onResize($event)"
      @enter
      [@.disabled]="!dialog.animate"
