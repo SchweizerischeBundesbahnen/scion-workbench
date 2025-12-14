@@ -354,6 +354,8 @@ class ResizeHandle {
       .subscribe((event: HandleMoveEvent) => {
         switch (event.type) {
           case 'mousestart': {
+            event.mouseEvent.preventDefault(); // prevent dragging user selection (e.g., by previous Ctrl+A)
+
             // Apply cursor on document level to prevent flickering while resizing
             prevBodyCursor = this._document.body.style.cursor;
             this._document.body.style.cursor = this._config.cursor;
