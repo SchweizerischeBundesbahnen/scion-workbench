@@ -25,6 +25,7 @@ import SizeTestPageComponent from '../test-pages/size-test-page/size-test-page.c
 import {UUID} from '@scion/toolkit/uuid';
 import {parseTypedString} from '../common/parse-typed-value.util';
 import {PopupSizeDirective} from '../popup-opener-page/popup-size.directive';
+import {LargeTestPageComponent} from '../test-pages/large-test-page/large-test-page.component';
 
 @Component({
   selector: 'app-dialog-opener-page',
@@ -104,6 +105,8 @@ export default class DialogOpenerPageComponent {
         return InputFieldTestPageComponent;
       case 'size-test-page':
         return SizeTestPageComponent;
+      case 'large-test-page':
+        return LargeTestPageComponent;
       default:
         throw Error(`[IllegalDialogComponent] Dialog component not supported: ${this.form.controls.component.value}`);
     }

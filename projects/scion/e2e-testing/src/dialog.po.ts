@@ -54,6 +54,10 @@ export class DialogPO {
     return fromRect(await this.dialog.boundingBox());
   }
 
+  public async getDialogSlotBoundingBox(): Promise<DomRect> {
+    return fromRect(await this.slot.boundingBox());
+  }
+
   public getComputedStyle(): Promise<CSSStyleDeclaration> {
     return this.dialog.evaluate((dialogElement: HTMLElement) => getComputedStyle(dialogElement));
   }
