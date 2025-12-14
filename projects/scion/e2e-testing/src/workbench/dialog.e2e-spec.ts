@@ -24,6 +24,7 @@ import {MAIN_AREA} from '../workbench.model';
 import {fromRect} from '../helper/testing.util';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 import {expectPopup} from '../matcher/popup-matcher';
+import {LargeTestPagePO} from './page-object/test-pages/large-test-page.po';
 
 test.describe('Workbench Dialog', () => {
 
@@ -247,10 +248,10 @@ test.describe('Workbench Dialog', () => {
       const dialogBounds = await dialog.getDialogBoundingBox();
 
       const left = workbenchBounds.hcenter - (dialogBounds.width / 2);
-      expect(left).toEqual(dialogBounds.left);
+      expect(left).toEqual(expect.closeTo(dialogBounds.left, 0));
 
       const right = workbenchBounds.hcenter + (dialogBounds.width / 2);
-      expect(right).toEqual(dialogBounds.right);
+      expect(right).toEqual(expect.closeTo(dialogBounds.right, 0));
     });
 
     test('should position dialog in view center if opened from non-peripheral view', async ({appPO, workbenchNavigator}) => {
@@ -295,10 +296,10 @@ test.describe('Workbench Dialog', () => {
       const dialogBounds = await dialog.getDialogBoundingBox();
 
       const left = viewBounds.hcenter - (dialogBounds.width / 2);
-      expect(left).toEqual(dialogBounds.left);
+      expect(left).toEqual(expect.closeTo(dialogBounds.left, 0));
 
       const right = viewBounds.hcenter + (dialogBounds.width / 2);
-      expect(right).toEqual(dialogBounds.right);
+      expect(right).toEqual(expect.closeTo(dialogBounds.right, 0));
     });
   });
 
@@ -517,10 +518,10 @@ test.describe('Workbench Dialog', () => {
       const dialogBounds = await dialog.getDialogBoundingBox();
 
       const left = workbenchBounds.hcenter - (dialogBounds.width / 2);
-      expect(left).toEqual(dialogBounds.left);
+      expect(left).toEqual(expect.closeTo(dialogBounds.left, 0));
 
       const right = workbenchBounds.hcenter + (dialogBounds.width / 2);
-      expect(right).toEqual(dialogBounds.right);
+      expect(right).toEqual(expect.closeTo(dialogBounds.right, 0));
     });
 
     test('should position dialog in part center if opened from non-peripheral part', async ({appPO, workbenchNavigator}) => {
@@ -564,10 +565,10 @@ test.describe('Workbench Dialog', () => {
       const dialogBounds = await dialog.getDialogBoundingBox();
 
       const left = partBounds.hcenter - (dialogBounds.width / 2);
-      expect(left).toEqual(dialogBounds.left);
+      expect(left).toEqual(expect.closeTo(dialogBounds.left, 0));
 
       const right = partBounds.hcenter + (dialogBounds.width / 2);
-      expect(right).toEqual(dialogBounds.right);
+      expect(right).toEqual(expect.closeTo(dialogBounds.right, 0));
     });
   });
 
@@ -1772,6 +1773,30 @@ test.describe('Workbench Dialog', () => {
         width: 500 + dialogBorder,
       }));
 
+      // Shrink the content.
+      await dialogPage.enterContentSize({
+        height: '400px',
+        width: '400px',
+      });
+
+      // Expect the dialog to adapt to the content size.
+      await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        height: 400 + dialogBorder + dialogHeaderHeight + dialogFooterHeight,
+        width: 400 + dialogBorder,
+      }));
+
+      // Grow the content.
+      await dialogPage.enterContentSize({
+        height: '500px',
+        width: '500px',
+      });
+
+      // Expect the dialog to adapt to the content size.
+      await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        height: 500 + dialogBorder + dialogHeaderHeight + dialogFooterHeight,
+        width: 500 + dialogBorder,
+      }));
+
       await test.step('should not grow past max-height', async () => {
         await dialogPage.enterDialogSize({maxHeight: '300px'});
 
@@ -1827,6 +1852,47 @@ test.describe('Workbench Dialog', () => {
         await expect(dialog.contentScrollbars.vertical).not.toBeVisible();
         await expect(dialog.contentScrollbars.horizontal).not.toBeVisible();
       });
+    });
+
+    test('should grow beyong context bounds', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false, designTokens: {'--sci-workbench-dialog-padding': '0'}});
+
+      // Add layout with a small main area.
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.left', {align: 'left'})
+        .addPart('part.right', {align: 'right'})
+        .addPart('part.bottom', {align: 'bottom'})
+        .navigatePart('part.left', ['path/to/part'])
+        .navigatePart('part.right', ['path/to/part'])
+        .navigatePart('part.bottom', ['path/to/part']),
+      );
+
+      // Expect main area to be less than 1000px.
+      const mainAreaBounds = await appPO.part({partId: MAIN_AREA}).getBoundingBox();
+      expect(mainAreaBounds.width).toBeLessThan(1000);
+      expect(mainAreaBounds.height).toBeLessThan(1000);
+
+      // Open a large dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('large-test-page', {cssClass: 'dialog'});
+      const dialogPage = new LargeTestPagePO(appPO.dialog({cssClass: 'dialog'}));
+
+      // Expect dialog to be visible.
+      await expectDialog(dialogPage).toBeVisible();
+
+      // Expect dialog to have a size of 1000x1000 pixels.
+      const dialogBounds = await dialogPage.dialog.getDialogBoundingBox();
+      expect(dialogBounds.width).toBeGreaterThan(1000);
+      expect(dialogBounds.height).toBeGreaterThan(1000);
+
+      const dialogSlotBounds = await dialogPage.dialog.getDialogSlotBoundingBox();
+      expect(dialogSlotBounds).toMatchObject({height: 1000, width: 1000});
+
+      // Expect dialog to be positioned in the center of the context.
+      const contextBounds = await dialogOpenerPage.view.getBoundingBox();
+      expect(dialogBounds.left).toBeCloseTo(contextBounds.hcenter - (dialogBounds.width / 2), 0);
+      expect(dialogBounds.right).toBeCloseTo(contextBounds.hcenter + (dialogBounds.width / 2), 0);
     });
   });
 

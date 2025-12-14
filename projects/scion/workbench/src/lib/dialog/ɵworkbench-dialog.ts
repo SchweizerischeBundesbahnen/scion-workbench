@@ -9,7 +9,7 @@
  */
 
 import {BehaviorSubject, concatWith, delay, firstValueFrom, of, Subject, switchMap} from 'rxjs';
-import {assertNotInReactiveContext, ComponentRef, computed, DestroyableInjector, DestroyRef, effect, inject, Injector, Signal, signal, untracked} from '@angular/core';
+import {assertNotInReactiveContext, ComponentRef, computed, DestroyableInjector, DestroyRef, DOCUMENT, effect, inject, Injector, Signal, signal, untracked} from '@angular/core';
 import {WorkbenchDialog, WorkbenchDialogSize} from './workbench-dialog';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
 import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
@@ -326,6 +326,7 @@ export class ɵWorkbenchDialog implements WorkbenchDialog, Blockable, Blocking {
     else {
       const viewDragService = inject(ViewDragService);
       const workbenchComponentBounds = inject(WORKBENCH_COMPONENT_BOUNDS);
+      const document = inject(DOCUMENT);
 
       effect(() => {
         const visible = this.attached() && !viewDragService.dragging();
@@ -336,6 +337,8 @@ export class ɵWorkbenchDialog implements WorkbenchDialog, Blockable, Blocking {
           return;
         }
 
+        // IMPORTANT: Track host bounds only if visible to prevent flickering.
+
         // Align dialog relative to contextual element if opened in non-peripheral area.
         const hostBounds = this.invocationContext?.peripheral() === false ? this.invocationContext.bounds() : workbenchComponentBounds();
         if (!hostBounds) {
@@ -343,14 +346,18 @@ export class ɵWorkbenchDialog implements WorkbenchDialog, Blockable, Blocking {
           return;
         }
 
-        // IMPORTANT: Track host bounds only if visible to prevent flickering.
-        const {left, top, width, height} = hostBounds;
         setStyle(this._overlayRef.overlayElement, {visibility: null});
+
+        // Center the dialog horizontally within the host bounds.
+        // Shift the overlay instead of fitting it to the host bounds, so the dialog can grow beyond host bounds
+        // if not specifying dialog size via a dialog handle.
+        const {left, top, width} = hostBounds;
+        const viewportCenter = document.documentElement.offsetWidth / 2;
+        const dialogCenter = left + width / 2;
+        const xDelta = -1 * (viewportCenter - dialogCenter);
+
         setStyle(this._overlayRef.hostElement, {
-          top: `${top}px`,
-          left: `${left}px`,
-          width: `${width}px`,
-          height: `${height}px`,
+          transform: `translateX(${Math.round(xDelta)}px) translateY(${Math.round(top)}px)`, // round offset to avoid blurry dialog
         });
       });
     }
