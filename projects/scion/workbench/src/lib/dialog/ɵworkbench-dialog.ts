@@ -34,8 +34,8 @@ import {boundingClientRect} from '@scion/components/dimension';
 import {Translatable} from '../text/workbench-text-provider.model';
 import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
 import {DialogId} from '../workbench.identifiers';
-import {provideContextAwareServices} from '../context-aware-service-provider';
 import {WorkbenchInvocationContext} from '../invocation-context/invocation-context';
+import {WORKBENCH_DIALOG_CONTEXT} from './workbench-dialog-context.provider';
 
 /** @inheritDoc */
 export class ɵWorkbenchDialog implements WorkbenchDialog, Blockable, Blocking {
@@ -259,8 +259,8 @@ export class ɵWorkbenchDialog implements WorkbenchDialog, Blockable, Blocking {
         {provide: ɵWorkbenchDialog, useValue: this},
         {provide: WorkbenchDialog, useExisting: ɵWorkbenchDialog},
         {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchDialog},
-        provideContextAwareServices(),
-        ...this._options.providers ?? [],
+        inject(WORKBENCH_DIALOG_CONTEXT, {optional: true}) ?? [],
+        this._options.providers ?? [],
       ],
     });
     inject(DestroyRef).onDestroy(() => injector.destroy());

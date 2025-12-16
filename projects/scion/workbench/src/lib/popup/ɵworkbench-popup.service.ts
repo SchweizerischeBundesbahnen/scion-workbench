@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationRef, assertNotInReactiveContext, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
+import {ApplicationRef, assertNotInReactiveContext, inject, Injectable, Injector, NgZone, Provider, runInInjectionContext} from '@angular/core';
 import {WorkbenchPopupRegistry} from './workbench-popup.registry';
 import {computePopupId} from '../workbench.identifiers';
 import {ɵWorkbenchPopup} from './ɵworkbench-popup';
@@ -16,6 +16,8 @@ import {createInvocationContext, WorkbenchInvocationContext} from '../invocation
 import {WorkbenchPopupService} from './workbench-popup.service';
 import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchPopupOptions} from './workbench-popup.options';
+import {ɵPopupService} from './ɵpopup.service';
+import {PopupService} from './popup.service';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})
@@ -66,4 +68,16 @@ export class ɵWorkbenchPopupService implements WorkbenchPopupService {
  */
 function createPopupInvocationContext(options: WorkbenchPopupOptions, injector: Injector): WorkbenchInvocationContext | null {
   return createInvocationContext(options.context && (typeof options.context === 'object' ? options.context.viewId : options.context), {injector});
+}
+
+/**
+ * Provides {@link WorkbenchPopupService} for dependency injection.
+ */
+export function provideWorkbenchPopupService(): Provider[] {
+  return [
+    ɵWorkbenchPopupService,
+    ɵPopupService,
+    {provide: WorkbenchPopupService, useExisting: ɵWorkbenchPopupService},
+    {provide: PopupService, useExisting: ɵPopupService},
+  ];
 }

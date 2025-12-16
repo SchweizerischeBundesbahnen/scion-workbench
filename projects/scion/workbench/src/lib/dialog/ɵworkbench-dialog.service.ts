@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationRef, assertNotInReactiveContext, DestroyRef, DOCUMENT, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
+import {ApplicationRef, assertNotInReactiveContext, DestroyRef, DOCUMENT, inject, Injectable, Injector, NgZone, Provider, runInInjectionContext} from '@angular/core';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
 import {firstValueFrom} from 'rxjs';
@@ -112,4 +112,14 @@ function createDialogInvocationContext(options: WorkbenchDialogOptions, injector
   }
 
   return createInvocationContext(options.context && (typeof options.context === 'object' ? options.context.viewId : options.context), {injector});
+}
+
+/**
+ * Provides {@link WorkbenchDialogService} for dependency injection.
+ */
+export function provideWorkbenchDialogService(): Provider[] {
+  return [
+    ɵWorkbenchDialogService,
+    {provide: WorkbenchDialogService, useExisting: ɵWorkbenchDialogService},
+  ];
 }
