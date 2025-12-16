@@ -129,7 +129,7 @@ export class WorkbenchClient {
   public static async connect(symbolicName: string, connectOptions?: ConnectOptions): Promise<void> {
     Beans.register(WorkbenchRouter, {useClass: ɵWorkbenchRouter});
     Beans.register(WorkbenchDialogService, {useFactory: () => new ɵWorkbenchDialogService(Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.id)});
-    Beans.register(WorkbenchMessageBoxService, {useClass: ɵWorkbenchMessageBoxService});
+    Beans.register(WorkbenchMessageBoxService, {useFactory: () => new ɵWorkbenchMessageBoxService(Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.id)});
     Beans.register(WorkbenchPopupService, {useClass: ɵWorkbenchPopupService});
     Beans.register(WorkbenchNotificationService, {useClass: ɵWorkbenchNotificationService});
     Beans.register(WorkbenchThemeMonitor, {useClass: ɵWorkbenchThemeMonitor});
