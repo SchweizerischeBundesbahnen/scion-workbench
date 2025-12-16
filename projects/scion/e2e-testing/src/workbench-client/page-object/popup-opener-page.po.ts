@@ -18,7 +18,7 @@ import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
-import {BottomLeftPoint, BottomRightPoint, CloseStrategy, DialogId, PartId, PopupId, TopLeftPoint, TopRightPoint, ViewId, WorkbenchPopupOptions} from '@scion/workbench-client';
+import {BottomLeftPoint, BottomRightPoint, CloseStrategy, DialogId, PartId, PopupId, PopupOrigin, TopLeftPoint, TopRightPoint, ViewId, WorkbenchPopupOptions} from '@scion/workbench-client';
 import {PartPO} from '../../part.po';
 
 /**
@@ -89,36 +89,38 @@ export class PopupOpenerPagePO implements MicrofrontendViewPagePO {
     }
   }
 
-  public async enterPosition(position: 'element' | TopLeftPoint | TopRightPoint | BottomLeftPoint | BottomRightPoint): Promise<void> {
+  public async enterPosition(position: PopupOrigin): Promise<void> {
     const topLeft = position as Partial<TopLeftPoint>;
+    const topRight = position as Partial<TopRightPoint>;
+    const bottomLeft = position as Partial<BottomLeftPoint>;
+    const bottomRight = position as Partial<BottomRightPoint>;
+
     if (topLeft.top !== undefined && topLeft.left !== undefined) {
       await this.locator.locator('select.e2e-position').selectOption('top-left');
       await this.locator.locator('input.e2e-position-vertical').fill(`${topLeft.top}`);
       await this.locator.locator('input.e2e-position-horizontal').fill(`${topLeft.left}`);
-      return;
     }
-    const topRight = position as Partial<TopRightPoint>;
-    if (topRight.top !== undefined && topRight.right !== undefined) {
+    else if (topRight.top !== undefined && topRight.right !== undefined) {
       await this.locator.locator('select.e2e-position').selectOption('top-right');
       await this.locator.locator('input.e2e-position-vertical').fill(`${topRight.top}`);
       await this.locator.locator('input.e2e-position-horizontal').fill(`${topRight.right}`);
-      return;
     }
-    const bottomLeft = position as Partial<BottomLeftPoint>;
-    if (bottomLeft.bottom !== undefined && bottomLeft.left !== undefined) {
+    else if (bottomLeft.bottom !== undefined && bottomLeft.left !== undefined) {
       await this.locator.locator('select.e2e-position').selectOption('bottom-left');
       await this.locator.locator('input.e2e-position-vertical').fill(`${bottomLeft.bottom}`);
       await this.locator.locator('input.e2e-position-horizontal').fill(`${bottomLeft.left}`);
-      return;
     }
-    const bottomRight = position as Partial<BottomRightPoint>;
-    if (bottomRight.bottom !== undefined && bottomRight.right !== undefined) {
+    else if (bottomRight.bottom !== undefined && bottomRight.right !== undefined) {
       await this.locator.locator('select.e2e-position').selectOption('bottom-right');
       await this.locator.locator('input.e2e-position-vertical').fill(`${bottomRight.bottom}`);
       await this.locator.locator('input.e2e-position-horizontal').fill(`${bottomRight.right}`);
-      return;
     }
-    throw Error('[PopupOriginError] Illegal popup origin; must be "Element", "Point", "TopLeftPoint", "TopRightPoint", "BottomLeftPoint" or "BottomRightPoint".');
+    else {
+      throw Error('[PopupOriginError] Illegal popup origin; must be "Element", "Point", "TopLeftPoint", "TopRightPoint", "BottomLeftPoint" or "BottomRightPoint".');
+    }
+
+    await this.locator.locator('input.e2e-anchor-width').fill(`${position.width ?? ''}`);
+    await this.locator.locator('input.e2e-anchor-height').fill(`${position.height ?? ''}`);
   }
 
   private async enterCloseStrategy(options: CloseStrategy): Promise<void> {
@@ -179,5 +181,5 @@ export interface PopupOpenerPageOptions {
   /**
    * @see WorkbenchPopupOptions.anchor
    */
-  anchor: 'element' | TopLeftPoint | TopRightPoint | BottomLeftPoint | BottomRightPoint;
+  anchor: 'element' | PopupOrigin;
 }

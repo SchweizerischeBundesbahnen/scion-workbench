@@ -22,7 +22,7 @@ import {WorkbenchPopupConfig} from './workbench-popup.config';
  * A microfrontend provided as a `popup` capability can be opened in a popup. The qualifier differentiates between different
  * popup capabilities. Declaring an intention allows for opening public popup capabilities of other applications.
  *
- * A popup can be bound to a context (e.g., a part or view), displaying the popup only if the context is visible and closing
+ * A popup can be bound to a context (e.g., part or view), displaying the popup only if the context is visible and closing
  * it when the context is disposed. Defaults to the calling context.
  *
  * @category Popup
