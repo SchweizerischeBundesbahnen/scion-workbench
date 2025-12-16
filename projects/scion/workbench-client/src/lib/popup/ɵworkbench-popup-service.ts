@@ -9,8 +9,9 @@
  */
 
 import {IntentClient, mapToBody, MessageClient, Qualifier, RequestError} from '@scion/microfrontend-platform';
+import {IntentClient, IS_PLATFORM_HOST, mapToBody, MessageClient, Qualifier, RequestError} from '@scion/microfrontend-platform';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {finalize} from 'rxjs/operators';
+import {finalize, map} from 'rxjs/operators';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {Defined, Maps, Observables} from '@scion/toolkit/util';
 import {fromBoundingClientRect$} from '@scion/toolkit/observable';
@@ -70,7 +71,17 @@ export class ɵWorkbenchPopupService implements WorkbenchPopupService {
    */
   private observePopupOrigin$(options: WorkbenchPopupOptions): Observable<PopupOrigin> {
     if (options.anchor instanceof Element) {
-      return fromBoundingClientRect$(options.anchor as HTMLElement);
+      return fromBoundingClientRect$(options.anchor as HTMLElement).pipe(map((domRect: DOMRect) => ({
+        top: domRect.top,
+        right: domRect.right,
+        bottom: domRect.bottom,
+        left: domRect.left,
+        width: domRect.width,
+        height: domRect.height,
+        x: domRect.x,
+        y: domRect.y,
+        relativeTo: Beans.get(IS_PLATFORM_HOST) ? 'viewport' : 'context',
+      })));
     }
     else {
       return concat(Observables.coerce(options.anchor), NEVER);

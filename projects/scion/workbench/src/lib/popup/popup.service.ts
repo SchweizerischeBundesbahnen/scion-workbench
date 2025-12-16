@@ -19,7 +19,7 @@ import {ɵPopupService} from './ɵpopup.service';
  * which can be an element or a coordinate. The popup moves with the anchor. By default, the popup closes on focus loss or
  * when pressing the escape key.
  *
- * A popup can be bound to a context (e.g., a part or view), displaying the popup only if the context is visible and closing
+ * A popup can be bound to a context (e.g., part or view), displaying the popup only if the context is visible and closing
  * it when the context is disposed. Defaults to the calling context.
  *
  * @deprecated since version 21.0.0-beta.1. Use `WorkbenchPopupService` to open popups. Marked for removal in version 22.

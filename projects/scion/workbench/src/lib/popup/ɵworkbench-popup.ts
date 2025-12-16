@@ -311,7 +311,8 @@ export class ɵWorkbenchPopup implements Popup, WorkbenchPopup, Blockable {
           return undefined;
         }
 
-        const {x, y} = mapToPageCoordinates(anchorBounds()!, this.invocationContext?.bounds() ?? documentBounds());
+        const relativeTo = anchorBounds()!.relativeTo ?? 'context';
+        const {x, y} = mapToPageCoordinates(anchorBounds()!, relativeTo === 'viewport' ? documentBounds() : (this.invocationContext?.bounds() ?? documentBounds()));
         const {width, height} = anchorBounds()!;
         return constrainClientRect(new DOMRect(x, y, width, height), this.invocationContext?.bounds());
       }, {equal: isEqualDomRect});

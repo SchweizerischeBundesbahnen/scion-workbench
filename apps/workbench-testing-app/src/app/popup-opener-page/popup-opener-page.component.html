@@ -32,6 +32,13 @@
       <sci-form-field [label]="`&nbsp;&nbsp;&nbsp;${$any(anchor.controls.position.value) | wbPopupPositionLabel:'horizontal'}`">
         <input [formControl]="anchor.controls.horizontalPosition" type="number" class="e2e-position-horizontal">
       </sci-form-field>
+      <sci-form-field label="&nbsp;&nbsp;&nbsp;Relative To" title="Specifies if the coordinate is relative to the context (e.g., part or view) or page viewport. Defaults to context.">
+        <select [formControl]="anchor.controls.relativeTo" class="e2e-relative-to">
+          <option value="context">context</option>
+          <option value="viewport">viewport</option>
+          <option value="">default</option>
+        </select>
+      </sci-form-field>
       <sci-form-field label="&nbsp;&nbsp;&nbsp;Width">
         <input [formControl]="anchor.controls.width" type="number" class="e2e-anchor-width">
       </sci-form-field>

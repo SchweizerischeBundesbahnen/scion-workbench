@@ -74,7 +74,7 @@ export interface WorkbenchPopupOptions {
   cssClass?: string | string[];
 
   /**
-   * Binds the popup to a context (e.g., a part or view). Defaults to the calling context.
+   * Binds the popup to a context (e.g., part or view). Defaults to the calling context.
    *
    * The popup is displayed only if the context is visible and closes when the context is disposed.
    *

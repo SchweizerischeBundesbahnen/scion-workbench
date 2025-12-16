@@ -16,6 +16,8 @@
 export type PopupOrigin = (Point | TopLeftPoint | TopRightPoint | BottomLeftPoint | BottomRightPoint) & {
   width?: number;
   height?: number;
+  /** @internal **/
+  relativeTo?: 'context' | 'viewport';
 };
 
 /**
