@@ -9,3 +9,4 @@
  */
 
 export {WorkbenchView, type WorkbenchViewNavigation} from './workbench-view.model';
+export {WORKBENCH_VIEW_CONTEXT} from './workbench-view-context.provider';

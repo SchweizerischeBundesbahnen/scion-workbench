@@ -24,6 +24,10 @@ import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
 import {ViewTabDragImageRenderer} from './view-dnd/view-tab-drag-image-renderer.service';
 import {provideTextProviders} from './text/text-providers';
 import {provideIconProviders} from './icon/icon-providers';
+import {provideWorkbenchViewContext} from './view/workbench-view-context.provider';
+import {provideWorkbenchPartContext} from './part/workbench-part-context.provider';
+import {provideWorkbenchDialogContext} from './dialog/workbench-dialog-context.provider';
+import {provideWorkbenchPopupContext} from './popup/workbench-popup-context.provider';
 
 /**
  * Enables and configures the SCION Workbench, returning a set of dependency-injection providers to be registered in Angular.
@@ -134,6 +138,10 @@ export function provideWorkbench(config?: WorkbenchConfig): EnvironmentProviders
     provideIconProviders(config),
     provideLogging(config),
     provideLocationPatch(),
+    provideWorkbenchPartContext(),
+    provideWorkbenchViewContext(),
+    provideWorkbenchDialogContext(),
+    provideWorkbenchPopupContext(),
     provideWorkbenchMicrofrontendSupport(config),
   ]);
 }

@@ -20,11 +20,11 @@ import {PopupId} from '../workbench.identifiers';
 import {BottomLeftPoint, BottomRightPoint, Point, PopupOrigin, TopLeftPoint, TopRightPoint} from './popup.origin';
 import {constrainClientRect, setStyle} from '../common/dom.util';
 import {WorkbenchPopup, WorkbenchPopupSize} from './workbench-popup';
-import {provideContextAwareServices} from '../context-aware-service-provider';
 import {WorkbenchInvocationContext} from '../invocation-context/invocation-context';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {WorkbenchPopupOptions} from './workbench-popup.options';
 import {Popup} from './popup';
+import {WORKBENCH_POPUP_CONTEXT} from './workbench-popup-context.provider';
 
 /** @inheritDoc */
 export class ɵWorkbenchPopup implements Popup, WorkbenchPopup, Blockable {
@@ -120,8 +120,8 @@ export class ɵWorkbenchPopup implements Popup, WorkbenchPopup, Blockable {
         {provide: WorkbenchPopup, useExisting: ɵWorkbenchPopup},
         {provide: Popup, useExisting: ɵWorkbenchPopup},
         {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchPopup},
-        provideContextAwareServices(),
-        ...this._options.providers ?? [],
+        inject(WORKBENCH_POPUP_CONTEXT, {optional: true}) ?? [],
+        this._options.providers ?? [],
       ],
     });
     inject(DestroyRef).onDestroy(() => injector.destroy());

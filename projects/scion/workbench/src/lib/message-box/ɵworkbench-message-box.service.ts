@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {assertNotInReactiveContext, DestroyRef, inject, Injectable, NgZone} from '@angular/core';
+import {assertNotInReactiveContext, DestroyRef, inject, Injectable, NgZone, Provider} from '@angular/core';
 import {WorkbenchMessageBoxOptions} from './workbench-message-box.options';
 import {WorkbenchDialogService} from '../dialog/workbench-dialog.service';
 import {WorkbenchMessageBoxComponent} from './workbench-message-box.component';
@@ -55,4 +55,14 @@ export class ɵWorkbenchMessageBoxService implements WorkbenchMessageBoxService 
     logger.debug(() => `Constructing WorkbenchMessageBoxService [context=${workbenchElement?.id}]`, LoggerNames.LIFECYCLE);
     inject(DestroyRef).onDestroy(() => logger.debug(() => `Destroying WorkbenchMessageBoxService [context=${workbenchElement?.id}]'`, LoggerNames.LIFECYCLE));
   }
+}
+
+/**
+ * Provides {@link WorkbenchDialogService} for dependency injection.
+ */
+export function provideWorkbenchMessageBoxService(): Provider[] {
+  return [
+    ɵWorkbenchMessageBoxService,
+    {provide: WorkbenchMessageBoxService, useExisting: ɵWorkbenchMessageBoxService},
+  ];
 }

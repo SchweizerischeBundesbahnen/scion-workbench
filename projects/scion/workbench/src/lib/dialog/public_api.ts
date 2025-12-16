@@ -14,3 +14,4 @@ export {WorkbenchDialogService} from './workbench-dialog.service';
 export {WorkbenchDialogActionDirective} from './dialog-footer/workbench-dialog-action.directive';
 export {WorkbenchDialogFooterDirective} from './dialog-footer/workbench-dialog-footer.directive';
 export {WorkbenchDialogHeaderDirective} from './dialog-header/workbench-dialog-header.directive';
+export {WORKBENCH_DIALOG_CONTEXT} from './workbench-dialog-context.provider';

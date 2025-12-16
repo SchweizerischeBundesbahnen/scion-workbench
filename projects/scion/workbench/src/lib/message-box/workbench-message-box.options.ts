@@ -59,7 +59,7 @@ export interface WorkbenchMessageBoxOptions {
   modality?: 'none' | 'context' | 'application' | ViewModality;
 
   /**
-   * Binds the message box to a context (e.g., a part or view). Defaults to the calling context.
+   * Binds the message box to a context (e.g., part or view). Defaults to the calling context.
    *
    * The message box is displayed only if the context is visible and closes when the context is disposed.
    * The message box is opened in the center of its context, if any, unless opened from the peripheral area.

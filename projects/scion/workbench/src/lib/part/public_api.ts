@@ -11,3 +11,4 @@
 export {WorkbenchViewMenuItemDirective} from './view-context-menu/view-menu-item.directive';
 export {WorkbenchPartActionDirective} from './part-action-bar/part-action.directive';
 export {WorkbenchPart, type WorkbenchPartNavigation} from './workbench-part.model';
+export {WORKBENCH_PART_CONTEXT} from './workbench-part-context.provider';
