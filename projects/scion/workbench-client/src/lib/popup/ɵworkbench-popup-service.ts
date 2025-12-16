@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {IntentClient, mapToBody, MessageClient, Qualifier, RequestError} from '@scion/microfrontend-platform';
 import {IntentClient, IS_PLATFORM_HOST, mapToBody, MessageClient, Qualifier, RequestError} from '@scion/microfrontend-platform';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {finalize, map} from 'rxjs/operators';
@@ -20,8 +19,7 @@ import {ɵWorkbenchPopupCommand} from './workbench-popup-command';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {WorkbenchPopupOptions} from './workbench-popup.options';
 import {PopupOrigin} from './popup.origin';
-import {computePopupId} from '../workbench.identifiers';
-import {WORKBENCH_ELEMENT, WorkbenchElement} from '../workbench.model';
+import {computePopupId, DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 import {WorkbenchPopupService} from './workbench-popup-service';
 
 /**
@@ -29,6 +27,9 @@ import {WorkbenchPopupService} from './workbench-popup-service';
  * @docs-private Not public API. For internal use only.
  */
 export class ɵWorkbenchPopupService implements WorkbenchPopupService {
+
+  constructor(private _context?: ViewId | PartId | DialogId | PopupId | undefined) {
+  }
 
   /** @inheritDoc */
   public async open<T>(qualifier: Qualifier, options: WorkbenchPopupOptions): Promise<T | undefined> {
@@ -43,7 +44,7 @@ export class ɵWorkbenchPopupService implements WorkbenchPopupService {
       context: (() => {
         // TODO [Angular 22] Remove backward compatiblity.
         const context = options.context && (typeof options.context === 'object' ? options.context.viewId : options.context);
-        return Defined.orElse(context, () => Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.id);
+        return Defined.orElse(context, this._context);
       })(),
     };
     const popupOriginReporter = this.observePopupOrigin$(options)
