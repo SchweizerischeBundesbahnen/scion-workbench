@@ -11,7 +11,7 @@
 import {EnvironmentProviders, inject, makeEnvironmentProviders, Provider} from '@angular/core';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {CapabilityInterceptor, HostManifestInterceptor, IntentInterceptor, MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
-import {WorkbenchCapabilities, WorkbenchDialogService, WorkbenchMessageBoxService, ɵWorkbenchDialogService, ɵWorkbenchMessageBoxService} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchPopupService, ɵWorkbenchDialogService, ɵWorkbenchMessageBoxService, ɵWorkbenchPopupService} from '@scion/workbench-client';
 import {provideStableCapabilityId} from '../stable-capability-id-assigner.provider';
 import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
 import {provideViewCommandHandlers} from './microfrontend-view-command-handler.service';
@@ -67,6 +67,7 @@ export function provideMicrofrontendView(): EnvironmentProviders {
       useFactory: (): Provider[] => [
         {provide: WorkbenchDialogService, useFactory: () => new ɵWorkbenchDialogService(inject(WorkbenchView).id)},
         {provide: WorkbenchMessageBoxService, useFactory: () => new ɵWorkbenchMessageBoxService(inject(WorkbenchView).id)},
+        {provide: WorkbenchPopupService, useFactory: () => new ɵWorkbenchPopupService(inject(WorkbenchView).id)},
       ],
       multi: true,
     };
