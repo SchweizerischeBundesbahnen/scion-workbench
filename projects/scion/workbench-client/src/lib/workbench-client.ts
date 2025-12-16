@@ -130,7 +130,7 @@ export class WorkbenchClient {
     Beans.register(WorkbenchRouter, {useClass: ɵWorkbenchRouter});
     Beans.register(WorkbenchDialogService, {useFactory: () => new ɵWorkbenchDialogService(Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.id)});
     Beans.register(WorkbenchMessageBoxService, {useFactory: () => new ɵWorkbenchMessageBoxService(Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.id)});
-    Beans.register(WorkbenchPopupService, {useClass: ɵWorkbenchPopupService});
+    Beans.register(WorkbenchPopupService, {useFactory: () => new ɵWorkbenchPopupService(Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.id)});
     Beans.register(WorkbenchNotificationService, {useClass: ɵWorkbenchNotificationService});
     Beans.register(WorkbenchThemeMonitor, {useClass: ɵWorkbenchThemeMonitor});
     Beans.register(WorkbenchTextService, {useClass: ɵWorkbenchTextService});
