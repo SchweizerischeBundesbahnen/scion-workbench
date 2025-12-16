@@ -28,7 +28,7 @@ import {Translatable} from '../text/workbench-text-provider.model';
  * application-modal blocks the workbench or browser viewport, based on global workbench settings.
  *
  * ## Context
- * A message box can be bound to a context (e.g., a part or view), defaulting to the calling context.
+ * A message box can be bound to a context (e.g., part or view), defaulting to the calling context.
  * The message box is displayed only if the context is visible and closes when the context is disposed.
  *
  * ## Positioning

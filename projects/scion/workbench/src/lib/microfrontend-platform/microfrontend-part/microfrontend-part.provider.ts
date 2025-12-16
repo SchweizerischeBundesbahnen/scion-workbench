@@ -11,7 +11,7 @@
 import {EnvironmentProviders, inject, makeEnvironmentProviders, Provider} from '@angular/core';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {CapabilityInterceptor, HostManifestInterceptor} from '@scion/microfrontend-platform';
-import {WorkbenchCapabilities, WorkbenchDialogService, ɵWorkbenchDialogService} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchDialogService, WorkbenchMessageBoxService, ɵWorkbenchDialogService, ɵWorkbenchMessageBoxService} from '@scion/workbench-client';
 import {provideStableCapabilityId} from '../stable-capability-id-assigner.provider';
 import {MicrofrontendPartCapabilityValidator} from './microfrontend-part-capability-validator.interceptor';
 import {provideMicrofrontendPartRoute} from './microfrontend-part-routes';
@@ -50,6 +50,7 @@ export function provideMicrofrontendPart(): EnvironmentProviders {
       provide: WORKBENCH_PART_CONTEXT,
       useFactory: (): Provider[] => [
         {provide: WorkbenchDialogService, useFactory: () => new ɵWorkbenchDialogService(inject(WorkbenchPart).id)},
+        {provide: WorkbenchMessageBoxService, useFactory: () => new ɵWorkbenchMessageBoxService(inject(WorkbenchPart).id)},
       ],
       multi: true,
     };

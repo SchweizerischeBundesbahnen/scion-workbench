@@ -17,13 +17,16 @@ import {catchError, firstValueFrom, throwError} from 'rxjs';
 import {eMESSAGE_BOX_MESSAGE_PARAM, ɵWorkbenchMessageBoxCommand} from './workbench-message-box-command';
 import {WorkbenchMessageBoxService} from './workbench-message-box-service';
 import {Translatable} from '../text/workbench-text-provider.model';
-import {WORKBENCH_ELEMENT, WorkbenchElement} from '../workbench.model';
+import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 
 /**
  * @ignore
  * @docs-private Not public API. For internal use only.
  */
 export class ɵWorkbenchMessageBoxService implements WorkbenchMessageBoxService {
+
+  constructor(private _context?: ViewId | PartId | DialogId | PopupId | undefined) {
+  }
 
   /** @inheritDoc */
   public open(message: Translatable | null | Qualifier, options?: WorkbenchMessageBoxOptions): Promise<string> {
@@ -45,7 +48,7 @@ export class ɵWorkbenchMessageBoxService implements WorkbenchMessageBoxService 
       context: (() => {
         // TODO [Angular 22] Remove backward compatiblity.
         const context = options?.context && (typeof options.context === 'object' ? options.context.viewId : options.context);
-        return Defined.orElse(context, () => Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.id);
+        return Defined.orElse(context, this._context);
       })(),
     };
 

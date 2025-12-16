@@ -14,7 +14,7 @@ import {MicrofrontendDialogCapabilityValidator} from './microfrontend-dialog-cap
 import {Beans} from '@scion/toolkit/bean-manager';
 import {CapabilityInterceptor, IntentInterceptor} from '@scion/microfrontend-platform';
 import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
-import {WorkbenchDialogService, ɵWorkbenchDialogService} from '@scion/workbench-client';
+import {WorkbenchDialogService, WorkbenchMessageBoxService, ɵWorkbenchDialogService, ɵWorkbenchMessageBoxService} from '@scion/workbench-client';
 import {WORKBENCH_DIALOG_CONTEXT} from '../../dialog/workbench-dialog-context.provider';
 import {WorkbenchDialog} from '../../dialog/workbench-dialog';
 
@@ -46,6 +46,7 @@ export function provideMicrofrontendDialog(): EnvironmentProviders {
       provide: WORKBENCH_DIALOG_CONTEXT,
       useFactory: (): Provider[] => [
         {provide: WorkbenchDialogService, useFactory: () => new ɵWorkbenchDialogService(inject(WorkbenchDialog).id)},
+        {provide: WorkbenchMessageBoxService, useFactory: () => new ɵWorkbenchMessageBoxService(inject(WorkbenchDialog).id)},
       ],
       multi: true,
     };
