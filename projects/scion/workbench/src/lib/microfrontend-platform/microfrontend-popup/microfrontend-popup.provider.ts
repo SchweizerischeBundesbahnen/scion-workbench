@@ -47,6 +47,7 @@ export function provideMicrofrontendPopup(): EnvironmentProviders {
       useFactory: (): Provider[] => [
         {provide: WorkbenchDialogService, useFactory: () => new ɵWorkbenchDialogService(inject(WorkbenchPopup).id)},
         {provide: WorkbenchMessageBoxService, useFactory: () => new ɵWorkbenchMessageBoxService(inject(WorkbenchPopup).id)},
+        {provide: WorkbenchPopupService, useFactory: () => new ɵWorkbenchPopupService(inject(WorkbenchPopup).id)},
       ],
       multi: true,
     };
