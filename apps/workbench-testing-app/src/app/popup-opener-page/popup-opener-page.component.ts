@@ -60,6 +60,7 @@ export default class PopupOpenerPageComponent {
         horizontalPosition: this._formBuilder.control(0, Validators.required),
         width: this._formBuilder.control<number | undefined>(undefined),
         height: this._formBuilder.control<number | undefined>(undefined),
+        relativeTo: this._formBuilder.control<'context' | 'viewport' | undefined>(undefined),
         delay: this._formBuilder.control(0),
       }),
       align: this._formBuilder.control<'east' | 'west' | 'north' | 'south' | ''>(''),
@@ -184,6 +185,7 @@ export default class PopupOpenerPageComponent {
                 left: anchor.horizontalPosition.value,
                 width: anchor.width.value,
                 height: anchor.height.value,
+                relativeTo: anchor.relativeTo.value || undefined,
               };
             case 'top-right':
               return {
@@ -191,6 +193,7 @@ export default class PopupOpenerPageComponent {
                 right: anchor.horizontalPosition.value,
                 width: anchor.width.value,
                 height: anchor.height.value,
+                relativeTo: anchor.relativeTo.value || undefined,
               };
             case 'bottom-left':
               return {
@@ -198,6 +201,7 @@ export default class PopupOpenerPageComponent {
                 left: anchor.horizontalPosition.value,
                 width: anchor.width.value,
                 height: anchor.height.value,
+                relativeTo: anchor.relativeTo.value || undefined,
               };
             case 'bottom-right':
               return {
@@ -205,6 +209,7 @@ export default class PopupOpenerPageComponent {
                 right: anchor.horizontalPosition.value,
                 width: anchor.width.value,
                 height: anchor.height.value,
+                relativeTo: anchor.relativeTo.value || undefined,
               };
             case 'point':
               return {
@@ -212,6 +217,7 @@ export default class PopupOpenerPageComponent {
                 y: anchor.verticalPosition.value,
                 width: anchor.width.value,
                 height: anchor.height.value,
+                relativeTo: anchor.relativeTo.value || undefined,
               };
             default: {
               throw Error(`Invalid popup origin specified: ${anchor.position.value}`);

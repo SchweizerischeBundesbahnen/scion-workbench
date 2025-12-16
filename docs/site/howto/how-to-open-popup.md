@@ -7,7 +7,7 @@
 A popup is a visual workbench element for displaying content above other content. It is positioned relative to an anchor, which can be an element or a coordinate.
 The popup moves with the anchor. By default, the popup closes on focus loss or when pressing the escape key.
 
-A popup can be bound to a context (e.g., a part or view), displaying the popup only if the context is visible and closing it when the context is disposed. Defaults to the calling context.
+A popup can be bound to a context (e.g., part or view), displaying the popup only if the context is visible and closing it when the context is disposed. Defaults to the calling context.
 
 ### How to Open a Popup
 To open a popup, inject `WorkbenchPopupService` and invoke the `open` method, passing the component to display.
