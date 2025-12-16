@@ -16,6 +16,9 @@ import {MAIN_AREA_INITIAL_PART_ID} from '../layout/ɵworkbench-layout';
 import {ComponentFixtureAutoDetect} from '@angular/core/testing';
 import {Router} from '@angular/router';
 import {PartId} from '../workbench.identifiers';
+import {provideWorkbenchDialogService} from '../dialog/ɵworkbench-dialog.service';
+import {provideWorkbenchMessageBoxService} from '../message-box/ɵworkbench-message-box.service';
+import {provideWorkbenchPopupService} from '../popup/ɵworkbench-popup.service';
 
 /**
  * Enables and configures the SCION Workbench in tests., returning a set of dependency-injection providers to be registered in Angular.
@@ -47,5 +50,8 @@ export function provideWorkbenchForTest(config?: WorkbenchConfig & {mainAreaInit
     provideEnvironmentInitializer(() => inject(Router).initialNavigation()),
     provideEnvironmentInitializer(() => localStorage.clear()),
     provideEnvironmentInitializer(() => window.name = ''),
+    provideWorkbenchDialogService(),
+    provideWorkbenchMessageBoxService(),
+    provideWorkbenchPopupService(),
   ]);
 }
