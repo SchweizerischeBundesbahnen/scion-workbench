@@ -14,7 +14,7 @@ import {CapabilityInterceptor, IntentInterceptor} from '@scion/microfrontend-pla
 import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
 import {MicrofrontendPopupIntentHandler} from './microfrontend-popup-intent-handler.interceptor';
 import {MicrofrontendPopupCapabilityValidator} from './microfrontend-popup-capability-validator.interceptor';
-import {WorkbenchDialogService, ɵWorkbenchDialogService} from '@scion/workbench-client';
+import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchPopupService, ɵWorkbenchDialogService, ɵWorkbenchMessageBoxService, ɵWorkbenchPopupService} from '@scion/workbench-client';
 import {WorkbenchPopup} from '../../popup/workbench-popup';
 import {WORKBENCH_POPUP_CONTEXT} from '../../popup/workbench-popup-context.provider';
 
@@ -46,6 +46,7 @@ export function provideMicrofrontendPopup(): EnvironmentProviders {
       provide: WORKBENCH_POPUP_CONTEXT,
       useFactory: (): Provider[] => [
         {provide: WorkbenchDialogService, useFactory: () => new ɵWorkbenchDialogService(inject(WorkbenchPopup).id)},
+        {provide: WorkbenchMessageBoxService, useFactory: () => new ɵWorkbenchMessageBoxService(inject(WorkbenchPopup).id)},
       ],
       multi: true,
     };
