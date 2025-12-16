@@ -39,7 +39,7 @@ import {ViewSlotComponent} from './view-slot.component';
 import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
 import {WorkbenchPopupRegistry} from '../popup/workbench-popup.registry';
 import {boundingClientRect} from '@scion/components/dimension';
-import {provideContextAwareServices} from '../context-aware-service-provider';
+import {WORKBENCH_VIEW_CONTEXT} from './workbench-view-context.provider';
 
 /** @inheritDoc */
 export class ɵWorkbenchView implements WorkbenchView, Blockable {
@@ -113,7 +113,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
         {provide: ɵWorkbenchView, useValue: this},
         {provide: WorkbenchView, useExisting: ɵWorkbenchView},
         {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchView},
-        provideContextAwareServices(),
+        inject(WORKBENCH_VIEW_CONTEXT, {optional: true}) ?? [],
         // Prevent injecting this part into the view because the view may be dragged to a different part.
         {provide: WorkbenchPart, useFactory: () => undefined},
         {provide: ɵWorkbenchPart, useFactory: () => undefined},

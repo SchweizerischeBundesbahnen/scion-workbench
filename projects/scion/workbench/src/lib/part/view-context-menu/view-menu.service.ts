@@ -26,7 +26,7 @@ import {TextComponent} from './text/text.component';
 import {coerceElement} from '@angular/cdk/coercion';
 import {rootEffect} from '../../common/rxjs-interop.util';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
-import {provideContextAwareServices} from '../../context-aware-service-provider';
+import {WORKBENCH_VIEW_CONTEXT} from '../../view/workbench-view-context.provider';
 
 /**
  * Shows menu items of a {@link WorkbenchView} in a menu.
@@ -101,7 +101,7 @@ export class ViewMenuService {
         {provide: ɵWorkbenchView, useValue: view},
         {provide: WorkbenchView, useExisting: ɵWorkbenchView},
         {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchView},
-        provideContextAwareServices(),
+        this._injector.get(WORKBENCH_VIEW_CONTEXT, [], {optional: true}),
       ],
     });
     overlayRef.attach(new ComponentPortal(ViewMenuComponent, null, injector));

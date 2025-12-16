@@ -35,10 +35,10 @@ import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
 import {Translatable} from '../text/workbench-text-provider.model';
 import {boundingClientRect} from '@scion/components/dimension';
-import {provideContextAwareServices} from '../context-aware-service-provider';
 import {Blockable} from '../glass-pane/blockable';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
+import {WORKBENCH_PART_CONTEXT} from './workbench-part-context.provider';
 
 /** @inheritDoc */
 export class ɵWorkbenchPart implements WorkbenchPart, Blockable {
@@ -130,7 +130,7 @@ export class ɵWorkbenchPart implements WorkbenchPart, Blockable {
         {provide: ɵWorkbenchPart, useValue: this},
         {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
         {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchPart},
-        provideContextAwareServices(),
+        inject(WORKBENCH_PART_CONTEXT, {optional: true}) ?? [],
       ],
     });
   }

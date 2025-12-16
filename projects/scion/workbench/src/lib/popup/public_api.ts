@@ -15,3 +15,4 @@ export {type Point, type TopLeftPoint, type TopRightPoint, type BottomLeftPoint,
 export {WorkbenchPopup, type WorkbenchPopupSize} from './workbench-popup';
 export {Popup} from './popup';
 export {type WorkbenchPopupOptions, type CloseStrategy} from './workbench-popup.options';
+export {WORKBENCH_POPUP_CONTEXT} from './workbench-popup-context.provider';
