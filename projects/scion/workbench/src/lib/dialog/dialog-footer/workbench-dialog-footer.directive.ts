@@ -9,7 +9,7 @@
  */
 
 import {booleanAttribute, DestroyRef, Directive, inject, input, TemplateRef} from '@angular/core';
-import {ɵWorkbenchDialog} from '../ɵworkbench-dialog';
+import {ɵWorkbenchDialog} from '../ɵworkbench-dialog.model';
 import {Disposable} from '../../common/disposable';
 import {asapScheduler} from 'rxjs';
 

@@ -10,7 +10,7 @@
 
 import {Translatable} from '../text/workbench-text-provider.model';
 import {Notification} from './notification';
-import {ɵWorkbenchNotification} from './ɵworkbench-notification';
+import {ɵWorkbenchNotification} from './ɵworkbench-notification.model';
 import {inject} from '@angular/core';
 import {UID} from '../common/uid.util';
 
