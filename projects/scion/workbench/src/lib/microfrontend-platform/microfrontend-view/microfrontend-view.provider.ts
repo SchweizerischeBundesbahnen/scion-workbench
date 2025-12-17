@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
+import {EnvironmentProviders, inject, makeEnvironmentProviders, Provider} from '@angular/core';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {CapabilityInterceptor, HostManifestInterceptor, IntentInterceptor, MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
-import {WorkbenchCapabilities} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchDialogService, ɵWorkbenchDialogService} from '@scion/workbench-client';
 import {provideStableCapabilityId} from '../stable-capability-id-assigner.provider';
 import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
 import {provideViewCommandHandlers} from './microfrontend-view-command-handler.service';
@@ -21,6 +21,8 @@ import {ViewCapabilityPreloadCapabilityInterceptor} from '../initialization/view
 import {MicrofrontendViewCapabilityValidator} from './microfrontend-view-capability-validator.interceptor';
 import {provideMicrofrontendViewRoute} from './microfrontend-view-routes';
 import {MicrofrontendViewIntentionProvider} from './microfrontend-view-intention-provider.interceptor';
+import {WORKBENCH_VIEW_CONTEXT} from '../../view/workbench-view-context.provider';
+import {WorkbenchView} from '../../view/workbench-view.model';
 
 /**
  * Provides a set of DI providers enabling microfrontend view support.
@@ -37,6 +39,7 @@ export function provideMicrofrontendView(): EnvironmentProviders {
     provideMicrofrontendViewRoute(),
     provideViewCommandHandlers(),
     provideStableCapabilityId(WorkbenchCapabilities.View),
+    provideWorkbenchViewContext(),
     provideMicrofrontendPlatformInitializer(onPreStartup, {phase: MicrofrontendPlatformStartupPhase.PreStartup}),
   ]);
 
@@ -53,5 +56,18 @@ export function provideMicrofrontendView(): EnvironmentProviders {
     if (inject(MicrofrontendPlatformConfig).preloadInactiveViews) {
       Beans.register(CapabilityInterceptor, {useValue: inject(ViewCapabilityPreloadCapabilityInterceptor), multi: true});
     }
+  }
+
+  /**
+   * Provides beans of @scion/workbench-client available for DI if in the context of a workbench view.
+   */
+  function provideWorkbenchViewContext(): Provider {
+    return {
+      provide: WORKBENCH_VIEW_CONTEXT,
+      useFactory: (): Provider[] => [
+        {provide: WorkbenchDialogService, useFactory: () => new ɵWorkbenchDialogService(inject(WorkbenchView).id)},
+      ],
+      multi: true,
+    };
   }
 }
