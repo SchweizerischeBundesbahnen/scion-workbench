@@ -8,15 +8,17 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
+import {EnvironmentProviders, inject, makeEnvironmentProviders, Provider} from '@angular/core';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {CapabilityInterceptor, HostManifestInterceptor} from '@scion/microfrontend-platform';
-import {WorkbenchCapabilities} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchDialogService, ɵWorkbenchDialogService} from '@scion/workbench-client';
 import {provideStableCapabilityId} from '../stable-capability-id-assigner.provider';
 import {MicrofrontendPartCapabilityValidator} from './microfrontend-part-capability-validator.interceptor';
 import {provideMicrofrontendPartRoute} from './microfrontend-part-routes';
 import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
 import {MicrofrontendPartIntentionProvider} from './microfrontend-part-intention-provider.interceptor';
+import {WORKBENCH_PART_CONTEXT} from '../../part/workbench-part-context.provider';
+import {WorkbenchPart} from '../../part/workbench-part.model';
 
 /**
  * Provides a set of DI providers enabling microfrontend part support.
@@ -29,6 +31,7 @@ export function provideMicrofrontendPart(): EnvironmentProviders {
     MicrofrontendPartCapabilityValidator,
     provideMicrofrontendPartRoute(),
     provideStableCapabilityId(WorkbenchCapabilities.Part),
+    provideWorkbenchPartContext(),
     provideMicrofrontendPlatformInitializer(onPreStartup, {phase: MicrofrontendPlatformStartupPhase.PreStartup}),
   ]);
 
@@ -37,5 +40,18 @@ export function provideMicrofrontendPart(): EnvironmentProviders {
     Beans.register(HostManifestInterceptor, {useValue: inject(MicrofrontendPartIntentionProvider), multi: true});
     // Register part capability validator.
     Beans.register(CapabilityInterceptor, {useValue: inject(MicrofrontendPartCapabilityValidator), multi: true});
+  }
+
+  /**
+   * Provides beans of @scion/workbench-client available for DI if in the context of a workbench part.
+   */
+  function provideWorkbenchPartContext(): Provider {
+    return {
+      provide: WORKBENCH_PART_CONTEXT,
+      useFactory: (): Provider[] => [
+        {provide: WorkbenchDialogService, useFactory: () => new ɵWorkbenchDialogService(inject(WorkbenchPart).id)},
+      ],
+      multi: true,
+    };
   }
 }

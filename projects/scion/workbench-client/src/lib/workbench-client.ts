@@ -33,6 +33,7 @@ import {WorkbenchPartInitializer} from './part/workbench-part-initializer';
 import {ɵWorkbenchPopupService} from './popup/ɵworkbench-popup-service';
 import {ɵWorkbenchRouter} from './routing/ɵworkbench-router';
 import {ɵWorkbenchNotificationService} from './notification/ɵworkbench-notification-service';
+import {WORKBENCH_ELEMENT, WorkbenchElement} from './workbench.model';
 
 /**
  * **SCION Workbench Client provides core API for a web app to interact with SCION Workbench and other microfrontends.**
@@ -127,7 +128,7 @@ export class WorkbenchClient {
    */
   public static async connect(symbolicName: string, connectOptions?: ConnectOptions): Promise<void> {
     Beans.register(WorkbenchRouter, {useClass: ɵWorkbenchRouter});
-    Beans.register(WorkbenchDialogService, {useClass: ɵWorkbenchDialogService});
+    Beans.register(WorkbenchDialogService, {useFactory: () => new ɵWorkbenchDialogService(Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.id)});
     Beans.register(WorkbenchMessageBoxService, {useClass: ɵWorkbenchMessageBoxService});
     Beans.register(WorkbenchPopupService, {useClass: ɵWorkbenchPopupService});
     Beans.register(WorkbenchNotificationService, {useClass: ɵWorkbenchNotificationService});
