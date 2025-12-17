@@ -27,7 +27,7 @@ import {WorkbenchDialogOptions} from './workbench-dialog.options';
  * application-modal blocks the workbench or browser viewport, based on global workbench settings.
  *
  * ## Context
- * A dialog can be bound to a context (e.g., a part or view), defaulting to the calling context.
+ * A dialog can be bound to a context (e.g., part or view), defaulting to the calling context.
  * The dialog is displayed only if the context is visible and closes when the context is disposed.
  *
  * ## Positioning
