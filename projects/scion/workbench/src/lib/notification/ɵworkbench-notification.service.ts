@@ -13,7 +13,7 @@ import {computeNotificationId} from '../workbench.identifiers';
 import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchNotificationService} from './workbench-notification.service';
 import {WorkbenchNotificationOptions} from './workbench-notification.options';
-import {ɵWorkbenchNotification} from './ɵworkbench-notification';
+import {ɵWorkbenchNotification} from './ɵworkbench-notification.model';
 import {WorkbenchNotificationRegistry} from './workbench-notification.registry';
 import {Translatable} from '../text/workbench-text-provider.model';
 

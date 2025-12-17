@@ -13,8 +13,8 @@ import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchView} from './view/workbench-view.model';
 import {Injector, TemplateRef} from '@angular/core';
 import {WorkbenchPart} from './part/workbench-part.model';
-import {WorkbenchDialog} from './dialog/workbench-dialog';
-import {WorkbenchPopup} from './popup/workbench-popup';
+import {WorkbenchDialog} from './dialog/workbench-dialog.model';
+import {WorkbenchPopup} from './popup/workbench-popup.model';
 
 /**
  * The signature of a function to confirm closing a view., e.g., if dirty.

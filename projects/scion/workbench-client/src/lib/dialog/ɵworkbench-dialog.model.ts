@@ -10,7 +10,7 @@
 
 import {mapToBody, MessageClient, MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
 import {ɵDialogContext} from './ɵworkbench-dialog-context';
-import {WorkbenchDialog} from './workbench-dialog';
+import {WorkbenchDialog} from './workbench-dialog.model';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {Observable, Subject} from 'rxjs';

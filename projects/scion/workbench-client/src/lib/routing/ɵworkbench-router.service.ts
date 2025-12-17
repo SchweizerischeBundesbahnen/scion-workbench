@@ -10,13 +10,13 @@
 
 import {IntentClient, mapToBody, MessageClient, Qualifier, RequestError} from '@scion/microfrontend-platform';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {WorkbenchView} from '../view/workbench-view';
+import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {Dictionaries, Dictionary, Maps} from '@scion/toolkit/util';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {lastValueFrom} from 'rxjs';
 import {Empty} from '../common/utility-types';
-import {WorkbenchNavigationExtras, WorkbenchRouter} from './workbench-router';
+import {WorkbenchNavigationExtras, WorkbenchRouter} from './workbench-router.service';
 import {PartId} from '../workbench.identifiers';
 
 /**

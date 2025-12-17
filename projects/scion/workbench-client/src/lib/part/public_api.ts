@@ -9,6 +9,6 @@
  */
 
 export {type WorkbenchPartCapability, type WorkbenchViewRef, type DockedPartExtras} from './workbench-part-capability';
-export {WorkbenchPart} from './workbench-part';
-export {ɵWorkbenchPart} from './ɵworkbench-part';
+export {WorkbenchPart} from './workbench-part.model';
+export {ɵWorkbenchPart} from './ɵworkbench-part.model';
 export {type ɵWorkbenchPartContext, ɵWORKBENCH_PART_CONTEXT} from './ɵworkbench-part-context';

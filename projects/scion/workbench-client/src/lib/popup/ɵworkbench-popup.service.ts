@@ -20,7 +20,7 @@ import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {WorkbenchPopupOptions} from './workbench-popup.options';
 import {PopupOrigin} from './popup.origin';
 import {computePopupId, DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
-import {WorkbenchPopupService} from './workbench-popup-service';
+import {WorkbenchPopupService} from './workbench-popup.service';
 
 /**
  * @ignore

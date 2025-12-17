@@ -9,7 +9,7 @@
  */
 
 import {inject, Injectable} from '@angular/core';
-import {LEGACY_POPUP_INPUT} from './ɵworkbench-popup';
+import {LEGACY_POPUP_INPUT} from './ɵworkbench-popup.model';
 import {PopupConfig} from './popup.config';
 import {PopupService} from './popup.service';
 import {WorkbenchPopupService} from './workbench-popup.service';

@@ -15,7 +15,7 @@ import {ManifestService, mapToBody, MessageClient, MicrofrontendPlatformClient} 
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {distinctUntilChanged, filter, map, mergeMap, shareReplay, skip, switchMap, takeUntil, tap} from 'rxjs/operators';
 import {Observables} from '@scion/toolkit/util';
-import {CanCloseFn, CanCloseRef, ViewSnapshot, WorkbenchView} from './workbench-view';
+import {CanCloseFn, CanCloseRef, ViewSnapshot, WorkbenchView} from './workbench-view.model';
 import {decorateObservable} from '../observable-decorator';
 import {PartId, ViewId} from '../workbench.identifiers';
 import {Translatable} from '../text/workbench-text-provider.model';

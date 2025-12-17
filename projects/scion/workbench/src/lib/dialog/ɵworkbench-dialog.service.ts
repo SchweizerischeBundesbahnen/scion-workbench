@@ -10,7 +10,7 @@
 
 import {ApplicationRef, assertNotInReactiveContext, DestroyRef, DOCUMENT, inject, Injectable, Injector, NgZone, Provider, runInInjectionContext} from '@angular/core';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
-import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
+import {ɵWorkbenchDialog} from './ɵworkbench-dialog.model';
 import {firstValueFrom} from 'rxjs';
 import {WorkbenchDialogRegistry} from './workbench-dialog.registry';
 import {filter} from 'rxjs/operators';

@@ -16,7 +16,7 @@ import {NgComponentOutlet} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
-import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog';
+import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog.model';
 import {Microfrontends} from '../common/microfrontend.util';
 import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provider';
 
