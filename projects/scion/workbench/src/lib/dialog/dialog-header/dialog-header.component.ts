@@ -9,7 +9,7 @@
  */
 
 import {Component, inject} from '@angular/core';
-import {ɵWorkbenchDialog} from '../ɵworkbench-dialog';
+import {ɵWorkbenchDialog} from '../ɵworkbench-dialog.model';
 import {TextPipe} from '../../text/text.pipe';
 import {IconComponent} from '../../icon/icon.component';
 

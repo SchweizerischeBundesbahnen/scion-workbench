@@ -1,4 +1,4 @@
-import {WorkbenchPopup} from './workbench-popup';
+import {WorkbenchPopup} from './workbench-popup.model';
 
 /**
  * A popup is a visual workbench element for displaying content above other content. The popup is positioned relative

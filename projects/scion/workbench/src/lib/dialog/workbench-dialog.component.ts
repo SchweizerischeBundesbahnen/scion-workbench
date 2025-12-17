@@ -12,7 +12,7 @@ import {Component, effect, ElementRef, HostListener, inject, NgZone, Provider, s
 import {BehaviorSubject, fromEvent} from 'rxjs';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {AsyncPipe, NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
-import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
+import {ɵWorkbenchDialog} from './ɵworkbench-dialog.model';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {animate, AnimationMetadata, style, transition, trigger} from '@angular/animations';
 import {subscribeIn} from '@scion/toolkit/operators';

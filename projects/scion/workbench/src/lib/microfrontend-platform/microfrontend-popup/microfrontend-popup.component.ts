@@ -17,7 +17,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
 import {Microfrontends} from '../common/microfrontend.util';
-import {ɵWorkbenchPopup} from '../../popup/ɵworkbench-popup';
+import {ɵWorkbenchPopup} from '../../popup/ɵworkbench-popup.model';
 
 /**
  * Displays the microfrontend of a given {@link WorkbenchPopupCapability}.

@@ -11,7 +11,7 @@
 import {ApplicationRef, assertNotInReactiveContext, inject, Injectable, Injector, NgZone, Provider, runInInjectionContext} from '@angular/core';
 import {WorkbenchPopupRegistry} from './workbench-popup.registry';
 import {computePopupId} from '../workbench.identifiers';
-import {ɵWorkbenchPopup} from './ɵworkbench-popup';
+import {ɵWorkbenchPopup} from './ɵworkbench-popup.model';
 import {createInvocationContext, WorkbenchInvocationContext} from '../invocation-context/invocation-context';
 import {WorkbenchPopupService} from './workbench-popup.service';
 import {ComponentType} from '@angular/cdk/portal';

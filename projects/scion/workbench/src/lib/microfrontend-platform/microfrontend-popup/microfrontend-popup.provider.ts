@@ -15,7 +15,7 @@ import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializ
 import {MicrofrontendPopupIntentHandler} from './microfrontend-popup-intent-handler.interceptor';
 import {MicrofrontendPopupCapabilityValidator} from './microfrontend-popup-capability-validator.interceptor';
 import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchPopupService, ɵWorkbenchDialogService, ɵWorkbenchMessageBoxService, ɵWorkbenchPopupService} from '@scion/workbench-client';
-import {WorkbenchPopup} from '../../popup/workbench-popup';
+import {WorkbenchPopup} from '../../popup/workbench-popup.model';
 import {WORKBENCH_POPUP_CONTEXT} from '../../popup/workbench-popup-context.provider';
 
 /**

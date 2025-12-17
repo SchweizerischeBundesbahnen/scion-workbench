@@ -13,7 +13,7 @@ import {NEVER, Observable, timer} from 'rxjs';
 import {NgComponentOutlet} from '@angular/common';
 import {TextPipe} from '../text/text.pipe';
 import {IconComponent} from '../icon/icon.component';
-import {ɵWorkbenchNotification} from './ɵworkbench-notification';
+import {ɵWorkbenchNotification} from './ɵworkbench-notification.model';
 import {RemoveLegacyInputPipe} from './remove-legacy-input.pipe';
 
 /**

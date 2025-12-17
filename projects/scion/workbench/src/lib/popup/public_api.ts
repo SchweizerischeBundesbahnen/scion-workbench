@@ -12,7 +12,7 @@ export {WorkbenchPopupService} from './workbench-popup.service';
 export {PopupService} from './popup.service';
 export {PopupConfig} from './popup.config';
 export {type Point, type TopLeftPoint, type TopRightPoint, type BottomLeftPoint, type BottomRightPoint, type PopupOrigin} from './popup.origin';
-export {WorkbenchPopup, type WorkbenchPopupSize} from './workbench-popup';
+export {WorkbenchPopup, type WorkbenchPopupSize} from './workbench-popup.model';
 export {Popup} from './popup';
 export {type WorkbenchPopupOptions, type CloseStrategy} from './workbench-popup.options';
 export {WORKBENCH_POPUP_CONTEXT} from './workbench-popup-context.provider';

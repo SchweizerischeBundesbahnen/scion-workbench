@@ -17,8 +17,8 @@ import {Injectable, Signal, WritableSignal} from '@angular/core';
 import {ɵWorkbenchService} from './ɵworkbench.service';
 import {WorkbenchLayout} from './layout/workbench-layout';
 import {DialogId, PartId, PopupId, ViewId} from './workbench.identifiers';
-import {WorkbenchDialog} from './dialog/workbench-dialog';
-import {WorkbenchPopup} from './popup/workbench-popup';
+import {WorkbenchDialog} from './dialog/workbench-dialog.model';
+import {WorkbenchPopup} from './popup/workbench-popup.model';
 
 /**
  * The central class of the SCION Workbench.

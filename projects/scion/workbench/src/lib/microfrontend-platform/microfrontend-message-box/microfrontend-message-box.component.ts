@@ -17,7 +17,7 @@ import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
 import {setStyle} from '../../common/dom.util';
 import {Microfrontends} from '../common/microfrontend.util';
-import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog';
+import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog.model';
 
 /**
  * Displays the microfrontend of a given {@link WorkbenchMessageBoxCapability}.

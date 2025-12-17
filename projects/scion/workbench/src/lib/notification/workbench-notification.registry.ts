@@ -10,7 +10,7 @@
 
 import {computed, Injectable, Signal} from '@angular/core';
 import {WorkbenchElementRegistry} from '../registry/workbench-element-registry';
-import {ɵWorkbenchNotification} from './ɵworkbench-notification';
+import {ɵWorkbenchNotification} from './ɵworkbench-notification.model';
 import {NotificationId} from '../workbench.identifiers';
 
 /**

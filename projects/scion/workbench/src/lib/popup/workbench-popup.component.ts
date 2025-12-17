@@ -13,7 +13,7 @@ import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
 import {trackFocus} from '../focus/workbench-focus-tracker.service';
-import {ɵWorkbenchPopup} from './ɵworkbench-popup';
+import {ɵWorkbenchPopup} from './ɵworkbench-popup.model';
 import {NgComponentOutlet} from '@angular/common';
 
 /**

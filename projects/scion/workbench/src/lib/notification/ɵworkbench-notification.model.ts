@@ -2,7 +2,7 @@ import {DestroyableInjector, DestroyRef, DOCUMENT, effect, inject, Injector, NgZ
 import {ComponentType} from '@angular/cdk/portal';
 import {Arrays} from '@scion/toolkit/util';
 import {NotificationId} from '../workbench.identifiers';
-import {WorkbenchNotification} from './workbench-notification';
+import {WorkbenchNotification} from './workbench-notification.model';
 import {WorkbenchNotificationOptions} from './workbench-notification.options';
 import {Translatable} from '../text/workbench-text-provider.model';
 import {ɵNotification} from './ɵnotification';

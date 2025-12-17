@@ -30,7 +30,7 @@ import {WorkbenchMessageBoxService} from '../message-box/workbench-message-box.s
 import {WorkbenchDialogService} from '../dialog/workbench-dialog.service';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
 import {TestComponent} from '../testing/test.component';
-import {WorkbenchDialog} from '../dialog/workbench-dialog';
+import {WorkbenchDialog} from '../dialog/workbench-dialog.model';
 import {throwError} from '../common/throw-error.util';
 import {WorkbenchPartActionDirective} from '../part/part-action-bar/part-action.directive';
 import {ɵWorkbenchService} from '../ɵworkbench.service';

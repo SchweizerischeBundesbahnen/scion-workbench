@@ -16,7 +16,7 @@ import {CapabilityInterceptor, IntentInterceptor} from '@scion/microfrontend-pla
 import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
 import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchPopupService, ɵWorkbenchDialogService, ɵWorkbenchMessageBoxService, ɵWorkbenchPopupService} from '@scion/workbench-client';
 import {WORKBENCH_DIALOG_CONTEXT} from '../../dialog/workbench-dialog-context.provider';
-import {WorkbenchDialog} from '../../dialog/workbench-dialog';
+import {WorkbenchDialog} from '../../dialog/workbench-dialog.model';
 
 /**
  * Provides a set of DI providers enabling microfrontend dialog support.

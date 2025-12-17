@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {Component, inject} from '@angular/core';
-import {ɵWorkbenchDialog} from '../ɵworkbench-dialog';
+import {ɵWorkbenchDialog} from '../ɵworkbench-dialog.model';
 import {NgTemplateOutlet} from '@angular/common';
 import {NullIfEmptyPipe} from '../../common/null-if-empty.pipe';
 import {DialogActionFilterPipe} from './dialog-action-filter.pipe';

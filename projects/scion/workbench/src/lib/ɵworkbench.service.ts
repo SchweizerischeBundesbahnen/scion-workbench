@@ -29,8 +29,8 @@ import {WorkbenchViewMenuItemRegistry} from './view/workbench-view-menu-item.reg
 import {WorkbenchFocusMonitor} from './focus/workbench-focus-tracker.service';
 import {WorkbenchDialogRegistry} from './dialog/workbench-dialog.registry';
 import {WorkbenchPopupRegistry} from './popup/workbench-popup.registry';
-import {ɵWorkbenchPopup} from './popup/ɵworkbench-popup';
-import {ɵWorkbenchDialog} from './dialog/ɵworkbench-dialog';
+import {ɵWorkbenchPopup} from './popup/ɵworkbench-popup.model';
+import {ɵWorkbenchDialog} from './dialog/ɵworkbench-dialog.model';
 
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchService implements WorkbenchService {

@@ -11,7 +11,7 @@
 import {Injectable} from '@angular/core';
 import {WorkbenchElementRegistry} from '../registry/workbench-element-registry';
 import {PopupId} from '../workbench.identifiers';
-import {ɵWorkbenchPopup} from './ɵworkbench-popup';
+import {ɵWorkbenchPopup} from './ɵworkbench-popup.model';
 
 /**
  * Registry for {@link WorkbenchPopup} elements.

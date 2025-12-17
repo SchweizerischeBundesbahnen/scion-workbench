@@ -10,7 +10,7 @@
 
 import {BehaviorSubject, concatWith, delay, firstValueFrom, of, Subject, switchMap} from 'rxjs';
 import {assertNotInReactiveContext, ComponentRef, computed, DestroyableInjector, DestroyRef, DOCUMENT, effect, inject, Injector, Signal, signal, untracked} from '@angular/core';
-import {WorkbenchDialog, WorkbenchDialogSize} from './workbench-dialog';
+import {WorkbenchDialog, WorkbenchDialogSize} from './workbench-dialog.model';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
 import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
 import {Overlay, OverlayRef} from '@angular/cdk/overlay';

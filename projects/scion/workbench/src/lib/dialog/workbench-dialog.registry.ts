@@ -9,7 +9,7 @@
  */
 
 import {assertNotInReactiveContext, computed, Injectable, Signal} from '@angular/core';
-import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
+import {ɵWorkbenchDialog} from './ɵworkbench-dialog.model';
 import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 import {WorkbenchElementRegistry} from '../registry/workbench-element-registry';
 

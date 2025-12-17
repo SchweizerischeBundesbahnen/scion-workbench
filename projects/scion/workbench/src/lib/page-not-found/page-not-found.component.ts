@@ -16,9 +16,9 @@ import {Routing} from '../routing/routing.util';
 import {Router} from '@angular/router';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
-import {WorkbenchDialog} from '../dialog/workbench-dialog';
+import {WorkbenchDialog} from '../dialog/workbench-dialog.model';
 import {isDialogOutlet, isPartOutlet, isPopupOutlet, isViewOutlet} from '../workbench.identifiers';
-import {WorkbenchPopup} from '../popup/workbench-popup';
+import {WorkbenchPopup} from '../popup/workbench-popup.model';
 
 @Component({
   selector: 'wb-page-not-found',
