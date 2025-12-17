@@ -15,14 +15,17 @@ import {catchError, firstValueFrom, throwError} from 'rxjs';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
 import {Defined, Maps} from '@scion/toolkit/util';
 import {WorkbenchDialogService} from './workbench-dialog-service';
-import {WORKBENCH_ELEMENT, WorkbenchElement} from '../workbench.model';
 import {ɵWorkbenchDialogCommand} from './workbench-dialog-command';
+import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 
 /**
  * @ignore
  * @docs-private Not public API. For internal use only.
  */
 export class ɵWorkbenchDialogService implements WorkbenchDialogService {
+
+  constructor(private _context?: ViewId | PartId | DialogId | PopupId | undefined) {
+  }
 
   /** @inheritDoc */
   public open<R>(qualifier: Qualifier, options?: WorkbenchDialogOptions): Promise<R | undefined> {
@@ -34,7 +37,7 @@ export class ɵWorkbenchDialogService implements WorkbenchDialogService {
       context: (() => {
         // TODO [Angular 22] Remove backward compatiblity.
         const context = options?.context && (typeof options.context === 'object' ? options.context.viewId : options.context);
-        return Defined.orElse(context, () => Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.id);
+        return Defined.orElse(context, this._context);
       })(),
     };
 
