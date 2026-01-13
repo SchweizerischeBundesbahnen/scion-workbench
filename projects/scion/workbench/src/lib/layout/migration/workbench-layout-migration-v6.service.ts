@@ -15,7 +15,6 @@ import {WorkbenchLayoutSerializer} from '../workbench-layout-serializer.service'
 import {MWorkbenchLayoutV6} from './model/workbench-layout-migration-v6.model';
 import {MActivity} from '../../activity/workbench-activity.model';
 import {ActivityId, PartId} from '../../workbench.identifiers';
-import {WorkbenchGridMigrationContext} from './workbench-grid-migration-context';
 
 /**
  * Migrates the workbench layout from version 5 to version 6.
@@ -38,8 +37,7 @@ export class WorkbenchLayoutMigrationV6 implements WorkbenchMigration {
   }
 
   private migrateLayout(layoutV5: MWorkbenchLayoutV5['referenceLayout'] | MWorkbenchLayoutV5['userLayout']): MWorkbenchLayoutV6['referenceLayout'] | MWorkbenchLayoutV6['userLayout'] {
-    const layoutSerializer = inject(WorkbenchLayoutSerializer);
-    const activityLayout = layoutSerializer.deserializeActivityLayout(layoutV5.activityLayout);
+    const activityLayout = inject(WorkbenchLayoutSerializer).deserializeActivityLayout(layoutV5.activityLayout);
     const activities = [
       ...activityLayout.toolbars.leftTop.activities,
       ...activityLayout.toolbars.leftBottom.activities,
@@ -49,30 +47,24 @@ export class WorkbenchLayoutMigrationV6 implements WorkbenchMigration {
       ...activityLayout.toolbars.bottomRight.activities,
     ];
     const activityGrids = new Map<ActivityId, string>();
-    const outlets = layoutSerializer.deserializeOutlets(layoutV5.outlets);
-    const migrationContext = new WorkbenchGridMigrationContext(outlets);
 
     // Move `referencePartId` property from `MActivity` to `MPartGrid`.
     activities.forEach((activity: (MActivity & {referencePartId?: PartId})) => {
       // Add `referencePartId` to `MPartGrid`.
-      activityGrids.set(activity.id, this.migrateGrid(layoutV5.grids[activity.id]!, activity.referencePartId!, migrationContext));
+      activityGrids.set(activity.id, this.migrateGrid(layoutV5.grids[activity.id]!, activity.referencePartId!));
       // Remove `referencePartId` from `MActivity`.
       delete activity.referencePartId;
     });
 
-    // Apply migrated outlets.
-    migrationContext.forEachDeletedOutlet(outlet => outlets.delete(outlet));
-    migrationContext.forEachChangedOutlet((outlet, urlSegments) => outlets.set(outlet, urlSegments));
-
     return {
-      activityLayout: layoutSerializer.serializeActivityLayout(activityLayout),
+      activityLayout: inject(WorkbenchLayoutSerializer).serializeActivityLayout(activityLayout),
       grids: {...layoutV5.grids, ...Object.fromEntries(activityGrids)},
-      outlets: layoutSerializer.serializeOutlets(Object.fromEntries(outlets)),
+      outlets: layoutV5.outlets,
     };
   }
 
-  private migrateGrid(serializedGrid: string, referencePartId: PartId, context: WorkbenchGridMigrationContext): string {
-    const grid = inject(WorkbenchLayoutSerializer).deserializeGrid(serializedGrid, context);
+  private migrateGrid(serializedGrid: string, referencePartId: PartId): string {
+    const grid = inject(WorkbenchLayoutSerializer).deserializeGrid(serializedGrid);
     grid.referencePartId = referencePartId;
     return inject(WorkbenchLayoutSerializer).serializeGrid(grid);
   }

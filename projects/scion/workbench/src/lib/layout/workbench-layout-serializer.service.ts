@@ -30,8 +30,6 @@ import {WorkbenchLayouts} from './workbench-layouts.util';
 import {WorkbenchLayoutMigrationV6} from './migration/workbench-layout-migration-v6.service';
 import {throwError} from '../common/throw-error.util';
 import {Objects} from '../common/objects.util';
-import {WorkbenchGridMigrationV8} from './migration/workbench-grid-migration-v8.service';
-import {WorkbenchGridMigrationContext} from './migration/workbench-grid-migration-context';
 
 /**
  * Represents the current version of the workbench layout.
@@ -49,7 +47,7 @@ const WORKBENCH_LAYOUT_VERSION = 6;
  *
  * @see WorkbenchMigrator
  */
-const WORKBENCH_GRID_VERSION = 8;
+const WORKBENCH_GRID_VERSION = 7;
 
 /**
  * Represents the current version of the workbench activity model.
@@ -79,13 +77,12 @@ export class WorkbenchLayoutSerializer {
   /**
    * Migrates a serialized {@link MPartGrid} to the latest version.
    */
-  private _workbenchGridMigrator = new WorkbenchMigrator<WorkbenchGridMigrationContext>()
+  private _workbenchGridMigrator = new WorkbenchMigrator()
     .registerMigration(2, inject(WorkbenchGridMigrationV3))
     .registerMigration(3, inject(WorkbenchGridMigrationV4))
     .registerMigration(4, inject(WorkbenchGridMigrationV5))
     .registerMigration(5, inject(WorkbenchGridMigrationV6))
-    .registerMigration(6, inject(WorkbenchGridMigrationV7))
-    .registerMigration(7, inject(WorkbenchGridMigrationV8));
+    .registerMigration(6, inject(WorkbenchGridMigrationV7));
 
   /**
    * Migrates a serialized {@link MActivityLayout} to the latest version.
@@ -152,9 +149,9 @@ export class WorkbenchLayoutSerializer {
   /**
    * Deserializes the given base64-serialized grid, applying necessary migrations if the serialized grid is outdated.
    */
-  public deserializeGrid(serialized: string, migrationContext: WorkbenchGridMigrationContext): MPartGrid {
+  public deserializeGrid(serialized: string): MPartGrid {
     const {json, version} = parseVersion(window.atob(serialized));
-    const migratedJsonGrid = this._workbenchGridMigrator.migrate(json, {from: version, to: WORKBENCH_GRID_VERSION}, migrationContext);
+    const migratedJsonGrid = this._workbenchGridMigrator.migrate(json, {from: version, to: WORKBENCH_GRID_VERSION});
 
     // Parse the JSON.
     const grid = JSON.parse(migratedJsonGrid, (key: string, value: unknown) => {

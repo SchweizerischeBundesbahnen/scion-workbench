@@ -13,14 +13,14 @@ import {WorkbenchMigration} from './workbench-migration';
 /**
  * Migrates serialized workbench data to the latest version.
  */
-export class WorkbenchMigrator<CONTEXT = void> {
+export class WorkbenchMigrator {
 
-  private _migrators = new Map<number, WorkbenchMigration<CONTEXT>>();
+  private _migrators = new Map<number, WorkbenchMigration>();
 
   /**
    * Registers a migration from a specific version to the next version.
    */
-  public registerMigration(fromVersion: number, migration: WorkbenchMigration<CONTEXT>): this {
+  public registerMigration(fromVersion: number, migration: WorkbenchMigration): this {
     this._migrators.set(fromVersion, migration);
     return this;
   }
@@ -28,13 +28,13 @@ export class WorkbenchMigrator<CONTEXT = void> {
   /**
    * Migrates serialized workbench data to the latest version.
    */
-  public migrate(json: string, version: {from: number; to: number}, context: CONTEXT): string {
+  public migrate(json: string, version: {from: number; to: number}): string {
     for (let v = version.from; v < version.to; v++) {
       const migrator = this._migrators.get(v);
       if (!migrator) {
         throw Error(`[NullMigrationError] Cannot perform workbench data migration. No migration registered for version ${v}.`);
       }
-      json = migrator.migrate(json, context);
+      json = migrator.migrate(json);
     }
     return json;
   }

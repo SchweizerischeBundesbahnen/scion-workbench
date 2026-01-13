@@ -26,7 +26,6 @@ import {RequireOne} from '../common/utility-types';
 import {readCssVariable} from '../common/dom.util';
 import {ActivationInstantProvider} from '../activation-instant.provider';
 import {prune} from '../common/prune.util';
-import {WorkbenchGridMigrationContext} from './migration/workbench-grid-migration-context';
 
 /**
  * @inheritDoc
@@ -1546,15 +1545,11 @@ function deserializeLayout(config?: WorkbenchLayoutConstructConfig): {activityLa
   const activityLayout = deserializeActivityLayout(config?.activityLayout) ?? createDefaultActivityLayout();
 
   // Deserialize and migrate grids.
-  const migrationContext = new WorkbenchGridMigrationContext(outlets);
   const grids = {
-    main: deserializeGrid(config?.grids?.main, migrationContext) ?? createDefaultMainGrid(),
-    mainArea: deserializeGrid(config?.grids?.mainArea, migrationContext) ?? createDefaultMainAreaGrid(),
-    ...WorkbenchLayouts.pickActivityGrids(config?.grids, grid => deserializeGrid(grid, migrationContext)),
+    main: deserializeGrid(config?.grids?.main) ?? createDefaultMainGrid(),
+    mainArea: deserializeGrid(config?.grids?.mainArea) ?? createDefaultMainAreaGrid(),
+    ...WorkbenchLayouts.pickActivityGrids(config?.grids, grid => deserializeGrid(grid)),
   };
-  // Apply migrated outlets.
-  migrationContext.forEachChangedOutlet((outlet, urlSegments) => outlets.set(outlet, urlSegments));
-  migrationContext.forEachDeletedOutlet(outlet => outlets.delete(outlet));
 
   return {activityLayout, grids, outlets};
 }
@@ -1586,7 +1581,7 @@ function deserializeActivityLayout(layout: string | MActivityLayout | undefined)
  *
  * @return Deserialized grid, or `undefined` if no grid is passed or deserialization fails.
  */
-function deserializeGrid(grid: string | MPartGrid | undefined, migrationContext: WorkbenchGridMigrationContext): MPartGrid | undefined {
+function deserializeGrid(grid: string | MPartGrid | undefined): MPartGrid | undefined {
   if (!grid) {
     return undefined;
   }
@@ -1595,7 +1590,7 @@ function deserializeGrid(grid: string | MPartGrid | undefined, migrationContext:
   }
 
   try {
-    return inject(WorkbenchLayoutSerializer).deserializeGrid(grid, migrationContext);
+    return inject(WorkbenchLayoutSerializer).deserializeGrid(grid);
   }
   catch (error) {
     inject(Logger).error('[WorkbenchSerializeError] Failed to deserialize "MPartGrid". Please clear your browser storage and reload the application.', error);
