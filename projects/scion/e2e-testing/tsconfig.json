@@ -27,6 +27,9 @@
       ],
       "@scion/workbench-client": [
         "projects/scion/workbench-client/src/public-api"
+      ],
+      "workbench-testing-app-common": [
+        "apps/workbench-testing-app-common/src/public-api.ts"
       ]
     }
   }
