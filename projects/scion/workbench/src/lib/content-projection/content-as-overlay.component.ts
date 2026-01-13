@@ -99,7 +99,7 @@ export class ContentAsOverlayComponent {
   private alignOverlayToHostBounds(): void {
     const hostBounds = boundingClientRect(inject(ElementRef<HTMLElement>));
 
-    // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+    // Use root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
     rootEffect(() => {
       const overlay = this._overlay();
       if (!overlay) {
