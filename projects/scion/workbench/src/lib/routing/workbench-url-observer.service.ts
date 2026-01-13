@@ -179,23 +179,9 @@ export class WorkbenchUrlObserver {
       this._logger.debug(() => `Registered auxiliary routes for parts: ${addedPartOutlets}`, LoggerNames.ROUTING, auxiliaryRoutes);
     }
 
-    // Register popup auxiliary routes.
-    const addedPopupOutlets = navigationContext.outletDiff.addedPopupOutlets;
-    if (addedPopupOutlets.length) {
-      const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedPopupOutlets, {notFoundRoute: true});
-      this._logger.debug(() => `Registered auxiliary routes for popups: ${addedPopupOutlets}`, LoggerNames.ROUTING, auxiliaryRoutes);
-    }
-
-    // Register dialog auxiliary routes.
-    const addedDialogOutlets = navigationContext.outletDiff.addedDialogOutlets;
-    if (addedDialogOutlets.length) {
-      const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedDialogOutlets, {notFoundRoute: true});
-      this._logger.debug(() => `Registered auxiliary routes for dialogs: ${addedDialogOutlets}`, LoggerNames.ROUTING, auxiliaryRoutes);
-    }
-
     // Revert registration if the navigation fails.
     navigationContext.registerUndoAction(() => {
-      const addedOutlets = [...addedViewOutlets, ...addedPartOutlets, ...addedPopupOutlets, ...addedDialogOutlets];
+      const addedOutlets = [...addedViewOutlets, ...addedPartOutlets];
       this._auxiliaryRouteInstaller.unregisterAuxiliaryRoutes(addedOutlets);
     });
   }
@@ -208,8 +194,6 @@ export class WorkbenchUrlObserver {
     const removedOutlets: string[] = [
       ...navigationContext.outletDiff.removedViewOutlets,
       ...navigationContext.outletDiff.removedPartOutlets,
-      ...navigationContext.outletDiff.removedPopupOutlets,
-      ...navigationContext.outletDiff.removedDialogOutlets,
     ];
     if (removedOutlets.length) {
       this._logger.debug(() => 'Unregistering outlet auxiliary routes: ', LoggerNames.ROUTING, removedOutlets);

@@ -10,10 +10,11 @@
 
 import {ActivatedRoute, ActivatedRouteSnapshot, ActivationEnd, ActivationStart, ChildrenOutletContexts, Event, NavigationStart, OutletContext, PRIMARY_OUTLET, Router, RouterEvent, UrlSegment, UrlSegmentGroup, UrlTree} from '@angular/router';
 import {Commands} from '../routing/routing.model';
-import {inject} from '@angular/core';
+import {inject, Injector} from '@angular/core';
 import {EMPTY, iif, MonoTypeOperatorFunction, Observable, of, OperatorFunction, pairwise, race, switchMap} from 'rxjs';
 import {filter, map, startWith, take} from 'rxjs/operators';
-import {DialogOutlet, isDialogOutlet, isPartOutlet, isPopupOutlet, isViewOutlet, PartOutlet, PopupOutlet, ViewOutlet, WorkbenchOutlet} from '../workbench.identifiers';
+import {isPartOutlet, isViewOutlet, PartOutlet, ViewOutlet, WorkbenchOutlet} from '../workbench.identifiers';
+import {ANGULAR_ROUTER_MUTEX} from '../executor/single-task-executor';
 
 /**
  * Provides utility functions for router operations.
@@ -107,7 +108,7 @@ export const Routing = {
   /**
    * Tests if given route has an empty path from root.
    */
-  hasEmptyPathFromRoot(route: ActivatedRoute): boolean {
+  hasEmptyPathFromRoot: (route: ActivatedRoute): boolean => {
     return route.snapshot.pathFromRoot.flatMap(route => route.url).filter(segment => segment.path.length).length === 0;
   },
 
@@ -130,7 +131,7 @@ export const Routing = {
    * @param options - Controls when to emit the observable.
    * @return An observable emitting a tuple of the previous and current route snapshots.
    */
-  activatedRoute$(outlet: string, options: {emitOn: 'routeChange' | 'routeOrParamChange' | 'always'}): Observable<[ActivatedRouteSnapshot | null, ActivatedRouteSnapshot]> {
+  activatedRoute$: (outlet: string, options: {emitOn: 'routeChange' | 'routeOrParamChange' | 'always'}): Observable<[ActivatedRouteSnapshot | null, ActivatedRouteSnapshot]> => {
     const router = inject(Router);
     const childrenOutletContexts = inject(ChildrenOutletContexts);
 
@@ -205,26 +206,26 @@ export const Routing = {
       return filter(event => event.snapshot.pathFromRoot[1]?.outlet === outlet);
     }
   },
+  /**
+   * Performs a "fake" navigation for Angular to evaluate `CanMatch` route guards, required if guards depend on external conditions
+   * like the completed startup of the SCION Microfrontend Platform or capability registration at runtime.
+   */
+  runCanMatchGuards: async (options?: {injector?: Injector}): Promise<void> => {
+    const injector = options?.injector ?? inject(Injector);
+    await injector.get(ANGULAR_ROUTER_MUTEX).submit(() => injector.get(Router).navigate([{outlets: {}}], {skipLocationChange: true, queryParamsHandling: 'preserve', preserveFragment: true}));
+  },
 } as const;
 
 function parseOutlets(url: UrlTree, selector: {view: true}): Map<ViewOutlet, UrlSegment[]>;
 function parseOutlets(url: UrlTree, selector: {part: true}): Map<PartOutlet, UrlSegment[]>;
-function parseOutlets(url: UrlTree, selector: {dialog: true}): Map<DialogOutlet, UrlSegment[]>;
-function parseOutlets(url: UrlTree, selector: {popup: true}): Map<PopupOutlet, UrlSegment[]>;
-function parseOutlets(url: UrlTree, selector: {view?: true; part?: true; dialog?: true; popup?: true}): Map<WorkbenchOutlet, UrlSegment[]>;
-function parseOutlets(url: UrlTree, selector: {view?: true; part?: true; dialog?: true; popup?: true}): Map<WorkbenchOutlet, UrlSegment[]> {
+function parseOutlets(url: UrlTree, selector: {view?: true; part?: true}): Map<WorkbenchOutlet, UrlSegment[]>;
+function parseOutlets(url: UrlTree, selector: {view?: true; part?: true}): Map<WorkbenchOutlet, UrlSegment[]> {
   const outlets = new Map<WorkbenchOutlet, UrlSegment[]>();
   Object.entries(url.root.children).forEach(([outlet, segmentGroup]) => {
     if (selector.view && isViewOutlet(outlet)) {
       outlets.set(outlet, segmentGroup.segments);
     }
     if (selector.part && isPartOutlet(outlet)) {
-      outlets.set(outlet, segmentGroup.segments);
-    }
-    if (selector.dialog && isDialogOutlet(outlet)) {
-      outlets.set(outlet, segmentGroup.segments);
-    }
-    if (selector.popup && isPopupOutlet(outlet)) {
       outlets.set(outlet, segmentGroup.segments);
     }
   });

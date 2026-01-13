@@ -49,17 +49,17 @@ import {filter} from 'rxjs/operators';
 })
 export class WorkbenchComponent {
 
-  private _workbenchLauncher = inject(WorkbenchLauncher);
-  private _logger = inject(Logger);
+  private readonly _workbenchLauncher = inject(WorkbenchLauncher);
+  private readonly _logger = inject(Logger);
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
 
-  private _iframeOverlayHost = viewChild('iframe_overlay_host', {read: ViewContainerRef});
-  private _viewDropZoneOverlayHost = viewChild('view_drop_zone_overlay_host', {read: ViewContainerRef});
+  private readonly _iframeOverlayHost = viewChild('iframe_overlay_host', {read: ViewContainerRef});
+  private readonly _viewDropZoneOverlayHost = viewChild('view_drop_zone_overlay_host', {read: ViewContainerRef});
 
   /** Splash to display during workbench startup. */
-  protected splash = inject(WorkbenchConfig).splashComponent ?? SplashComponent;
-  protected workbenchStartup = inject(WorkbenchStartup);
-  protected workbenchService = inject(ɵWorkbenchService);
+  protected readonly splash = inject(WorkbenchConfig).splashComponent ?? SplashComponent;
+  protected readonly workbenchStartup = inject(WorkbenchStartup);
+  protected readonly workbenchService = inject(ɵWorkbenchService);
 
   constructor() {
     this._logger.debug(() => 'Constructing WorkbenchComponent.', LoggerNames.LIFECYCLE);

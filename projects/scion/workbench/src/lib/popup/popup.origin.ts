@@ -15,7 +15,7 @@ export type PopupOrigin = (Point | TopLeftPoint | TopRightPoint | BottomLeftPoin
   width?: number;
   height?: number;
   /**
-   * Specifies if the coordinate is relative to the context (e.g., part or view) or page viewport. Defaults to context.
+   * Specifies if the coordinate is relative to the context (e.g., part or view) or page viewport. Defaults to `context`.
    *
    * If relative to the viewport and bound to a context, the popup is still constrained by the context's bounds.
    */

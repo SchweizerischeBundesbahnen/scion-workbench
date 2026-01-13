@@ -48,11 +48,11 @@ export class WorkbenchAuxiliaryRouteInstaller {
         outlet,
         providers: [{provide: WORKBENCH_OUTLET, useValue: outlet}],
         component: ɵEmptyOutletComponent,
-        children: [
+        children: new Array<Route>()
           // Add workbench-specific routes.
-          ...this._workbenchRoutes,
+          .concat(...this._workbenchRoutes)
           // Add application-specific routes.
-          ...this._router.config
+          .concat(this._router.config
             // Filter primary routes.
             .filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET)
             // Filter wildcard route as most likely not indended for workbench outlets. Otherwise, the "Not Found" and "Nothing to Show" pages would never be matched.
@@ -68,7 +68,10 @@ export class WorkbenchAuxiliaryRouteInstaller {
             // find a route for an empty-path outlet in an empty-path subtree. This prevents fallback to a top-level wildcard route, such as a "Not Found" or
             // "Nothing to Show" route.
             .map(route => ({...route, canMatch: [...route.canMatch ?? [], matchesIfNavigated]})),
-        ],
+          )
+          // Copy the route for each outlet to prevent unexpected routing behavior like infinite loops.
+          // TODO [Angular 22] Run test suite to check if still required
+          .map(route => ({...route})),
       }))
       // Add "Page Not Found" wildcard route.
       .map(route => addNotFoundWildcardRoute(route, {component: this._workbenchConfig.pageNotFoundComponent, canMatch: config.notFoundRoute}))

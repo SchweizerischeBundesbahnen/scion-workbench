@@ -11,13 +11,9 @@
 import {ChangeDetectionStrategy, Component, computed, inject, isDevMode} from '@angular/core';
 import {TextPipe} from '../text/text.pipe';
 import {WorkbenchService} from '../workbench.service';
-import {WORKBENCH_OUTLET} from '../routing/workbench-auxiliary-route-installer.service';
-import {Routing} from '../routing/routing.util';
-import {Router} from '@angular/router';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {WorkbenchDialog} from '../dialog/workbench-dialog.model';
-import {isDialogOutlet, isPartOutlet, isPopupOutlet, isViewOutlet} from '../workbench.identifiers';
 import {WorkbenchPopup} from '../popup/workbench-popup.model';
 
 @Component({
@@ -31,32 +27,12 @@ import {WorkbenchPopup} from '../popup/workbench-popup.model';
 })
 export default class PageNotFoundComponent {
 
-  private readonly _router = inject(Router);
-
   protected readonly isDevMode = isDevMode();
-  protected readonly isViewOutlet = isViewOutlet;
-  protected readonly isPartOutlet = isPartOutlet;
-  protected readonly isDialogOutlet = isDialogOutlet;
-  protected readonly isPopupOutlet = isPopupOutlet;
   protected readonly workbenchService = inject(WorkbenchService);
 
-  protected readonly outlet = inject(WORKBENCH_OUTLET);
   protected readonly view = inject(WorkbenchView, {optional: true});
   protected readonly part = inject(WorkbenchPart, {optional: true});
   protected readonly dialog = inject(WorkbenchDialog, {optional: true});
   protected readonly popup = inject(WorkbenchPopup, {optional: true});
-
-  protected readonly path = computed(() => {
-    // Track the URL.
-    this.workbenchService.layout();
-
-    const urlTree = this._router.parseUrl(this._router.url);
-    const outlets = Routing.parseOutlets(urlTree, {
-      view: isViewOutlet(this.outlet) || undefined,
-      part: isPartOutlet(this.outlet) || undefined,
-      dialog: isDialogOutlet(this.outlet) || undefined,
-      popup: isPopupOutlet(this.outlet) || undefined,
-    });
-    return outlets.get(this.outlet)?.map(segment => `${segment}`).join('/') ?? '';
-  });
+  protected readonly path = computed(() => (this.view ?? this.part)?.navigation()?.path.map(segment => `${segment}`).join('/') ?? '');
 }
