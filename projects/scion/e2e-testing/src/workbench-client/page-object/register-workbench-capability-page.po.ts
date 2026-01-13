@@ -9,14 +9,13 @@
  */
 
 import {coerceArray, rejectWhenAttached, toMatrixNotation, waitUntilAttached} from '../../helper/testing.util';
-import {AppPO} from '../../app.po';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
-import {DockingArea, RelativeTo, ViewId, ViewParamDefinition, WorkbenchDialogCapability as _WorkbenchDialogCapability, WorkbenchMessageBoxCapability as _WorkbenchMessageBoxCapability, WorkbenchPartCapability as _WorkbenchPartCapability, WorkbenchPartRef, WorkbenchPerspectiveCapability as _WorkbenchPerspectiveCapability, WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability} from '@scion/workbench-client';
-import {ActivatorCapability as _ActivatorCapability, Capability} from '@scion/microfrontend-platform';
+import {DockingArea, RelativeTo, ViewParamDefinition, WorkbenchDialogCapability as _WorkbenchDialogCapability, WorkbenchMessageBoxCapability as _WorkbenchMessageBoxCapability, WorkbenchNotificationCapability as _WorkbenchNotificationCapability, WorkbenchPartCapability as _WorkbenchPartCapability, WorkbenchPartRef, WorkbenchPerspectiveCapability as _WorkbenchPerspectiveCapability, WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability} from '@scion/workbench-client';
+import {ActivatorCapability as _ActivatorCapability, Capability, Qualifier} from '@scion/microfrontend-platform';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
-import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
+import {MicrofrontendViewPagePO, WorkbenchViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../view.po';
 
 /**
@@ -32,21 +31,20 @@ export type WorkbenchViewCapability = Omit<_WorkbenchViewCapability, 'type'> & {
 export type WorkbenchPopupCapability = Omit<_WorkbenchPopupCapability, 'type'> & {type: 'popup'; properties: {pinToDesktop?: boolean}};
 export type WorkbenchDialogCapability = Omit<_WorkbenchDialogCapability, 'type'> & {type: 'dialog'};
 export type WorkbenchMessageBoxCapability = Omit<_WorkbenchMessageBoxCapability, 'type'> & {type: 'messagebox'};
+export type WorkbenchNotificationCapability = Omit<_WorkbenchNotificationCapability, 'type' | 'qualifier'> & {type: 'notification'; qualifier: Qualifier};
 export type ActivatorCapability = Omit<_ActivatorCapability, 'type'> & {type: 'activator'};
 
 /**
  * Page object to interact with {@link RegisterWorkbenchCapabilityPageComponent}.
  */
-export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPagePO {
+export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPagePO, WorkbenchViewPagePO {
 
   public readonly locator: Locator;
   public readonly outlet: SciRouterOutletPO;
-  public readonly view: ViewPO;
 
-  constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.outlet = new SciRouterOutletPO(appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.locator = this.outlet.frameLocator.locator('app-register-workbench-capability-page');
+  constructor(public view: ViewPO, options?: {host?: boolean}) {
+    this.outlet = new SciRouterOutletPO(view.locator.page(), {name: view.locateBy?.id, cssClass: view.locateBy?.cssClass});
+    this.locator = (options?.host ? view.locator : this.outlet.frameLocator).locator('app-register-workbench-capability-page');
   }
 
   /**
@@ -56,7 +54,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
    *
    * Returns a Promise that resolves to the registered capability upon successful registration, or that rejects on registration error.
    */
-  public async registerCapability<T extends WorkbenchPerspectiveCapability | WorkbenchPartCapability | WorkbenchViewCapability | WorkbenchPopupCapability | WorkbenchDialogCapability | WorkbenchMessageBoxCapability>(capability: T): Promise<T & Capability> {
+  public async registerCapability<T extends WorkbenchPerspectiveCapability | WorkbenchPartCapability | WorkbenchViewCapability | WorkbenchPopupCapability | WorkbenchDialogCapability | WorkbenchMessageBoxCapability | WorkbenchNotificationCapability>(capability: T): Promise<T & Capability> {
     // Capability Type
     await this.locator.locator('select.e2e-type').selectOption(capability.type);
 
@@ -184,7 +182,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
   }
 
   private async enterPartCapabilityProperties(capability: WorkbenchPartCapability): Promise<void> {
-    await this.locator.locator('input.e2e-path').fill(capability.properties?.path ?? '');
+    await this.locator.locator('input.e2e-path').fill(capability.properties?.path === '' ? '<string></string>' : (capability.properties?.path ?? '<undefined>'));
     await this.locator.locator('input.e2e-title').fill(capability.properties?.title === false ? '<boolean>false</boolean>' : capability.properties?.title ?? '');
     await this.locator.locator('input.e2e-icon').fill(capability.properties?.extras?.icon ?? '');
     await this.locator.locator('input.e2e-label').fill(capability.properties?.extras?.label ?? '');
@@ -212,7 +210,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
   }
 
   private async enterViewCapabilityProperties(capability: WorkbenchViewCapability): Promise<void> {
-    await this.locator.locator('input.e2e-path').fill(capability.properties.path);
+    await this.locator.locator('input.e2e-path').fill(capability.properties.path === '' ? '<string></string>' : capability.properties.path);
 
     if (capability.properties.cssClass !== undefined) {
       await this.locator.locator('input.e2e-class').fill(coerceArray(capability.properties.cssClass).join(' '));
@@ -241,7 +239,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
   }
 
   private async enterPopupCapabilityProperties(capability: WorkbenchPopupCapability): Promise<void> {
-    await this.locator.locator('input.e2e-path').fill(capability.properties.path);
+    await this.locator.locator('input.e2e-path').fill(capability.properties.path === '' ? '<string></string>' : capability.properties.path);
 
     const size = capability.properties.size;
     if (size?.width) {
@@ -274,7 +272,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
   }
 
   private async enterDialogCapabilityProperties(capability: WorkbenchDialogCapability): Promise<void> {
-    await this.locator.locator('input.e2e-path').fill(capability.properties.path);
+    await this.locator.locator('input.e2e-path').fill(capability.properties.path === '' ? '<string></string>' : capability.properties.path);
 
     const size = capability.properties.size;
     if (size?.width) {
@@ -319,7 +317,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
   }
 
   private async enterMessageBoxCapabilityProperties(capability: WorkbenchMessageBoxCapability): Promise<void> {
-    await this.locator.locator('input.e2e-path').fill(capability.properties.path);
+    await this.locator.locator('input.e2e-path').fill(capability.properties.path === '' ? '<string></string>' : capability.properties.path);
 
     const size = capability.properties.size;
     if (size?.width) {

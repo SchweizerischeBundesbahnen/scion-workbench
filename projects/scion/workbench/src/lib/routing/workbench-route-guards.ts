@@ -12,7 +12,8 @@ import {CanMatchFn, Route, UrlSegment} from '@angular/router';
 import {inject} from '@angular/core';
 import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 import {WORKBENCH_OUTLET} from './workbench-auxiliary-route-installer.service';
-import {isDialogOutlet, isPartOutlet, isViewOutlet, isWorkbenchOutlet} from '../workbench.identifiers';
+import {isPartOutlet, isViewOutlet, isWorkbenchOutlet} from '../workbench.identifiers';
+import {isMicrofrontendHostOutlet} from '../microfrontend-platform/microfrontend-host/microfrontend-host-routes';
 
 /**
  * Configures a route to only match workbench views navigated with a specific hint.
@@ -22,12 +23,16 @@ import {isDialogOutlet, isPartOutlet, isViewOutlet, isWorkbenchOutlet} from '../
  *
  * Example for navigating a view to the 'SearchComponent':
  * ```ts
- * // Navigation
+ * import {WorkbenchRouter} from '@scion/workbench';
+ *
  * inject(WorkbenchRouter).navigate([], {hint: 'search'});
  * ```
  *
- * // Routes
+ * Routes:
  * ```ts
+ * import {Routes} from '@angular/router';
+ * import {canMatchWorkbenchView} from '@scion/workbench';
+ *
  * const routes: Routes = [
  *   {path: '', canMatch: [canMatchWorkbenchView('search')], component: SearchComponent},
  *   {path: '', canMatch: [canMatchWorkbenchView('outline')], component: OutlineComponent},
@@ -71,13 +76,18 @@ export function canMatchWorkbenchView(condition: string | boolean): CanMatchFn {
  *
  * Example for navigating a part to the 'SearchComponent':
  * ```ts
+ * import {WorkbenchRouter} from '@scion/workbench';
+ *
  * inject(WorkbenchRouter).navigate(layout => {
  *   return layout.navigatePart('search', [], {hint: 'search'});
  * });
  * ```
  *
- * // Routes
+ * Routes:
  * ```ts
+ * import {Routes} from '@angular/router';
+ * import {canMatchWorkbenchPart} from '@scion/workbench';
+ *
  * const routes: Routes = [
  *   {path: '', canMatch: [canMatchWorkbenchPart('search')], component: SearchComponent},
  *   {path: '', canMatch: [canMatchWorkbenchPart('outline')], component: OutlineComponent},
@@ -110,18 +120,6 @@ export function canMatchWorkbenchPart(condition: string | boolean): CanMatchFn {
         return part?.navigation?.hint === condition;
       }
     }
-  };
-}
-
-/**
- * Configures a route to only or never match workbench dialogs.
- *
- * @see canMatchWorkbenchOutlet
- */
-export function canMatchWorkbenchDialog(condition: boolean): CanMatchFn {
-  return (): boolean => {
-    const outlet = inject(WORKBENCH_OUTLET, {optional: true});
-    return isDialogOutlet(outlet) === condition;
   };
 }
 
@@ -206,6 +204,9 @@ export const matchesIfNavigated: CanMatchFn = (_route: Route, segments: UrlSegme
     const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
     const part = layout.part({partId: outlet}, {orElse: null});
     return !!part?.navigation;
+  }
+  if (isMicrofrontendHostOutlet(outlet)) {
+    return true; // navigated implicitly as empty-path route
   }
   return segments.length > 0;
 };

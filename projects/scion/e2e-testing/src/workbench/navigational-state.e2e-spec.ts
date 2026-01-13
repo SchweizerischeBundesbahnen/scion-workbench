@@ -28,7 +28,7 @@ test.describe('Navigational State', () => {
         cssClass: 'testee',
       });
 
-      const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      const viewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
       await expect.poll(() => viewPage.getNavigationState()).toEqual({});
     });
 
@@ -41,7 +41,7 @@ test.describe('Navigational State', () => {
         cssClass: 'testee',
       });
 
-      const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      const viewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
       await expect.poll(() => viewPage.getNavigationState()).toEqual({some: 'state'});
     });
 
@@ -54,7 +54,7 @@ test.describe('Navigational State', () => {
         .navigateView('testee', ['test-view'], {state: {some: 'state'}}),
       );
 
-      const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      const viewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
       await expect.poll(() => viewPage.getNavigationState()).toEqual({some: 'state'});
     });
 
@@ -75,7 +75,7 @@ test.describe('Navigational State', () => {
         cssClass: 'testee',
       });
 
-      const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      const viewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
       await expect.poll(() => viewPage.getNavigationState()).toEqual({
         state1: 'value',
         state2: '0 [number]',
@@ -96,7 +96,7 @@ test.describe('Navigational State', () => {
         cssClass: 'testee',
       });
 
-      const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      const viewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
       await expect.poll(() => viewPage.getNavigationState()).toEqual({state1: 'state 1'});
 
       // Navigate view again with a different state
@@ -107,7 +107,7 @@ test.describe('Navigational State', () => {
       });
 
       await expect.poll(() => viewPage.getNavigationState()).toEqual({state2: 'state 2'});
-      await expect.poll(() => viewPage.getParams()).toEqual({matrix: 'param'});
+      await expect.poll(() => viewPage.getRouteParams()).toEqual({matrix: 'param'});
 
       // Navigate view again without state
       await routerPage.view.tab.click();
@@ -116,7 +116,7 @@ test.describe('Navigational State', () => {
       });
 
       await expect.poll(() => viewPage.getNavigationState()).toEqual({});
-      await expect.poll(() => viewPage.getParams()).toEqual({});
+      await expect.poll(() => viewPage.getRouteParams()).toEqual({});
 
       // Navigate view again with a different state
       await routerPage.view.tab.click();
@@ -137,7 +137,7 @@ test.describe('Navigational State', () => {
         cssClass: 'testee',
       });
 
-      const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      const viewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
       await expect.poll(() => viewPage.getNavigationState()).toEqual({some: 'state'});
 
       // Close and open the application.
@@ -154,7 +154,7 @@ test.describe('Navigational State', () => {
         cssClass: 'testee',
       });
 
-      const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      const viewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
       await expect.poll(() => viewPage.getNavigationState()).toEqual({some: 'state'});
 
       await routerPage.view.tab.click();
@@ -178,8 +178,8 @@ test.describe('Navigational State', () => {
         .navigateView('view.1', ['test-router'])
         .navigateView('view.2', ['test-view']),
       );
-      const viewPage = new ViewPagePO(appPO, {viewId: 'view.2'});
-      const routerPage = new RouterPagePO(appPO, {viewId: 'view.1'});
+      const viewPage = new ViewPagePO(appPO.view({viewId: 'view.2'}));
+      const routerPage = new RouterPagePO(appPO.view({viewId: 'view.1'}));
       await routerPage.navigate(['test-view'], {
         target: 'view.2',
         state: {'state': 'a'},
@@ -232,7 +232,7 @@ test.describe('Navigational State', () => {
       );
 
       // Open test view
-      const routerPage = new RouterPagePO(appPO, {cssClass: 'workbench-router'});
+      const routerPage = new RouterPagePO(appPO.view({cssClass: 'workbench-router'}));
       await routerPage.navigate(['test-view'], {
         target: 'blank',
         partId: 'part.right',
@@ -241,11 +241,11 @@ test.describe('Navigational State', () => {
       });
 
       // Expect view state to be passed to the view.
-      const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      const viewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
       await expect.poll(() => viewPage.getNavigationState()).toEqual({some: 'state'});
 
       // Navigate through the Angular router
-      const angularRouterPage = new AngularRouterTestPagePO(appPO, {cssClass: 'angular-router'});
+      const angularRouterPage = new AngularRouterTestPagePO(appPO.view({cssClass: 'angular-router'}));
       await angularRouterPage.view.tab.click();
       await angularRouterPage.navigate(['test-view'], {outlet: await angularRouterPage.view.getViewId()});
 
@@ -263,7 +263,7 @@ test.describe('Navigational State', () => {
         target: 'view.100',
       });
 
-      const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+      const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
       await expect.poll(() => viewPage.getNavigationState()).toEqual({state1: 'state 1'});
       await expect(appPO.views()).toHaveCount(2);
 
@@ -302,7 +302,7 @@ test.describe('Navigational State', () => {
         .navigatePart('part.testee', ['test-part']),
       );
 
-      const partPage = new PartPagePO(appPO, {partId: 'part.testee'});
+      const partPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
       await expect.poll(() => partPage.getNavigationState()).toEqual({});
     });
 
@@ -315,7 +315,7 @@ test.describe('Navigational State', () => {
         .navigatePart('part.testee', ['test-part'], {state: {some: 'state'}}),
       );
 
-      const partPage = new PartPagePO(appPO, {partId: 'part.testee'});
+      const partPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
       await expect.poll(() => partPage.getNavigationState()).toEqual({some: 'state'});
     });
 
@@ -328,7 +328,7 @@ test.describe('Navigational State', () => {
         .navigatePart('part.testee', ['test-part'], {state: {state1: 'state 1'}}),
       );
 
-      const partPage = new PartPagePO(appPO, {partId: 'part.testee'});
+      const partPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
       await expect.poll(() => partPage.getNavigationState()).toEqual({state1: 'state 1'});
 
       // Navigate part again with different state.
@@ -362,7 +362,7 @@ test.describe('Navigational State', () => {
         .navigatePart('part.testee', ['test-part'], {state: {some: 'state'}}),
       );
 
-      const partPage = new PartPagePO(appPO, {partId: 'part.testee'});
+      const partPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
       await expect.poll(() => partPage.getNavigationState()).toEqual({some: 'state'});
 
       // Close and open the application.
@@ -380,7 +380,7 @@ test.describe('Navigational State', () => {
         .navigatePart('part.1', ['test-part'], {state: {some: 'state'}}),
       );
 
-      const part1Page = new PartPagePO(appPO, {partId: 'part.1'});
+      const part1Page = new PartPagePO(appPO.part({partId: 'part.1'}));
       await expect.poll(() => part1Page.getNavigationState()).toEqual({some: 'state'});
 
       // Navigate another part.

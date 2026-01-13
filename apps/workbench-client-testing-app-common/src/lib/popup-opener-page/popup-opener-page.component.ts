@@ -10,7 +10,7 @@
 
 import {Component, ElementRef, inject, viewChild} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {CloseStrategy, DialogId, PartId, PopupId, PopupOrigin, ViewId, WorkbenchPopupService} from '@scion/workbench-client';
+import {CloseStrategy, DialogId, PartId, PopupId, PopupOrigin, ViewId, WORKBENCH_ELEMENT, WorkbenchElement, WorkbenchPopupService} from '@scion/workbench-client';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import {PopupPositionLabelPipe, Position} from './popup-position-label.pipe';
@@ -19,8 +19,8 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {UUID} from '@scion/toolkit/uuid';
-import {MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
 import {MultiValueInputComponent, parseTypedString, stringifyError, undefinedIfEmpty} from 'workbench-testing-app-common';
+import {Beans} from '@scion/toolkit/bean-manager';
 
 @Component({
   selector: 'app-popup-opener-page',
@@ -80,7 +80,7 @@ export class PopupOpenerPageComponent {
   protected readonly nullList = `autocomplete-null-${UUID.randomUUID()}`;
 
   constructor() {
-    MicrofrontendPlatformClient.signalReady();
+    Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.signalReady();
     this._popupOrigin$ = this.observePopupOrigin$();
   }
 

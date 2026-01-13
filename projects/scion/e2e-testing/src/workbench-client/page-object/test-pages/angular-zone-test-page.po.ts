@@ -9,19 +9,15 @@
  */
 
 import {Locator} from '@playwright/test';
-import {AppPO} from '../../../app.po';
 import {SciAccordionPO} from '../../../@scion/components.internal/accordion.po';
 import {SciCheckboxPO} from '../../../@scion/components.internal/checkbox.po';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../../view.po';
-import {ViewId} from '@scion/workbench-client';
-import {RequireOne} from '../../../helper/utility-types';
 
 export class AngularZoneTestPagePO implements MicrofrontendViewPagePO {
 
   public readonly locator: Locator;
-  public readonly view: ViewPO;
   public readonly outlet: SciRouterOutletPO;
 
   public readonly workbenchView: {
@@ -37,9 +33,8 @@ export class AngularZoneTestPagePO implements MicrofrontendViewPagePO {
     focusedPanel: PanelPO;
   };
 
-  constructor(appPO: AppPO, locateBy: RequireOne<{viewId: ViewId; cssClass: string}>) {
-    this.outlet = new SciRouterOutletPO(appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
+  constructor(public view: ViewPO) {
+    this.outlet = new SciRouterOutletPO(view.locator.page(), {name: view.locateBy?.id, cssClass: view.locateBy?.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-angular-zone-test-page');
 
     this.workbenchView = {

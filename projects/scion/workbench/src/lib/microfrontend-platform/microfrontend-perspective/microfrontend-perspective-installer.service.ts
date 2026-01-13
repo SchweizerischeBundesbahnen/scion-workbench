@@ -113,8 +113,8 @@ export class MicrofrontendPerspectiveInstaller {
     });
 
     // Navigate the initial part.
-    if (partCapability.properties?.path) {
-      layout = this.navigatePart(partRef, partCapability, layout);
+    if (partCapability.properties?.path !== undefined) { // support empty-path navigation
+      layout = this.navigatePart(partRef, partCapability, perspectiveCapability, layout);
     }
 
     // Add views to the initial part.
@@ -195,8 +195,8 @@ export class MicrofrontendPerspectiveInstaller {
     }
 
     // Navigate the part.
-    if (partCapability.properties?.path) {
-      layout = this.navigatePart(partRef, partCapability, layout);
+    if (partCapability.properties?.path !== undefined) { // support empty-path navigation
+      layout = this.navigatePart(partRef, partCapability, perspectiveCapability, layout);
     }
 
     // Add views to the part.
@@ -210,12 +210,13 @@ export class MicrofrontendPerspectiveInstaller {
   /**
    * Navigates specified part.
    */
-  private navigatePart(partRef: Omit<WorkbenchPartRef, 'position'> | WorkbenchPartRef, partCapability: WorkbenchPartCapability, layout: WorkbenchLayout): WorkbenchLayout {
+  private navigatePart(partRef: Omit<WorkbenchPartRef, 'position'> | WorkbenchPartRef, partCapability: WorkbenchPartCapability, perspectiveCapability: WorkbenchPerspectiveCapability, layout: WorkbenchLayout): WorkbenchLayout {
     return layout.navigatePart(partRef.id, [], {
       hint: MICROFRONTEND_PART_NAVIGATION_HINT,
       data: {
         capabilityId: partCapability.metadata!.id,
-        params: partRef.params ?? {},
+        params: partRef.params!,
+        referrer: perspectiveCapability.metadata!.appSymbolicName,
       } satisfies MicrofrontendPartNavigationData,
     });
   }
@@ -247,6 +248,7 @@ export class MicrofrontendPerspectiveInstaller {
         data: {
           capabilityId: viewCapability.metadata!.id,
           params,
+          referrer: partCapability.metadata!.appSymbolicName,
         } satisfies MicrofrontendViewNavigationData,
         cssClass: viewCapability.properties.cssClass,
       });

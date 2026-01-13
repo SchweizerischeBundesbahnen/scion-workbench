@@ -12,17 +12,18 @@ import {AppPO} from '../../../app.po';
 import {Locator} from '@playwright/test';
 import {WorkbenchViewPagePO} from '../workbench-view-page.po';
 import {ViewPO} from '../../../view.po';
-import {Commands, ViewId} from '@scion/workbench';
+import {Commands} from '@scion/workbench';
 import {commandsToPath, rejectWhenAttached} from '../../../helper/testing.util';
 
 export class AngularRouterTestPagePO implements WorkbenchViewPagePO {
 
   public readonly locator: Locator;
-  public readonly view: ViewPO;
 
-  constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.locator = this.view.locator.locator('app-angular-router-test-page');
+  private readonly _appPO: AppPO;
+
+  constructor(public view: ViewPO) {
+    this.locator = view.locator.locator('app-angular-router-test-page');
+    this._appPO = new AppPO(this.locator.page());
   }
 
   public async navigate(commands: Commands, extras: {outlet: string}): Promise<void> {

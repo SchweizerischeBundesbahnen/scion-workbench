@@ -8,17 +8,23 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Locator} from '@playwright/test';
-import {DomRect, fromRect, getCssClasses} from './helper/testing.util';
+import {Locator, Page} from '@playwright/test';
+import {coerceArray, selectBy, DomRect, fromRect, getCssClasses} from './helper/testing.util';
+import {RequireOne} from './helper/utility-types';
+import {NotificationId} from '../../workbench/src/lib/workbench.identifiers';
 
 /**
  * Handle for interacting with a workbench notification.
  */
 export class NotificationPO {
 
-  public title: Locator;
+  public readonly locator: Locator;
+  public readonly locateBy?: {id?: NotificationId; cssClass?: string[]};
+  public readonly title: Locator;
 
-  constructor(public readonly locator: Locator) {
+  constructor(page: Page, locateBy: RequireOne<{notificationId: NotificationId; cssClass: string | string[]}>, options?: {nth?: number}) {
+    this.locateBy = {id: locateBy.notificationId, cssClass: coerceArray(locateBy.cssClass)};
+    this.locator = page.locator(selectBy('wb-notification', {attributes: {'data-notificationid': locateBy.notificationId}, cssClass: locateBy.cssClass})).nth(options?.nth ?? 0);
     this.title = this.locator.locator('header.e2e-title');
   }
 

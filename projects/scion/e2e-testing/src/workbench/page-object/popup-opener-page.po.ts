@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, rejectWhenAttached} from '../../helper/testing.util';
+import {coerceArray, rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {BottomLeftPoint, BottomRightPoint, CloseStrategy, PopupOrigin, TopLeftPoint, TopRightPoint, WorkbenchPopupOptions} from '@scion/workbench';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
@@ -33,11 +33,14 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO, WorkbenchDialogPa
   public readonly returnValue: Locator;
   public readonly error: Locator;
 
+  private readonly _appPO: AppPO;
+
   constructor(private _locateBy: ViewPO | PartPO | PopupPO | DialogPO) {
     this.locator = this._locateBy.locator.locator('app-popup-opener-page');
     this.openButton = this.locator.locator('button.e2e-open');
     this.returnValue = this.locator.locator('output.e2e-return-value');
     this.error = this.locator.locator('output.e2e-popup-error');
+    this._appPO = new AppPO(this.locator.page());
   }
 
   public async open(component: 'popup-page' | 'focus-test-page' | 'input-field-test-page' | 'blank-test-page' | 'size-test-page' | 'popup-opener-page' | 'dialog-opener-page', options: PopupOpenerPageOptions & Omit<WorkbenchPopupOptions, 'anchor' | 'size'>): Promise<void> {
@@ -95,15 +98,14 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO, WorkbenchDialogPa
     }
 
     // Open popup.
+    const popupCount = await this._appPO.popups.count();
     await this.openButton.click();
 
-    if (options.waitUntilAttached ?? true) {
-      // Evaluate the response: resolve the promise on success, or reject it on error.
-      await Promise.race([
-        this.waitUntilPopupAttached(),
-        rejectWhenAttached(this.error),
-      ]);
-    }
+    // Evaluate the response: resolve the promise on success, or reject it on error.
+    await Promise.race([
+      waitUntilAttached(this._appPO.popups.nth(popupCount)),
+      rejectWhenAttached(this.error),
+    ]);
   }
 
   public async enterPosition(position: PopupOrigin): Promise<void> {
@@ -183,12 +185,6 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO, WorkbenchDialogPa
     await accordion.collapse();
   }
 
-  private async waitUntilPopupAttached(): Promise<void> {
-    const cssClass = (await this.locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
-    const popup = new AppPO(this.locator.page()).popup({cssClass});
-    await popup.locator.waitFor({state: 'attached'});
-  }
-
   public async click(options?: {timeout?: number}): Promise<void> {
     await this.locator.click(options);
   }
@@ -225,10 +221,6 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO, WorkbenchDialogPa
  * Controls opening of a popup.
  */
 export interface PopupOpenerPageOptions {
-  /**
-   * Controls if to wait for the popup to display.
-   */
-  waitUntilAttached?: boolean;
   /**
    * @see WorkbenchPopupOptions.anchor
    */

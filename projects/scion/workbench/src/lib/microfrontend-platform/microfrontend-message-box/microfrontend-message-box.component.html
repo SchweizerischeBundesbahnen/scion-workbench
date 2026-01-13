@@ -2,6 +2,7 @@
                    [name]="dialog.id"
                    [attr.data-capabilityid]="capability().metadata!.id"
                    [attr.data-app]="capability().metadata!.appSymbolicName"
+                   [attr.data-focus]="focusWithin() ? '' : null"
                    keystrokes="keydown.escape"
                    [class]="dialog.cssClass()"
                    (focuswithin)="onFocusWithin($event)">

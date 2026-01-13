@@ -17,6 +17,7 @@ import {ViewPagePO} from './page-object/view-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
 import {ViewInfo} from './page-object/view-info-dialog.po';
 import {throwError} from '../helper/testing.util';
+import {canMatchWorkbenchView} from './page-object/layout-page/register-route-page.po';
 
 test.describe('Workbench Layout Migration', () => {
 
@@ -65,6 +66,25 @@ test.describe('Workbench Layout Migration', () => {
         'scion.workbench.perspective': 'e2e-perspective-with-main-area',
         'scion.workbench.perspectives.e2e-perspective-with-main-area': 'eyJpbml0aWFsV29ya2JlbmNoR3JpZCI6ImV5SnliMjkwSWpwN0luUjVjR1VpT2lKTlVHRnlkQ0lzSW5acFpYZHpJanBiWFN3aWFXUWlPaUp0WVdsdUxXRnlaV0VpTENKemRISjFZM1IxY21Gc0lqcDBjblZsZlN3aVlXTjBhWFpsVUdGeWRFbGtJam9pYldGcGJpMWhjbVZoSW4wdkx6ST0iLCJ3b3JrYmVuY2hHcmlkIjoiZXlKeWIyOTBJanA3SW5SNWNHVWlPaUpOVkhKbFpVNXZaR1VpTENKamFHbHNaREVpT25zaWRIbHdaU0k2SWsxVWNtVmxUbTlrWlNJc0ltTm9hV3hrTVNJNmV5SjBlWEJsSWpvaVRWQmhjblFpTENKMmFXVjNjeUk2VzNzaWFXUWlPaUoyYVdWM0xqTWlmVjBzSW1sa0lqb2lNek5pTWpKbU5qQXRZbVl6TkMwME56QTBMVGc0TldRdE4yUmxNR1EzTURjME16Qm1JaXdpYzNSeWRXTjBkWEpoYkNJNlptRnNjMlVzSW1GamRHbDJaVlpwWlhkSlpDSTZJblpwWlhjdU15SjlMQ0pqYUdsc1pESWlPbnNpZEhsd1pTSTZJazFRWVhKMElpd2lkbWxsZDNNaU9sdGRMQ0pwWkNJNkltMWhhVzR0WVhKbFlTSXNJbk4wY25WamRIVnlZV3dpT25SeWRXVjlMQ0prYVhKbFkzUnBiMjRpT2lKeWIzY2lMQ0p5WVhScGJ5STZNQzR5ZlN3aVkyaHBiR1F5SWpwN0luUjVjR1VpT2lKTlVHRnlkQ0lzSW5acFpYZHpJanBiZXlKcFpDSTZJblJsYzNRdGNtOTFkR1Z5SW4xZExDSnBaQ0k2SWpsaVl6UmpNRGxtTFRZM1lUY3ROR00yT1MxaE1qaGlMVFV6TWpjNE1XRXhZems0WmlJc0luTjBjblZqZEhWeVlXd2lPbVpoYkhObExDSmhZM1JwZG1WV2FXVjNTV1FpT2lKMFpYTjBMWEp2ZFhSbGNpSjlMQ0prYVhKbFkzUnBiMjRpT2lKeWIzY2lMQ0p5WVhScGJ5STZNQzQ0ZlN3aVlXTjBhWFpsVUdGeWRFbGtJam9pTXpOaU1qSm1OakF0WW1Zek5DMDBOekEwTFRnNE5XUXROMlJsTUdRM01EYzBNekJtSW4wdkx6ST0iLCJ2aWV3T3V0bGV0cyI6eyJ2aWV3LjMiOlsidGVzdC12aWV3Il19fQ==',
       },
+      routes: [
+        {
+          path: 'test-view',
+          component: 'view-page',
+          data: {path: 'test-view', navigationHint: ''},
+        },
+        {
+          path: '',
+          component: 'view-page',
+          canMatch: [canMatchWorkbenchView('test-view')],
+          data: {path: '', navigationHint: 'test-view'},
+        },
+        {
+          path: '',
+          component: 'router-page',
+          canMatch: [canMatchWorkbenchView('test-router')],
+          data: {path: '', navigationHint: 'test-router'},
+        },
+      ],
     });
 
     const _33b22f60Part = await appPO.workbench.part({alternativeId: '33b22f60-bf34-4704-885d-7de0d707430f'});
@@ -127,7 +147,7 @@ test.describe('Workbench Layout Migration', () => {
       },
     });
 
-    const viewPage1 = new ViewPagePO(appPO, {viewId: 'view.1'});
+    const viewPage1 = new ViewPagePO(appPO.view({viewId: 'view.1'}));
     await viewPage1.view.tab.click();
     await expectView(viewPage1).toBeActive();
     await expect.poll(() => viewPage1.view.getInfo()).toMatchObject(
@@ -137,7 +157,7 @@ test.describe('Workbench Layout Migration', () => {
       } satisfies Partial<ViewInfo>,
     );
 
-    const viewPage2 = new ViewPagePO(appPO, {viewId: 'view.2'});
+    const viewPage2 = new ViewPagePO(appPO.view({viewId: 'view.2'}));
     await viewPage2.view.tab.click();
     await expectView(viewPage2).toBeActive();
     await expect.poll(() => viewPage2.view.getInfo()).toMatchObject(
@@ -147,7 +167,7 @@ test.describe('Workbench Layout Migration', () => {
       } satisfies Partial<ViewInfo>,
     );
 
-    const viewPage3 = new ViewPagePO(appPO, {viewId: view3.id});
+    const viewPage3 = new ViewPagePO(appPO.view({viewId: view3.id}));
     await viewPage3.view.tab.click();
     await expectView(viewPage3).toBeActive();
     await expect.poll(() => viewPage3.view.getInfo()).toMatchObject(
@@ -157,7 +177,7 @@ test.describe('Workbench Layout Migration', () => {
       } satisfies Partial<ViewInfo>,
     );
 
-    const viewPage4 = new ViewPagePO(appPO, {viewId: testView.id});
+    const viewPage4 = new ViewPagePO(appPO.view({viewId: testView.id}));
     await viewPage4.view.tab.click();
     await expectView(viewPage4).toBeActive();
     await expect.poll(() => viewPage4.view.getInfo()).toMatchObject(
@@ -167,7 +187,7 @@ test.describe('Workbench Layout Migration', () => {
       } satisfies Partial<ViewInfo>,
     );
 
-    const viewPage5 = new RouterPagePO(appPO, {viewId: testRouterView.id});
+    const viewPage5 = new RouterPagePO(appPO.view({viewId: testRouterView.id}));
     await viewPage5.view.tab.click();
     await expectView(viewPage5).toBeActive();
     await expect.poll(() => viewPage5.view.getInfo()).toMatchObject(
@@ -205,6 +225,19 @@ test.describe('Workbench Layout Migration', () => {
         'scion.workbench.perspective': 'e2e-perspective-with-main-area',
         'scion.workbench.perspectives.e2e-perspective-with-main-area': 'eyJyZWZlcmVuY2VMYXlvdXQiOnsid29ya2JlbmNoR3JpZCI6ImV5SnliMjkwSWpwN0luUjVjR1VpT2lKTlVHRnlkQ0lzSW1sa0lqb2liV0ZwYmkxaGNtVmhJaXdpYzNSeWRXTjBkWEpoYkNJNmRISjFaU3dpZG1sbGQzTWlPbHRkZlN3aVlXTjBhWFpsVUdGeWRFbGtJam9pYldGcGJpMWhjbVZoSW4wdkx6UT0iLCJ2aWV3T3V0bGV0cyI6Int9In0sInVzZXJMYXlvdXQiOnsid29ya2JlbmNoR3JpZCI6ImV5SnliMjkwSWpwN0luUjVjR1VpT2lKTlZISmxaVTV2WkdVaUxDSmphR2xzWkRFaU9uc2lkSGx3WlNJNklrMVFZWEowSWl3aWFXUWlPaUpzWldaMElpd2ljM1J5ZFdOMGRYSmhiQ0k2ZEhKMVpTd2lkbWxsZDNNaU9sdDdJbWxrSWpvaWRtbGxkeTR5SWl3aWJtRjJhV2RoZEdsdmJpSTZlMzE5TEhzaWFXUWlPaUoyYVdWM0xqTWlMQ0p1WVhacFoyRjBhVzl1SWpwN0ltaHBiblFpT2lKMFpYTjBMWFpwWlhjaWZYMWRMQ0poWTNScGRtVldhV1YzU1dRaU9pSjJhV1YzTGpJaWZTd2lZMmhwYkdReUlqcDdJblI1Y0dVaU9pSk5WSEpsWlU1dlpHVWlMQ0pqYUdsc1pERWlPbnNpZEhsd1pTSTZJazFRWVhKMElpd2lhV1FpT2lKdFlXbHVMV0Z5WldFaUxDSnpkSEoxWTNSMWNtRnNJanAwY25WbExDSjJhV1YzY3lJNlcxMTlMQ0pqYUdsc1pESWlPbnNpZEhsd1pTSTZJazFRWVhKMElpd2lhV1FpT2lKeWFXZG9kQ0lzSW5OMGNuVmpkSFZ5WVd3aU9uUnlkV1VzSW5acFpYZHpJanBiZXlKcFpDSTZJblpwWlhjdU5DSXNJbTVoZG1sbllYUnBiMjRpT250OWZWMHNJbUZqZEdsMlpWWnBaWGRKWkNJNkluWnBaWGN1TkNKOUxDSmthWEpsWTNScGIyNGlPaUp5YjNjaUxDSnlZWFJwYnlJNk1DNDNOWDBzSW1ScGNtVmpkR2x2YmlJNkluSnZkeUlzSW5KaGRHbHZJam93TGpJMWZTd2lZV04wYVhabFVHRnlkRWxrSWpvaWJHVm1kQ0o5THk4MCIsInZpZXdPdXRsZXRzIjoie1widmlldy4yXCI6W3tcInBhdGhcIjpcInRlc3Qtdmlld1wiLFwicGFyYW1ldGVyc1wiOnt9fV0sXCJ2aWV3LjNcIjpbXSxcInZpZXcuNFwiOlt7XCJwYXRoXCI6XCJ0ZXN0LXZpZXdcIixcInBhcmFtZXRlcnNcIjp7fX1dfSJ9fS8vMg==',
       },
+      routes: [
+        {
+          path: 'test-view',
+          component: 'view-page',
+          data: {path: 'test-view', navigationHint: ''},
+        },
+        {
+          path: '',
+          component: 'view-page',
+          canMatch: [canMatchWorkbenchView('test-view')],
+          data: {path: '', navigationHint: 'test-view'},
+        },
+      ],
     });
 
     const leftPart = await appPO.workbench.part({alternativeId: 'left'});
@@ -268,7 +301,7 @@ test.describe('Workbench Layout Migration', () => {
       },
     });
 
-    const viewPage1 = new ViewPagePO(appPO, {viewId: 'view.1'});
+    const viewPage1 = new ViewPagePO(appPO.view({viewId: 'view.1'}));
     await viewPage1.view.tab.click();
     await expectView(viewPage1).toBeActive();
     await expect.poll(() => viewPage1.view.getInfo()).toMatchObject(
@@ -278,7 +311,7 @@ test.describe('Workbench Layout Migration', () => {
       } satisfies Partial<ViewInfo>,
     );
 
-    const viewPage2 = new ViewPagePO(appPO, {viewId: view2.id});
+    const viewPage2 = new ViewPagePO(appPO.view({viewId: view2.id}));
     await viewPage2.view.tab.click();
     await expectView(viewPage2).toBeActive();
     await expect.poll(() => viewPage2.view.getInfo()).toMatchObject(
@@ -288,7 +321,7 @@ test.describe('Workbench Layout Migration', () => {
       } satisfies Partial<ViewInfo>,
     );
 
-    const viewPage3 = new ViewPagePO(appPO, {viewId: view3.id});
+    const viewPage3 = new ViewPagePO(appPO.view({viewId: view3.id}));
     await viewPage3.view.tab.click();
     await expectView(viewPage3).toBeActive();
     await expect.poll(() => viewPage3.view.getInfo()).toMatchObject(
@@ -298,7 +331,7 @@ test.describe('Workbench Layout Migration', () => {
       } satisfies Partial<ViewInfo>,
     );
 
-    const viewPage4 = new ViewPagePO(appPO, {viewId: view4.id});
+    const viewPage4 = new ViewPagePO(appPO.view({viewId: view4.id}));
     await viewPage4.view.tab.click();
     await expectView(viewPage4).toBeActive();
     await expect.poll(() => viewPage4.view.getInfo()).toMatchObject(
@@ -308,7 +341,7 @@ test.describe('Workbench Layout Migration', () => {
       } satisfies Partial<ViewInfo>,
     );
 
-    const viewPage5 = new ViewPagePO(appPO, {viewId: 'view.5'});
+    const viewPage5 = new ViewPagePO(appPO.view({viewId: 'view.5'}));
     await viewPage5.view.tab.click();
     await expectView(viewPage5).toBeActive();
     await expect.poll(() => viewPage5.view.getInfo()).toMatchObject(

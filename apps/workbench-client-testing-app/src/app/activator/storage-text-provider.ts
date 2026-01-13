@@ -30,7 +30,7 @@ export function provideTextFromStorage(): void {
     const translatable = Object.entries(params).reduce((translatable, [name, value]) => `${translatable};${name}=${value}`, `%${key}`);
     console.debug(`[TextProvider][${appSymbolicName}] Requesting text: ${translatable}`);
     if (params['options.complete']) {
-      return sessionStorage.observe$<string | undefined>(`textprovider.texts.${key}`, {emitIfAbsent: false})
+      return sessionStorage.observe$<string | undefined>(`textprovider.texts.${key}`)
         .pipe(
           substituteParams(params),
           take(1),
@@ -71,14 +71,14 @@ export function provideValueFromStorage(): void {
   inject(MessageClient).onMessage(`textprovider/${appSymbolicName}/values/:id`, request => {
     const id = request.params!.get('id');
     console.debug(`[TextProvider][${appSymbolicName}] Requesting value: ${id}`);
-    return sessionStorage.observe$(`textprovider.values.${id}`);
+    return sessionStorage.observe$<string | undefined>(`textprovider.values.${id}`);
   });
 
   // Register message listener that replies with values from session storage, completing requests after responding.
   inject(MessageClient).onMessage(`textprovider/${appSymbolicName}/values/:id/complete`, request => {
     const id = request.params!.get('id');
     console.debug(`[TextProvider][${appSymbolicName}] Requesting value: ${id}`);
-    return sessionStorage.observe$(`textprovider.values.${id}`, {emitIfAbsent: false}).pipe(take(1));
+    return sessionStorage.observe$<string | undefined>(`textprovider.values.${id}`).pipe(take(1));
   });
 }
 

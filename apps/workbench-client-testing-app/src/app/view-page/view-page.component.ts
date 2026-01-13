@@ -18,7 +18,7 @@ import {finalize, startWith, take} from 'rxjs/operators';
 import {APP_INSTANCE_ID} from '../app-instance-id';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {AsyncPipe, JsonPipe, Location} from '@angular/common';
-import {AppendParamDataTypePipe, NullIfEmptyPipe, parseTypedObject} from 'workbench-testing-app-common';
+import {AppendDataTypePipe, NullIfEmptyPipe, parseTypedObject} from 'workbench-testing-app-common';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {SciKeyValueComponent} from '@scion/components.internal/key-value';
@@ -34,7 +34,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
     AsyncPipe,
     JsonPipe,
     ReactiveFormsModule,
-    AppendParamDataTypePipe,
+    AppendDataTypePipe,
     NullIfEmptyPipe,
     SciFormFieldComponent,
     SciAccordionComponent,

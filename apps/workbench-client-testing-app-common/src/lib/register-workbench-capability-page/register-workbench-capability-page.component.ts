@@ -12,7 +12,7 @@ import {Component, inject} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {Capability, ManifestService, ParamDefinition} from '@scion/microfrontend-platform';
-import {WorkbenchCapabilities, WorkbenchView} from '@scion/workbench-client';
+import {WORKBENCH_ELEMENT, WorkbenchCapabilities, WorkbenchElement} from '@scion/workbench-client';
 import {firstValueFrom} from 'rxjs';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {JsonPipe} from '@angular/common';
@@ -26,6 +26,7 @@ import {PopupCapabilityPropertiesComponent, WorkbenchPopupCapabilityProperties} 
 import {MessageBoxCapabilityPropertiesComponent, WorkbenchMessageBoxCapabilityProperties} from './message-box-capability-properties/message-box-capability-properties.component';
 import {CapabilityParamsComponent} from './capability-params/capability-params.component';
 import {stringifyError} from 'workbench-testing-app-common';
+import {Beans} from '@scion/toolkit/bean-manager';
 
 /**
  * Allows registering workbench capabilities.
@@ -74,7 +75,7 @@ export class RegisterWorkbenchCapabilityPageComponent {
   protected registerError: string | undefined;
 
   constructor() {
-    inject(WorkbenchView).signalReady();
+    Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.signalReady();
   }
 
   public async onRegister(): Promise<void> {
@@ -97,6 +98,8 @@ export class RegisterWorkbenchCapabilityPageComponent {
             return this.form.controls.dialogProperties.value;
           case WorkbenchCapabilities.MessageBox:
             return this.form.controls.messageBoxProperties.value;
+          case WorkbenchCapabilities.Notification:
+            return {};
           default:
             throw Error('Capability expected to be a workbench capability, but was not.');
         }

@@ -12,13 +12,14 @@ import {test} from '../fixtures';
 import {expect} from '@playwright/test';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {PopupPagePO} from './page-object/popup-page.po';
+import {WorkbenchPopupCapability} from './page-object/register-workbench-capability-page.po';
 
 test.describe('Workbench Popup Capability', () => {
 
   test(`should provide the popup's capability`, async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    await microfrontendNavigator.registerCapability('app1', {
+    await microfrontendNavigator.registerCapability<WorkbenchPopupCapability>('app1', {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
@@ -49,7 +50,7 @@ test.describe('Workbench Popup Capability', () => {
   test('should error if not having a qualifier', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const registeredCapability = microfrontendNavigator.registerCapability('app1', {
+    const registeredCapability = microfrontendNavigator.registerCapability<WorkbenchPopupCapability>('app1', {
       type: 'popup',
       qualifier: {},
       properties: {
@@ -62,39 +63,119 @@ test.describe('Workbench Popup Capability', () => {
   test('should error if path is `undefined`', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const registeredCapability = microfrontendNavigator.registerCapability('app1', {
+    const registeredCapability = microfrontendNavigator.registerCapability<WorkbenchPopupCapability>('app1', {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
         path: '<undefined>',
       },
     });
-    await expect(registeredCapability).rejects.toThrow(/\[PopupDefinitionError] Popup capability requires the 'path' property/);
+    await expect(registeredCapability).rejects.toThrow(/\[PopupDefinitionError] Popup capabilities require a path/);
   });
 
   test('should error if path is `null`', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const registeredCapability = microfrontendNavigator.registerCapability('app1', {
+    const registeredCapability = microfrontendNavigator.registerCapability<WorkbenchPopupCapability>('app1', {
       type: 'popup',
       qualifier: {component: 'testee-1'},
       properties: {
         path: '<null>',
       },
     });
-    await expect(registeredCapability).rejects.toThrow(/\[PopupDefinitionError] Popup capability requires the 'path' property/);
+    await expect(registeredCapability).rejects.toThrow(/\[PopupDefinitionError] Popup capabilities require a path/);
   });
 
   test('should not error if path is empty', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const registeredCapability = await microfrontendNavigator.registerCapability('app1', {
+    const registeredCapability = await microfrontendNavigator.registerCapability<WorkbenchPopupCapability>('app1', {
       type: 'popup',
       qualifier: {component: 'testee-1'},
       properties: {
-        path: '<string></string>',
+        path: '',
       },
     });
     expect(registeredCapability.properties.path).toEqual('');
+  });
+
+  test('should require empty path if host popup capability', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    await test.step('non-empty path', async () => {
+      const registeredCapability = microfrontendNavigator.registerCapability<WorkbenchPopupCapability>('host', {
+        type: 'popup',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'path/to/popup',
+        },
+      });
+
+      await expect(registeredCapability).rejects.toThrow(/\[PopupDefinitionError] Popup capabilities of the host application require an empty path/);
+    });
+
+    await test.step('null path', async () => {
+      const registeredCapability = microfrontendNavigator.registerCapability<WorkbenchPopupCapability>('host', {
+        type: 'popup',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: '<null>',
+        },
+      });
+
+      await expect(registeredCapability).rejects.toThrow(/\[PopupDefinitionError] Popup capabilities of the host application require an empty path/);
+    });
+
+    await test.step('undefined path', async () => {
+      const registeredCapability = microfrontendNavigator.registerCapability<WorkbenchPopupCapability>('host', {
+        type: 'popup',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: '<undefined>',
+        },
+      });
+
+      await expect(registeredCapability).rejects.toThrow(/\[PopupDefinitionError] Popup capabilities of the host application require an empty path/);
+    });
+
+    await test.step('empty path', async () => {
+      const registeredCapability = await microfrontendNavigator.registerCapability<WorkbenchPopupCapability>('host', {
+        type: 'popup',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: '',
+        },
+      });
+      expect(registeredCapability.properties.path).toEqual('');
+    });
+  });
+
+  test('should error if host capability defines "showSplash" property (unsupported)', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    const registeredCapability = microfrontendNavigator.registerCapability<WorkbenchPopupCapability>('host', {
+      type: 'popup',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: '',
+        showSplash: true,
+      },
+    });
+    await expect(registeredCapability).rejects.toThrow(/\[PopupDefinitionError] Property "showSplash" not supported for popup capabilities of the host application/);
+  });
+
+  test('should not error if capability defines "showSplash" property', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    const registeredCapability = await microfrontendNavigator.registerCapability<WorkbenchPopupCapability>('app1', {
+      type: 'popup',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'path/to/popup',
+        showSplash: true,
+      },
+    });
+
+    expect(registeredCapability.properties.showSplash).toBe(true);
   });
 });

@@ -17,6 +17,8 @@ import {PartPagePO} from './page-object/part-page.po';
 import {MAIN_AREA} from '../workbench.model';
 import {RouterPagePO} from './page-object/router-page.po';
 import {LayoutPagePO} from './page-object/layout-page/layout-page.po';
+import {canMatchWorkbenchPart} from './page-object/layout-page/register-route-page.po';
+import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 
 test.describe('Workbench Part', () => {
 
@@ -24,7 +26,10 @@ test.describe('Workbench Part', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Open test view.
-    const testPage = await InputFieldTestPagePO.openInNewTab(appPO, workbenchNavigator);
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-pages/input-field-test-page'], {cssClass: 'testee'});
+
+    const testPage = new InputFieldTestPagePO(appPO.view({cssClass: 'testee'}));
 
     // Open view list menu.
     const viewListMenu = await testPage.view.part.bar.openViewListMenu();
@@ -45,7 +50,15 @@ test.describe('Workbench Part', () => {
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // Open test popup.
-    const testPage = await InputFieldTestPagePO.openInPopup(appPO, workbenchNavigator, {closeOnFocusLost: false});
+    const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+    await popupOpenerPage.open('input-field-test-page', {
+      anchor: 'element',
+      closeStrategy: {onFocusLost: false},
+      cssClass: 'testee',
+    });
+
+    const popup = appPO.popup({cssClass: 'testee'});
+    const testPage = new InputFieldTestPagePO(popup);
 
     // Open view list menu.
     const viewListMenu = await viewPage.view.part.bar.openViewListMenu();
@@ -147,6 +160,13 @@ test.describe('Workbench Part', () => {
   test('should navigate from path-based route to path-based route', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
+    // Register test routes.
+    await workbenchNavigator.registerRoute({
+      path: 'test-part',
+      component: 'part-page',
+      data: {path: 'test-part', navigationHint: ''},
+    });
+
     await workbenchNavigator.createPerspective(layout => layout
       .addPart(MAIN_AREA)
       .addPart('part.testee', {align: 'right'})
@@ -156,7 +176,7 @@ test.describe('Workbench Part', () => {
     // Navigate to path-based route.
     await workbenchNavigator.modifyLayout(layout => layout.navigatePart('part.testee', ['test-part', {some: 'param'}]));
 
-    const testeePartPage = new PartPagePO(appPO, {partId: 'part.testee'});
+    const testeePartPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
 
     // Expect part to display path-based route.
     await expectPart(testeePartPage.part).toDisplayComponent(PartPagePO.selector);
@@ -172,6 +192,14 @@ test.describe('Workbench Part', () => {
   test('should navigate from path-based route to empty-path route', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
+    // Register test routes.
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'part-page',
+      canMatch: [canMatchWorkbenchPart('test-part')],
+      data: {path: '', navigationHint: 'test-part'},
+    });
+
     await workbenchNavigator.createPerspective(layout => layout
       .addPart(MAIN_AREA)
       .addPart('part.testee', {align: 'right'})
@@ -181,20 +209,25 @@ test.describe('Workbench Part', () => {
     // Navigate to empty-path route.
     await workbenchNavigator.modifyLayout(layout => layout.navigatePart('part.testee', [], {hint: 'test-part'}));
 
-    const testeePartPage = new PartPagePO(appPO, {partId: 'part.testee'});
+    const testeePartPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
 
     // Expect part to display empty-path route.
     await expectPart(testeePartPage.part).toDisplayComponent(PartPagePO.selector);
     await expect.poll(() => testeePartPage.getRouteData()).toMatchObject(
-      {
-        path: '',
-        navigationHint: 'test-part',
-      },
+      {path: '', navigationHint: 'test-part'},
     );
   });
 
   test('should navigate from empty-path route to empty-path route', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
+
+    // Register test routes.
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'part-page',
+      canMatch: [canMatchWorkbenchPart('test-part')],
+      data: {path: '', navigationHint: 'test-part'},
+    });
 
     await workbenchNavigator.createPerspective(layout => layout
       .addPart(MAIN_AREA)
@@ -205,21 +238,32 @@ test.describe('Workbench Part', () => {
     // Navigate to empty-path route.
     await workbenchNavigator.modifyLayout(layout => layout.navigatePart('part.testee', [], {hint: 'test-part', data: {some: 'data'}}));
 
-    const testeePartPage = new PartPagePO(appPO, {partId: 'part.testee'});
+    const testeePartPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
 
     // Expect part to display empty-path route.
     await expectPart(testeePartPage.part).toDisplayComponent(PartPagePO.selector);
     await expect.poll(() => testeePartPage.getRouteData()).toMatchObject(
-      {
-        path: '',
-        navigationHint: 'test-part',
-      },
+      {path: '', navigationHint: 'test-part'},
     );
     await expect.poll(() => testeePartPage.getNavigationData()).toMatchObject({some: 'data'});
   });
 
   test('should navigate from empty-path route to path-based route', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
+
+    // Register test routes.
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'part-page',
+      canMatch: [canMatchWorkbenchPart('test-part')],
+      data: {path: '', navigationHint: 'test-part'},
+    });
+
+    await workbenchNavigator.registerRoute({
+      path: 'test-part',
+      component: 'part-page',
+      data: {path: 'test-part', navigationHint: ''},
+    });
 
     await workbenchNavigator.createPerspective(layout => layout
       .addPart(MAIN_AREA)
@@ -230,15 +274,12 @@ test.describe('Workbench Part', () => {
     // Navigate to path-based route.
     await workbenchNavigator.modifyLayout(layout => layout.navigatePart('part.testee', ['test-part']));
 
-    const testeePartPage = new PartPagePO(appPO, {partId: 'part.testee'});
+    const testeePartPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
 
     // Expect part to display path-based route.
     await expectPart(testeePartPage.part).toDisplayComponent(PartPagePO.selector);
     await expect.poll(() => testeePartPage.getRouteData()).toMatchObject(
-      {
-        path: 'test-part',
-        navigationHint: '',
-      },
+      {path: 'test-part', navigationHint: ''},
     );
   });
 
@@ -284,8 +325,8 @@ test.describe('Workbench Part', () => {
         .navigatePart('part.right', ['test-part']),
       );
 
-      const leftPartPage = new PartPagePO(appPO, {partId: 'part.left'});
-      const rightPartPage = new PartPagePO(appPO, {partId: 'part.right'});
+      const leftPartPage = new PartPagePO(appPO.part({partId: 'part.left'}));
+      const rightPartPage = new PartPagePO(appPO.part({partId: 'part.right'}));
 
       // Enter part title.
       await leftPartPage.enterTitle('testee-1');
@@ -446,7 +487,7 @@ test.describe('Workbench Part', () => {
     await layoutPage.modifyLayout(layout => layout.navigatePart('part.right', ['test-part']));
 
     const part = appPO.part({partId: 'part.right'});
-    const partPage = new PartPagePO(appPO, {partId: 'part.right'});
+    const partPage = new PartPagePO(appPO.part({partId: 'part.right'}));
 
     // Expect part to display.
     await expectPart(part).toDisplayComponent(PartPagePO.selector);
@@ -491,7 +532,7 @@ test.describe('Workbench Part', () => {
     await activityItem.click();
 
     const part = appPO.part({partId: 'part.activity'});
-    const partPage = new PartPagePO(appPO, {partId: 'part.activity'});
+    const partPage = new PartPagePO(appPO.part({partId: 'part.activity'}));
 
     // Expect part to display.
     await expectPart(part).toDisplayComponent(PartPagePO.selector);
@@ -532,10 +573,10 @@ test.describe('Workbench Part', () => {
     await activityItem.click();
 
     const topPart = appPO.part({partId: 'part.activity-top'});
-    const topPartPage = new PartPagePO(appPO, {partId: 'part.activity-top'});
+    const topPartPage = new PartPagePO(appPO.part({partId: 'part.activity-top'}));
 
     const bottomPart = appPO.part({partId: 'part.activity-bottom'});
-    const bottomPartPage = new PartPagePO(appPO, {partId: 'part.activity-bottom'});
+    const bottomPartPage = new PartPagePO(appPO.part({partId: 'part.activity-bottom'}));
 
     // Expect parts to display.
     await expectPart(topPart).toDisplayComponent(PartPagePO.selector);
@@ -577,8 +618,8 @@ test.describe('Workbench Part', () => {
       .navigatePart('part.activity-2', ['test-part']),
     );
 
-    const activityPage1 = new PartPagePO(appPO, {partId: 'part.activity-1'});
-    const activityPage2 = new PartPagePO(appPO, {partId: 'part.activity-2'});
+    const activityPage1 = new PartPagePO(appPO.part({partId: 'part.activity-1'}));
+    const activityPage2 = new PartPagePO(appPO.part({partId: 'part.activity-2'}));
 
     // Open activity 1.
     const activityItem1 = appPO.activityItem({cssClass: 'activity-1'});
@@ -634,7 +675,7 @@ test.describe('Workbench Part', () => {
     );
 
     const part = appPO.part({partId: 'part.right'});
-    const partPage = new PartPagePO(appPO, {partId: 'part.right'});
+    const partPage = new PartPagePO(appPO.part({partId: 'part.right'}));
 
     // Expect part to display.
     await expectPart(part).toDisplayComponent(PartPagePO.selector);
@@ -665,7 +706,7 @@ test.describe('Workbench Part', () => {
     );
 
     const part = appPO.part({partId: MAIN_AREA});
-    const partPage = new PartPagePO(appPO, {partId: MAIN_AREA});
+    const partPage = new PartPagePO(appPO.part({partId: MAIN_AREA}));
 
     // Expect main area part to display.
     await expectPart(part).toDisplayComponent(PartPagePO.selector);
@@ -696,7 +737,7 @@ test.describe('Workbench Part', () => {
     );
 
     const part = appPO.part({partId: MAIN_AREA});
-    const partPage = new PartPagePO(appPO, {partId: MAIN_AREA});
+    const partPage = new PartPagePO(appPO.part({partId: MAIN_AREA}));
 
     // Expect main area part to display.
     await expectPart(part).toDisplayComponent(PartPagePO.selector);
@@ -735,7 +776,7 @@ test.describe('Workbench Part', () => {
     );
 
     const part = appPO.part({partId: 'part.activity'});
-    const partPage = new PartPagePO(appPO, {partId: 'part.activity'});
+    const partPage = new PartPagePO(appPO.part({partId: 'part.activity'}));
 
     // Expect part to display.
     await expectPart(part).toDisplayComponent(PartPagePO.selector);

@@ -10,7 +10,6 @@
 
 import {Locator} from '@playwright/test';
 import {DialogPO} from './dialog.po';
-import {DomRect, fromRect} from './helper/testing.util';
 
 /**
  * PO for interacting with a workbench message box.
@@ -48,9 +47,5 @@ export class MessageBoxPO {
 
   public async clickActionButton(action: string): Promise<void> {
     await this.actions.locator(`:scope[data-action="${action}"]`).click();
-  }
-
-  public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.dialog.getDialogBoundingBox());
   }
 }

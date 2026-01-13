@@ -92,7 +92,7 @@ test.describe('Workbench Page Not Found', () => {
       );
 
       // Expect view to display.
-      const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+      const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
       await expectView(viewPage).toBeActive();
 
       // Clear outlets in the URL, simulate navigation from a browser bookmark.

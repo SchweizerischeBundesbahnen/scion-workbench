@@ -13,6 +13,7 @@ import {Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchMessageBoxCapability} from '@scion/workbench-client';
 import {TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY, TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY_PROPERTY} from '../microfrontend-host-message-box/text-message/text-message.component';
 import {Objects} from '../../common/objects.util';
+import {Microfrontends} from '../common/microfrontend.util';
 
 /**
  * Asserts message box capabilities to have required properties.
@@ -37,13 +38,30 @@ export class MicrofrontendMessageBoxCapabilityValidator implements CapabilityInt
       throw Error(`[MessageBoxDefinitionError] MessageBox capability requires properties [app=${app(messageBoxCapability)}, messagebox=${qualifier(messageBoxCapability)}]`);
     }
 
-    // Assert capability to have a path.
-    const path = messageBoxCapability.properties.path as unknown;
-    if (path === undefined || path === null) {
-      throw Error(`[MessageBoxDefinitionError] MessageBox capability requires the 'path' property [app=${app(messageBoxCapability)}, messagebox=${qualifier(messageBoxCapability)}]`);
+    // Assert the messagebox capability to have a path, unless provided by the host application.
+    this.assertPath(messageBoxCapability);
+
+    // Assert host dialog capabilities not to define the "showSplash" property.
+    if (Microfrontends.isHostProvider(capability) && messageBoxCapability.properties.showSplash !== undefined) {
+      throw Error(`[MessageBoxDefinitionError] Property "showSplash" not supported for messagebox capabilities of the host application [app=${app(messageBoxCapability)}, messagebox=${qualifier(messageBoxCapability)}]`);
     }
 
     return capability;
+  }
+
+  private assertPath(capability: Partial<WorkbenchMessageBoxCapability>): void {
+    const path = capability.properties?.path as string | undefined | null;
+
+    if (Microfrontends.isHostProvider(capability)) {
+      if (path !== '') {
+        throw Error(`[MessageBoxDefinitionError] Messagebox capabilities of the host application require an empty path. [app=${app(capability)}, messagebox=${qualifier(capability)}]. Change the path '${path}' to empty and add 'canMatchWorkbenchMessageBoxCapability(${JSON.stringify(capability.qualifier)})' guard to the route.\n\nExample:\nCapability: { type: 'messagebox', qualifier: ${JSON.stringify(capability.qualifier)}, properties: {path: ''} }\nRoute: { path: '', canMatch: [canMatchWorkbenchMessageBoxCapability(${JSON.stringify(capability.qualifier)})], component: MessageComponent }`);
+      }
+    }
+    else {
+      if (path === null || path == undefined) {
+        throw Error(`[MessageBoxDefinitionError] MessageBox capabilities require a path. [app=${app(capability)}, messagebox=${qualifier(capability)}]`);
+      }
+    }
   }
 }
 

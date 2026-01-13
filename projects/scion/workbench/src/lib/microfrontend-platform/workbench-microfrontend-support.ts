@@ -10,7 +10,7 @@
 
 import './microfrontend-platform.config'; // DO NOT remove to augment `MicrofrontendPlatformConfig` with `splash` property.
 import {EnvironmentProviders, makeEnvironmentProviders} from '@angular/core';
-import {provideMicrofrontendPlatform} from './initialization/microfrontend-platform-initializer.service';
+import {provideMicrofrontendPlatform} from './microfrontend-platform.provider';
 import {IntentClient, ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, PlatformPropertyService} from '@scion/microfrontend-platform';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter, WorkbenchTextService} from '@scion/workbench-client';
@@ -24,6 +24,8 @@ import {provideMicrofrontendDialog} from './microfrontend-dialog/microfrontend-d
 import {provideMicrofrontendMessageBox} from './microfrontend-message-box/microfrontend-message-box.provider';
 import {provideMicrofrontendText} from './microfrontend-text/microfrontend-text.provider';
 import {provideMicrofrontendPopup} from './microfrontend-popup/microfrontend-popup.provider';
+import {Routing} from '../routing/routing.util';
+import {provideWorkbenchInitializer, WorkbenchStartupPhase} from '../startup/workbench-initializer';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -46,6 +48,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     provideManifestObjectCache(),
     provideMicrofrontendPlatformBeans(),
     provideWorkbenchClientBeans(),
+    runCanMatchGuardsAfterStartup(),
   ]);
 }
 
@@ -75,4 +78,13 @@ function provideWorkbenchClientBeans(): EnvironmentProviders {
     {provide: WorkbenchNotificationService, useFactory: () => Beans.get(WorkbenchNotificationService)},
     {provide: WorkbenchTextService, useFactory: () => Beans.get(WorkbenchTextService)},
   ]);
+}
+
+/**
+ * Instructs Angular to evaluate `CanMatch` route guards, required for guards that depend on data not available during initial navigation,
+ * such as the completed startup of the SCION Microfrontend Platform to lookup capabilities. Otherwise, microfrontends would display a
+ * "Not Found" page until the next Angular navigation.
+ */
+function runCanMatchGuardsAfterStartup(): EnvironmentProviders {
+  return provideWorkbenchInitializer(() => Routing.runCanMatchGuards(), {phase: WorkbenchStartupPhase.PostStartup});
 }

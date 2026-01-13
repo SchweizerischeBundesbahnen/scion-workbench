@@ -10,7 +10,7 @@
 
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
-import {NotificationPagePO} from '../notification-page.po';
+import {NotificationPagePO} from './page-object/notification-page.po';
 import {TextNotificationPagePO} from '../text-notification-page.po';
 import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
 import {expectNotification} from '../matcher/notification-matcher';

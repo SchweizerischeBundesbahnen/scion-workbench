@@ -17,7 +17,7 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
  * A popup is a visual workbench element for displaying content above other content. The popup is positioned relative
  * to an anchor based on its preferred alignment.
  *
- * The microfrontend can inject the {@link WorkbenchPopup} handle to interact with the popup.
+ * The microfrontend can inject the `WorkbenchPopup` handle (and `ActivatedMicrofrontend` if a host microfrontend) to interact with the popup or access parameters.
  *
  * @category Popup
  */
@@ -54,12 +54,25 @@ export interface WorkbenchPopupCapability extends Capability {
      *   }
      * }
      * ```
+     *
+     * ### Empty Path Required if Host Capability
+     * Popup capabilities of the host application require an empty path. In the route, use `canMatchWorkbenchPopupCapability` guard to match the popup capability.
+     *
+     * @example - Route matching a popup capability with qualifier {popup: 'info'}
+     * ```ts
+     * import {Routes} from '@angular/router';
+     * import {canMatchWorkbenchMessageBoxCapability} from '@scion/workbench';
+     *
+     * const routes: Routes = [
+     *   {path: '', canMatch: [canMatchWorkbenchPopupCapability({popup: 'info'})], component: InfoComponent},
+     * ];
+     * ```
      */
     path: string;
     /**
      * Specifies the size of this popup.
      *
-     * If not set, the microfrontend must report the preferred size using {@link @scion/microfrontend-platform!PreferredSizeService}.
+     * If not set, the microfrontend can report the preferred size using {@link @scion/microfrontend-platform!PreferredSizeService}.
      *
      * @example - Reporting the size of a microfrontend
      * ```ts
@@ -77,6 +90,8 @@ export interface WorkbenchPopupCapability extends Capability {
      * Instructs the workbench to show a splash, such as a skeleton or loading indicator, until the popup microfrontend signals readiness.
      *
      * By default, the workbench shows a loading indicator. A custom splash can be configured in the workbench host application.
+     *
+     * This property is not supported if a host microfrontend.
      *
      * @see WorkbenchPopup.signalReady
      */

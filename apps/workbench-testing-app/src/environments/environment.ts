@@ -18,7 +18,7 @@
 // import 'zone.js/plugins/zone-error';  // Included with Angular CLI.
 
 import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
-import {workbenchManifest} from '../app/workbench.manifest';
+import {hostAppManifest} from '../app/host-app.manifest';
 
 /**
  * Environment used if starting the app locally.
@@ -26,7 +26,8 @@ import {workbenchManifest} from '../app/workbench.manifest';
 const microfrontendPlatformConfig: MicrofrontendPlatformConfig = {
   host: {
     symbolicName: 'workbench-host-app',
-    manifest: workbenchManifest,
+    manifest: hostAppManifest,
+    intentionRegisterApiDisabled: false,
   },
   applications: [
     {symbolicName: 'workbench-client-testing-app1', manifestUrl: 'http://localhost:4201/manifest-app1.json', intentionRegisterApiDisabled: false},
@@ -38,6 +39,7 @@ const microfrontendPlatformConfig: MicrofrontendPlatformConfig = {
 export const environment = {
   animationEnabled: false,
   logAngularChangeDetectionCycles: true,
+  showMicrofrontendApplicationLabels: true,
   initialPerspective: 'blank',
   microfrontendPlatformConfig,
 };

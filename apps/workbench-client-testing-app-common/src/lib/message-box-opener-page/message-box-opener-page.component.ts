@@ -10,14 +10,14 @@
 
 import {Component, computed, inject, signal, Signal} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {DialogId, PartId, PopupId, Translatable, ViewId, WorkbenchMessageBoxOptions, WorkbenchMessageBoxService} from '@scion/workbench-client';
+import {DialogId, PartId, PopupId, Translatable, ViewId, WORKBENCH_ELEMENT, WorkbenchElement, WorkbenchMessageBoxOptions, WorkbenchMessageBoxService} from '@scion/workbench-client';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {UUID} from '@scion/toolkit/uuid';
-import {MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
 import {MultiValueInputComponent, parseTypedString, prune, stringifyError} from 'workbench-testing-app-common';
+import {Beans} from '@scion/toolkit/bean-manager';
 
 @Component({
   selector: 'app-message-box-opener-page',
@@ -58,7 +58,7 @@ export class MessageBoxOpenerPageComponent {
   protected readonly nullList = `autocomplete-null-${UUID.randomUUID()}`;
 
   constructor() {
-    MicrofrontendPlatformClient.signalReady();
+    Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.signalReady();
     this.isEmptyQualifier = this.computeIfEmptyQualifier();
   }
 

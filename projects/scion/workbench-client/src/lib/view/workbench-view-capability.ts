@@ -17,7 +17,7 @@ import {Translatable} from '../text/workbench-text-provider.model';
  *
  * A view capability can be opened via {@link WorkbenchRouter} or added to a perspective in a {@link WorkbenchPartCapability}.
  *
- * The microfrontend can inject the {@link WorkbenchView} handle to interact with the view.
+ * The microfrontend can inject the `WorkbenchView` handle (and `ActivatedMicrofrontend` if a host microfrontend) to interact with the view or access parameters.
  *
  * @category View
  * @see WorkbenchView
@@ -62,14 +62,26 @@ export interface WorkbenchViewCapability extends Capability {
      *   }
      * }
      * ```
+     * ### Empty Path Required if Host Capability
+     * View capabilities of the host application require an empty path. In the route, use `canMatchWorkbenchViewCapability` guard to match the view capability.
+     *
+     * @example - Route matching a view capability with qualifier {view: 'search'}
+     * ```ts
+     * import {Routes} from '@angular/router';
+     * import {canMatchWorkbenchViewCapability} from '@scion/workbench';
+     *
+     * const routes: Routes = [
+     *   {path: '', canMatch: [canMatchWorkbenchViewCapability({view: 'search'})], component: SearchComponent},
+     * ];
+     * ```
      */
     path: string;
     /**
-     * Controls if to load the microfrontend only when activating the view tab.
+     * Controls if to load the microfrontend only when activating the view tab. Defaults to `true`.
      *
      * Requires configuration of {@link title} and {@link heading} in the manifest.
      *
-     * Defaults to `true`.
+     * This property is not supported if a host microfrontend.
      */
     lazy?: boolean;
     /**
@@ -180,6 +192,8 @@ export interface WorkbenchViewCapability extends Capability {
      * Instructs the workbench to show a splash, such as a skeleton or loading indicator, until the view microfrontend signals readiness.
      *
      * By default, the workbench shows a loading indicator. A custom splash can be configured in the workbench host application.
+     *
+     * This property is not supported if a host microfrontend.
      *
      * @see WorkbenchView.signalReady
      */
