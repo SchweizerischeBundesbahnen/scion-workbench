@@ -14,7 +14,7 @@ import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {provideRouter, RouterOutlet} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';
-import {styleFixture, waitUntilWorkbenchStarted, waitUntilStable} from '../testing/testing.util';
+import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {Component} from '@angular/core';
 import PageNotFoundComponent from '../page-not-found/page-not-found.component';
 import {WorkbenchComponent} from '../workbench.component';

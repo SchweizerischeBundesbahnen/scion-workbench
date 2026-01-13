@@ -13,12 +13,13 @@ import {Component} from '@angular/core';
 import {provideRouter} from '@angular/router';
 import {firstValueFrom, Subject} from 'rxjs';
 import {toShowCustomMatcher} from '../../testing/jasmine/matcher/to-show.matcher';
-import {styleFixture, waitUntilWorkbenchStarted, waitUntilStable} from '../../testing/testing.util';
+import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../../testing/testing.util';
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
 import {WorkbenchComponent} from '../../workbench.component';
 import {expect} from '../../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchCapabilities, WorkbenchMessageBoxCapability, WorkbenchMessageBoxService} from '@scion/workbench-client';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
+import {canMatchWorkbenchMessageBoxCapability} from '../microfrontend-host/microfrontend-host-routes';
 
 describe('Microfrontend Host Message Box', () => {
 
@@ -41,14 +42,14 @@ describe('Microfrontend Host Message Box', () => {
                     type: WorkbenchCapabilities.MessageBox,
                     qualifier: {component: 'message-box-1'},
                     properties: {
-                      path: 'path/to/messagebox/1',
+                      path: '',
                     },
                   } satisfies WorkbenchMessageBoxCapability,
                   {
                     type: WorkbenchCapabilities.MessageBox,
                     qualifier: {component: 'message-box-2'},
                     properties: {
-                      path: 'path/to/messagebox/2',
+                      path: '',
                     },
                   } satisfies WorkbenchMessageBoxCapability,
                 ],
@@ -58,8 +59,8 @@ describe('Microfrontend Host Message Box', () => {
           },
         }),
         provideRouter([
-          {path: 'path/to/messagebox/1', canActivate: [() => firstValueFrom(canActivateMessageBox1)], component: SpecMessageBox1Component},
-          {path: 'path/to/messagebox/2', component: SpecMessageBox2Component},
+          {path: '', canMatch: [canMatchWorkbenchMessageBoxCapability({component: 'message-box-1'})], canActivate: [() => firstValueFrom(canActivateMessageBox1)], component: SpecMessageBox1Component},
+          {path: '', canMatch: [canMatchWorkbenchMessageBoxCapability({component: 'message-box-2'})], component: SpecMessageBox2Component},
         ]),
       ],
     });
@@ -102,9 +103,9 @@ describe('Microfrontend Host Message Box', () => {
                 capabilities: [
                   {
                     type: WorkbenchCapabilities.MessageBox,
-                    qualifier: {component: 'message-box'},
+                    qualifier: {component: 'messagebox'},
                     properties: {
-                      path: 'path/to/message-box',
+                      path: '',
                     },
                   } satisfies WorkbenchMessageBoxCapability,
                 ],
@@ -114,7 +115,7 @@ describe('Microfrontend Host Message Box', () => {
           },
         }),
         provideRouter([
-          {path: 'path/to/message-box', canActivate: [() => firstValueFrom(canActivateMessageBox)], component: SpecMessageBox1Component},
+          {path: '', canMatch: [canMatchWorkbenchMessageBoxCapability({component: 'messagebox'})], canActivate: [() => firstValueFrom(canActivateMessageBox)], component: SpecMessageBox1Component},
           {path: 'path/to/view', component: SpecViewComponent},
         ]),
       ],
@@ -124,7 +125,7 @@ describe('Microfrontend Host Message Box', () => {
     await waitUntilWorkbenchStarted();
 
     // Start navigation in a host message-box.
-    void TestBed.inject(WorkbenchMessageBoxService).open({component: 'message-box'});
+    void TestBed.inject(WorkbenchMessageBoxService).open({component: 'messagebox'});
     await waitUntilStable();
 
     // Start parallel navigation in a view.
@@ -158,9 +159,9 @@ describe('Microfrontend Host Message Box', () => {
                 capabilities: [
                   {
                     type: WorkbenchCapabilities.MessageBox,
-                    qualifier: {component: 'message-box'},
+                    qualifier: {component: 'messagebox'},
                     properties: {
-                      path: 'path/to/message-box',
+                      path: '',
                     },
                   } satisfies WorkbenchMessageBoxCapability,
                 ],
@@ -171,7 +172,7 @@ describe('Microfrontend Host Message Box', () => {
         }),
         provideRouter([
           {path: 'path/to/view', canActivate: [() => firstValueFrom(canActivateView)], component: SpecViewComponent},
-          {path: 'path/to/message-box', component: SpecMessageBox1Component},
+          {path: '', canMatch: [canMatchWorkbenchMessageBoxCapability({component: 'messagebox'})], component: SpecMessageBox1Component},
         ]),
       ],
     });
@@ -184,7 +185,7 @@ describe('Microfrontend Host Message Box', () => {
     await waitUntilStable();
 
     // Start parallel navigation in a host message-box.
-    void TestBed.inject(WorkbenchMessageBoxService).open({component: 'message-box'});
+    void TestBed.inject(WorkbenchMessageBoxService).open({component: 'messagebox'});
     await waitUntilStable();
 
     // First navigation should be blocked by the canActivate guard.

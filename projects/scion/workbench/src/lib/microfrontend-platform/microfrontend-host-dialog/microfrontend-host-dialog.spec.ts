@@ -13,12 +13,13 @@ import {Component} from '@angular/core';
 import {provideRouter} from '@angular/router';
 import {firstValueFrom, Subject} from 'rxjs';
 import {toShowCustomMatcher} from '../../testing/jasmine/matcher/to-show.matcher';
-import {styleFixture, waitUntilWorkbenchStarted, waitUntilStable} from '../../testing/testing.util';
+import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../../testing/testing.util';
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
 import {WorkbenchComponent} from '../../workbench.component';
 import {expect} from '../../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchDialogService} from '@scion/workbench-client';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
+import {canMatchWorkbenchDialogCapability} from '../microfrontend-host/microfrontend-host-routes';
 
 describe('Microfrontend Host Dialog', () => {
 
@@ -41,14 +42,14 @@ describe('Microfrontend Host Dialog', () => {
                     type: WorkbenchCapabilities.Dialog,
                     qualifier: {component: 'dialog-1'},
                     properties: {
-                      path: 'path/to/dialog/1',
+                      path: '',
                     },
                   } satisfies WorkbenchDialogCapability,
                   {
                     type: WorkbenchCapabilities.Dialog,
                     qualifier: {component: 'dialog-2'},
                     properties: {
-                      path: 'path/to/dialog/2',
+                      path: '',
                     },
                   } satisfies WorkbenchDialogCapability,
                 ],
@@ -58,8 +59,8 @@ describe('Microfrontend Host Dialog', () => {
           },
         }),
         provideRouter([
-          {path: 'path/to/dialog/1', canActivate: [() => firstValueFrom(canActivateDialog1)], component: SpecDialog1Component},
-          {path: 'path/to/dialog/2', component: SpecDialog2Component},
+          {path: '', canMatch: [canMatchWorkbenchDialogCapability({component: 'dialog-1'})], canActivate: [() => firstValueFrom(canActivateDialog1)], component: SpecDialog1Component},
+          {path: '', canMatch: [canMatchWorkbenchDialogCapability({component: 'dialog-2'})], component: SpecDialog2Component},
         ]),
       ],
     });
@@ -104,7 +105,7 @@ describe('Microfrontend Host Dialog', () => {
                     type: WorkbenchCapabilities.Dialog,
                     qualifier: {component: 'dialog'},
                     properties: {
-                      path: 'path/to/dialog',
+                      path: '',
                     },
                   } satisfies WorkbenchDialogCapability,
                 ],
@@ -114,7 +115,7 @@ describe('Microfrontend Host Dialog', () => {
           },
         }),
         provideRouter([
-          {path: 'path/to/dialog', canActivate: [() => firstValueFrom(canActivateDialog)], component: SpecDialog1Component},
+          {path: '', canMatch: [canMatchWorkbenchDialogCapability({component: 'dialog'})], canActivate: [() => firstValueFrom(canActivateDialog)], component: SpecDialog1Component},
           {path: 'path/to/view', component: SpecViewComponent},
         ]),
       ],
@@ -160,7 +161,7 @@ describe('Microfrontend Host Dialog', () => {
                     type: WorkbenchCapabilities.Dialog,
                     qualifier: {component: 'dialog'},
                     properties: {
-                      path: 'path/to/dialog',
+                      path: '',
                     },
                   } satisfies WorkbenchDialogCapability,
                 ],
@@ -171,7 +172,7 @@ describe('Microfrontend Host Dialog', () => {
         }),
         provideRouter([
           {path: 'path/to/view', canActivate: [() => firstValueFrom(canActivateView)], component: SpecViewComponent},
-          {path: 'path/to/dialog', component: SpecDialog1Component},
+          {path: '', canMatch: [canMatchWorkbenchDialogCapability({component: 'dialog'})], component: SpecDialog1Component},
         ]),
       ],
     });

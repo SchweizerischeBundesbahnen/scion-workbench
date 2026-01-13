@@ -19,6 +19,11 @@ describe('RemoteTextProvider', () => {
       expect(translatable).toEqual('text');
     });
 
+    it('should return text as is if \'%\'', () => {
+      const translatable = createRemoteTranslatable('%', {appSymbolicName: 'app'});
+      expect(translatable).toEqual('%');
+    });
+
     it('should add app to key', () => {
       const translatable = createRemoteTranslatable('%key', {appSymbolicName: 'app'});
       expect(translatable).toEqual('%workbench.external.scion-workbench-client.app.%key');
