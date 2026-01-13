@@ -92,7 +92,7 @@ test.describe('App With Guard', () => {
       );
 
       // Expect view to display.
-      const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+      const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
       await expectView(viewPage).toBeActive();
     });
 
@@ -121,7 +121,7 @@ test.describe('App With Guard', () => {
       );
 
       // Expect view to display.
-      const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+      const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
       await expectView(viewPage).toBeActive();
     });
 
@@ -204,7 +204,7 @@ test.describe('App With Guard', () => {
       );
 
       // Expect view to display.
-      const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+      const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
       await expectView(viewPage).toBeActive();
 
       // Clear outlets in the URL, simulate navigation from a browser bookmark.
@@ -246,7 +246,7 @@ test.describe('App With Guard', () => {
       );
 
       // Expect "Null Content" page to display.
-      const nullContentPage = new NullContentPagePO(appPO, {viewId: 'view.100'});
+      const nullContentPage = new NullContentPagePO(appPO.view({viewId: 'view.100'}));
       await expectView(nullContentPage).toBeActive();
     });
 

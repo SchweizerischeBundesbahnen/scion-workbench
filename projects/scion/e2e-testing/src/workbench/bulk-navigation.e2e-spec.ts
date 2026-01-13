@@ -11,13 +11,17 @@
 import {test} from '../fixtures';
 import {BulkNavigationTestPagePO} from './page-object/test-pages/bulk-navigation-test-page.po';
 import {expect} from '@playwright/test';
+import {RouterPagePO} from './page-object/router-page.po';
 
 test.describe('Bulk Navigation', () => {
 
   test('should navigate to multiple views if waiting for each navigation to complete', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const bulkNavigationTestPage = await BulkNavigationTestPagePO.openInNewTab(appPO, workbenchNavigator);
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-pages/bulk-navigation-test-page'], {cssClass: 'testee'});
+
+    const bulkNavigationTestPage = new BulkNavigationTestPagePO(appPO.view({cssClass: 'testee'}));
     await bulkNavigationTestPage.enterViewCount(10);
     await bulkNavigationTestPage.enterCssClass('bulk-navigation-test-target');
     await bulkNavigationTestPage.clickNavigateAwait();
@@ -28,7 +32,10 @@ test.describe('Bulk Navigation', () => {
   test('should navigate to multiple views if not waiting for each navigation to complete', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const bulkNavigationTestPage = await BulkNavigationTestPagePO.openInNewTab(appPO, workbenchNavigator);
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-pages/bulk-navigation-test-page'], {cssClass: 'testee'});
+
+    const bulkNavigationTestPage = new BulkNavigationTestPagePO(appPO.view({cssClass: 'testee'}));
     await bulkNavigationTestPage.enterViewCount(10);
     await bulkNavigationTestPage.enterCssClass('bulk-navigation-test-target');
     await bulkNavigationTestPage.clickNavigateNoAwait();

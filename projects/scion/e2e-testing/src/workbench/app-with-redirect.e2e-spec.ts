@@ -177,7 +177,7 @@ test.describe('App With Redirect', () => {
         );
 
         // Expect "Nothing to Show" page to display, not the "Redirect" page.
-        const nullContentPage = new NullContentPagePO(appPO, {viewId: 'view.100'});
+        const nullContentPage = new NullContentPagePO(appPO.view({viewId: 'view.100'}));
         await expectView(nullContentPage).toBeActive();
       });
 
@@ -190,7 +190,7 @@ test.describe('App With Redirect', () => {
         );
 
         // Expect "Nothing to Show" page to display, not the "Redirect" page.
-        const nullContentPage = new NullContentPagePO(appPO, {viewId: 'view.100'});
+        const nullContentPage = new NullContentPagePO(appPO.view({viewId: 'view.100'}));
         await expectView(nullContentPage).toBeActive();
       });
 
@@ -203,7 +203,7 @@ test.describe('App With Redirect', () => {
         );
 
         // Expect "Nothing to Show" page to display, not the "Redirect" page.
-        const nullContentPage = new NullContentPagePO(appPO, {viewId: 'view.100'});
+        const nullContentPage = new NullContentPagePO(appPO.view({viewId: 'view.100'}));
         await expectView(nullContentPage).toBeActive();
       });
 
@@ -216,7 +216,7 @@ test.describe('App With Redirect', () => {
         );
 
         // Expect "Nothing to Show" page to display, not the "Redirect" page.
-        const nullContentPage = new NullContentPagePO(appPO, {viewId: 'view.100'});
+        const nullContentPage = new NullContentPagePO(appPO.view({viewId: 'view.100'}));
         await expectView(nullContentPage).toBeActive();
       });
     });

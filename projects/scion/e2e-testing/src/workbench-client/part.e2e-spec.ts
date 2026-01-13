@@ -73,13 +73,13 @@ test.describe('Workbench Part', () => {
     });
 
     // Click left view.
-    const leftViewPage = new InputFieldTestPagePO(appPO, {cssClass: 'left'});
+    const leftViewPage = new InputFieldTestPagePO(appPO.view({cssClass: 'left'}));
     await leftViewPage.clickInputField();
     await expect(appPO.part({partId: 'part.left'}).state('active')).toBeVisible();
     await expect(appPO.part({partId: 'part.right'}).state('active')).not.toBeAttached();
 
     // Click right view.
-    const rightViewPage = new InputFieldTestPagePO(appPO, {cssClass: 'right'});
+    const rightViewPage = new InputFieldTestPagePO(appPO.view({cssClass: 'right'}));
     await rightViewPage.clickInputField();
     await expect(appPO.part({partId: 'part.left'}).state('active')).not.toBeAttached();
     await expect(appPO.part({partId: 'part.right'}).state('active')).toBeVisible();
@@ -99,7 +99,7 @@ test.describe('Workbench Part', () => {
     // Open test view.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'input-field'}, {cssClass: 'testee'});
-    const testPage = new InputFieldTestPagePO(appPO, {cssClass: 'testee'});
+    const testPage = new InputFieldTestPagePO(appPO.view({cssClass: 'testee'}));
 
     // Open view list menu.
     const viewListMenu = await testPage.view.part.bar.openViewListMenu();
@@ -132,7 +132,7 @@ test.describe('Workbench Part', () => {
       cssClass: 'testee',
     });
 
-    const popupPage = new InputFieldTestPagePO(appPO, {cssClass: 'testee'});
+    const popupPage = new InputFieldTestPagePO(appPO.popup({cssClass: 'testee'}));
 
     // Open view list menu.
     const viewListMenu = await popupOpenerPage.view.part.bar.openViewListMenu();
@@ -203,7 +203,7 @@ test.describe('Workbench Part', () => {
       },
     });
 
-    const partPage = new PartPagePO(appPO, {partId: 'part.testee'});
+    const partPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
 
     // Capture the part's component instance id.
     const componentInstanceId = await partPage.getComponentInstanceId();
@@ -267,7 +267,7 @@ test.describe('Workbench Part', () => {
     // Switch perspective.
     await appPO.switchPerspective(perspective.metadata!.id);
 
-    const partPage = new PartPagePO(appPO, {partId: 'part.testee'});
+    const partPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
 
     // Expect named params to be substituted.
     await expect.poll(() => partPage.getPartParams()).toMatchObject({
@@ -340,7 +340,7 @@ test.describe('Workbench Part', () => {
     });
 
     // Focus part microfrontend.
-    const partTestPage = new InputFieldTestPagePO(appPO, {id: 'part.testee'});
+    const partTestPage = new InputFieldTestPagePO(appPO.part({partId: 'part.testee'}));
     await partTestPage.clickInputField();
 
     // Expect part microfrontend to have focus.
@@ -416,7 +416,7 @@ test.describe('Workbench Part', () => {
     await expect(notification.locator).toBeVisible();
 
     // Focus part microfrontend.
-    const partTestPage = new InputFieldTestPagePO(appPO, {id: 'part.testee'});
+    const partTestPage = new InputFieldTestPagePO(appPO.part({partId: 'part.testee'}));
     await partTestPage.clickInputField();
 
     // Expect part microfrontend to have focus.
@@ -459,7 +459,7 @@ test.describe('Workbench Part', () => {
     // Switch perspective.
     await appPO.switchPerspective(perspective.metadata!.id);
 
-    const partPage = new PartPagePO(appPO, {partId: 'part.testee'});
+    const partPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
 
     // Expect part id to be provided on part handle.
     await expect(partPage.partId).toHaveText('part.testee');
@@ -493,7 +493,7 @@ test.describe('Workbench Part', () => {
     // Switch perspective.
     await appPO.switchPerspective(perspective.metadata!.id);
 
-    const partPage = new PartPagePO(appPO, {partId: 'part.testee'});
+    const partPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
 
     // Expect part capability to be provided on part handle.
     await expect.poll(() => partPage.getPartCapability()).toEqual(expect.objectContaining({
@@ -509,11 +509,13 @@ test.describe('Workbench Part', () => {
   test('should display "Not Found" page when unregistering part capability', async ({appPO, microfrontendNavigator, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
+    // Register main area part capability.
     await microfrontendNavigator.registerCapability('app1', {
       type: 'part',
       qualifier: {part: 'main-area'},
     });
 
+    // Register part capability.
     const testeePartCapability = await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
       type: 'part',
       qualifier: {part: 'testee'},
@@ -522,7 +524,8 @@ test.describe('Workbench Part', () => {
       },
     });
 
-    const perspective = await microfrontendNavigator.registerCapability('app1', {
+    // Create perspective.
+    await microfrontendNavigator.createPerspective('app1', {
       type: 'perspective',
       qualifier: {perspective: 'testee'},
       properties: {
@@ -542,12 +545,8 @@ test.describe('Workbench Part', () => {
       },
     });
 
-    // Switch perspective.
-    await appPO.switchPerspective(perspective.metadata!.id);
-
-    const part = appPO.part({partId: 'part.testee'});
-
     // Expect part to display part test page.
+    const part = appPO.part({partId: 'part.testee'});
     await expectPart(part).toDisplayComponent(PartPagePO.selector);
 
     // Remove part capability.

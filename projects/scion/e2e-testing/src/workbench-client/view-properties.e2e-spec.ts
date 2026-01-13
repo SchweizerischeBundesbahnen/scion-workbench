@@ -47,7 +47,7 @@ test.describe('Workbench View Properties', () => {
       });
 
       const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
-      const viewPropertiesTest = new ViewPropertiesTestPagePO(appPO, viewId);
+      const viewPropertiesTest = new ViewPropertiesTestPagePO(appPO.view({viewId}));
       await expect(viewPropertiesTest.view.tab.state('dirty')).not.toBeVisible();
     });
   });
@@ -84,7 +84,7 @@ test.describe('Workbench View Properties', () => {
       });
 
       const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
-      const viewPropertiesTest = new ViewPropertiesTestPagePO(appPO, viewId);
+      const viewPropertiesTest = new ViewPropertiesTestPagePO(appPO.view({viewId}));
       await expect(viewPropertiesTest.view.tab.state('dirty')).toBeVisible();
     });
   });
@@ -121,7 +121,7 @@ test.describe('Workbench View Properties', () => {
       });
 
       const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
-      const viewPropertiesTest = new ViewPropertiesTestPagePO(appPO, viewId);
+      const viewPropertiesTest = new ViewPropertiesTestPagePO(appPO.view({viewId}));
       await expect(viewPropertiesTest.view.tab.closeButton).not.toBeVisible();
     });
   });
@@ -158,7 +158,7 @@ test.describe('Workbench View Properties', () => {
       });
 
       const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
-      const viewPropertiesTest = new ViewPropertiesTestPagePO(appPO, viewId);
+      const viewPropertiesTest = new ViewPropertiesTestPagePO(appPO.view({viewId}));
       await expect(viewPropertiesTest.view.tab.closeButton).toBeVisible();
     });
   });

@@ -21,6 +21,7 @@ import {PartPagePO} from '../page-object/part-page.po';
 import {InputFieldTestPagePO} from '../page-object/test-pages/input-field-test-page.po';
 import {FocusTestPagePO} from '../page-object/test-pages/focus-test-page.po';
 import {PopupOpenerPagePO} from '../page-object/popup-opener-page.po';
+import {canMatchWorkbenchDialogCapability, canMatchWorkbenchPartCapability, canMatchWorkbenchPopupCapability} from '../../workbench/page-object/layout-page/register-route-page.po';
 
 test.describe('Workbench Dialog', () => {
 
@@ -75,7 +76,7 @@ test.describe('Workbench Dialog', () => {
       });
 
       // Open dialog.
-      const dialogOpenerPage = new DialogOpenerPagePO(appPO, {id: 'part.dialog-opener'});
+      const dialogOpenerPage = new DialogOpenerPagePO(appPO.part({partId: 'part.dialog-opener'}));
       await dialogOpenerPage.open({component: 'testee'}, {cssClass: 'testee'});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
@@ -89,6 +90,76 @@ test.describe('Workbench Dialog', () => {
         await dialogOpenerPage.part.getBoundingBox('content'), // workbench part
         await dialogOpenerPage.outlet.locator.boundingBox(), // router outlet
       ]));
+    });
+
+    test('should open a part-modal dialog from host part', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register intention.
+      await microfrontendNavigator.registerIntention('host', {type: 'dialog', qualifier: {component: 'testee', app: 'app1'}});
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'dialog',
+        qualifier: {component: 'testee', app: 'app1'},
+        properties: {
+          path: 'test-dialog',
+          size: {height: '475px', width: '300px'},
+        },
+      });
+
+      await microfrontendNavigator.registerCapability('host', {
+        type: 'part',
+        qualifier: {part: 'main-area'},
+      });
+
+      await microfrontendNavigator.registerCapability('host', {
+        type: 'part',
+        qualifier: {part: 'dialog-opener', app: 'host'},
+        properties: {
+          path: '',
+          extras: {
+            icon: 'folder',
+            label: 'Dialog Opener',
+          },
+        },
+      });
+
+      // Register host part route.
+      await workbenchNavigator.registerRoute({
+        path: '', component: 'microfrontend-dialog-opener-page', canMatch: [canMatchWorkbenchPartCapability({part: 'dialog-opener', app: 'host'})],
+      });
+
+      await microfrontendNavigator.createPerspective('host', {
+        type: 'perspective',
+        qualifier: {perspective: 'testee'},
+        properties: {
+          parts: [
+            {
+              id: MAIN_AREA,
+              qualifier: {part: 'main-area'},
+            },
+            {
+              id: 'part.dialog-opener',
+              qualifier: {part: 'dialog-opener', app: 'host'},
+              position: 'left-top',
+              active: true,
+            },
+          ],
+        },
+      });
+
+      // Open dialog.
+      const dialogOpenerPage = new DialogOpenerPagePO(appPO.part({partId: 'part.dialog-opener'}), {host: true});
+      await dialogOpenerPage.open({component: 'testee', app: 'app1'}, {cssClass: 'testee'});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(dialog);
+
+      // Expect dialog to display.
+      await expectDialog(dialogPage).toBeVisible();
+
+      // Expect glass pane of the dialog.
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.part.getBoundingBox('content')]));
     });
 
     test('should detach dialog if contextual part is not active', async ({appPO, microfrontendNavigator}) => {
@@ -141,7 +212,7 @@ test.describe('Workbench Dialog', () => {
       });
 
       // Open dialog.
-      const dialogOpenerPage = new DialogOpenerPagePO(appPO, {id: 'part.dialog-opener'});
+      const dialogOpenerPage = new DialogOpenerPagePO(appPO.part({partId: 'part.dialog-opener'}));
       await dialogOpenerPage.open({component: 'testee'}, {cssClass: 'testee'});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
@@ -221,10 +292,10 @@ test.describe('Workbench Dialog', () => {
       });
 
       // Open dialog.
-      const dialogOpenerPage = new DialogOpenerPagePO(appPO, {id: 'part.dialog-opener'});
+      const dialogOpenerPage = new DialogOpenerPagePO(appPO.part({partId: 'part.dialog-opener'}));
       await dialogOpenerPage.open({component: 'testee'}, {cssClass: 'testee'});
 
-      const dialogPage = new SizeTestPagePO(appPO, {cssClass: 'testee'});
+      const dialogPage = new SizeTestPagePO(appPO.dialog({cssClass: 'testee'}));
 
       // Expect dialog to display.
       await expectDialog(dialogPage).toBeVisible();
@@ -313,10 +384,10 @@ test.describe('Workbench Dialog', () => {
       });
 
       // Open the dialog in other part.
-      const dialogOpenerPage = new DialogOpenerPagePO(appPO, {id: 'part.dialog-opener'});
+      const dialogOpenerPage = new DialogOpenerPagePO(appPO.part({partId: 'part.dialog-opener'}));
       await dialogOpenerPage.open({component: 'testee'}, {cssClass: 'testee', context: 'part.other'});
 
-      const otherPartPage = new PartPagePO(appPO, {partId: 'part.other'});
+      const otherPartPage = new PartPagePO(appPO.part({partId: 'part.other'}));
 
       const dialog = appPO.dialog({cssClass: 'testee'});
       const dialogPage = new DialogPagePO(dialog);
@@ -387,7 +458,7 @@ test.describe('Workbench Dialog', () => {
       });
 
       // Open dialog.
-      const dialogOpenerPage = new DialogOpenerPagePO(appPO, {id: 'part.dialog-opener'});
+      const dialogOpenerPage = new DialogOpenerPagePO(appPO.part({partId: 'part.dialog-opener'}));
       await dialogOpenerPage.open({component: 'testee'}, {cssClass: 'testee', modality: 'application'});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
@@ -459,10 +530,10 @@ test.describe('Workbench Dialog', () => {
       const dialog = appPO.dialog({cssClass: 'testee'});
 
       // Focus input field.
-      const dialogPage = new FocusTestPagePO(appPO, {id: await dialog.getDialogId()});
+      const dialogPage = new FocusTestPagePO(appPO.dialog({dialogId: await dialog.getDialogId()}));
       await dialogPage.firstField.focus();
 
-      const inputFieldTestPage = new InputFieldTestPagePO(appPO, {id: 'part.input-field-test-page'});
+      const inputFieldTestPage = new InputFieldTestPagePO(appPO.part({partId: 'part.input-field-test-page'}));
 
       // Expect interaction with contextual part to be blocked.
       await expect(inputFieldTestPage.clickInputField({timeout: 1000})).rejects.toThrowError();
@@ -506,6 +577,35 @@ test.describe('Workbench Dialog', () => {
         await dialogOpenerPage.view.getBoundingBox(), // workbench view
         await dialogOpenerPage.outlet.locator.boundingBox(), // router outlet
       ]));
+    });
+
+    test('should open a view-modal dialog from host view', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register intention.
+      await microfrontendNavigator.registerIntention('host', {type: 'dialog', qualifier: {component: 'testee', app: 'app1'}});
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'dialog',
+        qualifier: {component: 'testee', app: 'app1'},
+        properties: {
+          path: 'test-dialog',
+          size: {height: '475px', width: '300px'},
+        },
+      });
+
+      // Open dialog.
+      const dialogOpenerPage = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'host');
+      await dialogOpenerPage.open({component: 'testee', app: 'app1'}, {cssClass: 'testee'});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(dialog);
+
+      // Expect dialog to display.
+      await expectDialog(dialogPage).toBeVisible();
+
+      // Expect glass pane of the dialog.
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.view.getBoundingBox()]));
     });
 
     test('should detach dialog if contextual view is not active', async ({appPO, microfrontendNavigator}) => {
@@ -562,7 +662,7 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPage = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
       await dialogOpenerPage.open({component: 'testee'}, {cssClass: 'testee'});
 
-      const dialogPage = new SizeTestPagePO(appPO, {cssClass: 'testee'});
+      const dialogPage = new SizeTestPagePO(appPO.dialog({cssClass: 'testee'}));
 
       // Expect dialog to be visible.
       await expectDialog(dialogPage).toBeVisible();
@@ -674,7 +774,7 @@ test.describe('Workbench Dialog', () => {
       // Open view.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'input-field'}, {cssClass: 'input-field'});
-      const inputFieldTestPage = new InputFieldTestPagePO(appPO, {cssClass: 'input-field'});
+      const inputFieldTestPage = new InputFieldTestPagePO(appPO.view({cssClass: 'input-field'}));
 
       // Open dialog from view.
       const dialogOpenerPage = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
@@ -685,7 +785,7 @@ test.describe('Workbench Dialog', () => {
       await dialog.moveDialog('bottom-right-corner');
 
       // Focus input field.
-      const dialogPage = new FocusTestPagePO(appPO, {id: await dialog.getDialogId()});
+      const dialogPage = new FocusTestPagePO(appPO.dialog({dialogId: await dialog.getDialogId()}));
       await dialogPage.firstField.focus();
 
       // Expect interaction with contextual view to be blocked.
@@ -731,8 +831,59 @@ test.describe('Workbench Dialog', () => {
       });
 
       // Open dialog from popup.
-      const dialogOpenerPage = new DialogOpenerPagePO(appPO, {cssClass: 'dialog-opener'});
+      const dialogOpenerPage = new DialogOpenerPagePO(appPO.popup({cssClass: 'dialog-opener'}));
       await dialogOpenerPage.open({component: 'testee'}, {cssClass: 'testee'});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(dialog);
+
+      // Expect dialog to display.
+      await expectDialog(dialogPage).toBeVisible();
+
+      // Expect glass pane of the dialog.
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await dialogOpenerPage.popup.getBoundingBox({box: 'content-box'}), // workbench popup
+      ]));
+    });
+
+    test('should open a popup-modal dialog from host popup', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register intention.
+      await microfrontendNavigator.registerIntention('host', {type: 'dialog', qualifier: {component: 'testee', app: 'app1'}});
+
+      await microfrontendNavigator.registerCapability('host', {
+        type: 'popup',
+        qualifier: {component: 'dialog-opener', app: 'host'},
+        properties: {
+          path: '',
+        },
+      });
+
+      // Register host popup route.
+      await workbenchNavigator.registerRoute({
+        path: '', component: 'microfrontend-dialog-opener-page', canMatch: [canMatchWorkbenchPopupCapability({component: 'dialog-opener', app: 'host'})],
+      });
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'dialog',
+        qualifier: {component: 'testee', app: 'app1'},
+        properties: {
+          path: 'test-dialog',
+          size: {height: '475px', width: '300px'},
+        },
+      });
+
+      // Open popup.
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'host');
+      await popupOpenerPage.open({component: 'dialog-opener', app: 'host'}, {
+        anchor: 'element',
+        cssClass: 'dialog-opener',
+      });
+
+      // Open dialog from popup.
+      const dialogOpenerPage = new DialogOpenerPagePO(appPO.popup({cssClass: 'dialog-opener'}), {host: true});
+      await dialogOpenerPage.open({component: 'testee', app: 'app1'}, {cssClass: 'testee'});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
       const dialogPage = new DialogPagePO(dialog);
@@ -774,7 +925,7 @@ test.describe('Workbench Dialog', () => {
       });
 
       // Open dialog from popup.
-      const dialogOpenerPage = new DialogOpenerPagePO(appPO, {cssClass: 'dialog-opener'});
+      const dialogOpenerPage = new DialogOpenerPagePO(appPO.popup({cssClass: 'dialog-opener'}));
       await dialogOpenerPage.open({component: 'testee'}, {cssClass: 'testee'});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
@@ -828,9 +979,9 @@ test.describe('Workbench Dialog', () => {
       });
 
       // Open dialog from popup.
-      const dialogOpenerPage = new DialogOpenerPagePO(appPO, {cssClass: 'dialog-opener'});
+      const dialogOpenerPage = new DialogOpenerPagePO(appPO.popup({cssClass: 'dialog-opener'}));
       await dialogOpenerPage.open({component: 'testee'}, {cssClass: 'testee'});
-      const dialogPage = new SizeTestPagePO(appPO, {cssClass: 'testee'});
+      const dialogPage = new SizeTestPagePO(appPO.dialog({cssClass: 'testee'}));
 
       // Expect dialog to display.
       await expectDialog(dialogPage).toBeVisible();
@@ -915,7 +1066,7 @@ test.describe('Workbench Dialog', () => {
       });
 
       // Open popup.
-      const popupOpenerPage = new PopupOpenerPagePO(appPO, {id: 'part.popup-opener'});
+      const popupOpenerPage = new PopupOpenerPagePO(appPO.part({partId: 'part.popup-opener'}));
       await popupOpenerPage.open({component: 'popup'}, {
         anchor: 'element',
         align: 'east',
@@ -978,7 +1129,7 @@ test.describe('Workbench Dialog', () => {
       });
 
       // Open dialog from popup.
-      const dialogOpenerPage = new DialogOpenerPagePO(appPO, {cssClass: 'dialog-opener'});
+      const dialogOpenerPage = new DialogOpenerPagePO(appPO.popup({cssClass: 'dialog-opener'}));
       await dialogOpenerPage.open({component: 'testee'}, {cssClass: 'testee', modality: 'application'});
       const dialog = appPO.dialog({cssClass: 'testee'});
       const dialogPage = new DialogPagePO(dialog);
@@ -1054,14 +1205,14 @@ test.describe('Workbench Dialog', () => {
       });
 
       // Open popup.
-      const popupOpenerPage = new PopupOpenerPagePO(appPO, {id: 'part.popup-opener'});
+      const popupOpenerPage = new PopupOpenerPagePO(appPO.part({partId: 'part.popup-opener'}));
       await popupOpenerPage.open({component: 'popup'}, {
         anchor: 'element',
         closeStrategy: {onFocusLost: false},
         cssClass: 'popup',
       });
       const popup = appPO.popup({cssClass: 'popup'});
-      const inputFieldTestPage = new InputFieldTestPagePO(appPO, {cssClass: 'popup'});
+      const inputFieldTestPage = new InputFieldTestPagePO(appPO.popup({cssClass: 'popup'}));
 
       // Open dialog from popup.
       const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
@@ -1071,7 +1222,7 @@ test.describe('Workbench Dialog', () => {
       await dialog.moveDialog('bottom-right-corner');
 
       // Focus input field.
-      const dialogPage = new FocusTestPagePO(appPO, {cssClass: 'testee'});
+      const dialogPage = new FocusTestPagePO(appPO.dialog({cssClass: 'testee'}));
       await dialogPage.firstField.focus();
 
       // Expect interaction with contextual popup to be blocked.
@@ -1114,8 +1265,57 @@ test.describe('Workbench Dialog', () => {
       await dialogOpenerPage1.open({component: 'dialog-opener'}, {cssClass: 'dialog-opener'});
 
       // Open dialog from dialog.
-      const dialogOpenerPage2 = new DialogOpenerPagePO(appPO, {cssClass: 'dialog-opener'});
+      const dialogOpenerPage2 = new DialogOpenerPagePO(appPO.dialog({cssClass: 'dialog-opener'}));
       await dialogOpenerPage2.open({component: 'testee'}, {cssClass: 'testee'});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(dialog);
+
+      // Expect dialog to display.
+      await expectDialog(dialogPage).toBeVisible();
+
+      // Expect glass pane of the dialog.
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await dialogOpenerPage2.dialog.getDialogBoundingBox(), // workbench dialog
+      ]));
+    });
+
+    test('should open a dialog-modal dialog from host dialog', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register intention.
+      await microfrontendNavigator.registerIntention('host', {type: 'dialog', qualifier: {component: 'testee', app: 'app1'}});
+
+      await microfrontendNavigator.registerCapability('host', {
+        type: 'dialog',
+        qualifier: {component: 'dialog-opener', app: 'host'},
+        properties: {
+          path: '',
+          size: {height: '475px', width: '300px'},
+        },
+      });
+
+      // Register host dialog route.
+      await workbenchNavigator.registerRoute({
+        path: '', component: 'microfrontend-dialog-opener-page', canMatch: [canMatchWorkbenchDialogCapability({component: 'dialog-opener', app: 'host'})],
+      });
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'dialog',
+        qualifier: {component: 'testee', app: 'app1'},
+        properties: {
+          path: 'test-dialog',
+          size: {height: '100px', width: '100px'},
+        },
+      });
+
+      // Open dialog.
+      const dialogOpenerPage1 = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'host');
+      await dialogOpenerPage1.open({component: 'dialog-opener', app: 'host'}, {cssClass: 'dialog-opener'});
+
+      // Open dialog from dialog.
+      const dialogOpenerPage2 = new DialogOpenerPagePO(appPO.dialog({cssClass: 'dialog-opener'}), {host: true});
+      await dialogOpenerPage2.open({component: 'testee', app: 'app1'}, {cssClass: 'testee'});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
       const dialogPage = new DialogPagePO(dialog);
@@ -1155,7 +1355,7 @@ test.describe('Workbench Dialog', () => {
       await dialogOpenerPage1.open({component: 'dialog-opener'}, {cssClass: 'dialog-opener'});
 
       // Open dialog from dialog.
-      const dialogOpenerPage2 = new DialogOpenerPagePO(appPO, {cssClass: 'dialog-opener'});
+      const dialogOpenerPage2 = new DialogOpenerPagePO(appPO.dialog({cssClass: 'dialog-opener'}));
       await dialogOpenerPage2.open({component: 'testee'}, {cssClass: 'testee'});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
@@ -1207,9 +1407,9 @@ test.describe('Workbench Dialog', () => {
       await dialogOpenerPage1.open({component: 'dialog-opener'}, {cssClass: 'dialog-opener'});
 
       // Open dialog from dialog.
-      const dialogOpenerPage2 = new DialogOpenerPagePO(appPO, {cssClass: 'dialog-opener'});
+      const dialogOpenerPage2 = new DialogOpenerPagePO(appPO.dialog({cssClass: 'dialog-opener'}));
       await dialogOpenerPage2.open({component: 'testee'}, {cssClass: 'testee'});
-      const dialogPage = new SizeTestPagePO(appPO, {cssClass: 'testee'});
+      const dialogPage = new SizeTestPagePO(appPO.dialog({cssClass: 'testee'}));
 
       // Expect dialog to display.
       await expectDialog(dialogPage).toBeVisible();
@@ -1294,7 +1494,7 @@ test.describe('Workbench Dialog', () => {
       });
 
       // Open dialog.
-      const dialogOpenerPage1 = new DialogOpenerPagePO(appPO, {id: 'part.dialog-opener'});
+      const dialogOpenerPage1 = new DialogOpenerPagePO(appPO.part({partId: 'part.dialog-opener'}));
       await dialogOpenerPage1.open({component: 'dialog'}, {cssClass: 'dialog'});
       const dialog1 = appPO.dialog({cssClass: 'dialog'});
 
@@ -1350,7 +1550,7 @@ test.describe('Workbench Dialog', () => {
       await dialogOpenerPage1.open({component: 'dialog-opener'}, {cssClass: 'dialog-opener'});
 
       // Open dialog from dialog.
-      const dialogOpenerPage2 = new DialogOpenerPagePO(appPO, {cssClass: 'dialog-opener'});
+      const dialogOpenerPage2 = new DialogOpenerPagePO(appPO.dialog({cssClass: 'dialog-opener'}));
       await dialogOpenerPage2.open({component: 'testee'}, {cssClass: 'testee', modality: 'application'});
 
       const dialog2 = appPO.dialog({cssClass: 'testee'});
@@ -1427,14 +1627,14 @@ test.describe('Workbench Dialog', () => {
       });
 
       // Open popup.
-      const popupOpenerPage = new PopupOpenerPagePO(appPO, {id: 'part.popup-opener'});
+      const popupOpenerPage = new PopupOpenerPagePO(appPO.part({partId: 'part.popup-opener'}));
       await popupOpenerPage.open({component: 'popup'}, {
         anchor: 'element',
         closeStrategy: {onFocusLost: false},
         cssClass: 'popup',
       });
       const popup = appPO.popup({cssClass: 'popup'});
-      const inputFieldTestPage = new InputFieldTestPagePO(appPO, {cssClass: 'popup'});
+      const inputFieldTestPage = new InputFieldTestPagePO(appPO.popup({cssClass: 'popup'}));
 
       // Open dialog from popup.
       const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
@@ -1444,7 +1644,7 @@ test.describe('Workbench Dialog', () => {
       await dialog.moveDialog('bottom-right-corner');
 
       // Focus input field.
-      const dialogPage = new FocusTestPagePO(appPO, {cssClass: 'testee'});
+      const dialogPage = new FocusTestPagePO(appPO.dialog({cssClass: 'testee'}));
       await dialogPage.firstField.focus();
 
       // Expect interaction with contextual popup to be blocked.

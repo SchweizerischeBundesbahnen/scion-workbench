@@ -14,6 +14,7 @@ import {TextNotificationPagePO} from '../text-notification-page.po';
 import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
 import {expectNotification} from '../matcher/notification-matcher';
 import {MAIN_AREA} from '../workbench.model';
+import {WorkbenchNotificationCapability} from './page-object/register-workbench-capability-page.po';
 
 test.describe('Workbench Notification', () => {
 
@@ -29,7 +30,7 @@ test.describe('Workbench Notification', () => {
         legacyAPI: {enabled: true, textAsConfig: false},
       });
 
-      const notification = appPO.notification({nth: 0});
+      const notification = appPO.notification({cssClass: []}, {nth: 0});
       const notificationPage = new TextNotificationPagePO(notification);
 
       await expectNotification(notificationPage).toBeVisible();
@@ -45,9 +46,10 @@ test.describe('Workbench Notification', () => {
       const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
       await notificationOpenerPage.show('Notification', {
         legacyAPI: {enabled: true, textAsConfig: true},
+        cssClass: 'testee',
       });
 
-      const notification = appPO.notification({nth: 0});
+      const notification = appPO.notification({cssClass: 'testee'});
       const notificationPage = new TextNotificationPagePO(notification);
 
       await expectNotification(notificationPage).toBeVisible();
@@ -73,28 +75,26 @@ test.describe('Workbench Notification', () => {
       await expect(notificationPage.text).toHaveText('Notification');
     });
 
-    test('should show custom host notification (1/2)', async ({appPO, microfrontendNavigator}) => {
+    test('should show custom host notification', async ({appPO, microfrontendNavigator, consoleLogs}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
-      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'host-notification'}});
-
-      // Display the notification.
-      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      const notification = notificationOpenerPage.show({component: 'host-notification'}, {
-        legacyAPI: {enabled: true, textAsConfig: true},
+      // Register host notification capability.
+      await microfrontendNavigator.registerCapability<WorkbenchNotificationCapability>('host', {
+        type: 'notification',
+        qualifier: {component: 'notification', app: 'host'},
+        private: false,
+        params: [
+          {name: 'param1', required: true},
+          {name: 'param2', required: true},
+        ],
       });
 
-      await expect(notification).rejects.toThrow(/IntentParamValidationError/);
-    });
-
-    test('should show custom host notification (2/2)', async ({appPO, microfrontendNavigator, consoleLogs}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'host-notification'}});
+      // Register intention.
+      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'notification', app: 'host'}});
 
       // Display the notification.
       const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      await notificationOpenerPage.show({component: 'host-notification'}, {
+      await notificationOpenerPage.show({component: 'notification', app: 'host'}, {
         params: {param1: 'value1', param2: 'value2'},
         title: 'title',
         severity: 'warn',
@@ -102,7 +102,6 @@ test.describe('Workbench Notification', () => {
         group: 'group',
         cssClass: 'class',
         legacyAPI: {enabled: true, textAsConfig: true},
-        waitUntilAttached: false,
       });
 
       await expect.poll(() => consoleLogs.get({severity: 'info'})).toContainEqual(
@@ -110,27 +109,46 @@ test.describe('Workbench Notification', () => {
       );
     });
 
-    test('should throw when not passing params required by the notification provider', async ({appPO, microfrontendNavigator}) => {
+    test('should throw when not passing required params', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
-      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'host-notification'}});
+      // Register host notification capability.
+      await microfrontendNavigator.registerCapability<WorkbenchNotificationCapability>('host', {
+        type: 'notification',
+        qualifier: {component: 'notification', app: 'host'},
+        private: false,
+        params: [
+          {name: 'param', required: true},
+        ],
+      });
+
+      // Register intention.
+      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'notification', app: 'host'}});
 
       // Display the notification.
       const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      const notification = notificationOpenerPage.show({component: 'host-notification'}, {
+      const notification = notificationOpenerPage.show({component: 'notification', app: 'host'}, {
         legacyAPI: {enabled: true, textAsConfig: true},
       });
       await expect(notification).rejects.toThrow(/IntentParamValidationError/);
     });
 
-    test('should throw when passing params not specified by the notification provider', async ({appPO, microfrontendNavigator}) => {
+    test('should throw when passing unspecified params', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
-      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'host-notification'}});
+      // Register host notification capability.
+      await microfrontendNavigator.registerCapability<WorkbenchNotificationCapability>('host', {
+        type: 'notification',
+        qualifier: {component: 'notification', app: 'host'},
+        private: false,
+      });
+
+      // Register intention.
+      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'notification', app: 'host'}});
 
       // Display the notification.
       const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      const notification = notificationOpenerPage.show({component: 'host-notification'}, {
+      const notification = notificationOpenerPage.show({component: 'notification', app: 'host'}, {
         params: {param: 'value'},
         legacyAPI: {enabled: true, textAsConfig: true},
       });
@@ -387,18 +405,29 @@ test.describe('Workbench Notification', () => {
     test('should show custom host notification', async ({appPO, microfrontendNavigator, consoleLogs}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
-      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'host-notification'}});
+      // Register host notification capability.
+      await microfrontendNavigator.registerCapability<WorkbenchNotificationCapability>('host', {
+        type: 'notification',
+        qualifier: {component: 'notification', app: 'host'},
+        private: false,
+        params: [
+          {name: 'param1', required: true},
+          {name: 'param2', required: true},
+        ],
+      });
+
+      // Register intention.
+      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'notification', app: 'host'}});
 
       // Display the notification.
       const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      await notificationOpenerPage.show({component: 'host-notification'}, {
+      await notificationOpenerPage.show({component: 'notification', app: 'host'}, {
         params: {param1: 'value1', param2: 'value2'},
         title: 'title',
         severity: 'warn',
         duration: 'long',
         group: 'group',
         cssClass: 'class',
-        waitUntilAttached: false,
       });
 
       await expect.poll(() => consoleLogs.get({severity: 'info'})).toContainEqual(
@@ -406,25 +435,44 @@ test.describe('Workbench Notification', () => {
       );
     });
 
-    test('should throw when not passing params required by the notification provider', async ({appPO, microfrontendNavigator}) => {
+    test('should throw when not passing required params', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
-      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'host-notification'}});
+      // Register host notification capability.
+      await microfrontendNavigator.registerCapability<WorkbenchNotificationCapability>('host', {
+        type: 'notification',
+        qualifier: {component: 'notification', app: 'host'},
+        private: false,
+        params: [
+          {name: 'param', required: true},
+        ],
+      });
+
+      // Register intention.
+      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'notification', app: 'host'}});
 
       // Display the notification.
       const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      const notification = notificationOpenerPage.show({component: 'host-notification'});
+      const notification = notificationOpenerPage.show({component: 'notification', app: 'host'});
       await expect(notification).rejects.toThrow(/IntentParamValidationError/);
     });
 
-    test('should throw when passing params not specified by the notification provider', async ({appPO, microfrontendNavigator}) => {
+    test('should throw when passing unspecified params', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
-      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'host-notification'}});
+      // Register host notification capability.
+      await microfrontendNavigator.registerCapability<WorkbenchNotificationCapability>('host', {
+        type: 'notification',
+        qualifier: {component: 'notification', app: 'host'},
+        private: false,
+      });
+
+      // Register intention.
+      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'notification', app: 'host'}});
 
       // Display the notification.
       const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      const notification = notificationOpenerPage.show({component: 'host-notification'}, {params: {param: 'value'}});
+      const notification = notificationOpenerPage.show({component: 'notification', app: 'host'}, {params: {param: 'value'}});
       await expect(notification).rejects.toThrow(/IntentParamValidationError/);
     });
   });

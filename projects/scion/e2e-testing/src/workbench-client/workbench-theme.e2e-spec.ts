@@ -28,7 +28,7 @@ test.describe('WorkbenchClient', () => {
 
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-    const testPage = new WorkbenchThemeTestPagePO(appPO, {cssClass: 'testee'});
+    const testPage = new WorkbenchThemeTestPagePO(appPO.view({cssClass: 'testee'}));
 
     await appPO.header.changeColorScheme('light');
     await expect(testPage.theme).toHaveText('scion-light');
@@ -50,7 +50,7 @@ test.describe('WorkbenchClient', () => {
 
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-    const testPage = new WorkbenchThemeTestPagePO(appPO, {cssClass: 'testee'});
+    const testPage = new WorkbenchThemeTestPagePO(appPO.view({cssClass: 'testee'}));
 
     await appPO.header.changeColorScheme('light');
     await expect(testPage.colorScheme).toHaveText('light');
@@ -72,7 +72,7 @@ test.describe('WorkbenchClient', () => {
 
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-    const testPage = new WorkbenchThemeTestPagePO(appPO, {cssClass: 'testee'});
+    const testPage = new WorkbenchThemeTestPagePO(appPO.view({cssClass: 'testee'}));
 
     // Open new tab to deactivate testPage.
     await appPO.openNewViewTab();

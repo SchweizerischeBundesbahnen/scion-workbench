@@ -36,7 +36,7 @@ test.describe('Workbench View Tab', () => {
     // Open test view.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'input-field'}, {cssClass: 'testee'});
-    const testPage = new InputFieldTestPagePO(appPO, {cssClass: 'testee'});
+    const testPage = new InputFieldTestPagePO(appPO.view({cssClass: 'testee'}));
 
     // Open context menu.
     const contextMenu = await testPage.view.tab.openContextMenu();
@@ -74,7 +74,7 @@ test.describe('Workbench View Tab', () => {
       cssClass: 'testee',
     });
 
-    const testPage = new InputFieldTestPagePO(appPO, {cssClass: 'testee'});
+    const testPage = new InputFieldTestPagePO(appPO.popup({cssClass: 'testee'}));
 
     // Open context menu.
     const contextMenu = await viewPage.view.tab.openContextMenu();

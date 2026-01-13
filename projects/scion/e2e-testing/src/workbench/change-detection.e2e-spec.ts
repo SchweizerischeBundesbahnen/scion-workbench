@@ -12,6 +12,7 @@ import {test} from '../fixtures';
 import {expect} from '@playwright/test';
 import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
 import {waitUntilStable} from '../helper/testing.util';
+import {RouterPagePO} from './page-object/router-page.po';
 
 test.describe('Angular Change Detection', () => {
 
@@ -35,7 +36,10 @@ test.describe('Angular Change Detection', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Open test page.
-    const testPage = await InputFieldTestPagePO.openInNewTab(appPO, workbenchNavigator);
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-pages/input-field-test-page'], {cssClass: 'testee'});
+
+    const testPage = new InputFieldTestPagePO(appPO.view({cssClass: 'testee'}));
 
     // Enable logging of Angular change detection cycles.
     await appPO.header.clickSettingMenuItem({cssClass: 'e2e-log-angular-change-detection-cycles'}, {check: true});
@@ -52,7 +56,10 @@ test.describe('Angular Change Detection', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Open test page.
-    const testPage = await InputFieldTestPagePO.openInNewTab(appPO, workbenchNavigator);
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-pages/input-field-test-page'], {cssClass: 'testee'});
+
+    const testPage = new InputFieldTestPagePO(appPO.view({cssClass: 'testee'}));
 
     // Enable logging of Angular change detection cycles.
     await appPO.header.clickSettingMenuItem({cssClass: 'e2e-log-angular-change-detection-cycles'}, {check: true});

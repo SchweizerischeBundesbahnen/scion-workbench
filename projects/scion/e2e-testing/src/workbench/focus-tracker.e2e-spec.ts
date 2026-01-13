@@ -1473,7 +1473,7 @@ test.describe('Focus Tracker', () => {
     await expect.poll(() => logPart.getLog()).toEqual(['view.1']);
 
     // TEST: Open messagebox.
-    const messageboxOpener = new MessageBoxOpenerPagePO(appPO, {viewId: 'view.1'});
+    const messageboxOpener = new MessageBoxOpenerPagePO(appPO.view({viewId: 'view.1'}));
     await messageboxOpener.open('component:focus-test-page', {cssClass: 'testee'});
     const messageboxPage = new FocusTestPagePO(appPO.dialog({cssClass: 'testee'}));
     const dialogId = await messageboxPage.dialog.getDialogId();
@@ -1504,7 +1504,7 @@ test.describe('Focus Tracker', () => {
     );
 
     // Open messagebox.
-    const messageboxOpener = new MessageBoxOpenerPagePO(appPO, {viewId: 'view.1'});
+    const messageboxOpener = new MessageBoxOpenerPagePO(appPO.view({viewId: 'view.1'}));
     await messageboxOpener.open('component:focus-test-page', {cssClass: 'testee'});
     const messageboxPage = new FocusTestPagePO(appPO.dialog({cssClass: 'testee'}));
     const dialogId = await messageboxPage.dialog.getDialogId();

@@ -17,6 +17,7 @@ import {MAIN_AREA} from '../workbench.model';
 import {expectView} from '../matcher/view-matcher';
 import {NavigationTestPagePO} from './page-object/test-pages/navigation-test-page.po';
 import {ViewInfo} from './page-object/view-info-dialog.po';
+import {canMatchWorkbenchView} from './page-object/layout-page/register-route-page.po';
 
 test.describe('Workbench Router', () => {
 
@@ -29,7 +30,7 @@ test.describe('Workbench Router', () => {
       target: 'view.101',
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
     await expectView(testeeViewPage).toBeActive();
     await expect(appPO.views()).toHaveCount(2);
 
@@ -57,7 +58,7 @@ test.describe('Workbench Router', () => {
       target: 'view.101',
     });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
     await expectView(testee1ViewPage).toBeActive();
     await expect(appPO.views()).toHaveCount(2);
 
@@ -67,7 +68,7 @@ test.describe('Workbench Router', () => {
       target: 'view.102',
     });
 
-    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const testee2ViewPage = new ViewPagePO(appPO.view({viewId: 'view.102'}));
     await expectView(testee2ViewPage).toBeActive();
     await expect(appPO.views()).toHaveCount(3);
 
@@ -77,7 +78,7 @@ test.describe('Workbench Router', () => {
       target: 'view.103',
     });
 
-    const testee3ViewPage = new ViewPagePO(appPO, {viewId: 'view.103'});
+    const testee3ViewPage = new ViewPagePO(appPO.view({viewId: 'view.103'}));
     await expectView(testee3ViewPage).toBeActive();
     await expect(appPO.views()).toHaveCount(4);
 
@@ -183,8 +184,8 @@ test.describe('Workbench Router', () => {
       target: 'view.102',
     });
 
-    const testee1ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.101'});
-    const testee2ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.102'});
+    const testee1ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.101'}));
+    const testee2ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.102'}));
 
     // expect the test views to be opened
     await expect(appPO.views()).toHaveCount(3);
@@ -254,7 +255,7 @@ test.describe('Workbench Router', () => {
     })).rejects.toThrow(/\[NavigateError]/);
 
     // Expect view not to be closed.
-    const testeeViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.100'}));
     await expectView(testeeViewPage).toBeInactive();
   });
 
@@ -289,9 +290,9 @@ test.describe('Workbench Router', () => {
       close: true,
     });
 
-    const testee1ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.101'});
-    const testee2ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.102'});
-    const testee3ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.103'});
+    const testee1ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.101'}));
+    const testee2ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.102'}));
+    const testee3ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.103'}));
 
     // expect the test view to be closed
     await expectView(routerPage).toBeActive();
@@ -332,9 +333,9 @@ test.describe('Workbench Router', () => {
       close: true,
     });
 
-    const testee1ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.101'});
-    const testee2ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.102'});
-    const testee3ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.103'});
+    const testee1ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.101'}));
+    const testee2ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.102'}));
+    const testee3ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.103'}));
 
     // expect the test view to be closed
     await expect(appPO.views()).toHaveCount(2);
@@ -375,9 +376,9 @@ test.describe('Workbench Router', () => {
       close: true,
     });
 
-    const testee1ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.101'});
-    const testee2ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.102'});
-    const testee3ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.103'});
+    const testee1ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.101'}));
+    const testee2ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.102'}));
+    const testee3ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.103'}));
 
     // expect the test view to be closed
     await expect(appPO.views()).toHaveCount(2);
@@ -436,12 +437,12 @@ test.describe('Workbench Router', () => {
       close: true,
     });
 
-    const testee1ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.101'});
-    const testee2ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.102'});
-    const testee3ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.103'});
-    const testee4ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.104'});
-    const testee5ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.105'});
-    const testee6ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.106'});
+    const testee1ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.101'}));
+    const testee2ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.102'}));
+    const testee3ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.103'}));
+    const testee4ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.104'}));
+    const testee5ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.105'}));
+    const testee6ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.106'}));
 
     // expect the test view to be closed
     await expect(appPO.views()).toHaveCount(6);
@@ -503,12 +504,12 @@ test.describe('Workbench Router', () => {
       close: true,
     });
 
-    const testee1ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.101'});
-    const testee2ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.102'});
-    const testee3ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.103'});
-    const testee4ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.104'});
-    const testee5ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.105'});
-    const testee6ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.106'});
+    const testee1ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.101'}));
+    const testee2ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.102'}));
+    const testee3ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.103'}));
+    const testee4ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.104'}));
+    const testee5ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.105'}));
+    const testee6ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.106'}));
 
     // expect the test view to be closed
     await expect(appPO.views()).toHaveCount(5);
@@ -570,12 +571,12 @@ test.describe('Workbench Router', () => {
       close: true,
     });
 
-    const testee1ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.101'});
-    const testee2ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.102'});
-    const testee3ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.103'});
-    const testee4ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.104'});
-    const testee5ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.105'});
-    const testee6ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.106'});
+    const testee1ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.101'}));
+    const testee2ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.102'}));
+    const testee3ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.103'}));
+    const testee4ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.104'}));
+    const testee5ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.105'}));
+    const testee6ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.106'}));
 
     // expect the test view to be closed
     await expect(appPO.views()).toHaveCount(3);
@@ -598,7 +599,7 @@ test.describe('Workbench Router', () => {
       cssClass: 'testee',
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+    const testeeViewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
 
     // expect the test view to be opened as new tab
     await expect(appPO.views()).toHaveCount(2);
@@ -620,7 +621,7 @@ test.describe('Workbench Router', () => {
       cssClass: 'testee',
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+    const testeeViewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
 
     // expect the test view to be opened in the same tab
     await expect.poll(() => testeeViewPage.view.getViewId()).toEqual(routerViewId);
@@ -640,7 +641,7 @@ test.describe('Workbench Router', () => {
       cssClass: 'testee-1',
     });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
 
     // expect the test view to be opened as new tab
     await expect(appPO.views()).toHaveCount(2);
@@ -654,7 +655,7 @@ test.describe('Workbench Router', () => {
       cssClass: 'testee-2',
     });
 
-    const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+    const testee2ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
 
     // expect a new test view to be opened
     await expect(appPO.views()).toHaveCount(3);
@@ -801,7 +802,7 @@ test.describe('Workbench Router', () => {
     );
 
     // Open view in a part not contained in the layout.
-    const routerPage = new RouterPagePO(appPO, {cssClass: 'router'});
+    const routerPage = new RouterPagePO(appPO.view({cssClass: 'router'}));
     await routerPage.navigate(['test-view'], {
       partId: 'does-not-exist',
       data: {navigated: 'true'},
@@ -946,7 +947,7 @@ test.describe('Workbench Router', () => {
       target: 'view.100',
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
     // expect the view to be opened as new tab
     await expect(appPO.views()).toHaveCount(2);
@@ -976,7 +977,7 @@ test.describe('Workbench Router', () => {
       cssClass: 'testee-1',
     });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
 
     // expect the test view to be opened as new tab
     await expect(appPO.views()).toHaveCount(2);
@@ -991,7 +992,7 @@ test.describe('Workbench Router', () => {
       cssClass: 'testee-2',
     });
 
-    const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+    const testee2ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
 
     // expect a new test view to be opened but not to be activated
     await expect(appPO.views()).toHaveCount(3);
@@ -1009,7 +1010,7 @@ test.describe('Workbench Router', () => {
       cssClass: 'testee',
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+    const testeeViewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
 
     // expect the test view to be opened as new tab
     await expect(appPO.views()).toHaveCount(2);
@@ -1026,7 +1027,7 @@ test.describe('Workbench Router', () => {
       target: 'view.100',
     });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
     // expect the test view to be opened as new tab
     await expect(appPO.views()).toHaveCount(2);
@@ -1054,10 +1055,10 @@ test.describe('Workbench Router', () => {
       target: 'view.101',
     });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
 
     // expect the param to be set
-    await expect.poll(() => testee1ViewPage.getParams()).toEqual({param: 'value1'});
+    await expect.poll(() => testee1ViewPage.getRouteParams()).toEqual({param: 'value1'});
 
     // navigate to the test view 2
     await routerPage.view.tab.click();
@@ -1065,10 +1066,10 @@ test.describe('Workbench Router', () => {
       target: 'view.102',
     });
 
-    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const testee2ViewPage = new ViewPagePO(appPO.view({viewId: 'view.102'}));
 
     // expect the param to be set
-    await expect.poll(() => testee2ViewPage.getParams()).toEqual({param: 'value1'});
+    await expect.poll(() => testee2ViewPage.getRouteParams()).toEqual({param: 'value1'});
 
     // update all matching present views
     await routerPage.view.tab.click();
@@ -1080,10 +1081,10 @@ test.describe('Workbench Router', () => {
     await expect(appPO.views()).toHaveCount(3);
 
     await testee1ViewPage.view.tab.click();
-    await expect.poll(() => testee1ViewPage.getParams()).toEqual({param: 'value2'});
+    await expect.poll(() => testee1ViewPage.getRouteParams()).toEqual({param: 'value2'});
 
     await testee2ViewPage.view.tab.click();
-    await expect.poll(() => testee2ViewPage.getParams()).toEqual({param: 'value2'});
+    await expect.poll(() => testee2ViewPage.getRouteParams()).toEqual({param: 'value2'});
   });
 
   test('should, by default, open a new view if no matching view is found [target=`undefined`]', async ({appPO, workbenchNavigator}) => {
@@ -1095,7 +1096,7 @@ test.describe('Workbench Router', () => {
       cssClass: 'testee',
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+    const testeeViewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
 
     // expect the test view to be opened as new tab
     await expect(appPO.views()).toHaveCount(2);
@@ -1112,7 +1113,7 @@ test.describe('Workbench Router', () => {
       target: 'view.100',
     });
 
-    const testeeView = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeView = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
     // expect the test view to be opened as new tab
     await expect(appPO.views()).toHaveCount(2);
@@ -1136,7 +1137,7 @@ test.describe('Workbench Router', () => {
     await expect(appPO.views()).toHaveCount(2);
     await expectView(routerPage).toBeInactive();
     await expectView(testeeView).toBeActive();
-    await expect.poll(() => testeeView.getParams()).toEqual({param: 'value1'});
+    await expect.poll(() => testeeView.getRouteParams()).toEqual({param: 'value1'});
   });
 
   test('should, by default, navigate existing view(s) of the same path (path matches multiple views) [target=`undefined`]', async ({appPO, workbenchNavigator}) => {
@@ -1148,10 +1149,10 @@ test.describe('Workbench Router', () => {
       target: 'view.101',
     });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
 
     // expect the param to be set
-    await expect.poll(() => testee1ViewPage.getParams()).toEqual({param: 'value1'});
+    await expect.poll(() => testee1ViewPage.getRouteParams()).toEqual({param: 'value1'});
 
     // navigate to the test view 2
     await routerPage.view.tab.click();
@@ -1159,10 +1160,10 @@ test.describe('Workbench Router', () => {
       target: 'view.102',
     });
 
-    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const testee2ViewPage = new ViewPagePO(appPO.view({viewId: 'view.102'}));
 
     // expect the param to be set
-    await expect.poll(() => testee2ViewPage.getParams()).toEqual({param: 'value1'});
+    await expect.poll(() => testee2ViewPage.getRouteParams()).toEqual({param: 'value1'});
 
     // update all matching present views
     await routerPage.view.tab.click();
@@ -1172,10 +1173,10 @@ test.describe('Workbench Router', () => {
     await expect(appPO.views()).toHaveCount(3);
 
     await testee1ViewPage.view.tab.click();
-    await expect.poll(() => testee1ViewPage.getParams()).toEqual({param: 'value2'});
+    await expect.poll(() => testee1ViewPage.getRouteParams()).toEqual({param: 'value2'});
 
     await testee2ViewPage.view.tab.click();
-    await expect.poll(() => testee2ViewPage.getParams()).toEqual({param: 'value2'});
+    await expect.poll(() => testee2ViewPage.getRouteParams()).toEqual({param: 'value2'});
   });
 
   test('should open a new view if the target view is not found [target=viewId]', async ({appPO, workbenchNavigator}) => {
@@ -1187,7 +1188,7 @@ test.describe('Workbench Router', () => {
       target: 'view.99',
     });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.99'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({viewId: 'view.99'}));
 
     // expect the test view to be opened as new tab
     await expect(appPO.views()).toHaveCount(2);
@@ -1197,6 +1198,21 @@ test.describe('Workbench Router', () => {
 
   test('should navigate views of the same path and hint [target=auto] (1/4)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
+
+    // Register test routes.
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'router-page',
+      canMatch: [canMatchWorkbenchView('test-router')],
+      data: {path: '', navigationHint: 'test-router'},
+    });
+
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'view-page',
+      canMatch: [canMatchWorkbenchView('test-view')],
+      data: {path: '', navigationHint: 'test-view'},
+    });
 
     await workbenchNavigator.createPerspective(layout => layout
       .addPart('part.main')
@@ -1214,7 +1230,7 @@ test.describe('Workbench Router', () => {
     const testView2 = appPO.view({viewId: 'view.102'});
 
     // Navigate to empty-path route with hint 'test-view'.
-    const routerPage = new RouterPagePO(appPO, {viewId: 'view.103'});
+    const routerPage = new RouterPagePO(appPO.view({viewId: 'view.103'}));
     await routerPage.navigate([], {
       target: 'auto',
       hint: 'test-view',
@@ -1240,6 +1256,20 @@ test.describe('Workbench Router', () => {
   test('should navigate views of the same path and hint [target=auto] (2/4)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
+    // Register test routes.
+    await workbenchNavigator.registerRoute({
+      path: 'test-view',
+      component: 'view-page',
+      data: {path: 'test-view', navigationHint: ''},
+    });
+
+    await workbenchNavigator.registerRoute({
+      path: 'test-view',
+      component: 'view-page',
+      canMatch: [canMatchWorkbenchView('test-view')],
+      data: {path: 'test-view', navigationHint: 'test-view'},
+    });
+
     await workbenchNavigator.createPerspective(layout => layout
       .addPart('part.main')
       .addPart('part.left', {relativeTo: 'part.main', align: 'left'})
@@ -1256,7 +1286,7 @@ test.describe('Workbench Router', () => {
     const testView2 = appPO.view({viewId: 'view.102'});
 
     // Navigate to 'test-view' route without hint.
-    const routerPage = new RouterPagePO(appPO, {viewId: 'view.103'});
+    const routerPage = new RouterPagePO(appPO.view({viewId: 'view.103'}));
     await routerPage.navigate(['test-view'], {
       target: 'auto',
       data: {navigated: 'true'},
@@ -1281,6 +1311,14 @@ test.describe('Workbench Router', () => {
   test('should navigate views of the same path and hint [target=auto] (3/4)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
+    // Register test routes.
+    await workbenchNavigator.registerRoute({
+      path: 'test-view',
+      component: 'view-page',
+      canMatch: [canMatchWorkbenchView('test-view')],
+      data: {path: 'test-view', navigationHint: 'test-view'},
+    });
+
     await workbenchNavigator.createPerspective(layout => layout
       .addPart('part.main')
       .addPart('part.left', {relativeTo: 'part.main', align: 'left'})
@@ -1297,7 +1335,7 @@ test.describe('Workbench Router', () => {
     const testView2 = appPO.view({viewId: 'view.102'});
 
     // Navigate to 'test-view' route without hint.
-    const routerPage = new RouterPagePO(appPO, {viewId: 'view.103'});
+    const routerPage = new RouterPagePO(appPO.view({viewId: 'view.103'}));
     await routerPage.navigate(['test-view'], {
       target: 'auto',
       hint: 'test-view',
@@ -1323,6 +1361,21 @@ test.describe('Workbench Router', () => {
   test('should navigate views of the same path and hint [target=auto] (4/4)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
+    // Register test routes.
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'router-page',
+      canMatch: [canMatchWorkbenchView('test-router')],
+      data: {path: '', navigationHint: 'test-router'},
+    });
+
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'view-page',
+      canMatch: [canMatchWorkbenchView('test-view')],
+      data: {path: '', navigationHint: 'test-view'},
+    });
+
     await workbenchNavigator.createPerspective(layout => layout
       .addPart('part.main')
       .addPart('part.right', {relativeTo: 'part.main', align: 'right'})
@@ -1336,7 +1389,7 @@ test.describe('Workbench Router', () => {
     const testView2 = appPO.view({cssClass: 'testee'});
 
     // Navigate to empty-path route with hint 'test-view'.
-    const routerPage = new RouterPagePO(appPO, {viewId: 'view.102'});
+    const routerPage = new RouterPagePO(appPO.view({viewId: 'view.102'}));
     await routerPage.navigate([], {
       target: 'auto',
       hint: 'test-view',
@@ -1363,6 +1416,19 @@ test.describe('Workbench Router', () => {
   test('should close views of the same path and hint [target=auto] (1/4)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
+    // Register test routes.
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'router-page',
+      canMatch: [canMatchWorkbenchView('test-router')],
+    });
+
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'view-page',
+      canMatch: [canMatchWorkbenchView('test-view')],
+    });
+
     await workbenchNavigator.createPerspective(layout => layout
       .addPart('part.main')
       .addPart('part.left', {relativeTo: 'part.main', align: 'left'})
@@ -1375,14 +1441,14 @@ test.describe('Workbench Router', () => {
       .navigateView('view.103', ['test-router']),
     );
 
-    const testView1 = new ViewPagePO(appPO, {viewId: 'view.101'});
-    const testView2 = new RouterPagePO(appPO, {viewId: 'view.102'});
+    const testView1 = new ViewPagePO(appPO.view({viewId: 'view.101'}));
+    const testView2 = new RouterPagePO(appPO.view({viewId: 'view.102'}));
 
     await expectView(testView1).toBeActive();
     await expectView(testView2).toBeActive();
 
     // Close views navigated to empty-path route with hint 'test-view'.
-    const routerPage = new RouterPagePO(appPO, {viewId: 'view.103'});
+    const routerPage = new RouterPagePO(appPO.view({viewId: 'view.103'}));
     await routerPage.navigate([], {
       hint: 'test-view',
       close: true,
@@ -1397,6 +1463,13 @@ test.describe('Workbench Router', () => {
   test('should close views of the same path and hint [target=auto] (2/4)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
+    // Register test routes.
+    await workbenchNavigator.registerRoute({
+      path: 'test-view',
+      component: 'view-page',
+      canMatch: [canMatchWorkbenchView('test-view')],
+    });
+
     await workbenchNavigator.createPerspective(layout => layout
       .addPart('part.main')
       .addPart('part.left', {relativeTo: 'part.main', align: 'left'})
@@ -1409,14 +1482,14 @@ test.describe('Workbench Router', () => {
       .navigateView('view.103', ['test-router']),
     );
 
-    const testView1 = new ViewPagePO(appPO, {viewId: 'view.101'});
-    const testView2 = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const testView1 = new ViewPagePO(appPO.view({viewId: 'view.101'}));
+    const testView2 = new ViewPagePO(appPO.view({viewId: 'view.102'}));
 
     await expectView(testView1).toBeActive();
     await expectView(testView2).toBeActive();
 
     // Close views navigated to 'test-view' route without hint.
-    const routerPage = new RouterPagePO(appPO, {viewId: 'view.103'});
+    const routerPage = new RouterPagePO(appPO.view({viewId: 'view.103'}));
     await routerPage.navigate(['test-view'], {
       close: true,
     });
@@ -1430,6 +1503,13 @@ test.describe('Workbench Router', () => {
   test('should close views of the same path and hint [target=auto] (3/4)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
+    // Register test routes.
+    await workbenchNavigator.registerRoute({
+      path: 'test-view',
+      component: 'view-page',
+      canMatch: [canMatchWorkbenchView('test-view')],
+    });
+
     await workbenchNavigator.createPerspective(layout => layout
       .addPart('part.main')
       .addPart('part.left', {relativeTo: 'part.main', align: 'left'})
@@ -1442,14 +1522,14 @@ test.describe('Workbench Router', () => {
       .navigateView('view.103', ['test-router']),
     );
 
-    const testView1 = new ViewPagePO(appPO, {viewId: 'view.101'});
-    const testView2 = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const testView1 = new ViewPagePO(appPO.view({viewId: 'view.101'}));
+    const testView2 = new ViewPagePO(appPO.view({viewId: 'view.102'}));
 
     await expectView(testView1).toBeActive();
     await expectView(testView2).toBeActive();
 
     // Close views navigated to 'test-view' route without hint.
-    const routerPage = new RouterPagePO(appPO, {viewId: 'view.103'});
+    const routerPage = new RouterPagePO(appPO.view({viewId: 'view.103'}));
     await routerPage.navigate(['test-view'], {
       hint: 'test-view',
       close: true,
@@ -1464,6 +1544,19 @@ test.describe('Workbench Router', () => {
   test('should close views of the same path and hint [target=auto] (4/4)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
+    // Register test routes.
+    await workbenchNavigator.registerRoute({
+      path: 'test-view',
+      component: 'view-page',
+      canMatch: [canMatchWorkbenchView('test-view')],
+    });
+
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'view-page',
+      canMatch: [canMatchWorkbenchView('test-view')],
+    });
+
     await workbenchNavigator.createPerspective(layout => layout
       .addPart('part.main')
       .addPart('part.left', {relativeTo: 'part.main', align: 'left'})
@@ -1476,11 +1569,11 @@ test.describe('Workbench Router', () => {
       .navigateView('view.103', ['test-router']),
     );
 
-    const view101 = new ViewPagePO(appPO, {viewId: 'view.101'});
-    const view102 = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const view101 = new ViewPagePO(appPO.view({viewId: 'view.101'}));
+    const view102 = new ViewPagePO(appPO.view({viewId: 'view.102'}));
 
     // Close views navigated to empty-path route with hint 'test-view'.
-    const routerPage = new RouterPagePO(appPO, {viewId: 'view.103'});
+    const routerPage = new RouterPagePO(appPO.view({viewId: 'view.103'}));
     await routerPage.navigate([], {
       hint: 'test-view',
       close: true,
@@ -1543,11 +1636,11 @@ test.describe('Workbench Router', () => {
     await routerPage.view.tab.close();
 
     // Expect view.101 to be closed.
-    const view101 = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const view101 = new ViewPagePO(appPO.view({viewId: 'view.101'}));
     await expectView(view101).not.toBeAttached();
 
     // Expect view.102 not to be closed.
-    const view102 = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const view102 = new ViewPagePO(appPO.view({viewId: 'view.102'}));
     await expectView(view102).toBeActive();
   });
 
@@ -1565,8 +1658,8 @@ test.describe('Workbench Router', () => {
       .activatePart('part.activity'),
     );
 
-    const view101 = new ViewPagePO(appPO, {viewId: 'view.101'});
-    const view102 = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const view101 = new ViewPagePO(appPO.view({viewId: 'view.101'}));
+    const view102 = new ViewPagePO(appPO.view({viewId: 'view.102'}));
 
     // Close view.101.
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
@@ -1598,8 +1691,8 @@ test.describe('Workbench Router', () => {
       .activatePart('part.activity'),
     );
 
-    const view101 = new ViewPagePO(appPO, {viewId: 'view.101'});
-    const view102 = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const view101 = new ViewPagePO(appPO.view({viewId: 'view.101'}));
+    const view102 = new ViewPagePO(appPO.view({viewId: 'view.102'}));
 
     // Close views in part.main.
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
@@ -1626,7 +1719,7 @@ test.describe('Workbench Router', () => {
       .navigateView('view.100', ['test-view']),
     );
 
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
     // Expect the view to be opened in the left part.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -1674,6 +1767,13 @@ test.describe('Workbench Router', () => {
   test('should allow for navigation to an empty-path route in the main grid', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
+    // Register test routes.
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'view-page',
+      canMatch: [canMatchWorkbenchView('test-view')],
+    });
+
     await workbenchNavigator.modifyLayout(layout => layout
       .addPart('part.left', {align: 'left', ratio: .25})
       .addView('view.100', {partId: 'part.left', activateView: true})
@@ -1699,12 +1799,19 @@ test.describe('Workbench Router', () => {
     });
 
     // Expect the view to display.
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expectView(viewPage).toBeActive();
   });
 
   test('should allow for navigation to an empty-path route in the main area', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
+
+    // Register test routes.
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'view-page',
+      canMatch: [canMatchWorkbenchView('test-view')],
+    });
 
     // Open view in the main area.
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
@@ -1730,12 +1837,19 @@ test.describe('Workbench Router', () => {
     });
 
     // Expect the view to display.
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expectView(viewPage).toBeActive();
   });
 
   test('should navigate from path-based route to path-based route', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
+
+    // Register test routes.
+    await workbenchNavigator.registerRoute({
+      path: 'test-view',
+      component: 'view-page',
+      data: {path: 'test-view', navigationHint: ''},
+    });
 
     // Open router page as path-based route.
     await workbenchNavigator.modifyLayout(layout => layout
@@ -1744,12 +1858,12 @@ test.describe('Workbench Router', () => {
     );
 
     // Navigate to path-based route.
-    const routerPage = new RouterPagePO(appPO, {viewId: 'view.100'});
+    const routerPage = new RouterPagePO(appPO.view({viewId: 'view.100'}));
     await routerPage.navigate(['test-view'], {
       target: 'view.100',
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
     // Expect view to display path-based route.
     await expectView(testeeViewPage).toBeActive();
@@ -1764,6 +1878,14 @@ test.describe('Workbench Router', () => {
   test('should navigate from path-based route to empty-path route', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
+    // Register test routes.
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'view-page',
+      canMatch: [canMatchWorkbenchView('test-view')],
+      data: {path: '', navigationHint: 'test-view'},
+    });
+
     // Open router page as path-based route.
     await workbenchNavigator.modifyLayout(layout => layout
       .addView('view.100', {partId: 'part.initial'})
@@ -1771,13 +1893,13 @@ test.describe('Workbench Router', () => {
     );
 
     // Navigate to empty-path route.
-    const routerPage = new RouterPagePO(appPO, {viewId: 'view.100'});
+    const routerPage = new RouterPagePO(appPO.view({viewId: 'view.100'}));
     await routerPage.navigate([], {
       target: 'view.100',
       hint: 'test-view',
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
     // Expect view to display empty-path route.
     await expectView(testeeViewPage).toBeActive();
@@ -1792,6 +1914,20 @@ test.describe('Workbench Router', () => {
   test('should navigate from empty-path route to empty-path route', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
+    // Register test routes.
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'router-page',
+      canMatch: [canMatchWorkbenchView('test-router')],
+    });
+
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'view-page',
+      canMatch: [canMatchWorkbenchView('test-view')],
+      data: {path: '', navigationHint: 'test-view'},
+    });
+
     // Open router page as empty-path route.
     await workbenchNavigator.modifyLayout(layout => layout
       .addView('view.100', {partId: 'part.initial'})
@@ -1799,13 +1935,13 @@ test.describe('Workbench Router', () => {
     );
 
     // Navigate to empty-path route.
-    const routerPage = new RouterPagePO(appPO, {viewId: 'view.100'});
+    const routerPage = new RouterPagePO(appPO.view({viewId: 'view.100'}));
     await routerPage.navigate([], {
       target: 'view.100',
       hint: 'test-view',
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
     // Expect view to display empty-path route.
     await expectView(testeeViewPage).toBeActive();
@@ -1820,6 +1956,26 @@ test.describe('Workbench Router', () => {
   test('should navigate from empty-path route to path-based route', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
+    // Register test routes.
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'router-page',
+      canMatch: [canMatchWorkbenchView('test-router')],
+    });
+
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'view-page',
+      canMatch: [canMatchWorkbenchView('test-view')],
+      data: {path: '', navigationHint: 'test-view'},
+    });
+
+    await workbenchNavigator.registerRoute({
+      path: 'test-view',
+      component: 'view-page',
+      data: {path: 'test-view', navigationHint: ''},
+    });
+
     // Open router page as empty-path route.
     await workbenchNavigator.modifyLayout(layout => layout
       .addView('view.100', {partId: 'part.initial'})
@@ -1827,12 +1983,12 @@ test.describe('Workbench Router', () => {
     );
 
     // Navigate to path-based route.
-    const routerPage = new RouterPagePO(appPO, {viewId: 'view.100'});
+    const routerPage = new RouterPagePO(appPO.view({viewId: 'view.100'}));
     await routerPage.navigate(['test-view'], {
       target: 'view.100',
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
     // Expect view to display path-based route.
     await expectView(testeeViewPage).toBeActive();
@@ -1847,13 +2003,34 @@ test.describe('Workbench Router', () => {
   test('should resolve to correct route', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
+    // Register test routes.
+    await workbenchNavigator.registerRoute({
+      path: 'test-view',
+      component: 'view-page',
+      data: {path: 'test-view', navigationHint: ''},
+    });
+
+    await workbenchNavigator.registerRoute({
+      path: 'test-view',
+      component: 'view-page',
+      canMatch: [canMatchWorkbenchView('test-view')],
+      data: {path: 'test-view', navigationHint: 'test-view'},
+    });
+
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'view-page',
+      canMatch: [canMatchWorkbenchView('test-view')],
+      data: {path: '', navigationHint: 'test-view'},
+    });
+
     // Open test-view with {path: 'test-view'}
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.navigate(['test-view'], {
       cssClass: 'testee',
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+    const testeeViewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
 
     await expect.poll(() => testeeViewPage.view.getInfo()).toMatchObject(
       {
@@ -1890,6 +2067,49 @@ test.describe('Workbench Router', () => {
     );
   });
 
+  test('should preserve query parameters and fragment', async ({appPO, workbenchNavigator, page}) => {
+    await test.step('initial navigation', async () => {
+      await appPO.navigateTo({url: '#?queryParam1=value1#fragment', microfrontendSupport: false});
+      const url = new URL(page.url().replace('/#', ''));
+
+      // Expect query params and fragment not to be removed.
+      expect(url.searchParams.get('queryParam1')).toEqual('value1');
+      expect(url.hash).toEqual('#fragment');
+    });
+
+    await test.step('Open view', async () => {
+      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+      await routerPage.navigate(['test-view']);
+      const url = new URL(page.url().replace('/#', ''));
+
+      // Expect query params and fragment not to be removed.
+      expect(url.searchParams.get('queryParam1')).toEqual('value1');
+      expect(url.hash).toEqual('#fragment');
+    });
+
+    await test.step('Add new query param', async () => {
+      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+      await routerPage.navigate(['test-view'], {queryParams: {queryParam2: 'value2'}});
+      const url = new URL(page.url().replace('/#', ''));
+
+      // Expect query params and fragment not to be removed.
+      expect(url.searchParams.get('queryParam1')).toEqual('value1');
+      expect(url.searchParams.get('queryParam2')).toEqual('value2');
+      expect(url.hash).toEqual('#fragment');
+    });
+
+    await test.step('Replace URL fragment', async () => {
+      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+      await routerPage.navigate(['test-view'], {fragment: 'newFragment'});
+      const url = new URL(page.url().replace('/#', ''));
+
+      // Expect query params and fragment not to be removed.
+      expect(url.searchParams.get('queryParam1')).toEqual('value1');
+      expect(url.searchParams.get('queryParam2')).toEqual('value2');
+      expect(url.hash).toEqual('#newFragment');
+    });
+  });
+
   test('should reject if no path or hint is set', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
@@ -1911,8 +2131,8 @@ test.describe('Workbench Router', () => {
         .navigateView('router', ['test-router']),
       );
 
-      const routerPage = new RouterPagePO(appPO, {cssClass: 'router'});
-      const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      const routerPage = new RouterPagePO(appPO.view({cssClass: 'router'}));
+      const testeeViewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
 
       // Open test view, assigning it an alternative view id
       await routerPage.navigate(['test-pages/navigation-test-page/1'], {
@@ -1941,9 +2161,9 @@ test.describe('Workbench Router', () => {
         .navigateView('testee-2', ['test-view']),
       );
 
-      const routerPage = new RouterPagePO(appPO, {cssClass: 'router'});
-      const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
-      const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+      const routerPage = new RouterPagePO(appPO.view({cssClass: 'router'}));
+      const testee1ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
+      const testee2ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
 
       // Expect test views to be opened.
       await expect(appPO.views()).toHaveCount(3);
@@ -1976,10 +2196,10 @@ test.describe('Workbench Router', () => {
         .navigateView('testee-2', ['test-view']),
       );
 
-      const routerPage = new RouterPagePO(appPO, {cssClass: 'router'});
-      const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
-      const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
-      const testee3ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-3'});
+      const routerPage = new RouterPagePO(appPO.view({cssClass: 'router'}));
+      const testee1ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
+      const testee2ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
+      const testee3ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-3'}));
 
       // Expect test views to be opened
       await expect(appPO.views()).toHaveCount(4);

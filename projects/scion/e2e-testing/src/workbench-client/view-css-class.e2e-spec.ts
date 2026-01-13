@@ -47,7 +47,7 @@ test.describe('Workbench View CSS Class', () => {
       .addView('view.100', {partId: 'part.right', activateView: true, cssClass: 'testee-layout'}),
     );
 
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
     // Navigate to test view 1 passing CSS class 'testee-navigation-1'.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
@@ -132,7 +132,7 @@ test.describe('Workbench View CSS Class', () => {
       cssClass: 'testee',
     });
 
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');
     await expect.poll(() => viewPage.outlet.getCssClasses()).toContain('testee');
   });

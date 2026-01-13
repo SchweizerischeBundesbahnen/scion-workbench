@@ -40,7 +40,7 @@ test.describe('Workbench Router', () => {
     });
 
     // expect testee view to be opened as new tab
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expect(appPO.views()).toHaveCount(2);
     await expectView(testeeViewPage).toBeActive();
   });
@@ -65,7 +65,7 @@ test.describe('Workbench Router', () => {
     });
 
     // expect testee view to be opened as new tab
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expect(appPO.views()).toHaveCount(2);
     await expectView(testeeViewPage).toBeActive();
   });
@@ -92,7 +92,7 @@ test.describe('Workbench Router', () => {
     })).rejects.toThrow(/NullProviderError/);
 
     // expect testee view not to be opened
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expect(appPO.views()).toHaveCount(1);
     await expectView(testeeViewPage).not.toBeAttached();
     await expectView(routerPage).toBeActive();
@@ -120,7 +120,7 @@ test.describe('Workbench Router', () => {
     });
 
     // expect testee view not to be opened
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expect(appPO.views()).toHaveCount(2);
     await expectView(testeeViewPage).toBeActive();
   });
@@ -145,7 +145,7 @@ test.describe('Workbench Router', () => {
     })).rejects.toThrow(/NotQualifiedError/);
 
     // expect testee view not to be opened
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expect(appPO.views()).toHaveCount(1);
     await expectView(routerPage).toBeActive();
     await expectView(testeeViewPage).not.toBeAttached();
@@ -170,7 +170,7 @@ test.describe('Workbench Router', () => {
     });
 
     // expect testee view to be opened as new tab
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expect(appPO.views()).toHaveCount(2);
     await expectView(testeeViewPage).toBeActive();
 
@@ -203,7 +203,7 @@ test.describe('Workbench Router', () => {
       target: routerPageId,
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: routerPageId});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: routerPageId}));
 
     // expect testee view to be opened in the current tab
     await expect(appPO.views()).toHaveCount(1);
@@ -239,7 +239,7 @@ test.describe('Workbench Router', () => {
       cssClass: 'testee-1',
     });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
 
     // expect testee-1 view to be opened in a new tab
     await expectView(routerPage).toBeInactive();
@@ -255,7 +255,7 @@ test.describe('Workbench Router', () => {
       cssClass: 'testee-2',
     });
 
-    const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+    const testee2ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
 
     // expect testee-2 view to be opened in a new tab
     await expectView(routerPage).toBeInactive();
@@ -292,7 +292,7 @@ test.describe('Workbench Router', () => {
     });
 
     // expect testee view to be opened in a new tab
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expect(appPO.views()).toHaveCount(2);
     await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({param: 'value1'});
     await expectView(testeeViewPage).toBeActive();
@@ -335,7 +335,7 @@ test.describe('Workbench Router', () => {
     });
 
     // expect testee-1 view to be opened in a new tab
-    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
     await expect(appPO.views()).toHaveCount(2);
     await expect.poll(() => testee1ViewPage.getViewParams()).toMatchObject({param: 'value1'});
     await expectView(testee1ViewPage).toBeActive();
@@ -348,7 +348,7 @@ test.describe('Workbench Router', () => {
     });
 
     // expect testee-2 view to be opened in a new tab
-    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const testee2ViewPage = new ViewPagePO(appPO.view({viewId: 'view.102'}));
     await expect(appPO.views()).toHaveCount(3);
     await expect.poll(() => testee2ViewPage.getViewParams()).toMatchObject({param: 'value2'});
     await expectView(testee2ViewPage).toBeActive();
@@ -397,7 +397,7 @@ test.describe('Workbench Router', () => {
     });
 
     // expect testee-1 view to be opened in a new tab
-    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
     await expect(appPO.views()).toHaveCount(2);
     await expect.poll(() => testee1ViewPage.getViewParams()).toMatchObject({optionalParam: 'value1', requiredParam: 'value1'});
     await expectView(testee1ViewPage).toBeActive();
@@ -410,7 +410,7 @@ test.describe('Workbench Router', () => {
     });
 
     // expect testee-2 view to be opened in a new tab
-    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const testee2ViewPage = new ViewPagePO(appPO.view({viewId: 'view.102'}));
     await expect(appPO.views()).toHaveCount(3);
     await expect.poll(() => testee2ViewPage.getViewParams()).toMatchObject({optionalParam: 'value2', requiredParam: 'value1'});
     await expectView(testee2ViewPage).toBeActive();
@@ -423,7 +423,7 @@ test.describe('Workbench Router', () => {
     });
 
     // expect testee-3 view to be opened in a new tab
-    const testee3ViewPage = new ViewPagePO(appPO, {viewId: 'view.103'});
+    const testee3ViewPage = new ViewPagePO(appPO.view({viewId: 'view.103'}));
     await expect(appPO.views()).toHaveCount(4);
     await expect.poll(() => testee3ViewPage.getViewParams()).toMatchObject({optionalParam: 'value3', requiredParam: 'value2'});
     await expectView(testee3ViewPage).toBeActive();
@@ -471,7 +471,7 @@ test.describe('Workbench Router', () => {
     });
 
     // expect testee-1 view to be opened in a new tab
-    const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
     await expect(appPO.views()).toHaveCount(2);
     await expectView(routerPage).toBeInactive();
     await expectView(testee1ViewPage).toBeActive();
@@ -485,7 +485,7 @@ test.describe('Workbench Router', () => {
     });
 
     // expect testee-2 view to be opened in a new tab
-    const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+    const testee2ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
     await expect(appPO.views()).toHaveCount(3);
     await expectView(routerPage).toBeInactive();
     await expectView(testee1ViewPage).toBeInactive();
@@ -520,7 +520,7 @@ test.describe('Workbench Router', () => {
     });
 
     // expect testee view to be opened in a new tab
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expect(appPO.views()).toHaveCount(2);
     await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({param: 'value1'});
     await expectView(testeeViewPage).toBeActive();
@@ -563,7 +563,7 @@ test.describe('Workbench Router', () => {
     });
 
     // expect testee-1 view to be opened in a new tab
-    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
     await expect(appPO.views()).toHaveCount(2);
     await expect.poll(() => testee1ViewPage.getViewParams()).toMatchObject({param: 'value1'});
     await expectView(testee1ViewPage).toBeActive();
@@ -576,7 +576,7 @@ test.describe('Workbench Router', () => {
     });
 
     // expect testee-2 view to be opened in a new tab
-    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const testee2ViewPage = new ViewPagePO(appPO.view({viewId: 'view.102'}));
     await expect(appPO.views()).toHaveCount(3);
     await expect.poll(() => testee2ViewPage.getViewParams()).toMatchObject({param: 'value2'});
     await expectView(testee2ViewPage).toBeActive();
@@ -625,7 +625,7 @@ test.describe('Workbench Router', () => {
     });
 
     // expect testee-1 view to be opened in a new tab
-    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
     await expect(appPO.views()).toHaveCount(2);
     await expect.poll(() => testee1ViewPage.getViewParams()).toMatchObject({optionalParam: 'value1', requiredParam: 'value1'});
     await expectView(testee1ViewPage).toBeActive();
@@ -638,7 +638,7 @@ test.describe('Workbench Router', () => {
     });
 
     // expect testee-2 view to be opened in a new tab
-    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const testee2ViewPage = new ViewPagePO(appPO.view({viewId: 'view.102'}));
     await expect(appPO.views()).toHaveCount(3);
     await expect.poll(() => testee2ViewPage.getViewParams()).toMatchObject({optionalParam: 'value2', requiredParam: 'value1'});
     await expectView(testee2ViewPage).toBeActive();
@@ -651,7 +651,7 @@ test.describe('Workbench Router', () => {
     });
 
     // expect testee-3 view to be opened in a new tab
-    const testee3ViewPage = new ViewPagePO(appPO, {viewId: 'view.103'});
+    const testee3ViewPage = new ViewPagePO(appPO.view({viewId: 'view.103'}));
     await expect(appPO.views()).toHaveCount(4);
     await expect.poll(() => testee3ViewPage.getViewParams()).toMatchObject({optionalParam: 'value3', requiredParam: 'value2'});
     await expectView(testee3ViewPage).toBeActive();
@@ -706,8 +706,8 @@ test.describe('Workbench Router', () => {
     });
     await routerPage.view.tab.close();
 
-    const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
-    const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
+    const testee2ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
 
     // expect testee views to be opened as new tab
     await expect(appPO.views()).toHaveCount(2);
@@ -749,9 +749,9 @@ test.describe('Workbench Router', () => {
       },
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
-    const testeeViewPage1 = new ViewPagePO(appPO, {cssClass: 'testee-1'});
-    const testeeViewPage2 = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
+    const testeeViewPage1 = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
+    const testeeViewPage2 = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
 
     const componentInstanceIds = new Set<string>();
 
@@ -833,7 +833,7 @@ test.describe('Workbench Router', () => {
     });
 
     // expect the view to display the component that is associated with the empty route
-    const testeeViewPage = new MicrofrontendViewTestPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new MicrofrontendViewTestPagePO(appPO.view({viewId: 'view.100'}));
     await expectView(testeeViewPage).toBeActive();
   });
 
@@ -865,7 +865,7 @@ test.describe('Workbench Router', () => {
     });
 
     // Expect view to be opened.
-    const testee = new ViewPagePO(appPO, {viewId: 'view.1'});
+    const testee = new ViewPagePO(appPO.view({viewId: 'view.1'}));
     await expectView(testee).toBeActive();
     await expect(appPO.views()).toHaveCount(2);
 
@@ -923,7 +923,7 @@ test.describe('Workbench Router', () => {
     });
 
     // expect the view to be present
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expectView(testeeViewPage).toBeActive();
     await expect(appPO.views()).toHaveCount(2);
 
@@ -968,8 +968,8 @@ test.describe('Workbench Router', () => {
       activate: true,
     });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.1'});
-    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.2'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({viewId: 'view.1'}));
+    const testee2ViewPage = new ViewPagePO(appPO.view({viewId: 'view.2'}));
 
     await expectView(routerPage).toBeInactive({loaded: true});
     await expectView(testee1ViewPage).toBeInactive({loaded: false});
@@ -1128,7 +1128,7 @@ test.describe('Workbench Router', () => {
       params: {id: '1'},
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.1'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.1'}));
 
     // Expect view properties to be set.
     await expect(testeeViewPage.view.tab.title).toHaveText('Title - 1');
@@ -1180,7 +1180,7 @@ test.describe('Workbench Router', () => {
       params: {id: '1'},
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.1'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.1'}));
 
     // Expect view properties to be set.
     await expect(testeeViewPage.view.tab.title).toBeEmpty();
@@ -1229,7 +1229,7 @@ test.describe('Workbench Router', () => {
       params: {id: '1'},
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.1'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.1'}));
 
     // Mark view dirty.
     await testeeViewPage.markDirty();
@@ -1273,7 +1273,7 @@ test.describe('Workbench Router', () => {
       target: 'view.1',
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.1'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.1'}));
 
     // Mark view dirty.
     await testeeViewPage.markDirty();
@@ -1309,7 +1309,7 @@ test.describe('Workbench Router', () => {
     });
 
     // expect the view to be present
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expectView(testeeViewPage).toBeActive();
     await expect(appPO.views()).toHaveCount(2);
 
@@ -1496,9 +1496,9 @@ test.describe('Workbench Router', () => {
       close: true,
     });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
-    const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
-    const testee3ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-3'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
+    const testee2ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
+    const testee3ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-3'}));
 
     // expect only the views of app 1 to be closed
     await expect(appPO.views()).toHaveCount(2);
@@ -1560,9 +1560,9 @@ test.describe('Workbench Router', () => {
       close: true,
     });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
-    const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
-    const testee3ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-3'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
+    const testee2ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
+    const testee3ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-3'}));
 
     // expect only the views of app 1 to be closed
     await expect(appPO.views()).toHaveCount(2);
@@ -1611,8 +1611,8 @@ test.describe('Workbench Router', () => {
       close: true,
     });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
-    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
+    const testee2ViewPage = new ViewPagePO(appPO.view({viewId: 'view.102'}));
 
     // expect the view 1 to be closed
     await expect(appPO.views()).toHaveCount(2);
@@ -1722,10 +1722,10 @@ test.describe('Workbench Router', () => {
       close: true,
     });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
-    const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
-    const testee3ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-3'});
-    const testee4ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-4'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
+    const testee2ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
+    const testee3ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-3'}));
+    const testee4ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-4'}));
 
     // expect the view to be closed
     await expect(appPO.views()).toHaveCount(4);
@@ -1794,10 +1794,10 @@ test.describe('Workbench Router', () => {
       close: true,
     });
 
-    const testee3ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-3'});
-    const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
-    const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
-    const testee4ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-4'});
+    const testee3ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-3'}));
+    const testee1ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
+    const testee2ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
+    const testee4ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-4'}));
 
     // expect the view to be closed
     await expect(appPO.views()).toHaveCount(3);
@@ -1866,10 +1866,10 @@ test.describe('Workbench Router', () => {
       close: true,
     });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
-    const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
-    const testee3ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-3'});
-    const testee4ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-4'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
+    const testee2ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
+    const testee3ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-3'}));
+    const testee4ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-4'}));
 
     // expect the view to be closed
     await expect(appPO.views()).toHaveCount(1);
@@ -1950,10 +1950,10 @@ test.describe('Workbench Router', () => {
       close: true,
     });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
-    const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
-    const testee3ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-3'});
-    const testee4ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-4'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
+    const testee2ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
+    const testee3ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-3'}));
+    const testee4ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-4'}));
 
     // expect the view to be closed
     await expect(appPO.views()).toHaveCount(3);
@@ -2006,8 +2006,8 @@ test.describe('Workbench Router', () => {
       close: true,
     });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
-    const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
+    const testee2ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
 
     // expect the views to be closed
     await expect(appPO.views()).toHaveCount(1);
@@ -2044,7 +2044,7 @@ test.describe('Workbench Router', () => {
       },
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.99'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.99'}));
 
     // navigate to microfrontend-1 view
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
@@ -2089,7 +2089,7 @@ test.describe('Workbench Router', () => {
     })).rejects.toThrow(/\[NotQualifiedError] Application 'workbench-client-testing-app1' is not qualified/);
 
     // expect testee view not to be opened
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expect(appPO.views()).toHaveCount(1);
     await expectView(routerPage).toBeActive();
     await expectView(testeeViewPage).not.toBeAttached();
@@ -2303,8 +2303,8 @@ test.describe('Workbench Router', () => {
       },
     });
 
-    const viewPage1 = new ViewPagePO(appPO, {cssClass: 'testee-1'});
-    const viewPage2 = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+    const viewPage1 = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
+    const viewPage2 = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
 
     // Open view in the left part.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
@@ -2378,8 +2378,8 @@ test.describe('Workbench Router', () => {
     });
 
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    const view101 = new ViewPagePO(appPO, {viewId: 'view.101'});
-    const view102 = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const view101 = new ViewPagePO(appPO.view({viewId: 'view.101'}));
+    const view102 = new ViewPagePO(appPO.view({viewId: 'view.102'}));
 
     // Prerequisite: Navigate view.101 to microfrontend view.
     await routerPage.navigate({component: 'testee'}, {target: 'view.101'});
@@ -2424,8 +2424,8 @@ test.describe('Workbench Router', () => {
     });
 
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    const view101 = new ViewPagePO(appPO, {viewId: 'view.101'});
-    const view102 = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const view101 = new ViewPagePO(appPO.view({viewId: 'view.101'}));
+    const view102 = new ViewPagePO(appPO.view({viewId: 'view.102'}));
 
     // Prerequisite: Navigate view.101 to microfrontend view.
     await routerPage.navigate({component: 'testee'}, {target: 'view.101'});

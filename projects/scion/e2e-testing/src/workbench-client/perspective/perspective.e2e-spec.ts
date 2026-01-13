@@ -12,6 +12,7 @@ import {test} from '../../fixtures';
 import {MAIN_AREA} from '../../workbench.model';
 import {expectView} from '../../matcher/view-matcher';
 import {ViewPagePO} from '../page-object/view-page.po';
+import {ViewPagePO as WorkbenchViewPagePO} from '../../workbench/page-object/view-page.po';
 import {expect} from '@playwright/test';
 import {MPart, MTreeNode} from '../../matcher/to-equal-workbench-layout.matcher';
 import {MessagingPagePO} from '../page-object/messaging-page.po';
@@ -19,12 +20,539 @@ import {ViewInfo} from '../../workbench/page-object/view-info-dialog.po';
 import {Manifest} from '@scion/microfrontend-platform';
 import {RouterPagePO} from '../page-object/router-page.po';
 import {PartPagePO} from '../page-object/part-page.po';
+import {PartPagePO as WorkbenchPartPagePO} from '../../workbench/page-object/part-page.po';
 import {expectPart} from '../matcher/part-matcher';
+import {expectPart as expectWorkbenchPart} from '../../matcher/part-matcher';
 import {expectDesktop} from '../../matcher/desktop-matcher';
 import {DesktopPagePO} from '../../workbench/page-object/desktop-page.po';
 import {ActivatorCapability, WorkbenchPartCapability, WorkbenchPerspectiveCapability, WorkbenchViewCapability} from '../page-object/register-workbench-capability-page.po';
+import {canMatchWorkbenchPartCapability, canMatchWorkbenchViewCapability} from '../../workbench/page-object/layout-page/register-route-page.po';
 
 test.describe('Workbench Perspective', () => {
+
+  /**
+   * App 1 defines a perspectives with part microfrontends of the host app, app1 and app2.
+   */
+  test('should display part microfrontend in perspective provided by a app1', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Register main area part capability in app1.
+    await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+      type: 'part',
+      qualifier: {part: 'main-area'},
+    });
+
+    // Register part capability in app1.
+    await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+      type: 'part',
+      qualifier: {part: 'testee', app: 'app1'},
+      properties: {
+        path: 'test-part',
+      },
+    });
+
+    // Register part capability in app2.
+    await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app2', {
+      type: 'part',
+      qualifier: {part: 'testee', app: 'app2'},
+      private: false,
+      properties: {
+        path: 'test-part',
+      },
+    });
+
+    // Register part capability in host app.
+    await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('host', {
+      type: 'part',
+      qualifier: {part: 'testee', app: 'host'},
+      private: false,
+      properties: {
+        path: '',
+      },
+    });
+
+    // Register route for host part capability.
+    await workbenchNavigator.registerRoute({
+      path: '', component: 'part-page', canMatch: [canMatchWorkbenchPartCapability({part: 'testee', app: 'host'})],
+    });
+
+    // Register part intention for app1 to access parts of other apps.
+    await microfrontendNavigator.registerIntention('app1', {
+      type: 'part',
+      qualifier: {part: 'testee', app: '*'},
+    });
+
+    // Create perspective.
+    await microfrontendNavigator.createPerspective('app1', {
+      type: 'perspective',
+      qualifier: {perspective: 'testee'},
+      properties: {
+        parts: [
+          {
+            id: MAIN_AREA,
+            qualifier: {part: 'main-area'},
+          },
+          {
+            id: 'part.testee.app1',
+            qualifier: {part: 'testee', app: 'app1'},
+            position: {align: 'left'},
+          },
+          {
+            id: 'part.testee.app2',
+            qualifier: {part: 'testee', app: 'app2'},
+            position: {align: 'right'},
+          },
+          {
+            id: 'part.testee.host',
+            qualifier: {part: 'testee', app: 'host'},
+            position: {align: 'bottom'},
+          },
+        ],
+      },
+    });
+
+    // Expect left part microfrontend of app1 to display.
+    await expectPart(appPO.part({partId: 'part.testee.app1'})).toDisplayComponent(PartPagePO.selector);
+
+    // Expect right part microfrontend of app2 to display.
+    await expectPart(appPO.part({partId: 'part.testee.app2'})).toDisplayComponent(PartPagePO.selector);
+
+    // Expect bottom part microfrontend of the host to display.
+    await expectWorkbenchPart(appPO.part({partId: 'part.testee.host'})).toDisplayComponent(WorkbenchPartPagePO.selector);
+  });
+
+  /**
+   * Host app defines a perspectives with part microfrontends of the host app, app1 and app2.
+   */
+  test('should display part microfrontend in perspective provided by the host app', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Register main area part capability in host app.
+    await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('host', {
+      type: 'part',
+      qualifier: {part: 'main-area'},
+    });
+
+    // Register part capability in host app.
+    await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('host', {
+      type: 'part',
+      qualifier: {part: 'testee', app: 'host'},
+      properties: {
+        path: '',
+      },
+    });
+
+    // Register part capability in app1.
+    await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+      type: 'part',
+      qualifier: {part: 'testee', app: 'app1'},
+      private: false,
+      properties: {
+        path: 'test-part',
+      },
+    });
+
+    // Register part capability in app2.
+    await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app2', {
+      type: 'part',
+      qualifier: {part: 'testee', app: 'app2'},
+      private: false,
+      properties: {
+        path: 'test-part',
+      },
+    });
+
+    // Register route for host part capability.
+    await workbenchNavigator.registerRoute({
+      path: '', component: 'part-page', canMatch: [canMatchWorkbenchPartCapability({part: 'testee', app: 'host'})],
+    });
+
+    // Register part intention for the host app to access parts of other apps.
+    await microfrontendNavigator.registerIntention('host', {
+      type: 'part',
+      qualifier: {part: 'testee', app: '*'},
+    });
+
+    // Create perspective.
+    await microfrontendNavigator.createPerspective('host', {
+      type: 'perspective',
+      qualifier: {perspective: 'testee'},
+      properties: {
+        parts: [
+          {
+            id: MAIN_AREA,
+            qualifier: {part: 'main-area'},
+          },
+          {
+            id: 'part.testee.app1',
+            qualifier: {part: 'testee', app: 'app1'},
+            position: {align: 'left'},
+          },
+          {
+            id: 'part.testee.app2',
+            qualifier: {part: 'testee', app: 'app2'},
+            position: {align: 'right'},
+          },
+          {
+            id: 'part.testee.host',
+            qualifier: {part: 'testee', app: 'host'},
+            position: {align: 'bottom'},
+          },
+        ],
+      },
+    });
+
+    // Expect left part microfrontend of app1 to display.
+    await expectPart(appPO.part({partId: 'part.testee.app1'})).toDisplayComponent(PartPagePO.selector);
+
+    // Expect right part microfrontend of app2 to display.
+    await expectPart(appPO.part({partId: 'part.testee.app2'})).toDisplayComponent(PartPagePO.selector);
+
+    // Expect bottom part microfrontend of the host to display.
+    await expectWorkbenchPart(appPO.part({partId: 'part.testee.host'})).toDisplayComponent(WorkbenchPartPagePO.selector);
+  });
+
+  /**
+   * App 1 defines a perspectives with view microfrontends of the host app, app1 and app2.
+   */
+  test('should display view microfrontend in perspective provided by app1', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Register view capability in app1.
+    await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+      type: 'view',
+      qualifier: {view: 'testee', app: 'app1'},
+      private: false,
+      properties: {
+        path: 'test-view',
+      },
+    });
+
+    // Register view capability in app2.
+    await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app2', {
+      type: 'view',
+      qualifier: {view: 'testee', app: 'app2'},
+      private: false,
+      properties: {
+        path: 'test-view',
+      },
+    });
+
+    // Register view capability in host app.
+    await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('host', {
+      type: 'view',
+      qualifier: {view: 'testee', app: 'host'},
+      private: false,
+      properties: {
+        path: '',
+      },
+    });
+
+    // Register main area part capability in app1.
+    await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+      type: 'part',
+      qualifier: {part: 'main-area'},
+    });
+
+    // Register part capability in app1.
+    await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+      type: 'part',
+      qualifier: {part: 'testee', app: 'app1'},
+      properties: {
+        views: [
+          {qualifier: {view: 'testee', app: 'app1'}, cssClass: ['view-1a', 'app1', 'part-app1']},
+          {qualifier: {view: 'testee', app: 'app2'}, cssClass: ['view-1b', 'app2', 'part-app1']},
+          {qualifier: {view: 'testee', app: 'host'}, cssClass: ['view-1c', 'host', 'part-app1']},
+        ],
+      },
+    });
+
+    // Register part capability in app2.
+    await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app2', {
+      type: 'part',
+      qualifier: {part: 'testee', app: 'app2'},
+      private: false,
+      properties: {
+        views: [
+          {qualifier: {view: 'testee', app: 'app1'}, cssClass: ['view-2a', 'app1', 'part-app2']},
+          {qualifier: {view: 'testee', app: 'app2'}, cssClass: ['view-2b', 'app2', 'part-app2']},
+          {qualifier: {view: 'testee', app: 'host'}, cssClass: ['view-2c', 'host', 'part-app2']},
+        ],
+      },
+    });
+
+    // Register part capability in host app.
+    await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('host', {
+      type: 'part',
+      qualifier: {part: 'testee', app: 'host'},
+      private: false,
+      properties: {
+        views: [
+          {qualifier: {view: 'testee', app: 'app1'}, cssClass: ['view-3a', 'app1', 'part-host']},
+          {qualifier: {view: 'testee', app: 'app2'}, cssClass: ['view-3b', 'app2', 'part-host']},
+          {qualifier: {view: 'testee', app: 'host'}, cssClass: ['view-3c', 'host', 'part-host']},
+        ],
+      },
+    });
+
+    // Register route for host view capability.
+    await workbenchNavigator.registerRoute({
+      path: '', component: 'view-page', canMatch: [canMatchWorkbenchViewCapability({view: 'testee', app: 'host'})],
+    });
+
+    // Register part intention for app 1 to access parts of other apps.
+    await microfrontendNavigator.registerIntention('app1', {
+      type: 'part',
+      qualifier: {part: 'testee', app: '*'},
+    });
+
+    // Register view intention for app 1 to access views of other apps.
+    await microfrontendNavigator.registerIntention('app1', {
+      type: 'view',
+      qualifier: {view: 'testee', app: '*'},
+    });
+
+    // Register view intention for app 2 to access views of other apps.
+    await microfrontendNavigator.registerIntention('app2', {
+      type: 'view',
+      qualifier: {view: 'testee', app: '*'},
+    });
+
+    // Register view intention for host app to access views of other apps.
+    await microfrontendNavigator.registerIntention('host', {
+      type: 'view',
+      qualifier: {view: 'testee', app: '*'},
+    });
+
+    // Create perspective.
+    await microfrontendNavigator.createPerspective('app1', {
+      type: 'perspective',
+      qualifier: {perspective: 'testee'},
+      properties: {
+        parts: [
+          {
+            id: MAIN_AREA,
+            qualifier: {part: 'main-area'},
+          },
+          {
+            id: 'part.testee.app1',
+            qualifier: {part: 'testee', app: 'app1'},
+            position: {align: 'left'},
+          },
+          {
+            id: 'part.testee.app2',
+            qualifier: {part: 'testee', app: 'app2'},
+            position: {align: 'right'},
+          },
+          {
+            id: 'part.testee.host',
+            qualifier: {part: 'testee', app: 'host'},
+            position: {align: 'bottom'},
+          },
+        ],
+      },
+    });
+
+    // Activate and assert views of app 1.
+    await appPO.view({cssClass: ['view-1a', 'app1', 'part-app1']}).tab.click();
+    await appPO.view({cssClass: ['view-2a', 'app1', 'part-app2']}).tab.click();
+    await appPO.view({cssClass: ['view-3a', 'app1', 'part-host']}).tab.click();
+
+    await expectView(new ViewPagePO(appPO.view({cssClass: ['view-1a', 'app1', 'part-app1']}))).toBeActive();
+    await expectView(new ViewPagePO(appPO.view({cssClass: ['view-2a', 'app1', 'part-app2']}))).toBeActive();
+    await expectView(new ViewPagePO(appPO.view({cssClass: ['view-3a', 'app1', 'part-host']}))).toBeActive();
+
+    // Activate and assert views of app 2.
+    await appPO.view({cssClass: ['view-1b', 'app2', 'part-app1']}).tab.click();
+    await appPO.view({cssClass: ['view-2b', 'app2', 'part-app2']}).tab.click();
+    await appPO.view({cssClass: ['view-3b', 'app2', 'part-host']}).tab.click();
+
+    await expectView(new ViewPagePO(appPO.view({cssClass: ['view-1b', 'app2', 'part-app1']}))).toBeActive();
+    await expectView(new ViewPagePO(appPO.view({cssClass: ['view-2b', 'app2', 'part-app2']}))).toBeActive();
+    await expectView(new ViewPagePO(appPO.view({cssClass: ['view-3b', 'app2', 'part-host']}))).toBeActive();
+
+    // Activate and assert views of the host app.
+    await appPO.view({cssClass: ['view-1c', 'host', 'part-app1']}).tab.click();
+    await appPO.view({cssClass: ['view-2c', 'host', 'part-app2']}).tab.click();
+    await appPO.view({cssClass: ['view-3c', 'host', 'part-host']}).tab.click();
+
+    await expectView(new WorkbenchViewPagePO(appPO.view({cssClass: ['view-1c', 'host', 'part-app1']}))).toBeActive();
+    await expectView(new WorkbenchViewPagePO(appPO.view({cssClass: ['view-2c', 'host', 'part-app2']}))).toBeActive();
+    await expectView(new WorkbenchViewPagePO(appPO.view({cssClass: ['view-3c', 'host', 'part-host']}))).toBeActive();
+  });
+
+  /**
+   * Host app defines a perspectives with view microfrontends of the host app, app1 and app2.
+   */
+  test('should display view microfrontend in perspective provided by the host app', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Register view capability in app1.
+    await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+      type: 'view',
+      qualifier: {view: 'testee', app: 'app1'},
+      private: false,
+      properties: {
+        path: 'test-view',
+      },
+    });
+
+    // Register view capability in app2.
+    await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app2', {
+      type: 'view',
+      qualifier: {view: 'testee', app: 'app2'},
+      private: false,
+      properties: {
+        path: 'test-view',
+      },
+    });
+
+    // Register view capability in host app.
+    await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('host', {
+      type: 'view',
+      qualifier: {view: 'testee', app: 'host'},
+      private: false,
+      properties: {
+        path: '',
+      },
+    });
+
+    // Register main area part capability in app1.
+    await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('host', {
+      type: 'part',
+      qualifier: {part: 'main-area'},
+    });
+
+    // Register part capability in app1.
+    await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+      type: 'part',
+      qualifier: {part: 'testee', app: 'app1'},
+      properties: {
+        views: [
+          {qualifier: {view: 'testee', app: 'app1'}, cssClass: ['view-1a', 'app1', 'part-app1']},
+          {qualifier: {view: 'testee', app: 'app2'}, cssClass: ['view-1b', 'app2', 'part-app1']},
+          {qualifier: {view: 'testee', app: 'host'}, cssClass: ['view-1c', 'host', 'part-app1']},
+        ],
+      },
+    });
+
+    // Register part capability in app2.
+    await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app2', {
+      type: 'part',
+      qualifier: {part: 'testee', app: 'app2'},
+      private: false,
+      properties: {
+        extras: {
+          icon: 'folder',
+          label: 'testee',
+        },
+        views: [
+          {qualifier: {view: 'testee', app: 'app1'}, cssClass: ['view-2a', 'app1', 'part-app2']},
+          {qualifier: {view: 'testee', app: 'app2'}, cssClass: ['view-2b', 'app2', 'part-app2']},
+          {qualifier: {view: 'testee', app: 'host'}, cssClass: ['view-2c', 'host', 'part-app2']},
+        ],
+      },
+    });
+
+    // Register part capability in host app.
+    await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('host', {
+      type: 'part',
+      qualifier: {part: 'testee', app: 'host'},
+      private: false,
+      properties: {
+        views: [
+          {qualifier: {view: 'testee', app: 'app1'}, cssClass: ['view-3a', 'app1', 'part-host']},
+          {qualifier: {view: 'testee', app: 'app2'}, cssClass: ['view-3b', 'app2', 'part-host']},
+          {qualifier: {view: 'testee', app: 'host'}, cssClass: ['view-3c', 'host', 'part-host']},
+        ],
+      },
+    });
+
+    // Register route for host view capability.
+    await workbenchNavigator.registerRoute({
+      path: '', component: 'view-page', canMatch: [canMatchWorkbenchViewCapability({view: 'testee', app: 'host'})],
+    });
+
+    // Register part intention for host app to access parts of other apps.
+    await microfrontendNavigator.registerIntention('host', {
+      type: 'part',
+      qualifier: {part: 'testee', app: '*'},
+    });
+
+    // Register view intention for app 1 to access views of other apps.
+    await microfrontendNavigator.registerIntention('app1', {
+      type: 'view',
+      qualifier: {view: 'testee', app: '*'},
+    });
+
+    // Register view intention for app 2 to access views of other apps.
+    await microfrontendNavigator.registerIntention('app2', {
+      type: 'view',
+      qualifier: {view: 'testee', app: '*'},
+    });
+
+    // Register view intention for host app to access views of other apps.
+    await microfrontendNavigator.registerIntention('host', {
+      type: 'view',
+      qualifier: {view: 'testee', app: '*'},
+    });
+
+    // Create perspective.
+    await microfrontendNavigator.createPerspective('host', {
+      type: 'perspective',
+      qualifier: {perspective: 'testee'},
+      properties: {
+        parts: [
+          {
+            id: MAIN_AREA,
+            qualifier: {part: 'main-area'},
+          },
+          {
+            id: 'part.testee.app1',
+            qualifier: {part: 'testee', app: 'app1'},
+            position: {align: 'left'},
+          },
+          {
+            id: 'part.testee.app2',
+            qualifier: {part: 'testee', app: 'app2'},
+            position: {align: 'right'},
+          },
+          {
+            id: 'part.testee.host',
+            qualifier: {part: 'testee', app: 'host'},
+            position: {align: 'bottom'},
+          },
+        ],
+      },
+    });
+
+    // Activate and assert views of app 1.
+    await appPO.view({cssClass: ['view-1a', 'app1', 'part-app1']}).tab.click();
+    await appPO.view({cssClass: ['view-2a', 'app1', 'part-app2']}).tab.click();
+    await appPO.view({cssClass: ['view-3a', 'app1', 'part-host']}).tab.click();
+
+    await expectView(new ViewPagePO(appPO.view({cssClass: ['view-1a', 'app1', 'part-app1']}))).toBeActive();
+    await expectView(new ViewPagePO(appPO.view({cssClass: ['view-2a', 'app1', 'part-app2']}))).toBeActive();
+    await expectView(new ViewPagePO(appPO.view({cssClass: ['view-3a', 'app1', 'part-host']}))).toBeActive();
+
+    // Activate and assert views of app 2.
+    await appPO.view({cssClass: ['view-1b', 'app2', 'part-app1']}).tab.click();
+    await appPO.view({cssClass: ['view-2b', 'app2', 'part-app2']}).tab.click();
+    await appPO.view({cssClass: ['view-3b', 'app2', 'part-host']}).tab.click();
+
+    await expectView(new ViewPagePO(appPO.view({cssClass: ['view-1b', 'app2', 'part-app1']}))).toBeActive();
+    await expectView(new ViewPagePO(appPO.view({cssClass: ['view-2b', 'app2', 'part-app2']}))).toBeActive();
+    await expectView(new ViewPagePO(appPO.view({cssClass: ['view-3b', 'app2', 'part-host']}))).toBeActive();
+
+    // Activate and assert views of the host app.
+    await appPO.view({cssClass: ['view-1c', 'host', 'part-app1']}).tab.click();
+    await appPO.view({cssClass: ['view-2c', 'host', 'part-app2']}).tab.click();
+    await appPO.view({cssClass: ['view-3c', 'host', 'part-host']}).tab.click();
+
+    await expectView(new WorkbenchViewPagePO(appPO.view({cssClass: ['view-1c', 'host', 'part-app1']}))).toBeActive();
+    await expectView(new WorkbenchViewPagePO(appPO.view({cssClass: ['view-2c', 'host', 'part-app2']}))).toBeActive();
+    await expectView(new WorkbenchViewPagePO(appPO.view({cssClass: ['view-3c', 'host', 'part-host']}))).toBeActive();
+  });
 
   test('should contribute perspective with main area', async ({appPO, microfrontendNavigator}) => {
     test.slow();
@@ -123,7 +651,7 @@ test.describe('Workbench Perspective', () => {
       },
     });
 
-    const perspective = await microfrontendNavigator.registerCapability('app1', {
+    await microfrontendNavigator.createPerspective('app1', {
       type: 'perspective',
       qualifier: {perspective: 'testee'},
       properties: {
@@ -175,18 +703,15 @@ test.describe('Workbench Perspective', () => {
       },
     });
 
-    // Switch perspective.
-    await appPO.switchPerspective(perspective.metadata!.id);
+    const viewPage1 = new ViewPagePO(appPO.view({cssClass: 'view-1'}));
+    const viewPage2 = new ViewPagePO(appPO.view({cssClass: 'view-2'}));
+    const viewPage3 = new ViewPagePO(appPO.view({cssClass: 'view-3'}));
+    const viewPage4 = new ViewPagePO(appPO.view({cssClass: 'view-4'}));
+    const viewPage5 = new ViewPagePO(appPO.view({cssClass: 'view-5'}));
 
-    const viewPage1 = new ViewPagePO(appPO, {cssClass: 'view-1'});
-    const viewPage2 = new ViewPagePO(appPO, {cssClass: 'view-2'});
-    const viewPage3 = new ViewPagePO(appPO, {cssClass: 'view-3'});
-    const viewPage4 = new ViewPagePO(appPO, {cssClass: 'view-4'});
-    const viewPage5 = new ViewPagePO(appPO, {cssClass: 'view-5'});
-
-    const partPage1 = new PartPagePO(appPO, {partId: 'part.activity-1'});
-    const partPage2 = new PartPagePO(appPO, {partId: 'part.activity-2'});
-    const partPage3 = new PartPagePO(appPO, {partId: 'part.activity-3'});
+    const partPage1 = new PartPagePO(appPO.part({partId: 'part.activity-1'}));
+    const partPage2 = new PartPagePO(appPO.part({partId: 'part.activity-2'}));
+    const partPage3 = new PartPagePO(appPO.part({partId: 'part.activity-3'}));
 
     // Expect layout of the perspective.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -396,7 +921,7 @@ test.describe('Workbench Perspective', () => {
       },
     });
 
-    const perspective = await microfrontendNavigator.registerCapability('app1', {
+    await microfrontendNavigator.createPerspective('app1', {
       type: 'perspective',
       qualifier: {perspective: 'testee'},
       properties: {
@@ -447,17 +972,14 @@ test.describe('Workbench Perspective', () => {
       },
     });
 
-    // Switch perspective.
-    await appPO.switchPerspective(perspective.metadata!.id);
+    const viewPage1 = new ViewPagePO(appPO.view({cssClass: 'view-1'}));
+    const viewPage2 = new ViewPagePO(appPO.view({cssClass: 'view-2'}));
+    const viewPage3 = new ViewPagePO(appPO.view({cssClass: 'view-3'}));
+    const viewPage4 = new ViewPagePO(appPO.view({cssClass: 'view-4'}));
 
-    const viewPage1 = new ViewPagePO(appPO, {cssClass: 'view-1'});
-    const viewPage2 = new ViewPagePO(appPO, {cssClass: 'view-2'});
-    const viewPage3 = new ViewPagePO(appPO, {cssClass: 'view-3'});
-    const viewPage4 = new ViewPagePO(appPO, {cssClass: 'view-4'});
-
-    const partPage1 = new PartPagePO(appPO, {partId: 'part.activity-1'});
-    const partPage2 = new PartPagePO(appPO, {partId: 'part.activity-2'});
-    const partPage3 = new PartPagePO(appPO, {partId: 'part.activity-3'});
+    const partPage1 = new PartPagePO(appPO.part({partId: 'part.activity-1'}));
+    const partPage2 = new PartPagePO(appPO.part({partId: 'part.activity-2'}));
+    const partPage3 = new PartPagePO(appPO.part({partId: 'part.activity-3'}));
 
     // Expect layout of the perspective.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -578,7 +1100,7 @@ test.describe('Workbench Perspective', () => {
       },
     });
 
-    const perspective = await microfrontendNavigator.registerCapability('app1', {
+    await microfrontendNavigator.createPerspective('app1', {
       type: 'perspective',
       qualifier: {perspective: 'testee'},
       properties: {
@@ -591,12 +1113,9 @@ test.describe('Workbench Perspective', () => {
       },
     });
 
-    // Switch perspective.
-    await appPO.switchPerspective(perspective.metadata!.id);
-
-    const viewPage1 = new ViewPagePO(appPO, {cssClass: 'testee-1'});
-    const viewPage2 = new ViewPagePO(appPO, {cssClass: 'testee-2'});
-    const viewPage3 = new ViewPagePO(appPO, {cssClass: 'testee-3'});
+    const viewPage1 = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
+    const viewPage2 = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
+    const viewPage3 = new ViewPagePO(appPO.view({cssClass: 'testee-3'}));
 
     // Expect first view to be active.
     await expectView(viewPage1).toBeActive();
@@ -628,7 +1147,7 @@ test.describe('Workbench Perspective', () => {
       },
     });
 
-    const perspective = await microfrontendNavigator.registerCapability('app1', {
+    await microfrontendNavigator.createPerspective('app1', {
       type: 'perspective',
       qualifier: {perspective: 'testee'},
       properties: {
@@ -641,12 +1160,9 @@ test.describe('Workbench Perspective', () => {
       },
     });
 
-    // Switch perspective.
-    await appPO.switchPerspective(perspective.metadata!.id);
-
-    const viewPage1 = new ViewPagePO(appPO, {cssClass: 'testee-1'});
-    const viewPage2 = new ViewPagePO(appPO, {cssClass: 'testee-2'});
-    const viewPage3 = new ViewPagePO(appPO, {cssClass: 'testee-3'});
+    const viewPage1 = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
+    const viewPage2 = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
+    const viewPage3 = new ViewPagePO(appPO.view({cssClass: 'testee-3'}));
 
     // Expect view 2 to be active.
     await expectView(viewPage1).toBeInactive({loaded: false});
@@ -759,8 +1275,8 @@ test.describe('Workbench Perspective', () => {
       qualifier: {perspective: '2'},
     });
 
-    const viewPage1 = new ViewPagePO(appPO, {cssClass: 'testee-1'});
-    const viewPage2 = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+    const viewPage1 = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
+    const viewPage2 = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
 
     // Switch to perspective 1.
     const messagingPage = await microfrontendNavigator.openInNewTab(MessagingPagePO, 'app1');
@@ -904,8 +1420,8 @@ test.describe('Workbench Perspective', () => {
     const messagingPage = await microfrontendNavigator.openInNewTab(MessagingPagePO, 'app1');
     await messagingPage.publishIntent({type: 'perspective', qualifier: {perspective: 'testee'}});
 
-    const testViewPage1 = new ViewPagePO(appPO, {cssClass: 'testee-1'});
-    const testViewPage2 = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+    const testViewPage1 = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
+    const testViewPage2 = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
 
     // Expect layout.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -1045,8 +1561,8 @@ test.describe('Workbench Perspective', () => {
     const messagingPage = await microfrontendNavigator.openInNewTab(MessagingPagePO, 'app1');
     await messagingPage.publishIntent({type: 'perspective', qualifier: {perspective: 'testee'}});
 
-    const testViewPage1 = new ViewPagePO(appPO, {cssClass: 'testee-1'});
-    const testViewPage2 = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+    const testViewPage1 = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
+    const testViewPage2 = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
 
     // Expect layout.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -1388,8 +1904,8 @@ test.describe('Workbench Perspective', () => {
       },
     });
 
-    const viewPageApp1 = new ViewPagePO(appPO, {cssClass: 'app-1'});
-    const viewPageApp2 = new ViewPagePO(appPO, {cssClass: 'app-2'});
+    const viewPageApp1 = new ViewPagePO(appPO.view({cssClass: 'app-1'}));
+    const viewPageApp2 = new ViewPagePO(appPO.view({cssClass: 'app-2'}));
 
     await test.step('Switching to perspective 1', async () => {
       await appPO.switchPerspective(perspective1.metadata!.id);
@@ -1472,7 +1988,7 @@ test.describe('Workbench Perspective', () => {
         qualifier: {part: 'testee'},
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -1485,10 +2001,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
-
-      const partPage = new PartPagePO(appPO, {partId: 'part.testee'});
+      const partPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
 
       // Expect part to display.
       await expectPart(partPage.part).toDisplayComponent(PartPagePO.selector);
@@ -1520,7 +2033,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -1539,9 +2052,6 @@ test.describe('Workbench Perspective', () => {
           ],
         },
       });
-
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
 
       // Expect layout.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -1584,7 +2094,7 @@ test.describe('Workbench Perspective', () => {
         path: 'test-part',
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -1604,9 +2114,6 @@ test.describe('Workbench Perspective', () => {
           ],
         },
       });
-
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
 
       // Expect layout.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -1632,7 +2139,7 @@ test.describe('Workbench Perspective', () => {
       );
 
       // Assert microfrontend not to display.
-      const partPage = new PartPagePO(appPO, {partId: MAIN_AREA});
+      const partPage = new PartPagePO(appPO.part({partId: MAIN_AREA}));
       await expect(partPage.locator).not.toBeAttached();
     });
 
@@ -1665,7 +2172,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -1685,9 +2192,6 @@ test.describe('Workbench Perspective', () => {
           ],
         },
       });
-
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
 
       // Expect layout.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -1714,7 +2218,7 @@ test.describe('Workbench Perspective', () => {
       );
 
       // Assert microfrontend not to display.
-      const partPage = new PartPagePO(appPO, {partId: MAIN_AREA});
+      const partPage = new PartPagePO(appPO.part({partId: MAIN_AREA}));
       await expect(partPage.locator).not.toBeAttached();
     });
 
@@ -1729,7 +2233,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -1741,9 +2245,6 @@ test.describe('Workbench Perspective', () => {
           ],
         },
       });
-
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
 
       // Expect layout.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -1768,7 +2269,7 @@ test.describe('Workbench Perspective', () => {
         qualifier: {part: 'testee'},
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -1780,9 +2281,6 @@ test.describe('Workbench Perspective', () => {
           ],
         },
       });
-
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
 
       // Expect desktop to display.
       await expectDesktop(appPO.desktop).toDisplayComponent(DesktopPagePO.selector);
@@ -1820,7 +2318,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -1833,11 +2331,8 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const viewPage1 = new ViewPagePO(appPO, {cssClass: 'view-1'});
-      const viewPage2 = new ViewPagePO(appPO, {cssClass: 'view-2'});
-
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
+      const viewPage1 = new ViewPagePO(appPO.view({cssClass: 'view-1'}));
+      const viewPage2 = new ViewPagePO(appPO.view({cssClass: 'view-2'}));
 
       // Expect layout.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -1884,7 +2379,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -1904,9 +2399,6 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
-
       // Expect layout.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         grids: {
@@ -1925,7 +2417,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const partPage = new PartPagePO(appPO, {partId: 'part.testee'});
+      const partPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
 
       // Expect part to display.
       await expectPart(partPage.part).toDisplayComponent(PartPagePO.selector);
@@ -2170,7 +2662,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -2190,10 +2682,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const viewPage = new ViewPagePO(appPO, {cssClass: 'view-1'});
-
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
+      const viewPage = new ViewPagePO(appPO.view({cssClass: 'view-1'}));
 
       // Expect layout.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -2223,7 +2712,7 @@ test.describe('Workbench Perspective', () => {
         qualifier: {part: 'main-area'},
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -2241,9 +2730,6 @@ test.describe('Workbench Perspective', () => {
           ],
         },
       });
-
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
 
       // Expect layout.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -2293,7 +2779,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -2319,9 +2805,6 @@ test.describe('Workbench Perspective', () => {
           ],
         },
       });
-
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
 
       // Expect layout.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -2365,7 +2848,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -2392,9 +2875,6 @@ test.describe('Workbench Perspective', () => {
           ],
         },
       });
-
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
 
       // Expect part not to be attached.
       await expectPart(appPO.part({partId: 'part.testee'})).not.toBeAttached();
@@ -2433,7 +2913,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -2461,9 +2941,6 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
-
       // Expect part not to be attached.
       await expectPart(appPO.part({partId: 'part.testee'})).not.toBeAttached();
 
@@ -2489,7 +2966,7 @@ test.describe('Workbench Perspective', () => {
         qualifier: {part: 'testee'},
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -2515,9 +2992,6 @@ test.describe('Workbench Perspective', () => {
           ],
         },
       });
-
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
 
       // Expect layout.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -2569,7 +3043,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -2586,9 +3060,6 @@ test.describe('Workbench Perspective', () => {
           ],
         },
       });
-
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
 
       // Expect layout.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -2634,7 +3105,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -2653,9 +3124,6 @@ test.describe('Workbench Perspective', () => {
           ],
         },
       });
-
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
 
       // Expect layout.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -2697,7 +3165,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -2716,9 +3184,6 @@ test.describe('Workbench Perspective', () => {
           ],
         },
       });
-
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
 
       // Expect layout.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -2785,7 +3250,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -2805,11 +3270,8 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const viewPage1 = new ViewPagePO(appPO, {cssClass: 'view-1'});
-      const viewPage2 = new ViewPagePO(appPO, {cssClass: 'view-2'});
-
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
+      const viewPage1 = new ViewPagePO(appPO.view({cssClass: 'view-1'}));
+      const viewPage2 = new ViewPagePO(appPO.view({cssClass: 'view-2'}));
 
       // Expect layout.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -2880,7 +3342,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -2900,11 +3362,8 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const viewPage1 = new ViewPagePO(appPO, {cssClass: 'view-1'});
-      const viewPage2 = new ViewPagePO(appPO, {cssClass: 'view-2'});
-
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
+      const viewPage1 = new ViewPagePO(appPO.view({cssClass: 'view-1'}));
+      const viewPage2 = new ViewPagePO(appPO.view({cssClass: 'view-2'}));
 
       // Expect layout.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -2978,7 +3437,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -2998,11 +3457,8 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const viewPage1 = new ViewPagePO(appPO, {cssClass: 'view-1'});
-      const viewPage2 = new ViewPagePO(appPO, {cssClass: 'view-2'});
-
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
+      const viewPage1 = new ViewPagePO(appPO.view({cssClass: 'view-1'}));
+      const viewPage2 = new ViewPagePO(appPO.view({cssClass: 'view-2'}));
 
       // Expect layout.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -3100,7 +3556,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -3120,11 +3576,8 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const viewPage1 = new ViewPagePO(appPO, {cssClass: 'view-1'});
-      const viewPage2 = new ViewPagePO(appPO, {cssClass: 'view-2'});
-
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
+      const viewPage1 = new ViewPagePO(appPO.view({cssClass: 'view-1'}));
+      const viewPage2 = new ViewPagePO(appPO.view({cssClass: 'view-2'}));
 
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         grids: {
@@ -3246,7 +3699,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -3286,9 +3739,6 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
-
       // Expect layout.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         grids: {
@@ -3315,9 +3765,9 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const initialPartPage = new PartPagePO(appPO, {partId: 'part.initial'});
-      const alignedPartPage = new PartPagePO(appPO, {partId: 'part.aligned'});
-      const dockedPartPage = new PartPagePO(appPO, {partId: 'part.docked'});
+      const initialPartPage = new PartPagePO(appPO.part({partId: 'part.initial'}));
+      const alignedPartPage = new PartPagePO(appPO.part({partId: 'part.aligned'}));
+      const dockedPartPage = new PartPagePO(appPO.part({partId: 'part.docked'}));
 
       // Expect parts.
       await expectPart(initialPartPage.part).toDisplayComponent(PartPagePO.selector);
@@ -3346,6 +3796,167 @@ test.describe('Workbench Perspective', () => {
         expect.stringContaining('[PerspectiveDefinitionWarning] Perspective \'perspective=testee\' of app \'workbench-client-testing-app1\' passes the deprecated parameter \'param3\' to part \'part.initial\'. Migrate deprecated parameters as specified in the capability documentation of part \'part=initial\'. Pass parameter \'param4\' instead. Message'),
         expect.stringContaining('[PerspectiveDefinitionWarning] Perspective \'perspective=testee\' of app \'workbench-client-testing-app1\' passes the deprecated parameter \'param3\' to part \'part.docked\'. Migrate deprecated parameters as specified in the capability documentation of part \'part=docked\'. Pass parameter \'param4\' instead. Message'),
         expect.stringContaining('[PerspectiveDefinitionWarning] Perspective \'perspective=testee\' of app \'workbench-client-testing-app1\' passes the deprecated parameter \'param3\' to part \'part.aligned\'. Migrate deprecated parameters as specified in the capability documentation of part \'part=aligned\'. Pass parameter \'param4\' instead. Message'),
+      ]));
+    });
+
+    test('should add host part with params', async ({appPO, microfrontendNavigator, workbenchNavigator, consoleLogs}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('host', {
+        type: 'part',
+        qualifier: {part: 'initial'},
+        params: [
+          {name: 'param1', required: true},
+          {name: 'param2', required: false},
+          {name: 'param3', required: false, deprecated: {message: 'Message', useInstead: 'param4'}},
+          {name: 'param4', required: false},
+          {name: 'param5', required: false},
+        ],
+        properties: {
+          path: '',
+        },
+      });
+      await workbenchNavigator.registerRoute({
+        path: '', component: 'part-page', canMatch: [canMatchWorkbenchPartCapability({part: 'initial'})],
+      });
+
+      await microfrontendNavigator.registerCapability('host', {
+        type: 'part',
+        qualifier: {part: 'aligned'},
+        params: [
+          {name: 'param1', required: true},
+          {name: 'param2', required: false},
+          {name: 'param3', required: false, deprecated: {message: 'Message', useInstead: 'param4'}},
+          {name: 'param4', required: false},
+          {name: 'param5', required: false},
+        ],
+        properties: {
+          path: '',
+        },
+      });
+      await workbenchNavigator.registerRoute({
+        path: '', component: 'part-page', canMatch: [canMatchWorkbenchPartCapability({part: 'aligned'})],
+      });
+
+      await microfrontendNavigator.registerCapability('host', {
+        type: 'part',
+        qualifier: {part: 'docked'},
+        params: [
+          {name: 'param1', required: true},
+          {name: 'param2', required: false},
+          {name: 'param3', required: false, deprecated: {message: 'Message', useInstead: 'param4'}},
+          {name: 'param4', required: false},
+          {name: 'param5', required: false},
+        ],
+        properties: {
+          path: '',
+          extras: {
+            icon: 'folder',
+            label: 'Activity',
+          },
+        },
+      });
+      await workbenchNavigator.registerRoute({
+        path: '', component: 'part-page', canMatch: [canMatchWorkbenchPartCapability({part: 'docked'})],
+      });
+
+      await microfrontendNavigator.createPerspective('host', {
+        type: 'perspective',
+        qualifier: {perspective: 'testee'},
+        properties: {
+          parts: [
+            {
+              id: 'part.initial',
+              qualifier: {part: 'initial'},
+              params: {
+                param1: 'value1',
+                param2: 'value2',
+                param3: 'value3',
+              },
+            },
+            {
+              id: 'part.aligned',
+              qualifier: {part: 'aligned'},
+              position: {align: 'left'},
+              params: {
+                param1: 'value1',
+                param2: 'value2',
+                param3: 'value3',
+              },
+            },
+            {
+              id: 'part.docked',
+              qualifier: {part: 'docked'},
+              position: 'left-top',
+              params: {
+                param1: 'value1',
+                param2: 'value2',
+                param3: 'value3',
+              },
+              ɵactivityId: 'activity.1',
+              active: true,
+            },
+          ],
+        },
+      });
+
+      // Expect layout.
+      await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+        grids: {
+          main: {
+            root: new MTreeNode({
+              direction: 'row',
+              ratio: .5,
+              child1: new MPart({
+                id: 'part.aligned',
+              }),
+              child2: new MPart({
+                id: 'part.initial',
+              }),
+            }),
+          },
+        },
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [{id: 'activity.1'}],
+              activeActivityId: 'activity.1',
+            },
+          },
+        },
+      });
+
+      const initialPartPage = new WorkbenchPartPagePO(appPO.part({partId: 'part.initial'}));
+      const alignedPartPage = new WorkbenchPartPagePO(appPO.part({partId: 'part.aligned'}));
+      const dockedPartPage = new WorkbenchPartPagePO(appPO.part({partId: 'part.docked'}));
+
+      // Expect parts.
+      await expectWorkbenchPart(initialPartPage.part).toDisplayComponent(WorkbenchPartPagePO.selector);
+      await expectWorkbenchPart(alignedPartPage.part).toDisplayComponent(WorkbenchPartPagePO.selector);
+      await expectWorkbenchPart(dockedPartPage.part).toDisplayComponent(WorkbenchPartPagePO.selector);
+
+      // Expect passed params.
+      await expect.poll(() => initialPartPage.activatedMicrofrontend.getParams()).toMatchObject({
+        param1: 'value1',
+        param2: 'value2',
+        param4: 'value3',
+      });
+      await expect.poll(() => alignedPartPage.activatedMicrofrontend.getParams()).toMatchObject({
+        param1: 'value1',
+        param2: 'value2',
+        param4: 'value3',
+      });
+      await expect.poll(() => dockedPartPage.activatedMicrofrontend.getParams()).toMatchObject({
+        param1: 'value1',
+        param2: 'value2',
+        param4: 'value3',
+      });
+
+      // Expect deprecation warning to be logged.
+      await expect.poll(() => consoleLogs.get({severity: 'warning', message: /PerspectiveDefinitionWarning/})).toEqual(expect.arrayContaining([
+        expect.stringContaining('[PerspectiveDefinitionWarning] Perspective \'perspective=testee\' of app \'workbench-host-app\' passes the deprecated parameter \'param3\' to part \'part.initial\'. Migrate deprecated parameters as specified in the capability documentation of part \'part=initial\'. Pass parameter \'param4\' instead. Message'),
+        expect.stringContaining('[PerspectiveDefinitionWarning] Perspective \'perspective=testee\' of app \'workbench-host-app\' passes the deprecated parameter \'param3\' to part \'part.docked\'. Migrate deprecated parameters as specified in the capability documentation of part \'part=docked\'. Pass parameter \'param4\' instead. Message'),
+        expect.stringContaining('[PerspectiveDefinitionWarning] Perspective \'perspective=testee\' of app \'workbench-host-app\' passes the deprecated parameter \'param3\' to part \'part.aligned\'. Migrate deprecated parameters as specified in the capability documentation of part \'part=aligned\'. Pass parameter \'param4\' instead. Message'),
       ]));
     });
 
@@ -3389,7 +4000,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -3413,9 +4024,6 @@ test.describe('Workbench Perspective', () => {
           ],
         },
       });
-
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
 
       // Expect parts.
       await expectPart(appPO.part({partId: 'part.initial'})).not.toBeAttached();
@@ -3461,7 +4069,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -3494,9 +4102,6 @@ test.describe('Workbench Perspective', () => {
           ],
         },
       });
-
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
 
       // Expect parts.
       await expectPart(appPO.part({partId: 'part.initial'})).not.toBeAttached();
@@ -3550,7 +4155,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -3563,10 +4168,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
-
-      const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      const viewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
 
       // Expect layout.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -3597,6 +4199,89 @@ test.describe('Workbench Perspective', () => {
       ]));
     });
 
+    test('should add host view with params', async ({appPO, microfrontendNavigator, workbenchNavigator, consoleLogs}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('host', {
+        type: 'view',
+        qualifier: {view: 'testee'},
+        params: [
+          {name: 'param1', required: true},
+          {name: 'param2', required: false},
+          {name: 'param3', required: false, deprecated: {message: 'Message', useInstead: 'param4'}},
+          {name: 'param4', required: false},
+          {name: 'param5', required: false},
+        ],
+        properties: {
+          path: '',
+        },
+      });
+      await workbenchNavigator.registerRoute({
+        path: '', component: 'view-page', canMatch: [canMatchWorkbenchViewCapability({view: 'testee'})],
+      });
+
+      await microfrontendNavigator.registerCapability('host', {
+        type: 'part',
+        qualifier: {part: 'initial'},
+        properties: {
+          views: [
+            {
+              qualifier: {view: 'testee'},
+              params: {
+                param1: 'value1',
+                param2: 'value2',
+                param3: 'value3',
+              },
+              cssClass: 'testee',
+            },
+          ],
+        },
+      });
+
+      await microfrontendNavigator.createPerspective('host', {
+        type: 'perspective',
+        qualifier: {perspective: 'testee'},
+        properties: {
+          parts: [
+            {
+              id: 'part.initial',
+              qualifier: {part: 'initial'},
+            },
+          ],
+        },
+      });
+
+      const viewPage = new WorkbenchViewPagePO(appPO.view({cssClass: 'testee'}));
+
+      // Expect layout.
+      await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+        grids: {
+          main: {
+            root: new MPart({
+              id: 'part.initial',
+              views: [{id: await viewPage.view.getViewId()}],
+              activeViewId: await viewPage.view.getViewId(),
+            }),
+          },
+        },
+      });
+
+      // Expect view.
+      await expectView(viewPage).toBeActive();
+
+      // Expect passed params.
+      await expect.poll(() => viewPage.activatedMicrofrontend.getParams()).toMatchObject({
+        param1: 'value1',
+        param2: 'value2',
+        param4: 'value3',
+      });
+
+      // Expect deprecation warning to be logged.
+      await expect.poll(() => consoleLogs.get({severity: 'warning', message: /PartDefinitionWarning/})).toEqual(expect.arrayContaining([
+        expect.stringContaining('[PartDefinitionWarning] Part \'part=initial\' of app \'workbench-host-app\' passes the deprecated parameter \'param3\' to view \'view=testee\'. Migrate deprecated parameters as specified in the capability documentation. Pass parameter \'param4\' instead. Message'),
+      ]));
+    });
+
     test('should error if not passing required parameter', async ({appPO, microfrontendNavigator, consoleLogs}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
@@ -3624,7 +4309,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -3637,10 +4322,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
-
-      const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      const viewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
 
       // Expect view.
       await expectView(viewPage).not.toBeAttached();
@@ -3678,7 +4360,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      const perspective = await microfrontendNavigator.registerCapability('app1', {
+      await microfrontendNavigator.createPerspective('app1', {
         type: 'perspective',
         qualifier: {perspective: 'testee'},
         properties: {
@@ -3691,10 +4373,7 @@ test.describe('Workbench Perspective', () => {
         },
       });
 
-      // Switch perspective.
-      await appPO.switchPerspective(perspective.metadata!.id);
-
-      const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      const viewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
 
       // Expect view.
       await expectView(viewPage).not.toBeAttached();

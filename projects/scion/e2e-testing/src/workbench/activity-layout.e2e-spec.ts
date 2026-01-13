@@ -1892,10 +1892,10 @@ test.describe('Activity Layout', () => {
       .activatePart('part.activity-1-left'),
     );
 
-    const view101 = new ViewPagePO(appPO, {viewId: 'view.101'});
-    const view102 = new ViewPagePO(appPO, {viewId: 'view.102'});
-    const view201 = new ViewPagePO(appPO, {viewId: 'view.201'});
-    const view202 = new ViewPagePO(appPO, {viewId: 'view.202'});
+    const view101 = new ViewPagePO(appPO.view({viewId: 'view.101'}));
+    const view102 = new ViewPagePO(appPO.view({viewId: 'view.102'}));
+    const view201 = new ViewPagePO(appPO.view({viewId: 'view.201'}));
+    const view202 = new ViewPagePO(appPO.view({viewId: 'view.202'}));
 
     // Expect activity to display grid.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -3555,7 +3555,7 @@ test.describe('Activity Layout', () => {
     });
 
     // Expect view to be active.
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expectView(viewPage).toBeActive();
   });
 
@@ -3601,7 +3601,7 @@ test.describe('Activity Layout', () => {
     });
 
     // Expect view to be active.
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expectView(viewPage).toBeActive();
     await expectPart(appPO.part({partId: 'part.activity-1'})).not.toDisplayComponent();
   });
@@ -3829,7 +3829,7 @@ test.describe('Activity Layout', () => {
         .activatePart('part.activity'),
       );
 
-      const activityPartPage = new PartPagePO(appPO, {partId: 'part.activity'});
+      const activityPartPage = new PartPagePO(appPO.part({partId: 'part.activity'}));
 
       // Expect title defined on the layout to display.
       await expect(activityPartPage.part.bar.title).toHaveText('ACTIVITY TITLE');
@@ -3862,8 +3862,8 @@ test.describe('Activity Layout', () => {
         .activatePart('part.activity-1-left'),
       );
 
-      const leftPartPage = new PartPagePO(appPO, {partId: 'part.activity-1-left'});
-      const rightPartPage = new PartPagePO(appPO, {partId: 'part.activity-1-right'});
+      const leftPartPage = new PartPagePO(appPO.part({partId: 'part.activity-1-left'}));
+      const rightPartPage = new PartPagePO(appPO.part({partId: 'part.activity-1-right'}));
 
       // Expect title defined on the layout to display.
       await expect(leftPartPage.part.bar.title).toHaveText('ACTIVITY TITLE');
@@ -3931,9 +3931,9 @@ test.describe('Activity Layout', () => {
         .activatePart('part.activity-1-bottom'),
       );
 
-      const leftPartPage = new PartPagePO(appPO, {partId: 'part.activity-1-left'});
-      const topPartPage = new PartPagePO(appPO, {partId: 'part.activity-1-top'});
-      const bottomPartPage = new PartPagePO(appPO, {partId: 'part.activity-1-bottom'});
+      const leftPartPage = new PartPagePO(appPO.part({partId: 'part.activity-1-left'}));
+      const topPartPage = new PartPagePO(appPO.part({partId: 'part.activity-1-top'}));
+      const bottomPartPage = new PartPagePO(appPO.part({partId: 'part.activity-1-bottom'}));
 
       // Expect activity title to display in top-leftmost part.
       await expect(leftPartPage.part.bar.title).toHaveText('ACTIVITY TITLE');

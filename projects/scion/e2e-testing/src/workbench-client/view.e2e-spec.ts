@@ -10,7 +10,6 @@
 
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
-import {ViewPagePO} from './page-object/view-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
 import {RouterPagePO as StandaloneRouterPagePO} from '../workbench/page-object/router-page.po';
 import {expectView} from '../matcher/view-matcher';
@@ -27,8 +26,29 @@ import {MicrofrontendTestPage2PO} from './page-object/microfrontend-test-page-2.
 import {MicrofrontendTestPage3PO} from './page-object/microfrontend-test-page-3.po';
 import {WorkbenchViewCapability} from './page-object/register-workbench-capability-page.po';
 import {TextTestPagePO} from './page-object/test-pages/text-test-page.po';
+import {ViewPagePO} from './page-object/view-page.po';
 
 test.describe('Workbench View', () => {
+
+  test('should open microfrontend view', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Register view capability.
+    await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-view',
+      },
+    });
+
+    // Open view.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {target: 'view.1'});
+
+    // Expect microfrontend to display.
+    await expectView(new ViewPagePO(appPO.view({viewId: 'view.1'}))).toBeActive();
+  });
 
   test('should complete view Observables on navigation', async ({appPO, microfrontendNavigator, consoleLogs}) => {
     // Observable completion expectations:
@@ -72,7 +92,7 @@ test.describe('Workbench View', () => {
       target: 'view.101',
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
 
     // expect testee-1 to show
     await expect(testeeViewPage.view.tab.title).toHaveText('Testee 1');
@@ -417,7 +437,7 @@ test.describe('Workbench View', () => {
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
 
-    const viewPage = new SizeTestPagePO(appPO, {cssClass: 'testee'});
+    const viewPage = new SizeTestPagePO(appPO.view({cssClass: 'testee'}));
 
     // Expect view to be visible.
     await expectView(viewPage).toBeActive();
@@ -476,7 +496,7 @@ test.describe('Workbench View', () => {
     });
 
     // Expect view to be opened.
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
     await expectView(testeeViewPage).toBeActive();
 
     // Prevent view from closing.
@@ -495,7 +515,7 @@ test.describe('Workbench View', () => {
     });
 
     // Expect view to be navigated.
-    const differentPage = new RouterPagePO(appPO, {viewId: 'view.101'});
+    const differentPage = new RouterPagePO(appPO.view({viewId: 'view.101'}));
     await expectView(differentPage).toBeActive();
     await expect(appPO.views()).toHaveCount(2);
 
@@ -521,7 +541,7 @@ test.describe('Workbench View', () => {
     });
 
     // Expect view to be opened.
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
     await expectView(testeeViewPage).toBeActive();
 
     // Prevent view from closing.
@@ -540,7 +560,7 @@ test.describe('Workbench View', () => {
     });
 
     // Expect view to be navigated.
-    const differentPage = new RouterPagePO(appPO, {viewId: 'view.101'});
+    const differentPage = new RouterPagePO(appPO.view({viewId: 'view.101'}));
     await expectView(differentPage).toBeActive();
     await expect(appPO.views()).toHaveCount(2);
 
@@ -598,7 +618,7 @@ test.describe('Workbench View', () => {
     });
 
     // Enable Close guard.
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await viewPage.checkConfirmClosing(true);
 
     // Capture component instance.
@@ -691,7 +711,7 @@ test.describe('Workbench View', () => {
       target: 'view.101',
     });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
     const testee1ComponentInstanceId = await testee1ViewPage.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
@@ -706,7 +726,7 @@ test.describe('Workbench View', () => {
       target: 'view.102',
     });
 
-    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const testee2ViewPage = new ViewPagePO(appPO.view({viewId: 'view.102'}));
     const testee2ComponentInstanceId = await testee2ViewPage.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
@@ -742,7 +762,7 @@ test.describe('Workbench View', () => {
       target: 'view.103',
     });
 
-    const testee3ViewPage = new ViewPagePO(appPO, {viewId: 'view.103'});
+    const testee3ViewPage = new ViewPagePO(appPO.view({viewId: 'view.103'}));
     const testee3ComponentInstanceId = await testee3ViewPage.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
@@ -802,7 +822,7 @@ test.describe('Workbench View', () => {
       target: 'view.100',
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
     await expect.poll(() => testeeViewPage.getViewCapability()).toEqual(expect.objectContaining({
       qualifier: {component: 'testee-1'},
@@ -895,7 +915,7 @@ test.describe('Workbench View', () => {
       target: 'view.100',
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
     // Assert the correct capability to be loaded
     await expect.poll(() => testeeViewPage.getViewCapability()).toEqual(expect.objectContaining({metadata: {id: capability1Id, appSymbolicName: 'workbench-client-testing-app1'}}));
@@ -982,7 +1002,7 @@ test.describe('Workbench View', () => {
       target: 'view.101',
     });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
     await expect(testee1ViewPage.viewId).toHaveText('view.101');
 
     // navigate to testee-2 view
@@ -999,7 +1019,7 @@ test.describe('Workbench View', () => {
       target: 'view.102',
     });
 
-    const testee3ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const testee3ViewPage = new ViewPagePO(appPO.view({viewId: 'view.102'}));
     await expect(testee3ViewPage.viewId).toHaveText('view.102');
   });
 
@@ -1021,7 +1041,7 @@ test.describe('Workbench View', () => {
       .addPart('part.left', {align: 'left'}),
     );
 
-    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+    const testeeViewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
 
     // Open view in the right part.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
@@ -1124,7 +1144,7 @@ test.describe('Workbench View', () => {
     await routerPage.view.tab.close();
 
     // Capture instance id of test view.
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     const viewComponentId = await viewPage.getComponentInstanceId();
 
     await expectView(viewInMainArea).toBeActive();
@@ -1166,7 +1186,7 @@ test.describe('Workbench View', () => {
       activate: true,
     });
 
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expect.poll(() => viewPage.outlet.getName()).toEqual('view.100');
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');
     await expect.poll(() => viewPage.outlet.getCssClasses()).toContain('testee');
@@ -1194,7 +1214,7 @@ test.describe('Workbench View', () => {
       activate: false,
     });
 
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expect.poll(() => viewPage.outlet.getName()).toEqual('view.100');
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');
     await expect.poll(() => viewPage.outlet.getCssClasses()).toContain('testee');
@@ -1343,7 +1363,7 @@ test.describe('Workbench View', () => {
     await routerPage.view.tab.close();
 
     // Move view to the left part.
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await appPO.view({viewId: 'view.100'}).tab.moveTo('part.left');
     // Expect the microfrontend to be aligned to the view bounds.
     await expect.poll(() => viewPage.view.getInfo()).toMatchObject({viewId: 'view.100', partId: 'part.left'} satisfies Partial<ViewInfo>);
@@ -1475,7 +1495,7 @@ test.describe('Workbench View', () => {
     await appPO.switchPerspective(perspective.metadata!.id);
 
     // Enter component state in view.
-    const testeeViewPage = new InputFieldTestPagePO(appPO, {cssClass: 'testee'});
+    const testeeViewPage = new InputFieldTestPagePO(appPO.view({cssClass: 'testee'}));
     await testeeViewPage.enterText('A');
     await expect(testeeViewPage.input).toHaveValue('A');
 
@@ -1489,7 +1509,7 @@ test.describe('Workbench View', () => {
 
     await test.step('activate another view in same part', async () => {
       // Activate another view in same part.
-      const viewPage1 = new ViewPagePO(appPO, {cssClass: 'testee-1'});
+      const viewPage1 = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
       await viewPage1.view.tab.click();
 
       // Activate testee view.
@@ -1509,7 +1529,7 @@ test.describe('Workbench View', () => {
 
     await test.step('close another view', async () => {
       // Activate another view in same part.
-      const viewPage2 = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+      const viewPage2 = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
       await viewPage2.view.tab.close();
 
       // Expect component state to be preserved.
@@ -1536,7 +1556,7 @@ test.describe('Workbench View', () => {
       // Open test view without activating it.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'testee'}, {target: 'view.1', activate: false});
-      const testPage = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+      const testPage = new MicrofrontendTestPage1PO(appPO.view({viewId: 'view.1'}));
 
       // Expect microfrontend not to be loaded.
       await expectView(testPage).toBeInactive({loaded: false});
@@ -1567,7 +1587,7 @@ test.describe('Workbench View', () => {
       // Open test view without activating it.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'testee'}, {target: 'view.1', activate: false});
-      const testPage = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+      const testPage = new MicrofrontendTestPage1PO(appPO.view({viewId: 'view.1'}));
 
       // Expect microfrontend to be loaded.
       await expectView(testPage).toBeInactive({loaded: true});
@@ -1593,7 +1613,7 @@ test.describe('Workbench View', () => {
       // Open test view.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'testee'}, {target: 'view.1'});
-      const testPage = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+      const testPage = new MicrofrontendTestPage1PO(appPO.view({viewId: 'view.1'}));
 
       // Expect microfrontend to be loaded.
       await expectView(testPage).toBeActive();
@@ -1665,9 +1685,9 @@ test.describe('Workbench View', () => {
         },
       });
 
-      const testPage1 = new MicrofrontendTestPage1PO(appPO, {cssClass: 'testee-1'});
-      const testPage2 = new MicrofrontendTestPage2PO(appPO, {cssClass: 'testee-2'});
-      const testPage3 = new MicrofrontendTestPage3PO(appPO, {cssClass: 'testee-3'});
+      const testPage1 = new MicrofrontendTestPage1PO(appPO.view({cssClass: 'testee-1'}));
+      const testPage2 = new MicrofrontendTestPage2PO(appPO.view({cssClass: 'testee-2'}));
+      const testPage3 = new MicrofrontendTestPage3PO(appPO.view({cssClass: 'testee-3'}));
 
       // Expect microfrontend of view 1 to be loaded.
       await expectView(testPage1).toBeActive();
@@ -1734,7 +1754,7 @@ test.describe('Workbench View', () => {
       // Open test view.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'testee'}, {target: 'view.1'});
-      const testPage = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+      const testPage = new MicrofrontendTestPage1PO(appPO.view({viewId: 'view.1'}));
       await expectView(testPage).toBeActive();
       await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([
         '[MicrofrontendTestPage1Component#construct]',
@@ -1774,7 +1794,7 @@ test.describe('Workbench View', () => {
       // Open test view without activating it.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'testee'}, {target: 'view.1', activate: false});
-      const testPage = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+      const testPage = new MicrofrontendTestPage1PO(appPO.view({viewId: 'view.1'}));
 
       // Expect microfrontend not to be loaded.
       await expectView(testPage).toBeInactive({loaded: false});
@@ -1816,7 +1836,7 @@ test.describe('Workbench View', () => {
       // Open test view 1.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'testee-1'}, {target: 'view.1'});
-      const testPage1 = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+      const testPage1 = new MicrofrontendTestPage1PO(appPO.view({viewId: 'view.1'}));
       await expectView(testPage1).toBeActive();
       await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([
         '[MicrofrontendTestPage1Component#construct]',
@@ -1832,7 +1852,7 @@ test.describe('Workbench View', () => {
 
       // Navigate inactive "view.1" to other lazy view.
       await routerPage.navigate({component: 'testee-2'}, {target: 'view.1', activate: false});
-      const testPage2 = new MicrofrontendTestPage2PO(appPO, {viewId: 'view.1'});
+      const testPage2 = new MicrofrontendTestPage2PO(appPO.view({viewId: 'view.1'}));
 
       // Expect no navigation.
       await expectView(testPage2).toBeInactive({loaded: false});
@@ -1880,13 +1900,13 @@ test.describe('Workbench View', () => {
       // Open inactive view.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'testee-1'}, {target: 'view.1', activate: false});
-      const testPage1 = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+      const testPage1 = new MicrofrontendTestPage1PO(appPO.view({viewId: 'view.1'}));
       await expectView(testPage1).toBeInactive({loaded: false});
       await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([]);
 
       // Navigate inactive view.
       await routerPage.navigate({component: 'testee-2'}, {target: 'view.1', activate: false});
-      const testPage2 = new MicrofrontendTestPage2PO(appPO, {viewId: 'view.1'});
+      const testPage2 = new MicrofrontendTestPage2PO(appPO.view({viewId: 'view.1'}));
       await expectView(testPage2).toBeInactive({loaded: false});
       await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([]);
 
@@ -1937,21 +1957,21 @@ test.describe('Workbench View', () => {
       // Open inactive view with test page 1.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'testee-1'}, {target: 'view.1', activate: false});
-      const testPage1 = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+      const testPage1 = new MicrofrontendTestPage1PO(appPO.view({viewId: 'view.1'}));
       await expectView(testPage1).toBeInactive({loaded: false});
       await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([]);
       await expect.poll(() => consoleLogs.get({severity: 'debug', message: /Loading microfrontend into "view\.1"/})).toEqual([]);
 
       // Navigate inactive view to test page 2.
       await routerPage.navigate({component: 'testee-2'}, {target: 'view.1', activate: false});
-      const testPage2 = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+      const testPage2 = new MicrofrontendTestPage1PO(appPO.view({viewId: 'view.1'}));
       await expectView(testPage2).toBeInactive({loaded: false});
       await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([]);
       await expect.poll(() => consoleLogs.get({severity: 'debug', message: /Loading microfrontend into "view\.1"/})).toEqual([]);
 
       // Navigate inactive view to test page 3.
       await routerPage.navigate({component: 'testee-3'}, {target: 'view.1', activate: true});
-      const testPage3 = new MicrofrontendTestPage3PO(appPO, {viewId: 'view.1'});
+      const testPage3 = new MicrofrontendTestPage3PO(appPO.view({viewId: 'view.1'}));
       await expectView(testPage3).toBeActive();
       await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([
         '[MicrofrontendTestPage3Component#construct]',
@@ -1979,7 +1999,7 @@ test.describe('Workbench View', () => {
       // Open test view without activating it.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'testee'}, {target: 'view.1', activate: false});
-      const testPage = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+      const testPage = new MicrofrontendTestPage1PO(appPO.view({viewId: 'view.1'}));
 
       // Expect title to display and microfrontend not to be loaded.
       await expectView(testPage).toBeInactive({loaded: false});
@@ -2019,14 +2039,14 @@ test.describe('Workbench View', () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'text'}, {target: 'view.1'});
 
-      const textPage = new TextTestPagePO(appPO, {id: 'view.1'});
+      const textPage = new TextTestPagePO(appPO.view({viewId: 'view.1'}));
       await textPage.provideText('view.title', 'Test View {{id}} - {{name}}');
       await textPage.provideValue('123', 'RESOLVED');
 
       // Open test view without activating it.
       await routerPage.view.tab.click();
       await routerPage.navigate({component: 'testee'}, {params: {id: '123'}, target: 'view.1', activate: false});
-      const testPage = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+      const testPage = new MicrofrontendTestPage1PO(appPO.view({viewId: 'view.1'}));
 
       // Expect title to display and microfrontend not to be loaded.
       await expectView(testPage).toBeInactive({loaded: false});
@@ -2097,9 +2117,9 @@ test.describe('Workbench View', () => {
         },
       });
 
-      const testPage1 = new MicrofrontendTestPage1PO(appPO, {cssClass: 'testee-1'});
-      const testPage2 = new MicrofrontendTestPage2PO(appPO, {cssClass: 'testee-2'});
-      const testPage3 = new MicrofrontendTestPage3PO(appPO, {cssClass: 'testee-3'});
+      const testPage1 = new MicrofrontendTestPage1PO(appPO.view({cssClass: 'testee-1'}));
+      const testPage2 = new MicrofrontendTestPage2PO(appPO.view({cssClass: 'testee-2'}));
+      const testPage3 = new MicrofrontendTestPage3PO(appPO.view({cssClass: 'testee-3'}));
 
       // Expect microfrontends to be loaded.
       await expectView(testPage1).toBeActive();
@@ -2155,13 +2175,13 @@ test.describe('Workbench View', () => {
       // Open test view without activating it.
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPage.navigate({component: 'testee-1'}, {target: 'view.1', activate: false});
-      const testPage1 = new MicrofrontendTestPage1PO(appPO, {viewId: 'view.1'});
+      const testPage1 = new MicrofrontendTestPage1PO(appPO.view({viewId: 'view.1'}));
       await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([]);
       await expectView(testPage1).toBeInactive({loaded: false});
 
       // Navigate test view to non-lazy view.
       await routerPage.navigate({component: 'testee-2'}, {target: 'view.1', activate: false});
-      const testPage2 = new MicrofrontendTestPage2PO(appPO, {viewId: 'view.1'});
+      const testPage2 = new MicrofrontendTestPage2PO(appPO.view({viewId: 'view.1'}));
       await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([
         '[MicrofrontendTestPage2Component#construct]',
       ]);

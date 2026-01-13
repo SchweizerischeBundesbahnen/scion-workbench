@@ -102,7 +102,7 @@ test.describe('Browser Session History', () => {
     });
 
     // Expect view-1 to be active
-    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
     await expectView(testee1ViewPage).toBeActive();
 
     // Add view-2 to the left part
@@ -113,7 +113,7 @@ test.describe('Browser Session History', () => {
     });
 
     // Expect view-2 to be active
-    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const testee2ViewPage = new ViewPagePO(appPO.view({viewId: 'view.102'}));
     await expectView(testee1ViewPage).toBeInactive();
     await expectView(testee2ViewPage).toBeActive();
 
@@ -196,8 +196,8 @@ test.describe('Browser Session History', () => {
       cssClass: 'testee',
     });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
-    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
+    const testee2ViewPage = new ViewPagePO(appPO.view({viewId: 'view.102'}));
 
     // Activate view-1
     await testee1ViewPage.view.tab.click();
@@ -279,7 +279,7 @@ test.describe('Browser Session History', () => {
       target: 'view.1',
     });
 
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.1'});
+    const viewPage = new ViewPagePO(appPO.view({viewId: 'view.1'}));
     await expectView(viewPage).toBeActive();
 
     // Enter title.
@@ -809,7 +809,7 @@ test.describe('Browser Session History', () => {
         cssClass: 'testee',
       });
 
-      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
+      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO.view({cssClass: 'testee'}));
       await expectView(routerPage).not.toBeAttached();
       await expectView(standaloneViewTestPage).toBeActive();
 
@@ -831,7 +831,7 @@ test.describe('Browser Session History', () => {
         cssClass: 'testee',
       });
 
-      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
+      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO.view({cssClass: 'testee'}));
       await expectView(routerPage).not.toBeAttached();
       await expectView(standaloneViewTestPage).toBeActive();
 
@@ -853,7 +853,7 @@ test.describe('Browser Session History', () => {
         cssClass: 'testee',
       });
 
-      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
+      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO.view({cssClass: 'testee'}));
       await expectView(routerPage).not.toBeAttached();
       await expectView(standaloneViewTestPage).toBeActive();
 
@@ -875,7 +875,7 @@ test.describe('Browser Session History', () => {
         cssClass: 'testee',
       });
 
-      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
+      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO.view({cssClass: 'testee'}));
       await expectView(routerPage).not.toBeAttached();
       await expectView(standaloneViewTestPage).toBeActive();
 
@@ -897,7 +897,7 @@ test.describe('Browser Session History', () => {
         cssClass: 'testee',
       });
 
-      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
+      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO.view({cssClass: 'testee'}));
       await expectView(routerPage).not.toBeAttached();
       await expectView(standaloneViewTestPage).toBeActive();
 
@@ -922,7 +922,7 @@ test.describe('Browser Session History', () => {
         cssClass: 'testee',
       });
 
-      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
+      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO.view({cssClass: 'testee'}));
       await expectView(routerPage).not.toBeAttached();
       await expectView(nonStandaloneViewTestPage).toBeActive();
 
@@ -944,7 +944,7 @@ test.describe('Browser Session History', () => {
         cssClass: 'testee',
       });
 
-      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
+      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO.view({cssClass: 'testee'}));
       await expectView(routerPage).not.toBeAttached();
       await expectView(nonStandaloneViewTestPage).toBeActive();
 
@@ -966,7 +966,7 @@ test.describe('Browser Session History', () => {
         cssClass: 'testee',
       });
 
-      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
+      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO.view({cssClass: 'testee'}));
       await expectView(routerPage).not.toBeAttached();
       await expectView(nonStandaloneViewTestPage).toBeActive();
 

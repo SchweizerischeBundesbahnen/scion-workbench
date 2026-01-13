@@ -27,7 +27,7 @@ test.describe('Navigational CSS Classes', () => {
         cssClass: 'testee-navigation',
       });
 
-      const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+      const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
       // Expect CSS classes of the navigation to be set.
       await expect.poll(() => viewPage.view.getCssClasses()).toContain('testee-navigation');
@@ -77,7 +77,7 @@ test.describe('Navigational CSS Classes', () => {
         .addView('view.100', {partId: 'part.right', activateView: true, cssClass: 'testee-layout'}),
       );
 
-      const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+      const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
       // Navigate to 'test-pages/navigation-test-page/1' passing CSS class 'testee-navigation-1'.
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
@@ -164,7 +164,7 @@ test.describe('Navigational CSS Classes', () => {
         .addView('view.100', {partId: 'part.right', activateView: true, cssClass: 'testee-layout'}),
       );
 
-      const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+      const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
       // Navigate to 'test-pages/navigation-test-page/1' passing CSS class 'testee-navigation-1'.
       await workbenchNavigator.modifyLayout(layout => layout.navigateView('view.100', ['test-pages/navigation-test-page/1'], {cssClass: 'testee-navigation-1'}));
@@ -236,7 +236,7 @@ test.describe('Navigational CSS Classes', () => {
         cssClass: 'testee-navigation',
       });
 
-      const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+      const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
       const dragHandle = await viewPage.view.tab.startDrag();
       await dragHandle.dragToPart(await viewPage.view.part.getPartId(), {region: 'east'});
       await dragHandle.drop();
@@ -258,7 +258,7 @@ test.describe('Navigational CSS Classes', () => {
       // Move view to new window.
       const newAppPO = await appPO.view({cssClass: 'testee-navigation'}).tab.moveToNewWindow();
       const newView = await newAppPO.workbench.view({alternativeId: 'testee'});
-      const newViewPage = new ViewPagePO(newAppPO, {viewId: newView.id});
+      const newViewPage = new ViewPagePO(newAppPO.view({viewId: newView.id}));
 
       // Expect CSS classes of the navigation to be retained
       await expect.poll(() => newViewPage.view.getCssClasses()).toContain('testee-navigation');
@@ -290,7 +290,7 @@ test.describe('Navigational CSS Classes', () => {
       // Move view 2 to the window.
       await appPO.view({cssClass: 'testee-navigation-2'}).tab.moveTo(newView1.partId, {workbenchId: await newAppPO.getWorkbenchId()});
       const newView2 = await newAppPO.workbench.view({alternativeId: 'testee-2'});
-      const newViewPage2 = new ViewPagePO(newAppPO, {viewId: newView2.id});
+      const newViewPage2 = new ViewPagePO(newAppPO.view({viewId: newView2.id}));
 
       // Expect CSS classes of the navigation to be retained.
       await expect.poll(() => newViewPage2.view.getCssClasses()).toContain('testee-navigation-2');
@@ -306,7 +306,7 @@ test.describe('Navigational CSS Classes', () => {
         cssClass: 'testee-navigation',
       });
 
-      const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+      const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
       // Expect CSS classes of the navigation to be set.
       await expect.poll(() => viewPage.view.getCssClasses()).toContain('testee-navigation');
@@ -336,8 +336,8 @@ test.describe('Navigational CSS Classes', () => {
         cssClass: 'testee-2',
       });
 
-      const viewPage1 = new ViewPagePO(appPO, {viewId: 'view.101'});
-      const viewPage2 = new ViewPagePO(appPO, {viewId: 'view.102'});
+      const viewPage1 = new ViewPagePO(appPO.view({viewId: 'view.101'}));
+      const viewPage2 = new ViewPagePO(appPO.view({viewId: 'view.102'}));
 
       // Expect CSS classes of the navigation to be present when clicking view 1.
       await viewPage1.view.tab.click();
@@ -360,7 +360,7 @@ test.describe('Navigational CSS Classes', () => {
         cssClass: 'testee',
       });
 
-      const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+      const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
       await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');
     });
 
@@ -372,7 +372,7 @@ test.describe('Navigational CSS Classes', () => {
         .navigateView('view.100', ['test-view'], {cssClass: 'testee'}),
       );
 
-      const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+      const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
       await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');
     });
   });
@@ -387,7 +387,7 @@ test.describe('Navigational CSS Classes', () => {
         .navigatePart('part.testee', ['test-part'], {cssClass: 'testee-navigation'}),
       );
 
-      const partPage = new PartPagePO(appPO, {partId: 'part.testee'});
+      const partPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
 
       // Expect CSS classes of the navigation to be set.
       await expect.poll(() => partPage.part.getCssClasses()).toContain('testee-navigation');
@@ -428,7 +428,7 @@ test.describe('Navigational CSS Classes', () => {
         .navigatePart('part.testee', ['test-part'], {cssClass: 'testee-navigation'}),
       );
 
-      const partPage = new PartPagePO(appPO, {partId: 'part.testee'});
+      const partPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
 
       // Expect CSS classes of the navigation to be set.
       await expect.poll(() => partPage.part.getCssClasses()).toContain('testee-navigation');

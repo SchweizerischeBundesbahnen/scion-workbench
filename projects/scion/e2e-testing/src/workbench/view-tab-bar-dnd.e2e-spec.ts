@@ -78,7 +78,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await expect.poll(() => appPO.part({partId: 'part.part'}).bar.viewTabBar.getViewIds()).toEqual(['view.101', 'view.102']);
 
     // Expect view to display correct content.
-    await expectView(new ViewPagePO(appPO, {viewId: 'view.102'})).toBeActive();
+    await expectView(new ViewPagePO(appPO.view({viewId: 'view.102'}))).toBeActive();
   });
 
   test('should swap tabs', async ({appPO, workbenchNavigator}) => {

@@ -35,7 +35,7 @@ test.describe('Workbench View', () => {
       cssClass: 'testee',
     });
 
-    const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+    const viewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
 
     await expect(viewPage.viewId).toHaveText('view.100');
   });
@@ -66,8 +66,8 @@ test.describe('Workbench View', () => {
       target: 'view.102',
     });
 
-    const testee1ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.101'});
-    const testee2ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.102'});
+    const testee1ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.101'}));
+    const testee2ViewPage = new NavigationTestPagePO(appPO.view({viewId: 'view.102'}));
 
     // reload the application
     await appPO.reload();
@@ -127,11 +127,11 @@ test.describe('Workbench View', () => {
     await expect(viewPage.view.tab.state('dirty')).not.toBeVisible();
 
     // Mark the view dirty
-    await viewPage.checkDirty(true);
+    await viewPage.markDirty(true);
     await expect(viewPage.view.tab.state('dirty')).toBeVisible();
 
     // Mark the view pristine
-    await viewPage.checkDirty(false);
+    await viewPage.markDirty(false);
     await expect(viewPage.view.tab.state('dirty')).not.toBeVisible();
   });
 
@@ -142,7 +142,7 @@ test.describe('Workbench View', () => {
     const viewId = await viewPage.view.getViewId();
 
     // Mark the view dirty
-    await viewPage.checkDirty(true);
+    await viewPage.markDirty(true);
     await expect(viewPage.view.tab.state('dirty')).toBeVisible();
 
     // Navigate to a different route in the same view
@@ -162,7 +162,7 @@ test.describe('Workbench View', () => {
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // Mark the view dirty
-    await viewPage.checkDirty(true);
+    await viewPage.markDirty(true);
     await expect(viewPage.view.tab.state('dirty')).toBeVisible();
 
     // Update matrix params (does not affect routing)
@@ -176,7 +176,7 @@ test.describe('Workbench View', () => {
 
     // Verify matrix params have changed
     await viewPage.view.tab.click();
-    await expect.poll(() => viewPage.getParams()).toEqual({matrixParam: 'value'});
+    await expect.poll(() => viewPage.getRouteParams()).toEqual({matrixParam: 'value'});
   });
 
   test('should not unset the title when the navigation resolves to the same route, e.g., when updating matrix params or route params', async ({appPO, workbenchNavigator}) => {
@@ -198,7 +198,7 @@ test.describe('Workbench View', () => {
     await expect(viewPage.view.tab.title).toHaveText('TITLE');
     // Verify matrix params have changed
     await viewPage.view.tab.click();
-    await expect.poll(() => viewPage.getParams()).toEqual({matrixParam: 'value'});
+    await expect.poll(() => viewPage.getRouteParams()).toEqual({matrixParam: 'value'});
   });
 
   test('should not unset the heading when the navigation resolves to the same route, e.g., when updating matrix params or route params', async ({appPO, workbenchNavigator}) => {
@@ -220,7 +220,7 @@ test.describe('Workbench View', () => {
     await expect(viewPage.view.tab.heading).toHaveText('HEADING');
 
     // Verify matrix params have changed
-    await expect.poll(() => viewPage.getParams()).toEqual({matrixParam: 'value'});
+    await expect.poll(() => viewPage.getRouteParams()).toEqual({matrixParam: 'value'});
   });
 
   test('should remove the closing handle from the view tab', async ({appPO, workbenchNavigator}) => {
@@ -317,7 +317,11 @@ test.describe('Workbench View', () => {
   test('should close view via Ctrl+K keystroke', async ({appPO, workbenchNavigator, page}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const testPage = await InputFieldTestPagePO.openInNewTab(appPO, workbenchNavigator);
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-pages/input-field-test-page'], {cssClass: 'testee'});
+    await routerPage.view.tab.close();
+
+    const testPage = new InputFieldTestPagePO(appPO.view({cssClass: 'testee'}));
     await testPage.clickInputField();
 
     // Close view by pressing Ctrl+K.
@@ -328,7 +332,11 @@ test.describe('Workbench View', () => {
   test('should close view via middle mouse button', async ({appPO, workbenchNavigator, page}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const testPage = await InputFieldTestPagePO.openInNewTab(appPO, workbenchNavigator);
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-pages/input-field-test-page'], {cssClass: 'testee'});
+    await routerPage.view.tab.close();
+
+    const testPage = new InputFieldTestPagePO(appPO.view({cssClass: 'testee'}));
     await testPage.clickInputField();
 
     // Close view by pressing the middle mouse button.
@@ -610,10 +618,10 @@ test.describe('Workbench View', () => {
       .navigateView('view.4', ['test-view']),
     );
 
-    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.1'});
-    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.2'});
-    const testee3ViewPage = new ViewPagePO(appPO, {viewId: 'view.3'});
-    const testee4ViewPage = new ViewPagePO(appPO, {viewId: 'view.4'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({viewId: 'view.1'}));
+    const testee2ViewPage = new ViewPagePO(appPO.view({viewId: 'view.2'}));
+    const testee3ViewPage = new ViewPagePO(appPO.view({viewId: 'view.3'}));
+    const testee4ViewPage = new ViewPagePO(appPO.view({viewId: 'view.4'}));
 
     // Prevent view.2 view from closing.
     await testee2ViewPage.view.tab.click();
@@ -735,9 +743,9 @@ test.describe('Workbench View', () => {
     });
 
     // Expect view to be opened.
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
     await expectView(testeeViewPage).toBeActive();
-    await expect.poll(() => testeeViewPage.getParams()).toEqual({navigation: '1'});
+    await expect.poll(() => testeeViewPage.getRouteParams()).toEqual({navigation: '1'});
 
     // Prevent view from closing.
     await testeeViewPage.checkConfirmClosing(true);
@@ -756,7 +764,7 @@ test.describe('Workbench View', () => {
 
     // Expect view to be navigated.
     await expectView(testeeViewPage).toBeActive();
-    await expect.poll(() => testeeViewPage.getParams()).toEqual({navigation: '2'});
+    await expect.poll(() => testeeViewPage.getRouteParams()).toEqual({navigation: '2'});
 
     // Navigate view to different page (RouterPage)
     await routerPage.view.tab.click();
@@ -765,7 +773,7 @@ test.describe('Workbench View', () => {
     });
 
     // Expect view to be navigated.
-    const differentPage = new RouterPagePO(appPO, {viewId: 'view.101'});
+    const differentPage = new RouterPagePO(appPO.view({viewId: 'view.101'}));
     await expectView(differentPage).toBeActive();
     await expect(appPO.views()).toHaveCount(2);
 
@@ -788,9 +796,9 @@ test.describe('Workbench View', () => {
     });
 
     // Expect view to be opened.
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
     await expectView(testeeViewPage).toBeActive();
-    await expect.poll(() => testeeViewPage.getParams()).toEqual({navigation: '1'});
+    await expect.poll(() => testeeViewPage.getRouteParams()).toEqual({navigation: '1'});
 
     // Prevent view from closing.
     await testeeViewPage.checkConfirmClosing(true);
@@ -809,7 +817,7 @@ test.describe('Workbench View', () => {
 
     // Expect view to be navigated.
     await expectView(testeeViewPage).toBeActive();
-    await expect.poll(() => testeeViewPage.getParams()).toEqual({navigation: '2'});
+    await expect.poll(() => testeeViewPage.getRouteParams()).toEqual({navigation: '2'});
 
     // Test that closing the view must be confirmed.
     await testeeViewPage.view.tab.close();
@@ -826,7 +834,7 @@ test.describe('Workbench View', () => {
 
     // Open test view.
     await routerPage.navigate(['test-view'], {target: 'view.100'});
-    const testViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await testViewPage.checkConfirmClosing(true);
     await expectView(testViewPage).toBeActive();
 
@@ -859,7 +867,7 @@ test.describe('Workbench View', () => {
 
     // Open test view.
     await routerPage.navigate(['test-view'], {target: 'view.100'});
-    const testViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await testViewPage.checkConfirmClosing(true);
     await expectView(testViewPage).toBeActive();
 
@@ -1106,8 +1114,8 @@ test.describe('Workbench View', () => {
       .navigateView('view.102', ['test-view']),
     );
 
-    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
-    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
+    const testee2ViewPage = new ViewPagePO(appPO.view({viewId: 'view.102'}));
 
     // Prevent the view from closing.
     await testee2ViewPage.checkConfirmClosing(true);
@@ -1140,7 +1148,7 @@ test.describe('Workbench View', () => {
         },
       },
     });
-    await expectView(new ViewPagePO(newWindow.appPO, {viewId: newViewId})).toBeActive();
+    await expectView(new ViewPagePO(newWindow.appPO.view({viewId: newViewId}))).toBeActive();
 
     // Expect view to be removed from the origin window.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -1167,8 +1175,8 @@ test.describe('Workbench View', () => {
       .navigateView('view.102', ['test-view']),
     );
 
-    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
-    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
+    const testee2ViewPage = new ViewPagePO(appPO.view({viewId: 'view.102'}));
 
     // Prevent the view from closing.
     await testee2ViewPage.checkConfirmClosing(true);
@@ -1204,7 +1212,7 @@ test.describe('Workbench View', () => {
         },
       },
     });
-    await expectView(new ViewPagePO(newAppPO, {viewId: newViewId})).toBeActive();
+    await expectView(new ViewPagePO(newAppPO.view({viewId: newViewId}))).toBeActive();
 
     // Expect view to be removed from the origin window.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -1255,7 +1263,7 @@ test.describe('Workbench View', () => {
     const viewPage1 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // Capture instance id of view 2
-    const viewPage2 = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const viewPage2 = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     const view2ComponentId = await viewPage2.getComponentInstanceId();
 
     // Maximize the main area.
@@ -1304,7 +1312,7 @@ test.describe('Workbench View', () => {
       cssClass: 'testee',
     });
 
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');
     await expect(viewPage.view.tab.title).toHaveText('View Title');
   });
@@ -1319,7 +1327,7 @@ test.describe('Workbench View', () => {
       cssClass: 'testee',
     });
 
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');
     await expect(viewPage.view.tab.title).toHaveText('View Title');
   });
@@ -1327,23 +1335,26 @@ test.describe('Workbench View', () => {
   test('should have no position and size when inactive', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    // Open view 1.
-    const viewPage1 = await SizeTestPagePO.openInNewTab(appPO);
-    await expectView(viewPage1).toBeActive();
-    const size = await viewPage1.getBoundingBox();
+    // Open test view.
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-pages/size-test-page'], {cssClass: 'testee'});
 
-    // Open view 2.
-    const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
-    await expectView(viewPage1).toBeInactive();
-    await expectView(viewPage2).toBeActive();
+    const testPage = new SizeTestPagePO(appPO.view({cssClass: 'testee'}));
+    await expectView(testPage).toBeActive();
+    const size = await testPage.getBoundingBox();
 
-    // Activate view 1.
-    await viewPage1.view.tab.click();
-    await expectView(viewPage1).toBeActive();
-    await expectView(viewPage2).toBeInactive();
+    // Activate route page.
+    await routerPage.view.tab.click();
+    await expectView(routerPage).toBeActive();
+    await expectView(testPage).toBeInactive();
+
+    // Activate test page.
+    await testPage.view.tab.click();
+    await expectView(routerPage).toBeInactive();
+    await expectView(testPage).toBeActive();
 
     // Expect view to have zero position and size when inactive.
-    await expect.poll(() => viewPage1.getRecordedSizeChanges()).toEqual([
+    await expect.poll(() => testPage.getRecordedSizeChanges()).toEqual([
       `x=${size.x}, y=${size.y}, width=${size.width}, height=${size.height}`,
       'x=0, y=0, width=0, height=0',
       `x=${size.x}, y=${size.y}, width=${size.width}, height=${size.height}`,
@@ -1358,7 +1369,7 @@ test.describe('Workbench View', () => {
     );
 
     // Expect hint to show.
-    const nullContextPage = new NullContentPagePO(appPO, {viewId: 'view.100'});
+    const nullContextPage = new NullContentPagePO(appPO.view({viewId: 'view.100'}));
     await expectView(nullContextPage).toBeActive();
 
     // Reload the application and expect the hint to still be displayed.
@@ -1371,7 +1382,7 @@ test.describe('Workbench View', () => {
     await workbenchNavigator.modifyLayout(layout => layout.navigateView('view.100', ['test-view']));
 
     // Expect hint not to show.
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expectView(viewPage).toBeActive();
   });
 

@@ -29,7 +29,7 @@ test.describe('View Tabbar', () => {
       cssClass: 'testee-1',
     });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
+    const testee1ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
 
     await expectView(routerPage).toBeInactive();
     await expectView(testee1ViewPage).toBeActive();
@@ -42,7 +42,7 @@ test.describe('View Tabbar', () => {
       cssClass: 'testee-2',
     });
 
-    const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+    const testee2ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
 
     await expectView(routerPage).toBeInactive();
     await expectView(testee1ViewPage).toBeInactive();
@@ -56,7 +56,7 @@ test.describe('View Tabbar', () => {
       cssClass: 'testee-3',
     });
 
-    const testee3ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-3'});
+    const testee3ViewPage = new ViewPagePO(appPO.view({cssClass: 'testee-3'}));
 
     await expectView(routerPage).toBeInactive();
     await expectView(testee1ViewPage).toBeInactive();
@@ -116,7 +116,7 @@ test.describe('View Tabbar', () => {
     );
 
     // Open view in the active part (left part).
-    const routerPage = new RouterPagePO(appPO, {viewId: 'view.2'});
+    const routerPage = new RouterPagePO(appPO.view({viewId: 'view.2'}));
     await routerPage.navigate(['test-view'], {
       target: 'view.7',
     });
@@ -327,7 +327,7 @@ test.describe('View Tabbar', () => {
       position: 'end',
     });
 
-    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.2'});
+    const testee2ViewPage = new ViewPagePO(appPO.view({viewId: 'view.2'}));
 
     await expectView(routerPage).toBeInactive();
     await expectView(testee2ViewPage).toBeActive();
@@ -340,7 +340,7 @@ test.describe('View Tabbar', () => {
       position: 'end',
     });
 
-    const testee3ViewPage = new ViewPagePO(appPO, {viewId: 'view.3'});
+    const testee3ViewPage = new ViewPagePO(appPO.view({viewId: 'view.3'}));
 
     await expectView(routerPage).toBeInactive();
     await expectView(testee2ViewPage).toBeInactive();
@@ -354,7 +354,7 @@ test.describe('View Tabbar', () => {
       position: 'end',
     });
 
-    const testee4ViewPage = new ViewPagePO(appPO, {viewId: 'view.4'});
+    const testee4ViewPage = new ViewPagePO(appPO.view({viewId: 'view.4'}));
 
     await expectView(routerPage).toBeInactive();
     await expectView(testee2ViewPage).toBeInactive();
@@ -374,7 +374,7 @@ test.describe('View Tabbar', () => {
       position: 'start',
     });
 
-    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.2'});
+    const testee2ViewPage = new ViewPagePO(appPO.view({viewId: 'view.2'}));
 
     await expectView(routerPage).toBeInactive();
     await expectView(testee2ViewPage).toBeActive();
@@ -387,7 +387,7 @@ test.describe('View Tabbar', () => {
       position: 'start',
     });
 
-    const testee3ViewPage = new ViewPagePO(appPO, {viewId: 'view.3'});
+    const testee3ViewPage = new ViewPagePO(appPO.view({viewId: 'view.3'}));
 
     await expectView(routerPage).toBeInactive();
     await expectView(testee2ViewPage).toBeInactive();
@@ -401,7 +401,7 @@ test.describe('View Tabbar', () => {
       position: 'start',
     });
 
-    const testee4ViewPage = new ViewPagePO(appPO, {viewId: 'view.4'});
+    const testee4ViewPage = new ViewPagePO(appPO.view({viewId: 'view.4'}));
 
     await expectView(routerPage).toBeInactive();
     await expectView(testee2ViewPage).toBeInactive();
@@ -421,7 +421,7 @@ test.describe('View Tabbar', () => {
       position: 1,
     });
 
-    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.2'});
+    const testee2ViewPage = new ViewPagePO(appPO.view({viewId: 'view.2'}));
 
     await expectView(routerPage).toBeInactive();
     await expectView(testee2ViewPage).toBeActive();
@@ -434,7 +434,7 @@ test.describe('View Tabbar', () => {
       position: 1,
     });
 
-    const testee3ViewPage = new ViewPagePO(appPO, {viewId: 'view.3'});
+    const testee3ViewPage = new ViewPagePO(appPO.view({viewId: 'view.3'}));
 
     await expectView(routerPage).toBeInactive();
     await expectView(testee2ViewPage).toBeInactive();
@@ -448,7 +448,7 @@ test.describe('View Tabbar', () => {
       position: 1,
     });
 
-    const testee4ViewPage = new ViewPagePO(appPO, {viewId: 'view.4'});
+    const testee4ViewPage = new ViewPagePO(appPO.view({viewId: 'view.4'}));
 
     await expectView(routerPage).toBeInactive();
     await expectView(testee2ViewPage).toBeInactive();

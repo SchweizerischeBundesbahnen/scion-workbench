@@ -10,7 +10,6 @@
 
 import {expect} from '@playwright/test';
 import {PartPO} from '../../part.po';
-import {AppPO} from '../../app.po';
 import {SciRouterOutletPO} from '../page-object/sci-router-outlet.po';
 
 /**
@@ -20,8 +19,7 @@ export function expectPart(part: PartPO): PartMatcher {
   return {
     toDisplayComponent: async (selector: string): Promise<void> => {
       const partId = await part.getPartId();
-      const appPO = new AppPO(part.locator.page());
-      const outlet = new SciRouterOutletPO(appPO, {name: partId});
+      const outlet = new SciRouterOutletPO(part.locator.page(), {name: partId});
 
       await expect(part.locator).toBeVisible();
       await expect(part.locator.locator('.e2e-part-content')).toBeVisible();
@@ -32,8 +30,7 @@ export function expectPart(part: PartPO): PartMatcher {
     not: {
       toDisplayComponent: async (): Promise<void> => {
         const partId = await part.getPartId();
-        const appPO = new AppPO(part.locator.page());
-        const outlet = new SciRouterOutletPO(appPO, {name: partId});
+        const outlet = new SciRouterOutletPO(part.locator.page(), {name: partId});
 
         await expect(part.locator).toBeVisible();
         await expect(part.locator.locator('.e2e-part-content')).not.toBeAttached();

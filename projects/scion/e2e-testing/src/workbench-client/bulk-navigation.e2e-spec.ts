@@ -29,7 +29,7 @@ test.describe('Bulk Navigation', () => {
     // Open test page.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-    const bulkNavigationTestPage = new BulkNavigationTestPagePO(appPO, {cssClass: 'testee'});
+    const bulkNavigationTestPage = new BulkNavigationTestPagePO(appPO.view({cssClass: 'testee'}));
 
     await bulkNavigationTestPage.enterViewCount(10);
     await bulkNavigationTestPage.enterCssClass('bulk-navigation-test-target');
@@ -52,7 +52,7 @@ test.describe('Bulk Navigation', () => {
     // Open test page.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-    const bulkNavigationTestPage = new BulkNavigationTestPagePO(appPO, {cssClass: 'testee'});
+    const bulkNavigationTestPage = new BulkNavigationTestPagePO(appPO.view({cssClass: 'testee'}));
 
     await bulkNavigationTestPage.enterViewCount(10);
     await bulkNavigationTestPage.enterCssClass('bulk-navigation-test-target');

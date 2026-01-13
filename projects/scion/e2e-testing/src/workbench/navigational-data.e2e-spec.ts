@@ -27,7 +27,7 @@ test.describe('Navigational Data', () => {
         cssClass: 'testee',
       });
 
-      const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      const viewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
       await expect.poll(() => viewPage.getNavigationData()).toEqual({some: 'data'});
     });
 
@@ -40,7 +40,7 @@ test.describe('Navigational Data', () => {
         .navigateView('testee', ['test-view'], {data: {some: 'data'}}),
       );
 
-      const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      const viewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
       await expect.poll(() => viewPage.getNavigationData()).toEqual({some: 'data'});
     });
 
@@ -61,7 +61,7 @@ test.describe('Navigational Data', () => {
         cssClass: 'testee',
       });
 
-      const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      const viewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
       await expect.poll(() => viewPage.getNavigationData()).toEqual({
         data1: 'value',
         data2: '0 [number]',
@@ -82,7 +82,7 @@ test.describe('Navigational Data', () => {
         cssClass: 'testee',
       });
 
-      const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      const viewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
       await expect.poll(() => viewPage.getNavigationData()).toEqual({data1: 'data 1'});
       await expect(appPO.views({cssClass: 'testee'})).toHaveCount(1);
 
@@ -122,7 +122,7 @@ test.describe('Navigational Data', () => {
         cssClass: 'testee',
       });
 
-      const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      const viewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
       await expect.poll(() => viewPage.getNavigationData()).toEqual({some: 'data'});
 
       await appPO.reload();
@@ -156,25 +156,25 @@ test.describe('Navigational Data', () => {
         data: {data: 'data-3'},
       });
 
-      const viewPage1 = new ViewPagePO(appPO, {cssClass: 'testee-1'});
-      const viewPage2 = new ViewPagePO(appPO, {cssClass: 'testee-2'});
-      const viewPage3 = new ViewPagePO(appPO, {cssClass: 'testee-3'});
+      const viewPage1 = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
+      const viewPage2 = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
+      const viewPage3 = new ViewPagePO(appPO.view({cssClass: 'testee-3'}));
 
       // Move view 1 to new window.
       const newAppPO = await viewPage1.view.tab.moveToNewWindow();
-      const newViewPage1 = new ViewPagePO(newAppPO, {cssClass: 'testee-1'});
+      const newViewPage1 = new ViewPagePO(newAppPO.view({cssClass: 'testee-1'}));
       // Expect navigation data be retained.
       await expect.poll(() => newViewPage1.getNavigationData()).toEqual({data: 'data-1'});
 
       // Move view 2 to the window.
       await viewPage2.view.tab.moveTo(await newViewPage1.view.part.getPartId(), {workbenchId: await newAppPO.getWorkbenchId()});
-      const newViewPage2 = new ViewPagePO(newAppPO, {cssClass: 'testee-2'});
+      const newViewPage2 = new ViewPagePO(newAppPO.view({cssClass: 'testee-2'}));
       // Expect navigation data be retained.
       await expect.poll(() => newViewPage2.getNavigationData()).toEqual({data: 'data-2'});
 
       // Move view 3 to the window in a new part.
       await viewPage3.view.tab.moveTo(await newViewPage1.view.part.getPartId(), {region: 'east', workbenchId: await newAppPO.getWorkbenchId()});
-      const newViewPage3 = new ViewPagePO(newAppPO, {cssClass: 'testee-3'});
+      const newViewPage3 = new ViewPagePO(newAppPO.view({cssClass: 'testee-3'}));
       // Expect navigation data be retained.
       await expect.poll(() => newViewPage3.getNavigationData()).toEqual({data: 'data-3'});
     });
@@ -189,7 +189,7 @@ test.describe('Navigational Data', () => {
         target: 'view.100',
       });
 
-      const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+      const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
       await expect.poll(() => viewPage.getNavigationData()).toEqual({data1: 'data 1'});
       await expect(appPO.views()).toHaveCount(2);
 
@@ -227,7 +227,7 @@ test.describe('Navigational Data', () => {
         .navigatePart('part.right', ['test-part'], {data: {some: 'data'}}),
       );
 
-      const partPage = new PartPagePO(appPO, {partId: 'part.right'});
+      const partPage = new PartPagePO(appPO.part({partId: 'part.right'}));
       await expect.poll(() => partPage.getNavigationData()).toEqual({some: 'data'});
     });
 
@@ -240,7 +240,7 @@ test.describe('Navigational Data', () => {
         .navigatePart('part.testee', ['test-part'], {data: {data1: 'data 1'}}),
       );
 
-      const partPage = new PartPagePO(appPO, {partId: 'part.testee'});
+      const partPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
       await expect.poll(() => partPage.getNavigationData()).toEqual({data1: 'data 1'});
 
       // Navigate part again with different data.
@@ -273,7 +273,7 @@ test.describe('Navigational Data', () => {
         .navigatePart('part.testee', ['test-part'], {data: {some: 'data'}}),
       );
 
-      const partPage = new PartPagePO(appPO, {partId: 'part.testee'});
+      const partPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
       await expect.poll(() => partPage.getNavigationData()).toEqual({some: 'data'});
 
       await appPO.reload();

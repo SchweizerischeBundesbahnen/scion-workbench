@@ -61,34 +61,34 @@ test.describe('Workbench Popup', () => {
     });
 
     /**
-     * TODO [#271]: Activate when fixed; Use host view to open popup.
-     *
-     * In this test, we do not open the popup from within a microfrontend because opening the popup from within a microfrontend causes that
+     * In this test, we do not open the popup from within an iframe-based microfrontend because opening the popup from within a microfrontend causes that
      * microfrontend to lose focus, which would trigger a change detection cycle in the host, causing the popup to be displayed at the correct size.
      *
      * This test verifies that the popup is displayed at the correct size even without an "additional" change detection cycle, i.e., is opened
      * inside the Angular zone.
      */
-    test.fixme('should size the popup as configured in the popup capability (insideAngularZone)', async ({appPO, microfrontendNavigator}) => {
+    test('should size the popup as configured in the popup capability (insideAngularZone)', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       await microfrontendNavigator.registerCapability('app1', {
         type: 'popup',
-        qualifier: {test: 'popup'},
+        qualifier: {component: 'testee'},
+        private: false,
         properties: {
           path: 'test-popup',
-          cssClass: 'testee',
-          pinToDesktop: true,
-          size: {
-            width: '350px',
-            height: '450px',
-          },
+          size: {width: '350px', height: '450px'},
         },
       });
 
-      // open the popup directly from the start page
-      // const startPage = await appPO.openNewViewTab();
-      // await startPage.clickTestCapability('testee', 'app1');
+      // Register intention.
+      await microfrontendNavigator.registerIntention('host', {type: 'popup', qualifier: {component: 'testee'}});
+
+      // Open the popup directly from the start page
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'host');
+      await popupOpenerPage.open({component: 'testee'}, {
+        anchor: 'element',
+        cssClass: 'testee',
+      });
 
       const popup = appPO.popup({cssClass: 'testee'});
 

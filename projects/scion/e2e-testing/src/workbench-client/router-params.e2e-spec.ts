@@ -37,7 +37,7 @@ test.describe('Workbench Router', () => {
       params: {id: '123'},
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
     await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
       id: '123',
@@ -101,7 +101,7 @@ test.describe('Workbench Router', () => {
     });
 
     // Expect params to have actual data type.
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.1'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.1'}));
     await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
       param1: 'value',
       param2: '0 [number]',
@@ -140,7 +140,7 @@ test.describe('Workbench Router', () => {
       params: {segment1: 'SEG1', segment2: 'SEG2', mp1: 'MP1', mp2: 'MP2', qp1: 'QP1', qp2: 'QP2', fragment: 'FRAGMENT'},
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
     // expect named params to be substituted
     await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
@@ -179,7 +179,7 @@ test.describe('Workbench Router', () => {
       params: {id: '123'},
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
     // capture the view's component instance id
     const testeeComponentInstanceId = await testeeViewPage.getComponentInstanceId();
@@ -226,7 +226,7 @@ test.describe('Workbench Router', () => {
       params: {id: '<null>'},
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
     // expect the optional parameter with value `null` to be contained in view params
     await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
@@ -263,7 +263,7 @@ test.describe('Workbench Router', () => {
       params: {id: '123', param1: '<undefined>'},
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
     await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
       id: '123',
@@ -543,7 +543,7 @@ test.describe('Workbench Router', () => {
         params: {id: '123', param1: 'transient param1', param2: 'transient param2'},
       });
 
-      const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+      const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
       // expect transient param to be contained in view params
       await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
@@ -618,7 +618,7 @@ test.describe('Workbench Router', () => {
       });
 
       // expect transient params to have actual data type
-      const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+      const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
       await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
         param1: 'value',
         param2: '0 [number]',
@@ -642,7 +642,7 @@ test.describe('Workbench Router', () => {
         params: {transientParam: 'TRANSIENT PARAM'},
       });
 
-      const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+      const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
 
       // expect transient param to be contained in view params
       await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
@@ -876,7 +876,7 @@ test.describe('Workbench Router', () => {
         cssClass: 'testee1',
       });
 
-      const testeeViewPage1 = new ViewPagePO(appPO, {cssClass: 'testee1'});
+      const testeeViewPage1 = new ViewPagePO(appPO.view({cssClass: 'testee1'}));
       const testeeViewId = await testeeViewPage1.view.getViewId();
 
       // expect transient param to be contained in view params
@@ -893,7 +893,7 @@ test.describe('Workbench Router', () => {
         cssClass: 'testee2',
       });
 
-      const testeeViewPage2 = new ViewPagePO(appPO, {cssClass: 'testee2'});
+      const testeeViewPage2 = new ViewPagePO(appPO.view({cssClass: 'testee2'}));
       await testeeViewPage2.view.tab.click();
 
       // expect transient param to be contained in view params
@@ -947,7 +947,7 @@ test.describe('Workbench Router', () => {
         cssClass: 'testee1',
       });
 
-      const testeeViewPage1 = new ViewPagePO(appPO, {cssClass: 'testee1'});
+      const testeeViewPage1 = new ViewPagePO(appPO.view({cssClass: 'testee1'}));
 
       // expect transient param to be contained in view params
       const testeeViewId = await testeeViewPage1.view.getViewId();
@@ -963,7 +963,7 @@ test.describe('Workbench Router', () => {
       });
 
       // expect transient param not to be contained in view params
-      const testeeViewPage2 = new ViewPagePO(appPO, {cssClass: 'testee2'});
+      const testeeViewPage2 = new ViewPagePO(appPO.view({cssClass: 'testee2'}));
       await testeeViewPage2.view.tab.click();
       await expect.poll(() => testeeViewPage2.getViewParams()).not.toMatchObject({
         transientParam: 'transient param app1',
