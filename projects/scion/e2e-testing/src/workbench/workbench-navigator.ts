@@ -17,6 +17,7 @@ import {ViewPagePO} from './page-object/view-page.po';
 import {LayoutPagePO} from './page-object/layout-page/layout-page.po';
 import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
 import {WorkbenchLayout, WorkbenchLayoutFn} from '@scion/workbench';
+import {RouteDescriptor} from 'workbench-testing-app-common';
 
 export interface Type<T> extends Function { // eslint-disable-line @typescript-eslint/no-unsafe-function-type
   new(...args: any[]): T; // eslint-disable-line @typescript-eslint/prefer-function-type
@@ -66,7 +67,7 @@ export class WorkbenchNavigator {
     switch (page) {
       case MessageBoxOpenerPagePO: {
         await startPage.openWorkbenchView('e2e-test-message-box-opener');
-        return new MessageBoxOpenerPagePO(this._appPO, {viewId, cssClass: 'e2e-test-message-box-opener'});
+        return new MessageBoxOpenerPagePO(this._appPO.view({viewId, cssClass: 'e2e-test-message-box-opener'}));
       }
       case DialogOpenerPagePO: {
         await startPage.openWorkbenchView('e2e-test-dialog-opener');
@@ -82,7 +83,7 @@ export class WorkbenchNavigator {
       }
       case RouterPagePO: {
         await startPage.openWorkbenchView('e2e-test-router');
-        return new RouterPagePO(this._appPO, {viewId, cssClass: 'e2e-test-router'});
+        return new RouterPagePO(this._appPO.view({viewId, cssClass: 'e2e-test-router'}));
       }
       case LayoutPagePO: {
         await startPage.openWorkbenchView('e2e-test-layout');
@@ -90,7 +91,7 @@ export class WorkbenchNavigator {
       }
       case ViewPagePO: {
         await startPage.openWorkbenchView('e2e-test-view');
-        return new ViewPagePO(this._appPO, {viewId, cssClass: 'e2e-test-view'});
+        return new ViewPagePO(this._appPO.view({viewId, cssClass: 'e2e-test-view'}));
       }
       default: {
         throw Error(`[TestError] Page not supported to be opened in a new tab. [page=${page}]`);
@@ -129,6 +130,21 @@ export class WorkbenchNavigator {
     const layoutPage = await this.openInNewTab(LayoutPagePO);
     await layoutPage.modifyLayout(layoutFn);
     await layoutPage.view.tab.close({programmatic: true});
+  }
+
+  /**
+   * Use to register an Angular route.
+   *
+   * The route will be added before existing routes for Angular to match it first (higher precedence).
+   */
+  public async registerRoute(route: RouteDescriptor): Promise<void> {
+    const layoutPage = await this.openInNewTab(LayoutPagePO);
+    try {
+      await layoutPage.registerRoute(route);
+    }
+    finally {
+      await layoutPage.view.tab.close();
+    }
   }
 }
 

@@ -62,7 +62,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _closable = signal(true);
   private readonly _scrolledIntoView = signal(true);
 
-  public alternativeId: string | undefined;
+  public readonly alternativeId: string | undefined;
   public readonly navigation = signal<WorkbenchViewNavigation | undefined>(undefined);
   public readonly position = computed(() => this.part().views().indexOf(this));
   public readonly first = computed(() => this.position() === 0);
@@ -137,9 +137,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     this.part.set(this._partRegistry.get(mPart.id));
     this.active.set(mPart.activeViewId === this.id);
     this.activationInstant.set(mView.activationInstant ?? 0);
-
-    // TODO [#626]: Remove assignment and change `alternativeId` to read only when resolved the issue #626
-    this.alternativeId = mView.alternativeId;
     this.classList.layout = mView.cssClass;
 
     // Test if a new route has been activated for this view.

@@ -8,8 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Injector, Provider, signal, Signal, untracked, viewChild} from '@angular/core';
-import {Router} from '@angular/router';
+import {ChangeDetectorRef, Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Injector, linkedSignal, Provider, signal, Signal, untracked, viewChild} from '@angular/core';
 import {asyncScheduler, firstValueFrom, MonoTypeOperatorFunction, switchMap, tap} from 'rxjs';
 import {filter, first, map, subscribeOn, take} from 'rxjs/operators';
 import {ManifestService, mapToBody, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
@@ -37,6 +36,7 @@ import {rootEffect, toRootObservable} from '../../common/rxjs-interop.util';
 import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provider';
 import {prune} from '../../common/prune.util';
 import {MicrofrontendViewNavigationData} from './microfrontend-view-navigation-data';
+import {Routing} from '../../routing/routing.util';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -58,7 +58,6 @@ import {MicrofrontendViewNavigationData} from './microfrontend-view-navigation-d
 export class MicrofrontendViewComponent {
 
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
-  private readonly _router = inject(Router);
   private readonly _outletRouter = inject(OutletRouter);
   private readonly _manifestService = inject(ManifestService);
   private readonly _messageClient = inject(MessageClient);
@@ -79,6 +78,7 @@ export class MicrofrontendViewComponent {
   protected readonly splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
   /** Keystrokes which to bubble across iframe boundaries from embedded content. */
   protected readonly keystrokesToBubble = this.computeKeyStrokesToBubble();
+  protected readonly focusWithin = signal(false);
   /** Configures iframe projection. */
   protected readonly overlayConfig: ContentAsOverlayConfig = {
     location: inject(IFRAME_OVERLAY_HOST),
@@ -107,7 +107,7 @@ export class MicrofrontendViewComponent {
     toRootObservable(this.navigationContext)
       .pipe(
         tap(context => this.onPreNavigate(context)),
-        filter((context): context is NavigationContext => !!context?.capability),
+        filter((context): context is NavigationContext => !!context.capability),
         delayIfLazy(),
         serializeExecution(context => this.onNavigate(context)),
         subscribeOn(asyncScheduler), // subscribe asynchronously because `onCapabilityChange` triggers a manual change detection cycle for inactive views; would error if called during component construction otherwise.
@@ -119,38 +119,32 @@ export class MicrofrontendViewComponent {
   /**
    * Computes the current navigation of this microfrontend view.
    */
-  private computeNavigationContext(): Signal<NavigationContext | undefined> {
-    const context = signal<NavigationContext | undefined>(undefined);
+  private computeNavigationContext(): Signal<NavigationContext> {
     const manifestObjectCache = inject(ManifestObjectCache);
+    const navigationData = computed(() => this.view.navigation()!.data as unknown as MicrofrontendViewNavigationData);
+    const transientParams = computed(() => this.view.navigation()!.state?.[MICROFRONTEND_VIEW_STATE_TRANSIENT_PARAMS] ?? {});
+    const capability = manifestObjectCache.capability<WorkbenchViewCapability>(computed(() => navigationData().capabilityId));
 
-    // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
-    rootEffect(onCleanup => {
-      const {capabilityId, params} = this.view.navigation()!.data as unknown as MicrofrontendViewNavigationData;
-      const transientParams = this.view.navigation()!.state?.[MICROFRONTEND_VIEW_STATE_TRANSIENT_PARAMS] ?? {};
-
-      untracked(() => {
-        const subscription = manifestObjectCache.observeCapability$<WorkbenchViewCapability>(capabilityId).subscribe(capability => {
-          context.update(prevContext => ({
-            capabilityId,
-            capability: capability ?? undefined,
-            prevCapability: prevContext?.capability,
-            params: Maps.coerce({
-              ...params,
-              ...transientParams,
-            }),
-          }));
-        });
-        onCleanup(() => subscription.unsubscribe());
-      });
+    return linkedSignal({
+      source: () => ({navigationData: navigationData(), capability: capability(), transientParams: transientParams()}),
+      computation: ({navigationData, capability, transientParams}, previousNavigationContext) => ({
+        capabilityId: navigationData.capabilityId,
+        capability: capability,
+        prevCapability: previousNavigationContext?.value.capability,
+        params: Maps.coerce({
+          ...navigationData.params,
+          ...transientParams,
+        }),
+        referrer: navigationData.referrer,
+      }),
     });
-    return context;
   }
 
   /**
    * Provides the view context to embedded content.
    */
   private propagateViewContext(): void {
-    // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+    // Use root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
     rootEffect(() => {
       const routerOutletElement = this._routerOutletElement().nativeElement;
       untracked(() => routerOutletElement.setContextValue(ɵVIEW_ID_CONTEXT_KEY, this.view.id));
@@ -162,11 +156,7 @@ export class MicrofrontendViewComponent {
    *
    * Unlike {@link onNavigate}, this method is also invoked if the view is inactive, allowing for updating view properties such as the view tab title.
    */
-  private onPreNavigate(context: NavigationContext | undefined): void {
-    if (!context) {
-      return; // not yet initialized.
-    }
-
+  private onPreNavigate(context: NavigationContext): void {
     const {capability, params, prevCapability} = context;
 
     // Signal application about unloading.
@@ -204,9 +194,7 @@ export class MicrofrontendViewComponent {
 
       // Unload microfrontend and free resources.
       this.unload();
-
-      // Perform navigation for Angular to evaluate `CanMatch` guards to display the "Not Found" page.
-      void this._router.navigate([{outlets: {}}], {skipLocationChange: true});
+      void Routing.runCanMatchGuards({injector: this._injector});
     }
   }
 
@@ -263,7 +251,7 @@ export class MicrofrontendViewComponent {
       .pipe(takeUntilDestroyed())
       .subscribe((request: TopicMessage<ɵViewParamsUpdateCommand>) => {
         const replyTo = request.headers.get(MessageHeaders.ReplyTo) as string;
-        const context = this.navigationContext()!;
+        const context = this.navigationContext();
 
         // Ignore request if not target of this capability.
         if (request.params!.get('capabilityId') !== context.capabilityId) {
@@ -288,6 +276,7 @@ export class MicrofrontendViewComponent {
             data: {
               capabilityId: context.capabilityId,
               params,
+              referrer: context.referrer,
             } satisfies MicrofrontendViewNavigationData,
             state: prune({
               [MICROFRONTEND_VIEW_STATE_TRANSIENT_PARAMS]: Object.keys(transientParams).length ? transientParams : undefined,
@@ -300,7 +289,7 @@ export class MicrofrontendViewComponent {
   }
 
   private installViewActivePublisher(): void {
-    // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+    // Use root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
     rootEffect(() => {
       const active = this.view.active();
       untracked(() => {
@@ -311,7 +300,7 @@ export class MicrofrontendViewComponent {
   }
 
   private installViewFocusedPublisher(): void {
-    // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+    // Use root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
     rootEffect(() => {
       const focused = this.view.focused();
       untracked(() => {
@@ -322,7 +311,7 @@ export class MicrofrontendViewComponent {
   }
 
   private installPartIdPublisher(): void {
-    // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+    // Use root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
     rootEffect(() => {
       const part = this.view.part();
       untracked(() => {
@@ -364,6 +353,8 @@ export class MicrofrontendViewComponent {
 
   protected onFocusWithin(event: Event): void {
     const {detail: focusWithin} = event as CustomEvent<boolean>;
+    this.focusWithin.set(focusWithin);
+
     if (focusWithin) {
       this._host.dispatchEvent(new CustomEvent('sci-microfrontend-focusin', {bubbles: true}));
     }
@@ -455,4 +446,5 @@ interface NavigationContext {
   capability?: WorkbenchViewCapability;
   prevCapability?: WorkbenchViewCapability;
   params: Map<string, unknown>;
+  referrer: string;
 }

@@ -9,7 +9,7 @@
  */
 
 import {WorkbenchPerspective, WorkbenchPerspectiveData} from '@scion/workbench';
-import {PerspectiveData} from '../workbench.perspectives';
+import {PerspectiveData} from '../app.perspectives';
 
 /**
  * Sorts two perspectives by display text, with non-microfrontend perspectives preceding microfrontend perspectives.

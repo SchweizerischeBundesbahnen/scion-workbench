@@ -22,6 +22,7 @@ import {expectView} from '../matcher/view-matcher';
 import {MAIN_AREA} from '../workbench.model';
 import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
 import {BlankTestPagePO} from './page-object/test-pages/blank-test-page.po';
+import {RouterPagePO} from './page-object/router-page.po';
 
 test.describe('Workbench Popup', () => {
 
@@ -432,10 +433,11 @@ test.describe('Workbench Popup', () => {
       cssClass: ['testee', 'a', 'b'],
     });
 
-    const popup = appPO.popup({cssClass: ['testee', 'a', 'b']});
+    const popup = appPO.popup({cssClass: 'testee'});
     const popupPage = new PopupPagePO(popup);
 
     await expectPopup(popupPage).toBeVisible();
+    await expect(popup.locator).toContainClass('testee a b');
   });
 
   test.describe('Moving Popup Anchor', () => {
@@ -1082,28 +1084,36 @@ test.describe('Workbench Popup', () => {
     test('should maintain popup bounds if contextual view is not active (to not flicker on reactivation; to support for virtual scrolling) [element anchor]', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      // Open view 1 with popup.
-      const popupPage = await SizeTestPagePO.openInPopup(appPO, {position: 'element'});
-      const viewPage1 = new PopupOpenerPagePO(appPO.view({viewId: await appPO.activePart({grid: 'mainArea'}).activeView.getViewId()}));
+      // Open popup.
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.open('size-test-page', {
+        anchor: 'element',
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'testee',
+        size: {minHeight: '100px', minWidth: '500px'},
+      });
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new SizeTestPagePO(popup);
 
       await expectPopup(popupPage).toBeVisible();
       const popupSize = await popupPage.getBoundingBox();
       const sizeChanges = await popupPage.getRecordedSizeChanges();
 
-      // Open view 2.
-      const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
+      // Open view.
+      const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
       await expectPopup(popupPage).toBeHidden();
-      await expectView(viewPage1).toBeInactive();
-      await expectView(viewPage2).toBeActive();
+      await expectView(popupOpenerPage).toBeInactive();
+      await expectView(viewPage).toBeActive();
 
       // Expect popup bounding box not to have changed.
       await expect.poll(() => popupPage.getBoundingBox()).toEqual(popupSize);
 
-      // Activate view 1.
-      await viewPage1.view.tab.click();
+      // Activate popup opener page.
+      await popupOpenerPage.view.tab.click();
       await expectPopup(popupPage).toBeVisible();
-      await expectView(viewPage1).toBeActive();
-      await expectView(viewPage2).toBeInactive();
+      await expectView(popupOpenerPage).toBeActive();
+      await expectView(viewPage).toBeInactive();
 
       // Expect popup not to be resized
       await expect.poll(() => popupPage.getRecordedSizeChanges()).toEqual(sizeChanges);
@@ -1112,28 +1122,36 @@ test.describe('Workbench Popup', () => {
     test('should maintain popup bounds if contextual view is not active (to not flicker on reactivation; to support for virtual scrolling) [coordinate anchor]', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      // Open view 1 with popup.
-      const popupPage = await SizeTestPagePO.openInPopup(appPO, {position: 'coordinate'});
-      const viewPage1 = new PopupOpenerPagePO(appPO.view({viewId: await appPO.activePart({grid: 'mainArea'}).activeView.getViewId()}));
+      // Open popup.
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.open('size-test-page', {
+        anchor: {top: 100, left: 100},
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'testee',
+        size: {minHeight: '100px', minWidth: '500px'},
+      });
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new SizeTestPagePO(popup);
 
       await expectPopup(popupPage).toBeVisible();
       const popupSize = await popupPage.getBoundingBox();
       const sizeChanges = await popupPage.getRecordedSizeChanges();
 
-      // Open view 2.
-      const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
+      // Open view.
+      const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
       await expectPopup(popupPage).toBeHidden();
-      await expectView(viewPage1).toBeInactive();
-      await expectView(viewPage2).toBeActive();
+      await expectView(popupOpenerPage).toBeInactive();
+      await expectView(viewPage).toBeActive();
 
       // Expect popup bounding box not to have changed.
       await expect.poll(() => popupPage.getBoundingBox()).toEqual(popupSize);
 
-      // Activate view 1.
-      await viewPage1.view.tab.click();
+      // Activate popup opener page.
+      await popupOpenerPage.view.tab.click();
       await expectPopup(popupPage).toBeVisible();
-      await expectView(viewPage1).toBeActive();
-      await expectView(viewPage2).toBeInactive();
+      await expectView(popupOpenerPage).toBeActive();
+      await expectView(viewPage).toBeInactive();
 
       // Expect popup not to be resized (no flickering).
       await expect.poll(() => popupPage.getRecordedSizeChanges()).toEqual(sizeChanges);
@@ -1879,14 +1897,19 @@ test.describe('Workbench Popup', () => {
 
       // Open popup page
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+
       // Open test page
-      const inputFieldPage = await InputFieldTestPagePO.openInNewTab(appPO, workbenchNavigator);
+      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+      await routerPage.navigate(['test-pages/input-field-test-page'], {cssClass: 'testee'});
+      const inputFieldPage = new InputFieldTestPagePO(appPO.view({cssClass: 'testee'}));
+
       // Move test page to the right
       const dragHandle = await inputFieldPage.view.tab.startDrag();
       await dragHandle.dragToPart(await inputFieldPage.view.part.getPartId(), {region: 'east'});
       await dragHandle.drop();
 
       // Open popup
+      await popupOpenerPage.view.tab.click();
       await popupOpenerPage.open('focus-test-page', {
         anchor: 'element',
         closeStrategy: {onFocusLost: true},
@@ -2027,7 +2050,7 @@ test.describe('Workbench Popup', () => {
         .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
       );
 
-      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+      const testPage = new PopupPositionTestPagePO(appPO.view({cssClass: 'testee'}));
 
       await testPage.enterMarginTop('2000');
 
@@ -2062,7 +2085,7 @@ test.describe('Workbench Popup', () => {
         .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
       );
 
-      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+      const testPage = new PopupPositionTestPagePO(appPO.view({cssClass: 'testee'}));
 
       await testPage.enterMarginBottom('2000');
 
@@ -2099,7 +2122,7 @@ test.describe('Workbench Popup', () => {
         .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
       );
 
-      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+      const testPage = new PopupPositionTestPagePO(appPO.view({cssClass: 'testee'}));
 
       await testPage.enterMarginLeft('2000');
 
@@ -2136,7 +2159,7 @@ test.describe('Workbench Popup', () => {
         .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
       );
 
-      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+      const testPage = new PopupPositionTestPagePO(appPO.view({cssClass: 'testee'}));
 
       await testPage.enterMarginRight('2000');
 
@@ -2173,7 +2196,7 @@ test.describe('Workbench Popup', () => {
         .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
       );
 
-      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+      const testPage = new PopupPositionTestPagePO(appPO.view({cssClass: 'testee'}));
 
       // Open popup.
       const popup = await testPage.open();
@@ -2220,7 +2243,7 @@ test.describe('Workbench Popup', () => {
         .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
       );
 
-      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+      const testPage = new PopupPositionTestPagePO(appPO.view({cssClass: 'testee'}));
 
       // Open popup.
       const popup = await testPage.open();
@@ -2264,7 +2287,7 @@ test.describe('Workbench Popup', () => {
         .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
       );
 
-      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+      const testPage = new PopupPositionTestPagePO(appPO.view({cssClass: 'testee'}));
 
       // Open popup.
       const popup = await testPage.open();
@@ -2308,7 +2331,7 @@ test.describe('Workbench Popup', () => {
         .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
       );
 
-      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+      const testPage = new PopupPositionTestPagePO(appPO.view({cssClass: 'testee'}));
 
       await testPage.enterMarginLeft('400');
 
@@ -2354,7 +2377,7 @@ test.describe('Workbench Popup', () => {
         .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
       );
 
-      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+      const testPage = new PopupPositionTestPagePO(appPO.view({cssClass: 'testee'}));
 
       await testPage.enterMarginLeft('400');
 
@@ -2398,7 +2421,7 @@ test.describe('Workbench Popup', () => {
         .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
       );
 
-      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+      const testPage = new PopupPositionTestPagePO(appPO.view({cssClass: 'testee'}));
 
       await testPage.enterMarginLeft('2000');
 
@@ -2453,7 +2476,7 @@ test.describe('Workbench Popup', () => {
         .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
       );
 
-      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+      const testPage = new PopupPositionTestPagePO(appPO.view({cssClass: 'testee'}));
 
       await testPage.enterMarginTop('2000');
 

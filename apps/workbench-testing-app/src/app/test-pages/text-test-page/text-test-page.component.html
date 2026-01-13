@@ -22,13 +22,6 @@
   <button (click)="onValueSave()" [disabled]="provideValueFormGroup.invalid" class="e2e-save">Save</button>
 </section>
 
-<section class="e2e-dialog-handle dialog-handle">
-  <header>WorkbenchDialog Handle</header>
-
-  <sci-form-field label="Title" direction="column"><input class="e2e-title" [attr.list]="undefinedList" #dialog_title></sci-form-field>
-  <button (click)="onDialogTitleSet(dialog_title.value)" class="e2e-set-title">Set</button>
-</section>
-
 <datalist [attr.id]="undefinedList">
   <option value="<undefined>">&lt;undefined&gt;</option>
 </datalist>

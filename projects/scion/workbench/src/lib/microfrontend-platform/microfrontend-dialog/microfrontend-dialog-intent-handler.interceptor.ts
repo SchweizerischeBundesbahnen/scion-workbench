@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, Injectable} from '@angular/core';
-import {APP_IDENTITY, Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
+import {inject, Injectable, runInInjectionContext, StaticProvider} from '@angular/core';
+import {Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchDialogCapability, ɵWorkbenchDialogCommand} from '@scion/workbench-client';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
@@ -17,12 +17,17 @@ import {stringifyError} from '../../common/stringify-error.util';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchDialogService} from '../../dialog/workbench-dialog.service';
 import {MicrofrontendDialogComponent} from './microfrontend-dialog.component';
-import {MicrofrontendHostDialogComponent} from '../microfrontend-host-dialog/microfrontend-host-dialog.component';
+import {ActivatedMicrofrontend} from '../microfrontend-host/microfrontend-host.model';
+import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog.model';
+import {MicrofrontendHostDialog} from '../microfrontend-host-dialog/microfrontend-host-dialog.model';
+import {MicrofrontendHostComponent} from '../microfrontend-host/microfrontend-host.component';
+import {prune} from '../../common/prune.util';
+import {Microfrontends} from '../common/microfrontend.util';
 
 /**
  * Handles dialog intents, opening a dialog based on resolved capability.
  *
- * Microfrontends of the host are displayed in {@link MicrofrontendHostDialogComponent}, microfrontends of other applications in {@link MicrofrontendDialogComponent}.
+ * Microfrontends of the host are displayed in {@link ActivatedMicrofrontendComponent}, microfrontends of other applications in {@link MicrofrontendDialogComponent}.
  *
  * Dialog intents are handled in this interceptor and are not transported to the providing application to support applications not connected to the SCION Workbench.
  */
@@ -69,16 +74,32 @@ export class MicrofrontendDialogIntentHandler implements IntentInterceptor {
   private async openDialog(message: IntentMessage<ɵWorkbenchDialogCommand>): Promise<unknown> {
     const command = message.body ?? {};
     const capability = message.capability as WorkbenchDialogCapability;
-    const params = message.intent.params ?? new Map();
-    const isHostProvider = capability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
+    const params = message.intent.params ?? new Map<string, unknown>();
+    const isHostProvider = Microfrontends.isHostProvider(capability);
+    const referrer = message.headers.get(MessageHeaders.AppSymbolicName) as string;
     this._logger.debug(() => 'Handling microfrontend dialog intent', LoggerNames.MICROFRONTEND, command);
 
-    return this._dialogService.open(isHostProvider ? MicrofrontendHostDialogComponent : MicrofrontendDialogComponent, {
-      inputs: {capability, params},
+    return this._dialogService.open(isHostProvider ? MicrofrontendHostComponent : MicrofrontendDialogComponent, prune({
+      inputs: isHostProvider ? {} : {capability, params},
+      providers: isHostProvider ? [provideActivatedMicrofrontend(capability, params, referrer)] : undefined,
       modality: command.modality,
       context: command.context,
       animate: command.animate,
       cssClass: Arrays.coerce(capability.properties.cssClass).concat(Arrays.coerce(command.cssClass)),
-    });
+    }));
   }
+}
+
+/**
+ * Provides {@link ActivatedMicrofrontend} for injection in the host microfrontend.
+ */
+function provideActivatedMicrofrontend(capability: WorkbenchDialogCapability, params: Map<string, unknown>, referrer: string): StaticProvider {
+  return {
+    provide: ActivatedMicrofrontend,
+    useFactory: () => {
+      const dialog = inject(ɵWorkbenchDialog);
+      // Create in dialog's injection context to bind 'MicrofrontendDialog' to the dialog's lifecycle.
+      return runInInjectionContext(dialog.injector, () => new MicrofrontendHostDialog(dialog, capability, params, referrer));
+    },
+  };
 }

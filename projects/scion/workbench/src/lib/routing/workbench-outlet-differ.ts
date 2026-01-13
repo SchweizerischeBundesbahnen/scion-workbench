@@ -12,7 +12,7 @@ import {inject, Injectable, IterableChanges, IterableDiffers} from '@angular/cor
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {UrlTree} from '@angular/router';
 import {Routing} from './routing.util';
-import {DialogOutlet, PartOutlet, PopupOutlet, ViewOutlet} from '../workbench.identifiers';
+import {PartOutlet, ViewOutlet} from '../workbench.identifiers';
 
 /**
  * Stateful differ to compute added and removed outlets.
@@ -24,8 +24,6 @@ export class WorkbenchOutletDiffer {
 
   private readonly _viewsDiffer = inject(IterableDiffers).find([]).create<ViewOutlet>();
   private readonly _partsDiffer = inject(IterableDiffers).find([]).create<PartOutlet>();
-  private readonly _popupsDiffer = inject(IterableDiffers).find([]).create<PopupOutlet>();
-  private readonly _dialogsDiffer = inject(IterableDiffers).find([]).create<DialogOutlet>();
 
   /**
    * Computes differences since last time {@link WorkbenchOutletDiffer#diff} was invoked.
@@ -46,14 +44,9 @@ export class WorkbenchOutletDiffer {
       ...workbenchLayout?.parts().map(part => part.id) ?? [],
     ]);
 
-    const popupOutlets = Routing.parseOutlets(urlTree, {popup: true}).keys();
-    const dialogOutlets = Routing.parseOutlets(urlTree, {dialog: true}).keys();
-
     return new WorkbenchOutletDiff({
       views: this._viewsDiffer.diff(viewOutlets),
       parts: this._partsDiffer.diff(partOutlets),
-      popups: this._popupsDiffer.diff(popupOutlets),
-      dialogs: this._dialogsDiffer.diff(dialogOutlets),
     });
   }
 }
@@ -69,39 +62,19 @@ export class WorkbenchOutletDiff {
   public readonly addedPartOutlets = new Array<PartOutlet>();
   public readonly removedPartOutlets = new Array<PartOutlet>();
 
-  public readonly addedPopupOutlets = new Array<PopupOutlet>();
-  public readonly removedPopupOutlets = new Array<PopupOutlet>();
-
-  public readonly addedDialogOutlets = new Array<DialogOutlet>();
-  public readonly removedDialogOutlets = new Array<DialogOutlet>();
-
   constructor(changes: WorkbenchOutletChanges) {
     changes.views?.forEachAddedItem(({item}) => this.addedViewOutlets.push(item));
     changes.views?.forEachRemovedItem(({item}) => this.removedViewOutlets.push(item));
-
     changes.parts?.forEachAddedItem(({item}) => this.addedPartOutlets.push(item));
     changes.parts?.forEachRemovedItem(({item}) => this.removedPartOutlets.push(item));
-
-    changes.popups?.forEachAddedItem(({item}) => this.addedPopupOutlets.push(item));
-    changes.popups?.forEachRemovedItem(({item}) => this.removedPopupOutlets.push(item));
-
-    changes.dialogs?.forEachAddedItem(({item}) => this.addedDialogOutlets.push(item));
-    changes.dialogs?.forEachRemovedItem(({item}) => this.removedDialogOutlets.push(item));
   }
 
   public toString(): string {
     return new Array<string>()
       .concat(this.addedViewOutlets.length ? `addedViewOutlets=[${this.addedViewOutlets}]` : [])
       .concat(this.removedViewOutlets.length ? `removedViewOutlets=[${this.removedViewOutlets}]` : [])
-
       .concat(this.addedPartOutlets.length ? `addedPartOutlets=[${this.addedPartOutlets}]` : [])
       .concat(this.removedPartOutlets.length ? `removedPartOutlets=[${this.removedPartOutlets}]` : [])
-
-      .concat(this.addedPopupOutlets.length ? `addedPopupOutlets=[${this.addedPopupOutlets}]` : [])
-      .concat(this.removedPopupOutlets.length ? `removedPopupOutlets=[${this.removedPopupOutlets}]` : [])
-
-      .concat(this.addedDialogOutlets.length ? `addedDialogOutlets=[${this.addedDialogOutlets}]` : [])
-      .concat(this.removedDialogOutlets.length ? `removedDialogOutlets=[${this.removedDialogOutlets}]` : [])
       .join(', ');
   }
 }
@@ -109,6 +82,4 @@ export class WorkbenchOutletDiff {
 interface WorkbenchOutletChanges {
   views: IterableChanges<ViewOutlet> | null;
   parts: IterableChanges<PartOutlet> | null;
-  popups: IterableChanges<PopupOutlet> | null;
-  dialogs: IterableChanges<DialogOutlet> | null;
 }

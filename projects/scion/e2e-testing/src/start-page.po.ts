@@ -15,6 +15,7 @@ import {SciTabbarPO} from './@scion/components.internal/tabbar.po';
 import {SciRouterOutletPO} from './workbench-client/page-object/sci-router-outlet.po';
 import {WorkbenchViewPagePO} from './workbench/page-object/workbench-view-page.po';
 import {PartId, ViewId} from '@scion/workbench';
+import {RequireOne} from './helper/utility-types';
 
 /**
  * Page object to interact with {@link StartPageComponent}.
@@ -27,9 +28,9 @@ export class StartPagePO implements WorkbenchViewPagePO {
 
   public readonly locator: Locator;
 
-  constructor(private _appPO: AppPO, locateBy?: {viewId?: ViewId; cssClass?: string}) {
+  constructor(private _appPO: AppPO, locateBy?: RequireOne<{viewId: ViewId; cssClass: string}>) {
     if (locateBy?.viewId || locateBy?.cssClass) {
-      this._view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
+      this._view = this._appPO.view(locateBy);
       this.locator = this._view.locator.locator('app-start-page');
     }
     else {
@@ -71,16 +72,23 @@ export class StartPagePO implements WorkbenchViewPagePO {
   /**
    * Clicks the microfrontend view tile with specified CSS class set.
    */
-  public async openMicrofrontendView(cssClass: string, app: string): Promise<void> {
+  public async openMicrofrontendView(cssClass: string, app: 'host' | 'app1' | 'app2'): Promise<void> {
     const viewId = await this.view.getViewId();
     const navigationId = await this._appPO.getCurrentNavigationId();
     await this._tabbar.selectTab('e2e-microfrontend-views');
-    await this._tabbarLocator.locator(`.e2e-microfrontend-view-tiles button.${cssClass}.workbench-client-testing-${app}`).click();
+    await this._tabbarLocator.locator(`.e2e-microfrontend-view-tiles button.${cssClass}.${apps.get(app)}`).click();
     await this._appPO.view({viewId, cssClass}).waitUntilAttached();
-    // Wait for microfrontend to be loaded.
-    const frameLocator = new SciRouterOutletPO(this._appPO, {name: viewId}).frameLocator;
-    await frameLocator.locator('app-root').waitFor({state: 'visible'});
+    if (app !== 'host') {
+      // Wait for microfrontend to be loaded.
+      const frameLocator = new SciRouterOutletPO(this.locator.page(), {name: viewId}).frameLocator;
+      await frameLocator.locator('app-root').waitFor({state: 'visible'});
+    }
     // Wait until completed navigation.
     await this._appPO.waitForLayoutChange({navigationId});
   }
 }
+
+const apps = new Map()
+  .set('host', 'workbench-host-app')
+  .set('app1', 'workbench-client-testing-app1')
+  .set('app2', 'workbench-client-testing-app2');

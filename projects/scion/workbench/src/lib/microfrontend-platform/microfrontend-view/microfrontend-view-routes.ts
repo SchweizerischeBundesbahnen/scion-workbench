@@ -10,7 +10,7 @@
 
 import {CanMatchFn, Params, Route} from '@angular/router';
 import {WorkbenchViewCapability} from '@scion/workbench-client';
-import {EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
+import {EnvironmentProviders, inject, makeEnvironmentProviders, runInInjectionContext, StaticProvider} from '@angular/core';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {ViewId} from '../../workbench.identifiers';
 import {MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
@@ -20,6 +20,11 @@ import {WORKBENCH_ROUTE} from '../../workbench.constants';
 import {MicrofrontendViewComponent} from './microfrontend-view.component';
 import {MicrofrontendViewNavigationData} from './microfrontend-view-navigation-data';
 import {WORKBENCH_OUTLET} from '../../routing/workbench-auxiliary-route-installer.service';
+import {MicrofrontendHostComponent} from '../microfrontend-host/microfrontend-host.component';
+import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
+import {MicrofrontendHostView} from '../microfrontend-host-view/microfrontend-host-view.model';
+import {ActivatedMicrofrontend} from '../microfrontend-host/microfrontend-host.model';
+import {Microfrontends} from '../common/microfrontend.util';
 
 /**
  * Hint passed to the navigation when navigating a microfrontend view.
@@ -53,14 +58,26 @@ export function splitMicrofrontendViewParams(params: Params, capability: Workben
  */
 export function provideMicrofrontendViewRoute(): EnvironmentProviders {
   return makeEnvironmentProviders([
+    // Route for embedding non-host microfrontend using <sci-router-outlet>.
     {
       provide: WORKBENCH_ROUTE,
-      multi: true,
       useFactory: (): Route => ({
         path: '',
         component: MicrofrontendViewComponent,
-        canMatch: [canMatchMicrofrontendView()], // use a single matcher because Angular evaluates matchers in parallel
+        canMatch: [canMatchMicrofrontendView({host: false})], // use a single matcher because Angular evaluates matchers in parallel
       }),
+      multi: true,
+    },
+    // Route for embedding host microfrontend using Angular <router-outlet>.
+    {
+      provide: WORKBENCH_ROUTE,
+      useFactory: (): Route => ({
+        path: '',
+        component: MicrofrontendHostComponent,
+        canMatch: [canMatchMicrofrontendView({host: true})], // use a single matcher because Angular evaluates matchers in parallel
+        providers: [provideActivatedMicrofrontend()],
+      }),
+      multi: true,
     },
   ]);
 }
@@ -69,20 +86,41 @@ export function provideMicrofrontendViewRoute(): EnvironmentProviders {
  * Matches the route if target of a workbench view navigated to a view microfrontend, but only
  * if the view capability exists.
  */
-function canMatchMicrofrontendView(): CanMatchFn {
+function canMatchMicrofrontendView(matcher: {host: boolean}): CanMatchFn {
   return (route, segments): boolean => {
     if (!canMatchWorkbenchView(MICROFRONTEND_VIEW_NAVIGATION_HINT)(route, segments)) {
       return false;
     }
 
+    // Guards cannot block waiting for platform startup, as the platform may start later in the bootstrapping, causing a deadlock.
+    // Guards are re-evaluated after startup. See `runCanMatchGuardsAfterStartup`.
     if (MicrofrontendPlatform.state !== PlatformState.Started) {
-      return true; // match until started the microfrontend platform to avoid flickering.
+      return false;
     }
 
     const viewId = inject(WORKBENCH_OUTLET) as ViewId;
     const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
     const view = layout.view({viewId});
     const {capabilityId} = view.navigation!.data as unknown as MicrofrontendViewNavigationData;
-    return inject(ManifestObjectCache).hasCapability(capabilityId);
+    const capability = inject(ManifestObjectCache).capability(capabilityId)();
+    if (!capability) {
+      return false;
+    }
+
+    return matcher.host === Microfrontends.isHostProvider(capability);
+  };
+}
+
+/**
+ * Provides {@link ActivatedMicrofrontend} for injection in the host microfrontend.
+ */
+function provideActivatedMicrofrontend(): StaticProvider {
+  return {
+    provide: ActivatedMicrofrontend,
+    useFactory: () => {
+      const view = inject(WorkbenchViewRegistry).get(inject(WORKBENCH_OUTLET) as ViewId);
+      // Create in view's injection context to bind 'MicrofrontendView' to the view's lifecycle.
+      return runInInjectionContext(view.injector, () => new MicrofrontendHostView(view));
+    },
   };
 }

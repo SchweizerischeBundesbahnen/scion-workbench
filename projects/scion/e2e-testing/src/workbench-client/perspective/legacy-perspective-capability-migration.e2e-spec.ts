@@ -134,9 +134,9 @@ test.describe('Workbench Perspective Capability Migration', () => {
     await messagingPage.publishIntent({type: 'perspective', qualifier: {perspective: 'testee'}});
     await messagingPage.view.tab.close();
 
-    const testViewPage1 = new ViewPagePO(appPO, {cssClass: 'testee-1'});
-    const testViewPage2 = new ViewPagePO(appPO, {cssClass: 'testee-2'});
-    const testViewPage3 = new ViewPagePO(appPO, {cssClass: 'testee-3'});
+    const testViewPage1 = new ViewPagePO(appPO.view({cssClass: 'testee-1'}));
+    const testViewPage2 = new ViewPagePO(appPO.view({cssClass: 'testee-2'}));
+    const testViewPage3 = new ViewPagePO(appPO.view({cssClass: 'testee-3'}));
 
     // Expect layout.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({

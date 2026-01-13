@@ -14,8 +14,6 @@ import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Locator} from '@playwright/test';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
-
-import {AppPO} from '../../app.po';
 import {MicrofrontendDialogPagePO} from '../../workbench/page-object/workbench-dialog-page.po';
 import {DialogPO} from '../../dialog.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
@@ -32,9 +30,9 @@ export class DialogPagePO implements MicrofrontendDialogPagePO {
   public readonly outlet: SciRouterOutletPO;
 
   constructor(public dialog: DialogPO) {
-    this.outlet = new SciRouterOutletPO(new AppPO(dialog.locator.page()), {locator: dialog.locator.locator('sci-router-outlet')});
+    this.outlet = new SciRouterOutletPO(dialog.locator.page(), {name: dialog.locateBy?.id, cssClass: dialog.locateBy?.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-dialog-page');
-    this._hasFocusLocator = this.outlet.frameLocator.locator('app-root').locator('.e2e-has-focus');
+    this._hasFocusLocator = this.outlet.frameLocator.locator('app-root[data-focus]');
   }
 
   public async enterTitle(title: Translatable): Promise<void> {

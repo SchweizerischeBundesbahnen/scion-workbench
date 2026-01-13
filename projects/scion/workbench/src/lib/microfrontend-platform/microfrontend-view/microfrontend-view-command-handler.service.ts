@@ -21,6 +21,7 @@ import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provid
 import {MICROFRONTEND_VIEW_NAVIGATION_HINT} from './microfrontend-view-routes';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {MicrofrontendViewNavigationData} from './microfrontend-view-navigation-data';
+import {throwError} from '../../common/throw-error.util';
 
 @Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 class MicrofrontendViewCommandHandler implements OnDestroy {
@@ -116,7 +117,7 @@ class MicrofrontendViewCommandHandler implements OnDestroy {
 
     // Test if provided by the requesting application.
     const {capabilityId} = view.navigation()!.data as unknown as MicrofrontendViewNavigationData;
-    const capability = this._manifestObjectCache.getCapability(capabilityId);
+    const capability = this._manifestObjectCache.capability(capabilityId)() ?? throwError(`[NullCapabilityError] No capability found with id '${capabilityId}'.`);
     if (capability.metadata!.appSymbolicName === sender) {
       runnable(view);
     }

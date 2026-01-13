@@ -9,13 +9,14 @@
  */
 
 import {Component, inject, input} from '@angular/core';
-import {WorkbenchDialog, WorkbenchDialogActionDirective} from '@scion/workbench';
+import {ActivatedMicrofrontend, WorkbenchDialog, WorkbenchDialogActionDirective} from '@scion/workbench';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {UUID} from '@scion/toolkit/uuid';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import ActivatedMicrofrontendComponent from '../activated-microfrontend/activated-microfrontend.component';
 
 @Component({
   selector: 'app-dialog-page',
@@ -28,19 +29,21 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
     SciAccordionItemDirective,
     SciCheckboxComponent,
     WorkbenchDialogActionDirective,
+    ActivatedMicrofrontendComponent,
   ],
   host: {
     '[style.height]': 'form.controls.componentSize.controls.height.value',
     '[style.width]': 'form.controls.componentSize.controls.width.value',
   },
 })
-export class DialogPageComponent {
+export default class DialogPageComponent {
 
   public readonly input = input<string>();
 
   private readonly _formBuilder = inject(NonNullableFormBuilder);
 
   protected readonly dialog = inject(WorkbenchDialog);
+  protected readonly activatedMicrofrontend = inject(ActivatedMicrofrontend, {optional: true});
   protected readonly uuid = UUID.randomUUID();
 
   protected readonly form = this._formBuilder.group({

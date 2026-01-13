@@ -26,7 +26,7 @@ test.describe('Browser Reload', () => {
         target: 'view.101',
       });
 
-      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
+      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO.view({viewId: 'view.101'}));
       await expectView(standaloneViewTestPage).toBeActive();
 
       await appPO.reload();
@@ -41,7 +41,7 @@ test.describe('Browser Reload', () => {
         target: 'view.101',
       });
 
-      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
+      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO.view({viewId: 'view.101'}));
       await expectView(standaloneViewTestPage).toBeActive();
 
       await appPO.reload();
@@ -56,7 +56,7 @@ test.describe('Browser Reload', () => {
         target: 'view.101',
       });
 
-      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
+      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO.view({viewId: 'view.101'}));
       await expectView(standaloneViewTestPage).toBeActive();
 
       await appPO.reload();
@@ -71,7 +71,7 @@ test.describe('Browser Reload', () => {
         target: 'view.101',
       });
 
-      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
+      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO.view({viewId: 'view.101'}));
       await expectView(standaloneViewTestPage).toBeActive();
 
       await appPO.reload();
@@ -86,7 +86,7 @@ test.describe('Browser Reload', () => {
         target: 'view.101',
       });
 
-      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
+      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO.view({viewId: 'view.101'}));
       await expectView(standaloneViewTestPage).toBeActive();
 
       await appPO.reload();
@@ -104,7 +104,7 @@ test.describe('Browser Reload', () => {
         target: 'view.101',
       });
 
-      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
+      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO.view({viewId: 'view.101'}));
       await expectView(nonStandaloneViewTestPage).toBeActive();
 
       await appPO.reload();
@@ -119,7 +119,7 @@ test.describe('Browser Reload', () => {
         target: 'view.101',
       });
 
-      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
+      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO.view({viewId: 'view.101'}));
       await expectView(nonStandaloneViewTestPage).toBeActive();
 
       await appPO.reload();
@@ -134,7 +134,7 @@ test.describe('Browser Reload', () => {
         target: 'view.101',
       });
 
-      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
+      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO.view({viewId: 'view.101'}));
       await expectView(nonStandaloneViewTestPage).toBeActive();
 
       await appPO.reload();

@@ -41,7 +41,7 @@ test.describe('Workbench View', () => {
       target: 'view.101',
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
 
     // Expect splash to display.
     await expect(testeeViewPage.outlet.splash).toBeVisible();
@@ -86,7 +86,7 @@ test.describe('Workbench View', () => {
       target: 'view.101',
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
 
     // Expect splash not to display.
     await expect(testeeViewPage.outlet.splash).not.toBeVisible();
@@ -109,7 +109,7 @@ test.describe('Workbench View', () => {
       target: 'view.101',
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.101'}));
 
     // Expect splash not to display.
     await expect(testeeViewPage.outlet.splash).not.toBeVisible();
@@ -167,7 +167,7 @@ test.describe('Workbench View', () => {
       },
     });
 
-    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+    const testeeViewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
 
     // Open docked part.
     await appPO.activityItem({activityId: 'activity.1'}).click();

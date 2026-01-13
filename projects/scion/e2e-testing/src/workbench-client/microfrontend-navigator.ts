@@ -11,8 +11,9 @@
 import {AppPO} from '../app.po';
 import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
 import {RegisterWorkbenchIntentionPagePO} from './page-object/register-workbench-intention-page.po';
-import {RegisterWorkbenchCapabilityPagePO, WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchPartCapability, WorkbenchPerspectiveCapability, WorkbenchPopupCapability, WorkbenchViewCapability} from './page-object/register-workbench-capability-page.po';
+import {RegisterWorkbenchCapabilityPagePO, WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchNotificationCapability, WorkbenchPartCapability, WorkbenchPerspectiveCapability, WorkbenchPopupCapability, WorkbenchViewCapability} from './page-object/register-workbench-capability-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
+import {ViewPagePO as HostViewPagePO} from '../workbench/page-object/view-page.po';
 import {UnregisterWorkbenchCapabilityPagePO} from './page-object/unregister-workbench-capability-page.po';
 import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
@@ -36,88 +37,93 @@ export class MicrofrontendNavigator {
   /**
    * Opens the page to test the message box in a new workbench tab.
    */
-  public openInNewTab(page: Type<MessageBoxOpenerPagePO>, app: 'app1' | 'app2'): Promise<MessageBoxOpenerPagePO>;
+  public openInNewTab(page: Type<MessageBoxOpenerPagePO>, app: 'host' | 'app1' | 'app2'): Promise<MessageBoxOpenerPagePO>;
   /**
    * Opens the page to test the notification in a new workbench tab.
    */
-  public openInNewTab(page: Type<NotificationOpenerPagePO>, app: 'app1' | 'app2'): Promise<NotificationOpenerPagePO>;
+  public openInNewTab(page: Type<NotificationOpenerPagePO>, app: 'host' | 'app1' | 'app2'): Promise<NotificationOpenerPagePO>;
   /**
    * Opens the page to register intentions in a new workbench tab.
    */
-  public openInNewTab(page: Type<RegisterWorkbenchIntentionPagePO>, app: 'app1' | 'app2'): Promise<RegisterWorkbenchIntentionPagePO>;
+  public openInNewTab(page: Type<RegisterWorkbenchIntentionPagePO>, app: 'host' | 'app1' | 'app2'): Promise<RegisterWorkbenchIntentionPagePO>;
   /**
    * Opens the page to register capabilities in a new workbench tab.
    */
-  public openInNewTab(page: Type<RegisterWorkbenchCapabilityPagePO>, app: 'app1' | 'app2'): Promise<RegisterWorkbenchCapabilityPagePO>;
+  public openInNewTab(page: Type<RegisterWorkbenchCapabilityPagePO>, app: 'host' | 'app1' | 'app2'): Promise<RegisterWorkbenchCapabilityPagePO>;
   /**
    * Opens the page to unregister capabilities in a new workbench tab.
    */
-  public openInNewTab(page: Type<UnregisterWorkbenchCapabilityPagePO>, app: 'app1' | 'app2'): Promise<UnregisterWorkbenchCapabilityPagePO>;
+  public openInNewTab(page: Type<UnregisterWorkbenchCapabilityPagePO>, app: 'host' | 'app1' | 'app2'): Promise<UnregisterWorkbenchCapabilityPagePO>;
   /**
    * Opens the page to inspect view properties in a new workbench tab.
    */
+  public openInNewTab(page: Type<HostViewPagePO>, app: 'host'): Promise<HostViewPagePO>;
   public openInNewTab(page: Type<ViewPagePO>, app: 'app1' | 'app2'): Promise<ViewPagePO>;
   /**
    * Opens the page to navigate to microfrontends in a new workbench tab.
    */
-  public openInNewTab(page: Type<RouterPagePO>, app: 'app1' | 'app2'): Promise<RouterPagePO>;
+  public openInNewTab(page: Type<RouterPagePO>, app: 'host' | 'app1' | 'app2'): Promise<RouterPagePO>;
   /**
    * Opens the page to open popups in a new workbench tab.
    */
-  public openInNewTab(page: Type<PopupOpenerPagePO>, app: 'app1' | 'app2'): Promise<PopupOpenerPagePO>;
+  public openInNewTab(page: Type<PopupOpenerPagePO>, app: 'host' | 'app1' | 'app2'): Promise<PopupOpenerPagePO>;
   /**
    * Opens the page to open dialog in a new workbench tab.
    */
-  public openInNewTab(page: Type<DialogOpenerPagePO>, app: 'app1' | 'app2'): Promise<DialogOpenerPagePO>;
+  public openInNewTab(page: Type<DialogOpenerPagePO>, app: 'host' | 'app1' | 'app2'): Promise<DialogOpenerPagePO>;
   /**
    * Opens the page to exchange messages in a new workbench tab.
    */
-  public openInNewTab(page: Type<MessagingPagePO>, app: 'app1' | 'app2'): Promise<MessagingPagePO>;
+  public openInNewTab(page: Type<MessagingPagePO>, app: 'host' | 'app1' | 'app2'): Promise<MessagingPagePO>;
 
-  public async openInNewTab(page: Type<any>, app: 'app1' | 'app2'): Promise<any> {
+  public async openInNewTab(page: Type<any>, app: 'host' | 'app1' | 'app2'): Promise<any> {
     const startPage = await this._appPO.openNewViewTab();
     const viewId = await startPage.view.getViewId();
 
     switch (page) {
       case MessageBoxOpenerPagePO: {
         await startPage.openMicrofrontendView('e2e-test-message-box-opener', app);
-        return new MessageBoxOpenerPagePO(this._appPO, {id: viewId, cssClass: 'e2e-test-message-box-opener'});
+        return new MessageBoxOpenerPagePO(this._appPO.view({viewId: viewId, cssClass: 'e2e-test-message-box-opener'}), {host: app === 'host'});
       }
       case RegisterWorkbenchIntentionPagePO: {
         await startPage.openMicrofrontendView('e2e-register-workbench-intention', app);
-        return new RegisterWorkbenchIntentionPagePO(this._appPO, {viewId, cssClass: 'e2e-register-workbench-intention'});
+        return new RegisterWorkbenchIntentionPagePO(this._appPO.view({viewId, cssClass: 'e2e-register-workbench-intention'}), {host: app === 'host'});
       }
       case RegisterWorkbenchCapabilityPagePO: {
         await startPage.openMicrofrontendView('e2e-register-workbench-capability', app);
-        return new RegisterWorkbenchCapabilityPagePO(this._appPO, {viewId, cssClass: 'e2e-register-workbench-capability'});
+        return new RegisterWorkbenchCapabilityPagePO(this._appPO.view({viewId, cssClass: 'e2e-register-workbench-capability'}), {host: app === 'host'});
       }
       case ViewPagePO: {
         await startPage.openMicrofrontendView('e2e-test-view', app);
-        return new ViewPagePO(this._appPO, {viewId, cssClass: 'e2e-test-view'});
+        return new ViewPagePO(this._appPO.view({viewId, cssClass: 'e2e-test-view'}));
+      }
+      case HostViewPagePO: {
+        await startPage.openMicrofrontendView('e2e-test-view', app);
+        return new HostViewPagePO(this._appPO.view({viewId, cssClass: 'e2e-test-view'}));
       }
       case UnregisterWorkbenchCapabilityPagePO: {
         await startPage.openMicrofrontendView('e2e-unregister-workbench-capability', app);
-        return new UnregisterWorkbenchCapabilityPagePO(this._appPO, {viewId, cssClass: 'e2e-unregister-workbench-capability'});
+        return new UnregisterWorkbenchCapabilityPagePO(this._appPO.view({viewId, cssClass: 'e2e-unregister-workbench-capability'}), {host: app === 'host'});
       }
       case NotificationOpenerPagePO: {
         await startPage.openMicrofrontendView('e2e-test-notification-opener', app);
-        return new NotificationOpenerPagePO(this._appPO, {viewId, cssClass: 'e2e-test-notification-opener'});
+        return new NotificationOpenerPagePO(this._appPO.view({viewId, cssClass: 'e2e-test-notification-opener'}), {host: app === 'host'});
       }
       case RouterPagePO: {
         await startPage.openMicrofrontendView('e2e-test-router', app);
-        return new RouterPagePO(this._appPO, {viewId, cssClass: 'e2e-test-router'});
+        return new RouterPagePO(this._appPO.view({viewId, cssClass: 'e2e-test-router'}), {host: app === 'host'});
       }
       case PopupOpenerPagePO: {
         await startPage.openMicrofrontendView('e2e-test-popup-opener', app);
-        return new PopupOpenerPagePO(this._appPO, {id: viewId, cssClass: 'e2e-test-popup-opener'});
+        return new PopupOpenerPagePO(this._appPO.view({viewId: viewId, cssClass: 'e2e-test-popup-opener'}), {host: app === 'host'});
       }
       case DialogOpenerPagePO: {
         await startPage.openMicrofrontendView('e2e-test-dialog-opener', app);
-        return new DialogOpenerPagePO(this._appPO, {id: viewId, cssClass: 'e2e-test-dialog-opener'});
+        return new DialogOpenerPagePO(this._appPO.view({viewId: viewId, cssClass: 'e2e-test-dialog-opener'}), {host: app === 'host'});
       }
       case MessagingPagePO: {
         await startPage.openMicrofrontendView('e2e-messaging', app);
-        return new MessagingPagePO(this._appPO, {viewId, cssClass: 'e2e-messaging'});
+        return new MessagingPagePO(this._appPO.view({viewId, cssClass: 'e2e-messaging'}), {host: app === 'host'});
       }
       default: {
         throw Error(`[TestError] Page not supported to be opened in a new tab. [page=${page}]`);
@@ -128,7 +134,7 @@ export class MicrofrontendNavigator {
   /**
    * Use to register a workbench capability.
    */
-  public async registerCapability<T extends WorkbenchPerspectiveCapability | WorkbenchPartCapability | WorkbenchViewCapability | WorkbenchPopupCapability | WorkbenchDialogCapability | WorkbenchMessageBoxCapability>(app: 'app1' | 'app2', capability: T): Promise<T & Capability> {
+  public async registerCapability<T extends WorkbenchPerspectiveCapability | WorkbenchPartCapability | WorkbenchViewCapability | WorkbenchPopupCapability | WorkbenchDialogCapability | WorkbenchMessageBoxCapability | WorkbenchNotificationCapability>(app: 'host' | 'app1' | 'app2', capability: T): Promise<T & Capability> {
     const registerCapabilityPage = await this.openInNewTab(RegisterWorkbenchCapabilityPagePO, app);
     try {
       return await registerCapabilityPage.registerCapability(capability);
@@ -141,7 +147,7 @@ export class MicrofrontendNavigator {
   /**
    * Use to register a workbench intention.
    */
-  public async registerIntention(app: 'app1' | 'app2', intention: Intention & {type: 'perspective' | 'part' | 'view' | 'dialog' | 'popup' | 'messagebox' | 'notification' | 'text-provider'}): Promise<string> {
+  public async registerIntention(app: 'host' | 'app1' | 'app2', intention: Intention & {type: 'perspective' | 'part' | 'view' | 'dialog' | 'popup' | 'messagebox' | 'notification' | 'text-provider'}): Promise<string> {
     const registerIntentionPage = await this.openInNewTab(RegisterWorkbenchIntentionPagePO, app);
     try {
       return await registerIntentionPage.registerIntention(intention);
@@ -154,7 +160,7 @@ export class MicrofrontendNavigator {
   /**
    * Use to unregister a workbench capability.
    */
-  public async unregisterCapability(app: 'app1' | 'app2', id: string): Promise<void> {
+  public async unregisterCapability(app: 'host' | 'app1' | 'app2', id: string): Promise<void> {
     const unregisterCapabilityPage = await this.openInNewTab(UnregisterWorkbenchCapabilityPagePO, app);
     try {
       await unregisterCapabilityPage.unregisterCapability(id);
@@ -167,7 +173,7 @@ export class MicrofrontendNavigator {
   /**
    * Registers the specified perspective and activates it.
    */
-  public async createPerspective(app: 'app1' | 'app2', capability: WorkbenchPerspectiveCapability, options?: PerspectiveCreateOptions): Promise<string> {
+  public async createPerspective(app: 'host' | 'app1' | 'app2', capability: WorkbenchPerspectiveCapability, options?: PerspectiveCreateOptions): Promise<string> {
     const perspectiveCapability = await this.registerCapability(app, capability);
     const perspectiveId = perspectiveCapability.metadata!.id;
     if (options?.activate ?? true) {

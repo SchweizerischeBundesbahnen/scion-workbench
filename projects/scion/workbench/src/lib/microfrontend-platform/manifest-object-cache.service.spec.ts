@@ -14,8 +14,10 @@ import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {ManifestObjectCache} from './manifest-object-cache.service';
 import {firstValueFrom} from 'rxjs';
 import {WorkbenchLauncher} from '../startup/workbench-launcher.service';
-import {ObserveCaptor} from '@scion/toolkit/testing';
 import {Beans} from '@scion/toolkit/bean-manager';
+import {ObserveCaptor} from '@scion/toolkit/testing';
+import {toObservable} from '@angular/core/rxjs-interop';
+import {Injector, signal} from '@angular/core';
 
 describe('ManifestObjectCache', () => {
 
@@ -31,35 +33,13 @@ describe('ManifestObjectCache', () => {
     const capabilityId = await TestBed.inject(ManifestService).registerCapability({type: 'testee'});
 
     // Test capability to be found.
-    expect(TestBed.inject(ManifestObjectCache).getCapability(capabilityId)).toEqual(await lookupCapability(capabilityId));
+    expect(TestBed.inject(ManifestObjectCache).capability(capabilityId)()).toEqual(await lookupCapability(capabilityId));
 
     // Test capability not to be found.
-    expect(TestBed.inject(ManifestObjectCache).getCapability('xyz', {orElse: null})).toBeNull();
-    expect(() => TestBed.inject(ManifestObjectCache).getCapability('xyz')).toThrowError(/NullCapabilityError/);
+    expect(TestBed.inject(ManifestObjectCache).capability('xyz')()).toBeUndefined();
   });
 
-  it('should test if capability exists', async () => {
-    TestBed.configureTestingModule({
-      providers: [
-        provideWorkbenchForTest({microfrontendPlatform: {applications: []}}),
-      ],
-    });
-    await TestBed.inject(WorkbenchLauncher).launch();
-
-    // Register capability.
-    const capabilityId = await TestBed.inject(ManifestService).registerCapability({type: 'testee'});
-
-    // Wait until capability is available.
-    await lookupCapability(capabilityId);
-
-    // Test capability to be found.
-    expect(TestBed.inject(ManifestObjectCache).hasCapability(capabilityId)).toBeTrue();
-
-    // Test capability not to be found.
-    expect(TestBed.inject(ManifestObjectCache).hasCapability('xyz')).toBeFalse();
-  });
-
-  it('should observe capability', async () => {
+  it('should track capability', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({microfrontendPlatform: {applications: []}}),
@@ -71,42 +51,80 @@ describe('ManifestObjectCache', () => {
     Beans.register(CapabilityInterceptor, {
       useValue: new class implements CapabilityInterceptor {
         public async intercept(capability: Capability): Promise<Capability> {
-          if (capability.type === 'testee') {
-            return {...capability, metadata: {...capability.metadata!, id: 'testee'}};
-          }
-          return capability;
+          return {...capability, metadata: {...capability.metadata!, id: capability.type}};
         }
       }(),
       multi: true,
     });
 
-    // Observe capability.
-    const captor = new ObserveCaptor<Capability | null, string | null>(capability => capability?.metadata!.id ?? null);
-    TestBed.inject(ManifestObjectCache).observeCapability$('testee').subscribe(captor);
+    const captor = new ObserveCaptor<Capability | undefined, string | undefined>(capability => capability?.metadata!.id);
 
-    // Expect no capability to be found.
+    // Observe capability 'testee-1'.
+    const observedCapability = signal('testee-1');
+    toObservable(TestBed.inject(ManifestObjectCache).capability(observedCapability), {injector: TestBed.inject(Injector)}).subscribe(captor);
+
+    // Expect capability 'testee-1' not to be found.
     await captor.waitUntilEmitCount(1);
     expect(captor.getValues()).toEqual([
-      null,
+      undefined,
     ]);
 
-    // Register capability.
-    await TestBed.inject(ManifestService).registerCapability({type: 'testee'});
-    // Expect capability to be found.
+    // Register capability 'testee-1'.
+    await TestBed.inject(ManifestService).registerCapability({type: 'testee-1'});
+
+    // Expect capability 'testee-1' to be found.
     await captor.waitUntilEmitCount(2);
     expect(captor.getValues()).toEqual([
-      null,
-      'testee',
+      undefined,
+      'testee-1',
     ]);
 
-    // Unregister capability.
-    await TestBed.inject(ManifestService).unregisterCapabilities({type: 'testee'});
-    // Expect capability not to be found.
+    // Observe capability 'testee-2'.
+    observedCapability.set('testee-2');
+
+    // Expect capability 'testee-2' not to be found.
     await captor.waitUntilEmitCount(3);
     expect(captor.getValues()).toEqual([
-      null,
-      'testee',
-      null,
+      undefined,
+      'testee-1',
+      undefined,
+    ]);
+
+    // Register capability 'testee-2'.
+    await TestBed.inject(ManifestService).registerCapability({type: 'testee-2'});
+
+    // Expect capability 'testee-2' to be found.
+    await captor.waitUntilEmitCount(4);
+    expect(captor.getValues()).toEqual([
+      undefined,
+      'testee-1',
+      undefined,
+      'testee-2',
+    ]);
+
+    // Register capability 'testee-3'.
+    await TestBed.inject(ManifestService).registerCapability({type: 'testee-3'});
+
+    // Expect no emission.
+    await Promise.resolve();
+    expect(captor.getValues()).toEqual([
+      undefined,
+      'testee-1',
+      undefined,
+      'testee-2',
+    ]);
+
+    // Unregister capability 'testee-2'.
+    await TestBed.inject(ManifestService).unregisterCapabilities({type: 'testee-2'});
+
+    // Expect capability 'testee-2' not to be found.
+    await captor.waitUntilEmitCount(5);
+    expect(captor.getValues()).toEqual([
+      undefined,
+      'testee-1',
+      undefined,
+      'testee-2',
+      undefined,
     ]);
   });
 });

@@ -12,8 +12,9 @@ import {Component, inject} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ManifestService} from '@scion/microfrontend-platform';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
-import {WorkbenchView} from '@scion/workbench-client';
+import {WORKBENCH_ELEMENT, WorkbenchElement} from '@scion/workbench-client';
 import {stringifyError} from 'workbench-testing-app-common';
+import {Beans} from '@scion/toolkit/bean-manager';
 
 /**
  * Allows unregistering workbench capabilities.
@@ -40,7 +41,7 @@ export class UnregisterWorkbenchCapabilityPageComponent {
   protected unregistered: boolean | undefined;
 
   constructor() {
-    inject(WorkbenchView).signalReady();
+    Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.signalReady();
   }
 
   protected async onUnregister(): Promise<void> {

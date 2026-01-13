@@ -1,0 +1,25 @@
+@use '@scion/components.internal/design' as sci-design;
+
+/**
+ * Displays microfrontend application labels, only if the `data-show-microfrontend-application-labels` attribute is set on the HTML root element.
+ */
+:root[data-show-microfrontend-application-labels] {
+  @layer app-microfrontend-application-labels {
+    sci-router-outlet[data-app], wb-microfrontend-host[data-app] { // display label only if app has been resolved
+      &::after {
+        @include sci-design.style-chip(var(--sci-color-gray-300), var(--sci-color-background-primary), var(--sci-color-text-subtlest));
+        content: attr(data-app);
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin-right: .25em;
+        margin-top: .25em;
+        pointer-events: none;
+      }
+
+      &[data-focus]::after {
+        @include sci-design.style-chip(var(--sci-color-accent), var(--sci-color-background-primary), var(--sci-color-accent));
+      }
+    }
+  }
+}

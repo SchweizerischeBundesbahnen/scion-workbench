@@ -67,6 +67,10 @@ const SETTINGS = {
     default: false,
     storageKey: 'scion.workbench.testing-app.settings.highlight-glasspane',
   },
+  showMicrofrontendApplicationLabels: {
+    default: environment.showMicrofrontendApplicationLabels,
+    storageKey: 'scion.workbench.testing-app.settings.show-microfrontend-application-labels',
+  },
   logAngularChangeDetectionCycles: {
     default: environment.logAngularChangeDetectionCycles,
     storageKey: 'scion.workbench.testing-app.settings.log-angular-change-detection-cycles',

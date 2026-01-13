@@ -14,6 +14,8 @@ import {ViewPagePO} from './page-object/view-page.po';
 import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
 import {fromRect} from '../helper/testing.util';
 import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
+import {RouterPagePO} from './page-object/router-page.po';
+import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 
 test.describe('Workbench View Tab', () => {
 
@@ -26,7 +28,9 @@ test.describe('Workbench View Tab', () => {
     await appPO.openNewViewTab();
 
     // Open test view.
-    const testPage = await InputFieldTestPagePO.openInNewTab(appPO, workbenchNavigator);
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-pages/input-field-test-page'], {cssClass: 'testee'});
+    const testPage = new InputFieldTestPagePO(appPO.view({cssClass: 'testee'}));
 
     // Open context menu.
     const contextMenu = await testPage.view.tab.openContextMenu();
@@ -47,7 +51,15 @@ test.describe('Workbench View Tab', () => {
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // Open test popup.
-    const testPage = await InputFieldTestPagePO.openInPopup(appPO, workbenchNavigator, {closeOnFocusLost: false});
+    const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+    await popupOpenerPage.open('input-field-test-page', {
+      anchor: 'element',
+      closeStrategy: {onFocusLost: false},
+      cssClass: 'testee',
+    });
+
+    const popup = appPO.popup({cssClass: 'testee'});
+    const testPage = new InputFieldTestPagePO(popup);
 
     // Open context menu.
     const contextMenu = await viewPage.view.tab.openContextMenu();
@@ -122,7 +134,7 @@ test.describe('Workbench View Tab', () => {
 
     // Prepare test view.
     await viewPage.enterTitle('View Title');
-    await viewPage.checkDirty(true);
+    await viewPage.markDirty(true);
 
     // Expect the view tab to have a dirty marker.
     await expect(viewTab.dirty).toBeVisible();
@@ -353,7 +365,7 @@ test.describe('Workbench View Tab', () => {
     const titleBounds = fromRect(await viewTab.title.boundingBox());
 
     // Mark view dirty.
-    await viewPage.checkDirty(true);
+    await viewPage.markDirty(true);
 
     // Expect the title to render at the same y-position.
     await expect.poll(async () => fromRect(await viewTab.title.boundingBox()).y).toEqual(titleBounds.y);
@@ -369,7 +381,7 @@ test.describe('Workbench View Tab', () => {
 
     // Prepare test view.
     await viewPage.enterTitle('View Title');
-    await viewPage.checkDirty(true);
+    await viewPage.markDirty(true);
 
     // Capture dirty marker bounds;
     const dirtyMarkerBounds = fromRect(await viewTab.dirty.boundingBox());
@@ -405,7 +417,7 @@ test.describe('Workbench View Tab', () => {
     const headingBounds = fromRect(await viewTab.heading.boundingBox());
 
     // Mark view dirty.
-    await viewPage.checkDirty(true);
+    await viewPage.markDirty(true);
 
     // Expect the heading to render at the same y-position.
     await expect.poll(async () => fromRect(await viewTab.heading.boundingBox()).y).toEqual(headingBounds.y);
@@ -423,7 +435,7 @@ test.describe('Workbench View Tab', () => {
     // Prepare test view.
     await viewPage.enterTitle('View Title');
     await viewPage.enterHeading('View Heading');
-    await viewPage.checkDirty(true);
+    await viewPage.markDirty(true);
 
     // Capture heading bounds.
     const headingBounds = fromRect(await viewTab.heading.boundingBox());

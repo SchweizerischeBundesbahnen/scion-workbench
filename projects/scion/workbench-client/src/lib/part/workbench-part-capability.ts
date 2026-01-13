@@ -20,7 +20,7 @@ import {Translatable} from '../text/workbench-text-provider.model';
  * a part capability to contribute content, either a microfrontend, a stack of views, or both. If both, the microfrontend is displayed
  * only if the view stack is empty. Views in a docked part cannot be dragged into or out of docked parts.
  *
- * The part microfrontend can inject the {@link WorkbenchPart} handle to interact with the part.
+ * The microfrontend can inject the `WorkbenchPart` handle (and `ActivatedMicrofrontend` if a host microfrontend) to interact with the part or access parameters.
  *
  * @category Part
  * @see WorkbenchPart
@@ -67,6 +67,18 @@ export interface WorkbenchPartCapability extends Capability {
      * ```
      *
      * If the part contains views, the microfrontend is displayed only if the view stack is empty.
+     *
+     * ### Empty Path Required if Host Capability
+     * Part capabilities of the host application require an empty path. In the route, use `canMatchWorkbenchPartCapability` guard to match the part capability.
+     *
+     * @example - Route matching a part capability with qualifier {part: 'navigator'}
+     * ```ts
+     * import {Routes} from '@angular/router';
+     * import {canMatchWorkbenchPartCapability} from '@scion/workbench';
+     *
+     * const routes: Routes = [
+     *   {path: '', canMatch: [canMatchWorkbenchPartCapability({part: 'navigator'})], component: NavigatorComponent},
+     * ];
      */
     path?: string;
     /**
@@ -123,6 +135,8 @@ export interface WorkbenchPartCapability extends Capability {
      * By default, the workbench shows a loading indicator. A custom splash can be configured in the workbench host application.
      *
      * This property only applies to the microfrontend loaded into the part, not views stacked in the part.
+     *
+     * This property is not supported if a host microfrontend.
      *
      * @see WorkbenchPart.signalReady
      */

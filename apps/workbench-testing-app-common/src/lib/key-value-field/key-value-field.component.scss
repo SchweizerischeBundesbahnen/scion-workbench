@@ -1,0 +1,23 @@
+@use '@scion/components.internal/design' as sci-design;
+
+:host {
+  display: grid;
+  outline: none;
+  grid-template-columns: 100px 1fr auto;
+  gap: .5em;
+  align-items: center;
+  border: 1px solid var(--sci-color-border);
+  border-radius: var(--sci-corner);
+  padding: 1em;
+
+  > header {
+    grid-column: 1/-1;
+    display: flex;
+    gap: .25em;
+    justify-content: flex-end;
+  }
+
+  input {
+    @include sci-design.style-input-field();
+  }
+}
