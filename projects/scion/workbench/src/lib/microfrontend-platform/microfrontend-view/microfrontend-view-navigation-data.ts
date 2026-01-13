@@ -14,4 +14,8 @@
 export interface MicrofrontendViewNavigationData {
   capabilityId: string;
   params: {[name: string]: unknown};
+  /**
+   * Symbolic name of the application that opened the view.
+   */
+  referrer: string;
 }

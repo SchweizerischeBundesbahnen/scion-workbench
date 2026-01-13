@@ -19,6 +19,7 @@ import {subscribeIn} from '@scion/toolkit/operators';
 import {SettingsService} from './settings.service';
 import {installFocusHighlighter} from './focus-highlight/focus-highlighter';
 import {installGlasspaneHighlighter} from './glasspane-highlight/glasspane-highlighter';
+import {installMicrofrontendApplicationLabels} from './microfrontend-application-labels/microfrontend-application-labels';
 
 @Component({
   selector: 'app-root',
@@ -54,6 +55,7 @@ export class AppComponent implements DoCheck {
     this.provideWorkbenchService();
     installFocusHighlighter();
     installGlasspaneHighlighter();
+    installMicrofrontendApplicationLabels();
   }
 
   public ngDoCheck(): void {

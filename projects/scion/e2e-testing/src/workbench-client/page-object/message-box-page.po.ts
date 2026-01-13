@@ -14,8 +14,6 @@ import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Locator} from '@playwright/test';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
-
-import {AppPO} from '../../app.po';
 import {MicrofrontendMessageBoxPagePO} from '../../workbench/page-object/workbench-message-box-page.po';
 import {MessageBoxPO} from '../../message-box.po';
 import {DomRect, fromRect} from '../../helper/testing.util';
@@ -29,7 +27,7 @@ export class MessageBoxPagePO implements MicrofrontendMessageBoxPagePO {
   public readonly outlet: SciRouterOutletPO;
 
   constructor(public messageBox: MessageBoxPO) {
-    this.outlet = new SciRouterOutletPO(new AppPO(messageBox.locator.page()), {locator: messageBox.locator.locator('sci-router-outlet')});
+    this.outlet = new SciRouterOutletPO(messageBox.locator.page(), {name: messageBox.dialog.locateBy?.id, cssClass: messageBox.dialog.locateBy?.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-message-box-page');
   }
 
@@ -108,7 +106,7 @@ export class MessageBoxPagePO implements MicrofrontendMessageBoxPagePO {
     return fromRect(await this.outlet.locator.boundingBox());
   }
 
-  public getComputedStyle(): Promise<CSSStyleDeclaration> {
+  public getOutletComputedStyle(): Promise<CSSStyleDeclaration> {
     return this.outlet.locator.evaluate((outletElement: HTMLElement) => getComputedStyle(outletElement));
   }
 }

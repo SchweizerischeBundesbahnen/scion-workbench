@@ -11,7 +11,7 @@
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
-import {MessageBoxPagePO} from '../message-box-page.po';
+import {MessageBoxPagePO} from './page-object/message-box-page.po';
 import {TextMessageBoxPagePO} from '../text-message-box-page.po';
 import {expectMessageBox} from '../matcher/message-box-matcher';
 
@@ -369,7 +369,7 @@ test.describe('Workbench Message Box', () => {
       const messageBox = appPO.messagebox({cssClass: 'testee'});
       const messageBoxPage = new MessageBoxPagePO(messageBox);
 
-      await expect(messageBoxPage.input).toHaveText('ABC');
+      await expect(messageBoxPage.input).toHaveValue('ABC');
     });
   });
 
@@ -385,7 +385,7 @@ test.describe('Workbench Message Box', () => {
       });
       const messageBox = appPO.messagebox({cssClass: 'testee'});
 
-      await expect.poll(() => messageBox.getBoundingBox()).toEqual(expect.objectContaining({
+      await expect.poll(() => messageBox.dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
         width: 400,
       }));
     });
@@ -412,7 +412,7 @@ test.describe('Workbench Message Box', () => {
       const messageBoxPage = new TextMessageBoxPagePO(messageBox);
 
       // Expect message box to exceed maximal width.
-      await expect.poll(() => messageBox.getBoundingBox()).toEqual(expect.objectContaining({
+      await expect.poll(() => messageBox.dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
         width: 1007, // visual regression test
       }));
       // Expect message to be aligned with message box bounds.

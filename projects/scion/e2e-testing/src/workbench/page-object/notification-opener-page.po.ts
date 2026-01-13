@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, rejectWhenAttached} from '../../helper/testing.util';
+import {coerceArray, rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
@@ -30,9 +30,12 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO, WorkbenchD
   public readonly locator: Locator;
   public readonly error: Locator;
 
+  private readonly _appPO: AppPO;
+
   constructor(private _locateBy: ViewPO | PartPO | PopupPO | DialogPO) {
     this.locator = this._locateBy.locator.locator('app-notification-opener-page');
     this.error = this.locator.locator('output.e2e-notification-open-error');
+    this._appPO = new AppPO(this.locator.page());
   }
 
   public async show(message: Translatable, options?: NotificationOpenerPageOptions & WorkbenchNotificationOptions): Promise<void>;
@@ -90,19 +93,15 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO, WorkbenchD
     await this.locator.locator('input.e2e-class').fill(coerceArray(options?.cssClass).join(' '));
 
     // Open notification.
+    const notificationCount = await this._appPO.notifications.count();
     await this.locator.locator('button.e2e-show').click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([
-      this.waitUntilNotificationAttached(),
+      // Opening a popup in a group may not open a new popup. Therefore, wait for the browser to become idle.
+      options?.group ? this._appPO.waitUntilIdle() : waitUntilAttached(this._appPO.notifications.nth(notificationCount)),
       rejectWhenAttached(this.error),
     ]);
-  }
-
-  private async waitUntilNotificationAttached(): Promise<void> {
-    const cssClass = (await this.locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
-    const notification = new AppPO(this.locator.page()).notification({cssClass});
-    await notification.locator.waitFor({state: 'visible'});
   }
 
   public async pressEscape(): Promise<void> {

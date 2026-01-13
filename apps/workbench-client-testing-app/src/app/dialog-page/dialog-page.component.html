@@ -43,7 +43,7 @@
         <header>Dialog Params</header>
       </ng-template>
       <ng-template #panel_dialog_params>
-        <sci-key-value [object]="params" class="e2e-dialog-params"/>
+        <sci-key-value [object]="params | appAppendDataType" class="e2e-dialog-params"/>
       </ng-template>
     </sci-accordion>
   }

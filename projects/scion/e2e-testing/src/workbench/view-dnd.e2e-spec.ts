@@ -567,7 +567,7 @@ test.describe('View Drag & Drop', () => {
         .navigateView('view.100', ['test-view']),
       );
 
-      const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+      const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
       await expect.poll(() => testeeViewPage.view.part.isPeripheral()).toBe(true);
 
       // Drop view on the main area.
@@ -591,7 +591,7 @@ test.describe('View Drag & Drop', () => {
       );
 
       // Drop view on the main area.
-      const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+      const testeeViewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
       const dragHandle = await testeeViewPage.view.tab.startDrag();
       await dragHandle.dragToPart(MAIN_AREA, {region: 'center'});
       await dragHandle.drop();

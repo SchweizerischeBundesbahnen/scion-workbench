@@ -1,4 +1,4 @@
-@let capability = navigationContext()?.capability;
+@let capability = navigationContext().capability;
 
 <wb-content-as-overlay [config]="overlayConfig">
   <div class="microfrontend-part"
@@ -9,6 +9,7 @@
                        [name]="part.id"
                        [attr.data-capabilityid]="capability?.metadata!.id"
                        [attr.data-app]="capability?.metadata!.appSymbolicName"
+                       [attr.data-focus]="focusWithin() ? '' : null"
                        [keystrokes]="['keydown.escape','keydown.control.shift.F12']"
                        [class]="part.classList.asList()"
                        (focuswithin)="onFocusWithin($event)">

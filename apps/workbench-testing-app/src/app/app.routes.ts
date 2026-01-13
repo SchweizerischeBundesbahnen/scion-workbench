@@ -10,9 +10,8 @@
 
 import {Routes} from '@angular/router';
 import {WorkbenchComponent} from './workbench/workbench.component';
-import {topLevelTestPageRoutes} from './test-pages/routes';
-import {canMatchWorkbenchOutlet, canMatchWorkbenchPart, canMatchWorkbenchView, WorkbenchRouteData} from '@scion/workbench';
-import {Perspectives} from './workbench.perspectives';
+import {canMatchWorkbenchOutlet, canMatchWorkbenchPart, WorkbenchRouteData} from '@scion/workbench';
+import {testPageRoutes} from './test-pages/routes';
 
 export const routes: Routes = [
   {
@@ -21,42 +20,8 @@ export const routes: Routes = [
     canMatch: [canMatchWorkbenchOutlet(false)],
   },
   {
-    path: 'workbench-page',
+    path: 'redirect-to-root',
     redirectTo: '',
-  },
-  {
-    path: '',
-    canMatch: [canMatchWorkbenchView('test-router')],
-    loadComponent: () => import('./router-page/router-page.component'),
-    data: {
-      [WorkbenchRouteData.title]: 'Workbench Router',
-      [WorkbenchRouteData.heading]: 'Workbench E2E Testpage',
-      [WorkbenchRouteData.cssClass]: 'e2e-test-router',
-      path: '',
-      navigationHint: 'test-router',
-    },
-  },
-  {
-    path: '',
-    canMatch: [canMatchWorkbenchView('test-view')],
-    loadComponent: () => import('./view-page/view-page.component'),
-    data: {
-      [WorkbenchRouteData.title]: 'Workbench View',
-      [WorkbenchRouteData.heading]: 'Workbench E2E Testpage',
-      [WorkbenchRouteData.cssClass]: 'e2e-test-view',
-      path: '',
-      navigationHint: 'test-view',
-    },
-  },
-  {
-    path: '',
-    canMatch: [canMatchWorkbenchPart('test-part')],
-    loadComponent: () => import('./part-page/part-page.component'),
-    data: {
-      [WorkbenchRouteData.cssClass]: 'e2e-test-part',
-      path: '',
-      navigationHint: 'test-part',
-    },
   },
   {
     path: 'start-page',
@@ -64,69 +29,19 @@ export const routes: Routes = [
     data: {[WorkbenchRouteData.title]: 'New Tab', [WorkbenchRouteData.cssClass]: 'e2e-start-page'},
   },
   {
-    path: 'sample-view',
-    loadComponent: () => import('./sample-view/sample-view.component'),
-    data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'},
-  },
-  {
     path: 'test-router',
     loadComponent: () => import('./router-page/router-page.component'),
-    data: {
-      [WorkbenchRouteData.title]: 'Workbench Router',
-      [WorkbenchRouteData.heading]: 'Workbench E2E Testpage',
-      [WorkbenchRouteData.cssClass]: 'e2e-test-router',
-      pinToDesktop: true,
-      path: 'test-router',
-      navigationHint: '',
-    },
-  },
-  {
-    path: 'test-view',
-    canMatch: [canMatchWorkbenchView('test-view')],
-    loadComponent: () => import('./view-page/view-page.component'),
-    data: {
-      [WorkbenchRouteData.title]: 'Workbench View',
-      [WorkbenchRouteData.heading]: 'Workbench E2E Testpage',
-      [WorkbenchRouteData.cssClass]: 'e2e-test-view',
-      path: 'test-view',
-      navigationHint: 'test-view',
-    },
+    data: {[WorkbenchRouteData.title]: 'Workbench Router', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-router', pinToDesktop: true},
   },
   {
     path: 'test-view',
     loadComponent: () => import('./view-page/view-page.component'),
-    data: {
-      [WorkbenchRouteData.title]: 'Workbench View',
-      [WorkbenchRouteData.heading]: 'Workbench E2E Testpage',
-      [WorkbenchRouteData.cssClass]: 'e2e-test-view',
-      pinToDesktop: true,
-      path: 'test-view',
-      navigationHint: '',
-    },
-  },
-  {
-    path: 'test-part',
-    canMatch: [canMatchWorkbenchPart('test-part')],
-    loadComponent: () => import('./part-page/part-page.component'),
-    data: {
-      [WorkbenchRouteData.cssClass]: 'e2e-test-part',
-      path: 'test-part',
-      navigationHint: 'test-part',
-    },
+    data: {[WorkbenchRouteData.title]: 'Workbench View', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-view', pinToDesktop: true},
   },
   {
     path: 'test-part',
     loadComponent: () => import('./part-page/part-page.component'),
-    data: {
-      [WorkbenchRouteData.cssClass]: 'e2e-test-part',
-      path: 'test-part',
-      navigationHint: '',
-    },
-  },
-  {
-    path: 'test-layout',
-    loadComponent: () => import('./layout-page/layout-page.component'),
-    data: {[WorkbenchRouteData.title]: 'Workbench Layout', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-layout', pinToDesktop: true},
+    data: {[WorkbenchRouteData.cssClass]: 'e2e-test-part'},
   },
   {
     path: 'test-part-opener',
@@ -134,9 +49,9 @@ export const routes: Routes = [
     data: {[WorkbenchRouteData.title]: 'Workbench Part', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', pinToDesktop: true},
   },
   {
-    path: 'test-message-box-opener',
-    loadComponent: () => import('./message-box-opener-page/message-box-opener-page.component'),
-    data: {[WorkbenchRouteData.title]: 'Workbench Messagebox', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-message-box-opener', pinToDesktop: true},
+    path: 'test-layout',
+    loadComponent: () => import('./layout-page/layout-page.component'),
+    data: {[WorkbenchRouteData.title]: 'Workbench Layout', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-layout', pinToDesktop: true},
   },
   {
     path: 'test-dialog-opener',
@@ -144,9 +59,9 @@ export const routes: Routes = [
     data: {[WorkbenchRouteData.title]: 'Workbench Dialog', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-dialog-opener', pinToDesktop: true},
   },
   {
-    path: 'test-notification-opener',
-    loadComponent: () => import('./notification-opener-page/notification-opener-page.component'),
-    data: {[WorkbenchRouteData.title]: 'Workbench Notification', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-notification-opener', pinToDesktop: true},
+    path: 'test-message-box-opener',
+    loadComponent: () => import('./message-box-opener-page/message-box-opener-page.component'),
+    data: {[WorkbenchRouteData.title]: 'Workbench Messagebox', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-message-box-opener', pinToDesktop: true},
   },
   {
     path: 'test-popup-opener',
@@ -154,28 +69,21 @@ export const routes: Routes = [
     data: {[WorkbenchRouteData.title]: 'Workbench Popup', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-popup-opener', pinToDesktop: true},
   },
   {
-    path: 'test-host-popup',
-    loadComponent: () => import('./host-popup-page/host-popup-page.component'),
+    path: 'test-notification-opener',
+    loadComponent: () => import('./notification-opener-page/notification-opener-page.component'),
+    data: {[WorkbenchRouteData.title]: 'Workbench Notification', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-notification-opener', pinToDesktop: true},
   },
   {
-    path: 'test-host-dialog',
-    loadComponent: () => import('./host-dialog-page/host-dialog-page.component'),
+    path: 'sample-view',
+    loadComponent: () => import('./sample-view/sample-view.component'),
+    data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'},
   },
-  {
-    path: 'test-host-message-box',
-    loadComponent: () => import('./host-message-box-page/host-message-box-page.component'),
-  },
+  ...testPageRoutes,
   {
     path: '',
     canMatch: [canMatchWorkbenchPart('active-workbench-element-log')],
     loadComponent: () => import('./active-workbench-element-log-page/active-workbench-element-log-page.component'),
   },
-  {
-    path: 'test-pages',
-    loadChildren: () => import('./test-pages/routes'),
-  },
-  ...Perspectives.routes,
-  ...topLevelTestPageRoutes,
   {
     path: '**',
     redirectTo: '',

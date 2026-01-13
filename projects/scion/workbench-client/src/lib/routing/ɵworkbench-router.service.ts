@@ -71,7 +71,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
   private isSelfNavigation(qualifier: Qualifier | Empty<Qualifier>): boolean {
     if (Object.keys(qualifier).length === 0) {
       if (!Beans.opt(WorkbenchView)) {
-        throw Error('[NavigateError] Self-navigation is supported only if in the context of a view.');
+        throw Error('[NavigateError] Self-navigation requires to be in the context of a view.');
       }
       return true;
     }

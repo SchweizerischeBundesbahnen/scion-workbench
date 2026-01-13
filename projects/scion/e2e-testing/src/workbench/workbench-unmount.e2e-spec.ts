@@ -13,6 +13,7 @@ import {expect} from '@playwright/test';
 import {ViewPagePO as MicrofrontendViewPagePO} from '../workbench-client/page-object/view-page.po';
 import {expectView} from '../matcher/view-matcher';
 import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
+import {RouterPagePO} from './page-object/router-page.po';
 
 test.describe('Workbench Component', () => {
 
@@ -73,7 +74,10 @@ test.describe('Workbench Component', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Open view page and enter free text as the view state.
-    const testPage = await InputFieldTestPagePO.openInNewTab(appPO, workbenchNavigator);
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-pages/input-field-test-page'], {cssClass: 'testee'});
+
+    const testPage = new InputFieldTestPagePO(appPO.view({cssClass: 'testee'}));
     await testPage.enterText('view state');
 
     // Unmount the workbench component by navigating the primary router outlet.

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, input, untracked, viewChild} from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, input, signal, untracked, viewChild} from '@angular/core';
 import {ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
 import {WorkbenchPopupCapability, WorkbenchPopupReferrer, ɵPOPUP_CONTEXT, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
@@ -51,6 +51,7 @@ export class MicrofrontendPopupComponent {
   protected readonly splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
   protected readonly popup = inject(ɵWorkbenchPopup);
   protected readonly workbenchLayoutService = inject(WorkbenchLayoutService);
+  protected readonly focusWithin = signal(false);
 
   constructor() {
     this._logger.debug(() => 'Constructing MicrofrontendPopupComponent.', LoggerNames.MICROFRONTEND);
@@ -154,6 +155,7 @@ export class MicrofrontendPopupComponent {
 
   protected onFocusWithin(event: Event): void {
     const {detail: focusWithin} = event as CustomEvent<boolean>;
+    this.focusWithin.set(focusWithin);
 
     // Close the popup on focus loss.
     if (this.closeOnFocusLost() && !focusWithin) {

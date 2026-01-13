@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Capability, SciRouterOutletElement} from '@scion/microfrontend-platform';
+import {APP_IDENTITY, Capability, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {DOCUMENT, ElementRef, inject, Injector, Signal, untracked} from '@angular/core';
 import {WorkbenchTheme, ɵTHEME_CONTEXT_KEY} from '@scion/workbench-client';
 import {WorkbenchService} from '../../workbench.service';
@@ -16,6 +16,7 @@ import {Crypto} from '@scion/toolkit/crypto';
 import {coerceElement} from '@angular/cdk/coercion';
 import {first} from 'rxjs/operators';
 import {rootEffect} from '../../common/rxjs-interop.util';
+import {Beans} from '@scion/toolkit/bean-manager';
 
 /**
  * Provides functions related to workbench themes.
@@ -33,7 +34,7 @@ export const Microfrontends = {
     const documentRoot = injector.get(DOCUMENT).documentElement;
     const settings = injector.get(WorkbenchService).settings;
 
-    // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+    // Use root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
     rootEffect(() => {
       const routerOutlet = coerceElement(routerOutletElement());
       const theme = settings.theme();
@@ -61,7 +62,7 @@ export const Microfrontends = {
     const injector = options?.injector ?? inject(Injector);
 
     return new Promise<void>(resolve => {
-      // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+      // Use root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
       rootEffect(onCleanup => {
         const routerOutlet = coerceElement(routerOutletElement());
 
@@ -78,6 +79,7 @@ export const Microfrontends = {
    * Creates a stable identifier for given capability.
    */
   createStableIdentifier: async (capability: Capability): Promise<string> => {
+    const type = capability.type;
     const qualifier = capability.qualifier!;
     const application = capability.metadata!.appSymbolicName;
 
@@ -86,7 +88,7 @@ export const Microfrontends = {
       .sort(([key1], [key2]) => key1.localeCompare(key2))
       .reduce(
         (acc, [key, value]) => acc.concat(key).concat(`${value}`),
-        [application],
+        new Array<string>(application, type),
       )
       .join(';');
 
@@ -94,6 +96,12 @@ export const Microfrontends = {
     const identifierHash = await Crypto.digest(identifier);
     // Use the first 7 digits of the hash.
     return identifierHash.substring(0, 7);
+  },
+  /**
+   * Tests if given capability is provided by the host application.
+   */
+  isHostProvider: (capability: Partial<Capability>): boolean => {
+    return capability.metadata?.appSymbolicName === Beans.get(APP_IDENTITY);
   },
   /**
    * Replaces named parameters in the given value with values contained in the given {@link Map}.

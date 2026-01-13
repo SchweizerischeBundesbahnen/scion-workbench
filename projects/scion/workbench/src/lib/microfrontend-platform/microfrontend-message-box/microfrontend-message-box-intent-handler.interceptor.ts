@@ -8,22 +8,27 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, Injectable} from '@angular/core';
-import {APP_IDENTITY, Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
+import {inject, Injectable, runInInjectionContext, StaticProvider} from '@angular/core';
+import {Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchMessageBoxCapability, ɵWorkbenchMessageBoxCommand} from '@scion/workbench-client';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {stringifyError} from '../../common/stringify-error.util';
 import {WorkbenchMessageBoxService} from '../../message-box/workbench-message-box.service';
 import {Arrays} from '@scion/toolkit/util';
-import {MicrofrontendHostMessageBoxComponent} from '../microfrontend-host-message-box/microfrontend-host-message-box.component';
 import {MicrofrontendMessageBoxComponent} from './microfrontend-message-box.component';
 import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provider';
+import {MicrofrontendHostComponent} from '../microfrontend-host/microfrontend-host.component';
+import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog.model';
+import {MicrofrontendHostMessageBox} from '../microfrontend-host-message-box/microfrontend-host-message-box.model';
+import {ActivatedMicrofrontend} from '../microfrontend-host/microfrontend-host.model';
+import {prune} from '../../common/prune.util';
+import {Microfrontends} from '../common/microfrontend.util';
 
 /**
  * Handles messagebox intents, opening a message box based on resolved capability.
  *
- * Microfrontends of the host are displayed in {@link MicrofrontendHostMessageBoxComponent}, microfrontends of other applications in {@link MicrofrontendMessageBoxComponent}.
+ * Microfrontends of the host are displayed in {@link ActivatedMicrofrontendComponent}, microfrontends of other applications in {@link MicrofrontendMessageBoxComponent}.
  *
  * Messagebox intents are handled in this interceptor and are not transported to the providing application to support applications not connected to the SCION Workbench.
  */
@@ -70,13 +75,14 @@ export class MicrofrontendMessageBoxIntentHandler implements IntentInterceptor {
   private async openMessageBox(message: IntentMessage<ɵWorkbenchMessageBoxCommand>): Promise<unknown> {
     const command = message.body ?? {};
     const capability = message.capability as WorkbenchMessageBoxCapability;
-    const params = message.intent.params ?? new Map();
+    const params = message.intent.params ?? new Map<string, unknown>();
     const referrer = message.headers.get(MessageHeaders.AppSymbolicName) as string;
-    const isHostProvider = capability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
+    const isHostProvider = Microfrontends.isHostProvider(capability);
 
     this._logger.debug(() => 'Handling microfrontend messagebox intent', LoggerNames.MICROFRONTEND, command);
-    return this._messageBoxService.open(isHostProvider ? MicrofrontendHostMessageBoxComponent : MicrofrontendMessageBoxComponent, {
-      inputs: {capability, params, referrer},
+    return this._messageBoxService.open(isHostProvider ? MicrofrontendHostComponent : MicrofrontendMessageBoxComponent, prune({
+      inputs: isHostProvider ? {} : {capability, params, referrer},
+      providers: isHostProvider ? [provideActivatedMicrofrontend(capability, params, referrer)] : undefined,
       title: createRemoteTranslatable(command.title, {appSymbolicName: referrer}),
       actions: command.actions && Object.fromEntries(Object.entries(command.actions).map(([key, label]) => [key, createRemoteTranslatable(label, {appSymbolicName: referrer})])),
       severity: command.severity,
@@ -84,6 +90,20 @@ export class MicrofrontendMessageBoxIntentHandler implements IntentInterceptor {
       contentSelectable: command.contentSelectable,
       cssClass: Arrays.coerce(capability.properties.cssClass).concat(Arrays.coerce(command.cssClass)),
       context: command.context,
-    });
+    }));
   }
+}
+
+/**
+ * Provides {@link ActivatedMicrofrontend} for injection in the host microfrontend.
+ */
+function provideActivatedMicrofrontend(capability: WorkbenchMessageBoxCapability, params: Map<string, unknown>, referrer: string): StaticProvider {
+  return {
+    provide: ActivatedMicrofrontend,
+    useFactory: () => {
+      const dialog = inject(ɵWorkbenchDialog);
+      // Create in dialog's injection context to bind 'MicrofrontendMessageBox' to the dialog's lifecycle.
+      return runInInjectionContext(dialog.injector, () => new MicrofrontendHostMessageBox(dialog, capability, params, referrer));
+    },
+  };
 }

@@ -1,0 +1,21 @@
+:host {
+  display: grid;
+
+  > sci-accordion {
+    header {
+      font-weight: bold;
+    }
+
+    sci-viewport.capability {
+      max-height: 200px;
+      border: 1px solid var(--sci-color-border);
+      border-radius: var(--sci-corner);
+
+      div.capability {
+        padding: .25em;
+        white-space: pre;
+        font-family: monospace;
+      }
+    }
+  }
+}

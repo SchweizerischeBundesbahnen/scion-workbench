@@ -1,15 +1,15 @@
 <section>
-  <header>Inputs</header>
-
-  <sci-form-field label="Input">
-    <output class="e2e-input">{{input()}}</output>
+  <sci-form-field label="Instance ID" title="Unique identifier of this component instance" direction="column">
+    <input class="e2e-component-instance-id" [value]="uuid" disabled>
   </sci-form-field>
 
-  <sci-form-field label="Param1">
-    <output class="e2e-param1">{{param1()}}</output>
-  </sci-form-field>
+  @if (input()) {
+    <sci-form-field label="Input">
+      <input class="e2e-input" [value]="input()" disabled>
+    </sci-form-field>
+  }
 
-  <sci-form-field label="Param2">
-    <output class="e2e-param2">{{param2()}}</output>
-  </sci-form-field>
+  @if (activatedMicrofrontend) {
+    <app-activated-microfrontend/>
+  }
 </section>

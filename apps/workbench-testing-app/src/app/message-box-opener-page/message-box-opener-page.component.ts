@@ -15,7 +15,7 @@ import {MultiValueInputComponent, parseTypedString, prune, stringifyError} from 
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
-import {MessageBoxPageComponent} from '../message-box-page/message-box-page.component';
+import MessageBoxPageComponent from '../message-box-page/message-box-page.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import {UUID} from '@scion/toolkit/uuid';
 

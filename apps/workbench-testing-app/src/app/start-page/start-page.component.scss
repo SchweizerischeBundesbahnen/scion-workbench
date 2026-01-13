@@ -59,6 +59,10 @@
           @include start-page.tile-background-color(var(--devtools-app-color));
         }
 
+        &.microfrontend.workbench-host-app {
+          @include start-page.tile-background-color(var(--workbench-host-app-color));
+        }
+
         &.microfrontend.workbench-client-testing-app1 {
           @include start-page.tile-background-color(var(--workbench-client-testing-app1-color));
         }

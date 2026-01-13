@@ -84,7 +84,7 @@ export class RouterCommandsComponent implements ControlValueAccessor {
     }
 
     const urlTree = this._router.createUrlTree(commands);
-    return urlTree.root.children[PRIMARY_OUTLET]!.segments.join('/');
+    return urlTree.root.children[PRIMARY_OUTLET]?.segments.join('/') || '';
   }
 
   /**

@@ -64,7 +64,6 @@ test.describe('Workbench Popup', () => {
         context: startPageViewId,
         closeStrategy: {onFocusLost: false},
         cssClass: 'testee',
-        waitUntilAttached: false,
       });
 
       await startPage.view.tab.click();
@@ -95,7 +94,6 @@ test.describe('Workbench Popup', () => {
         context: microfrontendViewId,
         closeStrategy: {onFocusLost: false},
         cssClass: 'testee',
-        waitUntilAttached: false,
       });
 
       await microfrontendPage.view.tab.click();

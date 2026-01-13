@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, Injectable} from '@angular/core';
-import {APP_IDENTITY, Handler, IntentInterceptor, IntentMessage, mapToBody, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
+import {inject, Injectable, InjectionToken, runInInjectionContext, StaticProvider} from '@angular/core';
+import {Handler, IntentInterceptor, IntentMessage, mapToBody, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchPopupReferrer, ɵWorkbenchCommands, ɵWorkbenchPopupCommand} from '@scion/workbench-client';
 import {MicrofrontendPopupComponent} from './microfrontend-popup.component';
 import {Observable} from 'rxjs';
@@ -19,17 +19,21 @@ import {stringifyError} from '../../common/stringify-error.util';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchPopupService} from '../../popup/workbench-popup.service';
 import {PopupOrigin} from '../../popup/popup.origin';
-import {MicrofrontendHostPopupComponent} from '../microfrontend-host-popup/microfrontend-host-popup.component';
 import {isViewId, PopupId} from '../../workbench.identifiers';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {prune} from '../../common/prune.util';
 import {MICROFRONTEND_VIEW_NAVIGATION_HINT} from '../microfrontend-view/microfrontend-view-routes';
 import {MicrofrontendViewNavigationData} from '../microfrontend-view/microfrontend-view-navigation-data';
+import {MicrofrontendHostComponent} from '../microfrontend-host/microfrontend-host.component';
+import {ɵWorkbenchPopup} from '../../popup/ɵworkbench-popup.model';
+import {MicrofrontendHostPopup} from '../microfrontend-host-popup/microfrontend-host-popup.model';
+import {ActivatedMicrofrontend} from '../microfrontend-host/microfrontend-host.model';
+import {Microfrontends} from '../common/microfrontend.util';
 
 /**
  * Handles popup intents, opening a popup based on resolved capability.
  *
- * Microfrontends of the host are displayed in {@link MicrofrontendHostPopupComponent}, microfrontends of other applications in {@link MicrofrontendPopupComponent}.
+ * Microfrontends of the host are displayed in {@link ActivatedMicrofrontendComponent}, microfrontends of other applications in {@link MicrofrontendPopupComponent}.
  *
  * Popup intents are handled in this interceptor and are not transported to the providing application to support applications not connected to the SCION Workbench.
  */
@@ -88,17 +92,19 @@ export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
   private async openPopup(message: IntentMessage<ɵWorkbenchPopupCommand>): Promise<unknown> {
     const command = message.body!;
     const capability = message.capability as WorkbenchPopupCapability;
-    const isHostProvider = capability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
+    const params = message.intent.params ?? new Map<string, unknown>();
+    const referrer = message.headers.get(MessageHeaders.AppSymbolicName) as string;
+    const closeOnFocusLost = command.closeStrategy?.onFocusLost ?? true;
+    const isHostProvider = Microfrontends.isHostProvider(capability);
     this._logger.debug(() => 'Handling microfrontend popup command', LoggerNames.MICROFRONTEND, command);
 
-    return this._popupService.open(isHostProvider ? MicrofrontendHostPopupComponent : MicrofrontendPopupComponent, prune({
+    return this._popupService.open(isHostProvider ? MicrofrontendHostComponent : MicrofrontendPopupComponent, prune({
       id: command.popupId,
-      inputs: {
-        capability,
-        params: message.intent.params ?? new Map(),
-        referrer: this.getReferrer(command),
-        closeOnFocusLost: isHostProvider ? undefined : (command.closeStrategy?.onFocusLost ?? true),
-      },
+      inputs: isHostProvider ? {} : {capability, params, referrer: this.getReferrer(command), closeOnFocusLost},
+      providers: isHostProvider ? [
+        provideActivatedMicrofrontend(capability, params, referrer),
+        {provide: WORKBENCH_POPUP_REFERRER, useValue: this.getReferrer(command)},
+      ] : undefined,
       anchor: this.observePopupOrigin$(command),
       context: command.context,
       align: command.align,
@@ -139,3 +145,24 @@ export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
     };
   }
 }
+
+/**
+ * Provides {@link ActivatedMicrofrontend} for injection in the host microfrontend.
+ */
+function provideActivatedMicrofrontend(capability: WorkbenchPopupCapability, params: Map<string, unknown>, referrer: string): StaticProvider {
+  return {
+    provide: ActivatedMicrofrontend,
+    useFactory: () => {
+      const popup = inject(ɵWorkbenchPopup);
+      // Create in popup's injection context to bind 'MicrofrontendPopup' to the popup's lifecycle.
+      return runInInjectionContext(popup.injector, () => new MicrofrontendHostPopup(popup, capability, params, referrer));
+    },
+  };
+}
+
+/**
+ * DI token to inject the deprecated referrer previously available on the removed `WorkbenchPopup.referrer`.
+ *
+ * @deprecated since version 21.0.0-beta.2. Marked for removal. No replacement. Instead, add a parameter to the popup capability for the popup opener to pass required referrer information.
+ */
+export const WORKBENCH_POPUP_REFERRER = new InjectionToken<WorkbenchPopupReferrer>('WORKBENCH_POPUP_REFERRER');

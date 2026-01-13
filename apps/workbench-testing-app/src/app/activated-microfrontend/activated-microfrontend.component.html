@@ -1,0 +1,32 @@
+<sci-accordion class="e2e-activated-microfrontend" variant="solid">
+  <ng-template sciAccordionItem [panel]="panel_activated_microfrontend">
+    <header>Activated Microfrontend</header>
+  </ng-template>
+
+  <ng-template #panel_activated_microfrontend>
+    <sci-form-field label="Capability">
+      <sci-viewport class="capability">
+        <div class="capability e2e-capability">{{activatedMicrofrontend.capability() | json}}</div>
+      </sci-viewport>
+    </sci-form-field>
+
+    @if (activatedMicrofrontend.params() | appNullIfEmpty; as params) {
+      <sci-form-field label="Params">
+        <sci-key-value [object]="params | appAppendDataType" class="e2e-params"/>
+      </sci-form-field>
+    }
+
+    <sci-form-field label="Referrer">
+      <output class="e2e-referrer" [value]="activatedMicrofrontend.referrer()"></output>
+    </sci-form-field>
+
+    @if (activatedMicrofrontendPopupReferrer) {
+      <sci-form-field label="View ID" title="Deprecated Referrer">
+        <output class="e2e-popup-legacy-referrer-view-id" [value]="activatedMicrofrontendPopupReferrer.viewId ?? '<undefined>'"></output>
+      </sci-form-field>
+      <sci-form-field label="View Capability ID" title="Deprecated Referrer">
+        <output class="e2e-popup-legacy-referrer-view-capability-id" [value]="activatedMicrofrontendPopupReferrer.viewCapabilityId ?? '<undefined>'"></output>
+      </sci-form-field>
+    }
+  </ng-template>
+</sci-accordion>

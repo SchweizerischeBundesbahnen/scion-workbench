@@ -46,8 +46,9 @@ describe('Microfrontends.createStableIdentifier', () => {
       qualifier: {a: 'b'},
       metadata: {appSymbolicName: 'app'} as Capability['metadata'],
     };
-    expect(await Microfrontends.createStableIdentifier(capability)).toEqual('2af383e');
-    expect(await Microfrontends.createStableIdentifier(capability)).toEqual('2af383e');
+
+    expect(await Microfrontends.createStableIdentifier(capability)).toEqual('86e3cd3');
+    expect(await Microfrontends.createStableIdentifier(capability)).toEqual('86e3cd3');
   });
 
   it('should ignore order of qualifier entries', async () => {
@@ -67,7 +68,7 @@ describe('Microfrontends.createStableIdentifier', () => {
     expect(identifier1).toEqual(identifier2);
   });
 
-  it('should ignore capability type', async () => {
+  it('should not ignore capability type', async () => {
     const capability1: Capability = {
       type: 'type1',
       qualifier: {a: 'b'},
@@ -81,7 +82,7 @@ describe('Microfrontends.createStableIdentifier', () => {
 
     const identifier1 = await Microfrontends.createStableIdentifier(capability1);
     const identifier2 = await Microfrontends.createStableIdentifier(capability2);
-    expect(identifier1).toEqual(identifier2);
+    expect(identifier1).not.toEqual(identifier2);
   });
 
   it('should use qualifier to generate id', async () => {

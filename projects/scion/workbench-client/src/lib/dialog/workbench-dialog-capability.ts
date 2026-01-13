@@ -21,7 +21,7 @@ import {Translatable} from '../text/workbench-text-provider.model';
  * Displayed on top of other content, a modal dialog blocks interaction with other parts of the application. A dialog can be context-modal
  * or application-modal. Dialogs are stacked per modality, with only the topmost dialog in each stack being interactive.
  *
- * The microfrontend can inject the {@link WorkbenchDialog} handle to interact with the dialog.
+ * The microfrontend can inject the `WorkbenchDialog` handle (and `ActivatedMicrofrontend` if a host microfrontend) to interact with the dialog or access parameters.
  *
  * Dialogs provided by the workbench host application have a footer and resize to fit content. See the documentation of `WorkbenchDialogService`
  * in `@scion/workbench` for more information on adding actions to the footer.
@@ -72,6 +72,19 @@ export interface WorkbenchDialogCapability extends Capability {
      *     "path": "products/:id", // `:id` references a capability parameter
      *   }
      * }
+     * ```
+     *
+     * ### Empty Path Required if Host Capability
+     * Dialog capabilities of the host application require an empty path. In the route, use `canMatchWorkbenchDialogCapability` guard to match the dialog capability.
+     *
+     * @example - Route matching a dialog capability with qualifier {dialog: 'about'}
+     * ```ts
+     * import {Routes} from '@angular/router';
+     * import {canMatchWorkbenchDialogCapability} from '@scion/workbench';
+     *
+     * const routes: Routes = [
+     *   {path: '', canMatch: [canMatchWorkbenchDialogCapability({dialog: 'about'})], component: AboutComponent},
+     * ];
      * ```
      */
     path: string;
@@ -157,6 +170,8 @@ export interface WorkbenchDialogCapability extends Capability {
      * Instructs the workbench to show a splash, such as a skeleton or loading indicator, until the dialog microfrontend signals readiness.
      *
      * By default, the workbench shows a loading indicator. A custom splash can be configured in the workbench host application.
+     *
+     * This property is not supported if a host microfrontend.
      *
      * @see WorkbenchDialog.signalReady
      */

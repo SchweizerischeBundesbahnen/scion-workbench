@@ -20,7 +20,7 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
  * Displayed on top of other content, a modal message box blocks interaction with other parts of the application. A message box can be context-modal
  * or application-modal. Message boxes are stacked per modality, with only the topmost message box in each stack being interactive.
  *
- * The microfrontend can inject the {@link WorkbenchMessageBox} handle to interact with the message box, such as reading parameters or signaling readiness.
+ * The microfrontend can inject the `WorkbenchMessageBox` handle (and `ActivatedMicrofrontend` if a host microfrontend) to interact with the message box or access parameters.
  *
  * The message box does not automatically adapt its size to the content. Refer to {@link WorkbenchMessageBoxCapability.properties.size} for more information.
  *
@@ -68,6 +68,19 @@ export interface WorkbenchMessageBoxCapability extends Capability {
      *   }
      * }
      * ```
+     *
+     * ### Empty Path Required if Host Capability
+     * Messagebox capabilities of the host application require an empty path. In the route, use `canMatchWorkbenchMessageBoxCapability` guard to match the messagebox capability.
+     *
+     * @example - Route matching a messagebox capability with qualifier {messagebox: 'alert'}
+     * ```ts
+     * import {Routes} from '@angular/router';
+     * import {canMatchWorkbenchMessageBoxCapability} from '@scion/workbench';
+     *
+     * const routes: Routes = [
+     *   {path: '', canMatch: [canMatchWorkbenchMessageBoxCapability({messagebox: 'alert'})], component: AlertComponent},
+     * ];
+     * ```
      */
     path: string;
     /**
@@ -82,6 +95,9 @@ export interface WorkbenchMessageBoxCapability extends Capability {
      * Instructs the workbench to show a splash, such as a skeleton or loading indicator, until the message box microfrontend signals readiness.
      *
      * By default, the workbench shows a loading indicator. A custom splash can be configured in the workbench host application.
+     *
+     * This property is not supported if a host microfrontend.
+     *
      * @see WorkbenchMessageBox.signalReady
      */
     showSplash?: boolean;

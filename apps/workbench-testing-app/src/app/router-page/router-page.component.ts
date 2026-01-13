@@ -57,6 +57,7 @@ export default class RouterPageComponent {
       partId: this._formBuilder.control(''),
       position: this._formBuilder.control(''),
       queryParams: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
+      fragment: this._formBuilder.control(''),
       activate: this._formBuilder.control<boolean | undefined>(undefined),
       close: this._formBuilder.control<boolean | undefined>(undefined),
       cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
@@ -106,6 +107,7 @@ export default class RouterPageComponent {
       position: coercePosition(extras.position.value),
       data: parseTypedObject(SciKeyValueFieldComponent.toDictionary(extras.data)) ?? undefined,
       state: parseTypedObject(SciKeyValueFieldComponent.toDictionary(extras.state)) ?? undefined,
+      fragment: extras.fragment.value,
       cssClass: extras.cssClass.value,
     });
   }

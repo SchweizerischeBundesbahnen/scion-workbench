@@ -19,6 +19,7 @@ import {expect} from '../../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchPopupService} from '@scion/workbench-client';
 import {toShowCustomMatcher} from '../../testing/jasmine/matcher/to-show.matcher';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
+import {canMatchWorkbenchPopupCapability} from '../microfrontend-host/microfrontend-host-routes';
 
 describe('Microfrontend Host Popup', () => {
 
@@ -41,14 +42,14 @@ describe('Microfrontend Host Popup', () => {
                     type: WorkbenchCapabilities.Popup,
                     qualifier: {component: 'popup-1'},
                     properties: {
-                      path: 'path/to/popup/1',
+                      path: '',
                     },
                   } satisfies WorkbenchPopupCapability,
                   {
                     type: WorkbenchCapabilities.Popup,
                     qualifier: {component: 'popup-2'},
                     properties: {
-                      path: 'path/to/popup/2',
+                      path: '',
                     },
                   } satisfies WorkbenchPopupCapability,
                 ],
@@ -58,8 +59,8 @@ describe('Microfrontend Host Popup', () => {
           },
         }),
         provideRouter([
-          {path: 'path/to/popup/1', canActivate: [() => firstValueFrom(canActivatePopup1)], component: SpecPopup1Component},
-          {path: 'path/to/popup/2', component: SpecPopup2Component},
+          {path: '', canMatch: [canMatchWorkbenchPopupCapability({component: 'popup-1'})], canActivate: [() => firstValueFrom(canActivatePopup1)], component: SpecPopup1Component},
+          {path: '', canMatch: [canMatchWorkbenchPopupCapability({component: 'popup-2'})], component: SpecPopup2Component},
         ]),
       ],
     });
@@ -104,7 +105,7 @@ describe('Microfrontend Host Popup', () => {
                     type: WorkbenchCapabilities.Popup,
                     qualifier: {component: 'popup'},
                     properties: {
-                      path: 'path/to/popup',
+                      path: '',
                     },
                   } satisfies WorkbenchPopupCapability,
                 ],
@@ -114,7 +115,7 @@ describe('Microfrontend Host Popup', () => {
           },
         }),
         provideRouter([
-          {path: 'path/to/popup', canActivate: [() => firstValueFrom(canActivatePopup)], component: SpecPopup1Component},
+          {path: '', canMatch: [canMatchWorkbenchPopupCapability({component: 'popup'})], canActivate: [() => firstValueFrom(canActivatePopup)], component: SpecPopup1Component},
           {path: 'path/to/view', component: SpecViewComponent},
         ]),
       ],
@@ -160,7 +161,7 @@ describe('Microfrontend Host Popup', () => {
                     type: WorkbenchCapabilities.Popup,
                     qualifier: {component: 'popup'},
                     properties: {
-                      path: 'path/to/popup',
+                      path: '',
                     },
                   } satisfies WorkbenchPopupCapability,
                 ],
@@ -171,7 +172,7 @@ describe('Microfrontend Host Popup', () => {
         }),
         provideRouter([
           {path: 'path/to/view', canActivate: [() => firstValueFrom(canActivateView)], component: SpecViewComponent},
-          {path: 'path/to/popup', component: SpecPopup1Component},
+          {path: '', canMatch: [canMatchWorkbenchPopupCapability({component: 'popup'})], component: SpecPopup1Component},
         ]),
       ],
     });

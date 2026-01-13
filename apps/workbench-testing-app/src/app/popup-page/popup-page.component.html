@@ -21,6 +21,10 @@
       </section>
     }
 
+    @if (activatedMicrofrontend) {
+      <app-activated-microfrontend/>
+    }
+
     <sci-accordion class="e2e-component-size" variant="solid">
       <ng-template sciAccordionItem [panel]="panel_component_size">
         <header>Component Size</header>
