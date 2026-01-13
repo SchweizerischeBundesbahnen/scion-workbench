@@ -8,14 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, rejectWhenAttached} from '../../helper/testing.util';
-import {AppPO} from '../../app.po';
+import {coerceArray, rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {Locator} from '@playwright/test';
 import {ViewPO} from '../../view.po';
-import {Translatable, ViewId, WorkbenchMessageBoxOptions} from '@scion/workbench';
+import {Translatable, WorkbenchMessageBoxOptions} from '@scion/workbench';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
+import {AppPO} from '../../app.po';
 
 /**
  * Page object to interact with {@link MessageBoxOpenerPageComponent}.
@@ -25,15 +25,16 @@ export class MessageBoxOpenerPagePO implements WorkbenchViewPagePO {
   public readonly locator: Locator;
   public readonly closeAction: Locator;
   public readonly error: Locator;
-  public readonly view: ViewPO;
   public readonly openButton: Locator;
 
-  constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.locator = this.view.locator.locator('app-message-box-opener-page');
+  private readonly _appPO: AppPO;
+
+  constructor(public view: ViewPO) {
+    this.locator = view.locator.locator('app-message-box-opener-page');
     this.closeAction = this.locator.locator('output.e2e-close-action');
     this.error = this.locator.locator('output.e2e-message-box-error');
     this.openButton = this.locator.locator('button.e2e-open');
+    this._appPO = new AppPO(this.locator.page());
   }
 
   public async open(message: Translatable | null, options?: WorkbenchMessageBoxOptions): Promise<void>;
@@ -89,18 +90,13 @@ export class MessageBoxOpenerPagePO implements WorkbenchViewPagePO {
       await this.locator.locator('input.e2e-class').fill(coerceArray(options.cssClass).join(' '));
     }
 
+    const dialogCount = await this._appPO.dialogs.count();
     await this.openButton.click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([
-      this.waitUntilMessageBoxAttached(options),
+      waitUntilAttached(this._appPO.dialogs.nth(dialogCount)),
       rejectWhenAttached(this.error),
     ]);
-  }
-
-  private async waitUntilMessageBoxAttached(options?: WorkbenchMessageBoxOptions): Promise<void> {
-    const cssClass = coerceArray(options?.cssClass).filter(Boolean);
-    const messagebox = this._appPO.messagebox({cssClass});
-    await messagebox.locator.waitFor({state: 'attached'});
   }
 }

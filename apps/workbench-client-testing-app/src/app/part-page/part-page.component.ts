@@ -15,7 +15,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {AppendParamDataTypePipe, NullIfEmptyPipe} from 'workbench-testing-app-common';
+import {AppendDataTypePipe, NullIfEmptyPipe} from 'workbench-testing-app-common';
 import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {APP_INSTANCE_ID} from '../app-instance-id';
 import {UUID} from '@scion/toolkit/uuid';
@@ -33,7 +33,7 @@ import {ActivatedRoute} from '@angular/router';
     SciAccordionComponent,
     SciAccordionItemDirective,
     SciViewportComponent,
-    AppendParamDataTypePipe,
+    AppendDataTypePipe,
     SciKeyValueComponent,
     NullIfEmptyPipe,
     FormsModule,

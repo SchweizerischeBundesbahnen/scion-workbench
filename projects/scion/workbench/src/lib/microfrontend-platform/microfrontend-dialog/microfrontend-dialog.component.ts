@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, input, untracked, viewChild} from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, input, signal, untracked, viewChild} from '@angular/core';
 import {ManifestService, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
 import {Translatable, WorkbenchDialogCapability, ɵDIALOG_CONTEXT, ɵDialogContext, ɵWorkbenchCommands, ɵWorkbenchDialogMessageHeaders} from '@scion/workbench-client';
@@ -52,6 +52,7 @@ export class MicrofrontendDialogComponent {
   /** Splash to display until the microfrontend signals readiness. */
   protected readonly splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
   protected readonly workbenchLayoutService = inject(WorkbenchLayoutService);
+  protected readonly focusWithin = signal(false);
 
   constructor() {
     this._logger.debug(() => 'Constructing MicrofrontendDialogComponent.', LoggerNames.MICROFRONTEND);
@@ -147,6 +148,8 @@ export class MicrofrontendDialogComponent {
 
   protected onFocusWithin(event: Event): void {
     const {detail: focusWithin} = event as CustomEvent<boolean>;
+    this.focusWithin.set(focusWithin);
+
     if (focusWithin) {
       this._host.dispatchEvent(new CustomEvent('sci-microfrontend-focusin', {bubbles: true}));
     }

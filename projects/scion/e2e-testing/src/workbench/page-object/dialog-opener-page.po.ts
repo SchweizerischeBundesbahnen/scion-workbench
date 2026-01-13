@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, rejectWhenAttached} from '../../helper/testing.util';
+import {coerceArray, rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
@@ -32,11 +32,14 @@ export class DialogOpenerPagePO implements WorkbenchViewPagePO, WorkbenchDialogP
   public readonly error: Locator;
   public readonly openButton: Locator;
 
+  private readonly _appPO: AppPO;
+
   constructor(private _locateBy: ViewPO | PartPO | PopupPO | DialogPO) {
     this.locator = this._locateBy.locator.locator('app-dialog-opener-page');
     this.returnValue = this.locator.locator('output.e2e-return-value');
     this.error = this.locator.locator('output.e2e-dialog-error');
     this.openButton = this.locator.locator('button.e2e-open');
+    this._appPO = new AppPO(this.locator.page());
   }
 
   public async open(component: 'dialog-page' | 'dialog-opener-page' | 'popup-opener-page' | 'focus-test-page' | 'input-field-test-page' | 'size-test-page' | 'large-test-page', options?: WorkbenchDialogOptions & DialogOpenerPageOptions): Promise<void> {
@@ -78,12 +81,13 @@ export class DialogOpenerPagePO implements WorkbenchViewPagePO, WorkbenchDialogP
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-root-context')).toggle(options.rootContext);
     }
 
+    const dialogCount = await this._appPO.dialogs.count();
     await this.openButton.click();
 
     if (options?.waitUntilOpened ?? true) {
       // Evaluate the response: resolve the promise on success, or reject it on error.
       await Promise.race([
-        this.waitUntilDialogsAttached(options),
+        waitUntilAttached(this._appPO.dialogs.nth(dialogCount)),
         rejectWhenAttached(this.error),
       ]);
     }
@@ -91,15 +95,6 @@ export class DialogOpenerPagePO implements WorkbenchViewPagePO, WorkbenchDialogP
 
   public async click(options?: {timeout?: number}): Promise<void> {
     await this.locator.click(options);
-  }
-
-  private async waitUntilDialogsAttached(options?: WorkbenchDialogOptions & DialogOpenerPageOptions): Promise<void> {
-    const cssClasses = coerceArray(options?.cssClass).filter(Boolean);
-
-    for (let i = 0; i < (options?.count ?? 1); i++) {
-      const dialog = new AppPO(this.locator.page()).dialog({cssClass: [`index-${i}`].concat(cssClasses)});
-      await dialog.locator.waitFor({state: 'attached'});
-    }
   }
 
   public get view(): ViewPO {

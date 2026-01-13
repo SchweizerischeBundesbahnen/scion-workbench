@@ -8,20 +8,25 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Locator} from '@playwright/test';
-import {DomRect, fromRect, getCssClasses, hasCssClass} from './helper/testing.util';
+import {Locator, Page} from '@playwright/test';
+import {coerceArray, DomRect, fromRect, getCssClasses, hasCssClass, selectBy} from './helper/testing.util';
 import {POPUP_DIAMOND_ANCHOR_SIZE} from './workbench/workbench-layout-constants';
 import {PopupId} from '@scion/workbench';
+import {RequireOne} from './helper/utility-types';
 
 /**
  * Handle for interacting with a workbench popup.
  */
 export class PopupPO {
 
-  private readonly _overlay: Locator;
+  public readonly locator: Locator;
+  public readonly overlay: Locator;
+  public readonly locateBy?: {id?: PopupId; cssClass?: string[]};
 
-  constructor(public readonly locator: Locator) {
-    this._overlay = this.locator.page().locator('.cdk-overlay-pane.wb-popup', {has: this.locator});
+  constructor(page: Page, locateBy: RequireOne<{popupId: PopupId; cssClass: string | string[]}>, options?: {nth?: number}) {
+    this.locateBy = {id: locateBy.popupId, cssClass: coerceArray(locateBy.cssClass)};
+    this.locator = page.locator(selectBy('wb-popup', {attributes: {'data-popupid': locateBy.popupId}, cssClass: locateBy.cssClass})).nth(options?.nth ?? 0);
+    this.overlay = this.locator.page().locator('.cdk-overlay-pane.wb-popup', {has: this.locator});
   }
 
   public async getPopupId(): Promise<PopupId> {
@@ -34,7 +39,7 @@ export class PopupPO {
    * @param options - Specifies whether to include borders ('border-box') or not ('content-box').
    */
   public async getBoundingBox(options?: {box?: 'border-box' | 'content-box'}): Promise<DomRect> {
-    const locator = options?.box === 'content-box' ? this.locator : this._overlay;
+    const locator = options?.box === 'content-box' ? this.locator : this.overlay;
     return fromRect(await locator.boundingBox());
   }
 
@@ -46,7 +51,7 @@ export class PopupPO {
   }
 
   public async getAlign(): Promise<'east' | 'west' | 'north' | 'south'> {
-    const cssClasses = await getCssClasses(this._overlay);
+    const cssClasses = await getCssClasses(this.overlay);
     if (cssClasses.includes('wb-east')) {
       return 'east';
     }

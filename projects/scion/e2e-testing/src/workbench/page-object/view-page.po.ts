@@ -9,7 +9,6 @@
  */
 
 import {coerceArray} from '../../helper/testing.util';
-import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {Locator} from '@playwright/test';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
@@ -17,7 +16,8 @@ import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Params} from '@angular/router';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
-import {NavigationData, NavigationState, Translatable, ViewId} from '@scion/workbench';
+import {NavigationData, NavigationState, Translatable} from '@scion/workbench';
+import {ActivatedMicrofrontendPO} from './activated-microfrontend.po';
 
 /**
  * Page object to interact with {@link ViewPageComponent}.
@@ -25,12 +25,12 @@ import {NavigationData, NavigationState, Translatable, ViewId} from '@scion/work
 export class ViewPagePO implements WorkbenchViewPagePO {
 
   public readonly locator: Locator;
-  public readonly view: ViewPO;
+  public readonly activatedMicrofrontend: ActivatedMicrofrontendPO;
   public readonly viewId: Locator;
 
-  constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.locator = this.view.locator.locator('app-view-page');
+  constructor(public view: ViewPO) {
+    this.locator = view.locator.locator('app-view-page');
+    this.activatedMicrofrontend = new ActivatedMicrofrontendPO(this.locator.locator('app-activated-microfrontend'));
     this.viewId = this.locator.locator('span.e2e-view-id');
   }
 
@@ -38,7 +38,7 @@ export class ViewPagePO implements WorkbenchViewPagePO {
     return this.locator.locator('span.e2e-component-instance-id').innerText();
   }
 
-  public async getParams(): Promise<Params> {
+  public async getRouteParams(): Promise<Params> {
     if (await this.locator.locator('sci-accordion.e2e-params').isHidden()) {
       return {};
     }
@@ -46,6 +46,20 @@ export class ViewPagePO implements WorkbenchViewPagePO {
     await accordion.expand();
     try {
       return await new SciKeyValuePO(this.locator.locator('sci-key-value.e2e-params')).readEntries();
+    }
+    finally {
+      await accordion.collapse();
+    }
+  }
+
+  public async getRouteData(): Promise<Params> {
+    if (await this.locator.locator('sci-accordion.e2e-data').isHidden()) {
+      return {};
+    }
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-data'));
+    await accordion.expand();
+    try {
+      return await new SciKeyValuePO(this.locator.locator('sci-key-value.e2e-data')).readEntries();
     }
     finally {
       await accordion.collapse();
@@ -88,8 +102,8 @@ export class ViewPagePO implements WorkbenchViewPagePO {
     await this.locator.locator('input.e2e-heading').fill(heading);
   }
 
-  public async checkDirty(check: boolean): Promise<void> {
-    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-dirty')).toggle(check);
+  public async markDirty(dirty: boolean): Promise<void> {
+    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-dirty')).toggle(dirty);
   }
 
   public async enterCssClass(cssClass: string | string[]): Promise<void> {

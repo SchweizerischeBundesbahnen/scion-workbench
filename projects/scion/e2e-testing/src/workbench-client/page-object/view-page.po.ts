@@ -9,10 +9,9 @@
  */
 
 import {DomRect, fromRect} from '../../helper/testing.util';
-import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {Params} from '@angular/router';
-import {Translatable, ViewId, WorkbenchViewCapability} from '@scion/workbench-client';
+import {Translatable, WorkbenchViewCapability} from '@scion/workbench-client';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
@@ -27,15 +26,13 @@ import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-vie
 export class ViewPagePO implements MicrofrontendViewPagePO {
 
   public readonly locator: Locator;
-  public readonly view: ViewPO;
   public readonly viewId: Locator;
   public readonly partId: Locator;
   public readonly outlet: SciRouterOutletPO;
   public readonly path: Locator;
 
-  constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.outlet = new SciRouterOutletPO(appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
+  constructor(public view: ViewPO) {
+    this.outlet = new SciRouterOutletPO(view.locator.page(), {name: view.locateBy?.id, cssClass: view.locateBy?.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-view-page');
     this.viewId = this.locator.locator('span.e2e-view-id');
     this.partId = this.locator.locator('span.e2e-part-id');

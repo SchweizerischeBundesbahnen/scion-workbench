@@ -1,9 +1,9 @@
 <header>{{('%workbench.page_not_found.title' | wbText)()}}</header>
 
-@if (isViewOutlet(outlet)) {
+@if (view) {
   @let message = '%workbench.page_not_found_view.message;path=' + path() | wbText;
   <section class="message" [innerHTML]="message()"></section>
-} @else if (isPartOutlet(outlet)) {
+} @else if (part) {
   @let message = '%workbench.page_not_found_part.message;path=' + path() | wbText;
   <section class="message" [innerHTML]="message()"></section>
 } @else {
@@ -12,15 +12,15 @@
 }
 
 <section class="actions">
-  @if (isViewOutlet(outlet)) {
+  @if (view) {
     <button (click)="workbenchService.resetPerspective()">{{('%workbench.reset_perspective.action' | wbText)()}}</button>
-    <button (click)="view!.close()">{{('%workbench.close.action' | wbText)()}}</button>
-  } @else if (isPartOutlet(outlet)) {
+    <button (click)="view.close()">{{('%workbench.close.action' | wbText)()}}</button>
+  } @else if (part) {
     <button (click)="workbenchService.resetPerspective()">{{('%workbench.reset_perspective.action' | wbText)()}}</button>
-  } @else if (isDialogOutlet(outlet)) {
-    <button (click)="dialog!.close()">{{('%workbench.close.action' | wbText)()}}</button>
-  } @else if (isPopupOutlet(outlet)) {
-    <button (click)="popup!.close()">{{('%workbench.close.action' | wbText)()}}</button>
+  } @else if (dialog) {
+    <button (click)="dialog.close()">{{('%workbench.close.action' | wbText)()}}</button>
+  } @else if (popup) {
+    <button (click)="popup.close()">{{('%workbench.close.action' | wbText)()}}</button>
   }
 </section>
 

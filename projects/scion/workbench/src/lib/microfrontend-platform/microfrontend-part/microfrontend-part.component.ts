@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Injector, Provider, signal, Signal, untracked, viewChild} from '@angular/core';
+import {Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Injector, linkedSignal, Provider, signal, Signal, untracked, viewChild} from '@angular/core';
 import {ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {WorkbenchPartCapability, ɵWORKBENCH_PART_CONTEXT, ɵWorkbenchCommands, ɵWorkbenchPartContext} from '@scion/workbench-client';
@@ -25,10 +25,9 @@ import {Microfrontends} from '../common/microfrontend.util';
 import {rootEffect, toRootObservable} from '../../common/rxjs-interop.util';
 import {ɵWorkbenchPart} from '../../part/ɵworkbench-part.model';
 import {MicrofrontendPartNavigationData} from './microfrontend-part-navigation-data';
-import {Router} from '@angular/router';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../../glass-pane/glass-pane.directive';
 import {WorkbenchPart} from '../../part/workbench-part.model';
-import {filter} from 'rxjs/operators';
+import {Routing} from '../../routing/routing.util';
 
 /**
  * Embeds the microfrontend of a part capability.
@@ -54,7 +53,6 @@ export class MicrofrontendPartComponent {
   private readonly _manifestService = inject(ManifestService);
   private readonly _messageClient = inject(MessageClient);
   private readonly _logger = inject(Logger);
-  private readonly _router = inject(Router);
   private readonly _injector = inject(Injector);
   private readonly _routerOutletElement = viewChild.required<ElementRef<SciRouterOutletElement>>('router_outlet');
 
@@ -62,6 +60,7 @@ export class MicrofrontendPartComponent {
   protected readonly workbenchLayoutService = inject(WorkbenchLayoutService);
   /** Splash to display until the microfrontend signals readiness. */
   protected readonly splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
+  protected readonly focusWithin = signal(false);
   /** Configures iframe projection. */
   protected readonly overlayConfig: ContentAsOverlayConfig = {
     location: inject(IFRAME_OVERLAY_HOST),
@@ -85,7 +84,6 @@ export class MicrofrontendPartComponent {
     // Use a root effect to emit even if detached from change detection.
     toRootObservable(this.navigationContext)
       .pipe(
-        filter(Boolean),
         serializeExecution(context => this.onNavigate(context)),
         takeUntilDestroyed(),
       )
@@ -96,8 +94,7 @@ export class MicrofrontendPartComponent {
     if (!context.capability) {
       this._logger.warn(() => `[NullCapabilityError] No application found to provide a part capability of id '${context.capabilityId}'. Maybe, the requested part is not public API or the providing application not available.`, LoggerNames.MICROFRONTEND_ROUTING);
       this.unload();
-      // Perform navigation for Angular to evaluate `CanMatch` guards to display "Not Found" page.
-      void this._router.navigate([{outlets: {}}], {skipLocationChange: true});
+      void Routing.runCanMatchGuards({injector: this._injector});
       return;
     }
 
@@ -119,7 +116,7 @@ export class MicrofrontendPartComponent {
   }
 
   private installPartActivePublisher(): void {
-    // Run as root effect to run even if the parent component is detached from change detection (e.g., if the part is not visible).
+    // Use root effect to run even if the parent component is detached from change detection (e.g., if the part is not visible).
     rootEffect(() => {
       const active = this.part.active();
       untracked(() => {
@@ -130,7 +127,7 @@ export class MicrofrontendPartComponent {
   }
 
   private installPartFocusedPublisher(): void {
-    // Run as root effect to run even if the parent component is detached from change detection (e.g., if the part is not visible).
+    // Use root effect to run even if the parent component is detached from change detection (e.g., if the part is not visible).
     rootEffect(() => {
       const focused = this.part.focused();
       untracked(() => {
@@ -142,6 +139,8 @@ export class MicrofrontendPartComponent {
 
   protected onFocusWithin(event: Event): void {
     const {detail: focusWithin} = event as CustomEvent<boolean>;
+    this.focusWithin.set(focusWithin);
+
     if (focusWithin) {
       this._host.dispatchEvent(new CustomEvent('sci-microfrontend-focusin', {bubbles: true}));
     }
@@ -157,7 +156,7 @@ export class MicrofrontendPartComponent {
       const context = this.navigationContext();
 
       untracked(() => {
-        if (context?.capability) {
+        if (context.capability) {
           routerOutletElement.setContextValue<ɵWorkbenchPartContext>(ɵWORKBENCH_PART_CONTEXT, {
             partId: this.part.id,
             capability: context.capability,
@@ -174,27 +173,20 @@ export class MicrofrontendPartComponent {
   /**
    * Computes the current navigation of this microfrontend part.
    */
-  private computeNavigationContext(): Signal<NavigationContext | undefined> {
-    const context = signal<NavigationContext | undefined>(undefined);
+  private computeNavigationContext(): Signal<NavigationContext> {
     const manifestObjectCache = inject(ManifestObjectCache);
+    const navigationData = computed(() => this.part.navigation()!.data as unknown as MicrofrontendPartNavigationData);
+    const capability = manifestObjectCache.capability<WorkbenchPartCapability>(computed(() => navigationData().capabilityId));
 
-    // Run as root effect to run even if the parent component is detached from change detection (e.g., if the part is not visible).
-    rootEffect(onCleanup => {
-      const {capabilityId, params} = this.part.navigation()!.data as unknown as MicrofrontendPartNavigationData;
-
-      untracked(() => {
-        const subscription = manifestObjectCache.observeCapability$<WorkbenchPartCapability>(capabilityId).subscribe(capability => {
-          context.update(prevContext => ({
-            capabilityId,
-            capability: capability ?? undefined,
-            prevCapability: prevContext?.capability,
-            params: Maps.coerce(params),
-          }));
-        });
-        onCleanup(() => subscription.unsubscribe());
-      });
+    return linkedSignal({
+      source: () => ({navigationData: navigationData(), capability: capability()}),
+      computation: ({navigationData, capability}, previousNavigationContext) => ({
+        capabilityId: navigationData.capabilityId,
+        capability: capability,
+        prevCapability: previousNavigationContext?.value.capability,
+        params: Maps.coerce(navigationData.params),
+      }),
     });
-    return context;
   }
 
   private propagateWorkbenchTheme(): void {

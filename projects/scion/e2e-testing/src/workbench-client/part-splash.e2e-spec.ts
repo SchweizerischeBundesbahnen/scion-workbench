@@ -56,7 +56,7 @@ test.describe('Workbench Part', () => {
       },
     });
 
-    const testeePartPage = new PartPagePO(appPO, {partId: 'part.testee'});
+    const testeePartPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
 
     // Expect splash to display.
     await expect(testeePartPage.outlet.splash).toBeVisible();
@@ -108,7 +108,7 @@ test.describe('Workbench Part', () => {
       },
     });
 
-    const testeePartPage = new PartPagePO(appPO, {partId: 'part.testee'});
+    const testeePartPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
 
     // Expect splash not to display.
     await expect(testeePartPage.outlet.splash).not.toBeVisible();
@@ -151,7 +151,7 @@ test.describe('Workbench Part', () => {
       },
     });
 
-    const testeePartPage = new PartPagePO(appPO, {partId: 'part.testee'});
+    const testeePartPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
 
     // Expect splash not to display.
     await expect(testeePartPage.outlet.splash).not.toBeVisible();
@@ -198,7 +198,7 @@ test.describe('Workbench Part', () => {
       },
     });
 
-    const testeePartPage = new PartPagePO(appPO, {partId: 'part.testee'});
+    const testeePartPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
 
     // Open docked part.
     await appPO.activityItem({activityId: 'activity.1'}).click();
@@ -334,8 +334,8 @@ test.describe('Workbench Part', () => {
     await messagingPage.publishIntent({type: 'perspective', qualifier: {perspective: 'testee'}});
     await messagingPage.view.tab.close();
 
-    const testee1 = new PartPagePO(appPO, {cssClass: 'testee-1'}); // Part with stable id (part.main-area); configured with showSplash=true.
-    const testee2 = new PartPagePO(appPO, {cssClass: 'testee-2'}); // Part with random id (part.xxx); configured with showSplash=true.
+    const testee1 = new PartPagePO(appPO.part({cssClass: 'testee-1'})); // Part with stable id (part.main-area); configured with showSplash=true.
+    const testee2 = new PartPagePO(appPO.part({cssClass: 'testee-2'})); // Part with random id (part.xxx); configured with showSplash=true.
 
     // Expect splash to be disposed.
     await expect(testee1.outlet.splash).not.toBeVisible();

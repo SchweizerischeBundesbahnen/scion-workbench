@@ -43,6 +43,7 @@ export class ɵWorkbenchMessageBoxService implements WorkbenchMessageBoxService 
       inputs: {message, options},
       modality: options?.modality,
       injector: options?.injector,
+      providers: options?.providers,
       cssClass: options?.cssClass,
       context: options?.context,
       animate: true,

@@ -11,7 +11,7 @@
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
-import {DialogPagePO} from '../dialog-page.po';
+import {DialogPagePO} from './page-object/dialog-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {FocusTestPagePO} from './page-object/test-pages/focus-test-page.po';
@@ -87,28 +87,31 @@ test.describe('Workbench Dialog', () => {
     test('should maintain dialog bounds if view is not active (to not flicker on reactivation; to support for virtual scrolling)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      // Open view 1 with dialog.
-      const dialogPage = await SizeTestPagePO.openInDialog(appPO);
-      const viewPage1 = new DialogOpenerPagePO(appPO.view({viewId: await appPO.activePart({grid: 'mainArea'}).activeView.getViewId()}));
+      // Open dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('size-test-page', {cssClass: 'testee'});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogPage = new SizeTestPagePO(dialog);
 
       await expectDialog(dialogPage).toBeVisible();
       const dialogSize = await dialogPage.getBoundingBox();
       const sizeChanges = await dialogPage.getRecordedSizeChanges();
 
-      // Open view 2.
-      const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
+      // Open view.
+      const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
       await expectDialog(dialogPage).toBeHidden();
-      await expectView(viewPage1).toBeInactive();
-      await expectView(viewPage2).toBeActive();
+      await expectView(dialogOpenerPage).toBeInactive();
+      await expectView(viewPage).toBeActive();
 
       // Expect dialog bounding box not to have changed.
       await expect.poll(() => dialogPage.getBoundingBox()).toEqual(dialogSize);
 
-      // Activate view 1.
-      await viewPage1.view.tab.click();
+      // Activate dialog opener page.
+      await dialogOpenerPage.view.tab.click();
       await expectDialog(dialogPage).toBeVisible();
-      await expectView(viewPage1).toBeActive();
-      await expectView(viewPage2).toBeInactive();
+      await expectView(dialogOpenerPage).toBeActive();
+      await expectView(viewPage).toBeInactive();
 
       // Expect dialog not to be resized (no flickering).
       await expect.poll(() => dialogPage.getRecordedSizeChanges()).toEqual(sizeChanges);
@@ -1071,8 +1074,8 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerViewPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerViewPage.open('dialog-opener-page', {cssClass: 'test-application-modal', modality: 'application', count: 2});
 
-      const applicationModalDialog1 = appPO.dialog({cssClass: 'test-application-modal', nth: 0});
-      const applicationModalDialog2 = appPO.dialog({cssClass: 'test-application-modal', nth: 1});
+      const applicationModalDialog1 = appPO.dialog({cssClass: 'test-application-modal'}, {nth: 0});
+      const applicationModalDialog2 = appPO.dialog({cssClass: 'test-application-modal'}, {nth: 1});
 
       await expect(applicationModalDialog1.locator).toBeVisible();
       await expect(applicationModalDialog2.locator).toBeVisible();
@@ -1195,8 +1198,8 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerViewPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerViewPage.open('dialog-opener-page', {cssClass: 'test-application-modal', modality: 'application', count: 2});
 
-      const applicationModalDialog1 = appPO.dialog({cssClass: 'test-application-modal', nth: 0});
-      const applicationModalDialog2 = appPO.dialog({cssClass: 'test-application-modal', nth: 1});
+      const applicationModalDialog1 = appPO.dialog({cssClass: 'test-application-modal'}, {nth: 0});
+      const applicationModalDialog2 = appPO.dialog({cssClass: 'test-application-modal'}, {nth: 1});
 
       await expect(applicationModalDialog1.locator).toBeVisible();
       await expect(applicationModalDialog2.locator).toBeVisible();
@@ -1348,9 +1351,9 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('focus-test-page', {cssClass: 'testee', count: 3});
 
-      const dialog1 = appPO.dialog({cssClass: 'testee', nth: 0});
-      const dialog2 = appPO.dialog({cssClass: 'testee', nth: 1});
-      const dialog3 = appPO.dialog({cssClass: 'testee', nth: 2});
+      const dialog1 = appPO.dialog({cssClass: 'testee'}, {nth: 0});
+      const dialog2 = appPO.dialog({cssClass: 'testee'}, {nth: 1});
+      const dialog3 = appPO.dialog({cssClass: 'testee'}, {nth: 2});
       const focusTestPage1 = new FocusTestPagePO(dialog1);
       const focusTestPage2 = new FocusTestPagePO(dialog2);
       const focusTestPage3 = new FocusTestPagePO(dialog3);
@@ -1381,9 +1384,9 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('focus-test-page', {cssClass: 'testee', count: 3});
 
-      const focusTestPage1 = new FocusTestPagePO(appPO.dialog({cssClass: 'testee', nth: 0}));
-      const focusTestPage2 = new FocusTestPagePO(appPO.dialog({cssClass: 'testee', nth: 1}));
-      const focusTestPage3 = new FocusTestPagePO(appPO.dialog({cssClass: 'testee', nth: 2}));
+      const focusTestPage1 = new FocusTestPagePO(appPO.dialog({cssClass: 'testee'}, {nth: 0}));
+      const focusTestPage2 = new FocusTestPagePO(appPO.dialog({cssClass: 'testee'}, {nth: 1}));
+      const focusTestPage3 = new FocusTestPagePO(appPO.dialog({cssClass: 'testee'}, {nth: 2}));
 
       await expect(focusTestPage1.firstField).not.toBeFocused();
       await expect(focusTestPage2.firstField).not.toBeFocused();
@@ -1409,8 +1412,8 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('focus-test-page', {cssClass: 'testee', count: 2});
 
-      const dialog1 = appPO.dialog({cssClass: 'testee', nth: 0});
-      const dialog2 = appPO.dialog({cssClass: 'testee', nth: 1});
+      const dialog1 = appPO.dialog({cssClass: 'testee'}, {nth: 0});
+      const dialog2 = appPO.dialog({cssClass: 'testee'}, {nth: 1});
 
       const focusTestPage1 = new FocusTestPagePO(dialog1);
       const focusTestPage2 = new FocusTestPagePO(dialog2);
@@ -1594,15 +1597,15 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('dialog-page', {cssClass: 'testee', count: 3});
 
-      const dialog1 = appPO.dialog({cssClass: 'testee', nth: 0});
+      const dialog1 = appPO.dialog({cssClass: 'testee'}, {nth: 0});
       const dialogPage1 = new DialogPagePO(dialog1);
       const dialogBounds1 = await dialog1.getDialogBoundingBox();
 
-      const dialog2 = appPO.dialog({cssClass: 'testee', nth: 1});
+      const dialog2 = appPO.dialog({cssClass: 'testee'}, {nth: 1});
       const dialogPage2 = new DialogPagePO(dialog2);
       const dialogBounds2 = await dialog2.getDialogBoundingBox();
 
-      const dialog3 = appPO.dialog({cssClass: 'testee', nth: 2});
+      const dialog3 = appPO.dialog({cssClass: 'testee'}, {nth: 2});
       const dialogPage3 = new DialogPagePO(dialog3);
       const dialogBounds3 = await dialog3.getDialogBoundingBox();
 
@@ -1624,15 +1627,15 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('input-field-test-page', {cssClass: 'testee', count: 3, animate: false});
 
-      const firstDialog = appPO.dialog({cssClass: 'testee', nth: 0});
+      const firstDialog = appPO.dialog({cssClass: 'testee'}, {nth: 0});
       const firstDialogPage = new InputFieldTestPagePO(firstDialog);
       await expectDialog(firstDialogPage).toBeVisible();
 
-      const middleDialog = appPO.dialog({cssClass: 'testee', nth: 1});
+      const middleDialog = appPO.dialog({cssClass: 'testee'}, {nth: 1});
       const middleDialogPage = new InputFieldTestPagePO(middleDialog);
       await expectDialog(middleDialogPage).toBeVisible();
 
-      const topDialog = appPO.dialog({cssClass: 'testee', nth: 2});
+      const topDialog = appPO.dialog({cssClass: 'testee'}, {nth: 2});
       const topDialogPage = new InputFieldTestPagePO(topDialog);
 
       await expectDialog(topDialogPage).toBeVisible();
@@ -1659,15 +1662,15 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('input-field-test-page', {cssClass: 'testee', count: 3, animate: true});
 
-      const firstDialog = appPO.dialog({cssClass: 'testee', nth: 0});
+      const firstDialog = appPO.dialog({cssClass: 'testee'}, {nth: 0});
       const firstDialogPage = new InputFieldTestPagePO(firstDialog);
       await expectDialog(firstDialogPage).toBeVisible();
 
-      const middleDialog = appPO.dialog({cssClass: 'testee', nth: 1});
+      const middleDialog = appPO.dialog({cssClass: 'testee'}, {nth: 1});
       const middleDialogPage = new InputFieldTestPagePO(middleDialog);
       await expectDialog(middleDialogPage).toBeVisible();
 
-      const topDialog = appPO.dialog({cssClass: 'testee', nth: 2});
+      const topDialog = appPO.dialog({cssClass: 'testee'}, {nth: 2});
       const topDialogPage = new InputFieldTestPagePO(topDialog);
       await expectDialog(topDialogPage).toBeVisible();
       await topDialog.moveDialog('bottom-right-corner');

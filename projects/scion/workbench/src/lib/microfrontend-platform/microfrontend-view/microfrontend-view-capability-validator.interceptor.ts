@@ -12,6 +12,7 @@ import {Capability, CapabilityInterceptor} from '@scion/microfrontend-platform';
 import {Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchViewCapability} from '@scion/workbench-client';
 import {Objects} from '../../common/objects.util';
+import {Microfrontends} from '../common/microfrontend.util';
 
 /**
  * Asserts view capabilities to have required properties.
@@ -35,13 +36,35 @@ export class MicrofrontendViewCapabilityValidator implements CapabilityIntercept
       throw Error(`[ViewDefinitionError] View capability requires properties [app=${app(viewCapability)}, view=${qualifier(viewCapability)}]`);
     }
 
-    // Assert the view capability to have a path set.
-    const path = viewCapability.properties.path as unknown;
-    if (path === undefined || path === null) {
-      throw Error(`[ViewDefinitionError] View capability requires the 'path' property [app=${app(viewCapability)}, view=${qualifier(viewCapability)}]`);
+    // Assert the view capability to have a path, unless provided by the host application.
+    this.assertPath(viewCapability);
+
+    // Assert host view capabilities not to define the "lazy" property.
+    if (Microfrontends.isHostProvider(capability) && viewCapability.properties.lazy !== undefined) {
+      throw Error(`[ViewDefinitionError] Property "lazy" not supported for view capabilities of the host application [app=${app(viewCapability)}, view=${qualifier(viewCapability)}]`);
+    }
+
+    // Assert host view capabilities not to define the "showSplash" property.
+    if (Microfrontends.isHostProvider(capability) && viewCapability.properties.showSplash !== undefined) {
+      throw Error(`[ViewDefinitionError] Property "showSplash" not supported for view capabilities of the host application [app=${app(viewCapability)}, view=${qualifier(viewCapability)}]`);
     }
 
     return capability;
+  }
+
+  private assertPath(capability: Partial<WorkbenchViewCapability>): void {
+    const path = capability.properties?.path as string | undefined | null;
+
+    if (Microfrontends.isHostProvider(capability)) {
+      if (path !== '') {
+        throw Error(`[ViewDefinitionError] View capabilities of the host application require an empty path. [app=${app(capability)}, view=${qualifier(capability)}]. Change the path '${path}' to empty and add 'canMatchWorkbenchViewCapability(${JSON.stringify(capability.qualifier)})' guard to the route.\n\nExample:\nCapability: { type: 'view', qualifier: ${JSON.stringify(capability.qualifier)}, properties: {path: ''} }\nRoute: { path: '', canMatch: [canMatchWorkbenchViewCapability(${JSON.stringify(capability.qualifier)})], component: ViewComponent }`);
+      }
+    }
+    else {
+      if (path === null || path == undefined) {
+        throw Error(`[ViewDefinitionError] View capabilities require a path. [app=${app(capability)}, view=${qualifier(capability)}]`);
+      }
+    }
   }
 }
 

@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {APP_IDENTITY, Capability, CapabilityInterceptor} from '@scion/microfrontend-platform';
+import {Capability, CapabilityInterceptor} from '@scion/microfrontend-platform';
 import {Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchDialogSize} from '@scion/workbench-client';
-import {Beans} from '@scion/toolkit/bean-manager';
 import {Objects} from '../../common/objects.util';
+import {Microfrontends} from '../common/microfrontend.util';
 
 /**
  * Asserts dialog capabilities to have required properties.
@@ -36,21 +36,37 @@ export class MicrofrontendDialogCapabilityValidator implements CapabilityInterce
       throw Error(`[DialogDefinitionError] Dialog capability requires properties [app=${app(dialogCapability)}, dialog=${qualifier(dialogCapability)}]`);
     }
 
-    // Assert the dialog capability to have a path.
-    const path = dialogCapability.properties.path as unknown;
-    if (path === undefined || path === null) {
-      throw Error(`[DialogDefinitionError] Dialog capability requires the 'path' property [app=${app(dialogCapability)}, dialog=${qualifier(dialogCapability)}]`);
-    }
+    // Assert the dialog capability to have a path, unless provided by the host application.
+    this.assertPath(dialogCapability);
 
     // Assert the dialog capability to have a height and width, unless provided by the host application.
     this.assertSize(dialogCapability);
 
+    // Assert host dialog capabilities not to define the "showSplash" property.
+    if (Microfrontends.isHostProvider(capability) && dialogCapability.properties.showSplash !== undefined) {
+      throw Error(`[DialogDefinitionError] Property "showSplash" not supported for dialog capabilities of the host application [app=${app(dialogCapability)}, dialog=${qualifier(dialogCapability)}]`);
+    }
+
     return capability;
   }
 
+  private assertPath(capability: Partial<WorkbenchDialogCapability>): void {
+    const path = capability.properties?.path as string | undefined | null;
+
+    if (Microfrontends.isHostProvider(capability)) {
+      if (path !== '') {
+        throw Error(`[DialogDefinitionError] Dialog capabilities of the host application require an empty path. [app=${app(capability)}, dialog=${qualifier(capability)}]. Change the path '${path}' to empty and add 'canMatchWorkbenchDialogCapability(${JSON.stringify(capability.qualifier)})' guard to the route.\n\nExample:\nCapability: { type: 'dialog', qualifier: ${JSON.stringify(capability.qualifier)}, properties: {path: ''} }\nRoute: { path: '', canMatch: [canMatchWorkbenchDialogCapability(${JSON.stringify(capability.qualifier)})], component: DialogComponent }`);
+      }
+    }
+    else {
+      if (path === null || path == undefined) {
+        throw Error(`[DialogDefinitionError] Dialog capabilities require a path. [app=${app(capability)}, dialog=${qualifier(capability)}]`);
+      }
+    }
+  }
+
   private assertSize(capability: Partial<WorkbenchDialogCapability>): void {
-    const isHostProvider = capability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
-    if (isHostProvider) {
+    if (Microfrontends.isHostProvider(capability)) {
       return;
     }
 

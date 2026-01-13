@@ -17,6 +17,7 @@ import {MAIN_AREA} from '../workbench.model';
 import {WorkbenchNavigator} from './workbench-navigator';
 import {getPerspectiveId} from '../helper/testing.util';
 import {expectView} from '../matcher/view-matcher';
+import {canMatchWorkbenchView} from './page-object/layout-page/register-route-page.po';
 
 test.describe('Workbench View', () => {
 
@@ -56,7 +57,7 @@ test.describe('Workbench View', () => {
     });
 
     // Expect test view to display.
-    const viewPage = new ViewPagePO(newWindow.appPO, {viewId: newViewId});
+    const viewPage = new ViewPagePO(newWindow.appPO.view({viewId: newViewId}));
     await expectView(viewPage).toBeActive();
 
     // Expect test view to be removed from the origin window.
@@ -71,6 +72,13 @@ test.describe('Workbench View', () => {
 
   test('should move an empty-path view in the main grid to a new window', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
+
+    // Register test routes.
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'view-page',
+      canMatch: [canMatchWorkbenchView('test-view')],
+    });
 
     // Define perspective with a view in the main grid.
     await workbenchNavigator.createPerspective(factory => factory
@@ -105,7 +113,7 @@ test.describe('Workbench View', () => {
     });
 
     // Expect test view to display.
-    const viewPage = new ViewPagePO(newWindow.appPO, {viewId: newViewId});
+    const viewPage = new ViewPagePO(newWindow.appPO.view({viewId: newViewId}));
     await expectView(viewPage).toBeActive();
 
     // Expect test view to be removed from the origin window.
@@ -152,7 +160,7 @@ test.describe('Workbench View', () => {
     });
 
     // Expect test view to display.
-    const viewPage = new ViewPagePO(newWindow.appPO, {viewId: newViewId});
+    const viewPage = new ViewPagePO(newWindow.appPO.view({viewId: newViewId}));
     await expectView(viewPage).toBeActive();
 
     // Expect test view to be removed from the origin window.
@@ -204,7 +212,7 @@ test.describe('Workbench View', () => {
     });
 
     // Expect test view to display.
-    const viewPage = new ViewPagePO(newAppPO, {viewId: newViewId});
+    const viewPage = new ViewPagePO(newAppPO.view({viewId: newViewId}));
     await expectView(viewPage).toBeActive();
 
     // Expect test view to be removed from the origin window.
@@ -225,6 +233,13 @@ test.describe('Workbench View', () => {
 
   test('should move a view to another window', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
+
+    // Register test routes.
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'view-page',
+      canMatch: [canMatchWorkbenchView('test-view')],
+    });
 
     await workbenchNavigator.createPerspective(factory => factory
       .addPart('part.part')

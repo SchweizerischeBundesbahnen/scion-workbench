@@ -11,6 +11,7 @@
 import {InjectionToken} from '@angular/core';
 import {UUID} from '@scion/toolkit/uuid';
 import {UID} from './common/uid.util';
+import {isMicrofrontendHostOutlet, MicrofrontendHostOutlet} from './microfrontend-platform/microfrontend-host/microfrontend-host-routes';
 
 /**
  * DI token to get a unique id of the workbench.
@@ -100,24 +101,10 @@ export function isDialogId(dialogId: string | undefined | null): dialogId is Dia
 }
 
 /**
- * Tests if the given outlet matches the format of a dialog outlet.
- */
-export function isDialogOutlet(outlet: string | undefined | null): outlet is DialogOutlet {
-  return isDialogId(outlet);
-}
-
-/**
  * Tests if the given id matches the format of a dialog identifier.
  */
 export function isPopupId(popupId: string | undefined | null): popupId is PopupId {
   return popupId?.startsWith(POPUP_ID_PREFIX) ?? false;
-}
-
-/**
- * Tests if the given outlet matches the format of a popup outlet.
- */
-export function isPopupOutlet(outlet: string | undefined | null): outlet is PopupOutlet {
-  return isPopupId(outlet);
 }
 
 /**
@@ -131,7 +118,7 @@ export function isActivityId(activityId: string | undefined | null): activityId 
  * Tests if the given outlet matches the format of a workbench outlet.
  */
 export function isWorkbenchOutlet(outlet: string | undefined | null): outlet is WorkbenchOutlet {
-  return isPartOutlet(outlet) || isViewOutlet(outlet) || isDialogOutlet(outlet) || isPopupOutlet(outlet);
+  return isPartOutlet(outlet) || isViewOutlet(outlet) || isMicrofrontendHostOutlet(outlet);
 }
 
 /**
@@ -187,19 +174,9 @@ export type ViewOutlet = ViewId;
 export type PartOutlet = PartId;
 
 /**
- * Format of a popup outlet name.
- */
-export type PopupOutlet = PopupId;
-
-/**
- * Format of a dialog outlet name.
- */
-export type DialogOutlet = DialogId;
-
-/**
  * Union of workbench outlets.
  */
-export type WorkbenchOutlet = PartOutlet | ViewOutlet | DialogOutlet | PopupOutlet;
+export type WorkbenchOutlet = PartOutlet | ViewOutlet | MicrofrontendHostOutlet;
 
 /**
  * Represents the id prefix of views.

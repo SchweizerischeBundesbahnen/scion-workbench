@@ -12,6 +12,7 @@ import {Capability, CapabilityInterceptor} from '@scion/microfrontend-platform';
 import {Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchPopupCapability} from '@scion/workbench-client';
 import {Objects} from '../../common/objects.util';
+import {Microfrontends} from '../common/microfrontend.util';
 
 /**
  * Asserts popup capabilities to have required properties.
@@ -35,13 +36,30 @@ export class MicrofrontendPopupCapabilityValidator implements CapabilityIntercep
       throw Error(`[PopupDefinitionError] Popup capability requires properties [app=${app(popupCapability)}, popup=${qualifier(popupCapability)}]`);
     }
 
-    // Assert the popup capability to have a path.
-    const path = popupCapability.properties.path as unknown;
-    if (path === undefined || path === null) {
-      throw Error(`[PopupDefinitionError] Popup capability requires the 'path' property [app=${app(popupCapability)}, popup=${qualifier(popupCapability)}]`);
+    // Assert the popup capability to have a path, unless provided by the host application.
+    this.assertPath(popupCapability);
+
+    // Assert host popup capabilities not to define the "showSplash" property.
+    if (Microfrontends.isHostProvider(capability) && popupCapability.properties.showSplash !== undefined) {
+      throw Error(`[PopupDefinitionError] Property "showSplash" not supported for popup capabilities of the host application [app=${app(popupCapability)}, popup=${qualifier(popupCapability)}]`);
     }
 
     return capability;
+  }
+
+  private assertPath(capability: Partial<WorkbenchPopupCapability>): void {
+    const path = capability.properties?.path as string | undefined | null;
+
+    if (Microfrontends.isHostProvider(capability)) {
+      if (path !== '') {
+        throw Error(`[PopupDefinitionError] Popup capabilities of the host application require an empty path. [app=${app(capability)}, popup=${qualifier(capability)}]. Change the path '${path}' to empty and add 'canMatchWorkbenchPopupCapability(${JSON.stringify(capability.qualifier)})' guard to the route.\n\nExample:\nCapability: { type: 'popup', qualifier: ${JSON.stringify(capability.qualifier)}, properties: {path: ''} }\nRoute: { path: '', canMatch: [canMatchWorkbenchPopupCapability(${JSON.stringify(capability.qualifier)})], component: PopupComponent }`);
+      }
+    }
+    else {
+      if (path === null || path == undefined) {
+        throw Error(`[PopupDefinitionError] Popup capabilities require a path. [app=${app(capability)}, popup=${qualifier(capability)}]`);
+      }
+    }
   }
 }
 

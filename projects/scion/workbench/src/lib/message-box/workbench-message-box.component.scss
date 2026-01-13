@@ -1,5 +1,5 @@
 :host {
-  display: block;
+  display: grid;
   overflow: hidden; // wrap text at message box bounds
   outline: none;
   padding-inline: var(--sci-workbench-messagebox-padding);

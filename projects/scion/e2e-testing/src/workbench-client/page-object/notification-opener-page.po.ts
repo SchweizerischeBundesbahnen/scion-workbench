@@ -8,16 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, rejectWhenAttached} from '../../helper/testing.util';
-import {AppPO} from '../../app.po';
+import {coerceArray, rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
 import {Qualifier} from '@scion/microfrontend-platform';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../view.po';
-import {Translatable, ViewId, WorkbenchNotificationOptions} from '@scion/workbench-client';
+import {Translatable, WorkbenchNotificationOptions} from '@scion/workbench-client';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
+import {AppPO} from '../../app.po';
 
 /**
  * Page object to interact with {@link NotificationOpenerPageComponent}.
@@ -26,14 +26,16 @@ export class NotificationOpenerPagePO implements MicrofrontendViewPagePO {
 
   public readonly locator: Locator;
   public readonly outlet: SciRouterOutletPO;
-  public readonly view: ViewPO;
   public readonly error: Locator;
 
-  constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.outlet = new SciRouterOutletPO(this._appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.locator = this.outlet.frameLocator.locator('app-notification-opener-page');
+  private readonly _appPO: AppPO;
+
+  constructor(public view: ViewPO, options?: {host?: boolean}) {
+    this.outlet = new SciRouterOutletPO(view.locator.page(), {name: view.locateBy?.id, cssClass: view.locateBy?.cssClass});
+    this.locator = (options?.host ? view.locator : this.outlet.frameLocator).locator('app-notification-opener-page');
     this.error = this.locator.locator('output.e2e-notification-open-error');
+
+    this._appPO = new AppPO(this.locator.page());
   }
 
   public async show(message: Translatable, options?: NotificationOpenerPageOptions & WorkbenchNotificationOptions): Promise<void>;
@@ -79,21 +81,14 @@ export class NotificationOpenerPagePO implements MicrofrontendViewPagePO {
     await this.locator.locator('input.e2e-class').fill(coerceArray(options?.cssClass).join(' '));
 
     // Open notification.
+    const notificationCount = await this._appPO.notifications.count();
     await this.locator.locator('button.e2e-show').click();
 
-    if (options?.waitUntilAttached ?? true) {
-      // Evaluate the response: resolve the promise on success, or reject it on error.
-      return Promise.race([
-        this.waitUntilNotificationAttached(),
-        rejectWhenAttached(this.error),
-      ]);
-    }
-  }
-
-  private async waitUntilNotificationAttached(): Promise<void> {
-    const cssClass = (await this.locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
-    const notification = this._appPO.notification({cssClass});
-    await notification.locator.waitFor({state: 'visible'});
+    // Evaluate the response: resolve the promise on success, or reject it on error.
+    return Promise.race([
+      options?.group ? this._appPO.waitUntilIdle() : waitUntilAttached(this._appPO.notifications.nth(notificationCount)),
+      rejectWhenAttached(this.error),
+    ]);
   }
 
   public async pressEscape(): Promise<void> {
@@ -106,10 +101,6 @@ export class NotificationOpenerPagePO implements MicrofrontendViewPagePO {
  * Controls opening of a notification.
  */
 export interface NotificationOpenerPageOptions {
-  /**
-   * Controls if to wait for the notification to display.
-   */
-  waitUntilAttached?: boolean;
   /**
    * Controls if to use the legacy Workbench Notification API.
    *

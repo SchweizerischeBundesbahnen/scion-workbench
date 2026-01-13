@@ -118,7 +118,7 @@ export class ViewMenuService {
     const injector = options?.injector ?? inject(Injector);
     const zone = injector.get(NgZone);
 
-    // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+    // Use root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
     rootEffect(onCleanup => {
       const element = coerceElement(isSignal(elementLike) ? elementLike() : elementLike);
       const view = isSignal(viewLike) ? viewLike() : viewLike;

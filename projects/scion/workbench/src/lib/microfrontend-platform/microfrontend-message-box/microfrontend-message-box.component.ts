@@ -8,14 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, input, untracked, viewChild} from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, input, signal, untracked, viewChild} from '@angular/core';
 import {ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
 import {WorkbenchMessageBoxCapability, ɵMESSAGE_BOX_CONTEXT, ɵMessageBoxContext, ɵWorkbenchCommands} from '@scion/workbench-client';
 import {NgComponentOutlet} from '@angular/common';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
-import {setStyle} from '../../common/dom.util';
 import {Microfrontends} from '../common/microfrontend.util';
 import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog.model';
 
@@ -52,6 +51,7 @@ export class MicrofrontendMessageBoxComponent {
   protected readonly splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
   protected readonly workbenchLayoutService = inject(WorkbenchLayoutService);
   protected readonly dialog = inject(ɵWorkbenchDialog);
+  protected readonly focusWithin = signal(false);
 
   constructor() {
     this._logger.debug(() => 'Constructing MicrofrontendMessageBoxComponent.', LoggerNames.MICROFRONTEND);
@@ -97,6 +97,8 @@ export class MicrofrontendMessageBoxComponent {
 
   protected onFocusWithin(event: Event): void {
     const {detail: focusWithin} = event as CustomEvent<boolean>;
+    this.focusWithin.set(focusWithin);
+
     if (focusWithin) {
       this._host.dispatchEvent(new CustomEvent('sci-microfrontend-focusin', {bubbles: true}));
     }
@@ -133,18 +135,15 @@ export class MicrofrontendMessageBoxComponent {
 
   private setMessageBoxProperties(): void {
     effect(() => {
-      const routerOutletElement = this._routerOutletElement();
       const properties = this.capability().properties;
 
       untracked(() => {
-        setStyle(routerOutletElement, {
-          'width': properties.size?.width ?? '0', // allow content size to go below the default iframe size when reporting preferred size
-          'min-width': properties.size?.minWidth ?? null,
-          'max-width': properties.size?.maxWidth ?? null,
-          'height': properties.size?.height ?? '0', // allow content size to go below the default iframe size when reporting preferred size
-          'min-height': properties.size?.minHeight ?? null,
-          'max-height': properties.size?.maxHeight ?? null,
-        });
+        this.dialog.size.width = properties.size?.width;
+        this.dialog.size.height = properties.size?.height;
+        this.dialog.size.minWidth = properties.size?.minWidth;
+        this.dialog.size.maxWidth = properties.size?.maxWidth;
+        this.dialog.size.minHeight = properties.size?.minHeight;
+        this.dialog.size.maxHeight = properties.size?.maxHeight;
       });
     });
   }

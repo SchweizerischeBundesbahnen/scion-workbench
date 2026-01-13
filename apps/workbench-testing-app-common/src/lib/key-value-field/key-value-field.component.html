@@ -1,0 +1,15 @@
+<header>
+  <!-- Add Button -->
+  <button (click)="onAdd()" class="e2e-add" type="button" title="Add Entry" sciMaterialIcon>add</button>
+  <!-- Clear Button -->
+  <button (click)="onClear()" class="e2e-clear" type="button" title="Clear All Entries" sciMaterialIcon>clear</button>
+</header>
+
+@for (entryField of form; track $index) {
+  <!-- Key -->
+  <input [field]="entryField.key" class="e2e-key">
+  <!-- Value -->
+  <input [field]="entryField.value" class="e2e-value">
+  <!-- Remove Button -->
+  <button class="e2e-remove" type="button" (click)="onRemove($index)" title="Remove Entry" sciMaterialIcon>remove</button>
+}
