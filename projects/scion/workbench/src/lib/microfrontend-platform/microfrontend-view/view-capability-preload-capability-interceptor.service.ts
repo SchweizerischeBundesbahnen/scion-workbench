@@ -13,6 +13,7 @@ import {inject, Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchViewCapability} from '@scion/workbench-client';
 import '../microfrontend-platform.config';
 import {Logger} from '../../logging';
+import {Microfrontends} from '../common/microfrontend.util';
 
 /**
  * Configures view capabilities not defining {@link WorkbenchViewCapability.properties.lazy} to preload views to maintain compatibility with applications setting view titles and headings in view microfrontends.
@@ -30,6 +31,12 @@ export class ViewCapabilityPreloadCapabilityInterceptor implements CapabilityInt
     }
 
     const viewCapability = capability as WorkbenchViewCapability;
+
+    // Lazy is not supported for host view capabilities.
+    if (Microfrontends.isHostProvider(capability)) {
+      return viewCapability;
+    }
+
     if (viewCapability.properties.lazy === undefined) {
       viewCapability.properties.lazy = false;
       const appSymbolicName = viewCapability.metadata?.appSymbolicName;

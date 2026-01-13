@@ -8,38 +8,32 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {EnvironmentProviders, inject, Injectable, makeEnvironmentProviders} from '@angular/core';
+import {assertNotInReactiveContext, computed, EnvironmentProviders, inject, Injectable, makeEnvironmentProviders, Signal, signal, untracked} from '@angular/core';
 import {Capability, ManifestService} from '@scion/microfrontend-platform';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {BehaviorSubject, Observable} from 'rxjs';
-import {distinctUntilChanged, map, startWith} from 'rxjs/operators';
 import {tapFirst} from '@scion/toolkit/operators';
 import {provideMicrofrontendPlatformInitializer} from './microfrontend-platform-initializer';
+import {map} from 'rxjs/operators';
 
 @Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class ManifestObjectCache {
 
-  private readonly _manifestService = inject(ManifestService);
-  private readonly _capabilities$ = new BehaviorSubject(new Map<string, Capability>());
+  public readonly capabilities = signal(new Map<string, Capability>());
 
   public async init(): Promise<void> {
+    const manifestService = inject(ManifestService);
+
     return new Promise<void>(resolve => {
-      this._manifestService.lookupCapabilities$()
+      manifestService.lookupCapabilities$()
         .pipe(
+          map(capabilities => capabilities.reduce((acc, capability) => acc.set(capability.metadata!.id, capability), new Map<string, Capability>())),
           tapFirst(() => resolve()),
           takeUntilDestroyed(),
         )
         .subscribe(capabilities => {
-          this._capabilities$.next(capabilities.reduce((acc, capability) => acc.set(capability.metadata!.id, capability), new Map<string, Capability>()));
+          this.capabilities.set(capabilities);
         });
     });
-  }
-
-  /**
-   * Tests if given capability exists.
-   */
-  public hasCapability(capabilityId: string): boolean {
-    return this._capabilities$.value.has(capabilityId);
   }
 
   /**
@@ -48,7 +42,7 @@ export class ManifestObjectCache {
   public getCapability<T extends Capability = Capability>(capabilityId: string): T;
   public getCapability<T extends Capability = Capability>(capabilityId: string, options: {orElse: null}): T | null;
   public getCapability<T extends Capability = Capability>(capabilityId: string, options?: {orElse: null}): T | null {
-    const capability = this._capabilities$.value.get(capabilityId) as T | undefined;
+    const capability = untracked(() => this.capabilities().get(capabilityId) as T | undefined);
     if (!capability && !options) {
       throw Error(`[NullCapabilityError] No capability found with id '${capabilityId}'.`);
     }
@@ -56,17 +50,17 @@ export class ManifestObjectCache {
   }
 
   /**
-   * Looks up specified capability.
+   * Gets the specified capability, or `undefined` if not found.
    *
-   * Upon subscription, emits the requested capability, and then emits continuously when it changes. It never completes.
+   * Method must not be called in a reactive context.
    */
-  public observeCapability$<T extends Capability = Capability>(capabilityId: string): Observable<T | null> {
-    return this._capabilities$
-      .pipe(
-        startWith(undefined as void),
-        map(() => this.getCapability<T>(capabilityId, {orElse: null})),
-        distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
-      );
+  public observeCapability<T extends Capability = Capability>(capabilityId: Signal<string>): Signal<T | undefined> {
+    assertNotInReactiveContext(this.observeCapability, 'Call ManifestObjectCache.computeCapability() in a non-reactive (non-tracking) context, such as within the untracked() function.');
+
+    return computed(
+      () => this.capabilities().get(capabilityId()) as T | undefined,
+      {equal: (a, b) => a?.metadata!.id === b?.metadata!.id},
+    );
   }
 }
 

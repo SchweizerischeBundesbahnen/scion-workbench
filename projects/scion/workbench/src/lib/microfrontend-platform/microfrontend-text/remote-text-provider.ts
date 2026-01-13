@@ -176,7 +176,7 @@ export function createRemoteTranslatable(translatable: undefined, config: {appSy
 export function createRemoteTranslatable(translatable: Translatable, config: {appSymbolicName: string; valueParams?: {[name: string]: unknown} | Map<string, unknown>; topicParams?: {[name: string]: string} | Map<string, string>}): Translatable;
 export function createRemoteTranslatable(translatable: Translatable | undefined, config: {appSymbolicName: string; valueParams?: {[name: string]: unknown} | Map<string, unknown>; topicParams?: {[name: string]: string} | Map<string, string>}): Translatable | undefined;
 export function createRemoteTranslatable(translatable: Translatable | undefined, config: {appSymbolicName: string; valueParams?: {[name: string]: unknown} | Map<string, unknown>; topicParams?: {[name: string]: string} | Map<string, string>}): Translatable | undefined {
-  if (!translatable) {
+  if (!translatable || translatable === '%') {
     return translatable;
   }
 

@@ -11,12 +11,7 @@
 import {Route} from '@angular/router';
 import {EnvironmentProviders, makeEnvironmentProviders} from '@angular/core';
 import {WORKBENCH_ROUTE} from '../../workbench.constants';
-import {canMatchWorkbenchDialog} from '../../routing/workbench-route-guards';
-
-/**
- * Route for the built-in text message box capability provided by the workbench host application.
- */
-export const TEXT_MESSAGE_BOX_CAPABILITY_ROUTE = '~/messagebox';
+import {canMatchWorkbenchMessageBoxCapability} from '../microfrontend-host/microfrontend-host-routes';
 
 /**
  * Provides the route for the built-in {@link WorkbenchMessageBoxCapability}.
@@ -25,12 +20,12 @@ export function provideMicrofrontendTextMessageBoxRoute(): EnvironmentProviders 
   return makeEnvironmentProviders([
     {
       provide: WORKBENCH_ROUTE,
-      multi: true,
-      useValue: {
-        path: TEXT_MESSAGE_BOX_CAPABILITY_ROUTE,
+      useFactory: (): Route => ({
+        path: '',
         loadComponent: () => import('../microfrontend-host-message-box/text-message/text-message.component'),
-        canMatch: [canMatchWorkbenchDialog(true)],
-      } satisfies Route,
+        canMatch: [canMatchWorkbenchMessageBoxCapability({})],
+      }),
+      multi: true,
     },
   ]);
 }

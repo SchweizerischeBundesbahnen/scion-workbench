@@ -71,6 +71,7 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
         data: command.close ? undefined : {
           capabilityId: capability.metadata!.id,
           params,
+          referrer: message.headers.get(MessageHeaders.AppSymbolicName) as string,
         } satisfies MicrofrontendViewNavigationData,
         state: {
           [MICROFRONTEND_VIEW_STATE_TRANSIENT_PARAMS]: Object.keys(transientParams).length ? transientParams : undefined,

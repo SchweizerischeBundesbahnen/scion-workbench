@@ -14,4 +14,8 @@
 export interface MicrofrontendPartNavigationData {
   capabilityId: string;
   params: {[name: string]: unknown};
+  /**
+   * Symbolic name of the application that added the part to the layout.
+   */
+  referrer: string;
 }

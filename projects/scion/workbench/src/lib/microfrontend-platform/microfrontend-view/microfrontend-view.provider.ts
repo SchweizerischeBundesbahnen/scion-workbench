@@ -17,12 +17,13 @@ import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializ
 import {provideViewCommandHandlers} from './microfrontend-view-command-handler.service';
 import {MicrofrontendViewIntentHandler} from './microfrontend-view-intent-handler.interceptor';
 import {MicrofrontendViewTransientParameterDeprecationLogger} from './microfrontend-view-transient-parameter-deprecation-logger.interceptor';
-import {ViewCapabilityPreloadCapabilityInterceptor} from '../initialization/view-capability-preload-capability-interceptor.service';
+import {ViewCapabilityPreloadCapabilityInterceptor} from './view-capability-preload-capability-interceptor.service';
 import {MicrofrontendViewCapabilityValidator} from './microfrontend-view-capability-validator.interceptor';
 import {provideMicrofrontendViewRoute} from './microfrontend-view-routes';
 import {MicrofrontendViewIntentionProvider} from './microfrontend-view-intention-provider.interceptor';
 import {WORKBENCH_VIEW_CONTEXT} from '../../view/workbench-view-context.provider';
 import {WorkbenchView} from '../../view/workbench-view.model';
+import {provideLegacyMicrofrontendViewRoute} from './legacy-microfrontend-view-navigation-migration';
 
 /**
  * Provides a set of DI providers enabling microfrontend view support.
@@ -37,6 +38,7 @@ export function provideMicrofrontendView(): EnvironmentProviders {
     ViewCapabilityPreloadCapabilityInterceptor,
     MicrofrontendViewTransientParameterDeprecationLogger,
     provideMicrofrontendViewRoute(),
+    provideLegacyMicrofrontendViewRoute(),
     provideViewCommandHandlers(),
     provideStableCapabilityId(WorkbenchCapabilities.View),
     provideWorkbenchViewContext(),

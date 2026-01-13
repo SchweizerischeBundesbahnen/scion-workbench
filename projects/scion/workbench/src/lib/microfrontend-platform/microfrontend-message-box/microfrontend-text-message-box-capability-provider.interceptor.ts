@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {HostManifestInterceptor, Manifest} from '@scion/microfrontend-platform';
 import {eMESSAGE_BOX_MESSAGE_PARAM, WorkbenchCapabilities, WorkbenchMessageBoxCapability} from '@scion/workbench-client';
 import {TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY, TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY_PROPERTY} from '../microfrontend-host-message-box/text-message/text-message.component';
-import {TEXT_MESSAGE_BOX_CAPABILITY_ROUTE} from '../microfrontend-message-box/microfrontend-message-box-routes';
 
 /**
  * Adds the built-in {@link WorkbenchMessageBoxCapability} to the host manifest.
@@ -24,7 +23,7 @@ export class MicrofrontendTextMessageBoxCapabilityProvider implements HostManife
           },
         ],
         properties: {
-          path: TEXT_MESSAGE_BOX_CAPABILITY_ROUTE,
+          path: '',
           [TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY_PROPERTY]: TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY,
         },
         private: false,

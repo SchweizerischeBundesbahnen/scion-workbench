@@ -11,13 +11,13 @@
 import {DestroyRef, EnvironmentProviders, inject, Injectable, Injector, makeEnvironmentProviders, NgZone, Provider} from '@angular/core';
 import {MicrofrontendPlatform, MicrofrontendPlatformConfig, MicrofrontendPlatformHost, ObservableDecorator} from '@scion/microfrontend-platform';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {Logger, LoggerNames} from '../../logging';
+import {Logger, LoggerNames} from '../logging';
 import {NgZoneObservableDecorator} from './ng-zone-observable-decorator';
-import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer, runMicrofrontendPlatformInitializers} from '../microfrontend-platform-initializer';
-import {MicrofrontendPlatformConfigLoader} from '../microfrontend-platform-config-loader';
+import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer, runMicrofrontendPlatformInitializers} from './microfrontend-platform-initializer';
+import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform-config-loader';
 import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter, WorkbenchTextService, ɵWorkbenchDialogService, ɵWorkbenchMessageBoxService, ɵWorkbenchNotificationService, ɵWorkbenchPopupService, ɵWorkbenchRouter, ɵWorkbenchTextService} from '@scion/workbench-client';
-import {WorkbenchConfig} from '../../workbench-config';
-import {provideWorkbenchInitializer} from '../../startup/workbench-initializer';
+import {WorkbenchConfig} from '../workbench-config';
+import {provideWorkbenchInitializer} from '../startup/workbench-initializer';
 
 /**
  * Provides a set of DI providers starting the SCION Microfrontend Platform.

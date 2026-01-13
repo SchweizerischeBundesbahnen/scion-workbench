@@ -19,6 +19,7 @@ import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializ
 import {MicrofrontendPartIntentionProvider} from './microfrontend-part-intention-provider.interceptor';
 import {WORKBENCH_PART_CONTEXT} from '../../part/workbench-part-context.provider';
 import {WorkbenchPart} from '../../part/workbench-part.model';
+import {provideLegacyMicrofrontendPartRoute} from './legacy-microfrontend-part-navigation-migration';
 
 /**
  * Provides a set of DI providers enabling microfrontend part support.
@@ -30,6 +31,7 @@ export function provideMicrofrontendPart(): EnvironmentProviders {
     MicrofrontendPartIntentionProvider,
     MicrofrontendPartCapabilityValidator,
     provideMicrofrontendPartRoute(),
+    provideLegacyMicrofrontendPartRoute(),
     provideStableCapabilityId(WorkbenchCapabilities.Part),
     provideWorkbenchPartContext(),
     provideMicrofrontendPlatformInitializer(onPreStartup, {phase: MicrofrontendPlatformStartupPhase.PreStartup}),

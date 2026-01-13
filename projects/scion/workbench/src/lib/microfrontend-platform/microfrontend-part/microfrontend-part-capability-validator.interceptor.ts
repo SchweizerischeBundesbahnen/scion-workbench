@@ -12,6 +12,7 @@ import {Capability, CapabilityInterceptor} from '@scion/microfrontend-platform';
 import {Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchPartCapability, WorkbenchViewRef} from '@scion/workbench-client';
 import {Objects} from '../../common/objects.util';
+import {Microfrontends} from '../common/microfrontend.util';
 
 /**
  * Asserts part capabilities to have required properties.
@@ -50,7 +51,37 @@ export class MicrofrontendPartCapabilityValidator implements CapabilityIntercept
       }
     });
 
+    // Assert the path of the part capability.
+    if (partCapability.properties?.path !== undefined) {
+      this.assertPath(partCapability);
+    }
+
+    // Assert host part capabilities not to define the "showSplash" property.
+    if (Microfrontends.isHostProvider(capability) && partCapability.properties?.showSplash !== undefined) {
+      throw Error(`[PartDefinitionError] Property "showSplash" not supported for part capabilities of the host application [app=${app(partCapability)}, part=${qualifier(partCapability)}]`);
+    }
+
+    // Assert "showSplash" property not to be defined if part has no path.
+    if (partCapability.properties?.path === undefined && partCapability.properties?.showSplash !== undefined) {
+      throw Error(`[PartDefinitionError] Property "showSplash" only supported for part capabilities with a path [app=${app(partCapability)}, part=${qualifier(partCapability)}]`);
+    }
+
     return capability;
+  }
+
+  private assertPath(capability: Partial<WorkbenchPartCapability>): void {
+    const path = capability.properties?.path as string | null;
+
+    if (Microfrontends.isHostProvider(capability)) {
+      if (path === null || path.length) {
+        throw Error(`[PartDefinitionError] Part capabilities of the host application require an empty path. [app=${app(capability)}, part=${qualifier(capability)}]. Change the path '${path}' to empty and add 'canMatchWorkbenchPartCapability(${JSON.stringify(capability.qualifier)})' guard to the route.\n\nExample:\nCapability: { type: 'part', qualifier: ${JSON.stringify(capability.qualifier)}, properties: {path: ''} }\nRoute: { path: '', canMatch: [canMatchWorkbenchPartCapability(${JSON.stringify(capability.qualifier)})], component: PartComponent }`);
+      }
+    }
+    else {
+      if (path === null) {
+        throw Error(`[PartDefinitionError] Part capabilities require a path. [app=${app(capability)}, part=${qualifier(capability)}]`);
+      }
+    }
   }
 }
 
