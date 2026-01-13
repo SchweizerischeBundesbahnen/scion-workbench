@@ -15,7 +15,7 @@ import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-fie
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
-import {Commands, NavigationData, NavigationState, ViewId, WorkbenchNavigationExtras} from '@scion/workbench';
+import {Commands, NavigationData, NavigationState, WorkbenchNavigationExtras} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link RouterPageComponent}.
@@ -25,11 +25,12 @@ export class RouterPagePO implements WorkbenchViewPagePO {
   public static readonly selector = 'app-router-page';
 
   public readonly locator: Locator;
-  public readonly view: ViewPO;
 
-  constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.locator = this.view.locator.locator('app-router-page');
+  private readonly _appPO: AppPO;
+
+  constructor(public view: ViewPO) {
+    this.locator = view.locator.locator('app-router-page');
+    this._appPO = new AppPO(this.locator.page());
   }
 
   /**
@@ -75,6 +76,8 @@ export class RouterPagePO implements WorkbenchViewPagePO {
     await this.enterTarget(extras?.target);
     await this.enterHint(extras?.hint);
     await this.enterData(extras?.data);
+    await this.enterQueryParams(extras?.queryParams);
+    await this.enterFragment(extras?.fragment);
     await this.enterState(extras?.state);
     await this.checkActivate(extras?.activate);
     await this.checkClose(extras?.close);
@@ -88,6 +91,16 @@ export class RouterPagePO implements WorkbenchViewPagePO {
     const dataField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-data'));
     await dataField.clear();
     await dataField.addEntries(data ?? {});
+  }
+
+  private async enterQueryParams(queryParams?: {[name: string]: string} | null): Promise<void> {
+    const dataField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-query-params'));
+    await dataField.clear();
+    await dataField.addEntries(queryParams ?? {});
+  }
+
+  private async enterFragment(fragment?: string): Promise<void> {
+    await this.locator.locator('input.e2e-fragment').fill(fragment ?? '');
   }
 
   private async enterState(state?: NavigationState): Promise<void> {

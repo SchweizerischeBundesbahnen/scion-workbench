@@ -11,8 +11,7 @@
 import {ViewPO} from '../../view.po';
 import {Locator} from '@playwright/test';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
-import {AppPO} from '../../app.po';
-import {ViewId} from '@scion/workbench';
+import {PartPO} from '../../part.po';
 
 /**
  * Page object to interact with {@link NullContentComponent}.
@@ -24,8 +23,8 @@ export class NullContentPagePO implements WorkbenchViewPagePO {
   public readonly locator: Locator;
   public readonly view: ViewPO;
 
-  constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.locator = this.view.locator.locator('wb-null-content');
+  constructor(locateBy: PartPO | ViewPO) {
+    this.locator = locateBy.locator.locator('wb-null-content');
+    this.view = locateBy instanceof ViewPO ? locateBy : undefined!;
   }
 }

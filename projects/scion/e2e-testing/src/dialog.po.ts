@@ -8,31 +8,32 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Locator} from '@playwright/test';
-import {DomRect, fromRect} from './helper/testing.util';
+import {Locator, Page} from '@playwright/test';
+import {coerceArray, selectBy, DomRect, fromRect} from './helper/testing.util';
 import {AppPO} from './app.po';
 import {DialogId} from '@scion/workbench';
+import {RequireOne} from './helper/utility-types';
 
 /**
  * PO for interacting with a workbench dialog.
  */
 export class DialogPO {
 
+  public readonly locator: Locator;
   public readonly dialog: Locator;
-
   public readonly header: Locator;
   public readonly title: Locator;
   public readonly closeButton: Locator;
   public readonly resizeHandles: Locator;
   public readonly slot: Locator;
   public readonly footer: Locator;
+  public readonly contentScrollbars: {vertical: Locator; horizontal: Locator};
+  public readonly locateBy?: {id?: DialogId; cssClass?: string[]};
 
-  public readonly contentScrollbars: {
-    vertical: Locator;
-    horizontal: Locator;
-  };
+  constructor(page: Page, locateBy: RequireOne<{dialogId: DialogId; cssClass: string | string[]}>, options?: {nth?: number}) {
+    this.locateBy = {id: locateBy.dialogId, cssClass: coerceArray(locateBy.cssClass)};
+    this.locator = page.locator(selectBy('wb-dialog', {attributes: {'data-dialogid': locateBy.dialogId}, cssClass: locateBy.cssClass})).nth(options?.nth ?? 0);
 
-  constructor(public readonly locator: Locator) {
     this.dialog = this.locator.locator('div.e2e-dialog');
     this.header = this.dialog.locator('header.e2e-dialog-header');
     this.title = this.header.locator('div.e2e-title > span');

@@ -2,12 +2,6 @@
   <sci-viewport cdkTrapFocus>
     <router-outlet/>
   </sci-viewport>
-  <section class="metadata">
-    @if (focusMonitor!.focus$ | async) {
-      <span class="chip has-focus e2e-has-focus">has-focus</span>
-    }
-    <span class="chip app-symbolic-name" [class.has-focus]="focusMonitor!.focus$ | async">{{appSymbolicName}}</span>
-  </section>
 } @else {
   <span class="workbench-context-note">This application is designed to run in the context of a workbench application.</span>
 }

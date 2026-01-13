@@ -8,9 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../../app.po';
-import {FrameLocator, Locator} from '@playwright/test';
-import {DomRect, fromRect, getCssClasses} from '../../helper/testing.util';
+import {FrameLocator, Locator, Page} from '@playwright/test';
+import {selectBy, DomRect, fromRect, getCssClasses} from '../../helper/testing.util';
 
 /**
  * Page object to interact with {@link SciRouterOutletElement}.
@@ -30,8 +29,11 @@ export class SciRouterOutletPO {
    */
   public readonly splash: Locator;
 
-  constructor(appPO: AppPO, locateBy: {name?: string; cssClass?: string | string[]; locator?: Locator}) {
-    this.locator = locateBy.locator ?? appPO.page.locator(this.createRouterOutletSelector(locateBy));
+  constructor(page: Page, locateBy: {name?: string; cssClass?: string | string[]}) {
+    if (!locateBy.name && !locateBy.cssClass?.length) {
+      throw Error('[PageObjectError] Missing required name or CSS class to locate SciRouterOutlet.');
+    }
+    this.locator = page.locator(selectBy('sci-router-outlet', {attributes: {name: locateBy.name}, cssClass: locateBy.cssClass}));
     this.frameLocator = this.locator.frameLocator('iframe');
     this.splash = this.locator.locator('wb-microfrontend-splash');
   }
@@ -54,24 +56,5 @@ export class SciRouterOutletPO {
 
   public getCssClasses(): Promise<string[]> {
     return getCssClasses(this.locator);
-  }
-
-  private createRouterOutletSelector(locateBy: {name?: string; cssClass?: string | string[]}): string {
-    if (locateBy.name && locateBy.cssClass) {
-      return new Array<string>()
-        .concat(`sci-router-outlet[name="${locateBy.name}"]`)
-        .concat(locateBy.cssClass)
-        .join('.');
-    }
-    else if (locateBy.name) {
-      return `sci-router-outlet[name="${locateBy.name}"]`;
-    }
-    else if (locateBy.cssClass) {
-      return new Array<string>()
-        .concat('sci-router-outlet')
-        .concat(locateBy.cssClass)
-        .join('.');
-    }
-    throw Error('[RouterOutletSelectorError] Missing required outlet name or CSS class');
   }
 }

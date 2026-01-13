@@ -11,10 +11,11 @@
 import {Component, inject} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Intention, ManifestService} from '@scion/microfrontend-platform';
-import {WorkbenchCapabilities, WorkbenchView} from '@scion/workbench-client';
+import {WORKBENCH_ELEMENT, WorkbenchCapabilities, WorkbenchElement} from '@scion/workbench-client';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {stringifyError} from 'workbench-testing-app-common';
+import {Beans} from '@scion/toolkit/bean-manager';
 
 @Component({
   selector: 'app-register-workbench-intention-page',
@@ -42,7 +43,7 @@ export class RegisterWorkbenchIntentionPageComponent {
   protected registerError: string | undefined;
 
   constructor() {
-    inject(WorkbenchView).signalReady();
+    Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.signalReady();
   }
 
   protected async onRegister(): Promise<void> {

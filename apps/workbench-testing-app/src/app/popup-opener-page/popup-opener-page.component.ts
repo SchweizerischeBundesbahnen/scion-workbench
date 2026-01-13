@@ -11,7 +11,7 @@
 import {Component, ElementRef, inject, Type, viewChild} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {DialogId, PartId, PopupId, PopupOrigin, PopupService, ViewId, WorkbenchPopupService} from '@scion/workbench';
-import {PopupPageComponent} from '../popup-page/popup-page.component';
+import PopupPageComponent from '../popup-page/popup-page.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import {map, startWith, switchMap} from 'rxjs/operators';
 import {Observable, of, timer} from 'rxjs';

@@ -107,9 +107,6 @@
       "qualifier": {
         "part": "main-area",
         "perspective": "sample-perspective-1"
-      },
-      "properties": {
-        "showSplash": true
       }
     },
     {
@@ -120,11 +117,11 @@
       },
       "properties": {
         "path": "test-part",
+        "showSplash": true,
         "extras": {
           "icon": "folder",
           "label": "Projects"
-        },
-        "showSplash": true
+        }
       }
     },
     {
@@ -135,11 +132,11 @@
       },
       "properties": {
         "path": "test-part",
+        "showSplash": true,
         "extras": {
           "icon": "mail",
           "label": "Inbox"
-        },
-        "showSplash": true
+        }
       }
     },
     {
@@ -150,11 +147,11 @@
       },
       "properties": {
         "path": "test-part",
+        "showSplash": true,
         "extras": {
           "icon": "bookmark",
           "label": "Bookmarks"
-        },
-        "showSplash": true
+        }
       }
     },
     {
@@ -187,8 +184,7 @@
         "extras": {
           "icon": "search",
           "label": "Find"
-        },
-        "showSplash": true
+        }
       }
     },
     {
@@ -199,11 +195,11 @@
       },
       "properties": {
         "path": "test-part",
+        "showSplash": true,
         "extras": {
           "icon": "inventory",
           "label": "Inventory"
-        },
-        "showSplash": true
+        }
       }
     },
     {
@@ -214,11 +210,11 @@
       },
       "properties": {
         "path": "test-part",
+        "showSplash": true,
         "extras": {
           "icon": "notifications",
           "label": "Notifications"
-        },
-        "showSplash": true
+        }
       }
     },
     {
@@ -229,11 +225,11 @@
       },
       "properties": {
         "path": "test-part",
+        "showSplash": true,
         "extras": {
           "icon": "overview",
           "label": "Progress"
-        },
-        "showSplash": true
+        }
       }
     },
     {
@@ -246,8 +242,7 @@
         "extras": {
           "icon": "error",
           "label": "Problems"
-        },
-        "showSplash": true
+        }
       }
     },
     {
@@ -326,9 +321,6 @@
       "qualifier": {
         "part": "main-area",
         "perspective": "sample-perspective-2"
-      },
-      "properties": {
-        "showSplash": true
       }
     },
     {
@@ -338,8 +330,8 @@
         "perspective": "sample-perspective-2"
       },
       "properties": {
-        "path": "test-part",
         "title": "Projects",
+        "path": "test-part",
         "showSplash": true
       }
     },
@@ -350,8 +342,8 @@
         "perspective": "sample-perspective-2"
       },
       "properties": {
-        "path": "test-part",
         "title": "Inbox",
+        "path": "test-part",
         "showSplash": true
       }
     },
@@ -382,8 +374,7 @@
               "app": "app1"
             }
           }
-        ],
-        "showSplash": true
+        ]
       }
     },
     {
@@ -393,8 +384,8 @@
         "perspective": "sample-perspective-2"
       },
       "properties": {
-        "path": "test-part",
         "title": "Inventory",
+        "path": "test-part",
         "showSplash": true,
         "views": [
           {

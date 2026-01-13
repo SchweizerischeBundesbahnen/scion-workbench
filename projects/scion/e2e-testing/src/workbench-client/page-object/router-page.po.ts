@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {Qualifier} from '@scion/microfrontend-platform';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
@@ -17,7 +16,8 @@ import {Locator} from '@playwright/test';
 import {coerceArray, rejectWhenAttached} from '../../helper/testing.util';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
-import {ViewId, WorkbenchNavigationExtras} from '@scion/workbench-client';
+import {WorkbenchNavigationExtras} from '@scion/workbench-client';
+import {AppPO} from '../../app.po';
 
 /**
  * Page object to interact with {@link RouterPageComponent} of workbench-client testing app.
@@ -25,13 +25,13 @@ import {ViewId, WorkbenchNavigationExtras} from '@scion/workbench-client';
 export class RouterPagePO implements MicrofrontendViewPagePO {
 
   public readonly locator: Locator;
-  public readonly view: ViewPO;
   public readonly outlet: SciRouterOutletPO;
+  private readonly _appPO: AppPO;
 
-  constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.outlet = new SciRouterOutletPO(this._appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.locator = this.outlet.frameLocator.locator('app-router-page');
+  constructor(public view: ViewPO, options?: {host?: boolean}) {
+    this.outlet = new SciRouterOutletPO(view.locator.page(), {name: view.locateBy?.id, cssClass: view.locateBy?.cssClass});
+    this.locator = (options?.host ? view.locator : this.outlet.frameLocator).locator('app-router-page');
+    this._appPO = new AppPO(this.locator.page());
   }
 
   /**

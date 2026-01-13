@@ -9,7 +9,7 @@
  */
 
 import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
-import {workbenchManifest} from '../app/workbench.manifest';
+import {hostAppManifest} from '../app/host-app.manifest';
 import packageJson from '../../../../projects/scion/workbench/package.json';
 
 const version = packageJson.version.replace(/\./g, '-');
@@ -20,7 +20,8 @@ const version = packageJson.version.replace(/\./g, '-');
 const microfrontendPlatformConfig: MicrofrontendPlatformConfig = {
   host: {
     symbolicName: 'workbench-host-app',
-    manifest: workbenchManifest,
+    manifest: hostAppManifest,
+    intentionRegisterApiDisabled: false,
   },
   applications: [
     {symbolicName: 'workbench-client-testing-app1', manifestUrl: `https://workbench-client-testing-app1-v${version}.scion.vercel.app/manifest-app1.json`, intentionRegisterApiDisabled: false},
@@ -32,6 +33,7 @@ const microfrontendPlatformConfig: MicrofrontendPlatformConfig = {
 export const environment = {
   animationEnabled: true,
   logAngularChangeDetectionCycles: false,
+  showMicrofrontendApplicationLabels: true,
   initialPerspective: 'activity-perspective-1',
   microfrontendPlatformConfig,
 };

@@ -9,7 +9,7 @@
  */
 
 import {ChangeDetectionStrategy, Component, effect, inject, Injector, runInInjectionContext, signal, untracked, WritableSignal} from '@angular/core';
-import {PerspectiveData} from '../workbench.perspectives';
+import {PerspectiveData} from '../app.perspectives';
 import {MenuItem, MenuItemSeparator} from '../menu/menu-item';
 import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-params';
 import {Router} from '@angular/router';
@@ -146,7 +146,7 @@ export class HeaderComponent {
         text: 'Navigate to Workbench Page',
         cssClass: 'e2e-navigate-to-workbench-page',
         disabled: !this._router.isActive('test-pages/blank-test-page', {paths: 'subset', queryParams: 'ignored', fragment: 'ignored', matrixParams: 'ignored'}),
-        onAction: () => this._router.navigate(['workbench-page']), // Do not navigate to the root page so Angular does not remove the view outlets from the URL.
+        onAction: () => this._router.navigate(['redirect-to-root']), // Do not navigate to the root page so Angular does not remove the view outlets from the URL.
       }),
       new MenuItem({
         text: 'Navigate to Blank Page',
@@ -206,6 +206,11 @@ export class HeaderComponent {
         text: 'Highlight Glasspane',
         checked: this._settingsService.isEnabled('highlightGlasspane'),
         onAction: () => this._settingsService.toggle('highlightGlasspane'),
+      }),
+      new MenuItem({
+        text: 'Show Microfrontend Application Labels',
+        checked: this._settingsService.isEnabled('showMicrofrontendApplicationLabels'),
+        onAction: () => this._settingsService.toggle('showMicrofrontendApplicationLabels'),
       }),
       new MenuItem({
         text: 'Show Skeletons',

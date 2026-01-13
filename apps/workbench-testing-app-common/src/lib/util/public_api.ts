@@ -8,9 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {AppendParamDataTypePipe} from './append-param-data-type.pipe';
+export {AppendDataTypePipe} from './append-data-type.pipe';
 export {NullIfEmptyPipe} from './null-if-empty.pipe';
 export {parseTypedString, parseTypedObject} from './parse-typed-value.util';
 export {prune} from './prune.util';
 export {stringifyError} from './stringify-error.util';
 export {undefinedIfEmpty} from './undefined-if-empty.util';
+export {FieldValidationDirective} from './field-validation.directive';
+export {throwError} from './throw-error.util';
+export {Objects} from './objects.util';

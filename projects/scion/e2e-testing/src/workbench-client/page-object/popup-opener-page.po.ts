@@ -8,8 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, rejectWhenAttached, waitForCondition, waitUntilBoundingBoxStable, waitUntilStable} from '../../helper/testing.util';
-import {AppPO} from '../../app.po';
+import {coerceArray, rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
 import {ViewPO} from '../../view.po';
 import {Qualifier} from '@scion/microfrontend-platform';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
@@ -17,31 +16,46 @@ import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
-import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
-import {BottomLeftPoint, BottomRightPoint, CloseStrategy, DialogId, PartId, PopupId, PopupOrigin, TopLeftPoint, TopRightPoint, ViewId, WorkbenchPopupOptions} from '@scion/workbench-client';
+import {MicrofrontendViewPagePO, WorkbenchViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
+import {BottomLeftPoint, BottomRightPoint, CloseStrategy, PopupOrigin, TopLeftPoint, TopRightPoint, WorkbenchPopupOptions} from '@scion/workbench-client';
 import {PartPO} from '../../part.po';
+import {PopupPO} from '../../popup.po';
+import {DialogPO} from '../../dialog.po';
+import {MicrofrontendDialogPagePO, WorkbenchDialogPagePO} from '../../workbench/page-object/workbench-dialog-page.po';
+import {MicrofrontendPopupPagePO, WorkbenchPopupPagePO} from '../../workbench/page-object/workbench-popup-page.po';
+import {AppPO} from '../../app.po';
 
 /**
  * Page object to interact with {@link PopupOpenerPageComponent}.
  */
-export class PopupOpenerPagePO implements MicrofrontendViewPagePO {
+export class PopupOpenerPagePO implements MicrofrontendViewPagePO, MicrofrontendDialogPagePO, MicrofrontendPopupPagePO, WorkbenchViewPagePO, WorkbenchDialogPagePO, WorkbenchPopupPagePO {
 
   public readonly locator: Locator;
-  public readonly view: ViewPO;
   public readonly part: PartPO;
+  public readonly view: ViewPO;
+  public readonly dialog: DialogPO;
+  public readonly popup: PopupPO;
   public readonly outlet: SciRouterOutletPO;
   public readonly returnValue: Locator;
   public readonly error: Locator;
   public readonly openButton: Locator;
 
-  constructor(private _appPO: AppPO, locateBy: {id?: ViewId | PartId | DialogId; cssClass?: string}) {
-    this.view = this._appPO.view({viewId: locateBy.id as ViewId | undefined, cssClass: locateBy.cssClass});
-    this.part = this._appPO.part({partId: locateBy.id as PartId | undefined, cssClass: locateBy.cssClass});
-    this.outlet = new SciRouterOutletPO(this._appPO, {name: locateBy.id, cssClass: locateBy.cssClass});
-    this.locator = this.outlet.frameLocator.locator('app-popup-opener-page');
+  private readonly _appPO: AppPO;
+
+  constructor(locateBy: PartPO | ViewPO | DialogPO | PopupPO, options?: {host?: boolean}) {
+    this.outlet = new SciRouterOutletPO(locateBy.locator.page(), {name: locateBy.locateBy?.id, cssClass: locateBy.locateBy?.cssClass});
+    this.locator = (options?.host ? locateBy.locator : this.outlet.frameLocator).locator('app-popup-opener-page');
+
+    this.part = locateBy instanceof PartPO ? locateBy : undefined!;
+    this.view = locateBy instanceof ViewPO ? locateBy : undefined!;
+    this.dialog = locateBy instanceof DialogPO ? locateBy : undefined!;
+    this.popup = locateBy instanceof PopupPO ? locateBy : undefined!;
+
     this.returnValue = this.locator.locator('output.e2e-return-value');
     this.error = this.locator.locator('output.e2e-popup-error');
     this.openButton = this.locator.locator('button.e2e-open');
+
+    this._appPO = new AppPO(this.locator.page());
   }
 
   public async open(qualifier: Qualifier, options: PopupOpenerPageOptions & Omit<WorkbenchPopupOptions, 'anchor'>): Promise<void> {
@@ -80,13 +94,11 @@ export class PopupOpenerPagePO implements MicrofrontendViewPagePO {
     const popupCount = await this._appPO.popups.count();
     await this.openButton.click();
 
-    if (options.waitUntilAttached ?? true) {
-      // Evaluate the response: resolve the promise on success, or reject it on error.
-      await Promise.race([
-        this.waitUntilPopupAttached(popupCount),
-        rejectWhenAttached(this.error),
-      ]);
-    }
+    // Evaluate the response: resolve the promise on success, or reject it on error.
+    await Promise.race([
+      waitUntilAttached(this._appPO.popups.nth(popupCount)).then(() => this._appPO.waitUntilIdle()), // Wait until idle to have stable bounding box and focus owner
+      rejectWhenAttached(this.error),
+    ]);
   }
 
   public async enterPosition(position: PopupOrigin): Promise<void> {
@@ -148,36 +160,12 @@ export class PopupOpenerPagePO implements MicrofrontendViewPagePO {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-close-strategy'));
     await accordion.collapse();
   }
-
-  private async waitUntilPopupAttached(prevPopupCount: number): Promise<void> {
-    // Wait until popup attached to the DOM.
-    await waitForCondition(async () => (await this._appPO.popups.count()) > prevPopupCount);
-
-    // Get popup index.
-    const index = await this._appPO.popups.count() - 1;
-    const popupId = await this._appPO.popups.nth(index).getAttribute('data-popupid') as PopupId | null;
-    if (!popupId) {
-      throw Error('[PageObjectError] No popup found');
-    }
-
-    const popup = this._appPO.popup({popupId});
-
-    // Wait for the popup to have a stable size.
-    await waitUntilBoundingBoxStable(popup.locator);
-
-    // Wait for the popup to have focus.
-    await waitUntilStable(async () => (await this._appPO.focusOwner()) === await popup.getPopupId());
-  }
 }
 
 /**
  * Controls opening of a popup.
  */
 export interface PopupOpenerPageOptions {
-  /**
-   * Controls if to wait for the popup to display.
-   */
-  waitUntilAttached?: boolean;
   /**
    * @see WorkbenchPopupOptions.anchor
    */

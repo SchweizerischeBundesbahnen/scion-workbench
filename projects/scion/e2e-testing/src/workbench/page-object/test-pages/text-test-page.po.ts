@@ -10,15 +10,20 @@
 
 import {Locator} from '@playwright/test';
 import {WorkbenchDialogPagePO} from '../workbench-dialog-page.po';
+import {WorkbenchViewPagePO} from '../workbench-view-page.po';
 import {DialogPO} from '../../../dialog.po';
-import {Translatable} from '@scion/workbench';
+import {ViewPO} from '../../../view.po';
 
-export class TextTestPagePO implements WorkbenchDialogPagePO {
+export class TextTestPagePO implements WorkbenchDialogPagePO, WorkbenchViewPagePO {
 
   public readonly locator: Locator;
+  public readonly view: ViewPO;
+  public readonly dialog: DialogPO;
 
-  constructor(public dialog: DialogPO) {
-    this.locator = this.dialog.locator.locator('app-text-test-page');
+  constructor(locateBy: ViewPO | DialogPO) {
+    this.view = locateBy instanceof ViewPO ? locateBy : undefined!;
+    this.dialog = locateBy instanceof DialogPO ? locateBy : undefined!;
+    this.locator = locateBy.locator.locator('app-text-test-page');
   }
 
   public async provideText(key: string, text: string | '<undefined>'): Promise<void> {
@@ -31,10 +36,5 @@ export class TextTestPagePO implements WorkbenchDialogPagePO {
     await this.locator.locator('section.e2e-provide-value input.e2e-key').fill(key);
     await this.locator.locator('section.e2e-provide-value input.e2e-value').fill(value);
     await this.locator.locator('section.e2e-provide-value button.e2e-save').click();
-  }
-
-  public async setDialogTitle(title: Translatable): Promise<void> {
-    await this.locator.locator('section.e2e-dialog-handle input.e2e-title').fill(title);
-    await this.locator.locator('section.e2e-dialog-handle button.e2e-set-title').click();
   }
 }

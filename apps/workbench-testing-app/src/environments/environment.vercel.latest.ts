@@ -9,7 +9,7 @@
  */
 
 import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
-import {workbenchManifest} from '../app/workbench.manifest';
+import {hostAppManifest} from '../app/host-app.manifest';
 
 /**
  * Environment used when packaging the app for Vercel.
@@ -17,7 +17,8 @@ import {workbenchManifest} from '../app/workbench.manifest';
 const microfrontendPlatformConfig: MicrofrontendPlatformConfig = {
   host: {
     symbolicName: 'workbench-host-app',
-    manifest: workbenchManifest,
+    manifest: hostAppManifest,
+    intentionRegisterApiDisabled: false,
   },
   applications: [
     {symbolicName: 'workbench-client-testing-app1', manifestUrl: 'https://workbench-client-testing-app1.scion.vercel.app/manifest-app1.json', intentionRegisterApiDisabled: false},
@@ -29,6 +30,7 @@ const microfrontendPlatformConfig: MicrofrontendPlatformConfig = {
 export const environment = {
   animationEnabled: true,
   logAngularChangeDetectionCycles: false,
+  showMicrofrontendApplicationLabels: true,
   initialPerspective: 'activity-perspective-1',
   microfrontendPlatformConfig,
 };

@@ -13,7 +13,6 @@ import {StartPagePO} from './start-page.po';
 import {expect, Locator, Page} from '@playwright/test';
 import {PartPO} from './part.po';
 import {ViewPO} from './view.po';
-import {ViewTabPO} from './view-tab.po';
 import {PopupPO} from './popup.po';
 import {MessageBoxPO} from './message-box.po';
 import {NotificationPO} from './notification.po';
@@ -29,6 +28,8 @@ import {GridPO} from './grid.po';
 import {DesktopPO} from './desktop.po';
 import {ConsoleLogs} from './helper/console-logs';
 import {MAIN_AREA} from './workbench.model';
+import {NotificationId} from '../../workbench/src/lib/workbench.identifiers';
+import {RouteDescriptor} from 'workbench-testing-app-common';
 
 /**
  * Central point to interact with the testing app in end-to-end tests.
@@ -111,6 +112,15 @@ export class AppPO {
       await this.page.goto('about:blank');
     }
 
+    // Provide routes for registration.
+    if (options?.routes?.length) {
+      await this.navigateTo({microfrontendSupport: false});
+      await this.page.evaluate(routes => {
+        window.sessionStorage.setItem('workbench-host-app.routes', JSON.stringify(routes));
+      }, options.routes);
+      await this.page.goto('about:blank');
+    }
+
     this._workbenchStartupQueryParams = new URLSearchParams();
     if (options?.appConfig) {
       this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.APP_CONFIG_QUERY_PARAM, options.appConfig);
@@ -153,15 +163,28 @@ export class AppPO {
 
     // Perform navigation.
     await this.page.goto((() => {
-      const [baseUrl = '/', hashedUrl = ''] = (options?.url?.split('#') ?? []);
+      const [baseUrl = '/', hashedUrl = '', fragment = ''] = (options?.url?.split('#') ?? []);
+      const url = new Array<string>(baseUrl);
 
-      // Add startup query params to the base URL part.
-      const url = `${baseUrl}?${this._workbenchStartupQueryParams.toString()}#${hashedUrl}`;
-      if (!featureQueryParams.size) {
-        return url;
+      // Append startup query params to the base URL, if any.
+      if (this._workbenchStartupQueryParams.size) {
+        url.push(`?${this._workbenchStartupQueryParams.toString()}`);
       }
-      // Add feature query params to the hashed URL part.
-      return hashedUrl.includes('?') ? `${url}&${featureQueryParams}` : `${url}?${featureQueryParams}`;
+
+      // Append hashed application URL.
+      url.push(`#${hashedUrl}`);
+
+      // Append feature query params to the hashed URL, if any.
+      if (featureQueryParams.size) {
+        url.push(hashedUrl.includes('?') ? `&${featureQueryParams}` : `?${featureQueryParams}`);
+      }
+
+      // Append fragment, if any.
+      if (fragment) {
+        url.push(`#${fragment}`);
+      }
+
+      return url.join('');
     })());
 
     // Wait until the workbench completed startup.
@@ -225,7 +248,7 @@ export class AppPO {
    * Handle for interacting with the active workbench part in the specified grid.
    */
   public activePart(locateBy: {grid: 'main' | 'mainArea' | ActivityId}): PartPO {
-    return new PartPO(this.page.locator(`wb-part[data-grid="${dasherize(locateBy.grid)}"][data-active]`));
+    return new PartPO(this.page, this.page.locator(`wb-part[data-grid="${dasherize(locateBy.grid)}"][data-active]`));
   }
 
   /**
@@ -242,17 +265,8 @@ export class AppPO {
    * @param locateBy.partId - Identifies the part by its id.
    * @param locateBy.cssClass - Identifies the part by its CSS class.
    */
-  public part(locateBy: {partId?: PartId; cssClass?: string}): PartPO {
-    if (locateBy.partId !== undefined && locateBy.cssClass !== undefined) {
-      return new PartPO(this.page.locator(`wb-part[data-partid="${locateBy.partId}"].${locateBy.cssClass}`));
-    }
-    else if (locateBy.partId !== undefined) {
-      return new PartPO(this.page.locator(`wb-part[data-partid="${locateBy.partId}"]`));
-    }
-    else if (locateBy.cssClass !== undefined) {
-      return new PartPO(this.page.locator(`wb-part.${locateBy.cssClass}`));
-    }
-    throw Error(`[PartLocateError] Missing required locator. Either 'partId' or 'cssClass', or both must be set.`);
+  public part(locateBy: RequireOne<{partId: PartId; cssClass: string | string[]}>): PartPO {
+    return new PartPO(this.page, locateBy);
   }
 
   /**
@@ -287,26 +301,8 @@ export class AppPO {
    * @param locateBy.viewId - Identifies the view by its id.
    * @param locateBy.cssClass - Identifies the view by its CSS class.
    */
-  public view(locateBy: {viewId?: ViewId; cssClass?: string}): ViewPO {
-    if (locateBy.viewId !== undefined && locateBy.cssClass !== undefined) {
-      const viewLocator = this.page.locator(`wb-view-slot[data-viewid="${locateBy.viewId}"].${locateBy.cssClass}`);
-      const viewTabLocator = this.page.locator(`wb-view-tab[data-viewid="${locateBy.viewId}"].${locateBy.cssClass}`);
-      const partLocator = this.page.locator(`wb-part:not([data-partid="${MAIN_AREA}"])`, {has: viewTabLocator});
-      return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
-    }
-    else if (locateBy.viewId !== undefined) {
-      const viewLocator = this.page.locator(`wb-view-slot[data-viewid="${locateBy.viewId}"]`);
-      const viewTabLocator = this.page.locator(`wb-view-tab[data-viewid="${locateBy.viewId}"]`);
-      const partLocator = this.page.locator(`wb-part:not([data-partid="${MAIN_AREA}"])`, {has: viewTabLocator});
-      return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
-    }
-    else if (locateBy.cssClass !== undefined) {
-      const viewLocator = this.page.locator(`wb-view-slot.${locateBy.cssClass}`);
-      const viewTabLocator = this.page.locator(`wb-view-tab.${locateBy.cssClass}`);
-      const partLocator: Locator = this.page.locator(`wb-part:not([data-partid="${MAIN_AREA}"])`, {has: viewTabLocator});
-      return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
-    }
-    throw Error(`[ViewLocateError] Missing required locator. Either 'viewId' or 'cssClass', or both must be set.`);
+  public view(locateBy: RequireOne<{viewId: ViewId; cssClass: string | string[]}>): ViewPO {
+    return new ViewPO(this.page, locateBy);
   }
 
   /**
@@ -350,16 +346,8 @@ export class AppPO {
   /**
    * Handle to the specified popup.
    */
-  public popup(locateBy?: {popupId?: PopupId; cssClass?: string | string[]}): PopupPO {
-    let locator = this.page.locator('wb-popup');
-    if (locateBy?.popupId) {
-      locator = locator.locator(`:scope[data-popupid="${locateBy.popupId}"]`);
-    }
-    const cssClasses = coerceArray(locateBy?.cssClass);
-    if (cssClasses.length) {
-      locator = locator.locator(`:scope.${cssClasses.map(escapeCssClass).join('.')}`);
-    }
-    return new PopupPO(locator);
+  public popup(locateBy: RequireOne<{popupId: PopupId; cssClass: string | string[]}>, options?: {nth?: number}): PopupPO {
+    return new PopupPO(this.page, locateBy, options);
   }
 
   /**
@@ -379,32 +367,22 @@ export class AppPO {
   /**
    * Handle to the specified notification.
    */
-  public notification(locateBy?: {cssClass?: string | string[]; nth?: number}): NotificationPO {
-    const cssClasses = coerceArray(locateBy?.cssClass).map(escapeCssClass);
-    const locator = this.page.locator(['wb-notification'].concat(cssClasses).join('.'));
-    return new NotificationPO(locateBy?.nth !== undefined ? locator.nth(locateBy.nth) : locator);
+  public notification(locateBy: RequireOne<{notificationId: NotificationId; cssClass: string | string[]}>, options?: {nth?: number}): NotificationPO {
+    return new NotificationPO(this.page, locateBy, options);
   }
 
   /**
    * Handle to the specified message box.
    */
-  public messagebox(locateBy?: {dialogId?: DialogId; cssClass?: string | string[]; nth?: number}): MessageBoxPO {
-    return new MessageBoxPO(this.dialog({dialogId: locateBy?.dialogId, cssClass: locateBy?.cssClass, nth: locateBy?.nth}));
+  public messagebox(locateBy: RequireOne<{dialogId: DialogId; cssClass: string | string[]}>, options?: {nth?: number}): MessageBoxPO {
+    return new MessageBoxPO(this.dialog(locateBy, options));
   }
 
   /**
    * Handle to the specified dialog.
    */
-  public dialog(locateBy?: {dialogId?: DialogId; cssClass?: string | string[]; nth?: number}): DialogPO {
-    let locator = this.page.locator('wb-dialog');
-    if (locateBy?.dialogId) {
-      locator = locator.locator(`:scope[data-dialogid="${locateBy.dialogId}"]`);
-    }
-    const cssClasses = coerceArray(locateBy?.cssClass);
-    if (cssClasses.length) {
-      locator = locator.locator(`:scope.${cssClasses.map(escapeCssClass).join('.')}`);
-    }
-    return new DialogPO(locateBy?.nth !== undefined ? locator.nth(locateBy.nth) : locator);
+  public dialog(locateBy: RequireOne<{dialogId: DialogId; cssClass: string | string[]}>, options?: {nth?: number}): DialogPO {
+    return new DialogPO(this.page, locateBy, options);
   }
 
   /**
@@ -438,6 +416,13 @@ export class AppPO {
    */
   public async waitUntilWorkbenchStarted(): Promise<void> {
     await this.page.locator('wb-workbench wb-layout').waitFor({state: 'visible'});
+  }
+
+  /**
+   * Waits for the browser to become idle.
+   */
+  public async waitUntilIdle(timeout?: number): Promise<void> {
+    return this.page.evaluate((timeout: number | undefined) => new Promise<void>(resolve => requestIdleCallback(() => resolve(), {timeout})), timeout);
   }
 
   /**
@@ -591,6 +576,10 @@ export interface Options {
    * Specifies data to be in local storage.
    */
   localStorage?: {[key: string]: string};
+  /**
+   * Specifies routes to register.
+   */
+  routes?: RouteDescriptor[];
   /**
    * Specifies design tokens available to the application.
    */

@@ -26,13 +26,17 @@
   </sci-form-field>
 </section>
 
+@if (activatedMicrofrontend) {
+  <app-activated-microfrontend/>
+}
+
 @if (route.params | async | appNullIfEmpty; as params) {
   <sci-accordion class="e2e-params" variant="solid">
     <ng-template sciAccordionItem [panel]="panel_route_params">
       <header>Route Params</header>
     </ng-template>
     <ng-template #panel_route_params>
-      <sci-key-value [object]="params | appAppendParamDataType" class="e2e-params"/>
+      <sci-key-value [object]="params | appAppendDataType" class="e2e-params"/>
     </ng-template>
   </sci-accordion>
 }
@@ -54,7 +58,7 @@
       <header>Navigation Data</header>
     </ng-template>
     <ng-template #panel_navigation_data>
-      <sci-key-value [object]="data | appAppendParamDataType" class="e2e-navigation-data"/>
+      <sci-key-value [object]="data | appAppendDataType" class="e2e-navigation-data"/>
     </ng-template>
   </sci-accordion>
 }
@@ -65,7 +69,7 @@
       <header>Navigation State</header>
     </ng-template>
     <ng-template #panel_navigation_state>
-      <sci-key-value [object]="state | appAppendParamDataType" class="e2e-navigation-state"/>
+      <sci-key-value [object]="state | appAppendDataType" class="e2e-navigation-state"/>
     </ng-template>
   </sci-accordion>
 }

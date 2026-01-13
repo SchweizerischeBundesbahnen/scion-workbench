@@ -9,8 +9,8 @@
  */
 
 import {Component, computed, inject, Signal} from '@angular/core';
-import {Translatable, WorkbenchPart, WorkbenchPartActionDirective} from '@scion/workbench';
-import {AppendParamDataTypePipe, MultiValueInputComponent, NullIfEmptyPipe, parseTypedString} from 'workbench-testing-app-common';
+import {ActivatedMicrofrontend, Translatable, WorkbenchPart, WorkbenchPartActionDirective} from '@scion/workbench';
+import {AppendDataTypePipe, MultiValueInputComponent, NullIfEmptyPipe, parseTypedString} from 'workbench-testing-app-common';
 import {AsyncPipe} from '@angular/common';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {JoinPipe} from '../common/join.pipe';
@@ -21,13 +21,14 @@ import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
 import {Arrays} from '@scion/toolkit/util';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
+import ActivatedMicrofrontendComponent from '../activated-microfrontend/activated-microfrontend.component';
 
 @Component({
   selector: 'app-part-page',
   templateUrl: './part-page.component.html',
   styleUrl: './part-page.component.scss',
   imports: [
-    AppendParamDataTypePipe,
+    AppendDataTypePipe,
     AsyncPipe,
     FormsModule,
     ReactiveFormsModule,
@@ -39,6 +40,7 @@ import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
     SciKeyValueComponent,
     WorkbenchPartActionDirective,
     MultiValueInputComponent,
+    ActivatedMicrofrontendComponent,
   ],
 })
 export default class PartPageComponent {
@@ -46,6 +48,7 @@ export default class PartPageComponent {
   private readonly _formBuilder = inject(NonNullableFormBuilder);
 
   protected readonly part = inject(WorkbenchPart);
+  protected readonly activatedMicrofrontend = inject(ActivatedMicrofrontend, {optional: true});
   protected readonly route = inject(ActivatedRoute);
   protected readonly uuid = UUID.randomUUID();
   protected readonly partActions: Signal<WorkbenchPartActionDescriptor[]>;

@@ -53,6 +53,10 @@
       <sci-key-value-field [keyValueFormArray]="form.controls.extras.controls.queryParams" [addable]="true" [removable]="true" class="e2e-query-params"/>
     </sci-form-field>
 
+    <sci-form-field label="Fragment">
+      <input [formControl]="form.controls.extras.controls.fragment" class="e2e-fragment">
+    </sci-form-field>
+
     <sci-form-field label="Activate">
       <sci-checkbox [formControl]="form.controls.extras.controls.activate" class="e2e-activate"/>
     </sci-form-field>

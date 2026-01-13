@@ -8,9 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../../app.po';
 import {Params} from '@angular/router';
-import {PartId, WorkbenchPartCapability} from '@scion/workbench-client';
+import {WorkbenchPartCapability} from '@scion/workbench-client';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {Locator} from '@playwright/test';
@@ -24,14 +23,12 @@ export class PartPagePO {
 
   public static readonly selector = 'app-part-page';
   public readonly locator: Locator;
-  public readonly part: PartPO;
   public readonly partId: Locator;
   public readonly outlet: SciRouterOutletPO;
   public readonly path: Locator;
 
-  constructor(appPO: AppPO, locateBy: {partId?: PartId; cssClass?: string}) {
-    this.part = appPO.part({partId: locateBy.partId, cssClass: locateBy.cssClass});
-    this.outlet = new SciRouterOutletPO(appPO, {name: locateBy.partId, cssClass: locateBy.cssClass});
+  constructor(public part: PartPO) {
+    this.outlet = new SciRouterOutletPO(part.locator.page(), {name: part.locateBy?.id, cssClass: part.locateBy?.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-part-page');
     this.partId = this.locator.locator('span.e2e-part-id');
     this.path = this.locator.locator('span.e2e-path');

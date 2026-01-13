@@ -9,25 +9,6 @@
     position: absolute; // out of document flow
   }
 
-  > section.metadata {
-    position: absolute;
-    display: flex;
-    justify-self: end;
-    padding: .25em;
-
-    > span.chip.has-focus {
-      @include sci-design.style-chip(var(--sci-color-accent), var(--sci-color-background-primary), var(--sci-color-accent));
-    }
-
-    > span.chip.app-symbolic-name {
-      @include sci-design.style-chip(var(--sci-color-text), var(--sci-color-background-primary), var(--sci-color-text));
-
-      &.has-focus {
-        @include sci-design.style-chip(var(--sci-color-accent), var(--sci-color-background-primary), var(--sci-color-accent));
-      }
-    }
-  }
-
   > span.workbench-context-note {
     text-align: center;
     padding: 2em;

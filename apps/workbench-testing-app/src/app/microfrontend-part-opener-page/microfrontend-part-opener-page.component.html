@@ -1,0 +1,47 @@
+<form [formGroup]="form">
+  <section>
+    <!-- Qualifier -->
+    <sci-form-field label="Qualifier">
+      <sci-key-value-field [keyValueFormArray]="form.controls.qualifier" [addable]="true" [removable]="true"/>
+    </sci-form-field>
+
+    <!-- Params -->
+    <sci-form-field label="Params">
+      <sci-key-value-field [keyValueFormArray]="form.controls.params" [addable]="true" [removable]="true"/>
+    </sci-form-field>
+
+    <!-- Dock To -->
+    <sci-form-field label="Dock To">
+      <select [formControl]="form.controls.dockTo">
+        <option value="left-top">left-top</option>
+        <option value="left-bottom">left-bottom</option>
+        <option value="right-top">right-top</option>
+        <option value="right-bottom">right-bottom</option>
+        <option value="bottom-left">bottom-left</option>
+        <option value="bottom-right">bottom-right</option>
+      </select>
+    </sci-form-field>
+
+    <!-- Icon -->
+    <sci-form-field label="Icon">
+      <input [formControl]="form.controls.icon">
+    </sci-form-field>
+
+    <!-- Label -->
+    <sci-form-field label="Label">
+      <input [formControl]="form.controls.label">
+    </sci-form-field>
+  </section>
+
+  <button (click)="onAddPart()" [disabled]="form.invalid" sci-primary>
+    Add Part
+  </button>
+
+  @if (addPartError()) {
+    <output class="add-part-error">
+      {{addPartError()}}
+    </output>
+  }
+</form>
+
+

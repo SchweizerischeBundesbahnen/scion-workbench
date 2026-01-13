@@ -16,7 +16,6 @@ import {Locator} from '@playwright/test';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendPopupPagePO} from '../../workbench/page-object/workbench-popup-page.po';
-import {AppPO} from '../../app.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {prune} from '../../helper/testing.util';
 import {parseTypedString} from '../../helper/parse-typed-value.util';
@@ -32,9 +31,9 @@ export class PopupPagePO implements MicrofrontendPopupPagePO {
   public readonly outlet: SciRouterOutletPO;
 
   constructor(public popup: PopupPO) {
-    this.outlet = new SciRouterOutletPO(new AppPO(popup.locator.page()), {locator: popup.locator.locator('sci-router-outlet')});
+    this.outlet = new SciRouterOutletPO(popup.locator.page(), {name: popup.locateBy?.id, cssClass: popup.locateBy?.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-popup-page');
-    this._hasFocusLocator = this.outlet.frameLocator.locator('app-root').locator('.e2e-has-focus');
+    this._hasFocusLocator = this.outlet.frameLocator.locator('app-root[data-focus]');
   }
 
   public getComponentInstanceId(): Promise<string> {

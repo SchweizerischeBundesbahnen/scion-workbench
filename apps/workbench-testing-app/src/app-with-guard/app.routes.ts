@@ -12,6 +12,7 @@ import {CanActivateFn, GuardResult, MaybeAsync, RedirectCommand, Router, Routes}
 import {canMatchWorkbenchOutlet, canMatchWorkbenchPart, canMatchWorkbenchView, WorkbenchRouteData} from '@scion/workbench';
 import {inject} from '@angular/core';
 import {WorkbenchComponent} from '../app/workbench/workbench.component';
+import {hostCapabilityRoutes} from '../app/host-app.manifest';
 
 export function routes(options: Record<string, string>): Routes {
   return [
@@ -61,18 +62,7 @@ export function routes(options: Record<string, string>): Routes {
               loadComponent: () => import('../app/layout-page/layout-page.component'),
               data: {[WorkbenchRouteData.title]: 'Workbench Layout', [WorkbenchRouteData.cssClass]: 'e2e-test-layout', pinToDesktop: true},
             },
-            {
-              path: 'test-host-popup',
-              loadComponent: () => import('../app/host-popup-page/host-popup-page.component'),
-            },
-            {
-              path: 'test-host-dialog',
-              loadComponent: () => import('../app/host-dialog-page/host-dialog-page.component'),
-            },
-            {
-              path: 'test-host-message-box',
-              loadComponent: () => import('../app/host-message-box-page/host-message-box-page.component'),
-            },
+            ...hostCapabilityRoutes,
           ],
         },
       ],

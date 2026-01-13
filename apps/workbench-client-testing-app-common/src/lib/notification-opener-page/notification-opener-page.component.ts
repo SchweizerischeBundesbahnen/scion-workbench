@@ -10,13 +10,14 @@
 
 import {Component, computed, inject, signal, Signal} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {WorkbenchNotificationConfig, WorkbenchNotificationOptions, WorkbenchNotificationService, WorkbenchView} from '@scion/workbench-client';
+import {WORKBENCH_ELEMENT, WorkbenchElement, WorkbenchNotificationConfig, WorkbenchNotificationOptions, WorkbenchNotificationService} from '@scion/workbench-client';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {UUID} from '@scion/toolkit/uuid';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {MultiValueInputComponent, prune, stringifyError} from 'workbench-testing-app-common';
+import {Beans} from '@scion/toolkit/bean-manager';
 
 @Component({
   selector: 'app-notification-opener-page',
@@ -59,7 +60,7 @@ export class NotificationOpenerPageComponent {
   protected readonly notificationOpenError = signal<string | undefined>(undefined);
 
   constructor() {
-    inject(WorkbenchView).signalReady();
+    Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.signalReady();
     this.isEmptyQualifier = this.computeIfEmptyQualifier();
   }
 

@@ -241,3 +241,24 @@ export function throwError(error: string): never {
 function encodeSemicolons(value: unknown): string {
   return `${value}`.replaceAll(';', '\\;');
 }
+
+/**
+ * Creates a CSS selector for the specified element with given attributes and CSS classes.
+ */
+export function selectBy(element: string, options: {attributes: Record<string, string | undefined>; cssClass: string | string[] | undefined}): string {
+  let selector = element;
+
+  // Append attributes.
+  Object.entries(options.attributes).forEach(([key, value]) => {
+    if (value) {
+      selector += `[${key}="${value}"]`;
+    }
+  });
+
+  // Append CSS classes, escaping each CSS class to support the usage of workbench element ids as CSS class.
+  coerceArray(options.cssClass).forEach(cssClass => {
+    selector += `.${cssClass.replace(/\./g, '\\.')}`;
+  });
+
+  return selector;
+}

@@ -3,7 +3,7 @@
     <input [formControl]="form.controls.title" class="e2e-title">
   </sci-form-field>
 
-  <sci-form-field label="Instance ID" title="Unique identifier of this component instance">
+  <sci-form-field label="Instance ID" title="Unique identifier of this component instance" direction="column">
     <input class="e2e-component-instance-id" [value]="uuid" disabled>
   </sci-form-field>
 
@@ -11,6 +11,10 @@
     <sci-form-field label="Input">
       <input class="e2e-input" [value]="input()" disabled>
     </sci-form-field>
+  }
+
+  @if (activatedMicrofrontend) {
+    <app-activated-microfrontend/>
   }
 
   <sci-accordion class="e2e-dialog-size" variant="solid">

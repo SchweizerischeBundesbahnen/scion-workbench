@@ -10,7 +10,7 @@
 
 import {EnvironmentProviders, inject, makeEnvironmentProviders, Signal} from '@angular/core';
 import {SESSION_STORAGE} from '../session.storage';
-import {map} from 'rxjs/operators';
+import {map, take} from 'rxjs/operators';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {provideMicrofrontendPlatformInitializer} from '@scion/workbench';
 import {Beans} from '@scion/toolkit/bean-manager';
@@ -29,10 +29,13 @@ export function provideTextFromStorage(key: string, params: {[name: string]: str
     return undefined;
   }
 
+  const translatable = Object.entries(params).reduce((translatable, [name, value]) => `${translatable};${name}=${value}`, `%${key}`);
+  console.debug(`[TextProvider][${Beans.get(APP_IDENTITY)}] Requesting text: ${translatable}`);
+
   const text$ = inject(SESSION_STORAGE).observe$<string | undefined>(`textprovider.texts.${key}`)
     .pipe(
       substituteParams(params),
-      map(text => text ?? ''),
+      map(text => text ?? `%${key}`),
     );
   return toSignal(text$, {initialValue: ''});
 }
@@ -50,8 +53,19 @@ export function provideValueFromStorage(): EnvironmentProviders {
     provideMicrofrontendPlatformInitializer(() => {
       const hostSymbolicName = Beans.get(APP_IDENTITY);
       const sessionStorage = inject(SESSION_STORAGE);
+
+      // Register message listener that replies with values from session storage.
       inject(MessageClient).onMessage(`textprovider/${hostSymbolicName}/values/:id`, request => {
-        return sessionStorage.observe$<string | undefined>(`textprovider.values.${request.params?.get('id')}`);
+        const id = request.params!.get('id');
+        console.debug(`[TextProvider][${hostSymbolicName}] Requesting value: ${id}`);
+        return sessionStorage.observe$<string | undefined>(`textprovider.values.${id}`);
+      });
+
+      // Register message listener that replies with values from session storage, completing requests after responding.
+      inject(MessageClient).onMessage(`textprovider/${hostSymbolicName}/values/:id/complete`, request => {
+        const id = request.params!.get('id');
+        console.debug(`[TextProvider][${hostSymbolicName}] Requesting value: ${id}`);
+        return sessionStorage.observe$<string | undefined>(`textprovider.values.${id}`).pipe(take(1));
       });
     }),
   ]);

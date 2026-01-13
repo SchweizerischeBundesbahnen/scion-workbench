@@ -8,17 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../../../app.po';
 import {Locator} from '@playwright/test';
 import {ViewPO} from '../../../view.po';
-import {RouterPagePO} from '../router-page.po';
 import {DomRect, fromRect} from '../../../helper/testing.util';
-import {DialogOpenerPagePO} from '../dialog-opener-page.po';
 import {DialogPO} from '../../../dialog.po';
 import {WorkbenchDialogPagePO} from '../workbench-dialog-page.po';
 import {WorkbenchViewPagePO} from '../workbench-view-page.po';
-import {WorkbenchNavigator} from '../../workbench-navigator';
-import {PopupOpenerPagePO} from '../popup-opener-page.po';
 import {PopupPO} from '../../../popup.po';
 import {WorkbenchPopupPagePO} from '../workbench-popup-page.po';
 
@@ -67,47 +62,5 @@ export class SizeTestPagePO implements WorkbenchViewPagePO, WorkbenchDialogPageP
 
   public async getBoundingBox(): Promise<DomRect> {
     return fromRect(await this.locator.boundingBox());
-  }
-
-  public static async openInNewTab(appPO: AppPO): Promise<SizeTestPagePO> {
-    const workbenchNavigator = new WorkbenchNavigator(appPO);
-    const cssClass = `size-${crypto.randomUUID()}`;
-
-    // Open view.
-    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.navigate(['test-pages/size-test-page'], {cssClass});
-
-    const view = appPO.view({cssClass});
-    return new SizeTestPagePO(view);
-  }
-
-  public static async openInDialog(appPO: AppPO): Promise<SizeTestPagePO> {
-    const workbenchNavigator = new WorkbenchNavigator(appPO);
-    const cssClass = `size-${crypto.randomUUID()}`;
-
-    // Open dialog.
-    const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-    await dialogOpenerPage.open('size-test-page', {cssClass});
-
-    const dialog = appPO.dialog({cssClass});
-    return new SizeTestPagePO(dialog);
-  }
-
-  public static async openInPopup(appPO: AppPO, options?: {position: 'element' | 'coordinate'}): Promise<SizeTestPagePO> {
-    const workbenchNavigator = new WorkbenchNavigator(appPO);
-    const cssClass = `size-${crypto.randomUUID()}`;
-    const position = options?.position ?? 'element';
-
-    // Open popup.
-    const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-    await popupOpenerPage.open('size-test-page', {
-      anchor: position === 'element' ? 'element' : {top: 100, left: 100},
-      size: {minHeight: '100px', minWidth: '500px'},
-      closeStrategy: {onFocusLost: false},
-      cssClass,
-    });
-
-    const popup = appPO.popup({cssClass});
-    return new SizeTestPagePO(popup);
   }
 }

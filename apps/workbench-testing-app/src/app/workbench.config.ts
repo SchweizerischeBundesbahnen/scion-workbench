@@ -10,7 +10,7 @@
 
 import {WorkbenchStartupQueryParams} from './workbench/workbench-startup-query-params';
 import {environment} from '../environments/environment';
-import {Perspectives} from './workbench.perspectives';
+import {perspectives} from './app.perspectives';
 import {WorkbenchConfig} from '@scion/workbench';
 import {provideTextFromStorage} from './text/storage-text-provider';
 
@@ -22,10 +22,7 @@ export const workbenchConfig: WorkbenchConfig = {
     ...environment.microfrontendPlatformConfig, // eslint-disable-line  @typescript-eslint/no-misused-spread
     preloadInactiveViews: WorkbenchStartupQueryParams.preloadInactiveMicrofrontendViews() ?? environment.microfrontendPlatformConfig.preloadInactiveViews,
   },
-  layout: {
-    perspectives: Perspectives.definitions,
-    initialPerspective: Perspectives.initialPerspective,
-  },
+  layout: perspectives,
   dialog: {
     modalityScope: WorkbenchStartupQueryParams.dialogModalityScope(),
   },

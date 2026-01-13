@@ -11,20 +11,18 @@
 import {AppPO} from '../../../app.po';
 import {Locator} from '@playwright/test';
 import {waitUntilStable} from '../../../helper/testing.util';
-import {RouterPagePO} from '../router-page.po';
-import {WorkbenchNavigator} from '../../workbench-navigator';
 import {WorkbenchViewPagePO} from '../workbench-view-page.po';
 import {ViewPO} from '../../../view.po';
-import {ViewId} from '@scion/workbench';
 
 export class BulkNavigationTestPagePO implements WorkbenchViewPagePO {
 
   public readonly locator: Locator;
-  public readonly view: ViewPO;
 
-  constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
+  private readonly _appPO: AppPO;
+
+  constructor(public view: ViewPO) {
     this.locator = this.view.locator.locator('app-bulk-navigation-test-page');
+    this._appPO = new AppPO(this.locator.page());
   }
 
   public async enterViewCount(viewCount: number): Promise<void> {
@@ -45,18 +43,5 @@ export class BulkNavigationTestPagePO implements WorkbenchViewPagePO {
     await this.locator.locator('button.e2e-navigate-await').click();
     // Wait for the URL to become stable after navigating.
     await waitUntilStable(() => this._appPO.getCurrentNavigationId());
-  }
-
-  public static async openInNewTab(appPO: AppPO, workbenchNavigator: WorkbenchNavigator): Promise<BulkNavigationTestPagePO> {
-    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    const viewId = await routerPage.view.getViewId();
-
-    await routerPage.navigate(['test-pages/bulk-navigation-test-page'], {
-      target: viewId,
-    });
-
-    const view = appPO.view({cssClass: 'e2e-test-bulk-navigation', viewId});
-    await view.waitUntilAttached();
-    return new BulkNavigationTestPagePO(appPO, {viewId: await view.getViewId()});
   }
 }

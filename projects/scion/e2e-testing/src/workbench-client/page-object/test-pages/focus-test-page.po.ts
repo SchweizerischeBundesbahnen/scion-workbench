@@ -10,10 +10,11 @@
 
 import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
-import {DialogId, PartId, PopupId, ViewId} from '@scion/workbench-client';
-import {AppPO} from '../../../app.po';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
-import {RequireOne} from '../../../helper/utility-types';
+import {PartPO} from '../../../part.po';
+import {ViewPO} from '../../../view.po';
+import {DialogPO} from '../../../dialog.po';
+import {PopupPO} from '../../../popup.po';
 
 /**
  * Page object to interact with {@link FocusTestPageComponent}.
@@ -21,14 +22,16 @@ import {RequireOne} from '../../../helper/utility-types';
 export class FocusTestPagePO {
 
   public readonly locator: Locator;
+  public readonly outlet: SciRouterOutletPO;
 
   public firstField: Locator;
   public middleField: Locator;
   public lastField: Locator;
 
-  constructor(appPO: AppPO, locateBy: RequireOne<{id: PartId | ViewId | DialogId | PopupId; cssClass: string}>) {
-    const outlet = new SciRouterOutletPO(appPO, {name: locateBy.id, cssClass: locateBy.cssClass});
-    this.locator = outlet.frameLocator.locator('app-focus-test-page');
+  constructor(locateBy: PartPO | ViewPO | DialogPO | PopupPO) {
+    this.outlet = new SciRouterOutletPO(locateBy.locator.page(), {name: locateBy.locateBy?.id, cssClass: locateBy.locateBy?.cssClass});
+    this.locator = this.outlet.frameLocator.locator('app-focus-test-page');
+
     this.firstField = this.locator.locator('input.e2e-first-field');
     this.middleField = this.locator.locator('input.e2e-middle-field');
     this.lastField = this.locator.locator('input.e2e-last-field');

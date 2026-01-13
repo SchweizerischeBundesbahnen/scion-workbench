@@ -9,14 +9,14 @@
  */
 
 import {Component, computed, inject, Signal} from '@angular/core';
-import {CanCloseRef, WorkbenchMessageBoxService, WorkbenchPartActionDirective, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
+import {ActivatedMicrofrontend, CanCloseRef, WorkbenchMessageBoxService, WorkbenchPartActionDirective, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
 import {startWith} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {Arrays} from '@scion/toolkit/util';
 import {AsyncPipe} from '@angular/common';
-import {AppendParamDataTypePipe, MultiValueInputComponent, NullIfEmptyPipe} from 'workbench-testing-app-common';
+import {AppendDataTypePipe, MultiValueInputComponent, NullIfEmptyPipe} from 'workbench-testing-app-common';
 import {JoinPipe} from '../common/join.pipe';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {SciKeyValueComponent} from '@scion/components.internal/key-value';
@@ -24,6 +24,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {rootEffect} from '../common/root-effect';
+import ActivatedMicrofrontendComponent from '../activated-microfrontend/activated-microfrontend.component';
 
 @Component({
   selector: 'app-view-page',
@@ -40,9 +41,10 @@ import {rootEffect} from '../common/root-effect';
     SciKeyValueComponent,
     NullIfEmptyPipe,
     JoinPipe,
-    AppendParamDataTypePipe,
+    AppendDataTypePipe,
     WorkbenchPartActionDirective,
     MultiValueInputComponent,
+    ActivatedMicrofrontendComponent,
   ],
 })
 export default class ViewPageComponent {
@@ -50,6 +52,7 @@ export default class ViewPageComponent {
   private readonly _formBuilder = inject(NonNullableFormBuilder);
 
   protected readonly view = inject(WorkbenchView);
+  protected readonly activatedMicrofrontend = inject(ActivatedMicrofrontend, {optional: true});
   protected readonly route = inject(ActivatedRoute);
   protected readonly uuid = UUID.randomUUID();
   protected readonly partActions: Signal<WorkbenchPartActionDescriptor[]>;

@@ -1,0 +1,62 @@
+<form autocomplete="off">
+  <section>
+    <sci-form-field label="Path">
+      <input [field]="form.path" appFieldValidation class="e2e-path">
+    </sci-form-field>
+
+    <sci-form-field label="Component">
+      <select [field]="form.component" appFieldValidation class="e2e-component">
+        <option value=""></option>
+        <option value="part-page">PartPageComponent</option>
+        <option value="view-page">ViewPageComponent</option>
+        <option value="dialog-page">DialogPageComponent</option>
+        <option value="messagebox-page">MessageBoxPageComponent</option>
+        <option value="popup-page">PopupPageComponent</option>
+        <option value="router-page">RouterPageComponent</option>
+        <option value="focus-test-page">FocusTestPageComponent</option>
+        <option value="size-test-page">SizeTestPageComponent</option>
+        <option value="text-test-page">TextTestPageComponent</option>
+        <option value="microfrontend-dialog-opener-page">MicrofrontendDialogOpenerPageComponent</option>
+        <option value="microfrontend-messagebox-opener-page">MicrofrontendMessageboxOpenerPageComponent</option>
+        <option value="microfrontend-popup-opener-page">MicrofrontendPopupOpenerPageComponent</option>
+      </select>
+    </sci-form-field>
+
+    <sci-form-field label="Data">
+      <app-key-value-field [field]="form.data" appFieldValidation class="e2e-data"/>
+    </sci-form-field>
+  </section>
+
+  <section>
+    <header>CanMatch</header>
+
+    <sci-form-field label="CanMatch">
+      <select [field]="form.canMatch.fn" appFieldValidation class="e2e-can-match">
+        <option value=""></option>
+        <option value="canMatchWorkbenchPart">canMatchWorkbenchPart</option>
+        <option value="canMatchWorkbenchView">canMatchWorkbenchView</option>
+        <option value="canMatchWorkbenchPartCapability">canMatchWorkbenchPartCapability</option>
+        <option value="canMatchWorkbenchViewCapability">canMatchWorkbenchViewCapability</option>
+        <option value="canMatchWorkbenchDialogCapability">canMatchWorkbenchDialogCapability</option>
+        <option value="canMatchWorkbenchMessageBoxCapability">canMatchWorkbenchMessageBoxCapability</option>
+        <option value="canMatchWorkbenchPopupCapability">canMatchWorkbenchPopupCapability</option>
+      </select>
+    </sci-form-field>
+
+    @if (!form.canMatch.qualifier().hidden()) {
+      <sci-form-field label="Qualifier">
+        <app-key-value-field [field]="form.canMatch.qualifier" appFieldValidation class="e2e-qualifier"/>
+      </sci-form-field>
+    }
+
+    @if (!form.canMatch.hint().hidden()) {
+      <sci-form-field label="Hint">
+        <input [field]="form.canMatch.hint" appFieldValidation class="e2e-hint">
+      </sci-form-field>
+    }
+  </section>
+
+  <button (click)="onRegister()" [disabled]="form().invalid()" class="e2e-register" sci-primary>
+    Register
+  </button>
+</form>

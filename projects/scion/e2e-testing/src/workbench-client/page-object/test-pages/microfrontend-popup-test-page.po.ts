@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../../../app.po';
 import {Locator} from '@playwright/test';
 import {PopupPO} from '../../../popup.po';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
@@ -20,7 +19,7 @@ export class MicrofrontendPopupTestPagePO implements MicrofrontendPopupPagePO {
   public readonly outlet: SciRouterOutletPO;
 
   constructor(public popup: PopupPO) {
-    this.outlet = new SciRouterOutletPO(new AppPO(popup.locator.page()), {locator: this.popup.locator.locator('sci-router-outlet')});
+    this.outlet = new SciRouterOutletPO(popup.locator.page(), {name: popup.locateBy?.id, cssClass: popup.locateBy?.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-microfrontend-test-page');
   }
 }

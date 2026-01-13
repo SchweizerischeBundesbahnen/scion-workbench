@@ -8,12 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../../../app.po';
 import {Locator} from '@playwright/test';
-import {WorkbenchNavigator} from '../../workbench-navigator';
-import {RouterPagePO} from '../router-page.po';
 import {ViewPO} from '../../../view.po';
-import {PopupOpenerPagePO} from '../popup-opener-page.po';
 import {PopupPO} from '../../../popup.po';
 import {DialogPO} from '../../../dialog.po';
 import {WorkbenchDialogPagePO} from '../workbench-dialog-page.po';
@@ -71,34 +67,5 @@ export class InputFieldTestPagePO implements WorkbenchViewPagePO, WorkbenchDialo
 
   public async clickInputField(): Promise<void> {
     await this.input.click();
-  }
-
-  public static async openInNewTab(appPO: AppPO, workbenchNavigator: WorkbenchNavigator): Promise<InputFieldTestPagePO> {
-    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    const viewId = await routerPage.view.getViewId();
-
-    await routerPage.navigate(['test-pages/input-field-test-page'], {
-      target: viewId,
-      cssClass: 'input-field-test-page',
-    });
-
-    const view = appPO.view({cssClass: 'input-field-test-page', viewId});
-    await view.waitUntilAttached();
-    return new InputFieldTestPagePO(view);
-  }
-
-  public static async openInPopup(appPO: AppPO, workbenchNavigator: WorkbenchNavigator, popupOptions?: {closeOnFocusLost?: boolean}): Promise<InputFieldTestPagePO> {
-    // Open the popup.
-    const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-    await popupOpenerPage.open('input-field-test-page', {
-      anchor: 'element',
-      closeStrategy: {onFocusLost: popupOptions?.closeOnFocusLost},
-      cssClass: 'input-field-test-page',
-    });
-
-    // Create the page object.
-    const popup = appPO.popup({cssClass: 'input-field-test-page'});
-    await popup.locator.waitFor({state: 'attached'});
-    return new InputFieldTestPagePO(popup);
   }
 }

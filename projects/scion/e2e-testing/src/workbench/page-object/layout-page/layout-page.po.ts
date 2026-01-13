@@ -18,6 +18,8 @@ import {ModifyLayoutPagePO} from './modify-layout-page.po';
 import {CreatePerspectivePagePO, PerspectiveDefinition} from './create-perspective-page.po';
 import {PartPO} from '../../../part.po';
 import {DesktopPO} from '../../../desktop.po';
+import {RegisterRoutePagePO} from './register-route-page.po';
+import {RouteDescriptor} from 'workbench-testing-app-common';
 
 /**
  * Page object to interact with {@link LayoutPageComponent}.
@@ -71,5 +73,12 @@ export class LayoutPagePO implements WorkbenchViewPagePO {
 
     const registerPartActionPage = new RegisterPartActionPagePO(this.locator.locator('app-register-part-action-page'));
     return registerPartActionPage.registerPartAction(content, options);
+  }
+
+  public async registerRoute(route: RouteDescriptor): Promise<void> {
+    await this._tabbar.selectTab('e2e-register-route');
+
+    const registerRoutePage = new RegisterRoutePagePO(this.locator.locator('app-register-route-page'));
+    return registerRoutePage.registerRoute(route);
   }
 }

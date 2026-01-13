@@ -11,23 +11,29 @@
 import {Locator} from '@playwright/test';
 import {ViewPO} from '../../../view.po';
 import {WorkbenchViewPagePO} from '../workbench-view-page.po';
-import {AppPO} from '../../../app.po';
-import {ViewId} from '@scion/workbench';
 import {PopupPO} from '../../../popup.po';
+import {PartPO} from '../../../part.po';
+import {DialogPO} from '../../../dialog.po';
+import {WorkbenchDialogPagePO} from '../workbench-dialog-page.po';
+import {WorkbenchPopupPagePO} from '../workbench-popup-page.po';
 
-export class PopupPositionTestPagePO implements WorkbenchViewPagePO {
+export class PopupPositionTestPagePO implements WorkbenchViewPagePO, WorkbenchDialogPagePO, WorkbenchPopupPagePO {
 
   public readonly locator: Locator;
   public readonly view: ViewPO;
+  public readonly dialog: DialogPO;
+  public readonly popup: PopupPO;
   public readonly openButton: Locator;
   public readonly marginTop: Locator;
   public readonly marginRight: Locator;
   public readonly marginBottom: Locator;
   public readonly marginLeft: Locator;
 
-  constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.locator = this.view.locator.locator('app-popup-position-test-page');
+  constructor(locateBy: PartPO | ViewPO | DialogPO | PopupPO) {
+    this.view = locateBy instanceof ViewPO ? locateBy : undefined!;
+    this.dialog = locateBy instanceof DialogPO ? locateBy : undefined!;
+    this.popup = locateBy instanceof PopupPO ? locateBy : undefined!;
+    this.locator = locateBy.locator.locator('app-popup-position-test-page');
     this.openButton = this.locator.locator('button.e2e-open');
     this.marginTop = this.locator.locator('input.e2e-margin-top');
     this.marginRight = this.locator.locator('input.e2e-margin-right');
@@ -37,7 +43,7 @@ export class PopupPositionTestPagePO implements WorkbenchViewPagePO {
 
   public async open(): Promise<PopupPO> {
     await this.locator.locator('button.e2e-open').click();
-    const popup = new PopupPO(this.locator.page().locator('wb-popup'));
+    const popup = new PopupPO(this.locator.page(), {cssClass: []}, {nth: 0});
     await popup.locator.waitFor({state: 'attached'});
     return popup;
   }

@@ -8,13 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../../app.po';
 import {Locator} from '@playwright/test';
 import {rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../view.po';
-import {ViewId} from '@scion/workbench-client';
 
 /**
  * Page object to interact with {@link UnregisterWorkbenchCapabilityPageComponent}.
@@ -22,13 +20,11 @@ import {ViewId} from '@scion/workbench-client';
 export class UnregisterWorkbenchCapabilityPagePO implements MicrofrontendViewPagePO {
 
   public readonly locator: Locator;
-  public readonly view: ViewPO;
   public readonly outlet: SciRouterOutletPO;
 
-  constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.outlet = new SciRouterOutletPO(appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.locator = this.outlet.frameLocator.locator('app-unregister-workbench-capability-page');
+  constructor(public view: ViewPO, options?: {host?: boolean}) {
+    this.outlet = new SciRouterOutletPO(view.locator.page(), {name: view.locateBy?.id, cssClass: view.locateBy?.cssClass});
+    this.locator = (options?.host ? view.locator : this.outlet.frameLocator).locator('app-unregister-workbench-capability-page');
   }
 
   /**

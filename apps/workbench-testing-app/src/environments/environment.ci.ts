@@ -9,7 +9,7 @@
  */
 
 import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
-import {workbenchManifest} from '../app/workbench.manifest';
+import {hostAppManifest} from '../app/host-app.manifest';
 
 /**
  * Environment used when packaging the app for CI on GitHub.
@@ -17,7 +17,8 @@ import {workbenchManifest} from '../app/workbench.manifest';
 const microfrontendPlatformConfig: MicrofrontendPlatformConfig = {
   host: {
     symbolicName: 'workbench-host-app',
-    manifest: workbenchManifest,
+    manifest: hostAppManifest,
+    intentionRegisterApiDisabled: false,
   },
   applications: [
     {symbolicName: 'workbench-client-testing-app1', manifestUrl: 'http://localhost:4201/manifest-app1.json', intentionRegisterApiDisabled: false},
@@ -28,6 +29,7 @@ const microfrontendPlatformConfig: MicrofrontendPlatformConfig = {
 export const environment = {
   animationEnabled: false,
   logAngularChangeDetectionCycles: false,
+  showMicrofrontendApplicationLabels: false,
   initialPerspective: 'blank',
   microfrontendPlatformConfig,
 };

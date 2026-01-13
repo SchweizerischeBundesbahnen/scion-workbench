@@ -9,11 +9,13 @@
  */
 
 import {Locator} from '@playwright/test';
-import {SciAccordionPO} from './@scion/components.internal/accordion.po';
-import {SciCheckboxPO} from './@scion/components.internal/checkbox.po';
-import {DialogPO} from './dialog.po';
-import {WorkbenchDialogPagePO} from './workbench/page-object/workbench-dialog-page.po';
+import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
+import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
+import {DialogPO} from '../../dialog.po';
+import {WorkbenchDialogPagePO} from './workbench-dialog-page.po';
 import {Translatable} from '@scion/workbench';
+import {DomRect, fromRect} from '../../helper/testing.util';
+import {ActivatedMicrofrontendPO} from './activated-microfrontend.po';
 
 /**
  * Page object to interact with {@link DialogPageComponent}.
@@ -21,10 +23,12 @@ import {Translatable} from '@scion/workbench';
 export class DialogPagePO implements WorkbenchDialogPagePO {
 
   public readonly locator: Locator;
+  public readonly activatedMicrofrontend: ActivatedMicrofrontendPO;
   public readonly input: Locator;
 
   constructor(public dialog: DialogPO) {
     this.locator = this.dialog.locator.locator('app-dialog-page');
+    this.activatedMicrofrontend = new ActivatedMicrofrontendPO(this.locator.locator('app-activated-microfrontend'));
     this.input = this.locator.locator('input.e2e-input');
   }
 
@@ -87,6 +91,10 @@ export class DialogPagePO implements WorkbenchDialogPagePO {
     }
 
     await this.dialog.footer.locator('button.e2e-close').click();
+  }
+
+  public async getBoundingBox(): Promise<DomRect> {
+    return fromRect(await this.locator.boundingBox());
   }
 
   private async enterReturnValue(returnValue: string): Promise<void> {

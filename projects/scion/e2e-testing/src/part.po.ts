@@ -8,15 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Locator} from '@playwright/test';
+import {Locator, Page} from '@playwright/test';
 import {ViewPO} from './view.po';
 import {ViewTabPO} from './view-tab.po';
 import {PartSashPO} from './part-sash.po';
 import {PartBarPO} from './part-bar.po';
 import {PartId} from '@scion/workbench';
-import {DomRect, fromRect, getCssClasses} from './helper/testing.util';
+import {coerceArray, DomRect, fromRect, getCssClasses, selectBy} from './helper/testing.util';
 import {PartSlotPO} from './part-slot.po';
 import {WorkbenchAccessor, WorkbenchPartNavigationE2E} from './workbench-accessor';
+import {RequireOne} from './helper/utility-types';
 
 /**
  * Handle for interacting with a workbench part.
@@ -24,6 +25,8 @@ import {WorkbenchAccessor, WorkbenchPartNavigationE2E} from './workbench-accesso
 export class PartPO {
 
   private readonly _workbenchAccessor: WorkbenchAccessor;
+
+  public readonly locator: Locator;
 
   /**
    * Handle for interacting with the part bar.
@@ -45,12 +48,25 @@ export class PartPO {
    */
   public readonly sash: PartSashPO;
 
-  constructor(public readonly locator: Locator) {
-    this._workbenchAccessor = new WorkbenchAccessor(this.locator.page());
+  public readonly locateBy?: {id?: PartId; cssClass?: string[]};
+
+  constructor(page: Page, locateBy: RequireOne<{partId: PartId; cssClass: string | string[]}> | Locator) {
+    if ('page' in locateBy) {
+      this.locator = locateBy;
+    }
+    else {
+      this.locateBy = {id: locateBy.partId, cssClass: coerceArray(locateBy.cssClass)};
+      this.locator = page.locator(selectBy('wb-part', {attributes: {'data-partid': locateBy.partId}, cssClass: locateBy.cssClass}));
+    }
+
     this.bar = new PartBarPO(this.locator.locator('wb-part-bar'), this);
-    this.activeView = new ViewPO(this.locator.locator('wb-view-slot'), new ViewTabPO(this.locator.locator('wb-view-tab[data-active]'), this));
     this.slot = new PartSlotPO(this.locator.locator('wb-part-slot'));
     this.sash = new PartSashPO(this.locator);
+    this.activeView = new ViewPO(page, {
+      locator: this.locator.locator('wb-view-slot'),
+      viewTab: new ViewTabPO(this.locator.locator('wb-view-tab[data-active]'), this),
+    });
+    this._workbenchAccessor = new WorkbenchAccessor(page);
   }
 
   public async getPartId(): Promise<PartId> {

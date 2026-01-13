@@ -2,6 +2,7 @@
 @use '@scion/components.internal/design' as sci-design;
 @use 'app/focus-highlight';
 @use 'app/glasspane-highlight';
+@use 'app/microfrontend-application-labels';
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:wght@300..400');
@@ -36,7 +37,8 @@ button:not([class*="material-icons"]):not([class*="material-symbols"]) {
 }
 
 :root {
+  --workbench-host-app-color: var(--sci-color-accent);
   --workbench-client-testing-app1-color: rgb(0, 49, 83);
-  --workbench-client-testing-app2-color: rgb(0, 112, 187);
+  --workbench-client-testing-app2-color: rgb(3, 80, 133);
   --devtools-app-color: rgb(72, 72, 72);
 }

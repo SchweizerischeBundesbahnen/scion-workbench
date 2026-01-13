@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Route, Routes, UrlSegment} from '@angular/router';
-import {canMatchWorkbenchPart, canMatchWorkbenchView, MAIN_AREA, WorkbenchLayout, WorkbenchLayoutFactory, WorkbenchPerspectiveDefinition, WorkbenchRouteData} from '@scion/workbench';
-import {inject} from '@angular/core';
+import {Route, ROUTES, Routes, UrlSegment} from '@angular/router';
+import {canMatchWorkbenchPart, canMatchWorkbenchView, MAIN_AREA, WorkbenchLayout, WorkbenchLayoutFactory, WorkbenchPerspectives, WorkbenchRouteData} from '@scion/workbench';
+import {EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
 import {ViewSkeletonNavigationData} from './sample-view/sample-view.component';
 import {SettingsService} from './settings.service';
 import {PartSkeletonNavigationData} from './sample-part/sample-part.component';
@@ -41,18 +41,11 @@ export const PerspectiveData = {
 } as const;
 
 /**
- * Provides perspectives of the SCION Workbench Testing Application.
+ * Defines perspectives of the Testing Application.
  */
-export const Perspectives = {
-  /**
-   * Specifies the initial perspective of the testing app.
-   */
+export const perspectives: WorkbenchPerspectives = {
   initialPerspective: environment.initialPerspective,
-
-  /**
-   * Specifies perspectives available in the testing app.
-   */
-  definitions: [
+  perspectives: [
     {
       id: 'blank',
       layout: factory => factory.addPart(MAIN_AREA),
@@ -126,20 +119,28 @@ export const Perspectives = {
         [PerspectiveData.visible]: false,
       },
     },
-  ] satisfies WorkbenchPerspectiveDefinition[],
+  ],
+};
 
-  /**
-   * Specifies routes used in perspectives of the testing app.
-   */
-  routes: [
-    // Sample View
-    {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchView('sample-view')(route, segments) && inject(SettingsService).isEnabled('showSkeletons')], loadComponent: () => import('./sample-view/sample-view.component'), data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'}},
-    {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchView('sample-view')(route, segments) && !inject(SettingsService).isEnabled('showSkeletons')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'}},
-    // Sample Part
-    {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchPart('sample-part')(route, segments) && inject(SettingsService).isEnabled('showSkeletons')], loadComponent: () => import('./sample-part/sample-part.component')},
-    {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchPart('sample-part')(route, segments) && !inject(SettingsService).isEnabled('showSkeletons')], loadComponent: () => import('./part-page/part-page.component')},
-  ] satisfies Routes,
-} as const;
+/**
+ * Provides routes of sample perspectives.
+ */
+export function provideRoutesForPerspectives(): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    {
+      provide: ROUTES,
+      useFactory: (): Routes => [
+        // Sample View
+        {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchView('sample-view')(route, segments) && inject(SettingsService).isEnabled('showSkeletons')], loadComponent: () => import('./sample-view/sample-view.component'), data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'}},
+        {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchView('sample-view')(route, segments) && !inject(SettingsService).isEnabled('showSkeletons')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'}},
+        // Sample Part
+        {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchPart('sample-part')(route, segments) && inject(SettingsService).isEnabled('showSkeletons')], loadComponent: () => import('./sample-part/sample-part.component')},
+        {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchPart('sample-part')(route, segments) && !inject(SettingsService).isEnabled('showSkeletons')], loadComponent: () => import('./part-page/part-page.component')},
+      ],
+      multi: true,
+    },
+  ]);
+}
 
 function provideActivityPerspectiveLayout1(factory: WorkbenchLayoutFactory): WorkbenchLayout {
   return factory

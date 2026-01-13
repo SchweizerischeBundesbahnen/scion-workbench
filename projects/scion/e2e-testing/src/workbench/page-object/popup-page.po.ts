@@ -13,6 +13,7 @@ import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Locator} from '@playwright/test';
 import {WorkbenchPopupPagePO} from './workbench-popup-page.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
+import {ActivatedMicrofrontendPO} from './activated-microfrontend.po';
 
 /**
  * Page object to interact with {@link PopupPageComponent}.
@@ -20,10 +21,12 @@ import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 export class PopupPagePO implements WorkbenchPopupPagePO {
 
   public readonly locator: Locator;
+  public readonly activatedMicrofrontend: ActivatedMicrofrontendPO;
   public readonly input: Locator;
 
   constructor(public popup: PopupPO) {
     this.locator = this.popup.locator.locator('app-popup-page');
+    this.activatedMicrofrontend = new ActivatedMicrofrontendPO(this.locator.locator('app-activated-microfrontend'));
     this.input = this.locator.locator('output.e2e-input');
   }
 

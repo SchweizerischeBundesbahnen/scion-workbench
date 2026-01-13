@@ -11,13 +11,16 @@
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {WorkbenchThemeTestPagePO} from './page-object/test-pages/workbench-theme-test-page.po';
+import {RouterPagePO} from './page-object/router-page.po';
 
 test.describe('Workbench', () => {
 
   test('should provide light and dark theme', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const testPage = await WorkbenchThemeTestPagePO.openInNewTab(appPO, workbenchNavigator);
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-pages/workbench-theme-test-page'], {cssClass: 'testee'});
+    const testPage = new WorkbenchThemeTestPagePO(appPO.view({cssClass: 'testee'}));
 
     await test.step('light theme', async () => {
       await appPO.header.changeColorScheme('light');

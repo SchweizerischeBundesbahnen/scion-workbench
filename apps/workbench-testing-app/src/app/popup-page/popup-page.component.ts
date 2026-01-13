@@ -9,7 +9,7 @@
  */
 
 import {Component, inject, input} from '@angular/core';
-import {Popup, WorkbenchPopup} from '@scion/workbench';
+import {ActivatedMicrofrontend, Popup, WorkbenchPopup} from '@scion/workbench';
 import {UUID} from '@scion/toolkit/uuid';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
@@ -18,6 +18,7 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {PopupSizeDirective} from '../popup-opener-page/popup-size.directive';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import ActivatedMicrofrontendComponent from '../activated-microfrontend/activated-microfrontend.component';
 
 @Component({
   selector: 'app-popup-page',
@@ -31,6 +32,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
     SciAccordionItemDirective,
     ReactiveFormsModule,
     SciCheckboxComponent,
+    ActivatedMicrofrontendComponent,
   ],
   host: {
     '[style.height]': 'form.controls.componentSize.controls.height.value',
@@ -42,7 +44,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
   },
   hostDirectives: [{directive: PopupSizeDirective, inputs: ['size']}],
 })
-export class PopupPageComponent {
+export default class PopupPageComponent {
 
   public readonly input = input<string>();
 
@@ -50,6 +52,7 @@ export class PopupPageComponent {
 
   protected readonly popup = inject(WorkbenchPopup);
   protected readonly legacyPopup = inject(Popup);
+  protected readonly activatedMicrofrontend = inject(ActivatedMicrofrontend, {optional: true});
   protected readonly uuid = UUID.randomUUID();
 
   protected readonly form = this._formBuilder.group({

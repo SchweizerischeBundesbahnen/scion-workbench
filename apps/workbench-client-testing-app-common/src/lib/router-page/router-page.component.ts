@@ -10,12 +10,13 @@
 
 import {Component, inject, numberAttribute} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {WorkbenchNavigationExtras, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
+import {WORKBENCH_ELEMENT, WorkbenchElement, WorkbenchNavigationExtras, WorkbenchRouter} from '@scion/workbench-client';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {UUID} from '@scion/toolkit/uuid';
 import {MultiValueInputComponent, parseTypedObject, prune, stringifyError} from 'workbench-testing-app-common';
+import {Beans} from '@scion/toolkit/bean-manager';
 
 @Component({
   selector: 'app-router-page',
@@ -51,7 +52,7 @@ export class RouterPageComponent {
   protected navigateError: string | undefined;
 
   constructor() {
-    inject(WorkbenchView).signalReady();
+    Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.signalReady();
   }
 
   protected async onNavigate(): Promise<void> {

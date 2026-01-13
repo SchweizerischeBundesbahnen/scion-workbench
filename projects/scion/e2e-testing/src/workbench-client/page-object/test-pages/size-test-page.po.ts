@@ -17,24 +17,26 @@ import {MicrofrontendDialogPagePO} from '../../../workbench/page-object/workbenc
 import {DialogPO} from '../../../dialog.po';
 import {PopupPO} from '../../../popup.po';
 import {MicrofrontendPopupPagePO} from '../../../workbench/page-object/workbench-popup-page.po';
-import {AppPO} from '../../../app.po';
-import {DialogId, PartId, PopupId, ViewId} from '@scion/workbench-client';
-import {RequireOne} from '../../../helper/utility-types';
+import {PartPO} from '../../../part.po';
 
 export class SizeTestPagePO implements MicrofrontendViewPagePO, MicrofrontendDialogPagePO, MicrofrontendPopupPagePO {
 
   public readonly locator: Locator;
+  public readonly part: PartPO;
   public readonly view: ViewPO;
   public readonly dialog: DialogPO;
   public readonly popup: PopupPO;
   public readonly outlet: SciRouterOutletPO;
 
-  constructor(appPO: AppPO, locateBy: RequireOne<{id: PartId | ViewId | DialogId | PopupId; cssClass: string}>) {
-    this.outlet = new SciRouterOutletPO(appPO, {name: locateBy.id, cssClass: locateBy.cssClass});
-    this.view = appPO.view({viewId: locateBy.id as ViewId | undefined, cssClass: locateBy.cssClass});
-    this.dialog = appPO.dialog({dialogId: locateBy.id as DialogId | undefined, cssClass: locateBy.cssClass});
-    this.popup = appPO.popup({popupId: locateBy.id as PopupId | undefined, cssClass: locateBy.cssClass});
-    this.outlet = new SciRouterOutletPO(appPO, {name: locateBy.id, cssClass: locateBy.cssClass});
+  constructor(locateBy: PartPO | ViewPO | DialogPO | PopupPO) {
+    this.outlet = new SciRouterOutletPO(locateBy.locator.page(), {name: locateBy.locateBy?.id, cssClass: locateBy.locateBy?.cssClass});
+    this.locator = this.outlet.frameLocator.locator('app-size-test-page');
+
+    this.part = locateBy instanceof PartPO ? locateBy : undefined!;
+    this.view = locateBy instanceof ViewPO ? locateBy : undefined!;
+    this.dialog = locateBy instanceof DialogPO ? locateBy : undefined!;
+    this.popup = locateBy instanceof PopupPO ? locateBy : undefined!;
+
     this.locator = this.outlet.frameLocator.locator('app-size-test-page');
   }
 

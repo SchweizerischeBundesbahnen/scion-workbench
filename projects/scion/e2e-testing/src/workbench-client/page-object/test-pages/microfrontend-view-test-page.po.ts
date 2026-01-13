@@ -8,23 +8,18 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../../../app.po';
 import {Locator} from '@playwright/test';
 import {ViewPO} from '../../../view.po';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../../workbench/page-object/workbench-view-page.po';
-import {ViewId} from '@scion/workbench-client';
-import {RequireOne} from '../../../helper/utility-types';
 
 export class MicrofrontendViewTestPagePO implements MicrofrontendViewPagePO {
 
   public readonly locator: Locator;
-  public readonly view: ViewPO;
   public readonly outlet: SciRouterOutletPO;
 
-  constructor(appPO: AppPO, locateBy: RequireOne<{viewId: ViewId; cssClass: string}>) {
-    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.outlet = new SciRouterOutletPO(appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
+  constructor(public view: ViewPO) {
+    this.outlet = new SciRouterOutletPO(view.locator.page(), {name: view.locateBy?.id, cssClass: view.locateBy?.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-microfrontend-test-page');
   }
 }

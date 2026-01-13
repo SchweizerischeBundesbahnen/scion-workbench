@@ -8,19 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../../../app.po';
 import {Locator} from '@playwright/test';
 import {ViewPO} from '../../../view.po';
 import {WorkbenchViewPagePO} from '../workbench-view-page.po';
-import {ViewId} from '@scion/workbench';
 
 export class NonStandaloneViewTestPagePO implements WorkbenchViewPagePO {
 
   public readonly locator: Locator;
-  public readonly view: ViewPO;
 
-  constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.locator = this.view.locator.locator('app-non-standalone-view-test-page');
+  constructor(public view: ViewPO) {
+    this.locator = view.locator.locator('app-non-standalone-view-test-page');
   }
 }

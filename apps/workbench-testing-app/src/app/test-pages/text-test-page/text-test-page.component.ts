@@ -16,7 +16,6 @@ import {parseTypedString} from 'workbench-testing-app-common';
 import {APP_IDENTITY} from '@scion/microfrontend-platform';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {SESSION_STORAGE} from '../../session.storage';
-import {Translatable, WorkbenchDialog} from '@scion/workbench-client';
 
 @Component({
   selector: 'app-text-test-page',
@@ -30,7 +29,6 @@ import {Translatable, WorkbenchDialog} from '@scion/workbench-client';
 export default class TextTestPageComponent {
 
   private readonly _sessionStorage = inject(SESSION_STORAGE);
-  private readonly _dialog = inject(WorkbenchDialog, {optional: true});
 
   protected readonly undefinedList = `autocomplete-list-${UUID.randomUUID()}`;
   protected readonly appSymbolicName = Beans.get(APP_IDENTITY);
@@ -55,9 +53,5 @@ export default class TextTestPageComponent {
     const key = this.provideValueFormGroup.controls.key.value;
     const value = this.provideValueFormGroup.controls.value.value;
     this._sessionStorage.put(`textprovider.values.${key}`, parseTypedString(value));
-  }
-
-  protected onDialogTitleSet(title: Translatable): void {
-    this._dialog!.setTitle(title);
   }
 }

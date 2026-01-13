@@ -32,11 +32,11 @@ test.describe('Workbench Part Action Directive', () => {
     );
 
     // Register part action for view 1.
-    const viewPage1 = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const viewPage1 = new ViewPagePO(appPO.view({viewId: 'view.101'}));
     await viewPage1.registerPartActions({content: 'search', cssClass: 'view-1-search-action'});
 
     // Register part action for view 2.
-    const viewPage2 = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const viewPage2 = new ViewPagePO(appPO.view({viewId: 'view.102'}));
     await viewPage2.view.tab.click();
     await viewPage2.registerPartActions([
       {content: 'settings', cssClass: 'view-2-settings-action'},
@@ -98,8 +98,8 @@ test.describe('Workbench Part Action Directive', () => {
       .navigatePart('part.bottom', ['test-part']),
     );
 
-    const leftPartPage = new PartPagePO(appPO, {partId: 'part.left'});
-    const rightPartPage = new PartPagePO(appPO, {partId: 'part.right'});
+    const leftPartPage = new PartPagePO(appPO.part({partId: 'part.left'}));
+    const rightPartPage = new PartPagePO(appPO.part({partId: 'part.right'}));
 
     // Register 'testee-1' part action in left part.
     await leftPartPage.registerPartActions({content: 'testee-1', cssClass: 'left-part-testee-1'});

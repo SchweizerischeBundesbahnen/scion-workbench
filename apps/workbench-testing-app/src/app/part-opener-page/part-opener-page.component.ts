@@ -35,7 +35,7 @@ export default class PartOpenerPageComponent {
     label: this._formBuilder.control('Workbench Part'),
   });
 
-  protected onOpenPart(): void {
+  protected onAddPart(): void {
     const partId = UUID.randomUUID();
     const path = this.form.controls.path.value;
     const dockTo = this.form.controls.dockTo.value;

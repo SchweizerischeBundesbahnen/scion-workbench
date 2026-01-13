@@ -15,8 +15,7 @@ import {MultiValueInputComponent, parseTypedString, stringifyError} from 'workbe
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
-import {DialogPageComponent} from '../dialog-page/dialog-page.component';
-import BlankTestPageComponent from '../test-pages/blank-test-page/blank-test-page.component';
+import DialogPageComponent from '../dialog-page/dialog-page.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import PopupOpenerPageComponent from '../popup-opener-page/popup-opener-page.component';
 import InputFieldTestPageComponent from '../test-pages/input-field-test-page/input-field-test-page.component';
@@ -89,7 +88,7 @@ export default class DialogOpenerPageComponent {
       .catch((error: unknown) => this.dialogError = stringifyError(error) || 'Workbench Dialog was closed with an error');
   }
 
-  private readComponentFromUI(): Type<DialogPageComponent | BlankTestPageComponent | DialogOpenerPageComponent> {
+  private readComponentFromUI(): Type<unknown> {
     switch (this.form.controls.component.value) {
       case 'dialog-page':
         return DialogPageComponent;

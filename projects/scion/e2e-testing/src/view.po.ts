@@ -8,14 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DomRect, fromRect, getCssClasses} from './helper/testing.util';
-import {Locator} from '@playwright/test';
+import {coerceArray, selectBy, DomRect, fromRect, getCssClasses} from './helper/testing.util';
+import {Locator, Page} from '@playwright/test';
 import {PartPO} from './part.po';
 import {ViewTabPO} from './view-tab.po';
 import {ViewId} from '@scion/workbench';
 import {ViewInfo} from './workbench/page-object/view-info-dialog.po';
 import {ScrollbarPO} from './scrollbar.po';
 import {WorkbenchAccessor, WorkbenchViewNavigationE2E} from './workbench-accessor';
+import {RequireOne} from './helper/utility-types';
+import {MAIN_AREA} from './workbench.model';
 
 /**
  * Handle for interacting with a workbench view.
@@ -24,20 +26,35 @@ export class ViewPO {
 
   private readonly _workbenchAccessor: WorkbenchAccessor;
 
+  public readonly locator: Locator;
   /**
    * Handle to the tab of the view in the tab bar.
    */
   public readonly tab: ViewTabPO;
+  /**
+   * Handle to the part in which this view tab is contained.
+   */
+  public readonly part: PartPO;
+
   public readonly viewport: Locator;
+  public readonly scrollbars: {vertical: ScrollbarPO; horizontal: ScrollbarPO};
+  public readonly locateBy?: {id?: ViewId; cssClass?: string[]};
 
-  public readonly scrollbars: {
-    vertical: ScrollbarPO;
-    horizontal: ScrollbarPO;
-  };
+  constructor(page: Page, locateBy: RequireOne<{viewId: ViewId; cssClass: string | string[]}> | {locator: Locator; viewTab: ViewTabPO}) {
+    if ('locator' in locateBy) {
+      this.locator = locateBy.locator;
+      this.tab = locateBy.viewTab;
+    }
+    else {
+      const viewTabLocator = page.locator(selectBy('wb-view-tab', {attributes: {'data-viewid': locateBy.viewId}, cssClass: locateBy.cssClass}));
+      const partLocator = page.locator(`wb-part:not([data-partid="${MAIN_AREA}"])`, {has: viewTabLocator});
+      this.locateBy = {id: locateBy.viewId, cssClass: coerceArray(locateBy.cssClass)};
+      this.locator = page.locator(selectBy('wb-view-slot', {attributes: {'data-viewid': locateBy.viewId}, cssClass: locateBy.cssClass}));
+      this.tab = new ViewTabPO(viewTabLocator, new PartPO(page, partLocator));
+    }
 
-  constructor(public readonly locator: Locator, tab: ViewTabPO) {
-    this._workbenchAccessor = new WorkbenchAccessor(this.locator.page());
-    this.tab = tab;
+    this._workbenchAccessor = new WorkbenchAccessor(page);
+    this.part = this.tab.part;
     this.viewport = this.locator.locator('> sci-viewport');
     this.scrollbars = {
       vertical: new ScrollbarPO(this.viewport.locator('> sci-scrollbar.e2e-vertical')),
@@ -51,13 +68,6 @@ export class ViewPO {
 
   public getInfo(): Promise<ViewInfo> {
     return this.tab.getInfo();
-  }
-
-  /**
-   * Handle to the part in which this view is contained.
-   */
-  public get part(): PartPO {
-    return this.tab.part;
   }
 
   /**

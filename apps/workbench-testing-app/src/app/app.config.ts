@@ -25,14 +25,20 @@ import {provideDesignTokens} from './workbench/provide-design-tokens';
 import {ActiveWorkbenchElementCollector} from './active-workbench-element-log-page/active-workbench-element-collector.service';
 import {provideValueFromStorage} from './text/storage-text-provider';
 import {provideWorkbenchLauncher} from './workbench-launcher.provider';
+import {provideRoutesFromStorage} from './route-registration.service';
+import {provideRoutesForHostCapabilities} from './host-app.manifest';
+import {provideRoutesForPerspectives} from './app.perspectives';
 
 /**
  * Central place to configure the workbench-testing-app.
  */
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes, withHashLocation(), withPreloading(PreloadAllModules)),
     provideWorkbench(workbenchConfig),
+    provideRoutesFromStorage(), // must precede `provideRouter` for routes to have precedence over app routes
+    provideRouter(routes, withHashLocation(), withPreloading(PreloadAllModules)),
+    provideRoutesForPerspectives(),
+    provideRoutesForHostCapabilities(),
     provideWorkbenchLauncher(),
     provideConfirmWorkbenchStartup(),
     provideDesignTokens(),

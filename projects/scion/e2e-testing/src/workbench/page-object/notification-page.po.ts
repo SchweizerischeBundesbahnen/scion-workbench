@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {NotificationPO} from './notification.po';
-import {coerceArray} from './helper/testing.util';
+import {NotificationPO} from '../../notification.po';
+import {coerceArray} from '../../helper/testing.util';
 import {Locator} from '@playwright/test';
-import {WorkbenchNotificationPagePO} from './workbench/page-object/workbench-notification-page.po';
+import {WorkbenchNotificationPagePO} from './workbench-notification-page.po';
 import {Translatable} from '@scion/workbench';
 
 /**

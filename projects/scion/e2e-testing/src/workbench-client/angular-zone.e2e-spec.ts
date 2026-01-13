@@ -37,7 +37,7 @@ test.describe('Angular Zone Synchronization', () => {
     // Open test page.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-    const angularZoneTestPage = new AngularZoneTestPagePO(appPO, {cssClass: 'testee'});
+    const angularZoneTestPage = new AngularZoneTestPagePO(appPO.view({cssClass: 'testee'}));
 
     const partIdPanel = angularZoneTestPage.workbenchView.partIdPanel;
     await partIdPanel.expand();
@@ -68,7 +68,7 @@ test.describe('Angular Zone Synchronization', () => {
     // Open test page.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-    const angularZoneTestPage = new AngularZoneTestPagePO(appPO, {cssClass: 'testee'});
+    const angularZoneTestPage = new AngularZoneTestPagePO(appPO.view({cssClass: 'testee'}));
 
     const capabilityPanel = angularZoneTestPage.workbenchView.capabilityPanel;
     await capabilityPanel.expand();
@@ -99,7 +99,7 @@ test.describe('Angular Zone Synchronization', () => {
     // Open test page.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-    const angularZoneTestPage = new AngularZoneTestPagePO(appPO, {cssClass: 'testee'});
+    const angularZoneTestPage = new AngularZoneTestPagePO(appPO.view({cssClass: 'testee'}));
 
     const paramsPanel = angularZoneTestPage.workbenchView.paramsPanel;
     await paramsPanel.expand();
@@ -130,7 +130,7 @@ test.describe('Angular Zone Synchronization', () => {
     // Open test page.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-    const angularZoneTestPage = new AngularZoneTestPagePO(appPO, {cssClass: 'testee'});
+    const angularZoneTestPage = new AngularZoneTestPagePO(appPO.view({cssClass: 'testee'}));
 
     const activePanel = angularZoneTestPage.workbenchView.activePanel;
     await activePanel.expand();
@@ -161,7 +161,7 @@ test.describe('Angular Zone Synchronization', () => {
     // Open test page.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-    const angularZoneTestPage = new AngularZoneTestPagePO(appPO, {cssClass: 'testee'});
+    const angularZoneTestPage = new AngularZoneTestPagePO(appPO.view({cssClass: 'testee'}));
 
     const focusedPanel = angularZoneTestPage.workbenchView.focusedPanel;
     await focusedPanel.expand();
@@ -192,7 +192,7 @@ test.describe('Angular Zone Synchronization', () => {
     // Open test page.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-    const angularZoneTestPage = new AngularZoneTestPagePO(appPO, {cssClass: 'testee'});
+    const angularZoneTestPage = new AngularZoneTestPagePO(appPO.view({cssClass: 'testee'}));
 
     const activePanel = angularZoneTestPage.workbenchPart.activePanel;
     await activePanel.expand();
@@ -223,7 +223,7 @@ test.describe('Angular Zone Synchronization', () => {
     // Open test page.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
-    const angularZoneTestPage = new AngularZoneTestPagePO(appPO, {cssClass: 'testee'});
+    const angularZoneTestPage = new AngularZoneTestPagePO(appPO.view({cssClass: 'testee'}));
 
     const focusedPanel = angularZoneTestPage.workbenchPart.focusedPanel;
     await focusedPanel.expand();

@@ -8,14 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../../app.po';
 import {Locator} from '@playwright/test';
 import {PartPO} from '../../part.po';
-import {NavigationData, NavigationState, PartId, Translatable} from '@scion/workbench';
+import {NavigationData, NavigationState, Translatable} from '@scion/workbench';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {coerceArray} from '../../helper/testing.util';
 import {Params} from '@angular/router';
+import {ActivatedMicrofrontendPO} from './activated-microfrontend.po';
 
 /**
  * Page object to interact with {@link PartPageComponent}.
@@ -25,11 +25,11 @@ export class PartPagePO {
   public static readonly selector = 'app-part-page';
 
   public readonly locator: Locator;
-  public readonly part: PartPO;
+  public readonly activatedMicrofrontend: ActivatedMicrofrontendPO;
 
-  constructor(appPO: AppPO, locateBy: {partId?: PartId; cssClass?: string}) {
-    this.part = appPO.part({partId: locateBy.partId, cssClass: locateBy.cssClass});
+  constructor(public part: PartPO) {
     this.locator = this.part.locator.locator(PartPagePO.selector);
+    this.activatedMicrofrontend = new ActivatedMicrofrontendPO(this.locator.locator('app-activated-microfrontend'));
   }
 
   public getComponentInstanceId(): Promise<string> {

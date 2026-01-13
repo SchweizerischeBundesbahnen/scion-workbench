@@ -13,6 +13,7 @@ import RegisterPartActionPageComponent from './register-part-action-page/registe
 import {SciTabbarComponent, SciTabDirective} from '@scion/components.internal/tabbar';
 import ModifyLayoutPageComponent from './modify-layout-page/modify-layout-page.component';
 import CreatePerspectivePageComponent from './create-perspective-page/create-perspective-page.component';
+import RegisterRoutePageComponent from './register-route-page/register-route-page.component';
 
 @Component({
   selector: 'app-layout-page',
@@ -24,6 +25,7 @@ import CreatePerspectivePageComponent from './create-perspective-page/create-per
     ModifyLayoutPageComponent,
     CreatePerspectivePageComponent,
     RegisterPartActionPageComponent,
+    RegisterRoutePageComponent,
   ],
 })
 export default class LayoutPageComponent {

@@ -8,8 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import ActivatedMicrofrontendComponent from '../activated-microfrontend/activated-microfrontend.component';
+import {ActivatedMicrofrontend} from '@scion/workbench';
+import {UUID} from '@scion/toolkit/uuid';
 
 @Component({
   selector: 'app-message-box-page',
@@ -18,11 +21,13 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     SciFormFieldComponent,
+    ActivatedMicrofrontendComponent,
   ],
 })
-export class MessageBoxPageComponent {
+export default class MessageBoxPageComponent {
+
+  protected readonly activatedMicrofrontend = inject(ActivatedMicrofrontend, {optional: true});
+  protected readonly uuid = UUID.randomUUID();
 
   public readonly input = input<string>();
-  public readonly param1 = input<string>();
-  public readonly param2 = input<string>();
 }

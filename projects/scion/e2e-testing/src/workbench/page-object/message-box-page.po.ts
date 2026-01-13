@@ -8,9 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {MessageBoxPO} from './message-box.po';
+import {MessageBoxPO} from '../../message-box.po';
 import {Locator} from '@playwright/test';
-import {WorkbenchMessageBoxPagePO} from './workbench/page-object/workbench-message-box-page.po';
+import {WorkbenchMessageBoxPagePO} from './workbench-message-box-page.po';
+import {ActivatedMicrofrontendPO} from './activated-microfrontend.po';
 
 /**
  * Page object to interact with {@link MessageBoxPageComponent}.
@@ -18,14 +19,16 @@ import {WorkbenchMessageBoxPagePO} from './workbench/page-object/workbench-messa
 export class MessageBoxPagePO implements WorkbenchMessageBoxPagePO {
 
   public readonly locator: Locator;
+  public readonly activatedMicrofrontend: ActivatedMicrofrontendPO;
   public readonly input: Locator;
-  public readonly param1: Locator;
-  public readonly param2: Locator;
 
   constructor(public messageBox: MessageBoxPO) {
     this.locator = messageBox.locator.locator('app-message-box-page');
-    this.input = this.locator.locator('output.e2e-input');
-    this.param1 = this.locator.locator('output.e2e-param1');
-    this.param2 = this.locator.locator('output.e2e-param2');
+    this.activatedMicrofrontend = new ActivatedMicrofrontendPO(this.locator.locator('app-activated-microfrontend'));
+    this.input = this.locator.locator('input.e2e-input');
+  }
+
+  public getComponentInstanceId(): Promise<string> {
+    return this.locator.locator('input.e2e-component-instance-id').inputValue();
   }
 }

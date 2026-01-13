@@ -35,10 +35,10 @@ test.describe('Workbench Layout Storage', () => {
       .navigatePart('part.right', ['test-part']),
     );
 
-    const viewPage1 = new ViewPagePO(appPO, {viewId: 'view.101'});
-    const viewPage2 = new ViewPagePO(appPO, {viewId: 'view.102'});
-    const viewPage3 = new ViewPagePO(appPO, {viewId: 'view.103'});
-    const partPage = new PartPagePO(appPO, {partId: 'part.right'});
+    const viewPage1 = new ViewPagePO(appPO.view({viewId: 'view.101'}));
+    const viewPage2 = new ViewPagePO(appPO.view({viewId: 'view.102'}));
+    const viewPage3 = new ViewPagePO(appPO.view({viewId: 'view.103'}));
+    const partPage = new PartPagePO(appPO.part({partId: 'part.right'}));
 
     // Reopen the page
     await appPO.reload();

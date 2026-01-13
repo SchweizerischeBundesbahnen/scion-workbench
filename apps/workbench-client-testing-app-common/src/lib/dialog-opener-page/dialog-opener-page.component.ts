@@ -10,14 +10,13 @@
 
 import {Component, inject} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {DialogId, PartId, PopupId, ViewId, WorkbenchDialogOptions, WorkbenchDialogService} from '@scion/workbench-client';
+import {DialogId, PartId, PopupId, ViewId, WORKBENCH_ELEMENT, WorkbenchDialogOptions, WorkbenchDialogService, WorkbenchElement} from '@scion/workbench-client';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
-
 import {UUID} from '@scion/toolkit/uuid';
-import {MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
-import {MultiValueInputComponent, parseTypedString, stringifyError} from 'workbench-testing-app-common';
+import {MultiValueInputComponent, parseTypedObject, parseTypedString, stringifyError} from 'workbench-testing-app-common';
+import {Beans} from '@scion/toolkit/bean-manager';
 
 @Component({
   selector: 'app-dialog-opener-page',
@@ -62,7 +61,7 @@ export class DialogOpenerPageComponent {
   protected readonly nullList = `autocomplete-null-${UUID.randomUUID()}`;
 
   constructor() {
-    MicrofrontendPlatformClient.signalReady();
+    Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.signalReady();
   }
 
   protected async onDialogOpen(): Promise<void> {
@@ -81,7 +80,7 @@ export class DialogOpenerPageComponent {
   private readOptions(): WorkbenchDialogOptions {
     const options = this.form.controls.options.controls;
     return {
-      params: SciKeyValueFieldComponent.toDictionary(options.params) ?? undefined,
+      params: parseTypedObject(SciKeyValueFieldComponent.toDictionary(options.params)) ?? undefined,
       modality: options.modality.value || undefined,
       animate: options.animate.value,
       context: parseTypedString(options.context.value, {undefinedIfEmpty: true}),

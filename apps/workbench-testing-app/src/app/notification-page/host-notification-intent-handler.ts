@@ -7,7 +7,7 @@ import {IntentClient} from '@scion/microfrontend-platform';
  * Installs an intent handler that logs host notification intents.
  */
 function installHostNotificationIntentHandler(): void {
-  inject(IntentClient).onIntent<ɵWorkbenchNotificationCommand, void>({type: WorkbenchCapabilities.Notification, qualifier: {component: 'host-notification'}}, request => {
+  inject(IntentClient).onIntent<ɵWorkbenchNotificationCommand, void>({type: WorkbenchCapabilities.Notification, qualifier: {component: 'notification', app: 'host'}}, request => {
     const command: ɵWorkbenchNotificationCommand = request.body!;
     const params = Array.from(request.intent.params?.entries() ?? []).map(([key, value]) => `${key}=${value}`).join(',');
     console.info(`[HostNotification] command=[title=${command.title}, severity=${command.severity}, duration=${command.duration}, group=${command.group}, cssClass=${command.cssClass}, params=[${params}]]`);
