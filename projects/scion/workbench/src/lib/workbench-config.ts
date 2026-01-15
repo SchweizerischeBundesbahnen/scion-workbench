@@ -110,6 +110,8 @@ export abstract class WorkbenchConfig {
    * @see WorkbenchIconProviderFn
    */
   public abstract iconProvider?: WorkbenchIconProviderFn;
+  // Or mayby iconDecorator?
+  public abstract iconDecorator?: WorkbenchIconDecoratorFn;
 
   /**
    * Specifies the component to display in `<wb-workbench>` while the workbench is starting.

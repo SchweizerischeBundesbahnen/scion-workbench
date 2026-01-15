@@ -8,8 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, computed, createComponent, DestroyRef, effect, ElementRef, EnvironmentInjector, inject, Injector, input, Renderer2, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
-import {WORKBENCH_ICON_PROVIDER, WorkbenchIconDescriptor, WorkbenchIconProviderFn} from './workbench-icon-provider.model';
+import {ChangeDetectionStrategy, Component, computed, createComponent, DestroyRef, effect, ElementRef, EnvironmentInjector, inject, Injector, input, Renderer2, runInInjectionContext, untracked} from '@angular/core';
+import {WORKBENCH_ICON_PROVIDER, WorkbenchIconDescriptor} from './workbench-icon-provider.model';
 
 /**
  * Renders an icon based on registered icon providers.
@@ -37,8 +37,10 @@ export class IconComponent {
   private readonly _injector = inject(Injector);
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _renderer = inject(Renderer2);
-
-  private readonly _iconDescriptor = computeIconDescriptor(this.icon);
+  private readonly _iconDescriptor = computed(() => {
+    const icon = this.icon();
+    return untracked(() => iconDescriptor(icon, {injector: this._injector}));
+  });
 
   constructor() {
     // Render icon in an animation frame to capture CSS classes set on the host.
@@ -83,36 +85,62 @@ export class IconComponent {
   }
 }
 
-/**
- * Computes the icon descriptor for the specified icon based on the installed icon providers.
- */
-function computeIconDescriptor(icon: Signal<string | undefined>): Signal<WorkbenchIconDescriptor | undefined> {
-  const injector = inject(Injector);
-  const iconProviders = inject(WORKBENCH_ICON_PROVIDER, {optional: true}) as WorkbenchIconProviderFn[] | null;
-  if (!iconProviders?.length) {
-    return signal(undefined);
-  }
-
-  return computed(() => {
-    if (!icon()) {
-      return undefined;
-    }
-
-    return untracked(() => {
-      for (const iconProvider of iconProviders) {
-        const componentOrDescriptor = runInInjectionContext(injector, () => iconProvider(icon()!));
-        if (componentOrDescriptor) {
-          return typeof componentOrDescriptor === 'function' ? {component: componentOrDescriptor} : componentOrDescriptor;
-        }
-      }
-      return undefined;
-    });
-  });
-}
+// /**
+//  * Computes the icon descriptor for the specified icon based on the installed icon providers.
+//  */
+// function computeIconDescriptor(icon: Signal<string | undefined>): Signal<WorkbenchIconDescriptor | undefined> {
+//   const injector = inject(Injector);
+//   const iconProviders = inject(WORKBENCH_ICON_PROVIDER, {optional: true}) as WorkbenchIconProviderFn[] | null;
+//   if (!iconProviders?.length) {
+//     return signal(undefined);
+//   }
+//
+//   return computed(() => {
+//     if (!icon()) {
+//       return undefined;
+//     }
+//
+//     return untracked(() => {
+//       for (const iconProvider of iconProviders) {
+//         const componentOrDescriptor = runInInjectionContext(injector, () => iconProvider(icon()!));
+//         if (componentOrDescriptor) {
+//           return typeof componentOrDescriptor === 'function' ? {component: componentOrDescriptor} : componentOrDescriptor;
+//         }
+//       }
+//       return undefined;
+//     });
+//   });
+// }
 
 /**
  * Acts as placeholder if no icon could be found.
  */
 @Component({template: ''})
 export class NullIconComponent {
+}
+
+/**
+ * Computes the icon descriptor for the specified icon based on the installed icon providers.
+ *
+ * @experimental since xxx; API and behavior may change in any version without notice.
+ */
+export function iconDescriptor(icon: string | undefined, options?: {injector?: Injector}): WorkbenchIconDescriptor | undefined {
+  if (!icon) {
+    return undefined;
+  }
+
+  const injector = options?.injector ?? inject(Injector);
+  return runInInjectionContext(injector, () => {
+    const iconProviders = inject(WORKBENCH_ICON_PROVIDER, {optional: true});
+    if (!iconProviders?.length) {
+      return undefined;
+    }
+    for (const iconProvider of iconProviders) {
+      const componentOrDescriptor = iconProvider(icon);
+      if (componentOrDescriptor) {
+        return typeof componentOrDescriptor === 'function' ? {component: componentOrDescriptor} : componentOrDescriptor;
+      }
+    }
+    return undefined;
+  });
 }

@@ -8,8 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {InjectionToken, Injector} from '@angular/core';
+import {InjectionToken, Injector, Signal} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
+import {Observable} from 'rxjs';
 
 /**
  * Signature of a function to provide icons to the SCION Workbench.
@@ -50,6 +51,7 @@ export interface WorkbenchIconDescriptor {
    * ```
    */
   inputs?: {[name: string]: unknown};
+  badge?: (icon: string) => string | number | boolean | Promise<string | number | boolean | undefined> | Signal<string | number | boolean | undefined> | Observable<string | number | boolean | undefined> | undefined; // mayby only signal
   /**
    * Sets the injector for the instantiation of the component, giving control over the objects available for injection.
    *
@@ -72,4 +74,4 @@ export interface WorkbenchIconDescriptor {
  * Multiple icon providers can be registered. Providers are called in registration order.
  * If a provider does not provide the icon, the next provider is called, and so on.
  */
-export const WORKBENCH_ICON_PROVIDER = new InjectionToken<WorkbenchIconProviderFn>('WORKBENCH_ICON_PROVIDER');
+export const WORKBENCH_ICON_PROVIDER = new InjectionToken<WorkbenchIconProviderFn[]>('WORKBENCH_ICON_PROVIDER');
