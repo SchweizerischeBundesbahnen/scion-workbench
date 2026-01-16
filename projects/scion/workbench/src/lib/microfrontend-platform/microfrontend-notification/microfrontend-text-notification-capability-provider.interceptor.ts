@@ -32,6 +32,9 @@ function provideBuiltInTextNotificationCapability(): WorkbenchNotificationCapabi
         description: 'Text to display in the notification.',
       },
     ],
+    properties: {
+      path: '',
+    },
     private: false,
     description: 'Displays a text notification.',
   };

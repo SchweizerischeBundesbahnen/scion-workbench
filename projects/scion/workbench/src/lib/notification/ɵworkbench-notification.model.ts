@@ -11,12 +11,13 @@ import {fromEvent} from 'rxjs';
 import {observeIn, subscribeIn} from '@scion/toolkit/operators';
 import {filter} from 'rxjs/operators';
 import {WorkbenchNotificationRegistry} from './workbench-notification.registry';
+import {WORKBENCH_ELEMENT} from '../workbench-element-references';
 
 /** @inheritDoc */
 export class ɵWorkbenchNotification implements WorkbenchNotification {
 
   /** Injector for the notification; destroyed when the notification is closed. */
-  private readonly _injector = inject(Injector) as DestroyableInjector;
+  public readonly injector = inject(Injector) as DestroyableInjector;
 
   public readonly slot: {
     component: ComponentType<unknown> | undefined;
@@ -62,6 +63,7 @@ export class ɵWorkbenchNotification implements WorkbenchNotification {
         {provide: ɵWorkbenchNotification, useValue: this},
         {provide: WorkbenchNotification, useExisting: ɵWorkbenchNotification},
         {provide: Notification, useClass: ɵNotification},
+        {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchNotification},
         ...this._options.providers ?? [],
       ],
     });
@@ -150,7 +152,7 @@ export class ɵWorkbenchNotification implements WorkbenchNotification {
    */
   public destroy(): void {
     if (!this.destroyed()) {
-      this._injector.destroy();
+      this.injector.destroy();
       this._notificationRegistry.unregister(this.id);
     }
   }

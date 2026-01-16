@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,22 +11,23 @@
 import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, input, signal, untracked, viewChild} from '@angular/core';
 import {ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
-import {WorkbenchMessageBoxCapability, ɵMESSAGE_BOX_CONTEXT, ɵMessageBoxContext, ɵWorkbenchCommands} from '@scion/workbench-client';
+import {WorkbenchNotificationCapability, ɵNOTIFICATION_CONTEXT, ɵNotificationContext, ɵWorkbenchCommands, ɵWorkbenchDialogMessageHeaders} from '@scion/workbench-client';
 import {NgComponentOutlet} from '@angular/common';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
 import {Microfrontends} from '../common/microfrontend.util';
-import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog.model';
+import {ɵWorkbenchNotification} from '../../notification/ɵworkbench-notification.model';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
- * Displays the microfrontend of a given {@link WorkbenchMessageBoxCapability}.
+ * Displays the microfrontend of a given {@link WorkbenchNotficationCapability}.
  *
- * This component is designed to be displayed in a workbench message box.
+ * This component is designed to be displayed in a workbench notification.
  */
 @Component({
-  selector: 'wb-microfrontend-message-box',
-  styleUrls: ['./microfrontend-message-box.component.scss'],
-  templateUrl: './microfrontend-message-box.component.html',
+  selector: 'wb-microfrontend-notification',
+  styleUrls: ['./microfrontend-notification.component.scss'],
+  templateUrl: './microfrontend-notification.component.html',
   imports: [
     NgComponentOutlet,
   ],
@@ -35,37 +36,34 @@ import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog.model';
     '[class.workbench-drag]': 'workbenchLayoutService.dragging()',
   },
 })
-export class MicrofrontendMessageBoxComponent {
+export class MicrofrontendNotificationComponent {
 
-  public readonly capability = input.required<WorkbenchMessageBoxCapability>();
+  public readonly capability = input.required<WorkbenchNotificationCapability>();
   public readonly params = input.required<Map<string, unknown>>();
   public readonly referrer = input.required<string>();
 
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _outletRouter = inject(OutletRouter);
-  private readonly _messageClient = inject(MessageClient);
   private readonly _logger = inject(Logger);
   private readonly _routerOutletElement = viewChild.required<ElementRef<SciRouterOutletElement>>('router_outlet');
 
   /** Splash to display until the microfrontend signals readiness. */
   protected readonly splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
   protected readonly workbenchLayoutService = inject(WorkbenchLayoutService);
-  protected readonly dialog = inject(ɵWorkbenchDialog);
+  protected readonly notification = inject(ɵWorkbenchNotification);
   protected readonly focusWithin = signal(false);
 
   constructor() {
     this._logger.debug(() => 'Constructing MicrofrontendNotificationComponent.', LoggerNames.MICROFRONTEND);
-    this.setMessageBoxProperties();
-    this.propagateMessageBoxContext();
+    this.setNotificationProperties();
+    this.propagateNotificationContext();
     this.propagateWorkbenchTheme();
-    this.installDialogFocusedPublisher();
     this.installNavigator();
+    this.installNotificationCloseListener();
 
     inject(DestroyRef).onDestroy(() => {
       // Clear the outlet.
-      void this._outletRouter.navigate(null, {outlet: this.dialog.id});
-      // Delete retained messages to free resources.
-      void this._messageClient.publish(ɵWorkbenchCommands.dialogFocusedTopic(this.dialog.id), undefined, {retain: true});
+      void this._outletRouter.navigate(null, {outlet: this.notification.id});
     });
   }
 
@@ -79,13 +77,13 @@ export class MicrofrontendMessageBoxComponent {
 
       void untracked(async () => {
         const application = manifestService.getApplication(capability.metadata!.appSymbolicName);
-        this._logger.debug(() => `Loading microfrontend into workbench message box [app=${capability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${capability.properties.path}].`, LoggerNames.MICROFRONTEND, params, capability);
+        this._logger.debug(() => `Loading microfrontend into workbench notification [app=${capability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${capability.properties.path}].`, LoggerNames.MICROFRONTEND, params, capability);
 
         // Wait for the context to be set on the router outlet, as @scion/workbench-client expects it to be available on startup.
-        await Microfrontends.waitForContext(this._routerOutletElement, ɵMESSAGE_BOX_CONTEXT, {injector});
+        await Microfrontends.waitForContext(this._routerOutletElement, ɵNOTIFICATION_CONTEXT, {injector});
 
-        void this._outletRouter.navigate(capability.properties.path, {
-          outlet: this.dialog.id,
+        void this._outletRouter.navigate(capability.properties.path ?? '', {
+          outlet: this.notification.id,
           relativeTo: application.baseUrl,
           params: params,
           pushStateToSessionHistoryStack: false,
@@ -93,6 +91,14 @@ export class MicrofrontendMessageBoxComponent {
         });
       });
     });
+  }
+
+  private installNotificationCloseListener(): void {
+    inject(MessageClient).observe$<unknown>(ɵWorkbenchCommands.notificationCloseTopic(this.notification.id))
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => {
+        this.notification.close();
+      });
   }
 
   protected onFocusWithin(event: Event): void {
@@ -105,12 +111,12 @@ export class MicrofrontendMessageBoxComponent {
   }
 
   /**
-   * Provides the message box context to embedded content.
+   * Provides the notification context to embedded content.
    */
-  private propagateMessageBoxContext(): void {
+  private propagateNotificationContext(): void {
     effect(() => {
-      const context: ɵMessageBoxContext = {
-        dialogId: this.dialog.id,
+      const context: ɵNotificationContext = {
+        notificationId: this.notification.id,
         capability: this.capability(),
         params: this.params(),
         referrer: {
@@ -119,31 +125,15 @@ export class MicrofrontendMessageBoxComponent {
       };
       const routerOutletElement = this._routerOutletElement().nativeElement;
 
-      untracked(() => routerOutletElement.setContextValue(ɵMESSAGE_BOX_CONTEXT, context));
+      untracked(() => routerOutletElement.setContextValue(ɵNOTIFICATION_CONTEXT, context));
     });
   }
 
-  private installDialogFocusedPublisher(): void {
-    effect(() => {
-      const focused = this.dialog.focused();
-      untracked(() => {
-        const commandTopic = ɵWorkbenchCommands.dialogFocusedTopic(this.dialog.id);
-        void this._messageClient.publish(commandTopic, focused, {retain: true});
-      });
-    });
-  }
-
-  private setMessageBoxProperties(): void {
+  private setNotificationProperties(): void {
     effect(() => {
       const properties = this.capability().properties;
 
       untracked(() => {
-        this.dialog.size.width = properties.size?.width;
-        this.dialog.size.height = properties.size?.height;
-        this.dialog.size.minWidth = properties.size?.minWidth;
-        this.dialog.size.maxWidth = properties.size?.maxWidth;
-        this.dialog.size.minHeight = properties.size?.minHeight;
-        this.dialog.size.maxHeight = properties.size?.maxHeight;
       });
     });
   }

@@ -12,6 +12,17 @@
       }
     },
     {
+      "type": "notification",
+      "private": false,
+      "qualifier": {
+        "component": "notification",
+        "app": "app1"
+      },
+      "properties": {
+        "path": "test-notification"
+      }
+    },
+    {
       "type": "perspective",
       "qualifier": {
         "perspective": "sample-perspective-1",
@@ -405,5 +416,11 @@
     }
   ],
   "intentions": [
+    {
+      "type": "notification",
+      "qualifier": {
+        "*": "*"
+      }
+    }
   ]
 }

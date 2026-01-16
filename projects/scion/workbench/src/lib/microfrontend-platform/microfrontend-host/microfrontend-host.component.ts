@@ -33,7 +33,8 @@ import {MicrofrontendHostOutlet} from './microfrontend-host-routes';
   host: {
     '[attr.data-capabilityid]': 'capability().metadata!.id',
     '[attr.data-app]': 'capability().metadata!.appSymbolicName',
-    '[attr.data-focus]': `workbenchElement.focused() ? '' : null`,
+    // TODO [eg]: add focus handling for notification
+    '[attr.data-focus]': `workbenchElement.focused?.() ? '' : null`,
   },
   providers: [
     // Provide `ActivatedMicrofrontend` for DI in router outlet. Otherwise, `ActivatedMicrofrontend` would not be available, most likely because provided on the route level.

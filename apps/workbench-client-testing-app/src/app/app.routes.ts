@@ -56,6 +56,10 @@ export const routes: Routes = [
     loadComponent: () => import('workbench-client-testing-app-common').then(m => m.NotificationOpenerPageComponent),
   },
   {
+    path: 'test-notification',
+    loadComponent: () => import('./notification-page/notification-page.component'),
+  },
+  {
     path: 'register-workbench-capability',
     loadComponent: () => import('workbench-client-testing-app-common').then(m => m.RegisterWorkbenchCapabilityPageComponent),
   },

@@ -35,10 +35,10 @@ export default class RegisterRoutePageComponent {
   private readonly _routeRegistrationService = inject(RouteRegistrationService);
   private readonly _initialFormValue = {
     path: '',
-    component: '' as '' | 'part-page' | 'view-page' | 'dialog-page' | 'messagebox-page' | 'popup-page' | 'router-page' | 'focus-test-page' | 'size-test-page' | 'text-test-page' | 'microfrontend-dialog-opener-page' | 'microfrontend-messagebox-opener-page' | 'microfrontend-popup-opener-page',
+    component: '' as '' | 'part-page' | 'view-page' | 'dialog-page' | 'messagebox-page' | 'popup-page' | 'notification-page' | 'router-page' | 'focus-test-page' | 'size-test-page' | 'text-test-page' | 'microfrontend-dialog-opener-page' | 'microfrontend-messagebox-opener-page' | 'microfrontend-popup-opener-page',
     data: {} as Record<string, unknown>,
     canMatch: {
-      fn: '' as '' | 'canMatchWorkbenchPart' | 'canMatchWorkbenchView' | 'canMatchWorkbenchPartCapability' | 'canMatchWorkbenchViewCapability' | 'canMatchWorkbenchDialogCapability' | 'canMatchWorkbenchMessageBoxCapability' | 'canMatchWorkbenchPopupCapability',
+      fn: '' as '' | 'canMatchWorkbenchPart' | 'canMatchWorkbenchView' | 'canMatchWorkbenchPartCapability' | 'canMatchWorkbenchViewCapability' | 'canMatchWorkbenchDialogCapability' | 'canMatchWorkbenchMessageBoxCapability' | 'canMatchWorkbenchPopupCapability' | 'canMatchWorkbenchNotificationCapability',
       qualifier: {} as Qualifier,
       hint: '',
     },

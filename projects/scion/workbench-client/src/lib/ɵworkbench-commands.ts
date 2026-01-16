@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DialogId, PartId, PopupId, ViewId} from './workbench.identifiers';
+import {DialogId, NotificationId, PartId, PopupId, ViewId} from './workbench.identifiers';
 
 /**
  * Defines command endpoints for the communication between SCION Workbench and SCION Workbench Client.
@@ -143,4 +143,16 @@ export const ɵWorkbenchCommands = {
    * Computes the topic via which a dialog can be closed.
    */
   dialogCloseTopic: (dialogId: DialogId) => `ɵworkbench/dialogs/${dialogId}/close`,
+
+  /**
+   * Computes the topic to notify the focused state of a notification.
+   *
+   * The focused state is published as a retained message.
+   */
+  notificationFocusedTopic: (notificationId: NotificationId) => `ɵworkbench/notifications/${notificationId}/focused`,
+
+  /**
+   * Computes the topic via which a notification can be closed.
+   */
+  notificationCloseTopic: (notificationId: NotificationId) => `ɵworkbench/notifications/${notificationId}/close`,
 } as const;

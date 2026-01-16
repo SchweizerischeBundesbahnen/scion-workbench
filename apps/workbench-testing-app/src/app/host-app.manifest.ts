@@ -1,7 +1,7 @@
-import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchPartCapability, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchNotificationCapability, WorkbenchPartCapability, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
 import {Manifest} from '@scion/microfrontend-platform';
 import {Route, Routes, ROUTES} from '@angular/router';
-import {canMatchWorkbenchDialogCapability, canMatchWorkbenchMessageBoxCapability, canMatchWorkbenchPartCapability, canMatchWorkbenchPopupCapability, canMatchWorkbenchViewCapability} from '@scion/workbench';
+import {canMatchWorkbenchDialogCapability, canMatchWorkbenchMessageBoxCapability, canMatchWorkbenchNotificationCapability, canMatchWorkbenchPartCapability, canMatchWorkbenchPopupCapability, canMatchWorkbenchViewCapability} from '@scion/workbench';
 import {EnvironmentProviders, makeEnvironmentProviders} from '@angular/core';
 
 /**
@@ -25,6 +25,7 @@ export const hostAppManifest: Manifest = {
     provideDialogCapability(),
     provideMessageBoxCapability(),
     providePopupCapability(),
+    provideNotificationCapability(),
   ],
   intentions: [
     // allow opening DevTools
@@ -51,6 +52,7 @@ export const hostCapabilityRoutes: Routes = [
   provideDialogCapabilityRoute(),
   provideMessageBoxCapabilityRoute(),
   providePopupCapabilityRoute(),
+  provideNotificationCapabilityRoute()
 ];
 
 /**
@@ -388,5 +390,25 @@ function providePopupCapabilityRoute(): Route {
     path: '',
     canMatch: [canMatchWorkbenchPopupCapability({component: 'popup', app: 'host'})],
     loadComponent: () => import('./popup-page/popup-page.component'),
+  };
+}
+
+function provideNotificationCapability(): WorkbenchNotificationCapability {
+  return {
+    type: WorkbenchCapabilities.Notification,
+    qualifier: {component: 'notification', app: 'host'},
+    description: 'Notification to interact with WorkbenchNotification handle',
+    private: false,
+    properties: {
+      path: '',
+    },
+  };
+}
+
+function provideNotificationCapabilityRoute(): Route {
+  return {
+    path: '',
+    canMatch: [canMatchWorkbenchNotificationCapability({component: 'notification', app: 'host'})],
+    loadComponent: () => import('./notification-page/notification-page.component'),
   };
 }

@@ -34,6 +34,7 @@ import {ɵWorkbenchPopupService} from './popup/ɵworkbench-popup-service';
 import {ɵWorkbenchRouter} from './routing/ɵworkbench-router';
 import {ɵWorkbenchNotificationService} from './notification/ɵworkbench-notification-service';
 import {WORKBENCH_ELEMENT, WorkbenchElement} from './workbench.model';
+import {WorkbenchNotificationInitializer} from './notification/workbench-notification-initializer';
 
 /**
  * **SCION Workbench Client provides core API for a web app to interact with SCION Workbench and other microfrontends.**
@@ -54,6 +55,8 @@ import {WORKBENCH_ELEMENT, WorkbenchElement} from './workbench.model';
  * - {@link WorkbenchMessageBoxService} for displaying a message.
  * - {@link WorkbenchMessageBox} for the microfrontend to interact with the message box.
  * - {@link WorkbenchNotificationService} for displaying a notification.
+ * - {@link WorkbenchNotification} for the microfrontend to interact with the notification.
+ *
  * - `MessageClient` for sending or receiving messages between micro applications.
  * - `IntentClient` for issuing or receiving intents between micro applications.
  * - `ManifestService` for reading and registering capabilities at runtime.
@@ -140,6 +143,7 @@ export class WorkbenchClient {
     Beans.registerInitializer({useClass: WorkbenchPopupInitializer});
     Beans.registerInitializer({useClass: WorkbenchDialogInitializer});
     Beans.registerInitializer({useClass: WorkbenchMessageBoxInitializer});
+    Beans.registerInitializer({useClass: WorkbenchNotificationInitializer});
     await MicrofrontendPlatformClient.connect(symbolicName, connectOptions);
   }
 

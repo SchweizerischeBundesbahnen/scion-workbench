@@ -24,6 +24,7 @@ import {ViewCapabilityPropertiesComponent, WorkbenchViewCapabilityProperties} fr
 import {DialogCapabilityPropertiesComponent, WorkbenchDialogCapabilityProperties} from './dialog-capability-properties/dialog-capability-properties.component';
 import {PopupCapabilityPropertiesComponent, WorkbenchPopupCapabilityProperties} from './popup-capability-properties/popup-capability-properties.component';
 import {MessageBoxCapabilityPropertiesComponent, WorkbenchMessageBoxCapabilityProperties} from './message-box-capability-properties/message-box-capability-properties.component';
+import {NotificationCapabilityPropertiesComponent, WorkbenchNotificationCapabilityProperties} from './notification-capability-properties/notification-capability-properties.component';
 import {CapabilityParamsComponent} from './capability-params/capability-params.component';
 import {stringifyError} from 'workbench-testing-app-common';
 import {Beans} from '@scion/toolkit/bean-manager';
@@ -47,6 +48,7 @@ import {Beans} from '@scion/toolkit/bean-manager';
     ViewCapabilityPropertiesComponent,
     DialogCapabilityPropertiesComponent,
     PopupCapabilityPropertiesComponent,
+    NotificationCapabilityPropertiesComponent,
     MessageBoxCapabilityPropertiesComponent,
     CapabilityParamsComponent,
   ],
@@ -67,6 +69,7 @@ export class RegisterWorkbenchCapabilityPageComponent {
     popupProperties: this._formBuilder.control<WorkbenchPopupCapabilityProperties | undefined>(undefined),
     dialogProperties: this._formBuilder.control<WorkbenchDialogCapabilityProperties | undefined>(undefined),
     messageBoxProperties: this._formBuilder.control<WorkbenchMessageBoxCapabilityProperties | undefined>(undefined),
+    notificationProperties: this._formBuilder.control<WorkbenchNotificationCapabilityProperties | undefined>(undefined),
   });
 
   protected readonly WorkbenchCapabilities = WorkbenchCapabilities;
@@ -99,7 +102,7 @@ export class RegisterWorkbenchCapabilityPageComponent {
           case WorkbenchCapabilities.MessageBox:
             return this.form.controls.messageBoxProperties.value;
           case WorkbenchCapabilities.Notification:
-            return {};
+            return this.form.controls.notificationProperties.value;
           default:
             throw Error('Capability expected to be a workbench capability, but was not.');
         }

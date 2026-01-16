@@ -14,7 +14,7 @@ import {NotificationService, WorkbenchNotificationOptions, WorkbenchNotification
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {MultiValueInputComponent, prune, stringifyError} from 'workbench-testing-app-common';
-import {NotificationPageComponent} from '../notification-page/notification-page.component';
+import NotificationPageComponent from '../notification-page/notification-page.component';
 import {UUID} from '@scion/toolkit/uuid';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {LegacyNotificationPageComponent} from '../legacy-notification-page/legacy-notification-page.component';

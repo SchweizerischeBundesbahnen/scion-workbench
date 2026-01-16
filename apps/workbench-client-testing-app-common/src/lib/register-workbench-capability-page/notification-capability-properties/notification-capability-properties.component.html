@@ -1,0 +1,13 @@
+<header>Properties</header>
+
+<sci-form-field label="Path">
+  <input [formControl]="this.form.controls.path" class="e2e-path">
+</sci-form-field>
+
+<sci-form-field label="Show Splash">
+  <sci-checkbox [formControl]="this.form.controls.showSplash" class="e2e-show-splash"/>
+</sci-form-field>
+
+<sci-form-field label="CSS Class(es)">
+  <app-multi-value-input [formControl]="form.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
+</sci-form-field>

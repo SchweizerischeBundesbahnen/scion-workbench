@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,13 +9,14 @@
  */
 
 import {Component, inject, input} from '@angular/core';
-import {WorkbenchNotification} from '@scion/workbench';
+import {ActivatedMicrofrontend, WorkbenchNotification} from '@scion/workbench';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {filter} from 'rxjs/operators';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {MultiValueInputComponent} from 'workbench-testing-app-common';
 import {UUID} from '@scion/toolkit/uuid';
+import ActivatedMicrofrontendComponent from '../activated-microfrontend/activated-microfrontend.component';
 
 @Component({
   selector: 'app-notification-page',
@@ -25,13 +26,15 @@ import {UUID} from '@scion/toolkit/uuid';
     ReactiveFormsModule,
     SciFormFieldComponent,
     MultiValueInputComponent,
+    ActivatedMicrofrontendComponent,
   ],
 })
-export class NotificationPageComponent {
+export default class NotificationPageComponent {
 
   public readonly input = input<string>();
 
   private readonly _formBuilder = inject(NonNullableFormBuilder);
+  protected readonly activatedMicrofrontend = inject(ActivatedMicrofrontend, {optional: true});
 
   protected readonly notification = inject(WorkbenchNotification);
   protected readonly durationList = `duration-list-${UUID.randomUUID()}`;

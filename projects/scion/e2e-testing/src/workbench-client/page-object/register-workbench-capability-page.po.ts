@@ -91,6 +91,9 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
       case 'messagebox':
         await this.enterMessageBoxCapabilityProperties(capability);
         break;
+      case 'notification':
+        await this.enterNotificationCapabilityProperties(capability);
+        break;
     }
 
     await this.clickRegister();
@@ -338,6 +341,17 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     if (size?.maxHeight) {
       await this.locator.locator('input.e2e-max-height').fill(size.maxHeight);
     }
+    if (capability.properties.showSplash !== undefined) {
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-show-splash')).toggle(capability.properties.showSplash);
+    }
+    if (capability.properties.cssClass !== undefined) {
+      await this.locator.locator('input.e2e-class').fill(coerceArray(capability.properties.cssClass).join(' '));
+    }
+  }
+
+  private async enterNotificationCapabilityProperties(capability: WorkbenchNotificationCapability): Promise<void> {
+    await this.locator.locator('input.e2e-path').fill(capability.properties.path === '' ? '<string></string>' : capability.properties.path);
+
     if (capability.properties.showSplash !== undefined) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-show-splash')).toggle(capability.properties.showSplash);
     }

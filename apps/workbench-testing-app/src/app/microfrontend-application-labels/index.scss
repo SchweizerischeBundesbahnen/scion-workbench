@@ -11,6 +11,7 @@
         content: attr(data-app);
         position: absolute;
         top: 0;
+        // TODO [eg]: for wb-notification children add offset
         right: 0;
         margin-right: .25em;
         margin-top: .25em;

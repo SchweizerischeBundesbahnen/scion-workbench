@@ -197,9 +197,45 @@ export function canMatchWorkbenchPopupCapability(qualifier: Qualifier): CanMatch
 }
 
 /**
+ * Configures a route to only match workbench notifications navigated to the specified notification capability.
+ *
+ * Use this guard to differentiate microfrontend routes, which must all have an empty path.
+ *
+ * @example - Route matching a notification capability with qualifier {notification: 'info'}
+ * ```ts
+ * import {Routes} from '@angular/router';
+ * import {canMatchWorkbenchNotificationCapability} from '@scion/workbench';
+ *
+ * const routes: Routes = [
+ *   {path: '', canMatch: [canMatchWorkbenchNotificationCapability({notification: 'info'})], component: InfoComponent},
+ * ];
+ * ```
+ *
+ * The above route matches the following notification capability:
+ *
+ * ```json
+ * {
+ *   "type": "notification",
+ *   "qualifier": {
+ *     "notification": "info"
+ *   },
+ *   "properties": {
+ *     "path": ""
+ *   }
+ * }
+ * ```
+ *
+ * @param qualifier - Identifies the notification capability.
+ * @return guard matching the specified notification capability.
+ */
+export function canMatchWorkbenchNotificationCapability(qualifier: Qualifier): CanMatchFn {
+  return canMatchWorkbenchCapability('notification', WorkbenchCapabilities.Notification, qualifier);
+}
+
+/**
  * Matches a route if navigated to the specified capability displayed in the specified workbench element.
  */
-function canMatchWorkbenchCapability(workbenchElementType: 'part' | 'view' | 'dialog' | 'popup', capabilityType: WorkbenchCapabilities, qualifier: Qualifier): CanMatchFn {
+function canMatchWorkbenchCapability(workbenchElementType: 'part' | 'view' | 'dialog' | 'popup' | 'notification', capabilityType: WorkbenchCapabilities, qualifier: Qualifier): CanMatchFn {
   return (): boolean => {
     const outlet = inject(WORKBENCH_OUTLET, {optional: true});
 

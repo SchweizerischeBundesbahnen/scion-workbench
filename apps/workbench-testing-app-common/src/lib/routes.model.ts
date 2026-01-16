@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2018-2025 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
- * available under the terms from the Eclipse Public License 2.0
+ * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
  *
  * SPDX-License-Identifier: EPL-2.0
@@ -15,7 +15,7 @@ import {Qualifier} from '@scion/microfrontend-platform';
  */
 export interface RouteDescriptor {
   path: string;
-  component: 'part-page' | 'view-page' | 'dialog-page' | 'popup-page' | 'messagebox-page' | 'router-page' | 'focus-test-page' | 'size-test-page' | 'text-test-page' | 'microfrontend-dialog-opener-page' | 'microfrontend-messagebox-opener-page' | 'microfrontend-popup-opener-page';
+  component: 'part-page' | 'view-page' | 'dialog-page' | 'popup-page' | 'messagebox-page' | 'notification-page' | 'router-page' | 'focus-test-page' | 'size-test-page' | 'text-test-page' | 'microfrontend-dialog-opener-page' | 'microfrontend-messagebox-opener-page' | 'microfrontend-popup-opener-page';
   data?: Record<string, unknown>;
   canMatch?: [CanMatchWorkbenchElementDescriptor | CanMatchWorkbenchCapabilityDescriptor];
 }
@@ -39,8 +39,9 @@ export interface CanMatchWorkbenchElementDescriptor {
  * @see canMatchWorkbenchDialogCapability
  * @see canMatchWorkbenchMessageBoxCapability
  * @see canMatchWorkbenchPopupCapability
+ * @see canMatchWorkbenchNotificationCapability
  */
 export interface CanMatchWorkbenchCapabilityDescriptor {
-  fn: 'canMatchWorkbenchPartCapability' | 'canMatchWorkbenchViewCapability' | 'canMatchWorkbenchDialogCapability' | 'canMatchWorkbenchMessageBoxCapability' | 'canMatchWorkbenchPopupCapability';
+  fn: 'canMatchWorkbenchPartCapability' | 'canMatchWorkbenchViewCapability' | 'canMatchWorkbenchDialogCapability' | 'canMatchWorkbenchMessageBoxCapability' | 'canMatchWorkbenchPopupCapability' | 'canMatchWorkbenchNotificationCapability';
   qualifier: Qualifier;
 }

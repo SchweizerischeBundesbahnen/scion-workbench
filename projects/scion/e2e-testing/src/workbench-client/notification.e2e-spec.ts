@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,8 +15,70 @@ import {NotificationOpenerPagePO} from './page-object/notification-opener-page.p
 import {expectNotification} from '../matcher/notification-matcher';
 import {MAIN_AREA} from '../workbench.model';
 import {WorkbenchNotificationCapability} from './page-object/register-workbench-capability-page.po';
+import {NotificationPagePO} from './page-object/notification-page.po';
+import {NotificationPagePO as HostNotificationPagePO} from '../workbench/page-object/notification-page.po';
+import {canMatchWorkbenchNotificationCapability} from '../workbench/page-object/layout-page/register-route-page.po';
 
 test.describe('Workbench Notification', () => {
+  test('should show notification with specified component', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    const notificationCapability: WorkbenchNotificationCapability = {
+      type: 'notification',
+      qualifier: {
+        component: 'testee',
+      },
+      properties: {
+        path: 'test-notification',
+      }
+    };
+    await microfrontendNavigator.registerCapability('app1', notificationCapability);
+
+    // Display the notification.
+    const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+    await notificationOpenerPage.show({ component: 'testee' }, {cssClass: 'testee', duration: 'infinite'});
+
+    const notification = appPO.notification({cssClass: 'testee'});
+    const notificationPage = new NotificationPagePO(notification);
+
+    await expectNotification(notificationPage).toBeVisible();
+    await expect(notificationPage.getNotificationCapability()).resolves.toMatchObject(notificationCapability);
+
+    await notificationPage.close();
+
+    await expectNotification(notificationPage).not.toBeAttached();
+  });
+
+  test('should show notification with specified host component', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'notification-page',
+      canMatch: [canMatchWorkbenchNotificationCapability({component: 'testee'})],
+    });
+
+    const notificationCapability: WorkbenchNotificationCapability = {
+      type: 'notification',
+      qualifier: {
+        component: 'testee',
+      },
+      properties: {
+        path: '',
+      },
+      private: false
+    };
+    await microfrontendNavigator.registerCapability('host', notificationCapability);
+
+    // Display the notification.
+    const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+    await notificationOpenerPage.show({ component: 'testee' }, {cssClass: 'testee'});
+
+    const notification = appPO.notification({cssClass: 'testee'});
+    const notificationPage = new HostNotificationPagePO(notification);
+
+    await expectNotification(notificationPage).toBeVisible();
+  });
 
   test.describe('Legacy Notification API', () => {
     test('should show notification with specified text (text as argument)', async ({appPO, microfrontendNavigator}) => {
@@ -83,6 +145,7 @@ test.describe('Workbench Notification', () => {
         type: 'notification',
         qualifier: {component: 'notification', app: 'host'},
         private: false,
+        properties: { },
         params: [
           {name: 'param1', required: true},
           {name: 'param2', required: true},
@@ -117,6 +180,7 @@ test.describe('Workbench Notification', () => {
         type: 'notification',
         qualifier: {component: 'notification', app: 'host'},
         private: false,
+        properties: { },
         params: [
           {name: 'param', required: true},
         ],
@@ -140,6 +204,7 @@ test.describe('Workbench Notification', () => {
       await microfrontendNavigator.registerCapability<WorkbenchNotificationCapability>('host', {
         type: 'notification',
         qualifier: {component: 'notification', app: 'host'},
+        properties: { },
         private: false,
       });
 
@@ -398,82 +463,5 @@ test.describe('Workbench Notification', () => {
     // Expect the notification not to display after 2.5s.
     await page.waitForTimeout(1000);
     expect(await notification.locator.isVisible()).toBe(false);
-  });
-
-  test.describe('Custom Notification Provider', () => {
-
-    test('should show custom host notification', async ({appPO, microfrontendNavigator, consoleLogs}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // Register host notification capability.
-      await microfrontendNavigator.registerCapability<WorkbenchNotificationCapability>('host', {
-        type: 'notification',
-        qualifier: {component: 'notification', app: 'host'},
-        private: false,
-        params: [
-          {name: 'param1', required: true},
-          {name: 'param2', required: true},
-        ],
-      });
-
-      // Register intention.
-      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'notification', app: 'host'}});
-
-      // Display the notification.
-      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      await notificationOpenerPage.show({component: 'notification', app: 'host'}, {
-        params: {param1: 'value1', param2: 'value2'},
-        title: 'title',
-        severity: 'warn',
-        duration: 'long',
-        group: 'group',
-        cssClass: 'class',
-      });
-
-      await expect.poll(() => consoleLogs.get({severity: 'info'})).toContainEqual(
-        expect.stringContaining('[HostNotification] command=[title=title, severity=warn, duration=long, group=group, cssClass=class, params=[param1=value1,param2=value2]]'),
-      );
-    });
-
-    test('should throw when not passing required params', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // Register host notification capability.
-      await microfrontendNavigator.registerCapability<WorkbenchNotificationCapability>('host', {
-        type: 'notification',
-        qualifier: {component: 'notification', app: 'host'},
-        private: false,
-        params: [
-          {name: 'param', required: true},
-        ],
-      });
-
-      // Register intention.
-      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'notification', app: 'host'}});
-
-      // Display the notification.
-      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      const notification = notificationOpenerPage.show({component: 'notification', app: 'host'});
-      await expect(notification).rejects.toThrow(/IntentParamValidationError/);
-    });
-
-    test('should throw when passing unspecified params', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // Register host notification capability.
-      await microfrontendNavigator.registerCapability<WorkbenchNotificationCapability>('host', {
-        type: 'notification',
-        qualifier: {component: 'notification', app: 'host'},
-        private: false,
-      });
-
-      // Register intention.
-      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'notification', app: 'host'}});
-
-      // Display the notification.
-      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      const notification = notificationOpenerPage.show({component: 'notification', app: 'host'}, {params: {param: 'value'}});
-      await expect(notification).rejects.toThrow(/IntentParamValidationError/);
-    });
   });
 });

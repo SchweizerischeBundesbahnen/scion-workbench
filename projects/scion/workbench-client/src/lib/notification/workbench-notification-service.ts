@@ -21,9 +21,8 @@ import {WorkbenchNotificationOptions} from './workbench-notification.options';
  *
  * Notifications can be grouped. Only the most recent notification within a group is displayed.
  *
- * The built-in notification supports the display of a plain text message.
- * Other notification capabilities can be contributed by the host app, e.g., to display structured content or to provide out-of-the-box
- * notification templates. The use of a qualifier distinguishes different notification providers.
+ * A microfrontend provided as a `notification` capability can be opened in a notification. The qualifier differentiates between different
+ * notification capabilities. Declaring an intention allows for opening public notification capabilities of other applications.
  *
  * @see WorkbenchNotificationCapability
  * @category Notification
