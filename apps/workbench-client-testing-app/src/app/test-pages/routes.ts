@@ -87,6 +87,15 @@ const routes: Routes = [
     ],
   },
   {
+    path: 'notification-test-page',
+    children: [
+      {
+        path: ':segment1/segment2',
+        loadComponent: () => import('../notification-page/notification-page.component'),
+      },
+    ],
+  },
+  {
     path: 'view-test-page',
     children: [
       {
