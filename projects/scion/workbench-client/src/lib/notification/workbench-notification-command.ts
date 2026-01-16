@@ -30,4 +30,4 @@ export interface ɵWorkbenchNotificationCommand {
  * @docs-private Not public API. For internal use only.
  * @ignore
  */
-export const eNOTIFICATION_MESSAGE_PARAM = 'message';
+  export const eNOTIFICATION_MESSAGE_PARAM = 'message';

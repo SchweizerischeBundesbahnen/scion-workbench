@@ -94,5 +94,9 @@ export interface WorkbenchNotificationCapability extends Capability {
      * Specifies CSS class(es) to add to the notification, e.g., to locate the notification in tests.
      */
     cssClass?: string | string[];
+    /**
+     * Arbitrary metadata associated with the capability.
+     */
+    [key: string]: unknown;
   };
 }

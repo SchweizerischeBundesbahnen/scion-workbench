@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2025 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,13 +9,12 @@
  */
 
 import {EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
-import {provideNotificationIntentHandler} from './microfrontend-notification-intent-handler';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {HostManifestInterceptor, IntentInterceptor} from '@scion/microfrontend-platform';
 import {MicrofrontendTextNotificationCapabilityProvider} from './microfrontend-text-notification-capability-provider.interceptor';
 import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
 import {MicrofrontendNotificationIntentHandler} from './microfrontend-notification-intent-handler.interceptor';
-import {MicrofrontendMessageBoxIntentHandler} from '../microfrontend-message-box/microfrontend-message-box-intent-handler.interceptor';
+import {provideMicrofrontendTextNotificationRoute} from './microfrontend-message-box-routes';
 
 /**
  * Provides a set of DI providers enabling microfrontend notification support.
@@ -26,7 +25,7 @@ export function provideMicrofrontendNotification(): EnvironmentProviders {
   return makeEnvironmentProviders([
     MicrofrontendTextNotificationCapabilityProvider,
     MicrofrontendNotificationIntentHandler,
-    provideNotificationIntentHandler(),
+    provideMicrofrontendTextNotificationRoute(),
     provideMicrofrontendPlatformInitializer(onPreStartup, {phase: MicrofrontendPlatformStartupPhase.PreStartup}),
   ]);
 

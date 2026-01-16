@@ -10,7 +10,7 @@
 
 import {inject, Injectable, runInInjectionContext, StaticProvider} from '@angular/core';
 import {Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
-import {eNOTIFICATION_MESSAGE_PARAM, Translatable, WorkbenchCapabilities, WorkbenchNotificationCapability, WorkbenchNotificationConfig, ɵWorkbenchNotificationCommand} from '@scion/workbench-client';
+import {eNOTIFICATION_MESSAGE_PARAM, WorkbenchCapabilities, WorkbenchNotificationCapability, WorkbenchNotificationConfig, ɵWorkbenchNotificationCommand} from '@scion/workbench-client';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Arrays} from '@scion/toolkit/util';
@@ -23,6 +23,7 @@ import {Microfrontends} from '../common/microfrontend.util';
 import {WorkbenchNotificationService} from "../../notification/workbench-notification.service";
 import {MicrofrontendHostNotification} from '../microfrontend-host-notification/microfrontend-host-notification.model';
 import {ɵWorkbenchNotification} from '../../notification/ɵworkbench-notification.model';
+import {TEXT_NOTIFICATION_CAPABILITY_IDENTITY, TEXT_NOTIFICATION_CAPABILITY_IDENTITY_PROPERTY} from '../microfrontend-host-notification/notification-text-message/notification-text-message.component';
 
 /**
  * Handles notification intents, opening a notification based on resolved capability.
@@ -64,16 +65,15 @@ export class MicrofrontendNotificationIntentHandler implements IntentInterceptor
     const params = intentMessage.intent.params ?? new Map<string, unknown>();
     const referrer = intentMessage.headers.get(MessageHeaders.AppSymbolicName) as string;
     const isHostProvider = Microfrontends.isHostProvider(capability);
-    const isLegacyApi = !intentMessage.intent.params?.has(eNOTIFICATION_MESSAGE_PARAM);
+    const isTextMessage = capability.properties[TEXT_NOTIFICATION_CAPABILITY_IDENTITY_PROPERTY] === TEXT_NOTIFICATION_CAPABILITY_IDENTITY;
+    const isLegacyApi = isTextMessage && !intentMessage.intent.params?.has(eNOTIFICATION_MESSAGE_PARAM);
 
-    const message = (isLegacyApi ? (command as WorkbenchNotificationConfig).content : intentMessage.intent.params?.get(eNOTIFICATION_MESSAGE_PARAM)) as Translatable | undefined ?? '';
-    const component = isHostProvider ? MicrofrontendHostComponent : MicrofrontendNotificationComponent;
+    if (isLegacyApi) {
+      params.set(eNOTIFICATION_MESSAGE_PARAM, (command as WorkbenchNotificationConfig).content);
+    }
 
     this._logger.debug(() => 'Handling microfrontend notification intent', LoggerNames.MICROFRONTEND, command);
-
-    console.log(referrer, 'REFERRER')
-
-    return this._notificationService.show(component, prune({
+    return this._notificationService.show(isHostProvider ? MicrofrontendHostComponent : MicrofrontendNotificationComponent,  prune({
       inputs: isHostProvider ? {} : {capability, params, referrer},
       providers: isHostProvider ? [provideActivatedMicrofrontend(capability, params, referrer)] : undefined,
       title: createRemoteTranslatable(command.title, {appSymbolicName: referrer}),
