@@ -9,9 +9,9 @@
  */
 
 export {type WorkbenchMessageBoxCapability, type WorkbenchMessageBoxSize} from './workbench-message-box-capability';
-export {WorkbenchMessageBoxService} from './workbench-message-box-service';
-export {ɵWorkbenchMessageBoxService} from './ɵworkbench-message-box-service';
+export {WorkbenchMessageBoxService} from './workbench-message-box.service';
+export {ɵWorkbenchMessageBoxService} from './ɵworkbench-message-box.service';
 export {type WorkbenchMessageBoxOptions} from './workbench-message-box.options';
-export {WorkbenchMessageBox} from './workbench-message-box';
+export {WorkbenchMessageBox} from './workbench-message-box.model';
 export {type ɵMessageBoxContext, ɵMESSAGE_BOX_CONTEXT} from './ɵworkbench-message-box-context';
 export {type ɵWorkbenchMessageBoxCommand, eMESSAGE_BOX_MESSAGE_PARAM} from './workbench-message-box-command';

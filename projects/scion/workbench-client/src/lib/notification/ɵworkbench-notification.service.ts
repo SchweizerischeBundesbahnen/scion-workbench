@@ -15,7 +15,7 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {Maps} from '@scion/toolkit/util';
 import {firstValueFrom, lastValueFrom} from 'rxjs';
 import {Translatable} from '../text/workbench-text-provider.model';
-import {WorkbenchNotificationService} from './workbench-notification-service';
+import {WorkbenchNotificationService} from './workbench-notification.service';
 import {WorkbenchNotificationOptions} from './workbench-notification.options';
 import {eNOTIFICATION_MESSAGE_PARAM, ɵWorkbenchNotificationCommand} from './workbench-notification-command';
 

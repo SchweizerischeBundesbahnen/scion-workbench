@@ -11,8 +11,8 @@
 import {Beans, Initializer} from '@scion/toolkit/bean-manager';
 import {ContextService} from '@scion/microfrontend-platform';
 import {ɵDIALOG_CONTEXT, ɵDialogContext} from './ɵworkbench-dialog-context';
-import {WorkbenchDialog} from './workbench-dialog';
-import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
+import {WorkbenchDialog} from './workbench-dialog.model';
+import {ɵWorkbenchDialog} from './ɵworkbench-dialog.model';
 import {WORKBENCH_ELEMENT} from '../workbench.model';
 
 /**

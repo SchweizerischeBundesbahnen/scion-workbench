@@ -13,7 +13,7 @@ import {Observable} from 'rxjs';
 import {mapToBody, MessageClient, MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {shareReplay} from 'rxjs/operators';
-import {WorkbenchPart} from './workbench-part';
+import {WorkbenchPart} from './workbench-part.model';
 import {decorateObservable} from '../observable-decorator';
 import {PartId} from '../workbench.identifiers';
 import {WorkbenchPartCapability} from './workbench-part-capability';

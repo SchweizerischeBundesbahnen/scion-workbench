@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {WorkbenchPart} from './part/workbench-part';
-import {WorkbenchView} from './view/workbench-view';
-import {WorkbenchDialog} from './dialog/workbench-dialog';
-import {WorkbenchPopup} from './popup/workbench-popup';
+import {WorkbenchPart} from './part/workbench-part.model';
+import {WorkbenchView} from './view/workbench-view.model';
+import {WorkbenchDialog} from './dialog/workbench-dialog.model';
+import {WorkbenchPopup} from './popup/workbench-popup.model';
 
 /**
  * Union of workbench elements.

@@ -10,8 +10,8 @@
 
 import {Beans, Initializer} from '@scion/toolkit/bean-manager';
 import {ContextService} from '@scion/microfrontend-platform';
-import {ɵWorkbenchMessageBox} from './ɵworkbench-message-box';
-import {WorkbenchMessageBox} from './workbench-message-box';
+import {ɵWorkbenchMessageBox} from './ɵworkbench-message-box.model';
+import {WorkbenchMessageBox} from './workbench-message-box.model';
 import {ɵMESSAGE_BOX_CONTEXT, ɵMessageBoxContext} from './ɵworkbench-message-box-context';
 import {WORKBENCH_ELEMENT} from '../workbench.model';
 

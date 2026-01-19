@@ -10,9 +10,9 @@
 
 import {Beans, Initializer} from '@scion/toolkit/bean-manager';
 import {ContextService} from '@scion/microfrontend-platform';
-import {WorkbenchPopup} from './workbench-popup';
+import {WorkbenchPopup} from './workbench-popup.model';
 import {ɵPOPUP_CONTEXT, ɵPopupContext} from './workbench-popup-context';
-import {ɵWorkbenchPopup} from './ɵworkbench-popup';
+import {ɵWorkbenchPopup} from './ɵworkbench-popup.model';
 import {WORKBENCH_ELEMENT} from '../workbench.model';
 
 /**

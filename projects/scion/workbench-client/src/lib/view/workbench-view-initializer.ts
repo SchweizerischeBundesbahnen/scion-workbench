@@ -10,8 +10,8 @@
 
 import {Beans, Initializer} from '@scion/toolkit/bean-manager';
 import {ContextService} from '@scion/microfrontend-platform';
-import {WorkbenchView} from './workbench-view';
-import {ɵVIEW_ID_CONTEXT_KEY, ɵWorkbenchView} from './ɵworkbench-view';
+import {WorkbenchView} from './workbench-view.model';
+import {ɵVIEW_ID_CONTEXT_KEY, ɵWorkbenchView} from './ɵworkbench-view.model';
 import {WORKBENCH_ELEMENT} from '../workbench.model';
 import {ViewId} from '../workbench.identifiers';
 

@@ -10,7 +10,7 @@
 
 import {mapToBody, MessageClient, MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
 import {ɵMessageBoxContext} from './ɵworkbench-message-box-context';
-import {WorkbenchMessageBox} from './workbench-message-box';
+import {WorkbenchMessageBox} from './workbench-message-box.model';
 import {WorkbenchMessageBoxCapability} from '../message-box/workbench-message-box-capability';
 import {Observable} from 'rxjs';
 import {Beans} from '@scion/toolkit/bean-manager';

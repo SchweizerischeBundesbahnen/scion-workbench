@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {WorkbenchTextService} from './workbench-text-service';
+import {WorkbenchTextService} from './workbench-text.service';
 import {animationFrameScheduler, catchError, concatWith, first, MonoTypeOperatorFunction, NEVER, Observable, of, ReplaySubject, share, switchMap, timeout, timer} from 'rxjs';
 import {APP_IDENTITY, Intent, IntentClient, ManifestService, mapToBody} from '@scion/microfrontend-platform';
 import {Beans, PreDestroy} from '@scion/toolkit/bean-manager';
