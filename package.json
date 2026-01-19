@@ -101,7 +101,7 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "21.0.1",
     "@angular/build": "21.0.1",
-    "@angular/cli": "21.0.1",
+    "@angular/cli": "21.1.0",
     "@angular/compiler-cli": "21.0.1",
     "@playwright/test": "1.57.0",
     "@smarttools/eslint-plugin-rxjs": "1.0.22",
