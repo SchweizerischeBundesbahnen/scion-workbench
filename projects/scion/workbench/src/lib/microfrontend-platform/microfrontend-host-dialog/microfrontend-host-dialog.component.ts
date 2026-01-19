@@ -13,7 +13,7 @@ import {Translatable, WorkbenchDialog as WorkbenchClientDialog, WorkbenchDialogC
 import {Routing} from '../../routing/routing.util';
 import {Commands} from '../../routing/routing.model';
 import {Router, RouterOutlet} from '@angular/router';
-import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog';
+import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog.model';
 import {NgTemplateOutlet} from '@angular/common';
 import {Observable, Subject} from 'rxjs';
 import {Microfrontends} from '../common/microfrontend.util';

@@ -10,7 +10,7 @@
 import {Component, HostBinding, HostListener, inject, input} from '@angular/core';
 import {MessageBoxFooterComponent} from './message-box-footer/message-box-footer.component';
 import {WorkbenchMessageBoxOptions} from './workbench-message-box.options';
-import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
+import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog.model';
 import {NgComponentOutlet} from '@angular/common';
 import {WorkbenchDialogFooterDirective} from '../dialog/dialog-footer/workbench-dialog-footer.directive';
 import {WorkbenchDialogHeaderDirective} from '../dialog/dialog-header/workbench-dialog-header.directive';
