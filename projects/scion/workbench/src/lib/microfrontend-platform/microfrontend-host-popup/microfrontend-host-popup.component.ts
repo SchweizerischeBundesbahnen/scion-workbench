@@ -17,7 +17,7 @@ import {NgTemplateOutlet} from '@angular/common';
 import {Microfrontends} from '../common/microfrontend.util';
 import {ANGULAR_ROUTER_MUTEX} from '../../executor/single-task-executor';
 import {toObservable} from '@angular/core/rxjs-interop';
-import {ɵWorkbenchPopup} from '../../popup/ɵworkbench-popup';
+import {ɵWorkbenchPopup} from '../../popup/ɵworkbench-popup.model';
 
 /**
  * Displays the microfrontend of a popup capability provided by the host.

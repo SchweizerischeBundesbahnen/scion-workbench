@@ -10,12 +10,12 @@ import {By} from '@angular/platform-browser';
 import {WorkbenchDialogHeaderDirective} from './dialog-header/workbench-dialog-header.directive';
 import {WorkbenchDialogFooterDirective} from './dialog-footer/workbench-dialog-footer.directive';
 import {WorkbenchDialogActionDirective} from './dialog-footer/workbench-dialog-action.directive';
-import {WorkbenchDialog} from './workbench-dialog';
+import {WorkbenchDialog} from './workbench-dialog.model';
 import {toBeActiveCustomMatcher} from '../testing/jasmine/matcher/to-be-active.matcher';
 import {WorkbenchDialogRegistry} from './workbench-dialog.registry';
 import {throwError} from '../common/throw-error.util';
 import {TestComponent} from '../testing/test.component';
-import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
+import {ɵWorkbenchDialog} from './ɵworkbench-dialog.model';
 import {LogLevel} from '../logging';
 import {WorkbenchMessageBoxService} from '../message-box/workbench-message-box.service';
 

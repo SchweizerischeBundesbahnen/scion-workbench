@@ -14,7 +14,7 @@ import {Routing} from '../../routing/routing.util';
 import {Commands} from '../../routing/routing.model';
 import {Router, RouterOutlet} from '@angular/router';
 import {NgTemplateOutlet} from '@angular/common';
-import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog';
+import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog.model';
 import {Microfrontends} from '../common/microfrontend.util';
 import {ANGULAR_ROUTER_MUTEX} from '../../executor/single-task-executor';
 import {setStyle} from '../../common/dom.util';

@@ -23,7 +23,7 @@ import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
+import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog.model';
 import {Blockable} from '../glass-pane/blockable';
 import {ViewId, WORKBENCH_ID} from '../workbench.identifiers';
 import {ClassList} from '../common/class-list';
