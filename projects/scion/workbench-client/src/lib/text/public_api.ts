@@ -9,5 +9,5 @@
  */
 
 export {type WorkbenchTextProviderFn, type Translatable} from './workbench-text-provider.model';
-export {WorkbenchTextService} from './workbench-text-service';
-export {ɵWorkbenchTextService} from './ɵworkbench-text-service';
+export {WorkbenchTextService} from './workbench-text.service';
+export {ɵWorkbenchTextService} from './ɵworkbench-text.service';

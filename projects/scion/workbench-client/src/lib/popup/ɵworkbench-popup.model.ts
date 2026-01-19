@@ -18,7 +18,7 @@ import {Observable} from 'rxjs';
 import {shareReplay} from 'rxjs/operators';
 import {decorateObservable} from '../observable-decorator';
 import {PopupId} from '../workbench.identifiers';
-import {WorkbenchPopup} from './workbench-popup';
+import {WorkbenchPopup} from './workbench-popup.model';
 
 /**
  * @ignore

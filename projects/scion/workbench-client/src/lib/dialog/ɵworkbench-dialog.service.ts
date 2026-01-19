@@ -14,7 +14,7 @@ import {Beans} from '@scion/toolkit/bean-manager';
 import {catchError, firstValueFrom, throwError} from 'rxjs';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
 import {Defined, Maps} from '@scion/toolkit/util';
-import {WorkbenchDialogService} from './workbench-dialog-service';
+import {WorkbenchDialogService} from './workbench-dialog.service';
 import {ɵWorkbenchDialogCommand} from './workbench-dialog-command';
 import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 

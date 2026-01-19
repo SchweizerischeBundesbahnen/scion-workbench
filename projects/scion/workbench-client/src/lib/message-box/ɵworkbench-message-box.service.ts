@@ -15,7 +15,7 @@ import {Defined, Maps} from '@scion/toolkit/util';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {catchError, firstValueFrom, throwError} from 'rxjs';
 import {eMESSAGE_BOX_MESSAGE_PARAM, ɵWorkbenchMessageBoxCommand} from './workbench-message-box-command';
-import {WorkbenchMessageBoxService} from './workbench-message-box-service';
+import {WorkbenchMessageBoxService} from './workbench-message-box.service';
 import {Translatable} from '../text/workbench-text-provider.model';
 import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 

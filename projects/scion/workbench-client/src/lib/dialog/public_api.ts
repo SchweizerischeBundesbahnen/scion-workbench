@@ -9,10 +9,10 @@
  */
 
 export {type WorkbenchDialogCapability, type WorkbenchDialogSize} from './workbench-dialog-capability';
-export {WorkbenchDialog} from './workbench-dialog';
-export {WorkbenchDialogService} from './workbench-dialog-service';
-export {ɵWorkbenchDialogService} from './ɵworkbench-dialog-service';
+export {WorkbenchDialog} from './workbench-dialog.model';
+export {WorkbenchDialogService} from './workbench-dialog.service';
+export {ɵWorkbenchDialogService} from './ɵworkbench-dialog.service';
 export {type WorkbenchDialogOptions} from './workbench-dialog.options';
 export {type ɵDialogContext, ɵDIALOG_CONTEXT} from './ɵworkbench-dialog-context';
-export {ɵWorkbenchDialogMessageHeaders} from './ɵworkbench-dialog';
+export {ɵWorkbenchDialogMessageHeaders} from './ɵworkbench-dialog.model';
 export {type ɵWorkbenchDialogCommand} from './workbench-dialog-command';

@@ -9,10 +9,10 @@
  */
 
 export {type ɵWorkbenchPopupCommand} from './workbench-popup-command';
-export {WorkbenchPopupService} from './workbench-popup-service';
-export {ɵWorkbenchPopupService} from './ɵworkbench-popup-service';
-export {WorkbenchPopup} from './workbench-popup';
-export {ɵWorkbenchPopupMessageHeaders} from './ɵworkbench-popup';
+export {WorkbenchPopupService} from './workbench-popup.service';
+export {ɵWorkbenchPopupService} from './ɵworkbench-popup.service';
+export {WorkbenchPopup} from './workbench-popup.model';
+export {ɵWorkbenchPopupMessageHeaders} from './ɵworkbench-popup.model';
 export {type WorkbenchPopupCapability, type WorkbenchPopupSize} from './workbench-popup-capability';
 export {type WorkbenchPopupConfig} from './workbench-popup.config';
 export {type WorkbenchPopupOptions, type CloseStrategy} from './workbench-popup.options';
