@@ -67,3 +67,35 @@ export function parseTypedObject(object: Record<string, string> | null | undefin
   }
   return Object.fromEntries(Object.entries(object).map(([key, value]) => ([key, parseTypedString(value)])));
 }
+
+/**
+ * Creates a typed value for given value.
+ *
+ * Examples:
+ * - undefined => '<undefined>'
+ * - null => '<null>'
+ * - 'value' => '<string>value</string>'
+ * - 123 => '<number>123</number>'
+ * - true => '<boolean>true</boolean>'
+ * - {"key": "value"} => '<json>{"key": "value"}</json>'
+ */
+export function toTypedString(value: unknown, options?: {emptyIfUndefined?: true}): string {
+  if (value === undefined) {
+    return options?.emptyIfUndefined ? '' : '<undefined>';
+  }
+  else if (value === null) {
+    return '<null>';
+  }
+  else if (typeof value === 'string') {
+    return `<string>${value}</string>`;
+  }
+  else if (typeof value === 'number') {
+    return `<number>${value}</number>`;
+  }
+  else if (typeof value === 'boolean') {
+    return `<boolean>${value}</boolean>`;
+  }
+  else {
+    return `<json>${JSON.stringify(value)}</json>`;
+  }
+}

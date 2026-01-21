@@ -18,7 +18,7 @@ import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendPopupPagePO} from '../../workbench/page-object/workbench-popup-page.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {prune} from '../../helper/testing.util';
-import {parseTypedString} from '../../helper/parse-typed-value.util';
+import {parseTypedString} from '../../helper/typed-value.util';
 
 /**
  * Page object to interact with {@link PopupPageComponent}.

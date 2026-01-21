@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -48,5 +48,37 @@ export function parseTypedString<T = unknown>(value: string | undefined | null, 
     default: {
       return value as T;
     }
+  }
+}
+
+/**
+ * Creates a typed value for given value.
+ *
+ * Examples:
+ * - undefined => '<undefined>'
+ * - null => '<null>'
+ * - 'value' => '<string>value</string>'
+ * - 123 => '<number>123</number>'
+ * - true => '<boolean>true</boolean>'
+ * - {"key": "value"} => '<json>{"key": "value"}</json>'
+ */
+export function toTypedString(value: unknown, options?: {emptyIfUndefined?: true}): string {
+  if (value === undefined) {
+    return options?.emptyIfUndefined ? '' : '<undefined>';
+  }
+  else if (value === null) {
+    return '<null>';
+  }
+  else if (typeof value === 'string') {
+    return `<string>${value}</string>`;
+  }
+  else if (typeof value === 'number') {
+    return `<number>${value}</number>`;
+  }
+  else if (typeof value === 'boolean') {
+    return `<boolean>${value}</boolean>`;
+  }
+  else {
+    return `<json>${JSON.stringify(value)}</json>`;
   }
 }

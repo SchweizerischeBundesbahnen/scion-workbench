@@ -1,5 +1,6 @@
 <span class="header">Name</span>
 <span class="header checkbox">Required</span>
+<span class="header">Default</span>
 @if (showTransientParams()) {
   <span class="header checkbox">Transient</span>
 }
@@ -13,6 +14,8 @@
   <input [formControl]="paramFormGroup.controls.name" class="e2e-name">
   <!-- Required -->
   <sci-checkbox [formControl]="paramFormGroup.controls.required" class="e2e-required"/>
+  <!-- Default -->
+  <input [formControl]="paramFormGroup.controls.default" class="e2e-default">
   @if (showTransientParams()) {
     <!-- Transient -->
     <sci-checkbox [formControl]="paramFormGroup.controls.transient" class="e2e-transient"/>
