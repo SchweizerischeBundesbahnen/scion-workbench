@@ -32,7 +32,7 @@ const microfrontendPlatformConfig: MicrofrontendPlatformConfig = {
   applications: [
     {symbolicName: 'workbench-client-testing-app1', manifestUrl: 'http://localhost:4201/manifest-app1.json', intentionRegisterApiDisabled: false},
     {symbolicName: 'workbench-client-testing-app2', manifestUrl: 'http://localhost:4202/manifest-app2.json', intentionRegisterApiDisabled: false},
-    {symbolicName: 'devtools', manifestUrl: 'https://microfrontend-platform-devtools-v1-6-0.scion.vercel.app/manifest.json', intentionCheckDisabled: true, scopeCheckDisabled: true},
+    {symbolicName: 'devtools', manifestUrl: 'https://microfrontend-platform-devtools-v2-0-0.scion.vercel.app/manifest.json', intentionCheckDisabled: true, scopeCheckDisabled: true},
   ],
 };
 
