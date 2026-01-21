@@ -58,6 +58,10 @@ export function registerTextProvider(textProvider: WorkbenchTextProviderFn): Dis
       };
       const manifestService = Beans.get(ManifestService);
       const capabilityId = await manifestService.registerCapability(capability);
+      if (capabilityId === null) {
+        return;
+      }
+
       resources.add(() => void manifestService.unregisterCapabilities({id: capabilityId}));
 
       // Install intent handler.

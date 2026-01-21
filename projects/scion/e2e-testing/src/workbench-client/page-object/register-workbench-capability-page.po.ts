@@ -17,6 +17,7 @@ import {ActivatorCapability as _ActivatorCapability, Capability, Qualifier} from
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO, WorkbenchViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../view.po';
+import {toTypedString} from '../../helper/typed-value.util';
 
 /**
  * Playwright's test runner fails to compile when importing runtime types from `@scion/workbench` or `@scion/microfrontend-platform`, because
@@ -113,6 +114,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
 
       await paramsLocator.locator('input.e2e-name').nth(paramIndex).fill(param.name);
       await new SciCheckboxPO(paramsLocator.locator('sci-checkbox.e2e-required').nth(paramIndex)).toggle(param.required);
+      await paramsLocator.locator('input.e2e-default').nth(paramIndex).fill(toTypedString(param.default, {emptyIfUndefined: true}));
 
       if (param.deprecated === true || typeof param.deprecated === 'object') {
         await new SciCheckboxPO(paramsLocator.locator('sci-checkbox.e2e-deprecated').nth(paramIndex)).toggle(true);

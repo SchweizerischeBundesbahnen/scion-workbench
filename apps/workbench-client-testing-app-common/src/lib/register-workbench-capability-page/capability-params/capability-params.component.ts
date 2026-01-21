@@ -18,7 +18,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {ParamDefinition} from '@scion/microfrontend-platform';
 import {UUID} from '@scion/toolkit/uuid';
 import {Arrays} from '@scion/toolkit/util';
-import {prune} from 'workbench-testing-app-common';
+import {parseTypedString, prune, toTypedString} from 'workbench-testing-app-common';
 
 @Component({
   selector: 'app-capability-params',
@@ -65,6 +65,7 @@ export class CapabilityParamsComponent implements ControlValueAccessor, Validato
             name: paramFormGroup.controls.name.value!,
             required: paramFormGroup.controls.required.value ?? false,
             transient: this.showTransientParams() ? (paramFormGroup.controls.transient.value ?? undefined) : undefined,
+            default: parseTypedString(paramFormGroup.controls.default.value, {undefinedIfEmpty: true}),
             deprecated: (() => {
               if (!paramFormGroup.controls.deprecated.value) {
                 return undefined;
@@ -101,6 +102,7 @@ export class CapabilityParamsComponent implements ControlValueAccessor, Validato
       name: this._formBuilder.control(param?.name, {validators: Validators.required}),
       required: this._formBuilder.control(param?.required),
       transient: this._formBuilder.control((param as ViewParamDefinition | undefined)?.transient),
+      default: this._formBuilder.control(toTypedString(param?.default, {emptyIfUndefined: true}) || ''),
       deprecated: this._formBuilder.control(param?.deprecated === true ? true : undefined),
       deprecatedMessage: this._formBuilder.control({value: typeof param?.deprecated === 'object' ? param.deprecated.message : undefined, disabled: param?.deprecated !== true}),
       deprecatedUseInstead: this._formBuilder.control({value: typeof param?.deprecated === 'object' ? param.deprecated.useInstead : undefined, disabled: param?.deprecated !== true}),
@@ -175,6 +177,7 @@ interface ParamFormGroup {
   name: FormControl<string | undefined>;
   required: FormControl<boolean | undefined>;
   transient: FormControl<boolean | undefined>;
+  default: FormControl<string>;
   deprecated: FormControl<boolean | undefined>;
   deprecatedMessage: FormControl<string | undefined>;
   deprecatedUseInstead: FormControl<string | undefined>;

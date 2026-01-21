@@ -111,7 +111,7 @@ export class RegisterWorkbenchCapabilityPageComponent {
 
     await this._manifestService.registerCapability(capability as Capability)
       .then(async id => {
-        this.capability = (await firstValueFrom(this._manifestService.lookupCapabilities$({id})))[0];
+        this.capability = id ? (await firstValueFrom(this._manifestService.lookupCapabilities$({id})))[0] : undefined;
         this.form.reset();
         this.form.setControl('qualifier', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
       })

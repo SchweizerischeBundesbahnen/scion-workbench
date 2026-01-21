@@ -2612,4 +2612,36 @@ test.describe('Workbench Router', () => {
       } satisfies Partial<ViewInfo>,
     );
   });
+
+  test('should use default value of optional param', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-view',
+      },
+      params: [
+        {name: 'param1', required: false, default: 'defaultValue'},
+        {name: 'param2', required: false, default: 123},
+        {name: 'param3', required: false, default: true},
+        {name: 'param4', required: false, default: null},
+        {name: 'param5', required: false, default: undefined},
+      ],
+    });
+
+    // Open view.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+
+    // Expect default values to be set.
+    const viewPage = new ViewPagePO(appPO.view({cssClass: 'testee'}));
+    await expect.poll(() => viewPage.getViewParams()).toMatchObject({
+      param1: 'defaultValue',
+      param2: '123 [number]',
+      param3: 'true [boolean]',
+      param4: 'null [null]',
+    });
+  });
 });

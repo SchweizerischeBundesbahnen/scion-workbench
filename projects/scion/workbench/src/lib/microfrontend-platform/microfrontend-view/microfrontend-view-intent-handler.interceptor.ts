@@ -127,7 +127,7 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
 
         // Test whether all "navigational" params match.
         return requiredParams.every(({name}) => {
-          const intentParamValue = intentMessage.intent.params!.get(name) as unknown;
+          const intentParamValue = intentMessage.intent.params!.get(name);
           return (options.matchWildcardParams && intentParamValue === '*') || intentParamValue === navigation.params[name];
         });
 

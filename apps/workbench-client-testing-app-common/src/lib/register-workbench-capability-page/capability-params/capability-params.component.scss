@@ -5,6 +5,7 @@
   grid-template-columns:
         1fr // Name
         min-content // Required
+        1fr // Default
         min-content // Deprecated
         1fr // Deprecated Message
         1fr // Deprecated Use Instead
@@ -27,6 +28,7 @@
     grid-template-columns:
         1fr // Name
         min-content // Required
+        1fr // Default
         min-content // Transient
         min-content // Deprecated
         1fr // Deprecated Message

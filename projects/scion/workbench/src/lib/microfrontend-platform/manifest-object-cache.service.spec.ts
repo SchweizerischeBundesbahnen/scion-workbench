@@ -30,7 +30,7 @@ describe('ManifestObjectCache', () => {
     await TestBed.inject(WorkbenchLauncher).launch();
 
     // Register capability.
-    const capabilityId = await TestBed.inject(ManifestService).registerCapability({type: 'testee'});
+    const capabilityId = (await TestBed.inject(ManifestService).registerCapability({type: 'testee'}))!;
 
     // Test capability to be found.
     expect(TestBed.inject(ManifestObjectCache).capability(capabilityId)()).toEqual(await lookupCapability(capabilityId));

@@ -450,7 +450,7 @@ describe('Workbench Perspective Capability', () => {
     });
     await TestBed.inject(WorkbenchLauncher).launch();
 
-    const perspectiveId = await TestBed.inject(ManifestService).registerCapability({
+    const perspectiveId = (await TestBed.inject(ManifestService).registerCapability({
       type: WorkbenchCapabilities.Perspective,
       qualifier: {name: 'testee'},
       properties: {
@@ -461,7 +461,7 @@ describe('Workbench Perspective Capability', () => {
           },
         ],
       },
-    });
+    }))!;
 
     // Expect perspective capability to be set on perspective data.
     const capability = await lookupCapability(perspectiveId);

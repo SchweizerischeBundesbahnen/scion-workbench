@@ -1236,6 +1236,119 @@ test.describe('Text Provider', () => {
         });
       });
 
+      test('should substitute parameters and resolvers (optional param with default value)', async ({appPO, microfrontendNavigator, page}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // Register text view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'text'},
+          properties: {
+            path: 'test-pages/text-test-page',
+          },
+        });
+
+        // Register docked part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'activity'},
+          params: [
+            {name: 'id', required: false, default: 'defaultValue'},
+          ],
+          properties: {
+            path: 'test-part',
+            extras: {
+              icon: 'folder',
+              label: '%part_label;name=:name',
+              tooltip: '%part_tooltip;name=:name',
+            },
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+          },
+        });
+
+        // Register main-area part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'main-area'},
+        });
+
+        // Create perspective with two parts: Part 1 provides the param; Part 2 uses the default.
+        await microfrontendNavigator.createPerspective('app1', {
+          type: 'perspective',
+          qualifier: {perspective: 'testee'},
+          properties: {
+            parts: [
+              {
+                id: MAIN_AREA,
+                qualifier: {part: 'main-area'},
+              },
+              {
+                id: 'part.activity-1',
+                qualifier: {part: 'activity'},
+                params: {id: 'value'},
+                position: 'left-top',
+                active: true,
+                cssClass: 'testee-1',
+              },
+              {
+                id: 'part.activity-2',
+                qualifier: {part: 'activity'},
+                position: 'right-top',
+                active: true,
+                cssClass: 'testee-2',
+              },
+            ],
+          },
+        });
+
+        const activityItem1 = appPO.activityItem({cssClass: 'testee-1'});
+        const activityItem2 = appPO.activityItem({cssClass: 'testee-2'});
+        const dockedPart1 = appPO.part({cssClass: 'testee-1'});
+        const dockedPart2 = appPO.part({cssClass: 'testee-2'});
+
+        // Open text view.
+        const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+        await routerPage.navigate({component: 'text'}, {cssClass: 'text'});
+        const textPage = new TextTestPagePO(appPO.view({cssClass: 'text'}));
+
+        // Provide text.
+        await textPage.provideText('part_label', 'Label - {{name}}');
+        await textPage.provideText('part_title', 'Title - {{name}}');
+        await textPage.provideText('part_tooltip', 'Tooltip - {{name}}');
+
+        // No resolved value yet.
+        await test.step('No resolved value yet', async () => {
+          // Wait some time.
+          await page.waitForTimeout(1000);
+          await expect(dockedPart1.bar.title).toHaveText('');
+          await expect(dockedPart2.bar.title).toHaveText('');
+          await expect.poll(() => activityItem1.getTooltip()).toEqual('');
+          await expect.poll(() => activityItem2.getTooltip()).toEqual('');
+        });
+
+        // Resolve value.
+        await test.step('Resolve Value', async () => {
+          await textPage.provideValue('value', 'RESOLVED 1');
+          await textPage.provideValue('defaultValue', 'RESOLVED 1 DEFAULT');
+          await expect(dockedPart1.bar.title).toHaveText('Label - RESOLVED 1');
+          await expect(dockedPart2.bar.title).toHaveText('Label - RESOLVED 1 DEFAULT');
+          await expect.poll(() => activityItem1.getTooltip()).toEqual('Tooltip - RESOLVED 1');
+          await expect.poll(() => activityItem2.getTooltip()).toEqual('Tooltip - RESOLVED 1 DEFAULT');
+        });
+
+        // Resolve to a different value.
+        await test.step('Resolve to a different value', async () => {
+          await textPage.provideValue('value', 'RESOLVED 2');
+          await textPage.provideValue('defaultValue', 'RESOLVED 2 DEFAULT');
+          await expect(dockedPart1.bar.title).toHaveText('Label - RESOLVED 2');
+          await expect(dockedPart2.bar.title).toHaveText('Label - RESOLVED 2 DEFAULT');
+          await expect.poll(() => activityItem1.getTooltip()).toEqual('Tooltip - RESOLVED 2');
+          await expect.poll(() => activityItem2.getTooltip()).toEqual('Tooltip - RESOLVED 2 DEFAULT');
+        });
+      });
+
       test('should support semicolon in parameter and resolver', async ({appPO, microfrontendNavigator}) => {
         await appPO.navigateTo({microfrontendSupport: true});
 
@@ -3459,6 +3572,58 @@ test.describe('Text Provider', () => {
           await testPage.provideValue('123', '<undefined>');
           await expect(testPage.view.tab.title).toHaveText('Title - 123 -  - :undefined');
           await expect(testPage.view.tab.heading).toHaveText('Heading - 123 -  - :undefined');
+        });
+      });
+
+      test('should substitute parameters and resolvers (optional param with default value)', async ({appPO, microfrontendNavigator, page}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // Register test view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'testee'},
+          params: [
+            {name: 'id', required: false, default: 'defaultValue'},
+          ],
+          properties: {
+            path: 'test-pages/text-test-page',
+            title: '%view_title;id=:id;name=:name',
+            heading: '%view_heading;id=:id;name=:name',
+            resolve: {
+              name: 'textprovider/workbench-client-testing-app1/values/:id',
+            },
+          },
+        });
+
+        // Open test view.
+        const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+        await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+        const testPage = new TextTestPagePO(appPO.view({cssClass: 'testee'}));
+
+        // Provide text.
+        await testPage.provideText('view_title', 'Title - {{id}} - {{name}}');
+        await testPage.provideText('view_heading', 'Heading - {{id}} - {{name}}');
+
+        // No resolved value yet.
+        await test.step('No resolved value yet', async () => {
+          // Wait some time.
+          await page.waitForTimeout(1000);
+          await expect(testPage.view.tab.title).toHaveText('');
+          await expect(testPage.view.tab.heading).toHaveText('');
+        });
+
+        // Resolve value.
+        await test.step('Resolve Value', async () => {
+          await testPage.provideValue('defaultValue', 'RESOLVED 1');
+          await expect(testPage.view.tab.title).toHaveText('Title - defaultValue - RESOLVED 1');
+          await expect(testPage.view.tab.heading).toHaveText('Heading - defaultValue - RESOLVED 1');
+        });
+
+        // Resolve to a different value.
+        await test.step('Resolve to a different value', async () => {
+          await testPage.provideValue('defaultValue', 'RESOLVED 2');
+          await expect(testPage.view.tab.title).toHaveText('Title - defaultValue - RESOLVED 2');
+          await expect(testPage.view.tab.heading).toHaveText('Heading - defaultValue - RESOLVED 2');
         });
       });
 
