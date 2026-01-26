@@ -10,7 +10,7 @@
 
 import {Component, effect, ElementRef, inject, linkedSignal, model, Signal, untracked, WritableSignal} from '@angular/core';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
-import {applyEach, Field, form, FormValueControl, required} from '@angular/forms/signals';
+import {applyEach, FormField, form, FormValueControl, required} from '@angular/forms/signals';
 
 /**
  * Allows entering key-value pairs.
@@ -21,7 +21,7 @@ import {applyEach, Field, form, FormValueControl, required} from '@angular/forms
   styleUrls: ['./key-value-field.component.scss'],
   imports: [
     SciMaterialIconDirective,
-    Field,
+    FormField,
   ],
   host: {
     '[attr.tabindex]': '-1',

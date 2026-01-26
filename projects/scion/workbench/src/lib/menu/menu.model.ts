@@ -1,19 +1,18 @@
 /* eslint-disable */
 
-import {Component, input, Signal} from '@angular/core';
-import {Disposable} from '@scion/workbench';
+import {Signal} from '@angular/core';
 
-export interface Menu {
-  addMenuItem(menuItemDescriptor: MenuItemDescriptor | IconMenuItemDescriptor | CheckableMenuItemDescriptor, onSelect: () => void): this;
+export interface SciMenu {
+  addMenuItem(menuItemDescriptor: SciMenuItemDescriptor | SciIconMenuItemDescriptor | SciCheckableMenuItemDescriptor, onSelect: () => void): this;
 
-  addMenu(menuDescriptor: MenuDescriptor, menuFactoryFn: (menu: Menu) => Menu): this;
+  addMenu(menuDescriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenu) => SciMenu): this;
 
-  addGroup(menuGroupDescriptor: MenuGroupDescriptor, menuFactoryFn?: (group: Menu) => Menu): this;
+  addGroup(menuGroupDescriptor: SciMenuGroupDescriptor, menuFactoryFn?: (group: SciMenu) => SciMenu): this;
 
-  addGroup(menuFactoryFn: (group: Menu) => Menu): this;
+  addGroup(menuFactoryFn: (group: SciMenu) => SciMenu): this;
 }
 
-export interface MenuDescriptor {
+export interface SciMenuDescriptor {
   text: string;
   icon?: string;
   id?: string;
@@ -22,7 +21,7 @@ export interface MenuDescriptor {
   disabled?: () => Signal<boolean> | boolean;
 }
 
-export interface MenuItemDescriptor {
+export interface SciMenuItemDescriptor {
   text: string;
   tooltip?: string;
   mnemonic?: string;
@@ -30,32 +29,18 @@ export interface MenuItemDescriptor {
   disabled?: () => Signal<boolean> | boolean;
 }
 
-export interface IconMenuItemDescriptor extends MenuItemDescriptor {
+export interface SciIconMenuItemDescriptor extends SciMenuItemDescriptor {
   icon: string;
 }
 
-export interface CheckableMenuItemDescriptor extends MenuItemDescriptor {
+export interface SciCheckableMenuItemDescriptor extends SciMenuItemDescriptor {
   checked: () => Signal<boolean> | boolean;
 }
 
-export interface MenuGroupDescriptor {
+export interface SciMenuGroupDescriptor {
   id?: string;
   label?: string;
 }
 
-export function provideMenu(name: string, menuFactoryFn: (menu: Menu) => Menu, options?: ProvideMenuOptions): Disposable {
-  return undefined as unknown as Disposable;
-}
-
-export interface ProvideMenuOptions {
-  canMatch?: () => boolean;
-}
-
 export function openMenu(name: string, anchor: HTMLElement): void {
-}
-
-@Component({selector: 'sci-toolbar', template: ''})
-export class SciToolbar {
-
-  public location = input.required<string>();
 }

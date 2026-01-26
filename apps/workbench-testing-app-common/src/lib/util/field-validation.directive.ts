@@ -9,7 +9,7 @@
  */
 
 import {Directive, inject} from '@angular/core';
-import {Field} from '@angular/forms/signals';
+import {FormField} from '@angular/forms/signals';
 
 @Directive({
   selector: '[appFieldValidation]',
@@ -20,5 +20,5 @@ import {Field} from '@angular/forms/signals';
 })
 export class FieldValidationDirective {
 
-  protected readonly field = inject(Field);
+  protected readonly field = inject(FormField);
 }

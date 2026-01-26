@@ -12,7 +12,7 @@ import {Component, DoCheck, DOCUMENT, inject, NgZone, Signal} from '@angular/cor
 import {filter, map, scan} from 'rxjs/operators';
 import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} from '@angular/router';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
-import {WORKBENCH_ID, WorkbenchService, WorkbenchStartup} from '@scion/workbench';
+import {provideMenu, WORKBENCH_ID, WorkbenchService, WorkbenchStartup} from '@scion/workbench';
 import {HeaderComponent} from './header/header.component';
 import {fromEvent} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
@@ -56,6 +56,67 @@ export class AppComponent implements DoCheck {
     installFocusHighlighter();
     installGlasspaneHighlighter();
     installMicrofrontendApplicationLabels();
+
+    provideMenu('toolbar:workbench.part.tools', menu => menu
+      .addMenu({text: 'File'}, menu => menu
+        .addMenuItem({text: 'New', icon: 'article'}, () => this.onAction())
+        .addMenuItem({text: 'Open', icon: 'folder'}, () => this.onAction())
+        .addMenuItem({text: 'Make a Copy', icon: 'file_copy'}, () => this.onAction())
+        .addMenu({text: 'Share', icon: 'person_add', id: 'extend-me'}, menu => menu
+          .addMenuItem({text: 'Share with others', icon: 'person_add'}, () => this.onAction())
+          .addMenuItem({text: 'Publish to web', icon: 'public'}, () => this.onAction()),
+        )
+        .addMenuItem({text: 'Download', icon: 'download'}, () => this.onAction())
+        .addMenuItem({text: 'Print', icon: 'print'}, () => this.onAction()),
+      )
+      .addMenu({text: 'Edit'}, menu => menu
+        .addMenuItem({text: 'Undo', icon: 'undo'}, () => this.onAction())
+        .addMenuItem({text: 'Redo', icon: 'redo'}, () => this.onAction())
+        .addMenuItem({text: 'Cut', icon: 'content_cut'}, () => this.onAction())
+        .addMenuItem({text: 'Copy', icon: 'content_copy'}, () => this.onAction())
+        .addMenuItem({text: 'Paste', icon: 'content_paste'}, () => this.onAction())
+        .addMenuItem({text: 'Find and replace', icon: 'find_replace'}, () => this.onAction()),
+      )
+      .addMenu({text: 'Format'}, menu => menu
+        .addMenu({text: 'Text', icon: 'format_bold'}, menu => menu
+          .addMenuItem({text: 'Bold', icon: 'format_bold'}, () => this.onAction())
+          .addMenuItem({text: 'Italic', icon: 'format_italic'}, () => this.onAction())
+          .addMenuItem({text: 'Underline', icon: 'format_underlined'}, () => this.onAction())
+          .addMenuItem({text: 'Strikethrough', icon: 'strikethrough_s'}, () => this.onAction())
+          .addMenu({text: 'Size', icon: 'format_bold'}, menu => menu
+            .addMenuItem({text: 'Increase font size'}, () => this.onAction())
+            .addMenuItem({text: 'Decrease font size'}, () => this.onAction()),
+          ),
+        )
+        .addMenu({text: 'Paragraph styles', icon: 'format_align_justify', id: 'menu:paragraph'}, menu => menu
+          .addMenuItem({text: 'Normal text'}, () => this.onAction())
+          .addMenuItem({text: 'Heading 1'}, () => this.onAction())
+          .addMenuItem({text: 'Heading 2'}, () => this.onAction()),
+        )
+        .addMenu({text: 'Align & indent', icon: 'format_bold'}, menu => menu
+          .addMenuItem({text: 'Align left', icon: 'format_align_left'}, () => this.onAction())
+          .addMenuItem({text: 'Align center', icon: 'format_align_center'}, () => this.onAction())
+          .addMenuItem({text: 'Align right', icon: 'format_align_right'}, () => this.onAction())
+          .addMenuItem({text: 'Justify', icon: 'format_align_justify'}, () => this.onAction()),
+        ),
+      ),
+    );
+
+    provideMenu('menu:paragraph', menu => menu
+      .addMenuItem({text: 'Heading 3'}, () => this.onAction())
+    );
+
+    provideMenu('menu:paragraph', menu => menu
+      .addMenu({text: 'SCION'}, menu => menu
+        .addMenuItem({text: 'Dani'}, () => this.onAction())
+        .addMenuItem({text: 'Marc'}, () => this.onAction())
+        .addMenuItem({text: 'Konstantin'}, () => this.onAction())
+      ),
+    );
+  }
+
+  private onAction(): void {
+    console.log('>>> click');
   }
 
   public ngDoCheck(): void {
