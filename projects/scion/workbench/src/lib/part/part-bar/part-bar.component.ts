@@ -11,15 +11,14 @@
 import {Component, computed, effect, ElementRef, inject, InjectionToken, NgZone, Signal, untracked, viewChild} from '@angular/core';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
-import {PartActionComponent} from '../part-action/part-action.component';
 import {ViewListButtonComponent} from '../view-list-button/view-list-button.component';
 import {ViewTabBarComponent} from '../view-tab-bar/view-tab-bar.component';
 import {dimension} from '@scion/components/dimension';
-import {NgClass} from '@angular/common';
 import {EMPTY, fromEvent, mergeMap, of, pairwise, withLatestFrom} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {TextPipe} from '../../text/text.pipe';
 import {IconComponent} from '../../icon/icon.component';
+import {SciToolbarComponent} from '../../menu/toolbar/toolbar.component';
 
 /**
  * DI token to inject the HTML element of the {@link PartBarComponent}.
@@ -32,11 +31,10 @@ export const PART_BAR_ELEMENT = new InjectionToken<HTMLElement>('PART_BAR_ELEMEN
   styleUrls: ['./part-bar.component.scss'],
   imports: [
     ViewTabBarComponent,
-    PartActionComponent,
     ViewListButtonComponent,
-    NgClass,
     TextPipe,
     IconComponent,
+    SciToolbarComponent,
   ],
   providers: [
     {provide: PART_BAR_ELEMENT, useFactory: () => inject(ElementRef).nativeElement as HTMLElement},

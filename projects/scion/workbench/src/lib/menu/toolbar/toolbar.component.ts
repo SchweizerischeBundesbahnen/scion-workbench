@@ -1,29 +1,45 @@
-import {Component, signal, viewChild} from '@angular/core';
+import {Component, inject, input, signal} from '@angular/core';
 import {Menu, MenuBar, MenuContent, MenuItem} from '@angular/aria/menu';
 import {OverlayModule} from '@angular/cdk/overlay';
+import {SciMenuRegistry} from '../menu.registry';
+import {HolderDirective} from './holder.directive';
+import {SetIntoHolderDirective} from './set-into-holder.directive';
+import {MMenuItem, MSubMenuItem} from '../ɵmenu';
 
 @Component({
   selector: 'sci-toolbar',
-  imports: [MenuBar, Menu, MenuContent, MenuItem, OverlayModule],
+  imports: [MenuBar, Menu, MenuContent, MenuItem, OverlayModule, HolderDirective, SetIntoHolderDirective],
   templateUrl: './toolbar.component.html',
   styleUrl: './toolbar.component.scss',
 })
 export class SciToolbarComponent {
-  fileMenu = viewChild<Menu<string>>('fileMenu');
-  shareMenu = viewChild<Menu<string>>('shareMenu');
-  editMenu = viewChild<Menu<string>>('editMenu');
-  viewMenu = viewChild<Menu<string>>('viewMenu');
-  insertMenu = viewChild<Menu<string>>('insertMenu');
-  imageMenu = viewChild<Menu<string>>('imageMenu');
-  chartMenu = viewChild<Menu<string>>('chartMenu');
-  formatMenu = viewChild<Menu<string>>('formatMenu');
-  textMenu = viewChild<Menu<string>>('textMenu');
-  sizeMenu = viewChild<Menu<string>>('sizeMenu');
-  paragraphMenu = viewChild<Menu<string>>('paragraphMenu');
-  alignMenu = viewChild<Menu<string>>('alignMenu');
+
+  public readonly name = input.required<string>();
+
+  protected readonly menuRegistry = inject(SciMenuRegistry);
+
+  // fileMenu = viewChild<Menu<string>>('fileMenu');
+  // shareMenu = viewChild<Menu<string>>('shareMenu');
+  // editMenu = viewChild<Menu<string>>('editMenu');
+  // viewMenu = viewChild<Menu<string>>('viewMenu');
+  // insertMenu = viewChild<Menu<string>>('insertMenu');
+  // imageMenu = viewChild<Menu<string>>('imageMenu');
+  // chartMenu = viewChild<Menu<string>>('chartMenu');
+  // formatMenu = viewChild<Menu<string>>('formatMenu');
+  // textMenu = viewChild<Menu<string>>('textMenu');
+  // sizeMenu = viewChild<Menu<string>>('sizeMenu');
+  // paragraphMenu = viewChild<Menu<string>>('paragraphMenu');
+  // alignMenu = viewChild<Menu<string>>('alignMenu');
   rendered = signal(false);
 
   onFocusIn() {
     this.rendered.set(true);
+  }
+
+  public getMenuItems(menu: MSubMenuItem): Array<MMenuItem | MSubMenuItem> {
+    return [
+      ...menu.children,
+      ...this.menuRegistry.findMenuContributions(menu.id).flatMap(m => m.menuItems),
+    ];
   }
 }
