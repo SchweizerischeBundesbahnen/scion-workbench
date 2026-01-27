@@ -1,31 +1,87 @@
-import {Component, inject, InjectionToken} from '@angular/core';
-import {MMenuItem, MSubMenuItem} from '../ɵmenu';
+import {Component, computed, DestroyRef, effect, ElementRef, inject, InjectionToken, input, linkedSignal, untracked, viewChild} from '@angular/core';
+import {MSubMenuItem} from '../ɵmenu';
 import {SciMenuRegistry} from '../menu.registry';
-import {MenuService} from '../menu.service';
+import {UUID} from '@scion/toolkit/uuid';
+import {NgComponentOutlet} from '@angular/common';
 
 export const SUBMENU_ITEM = new InjectionToken<MSubMenuItem>('SUBMENU_ITEM');
 
 @Component({
   selector: 'wb-menu',
-  imports: [],
+  imports: [
+    NgComponentOutlet,
+  ],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss',
+  host: {
+    '[style.--anchor]': '`--${popoverId}`',
+  },
 })
 export class MenuComponent {
 
-  private readonly _menuService = inject(MenuService);
-  protected readonly menuItems = getMenuItems();
+  public readonly subMenuItem = input.required<MSubMenuItem>();
 
-  protected onMenuOpen(anchor: Element, menuItem: MSubMenuItem): void {
-    this._menuService.open(anchor as HTMLElement, menuItem, {rootMenu: false});
+  private readonly _menuRegistry = inject(SciMenuRegistry);
+
+  protected readonly _popover = viewChild.required<ElementRef<HTMLElement>>('popover');
+  protected readonly menuItems = computed(() => {
+    const subMenuItem = this.subMenuItem();
+
+    return untracked(() => {
+      return [
+        ...subMenuItem.children,
+        ...this._menuRegistry.findMenuContributions(subMenuItem.id).flatMap(m => m.menuItems),
+      ];
+    });
+  });
+  protected readonly popoverId = UUID.randomUUID();
+  protected readonly MenuComponent = MenuComponent;
+  // protected readonly activeSubMenuItem = signal<MSubMenuItem | undefined>(undefined);
+  protected readonly activeSubMenuItem = linkedSignal({
+    source: this.subMenuItem,
+    computation: (): MSubMenuItem | undefined => undefined,
+  });
+
+  constructor() {
+    console.log('>>> construct MenuComponent');
+    // console.log('>>> construct MenuComponent', this.menuItems());
+
+    inject(DestroyRef).onDestroy(() => {
+      console.log('>>> onDestroy MenuComponent', this.menuItems());
+    })
+
+    effect(() => {
+      if (this.activeSubMenuItem()) {
+        this._popover().nativeElement.showPopover();
+      }
+      else {
+        this._popover().nativeElement.hidePopover();
+      }
+    });
+  }
+
+  protected onSubMenuMouseEnter(subMenuItem: MSubMenuItem): void {
+    this.activeSubMenuItem.set(subMenuItem);
+  }
+
+  protected onSubMenuClick(subMenuItem: MSubMenuItem, event: Event): void {
+    this.activeSubMenuItem.set(subMenuItem);
+    event.preventDefault();
+  }
+
+  protected onToggle(event: ToggleEvent): void {
+    if (event.newState === 'closed') {
+      console.log('>>> closing menu');
+      this.activeSubMenuItem.set(undefined);
+    }
   }
 }
 
-function getMenuItems(): Array<MMenuItem | MSubMenuItem> {
-  const subMenu = inject(SUBMENU_ITEM);
-  const menuRegistry = inject(SciMenuRegistry);
-  return [
-    ...subMenu.children,
-    ...menuRegistry.findMenuContributions(subMenu.id).flatMap(m => m.menuItems),
-  ];
-}
+// function getMenuItems(): Array<MMenuItem | MSubMenuItem> {
+//   const subMenu = inject(SUBMENU_ITEM);
+//   const menuRegistry = inject(SciMenuRegistry);
+//   return [
+//     ...subMenu.children,
+//     ...menuRegistry.findMenuContributions(subMenu.id).flatMap(m => m.menuItems),
+//   ];
+// }
