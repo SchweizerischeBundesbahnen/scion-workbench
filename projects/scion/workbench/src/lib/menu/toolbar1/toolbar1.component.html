@@ -11,9 +11,9 @@
   }
 }
 
-<div popover #popover [attr.id]="popoverId" (toggle)="onToggle($event)">
-  @if (activeSubMenuItem()) {
+@if (activeSubMenuItem()) {
+  <div popover #popover [attr.id]="popoverId" (toggle)="onToggle($event)">
     Toolbar Popover
     <ng-container *ngComponentOutlet="MenuComponent; inputs: {subMenuItem: activeSubMenuItem()}"/>
-  }
-</div>
+  </div>
+}

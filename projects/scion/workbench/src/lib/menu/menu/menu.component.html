@@ -1,12 +1,12 @@
 @for (menuItem of menuItems(); track menuItem) {
   @if (menuItem.type === 'menu-item') {
-    <div class="menu-item">
+    <div class="menu-item" (mouseenter)="onMenuItemMouseEnter()">
       <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
       <span class="label">{{menuItem.text}}</span>
       <div></div>
     </div>
   } @else {
-    <button [class.active]="activeSubMenuItem() === menuItem" [attr.popovertarget]="popoverId" class="menu-item" (mouseenter)="onSubMenuMouseEnter(menuItem)" (click)="onSubMenuClick(menuItem, $event)">
+    <button [attr.popovertarget]="popoverId" popovertargetaction="show" [class.active]="activeSubMenuItem() === menuItem" class="menu-item" (mouseenter)="onSubMenuMouseEnter(menuItem)">
       <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
       <span class="label">{{menuItem.text}}</span>
       <span class="icon arrow material-symbols-rounded" translate="no">arrow_right</span>
@@ -14,9 +14,9 @@
   }
 }
 
-<div popover #popover [attr.id]="popoverId" (toggle)="onToggle($event)">
-  @if (activeSubMenuItem()) {
+@if (activeSubMenuItem()) {
+  <div popover #popover [attr.id]="popoverId" (toggle)="onToggle($event)">
     Menu Popover
     <ng-container *ngComponentOutlet="MenuComponent; inputs: {subMenuItem: activeSubMenuItem()}"/>
-  }
-</div>
+  </div>
+}
