@@ -1,0 +1,11 @@
+:host {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+
+  > div.menu-item {
+    &:hover {
+      background-color: gray;
+    }
+  }
+}
