@@ -5,8 +5,15 @@
       <span class="label">{{menuItem.text}}</span>
     </div>
   } @else {
-    <div class="menu-item" #menu_item (click)="onMenuOpen(menu_item, menuItem)">
+    <button [attr.popovertarget]="popoverId" [class.active]="activeSubMenuItem() === menuItem" class="menu-item" (mouseenter)="onSubMenuMouseEnter(menuItem)" (click)="onSubMenuClick(menuItem)">
       {{menuItem.text}}
-    </div>
+    </button>
   }
 }
+
+<div popover #popover [attr.id]="popoverId" (toggle)="onToggle($event)">
+  @if (activeSubMenuItem()) {
+    Toolbar Popover
+    <ng-container *ngComponentOutlet="MenuComponent; inputs: {subMenuItem: activeSubMenuItem()}"/>
+  }
+</div>

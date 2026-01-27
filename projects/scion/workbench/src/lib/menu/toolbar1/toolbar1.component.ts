@@ -1,21 +1,39 @@
-import {Component, computed, inject, input, Signal} from '@angular/core';
+import {Component, computed, effect, ElementRef, inject, input, signal, Signal, viewChild} from '@angular/core';
 import {SciMenuRegistry} from '../menu.registry';
 import {MMenuItem, MSubMenuItem} from '../ɵmenu';
-import {MenuService} from '../menu.service';
+import {NgComponentOutlet} from '@angular/common';
+import {MenuComponent} from '../menu/menu.component';
+import {UUID} from '@scion/toolkit/uuid';
 
 @Component({
   selector: 'sci-toolbar-1',
   templateUrl: './toolbar1.component.html',
   styleUrl: './toolbar1.component.scss',
+  imports: [
+    NgComponentOutlet,
+  ],
+  host: {
+    '[style.--anchor]': '`--${popoverId}`',
+  },
 })
 export class SciToolbarComponent {
 
   public readonly name = input.required<string>();
-
+  protected readonly popoverId = UUID.randomUUID();
   private readonly _menuRegistry = inject(SciMenuRegistry);
-  private readonly _menuService = inject(MenuService);
+  protected readonly _popover = viewChild.required<ElementRef<HTMLElement>>('popover');
 
+  protected readonly MenuComponent = MenuComponent;
   protected readonly menuItems = this.getMenuItems();
+  protected readonly activeSubMenuItem = signal<MSubMenuItem | undefined>(undefined);
+
+  constructor() {
+    effect(() => {
+      if (!this.activeSubMenuItem()) {
+        this._popover().nativeElement.hidePopover();
+      }
+    });
+  }
 
   private getMenuItems(): Signal<Array<MMenuItem | MSubMenuItem>> {
     return computed(() => {
@@ -24,8 +42,21 @@ export class SciToolbarComponent {
     });
   }
 
-  protected onMenuOpen(anchor: Element, menuItem: MSubMenuItem): void {
-    this._menuService.open(anchor as HTMLElement, menuItem, {rootMenu: true});
+  protected onSubMenuMouseEnter(subMenuItem: MSubMenuItem): void {
+    if (!this.activeSubMenuItem()) {
+      return;
+    }
+    this.activeSubMenuItem.set(subMenuItem);
+  }
+
+  protected onSubMenuClick(subMenuItem: MSubMenuItem): void {
+    this.activeSubMenuItem.set(subMenuItem);
+  }
+
+  protected onToggle(event: ToggleEvent): void {
+    if (event.newState === 'closed') {
+      this.activeSubMenuItem.set(undefined);
+    }
   }
 }
 

@@ -12,9 +12,23 @@
   background-color: var(--sci-color-background-elevation);
   padding: .5em;
 
-  > div.menu-item {
+  > div.menu-item, button.menu-item {
     grid-column: 1/-1;
     display: grid;
     grid-template-columns: subgrid;
+
+    &.active {
+      anchor-name: var(--anchor);
+    }
+  }
+
+  > div[popover] {
+    position-anchor: var(--anchor);
+    position-try-fallbacks: flip-inline, flip-block;
+    background-color: red;
+    margin: 0;
+    inset: auto;
+    top: anchor(top);
+    left: anchor(right);
   }
 }

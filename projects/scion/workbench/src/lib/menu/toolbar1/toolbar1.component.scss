@@ -3,9 +3,23 @@
   align-items: center;
   gap: 1em;
 
-  > div.menu-item {
+  > div.menu-item, button.menu-item {
     &:hover {
       background-color: gray;
     }
+
+    &.active {
+      anchor-name: var(--anchor);
+    }
+  }
+
+  > div[popover] {
+    position-anchor: var(--anchor);
+    position-try-fallbacks: flip-block, flip-inline;
+    background-color: green;
+    margin: 0;
+    inset: auto;
+    top: anchor(bottom);
+    left: anchor(left);
   }
 }
