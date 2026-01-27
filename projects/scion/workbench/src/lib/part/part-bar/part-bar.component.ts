@@ -18,7 +18,7 @@ import {EMPTY, fromEvent, mergeMap, of, pairwise, withLatestFrom} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {TextPipe} from '../../text/text.pipe';
 import {IconComponent} from '../../icon/icon.component';
-import {SciToolbarComponent} from '../../menu/toolbar/toolbar.component';
+import {SciToolbarComponent} from '../../menu/toolbar1/toolbar1.component';
 
 /**
  * DI token to inject the HTML element of the {@link PartBarComponent}.
@@ -34,6 +34,7 @@ export const PART_BAR_ELEMENT = new InjectionToken<HTMLElement>('PART_BAR_ELEMEN
     ViewListButtonComponent,
     TextPipe,
     IconComponent,
+    SciToolbarComponent,
     SciToolbarComponent,
   ],
   providers: [

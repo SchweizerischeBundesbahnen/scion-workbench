@@ -1,0 +1,15 @@
+@for (menuItem of menuItems; track menuItem) {
+  @if (menuItem.type === 'menu-item') {
+    <div class="menu-item">
+      <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
+      <span class="label">{{menuItem.text}}</span>
+      <div></div>
+    </div>
+  } @else {
+    <div class="menu-item" #menu_item (click)="onMenuOpen(menu_item, menuItem)">
+      <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
+      <span class="label">{{menuItem.text}}</span>
+      <span class="icon arrow material-symbols-rounded" translate="no">arrow_right</span>
+    </div>
+  }
+}
