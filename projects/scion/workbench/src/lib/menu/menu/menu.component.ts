@@ -23,7 +23,7 @@ export class MenuComponent {
 
   private readonly _menuRegistry = inject(SciMenuRegistry);
 
-  protected readonly _popover = viewChild.required<ElementRef<HTMLElement>>('popover');
+  protected readonly _popover = viewChild<ElementRef<HTMLElement>>('popover');
   protected readonly menuItems = computed(() => {
     const subMenuItem = this.subMenuItem();
 
@@ -51,22 +51,25 @@ export class MenuComponent {
     })
 
     effect(() => {
+      const popover = this._popover();
+      if (!popover) {
+        return;
+      }
       if (this.activeSubMenuItem()) {
-        this._popover().nativeElement.showPopover();
+        popover.nativeElement.showPopover();
       }
       else {
-        this._popover().nativeElement.hidePopover();
+        popover.nativeElement.hidePopover();
       }
     });
   }
 
-  protected onSubMenuMouseEnter(subMenuItem: MSubMenuItem): void {
-    this.activeSubMenuItem.set(subMenuItem);
+  protected onMenuItemMouseEnter(): void {
+    this.activeSubMenuItem.set(undefined);
   }
 
-  protected onSubMenuClick(subMenuItem: MSubMenuItem, event: Event): void {
+  protected onSubMenuMouseEnter(subMenuItem: MSubMenuItem): void {
     this.activeSubMenuItem.set(subMenuItem);
-    event.preventDefault();
   }
 
   protected onToggle(event: ToggleEvent): void {

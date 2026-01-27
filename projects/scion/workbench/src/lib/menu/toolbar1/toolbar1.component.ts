@@ -21,7 +21,7 @@ export class SciToolbarComponent {
   public readonly name = input.required<string>();
   protected readonly popoverId = UUID.randomUUID();
   private readonly _menuRegistry = inject(SciMenuRegistry);
-  protected readonly _popover = viewChild.required<ElementRef<HTMLElement>>('popover');
+  protected readonly _popover = viewChild<ElementRef<HTMLElement>>('popover');
 
   protected readonly MenuComponent = MenuComponent;
   protected readonly menuItems = this.getMenuItems();
@@ -29,8 +29,13 @@ export class SciToolbarComponent {
 
   constructor() {
     effect(() => {
+      const popover = this._popover();
+      if (!popover) {
+        return;
+      }
+
       if (!this.activeSubMenuItem()) {
-        this._popover().nativeElement.hidePopover();
+        popover.nativeElement.hidePopover();
       }
     });
   }
