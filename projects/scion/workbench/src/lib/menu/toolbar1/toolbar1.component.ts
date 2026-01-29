@@ -1,7 +1,6 @@
 import {Component, computed, effect, ElementRef, inject, input, signal, Signal, viewChild} from '@angular/core';
 import {SciMenuRegistry} from '../menu.registry';
 import {MMenuItem, MSubMenuItem} from '../ɵmenu';
-import {NgComponentOutlet} from '@angular/common';
 import {MenuComponent} from '../menu/menu.component';
 import {UUID} from '@scion/toolkit/uuid';
 
@@ -10,32 +9,26 @@ import {UUID} from '@scion/toolkit/uuid';
   templateUrl: './toolbar1.component.html',
   styleUrl: './toolbar1.component.scss',
   imports: [
-    NgComponentOutlet,
+    MenuComponent,
   ],
-  host: {
-    '[style.--anchor]': '`--${popoverId}`',
-  },
 })
 export class SciToolbarComponent {
 
   public readonly name = input.required<string>();
   protected readonly popoverId = UUID.randomUUID();
   private readonly _menuRegistry = inject(SciMenuRegistry);
-  protected readonly _popover = viewChild<ElementRef<HTMLElement>>('popover');
+  private readonly _popover = viewChild('popover', {read: ElementRef<HTMLElement>});
 
-  protected readonly MenuComponent = MenuComponent;
   protected readonly menuItems = this.getMenuItems();
   protected readonly activeSubMenuItem = signal<MSubMenuItem | undefined>(undefined);
 
   constructor() {
+
     effect(() => {
       const popover = this._popover();
-      if (!popover) {
-        return;
-      }
 
       if (!this.activeSubMenuItem()) {
-        popover.nativeElement.hidePopover();
+        popover?.nativeElement.hidePopover();
       }
     });
   }
@@ -58,7 +51,7 @@ export class SciToolbarComponent {
     this.activeSubMenuItem.set(subMenuItem);
   }
 
-  protected onToggle(event: ToggleEvent): void {
+  protected onTogglePopover(event: ToggleEvent): void {
     if (event.newState === 'closed') {
       this.activeSubMenuItem.set(undefined);
     }

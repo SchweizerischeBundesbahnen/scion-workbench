@@ -5,15 +5,20 @@
       <span class="label">{{menuItem.text}}</span>
     </div>
   } @else {
-    <button [attr.popovertarget]="popoverId" [class.active]="activeSubMenuItem() === menuItem" class="menu-item" (mouseenter)="onSubMenuMouseEnter(menuItem)" (click)="onSubMenuClick(menuItem)">
+    <button [attr.popovertarget]="popoverId"
+            [style.anchor-name]="activeSubMenuItem() === menuItem ? `--${popoverId}` : null"
+            class="menu-item"
+            (mouseenter)="onSubMenuMouseEnter(menuItem)"
+            (click)="onSubMenuClick(menuItem)">
       {{menuItem.text}}
     </button>
   }
 }
 
 @if (activeSubMenuItem()) {
-  <div popover #popover [attr.id]="popoverId" (toggle)="onToggle($event)">
-    Toolbar Popover
-    <ng-container *ngComponentOutlet="MenuComponent; inputs: {subMenuItem: activeSubMenuItem()}"/>
-  </div>
+  <wb-menu [subMenuItem]="activeSubMenuItem()!"
+           [attr.id]="popoverId"
+           [style.position-anchor]="`--${popoverId}`"
+           (toggle)="onTogglePopover($event)"
+           popover #popover/>
 }

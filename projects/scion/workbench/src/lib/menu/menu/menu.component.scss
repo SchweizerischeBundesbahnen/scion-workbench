@@ -1,34 +1,93 @@
+$padding: .3em;
+
 :host {
-  display: grid;
+  display: inline-grid;
+  overflow: hidden;
   grid-template-columns:
     // === Menu Item Subgrid ===
-    auto
-    1fr
-    20px;
+    auto // icon or check mark
+    minmax(7.5em, auto) // label
+    auto; // chevron or accelerator
   align-items: center;
+  gap: .125em .5em;
   border: 1px solid var(--sci-color-border);
   border-radius: 0.5rem;
   color: var(--sci-color-text);
   background-color: var(--sci-color-background-elevation);
-  padding: .5em;
+  padding: $padding;
 
-  > div.menu-item, button.menu-item {
+  &.gutter-column-hidden {
+    grid-template-columns:
+    // === Menu Item Subgrid ===
+    minmax(7.5em, auto) // label
+    auto; // chevron or accelerator
+  }
+
+  > button.menu-item {
+    all: unset;
     grid-column: 1/-1;
-    display: grid;
+    display: inline-grid;
+    align-items: center;
     grid-template-columns: subgrid;
+    text-wrap: nowrap;
+    padding: .25em .25em;
+    border-radius: var(--sci-corner);
+    user-select: none;
+    overflow: hidden;
+    cursor: var(--sci-workbench-button-cursor);
 
-    &.active {
-      anchor-name: var(--anchor);
+    > span.label:last-child {
+      grid-column: span 2 / -1;
+    }
+
+    > span.checkmark {
+      width: 16px;
+    }
+
+    > span.icon {
+      justify-self: center;
+      font-size: 16px;
+    }
+
+    > span.label {
+      justify-self: start;
+    }
+
+    > span.accelerator, span.sub-menu-chevron {
+      justify-self: end;
+    }
+
+    > span.accelerator {
+      color: var(--sci-color-text-subtlest);
+      font-size: smaller;
+    }
+
+    &:hover:where(:not(:disabled)) {
+      background-color: var(--sci-workbench-button-background-color-hover);
+    }
+
+    &:active:where(:not(:disabled)) {
+      background-color: var(--sci-workbench-button-background-color-active);
+    }
+
+    &:focus:not(:focus-visible) {
+      outline: none;
+    }
+
+    &:focus-visible {
+      outline: var(--sci-workbench-button-outline-width-focus) solid var(--sci-color-accent);
+    }
+
+    &:disabled {
+      color: var(--sci-color-gray-500);
     }
   }
 
-  > div[popover] {
-    position-anchor: var(--anchor);
+  > wb-menu[popover] {
+    margin: unset; // unset native popover styling
+    inset: unset; // unset native popover styling
     position-try-fallbacks: flip-inline, flip-block;
-    background-color: red;
-    margin: 0;
-    inset: auto;
-    top: anchor(top);
-    left: anchor(right);
+    top: calc(anchor(top) - $padding);
+    left: calc(anchor(right) + .1em);
   }
 }
