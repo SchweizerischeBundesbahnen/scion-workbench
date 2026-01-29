@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DoCheck, DOCUMENT, inject, NgZone, Signal} from '@angular/core';
+import {Component, computed, DoCheck, DOCUMENT, inject, NgZone, signal, Signal} from '@angular/core';
 import {filter, map, scan} from 'rxjs/operators';
 import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} from '@angular/router';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
@@ -57,9 +57,11 @@ export class AppComponent implements DoCheck {
     installGlasspaneHighlighter();
     installMicrofrontendApplicationLabels();
 
+    const paragraphStyle = signal<string>('');
+
     provideMenu('toolbar:workbench.part.tools', menu => menu
       .addMenu({text: 'File'}, menu => menu
-        .addMenuItem({text: 'New', icon: 'article'}, () => this.onAction())
+        .addMenuItem({text: 'New', icon: 'article', accelerator: ['Ctrl', 'N']}, () => this.onAction())
         .addMenuItem({text: 'Open', icon: 'folder'}, () => this.onAction())
         .addMenuItem({text: 'Make a Copy', icon: 'file_copy'}, () => this.onAction())
         .addMenu({text: 'Share', icon: 'person_add', id: 'extend-me'}, menu => menu
@@ -70,17 +72,17 @@ export class AppComponent implements DoCheck {
         .addMenuItem({text: 'Print', icon: 'print'}, () => this.onAction()),
       )
       .addMenu({text: 'Edit'}, menu => menu
-        .addMenuItem({text: 'Undo', icon: 'undo'}, () => this.onAction())
+        .addMenuItem({text: 'Undo', icon: 'undo', accelerator: ['Ctrl', 'Z']}, () => this.onAction())
         .addMenuItem({text: 'Redo', icon: 'redo'}, () => this.onAction())
-        .addMenuItem({text: 'Cut', icon: 'content_cut'}, () => this.onAction())
-        .addMenuItem({text: 'Copy', icon: 'content_copy'}, () => this.onAction())
-        .addMenuItem({text: 'Paste', icon: 'content_paste'}, () => this.onAction())
-        .addMenuItem({text: 'Find and replace', icon: 'find_replace'}, () => this.onAction()),
+        .addMenuItem({text: 'Cut', icon: 'content_cut', accelerator: ['Ctrl', 'X']}, () => this.onAction())
+        .addMenuItem({text: 'Copy', icon: 'content_copy', accelerator: ['Ctrl', 'C']}, () => this.onAction())
+        .addMenuItem({text: 'Paste', icon: 'content_paste', accelerator: ['Ctrl', 'V']}, () => this.onAction())
+        .addMenuItem({text: 'Find and replace', icon: 'find_replace', accelerator: ['Ctrl', 'F']}, () => this.onAction()),
       )
       .addMenu({text: 'Format'}, menu => menu
         .addMenu({text: 'Text', icon: 'format_bold'}, menu => menu
-          .addMenuItem({text: 'Bold', icon: 'format_bold'}, () => this.onAction())
-          .addMenuItem({text: 'Italic', icon: 'format_italic'}, () => this.onAction())
+          .addMenuItem({text: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B']}, () => this.onAction())
+          .addMenuItem({text: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I']}, () => this.onAction())
           .addMenuItem({text: 'Underline', icon: 'format_underlined'}, () => this.onAction())
           .addMenuItem({text: 'Strikethrough', icon: 'strikethrough_s'}, () => this.onAction())
           .addMenu({text: 'Size', icon: 'format_bold'}, menu => menu
@@ -88,10 +90,12 @@ export class AppComponent implements DoCheck {
             .addMenuItem({text: 'Decrease font size'}, () => this.onAction()),
           ),
         )
-        .addMenu({text: 'Paragraph styles', icon: 'format_align_justify', id: 'menu:paragraph'}, menu => menu
-          .addMenuItem({text: 'Normal text'}, () => this.onAction())
-          .addMenuItem({text: 'Heading 1'}, () => this.onAction())
-          .addMenuItem({text: 'Heading 2'}, () => this.onAction()),
+        .addMenu({text: 'Paragraph styles', icon: 'format_align_justify', id: 'menu:paragraph'}, menu => {
+            return menu
+              .addMenuItem({text: 'Normal text', checked: computed(() => paragraphStyle() === 'normal')}, () => paragraphStyle.set('normal'))
+              .addMenuItem({text: 'Heading 1', checked: computed(() => paragraphStyle() === 'heading1')}, () => paragraphStyle.set('heading1'))
+              .addMenuItem({text: 'Heading 2', checked: computed(() => paragraphStyle() === 'heading2')}, () => paragraphStyle.set('heading2'))
+          },
         )
         .addMenu({text: 'Align & indent', icon: 'format_bold'}, menu => menu
           .addMenuItem({text: 'Align left', icon: 'format_align_left'}, () => this.onAction())
@@ -103,14 +107,14 @@ export class AppComponent implements DoCheck {
     );
 
     provideMenu('menu:paragraph', menu => menu
-      .addMenuItem({text: 'Heading 3'}, () => this.onAction())
+      .addMenuItem({text: 'Heading 3', checked: computed(() => paragraphStyle() === 'heading3')}, () => paragraphStyle.set('heading3'))
     );
 
     provideMenu('menu:paragraph', menu => menu
       .addMenu({text: 'SCION'}, menu => menu
         .addMenuItem({text: 'Dani'}, () => this.onAction())
         .addMenuItem({text: 'Marc'}, () => this.onAction())
-        .addMenuItem({text: 'Konstantin'}, () => this.onAction())
+        .addMenuItem({text: 'Konstantin'}, () => this.onAction()),
       ),
     );
   }

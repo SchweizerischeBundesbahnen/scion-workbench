@@ -7,18 +7,13 @@
     &:hover {
       background-color: gray;
     }
-
-    &.active {
-      anchor-name: var(--anchor);
-    }
   }
 
-  > div[popover] {
-    position-anchor: var(--anchor);
-    position-try-fallbacks: flip-block, flip-inline;
-    background-color: green;
-    margin: 0;
-    inset: auto;
+  > wb-menu[popover] {
+    margin: unset; // unset native popover styling
+    inset: unset; // unset native popover styling
+    position-try-fallbacks: flip-inline, flip-block;
+    //background-color: green;
     top: anchor(bottom);
     left: anchor(left);
   }

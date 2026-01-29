@@ -1,20 +1,22 @@
-import {Component, computed, DestroyRef, effect, ElementRef, inject, InjectionToken, input, linkedSignal, untracked, viewChild} from '@angular/core';
-import {MSubMenuItem} from '../ɵmenu';
+import {Component, computed, DestroyRef, effect, ElementRef, inject, InjectionToken, input, linkedSignal, Signal, untracked, viewChild} from '@angular/core';
+import {MMenuItem, MSubMenuItem} from '../ɵmenu';
 import {SciMenuRegistry} from '../menu.registry';
 import {UUID} from '@scion/toolkit/uuid';
-import {NgComponentOutlet} from '@angular/common';
+import {JoinPipe} from './join.pipe';
+import {MenuItemDirective} from './menu-item.directive';
 
 export const SUBMENU_ITEM = new InjectionToken<MSubMenuItem>('SUBMENU_ITEM');
 
 @Component({
   selector: 'wb-menu',
   imports: [
-    NgComponentOutlet,
+    JoinPipe,
+    MenuItemDirective,
   ],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss',
   host: {
-    '[style.--anchor]': '`--${popoverId}`',
+    '[class.gutter-column-hidden]': '!hasGutterColumn()',
   },
 })
 export class MenuComponent {
@@ -22,69 +24,62 @@ export class MenuComponent {
   public readonly subMenuItem = input.required<MSubMenuItem>();
 
   private readonly _menuRegistry = inject(SciMenuRegistry);
+  private readonly _popover = viewChild('popover', {read: ElementRef<HTMLElement>});
 
-  protected readonly _popover = viewChild<ElementRef<HTMLElement>>('popover');
-  protected readonly menuItems = computed(() => {
-    const subMenuItem = this.subMenuItem();
-
-    return untracked(() => {
-      return [
-        ...subMenuItem.children,
-        ...this._menuRegistry.findMenuContributions(subMenuItem.id).flatMap(m => m.menuItems),
-      ];
-    });
-  });
   protected readonly popoverId = UUID.randomUUID();
-  protected readonly MenuComponent = MenuComponent;
-  // protected readonly activeSubMenuItem = signal<MSubMenuItem | undefined>(undefined);
-  protected readonly activeSubMenuItem = linkedSignal({
+  protected readonly menuItems = this.computeMenuItems();
+  protected readonly activeSubMenuItem = linkedSignal<MSubMenuItem, MSubMenuItem | undefined>({
     source: this.subMenuItem,
-    computation: (): MSubMenuItem | undefined => undefined,
+    computation: () => undefined,
+  });
+
+  protected hasGutterColumn = computed(() => {
+    return this.menuItems().some(menuItem => menuItem.icon || (menuItem.type === 'menu-item' && menuItem.checked !== undefined));
   });
 
   constructor() {
-    console.log('>>> construct MenuComponent');
-    // console.log('>>> construct MenuComponent', this.menuItems());
-
     inject(DestroyRef).onDestroy(() => {
       console.log('>>> onDestroy MenuComponent', this.menuItems());
     })
 
     effect(() => {
+      console.log('>>> menu input changed', this.subMenuItem());
+    })
+
+    // Open popover when hovering over a submenu item, or hide it otherwise.
+    effect(() => {
       const popover = this._popover();
-      if (!popover) {
-        return;
-      }
       if (this.activeSubMenuItem()) {
-        popover.nativeElement.showPopover();
+        popover?.nativeElement.showPopover();
       }
       else {
-        popover.nativeElement.hidePopover();
+        popover?.nativeElement.hidePopover();
       }
     });
   }
 
-  protected onMenuItemMouseEnter(): void {
-    this.activeSubMenuItem.set(undefined);
+  private computeMenuItems(): Signal<Array<MMenuItem | MSubMenuItem>> {
+    return computed(() => {
+      const subMenuItem = this.subMenuItem();
+
+      // TODO [MENU] Sort by order (e.g., after, before)
+      return untracked(() => {
+        return [
+          ...subMenuItem.children,
+          ...this._menuRegistry.findMenuContributions(subMenuItem.id).flatMap(m => m.menuItems),
+        ];
+      });
+    });
   }
 
-  protected onSubMenuMouseEnter(subMenuItem: MSubMenuItem): void {
-    this.activeSubMenuItem.set(subMenuItem);
+  protected onMenuItemMouseEnter(menuItem: MMenuItem | MSubMenuItem): void {
+    this.activeSubMenuItem.set(menuItem.type === 'sub-menu-item' ? menuItem : undefined);
   }
 
-  protected onToggle(event: ToggleEvent): void {
+  protected onTogglePopover(event: ToggleEvent): void {
     if (event.newState === 'closed') {
-      console.log('>>> closing menu');
+      console.log('>>> closing menu popover');
       this.activeSubMenuItem.set(undefined);
     }
   }
 }
-
-// function getMenuItems(): Array<MMenuItem | MSubMenuItem> {
-//   const subMenu = inject(SUBMENU_ITEM);
-//   const menuRegistry = inject(SciMenuRegistry);
-//   return [
-//     ...subMenu.children,
-//     ...menuRegistry.findMenuContributions(subMenu.id).flatMap(m => m.menuItems),
-//   ];
-// }
