@@ -37,7 +37,16 @@ export class NotificationOpenerPageComponent {
   private readonly _notificationService = inject(WorkbenchNotificationService);
 
   protected readonly form = this._formBuilder.group({
-    qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
+    qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([
+      this._formBuilder.group({
+        key: this._formBuilder.control('component'),
+        value: this._formBuilder.control('notification'),
+      }),
+      this._formBuilder.group({
+        key: this._formBuilder.control('app'),
+        value: this._formBuilder.control('app1'),
+      }),
+    ]),
     text: this._formBuilder.control(''),
     options: this._formBuilder.group({
       params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),

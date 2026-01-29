@@ -44,6 +44,9 @@
     @case (WorkbenchCapabilities.MessageBox) {
       <app-message-box-capability-properties [formControl]="form.controls.messageBoxProperties"/>
     }
+    @case (WorkbenchCapabilities.Notification) {
+      <app-notification-capability-properties [formControl]="form.controls.notificationProperties"/>
+    }
   }
 
   <button (click)="onRegister()" class="e2e-register" [disabled]="form.invalid" sci-primary>Register</button>

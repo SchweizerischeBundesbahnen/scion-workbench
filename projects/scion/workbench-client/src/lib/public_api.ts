@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2025 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,7 +11,7 @@
 export {WorkbenchClient} from './workbench-client';
 export {WorkbenchCapabilities} from './workbench-capabilities.enum';
 export {ɵWorkbenchCommands} from './ɵworkbench-commands';
-export {type ViewId, type PartId, type DialogId, type PopupId, type ActivityId} from './workbench.identifiers';
+export {type ViewId, type PartId, type DialogId, type PopupId, type NotificationId, type ActivityId} from './workbench.identifiers';
 export {type WorkbenchElement, WORKBENCH_ELEMENT} from './workbench.model';
 
 export * from './common/public_api';

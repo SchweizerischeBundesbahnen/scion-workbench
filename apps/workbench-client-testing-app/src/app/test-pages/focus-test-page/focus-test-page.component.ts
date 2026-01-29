@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2025 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,7 +11,7 @@
 import {Component, inject, signal, Signal} from '@angular/core';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {WorkbenchDialog, WorkbenchMessageBox, WorkbenchPart, WorkbenchPopup, WorkbenchView} from '@scion/workbench-client';
+import {WorkbenchDialog, WorkbenchMessageBox, WorkbenchNotification, WorkbenchPart, WorkbenchPopup, WorkbenchView} from '@scion/workbench-client';
 import {FormsModule} from '@angular/forms';
 
 @Component({
@@ -39,6 +39,9 @@ export default class FocusTestPageComponent {
     }
     else if (inject(WorkbenchPopup, {optional: true})) {
       this.focused = toSignal(inject(WorkbenchPopup).focused$, {initialValue: true});
+    }
+    else if (inject(WorkbenchNotification, {optional: true})) {
+      this.focused = toSignal(inject(WorkbenchNotification).focused$, {initialValue: true});
     }
     else {
       this.focused = signal(false).asReadonly();

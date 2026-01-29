@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2018-2025 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
- * available under the terms from the Eclipse Public License 2.0
+ * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
  *
  * SPDX-License-Identifier: EPL-2.0
@@ -15,6 +15,7 @@ import {PartPO} from '../../../part.po';
 import {ViewPO} from '../../../view.po';
 import {DialogPO} from '../../../dialog.po';
 import {PopupPO} from '../../../popup.po';
+import {NotificationPO} from '../../../notification.po';
 
 /**
  * Page object to interact with {@link FocusTestPageComponent}.
@@ -28,7 +29,7 @@ export class FocusTestPagePO {
   public middleField: Locator;
   public lastField: Locator;
 
-  constructor(locateBy: PartPO | ViewPO | DialogPO | PopupPO) {
+  constructor(locateBy: PartPO | ViewPO | DialogPO | PopupPO | NotificationPO) {
     this.outlet = new SciRouterOutletPO(locateBy.locator.page(), {name: locateBy.locateBy?.id, cssClass: locateBy.locateBy?.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-focus-test-page');
 

@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
- * available under the terms from the Eclipse Public License 2.0
+ * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
  *
  * SPDX-License-Identifier: EPL-2.0
@@ -13,6 +13,7 @@ import {coerceArray} from '../../helper/testing.util';
 import {Locator} from '@playwright/test';
 import {WorkbenchNotificationPagePO} from './workbench-notification-page.po';
 import {Translatable} from '@scion/workbench';
+import {ActivatedMicrofrontendPO} from './activated-microfrontend.po';
 
 /**
  * Page object to interact with {@link NotificationPageComponent}.
@@ -20,10 +21,12 @@ import {Translatable} from '@scion/workbench';
 export class NotificationPagePO implements WorkbenchNotificationPagePO {
 
   public readonly locator: Locator;
+  public readonly activatedMicrofrontend: ActivatedMicrofrontendPO;
   public readonly input: Locator;
 
   constructor(public notification: NotificationPO) {
     this.locator = this.notification.locator.locator('app-notification-page');
+    this.activatedMicrofrontend = new ActivatedMicrofrontendPO(this.locator.locator('app-activated-microfrontend'));
     this.input = this.locator.locator('output.e2e-input');
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2025 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -83,6 +83,15 @@ const routes: Routes = [
       {
         path: ':segment1/segment2',
         loadComponent: () => import('../message-box-page/message-box-page.component'),
+      },
+    ],
+  },
+  {
+    path: 'notification-test-page',
+    children: [
+      {
+        path: ':segment1/segment2',
+        loadComponent: () => import('../notification-page/notification-page.component'),
       },
     ],
   },
