@@ -51,6 +51,8 @@ export abstract class WorkbenchPart {
   public abstract get title(): Signal<Translatable | undefined>;
   public abstract set title(title: Translatable | undefined);
 
+  public abstract showNotification(message: string): void;
+
   /**
    * Indicates whether this part is located in the workbench main area.
    */

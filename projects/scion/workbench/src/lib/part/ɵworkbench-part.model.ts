@@ -78,6 +78,7 @@ export class ɵWorkbenchPart implements WorkbenchPart, Blockable {
     portal: WbComponentPortal<PartSlotComponent>;
     bounds: Signal<DOMRect | undefined>;
   };
+  public onNotification: ((message: string) => void) | undefined = undefined;
 
   private _isInMainArea: boolean | undefined;
 
@@ -226,6 +227,11 @@ export class ɵWorkbenchPart implements WorkbenchPart, Blockable {
       layout => currentLayout === layout ? layout.activatePart(this.id) : null, // cancel navigation if the layout has become stale
       {skipLocationChange: true}, // do not add part activation into browser session history stack
     );
+  }
+
+  /** @inheritDoc */
+  public showNotification(message:string): void {
+    this.onNotification?.(message);
   }
 
   /** @inheritDoc */

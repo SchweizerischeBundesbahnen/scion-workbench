@@ -56,6 +56,7 @@ export default class PartPageComponent {
   protected readonly form = this._formBuilder.group({
     partActions: this._formBuilder.control(''),
     cssClass: this._formBuilder.control(''),
+    notification: this._formBuilder.control(''),
   });
 
   constructor() {
@@ -65,6 +66,10 @@ export default class PartPageComponent {
 
   protected onPartTitleChange(title: Translatable): void {
     this.part.title = parseTypedString(title)!;
+  }
+
+  protected onShowPartNotification(): void {
+    this.part.showNotification(this.form.controls.notification.value);
   }
 
   private computePartActions(): Signal<WorkbenchPartActionDescriptor[]> {

@@ -92,6 +92,14 @@
   </sci-form-field>
 </section>
 
+<section>
+  <sci-form-field label="Part Notification">
+    <input [formControl]="form.controls.notification" class="e2e-part-notification">
+  </sci-form-field>
+
+  <button (click)="onShowPartNotification()" class="show-part-notification e2e-show-part-notification">Show Notification</button>
+</section>
+
 @for (action of partActions(); track action) {
   <ng-template wbPartAction
                [align]="action.align"

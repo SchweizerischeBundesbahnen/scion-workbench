@@ -18,7 +18,6 @@ import {fromEvent} from 'rxjs';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog.model';
 import {Arrays, Observables} from '@scion/toolkit/util';
 import {ConnectedPosition, FlexibleConnectedPositionStrategy, Overlay, OverlayRef, PositionStrategy} from '@angular/cdk/overlay';
-import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
 import {fromResize$} from '@scion/toolkit/observable';
 import {observeIn, subscribeIn} from '@scion/toolkit/operators';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
@@ -197,19 +196,30 @@ export class ɵWorkbenchPopup implements Popup, WorkbenchPopup, Blockable {
    * Closes the popup on focus loss, if configured.
    */
   private closeOnFocusLoss(popupElement: HTMLElement): void {
-    const focusMonitor = inject(FocusMonitor);
+    // const focusMonitor = inject(FocusMonitor);
 
     if (this._options.closeStrategy?.onFocusLost ?? true) {
       effect(onCleanup => {
         if (!this.attached() || !this._popupOrigin()) {
           return;
         }
+        const focused = this.focused();
+
         untracked(() => {
-          const subscription = focusMonitor.monitor(popupElement, true)
-            .pipe(filter((focusOrigin: FocusOrigin) => !focusOrigin))
-            .subscribe(() => this.close(this.result));
-          onCleanup(() => subscription.unsubscribe());
-        });
+          if (!focused) {
+            this.close(this.result);
+          }
+        })
+
+        // untracked(() => {
+        //   const subscription = focusMonitor.monitor(popupElement, true)
+        //     .pipe(
+        //       tap(focusOrigin => console.log('>>> focus', focusOrigin)),
+        //       filter((focusOrigin: FocusOrigin) => !focusOrigin),
+        //     )
+        //     .subscribe(() => this.close(this.result));
+        //   onCleanup(() => subscription.unsubscribe());
+        // });
       });
     }
   }
