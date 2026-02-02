@@ -4,6 +4,7 @@ import {SciMenuRegistry} from '../menu.registry';
 import {UUID} from '@scion/toolkit/uuid';
 import {JoinPipe} from './join.pipe';
 import {MenuItemDirective} from './menu-item.directive';
+import {GroupComponent} from './group.component';
 
 export const SUBMENU_ITEM = new InjectionToken<MSubMenuItem>('SUBMENU_ITEM');
 
@@ -12,6 +13,7 @@ export const SUBMENU_ITEM = new InjectionToken<MSubMenuItem>('SUBMENU_ITEM');
   imports: [
     JoinPipe,
     MenuItemDirective,
+    GroupComponent,
   ],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss',
