@@ -1,7 +1,8 @@
 <div ngMenuBar (focusin)="onFocusIn()">
   @for (menu of menuRegistry.findMenuContributions(name()); track menu) {
     @for (menuItem of menu.menuItems; track menuItem) {
-      @if (menuItem.type === 'menu-item') {
+      @if (menuItem.type === 'group') {
+      } @else if (menuItem.type === 'menu-item') {
         <div ngMenuItem value="{{menuItem.text}}">
           <span class="icon material-symbols-outlined" translate="no" aria-hidden="true">{{menuItem.icon}}</span>
           <span class="label">{{menuItem.text}}</span>
@@ -26,7 +27,8 @@
           <div ngMenu #fileMenu="ngMenu" wbSetIntoHolder [holder]="wbHolder">
             <ng-template ngMenuContent>
               @for (childMenuItem of getMenuItems(menuItem); track childMenuItem) {
-                @if (childMenuItem.type === 'menu-item') {
+                @if (childMenuItem.type === 'group') {
+                } @else if (childMenuItem.type === 'menu-item') {
                   <div ngMenuItem value="{{childMenuItem.text}}">
                     <span class="icon material-symbols-outlined" translate="no" aria-hidden="true">{{childMenuItem.icon}}</span>
                     <span class="label">{{childMenuItem.text}}</span>
@@ -53,7 +55,8 @@
                     <div ngMenu #shareMenu="ngMenu" wbSetIntoHolder [holder]="wbHolder2">
                       <ng-template ngMenuContent>
                         @for (childMenuItem of getMenuItems(childMenuItem); track childMenuItem) {
-                          @if (childMenuItem.type === 'menu-item') {
+                          @if (childMenuItem.type === 'group') {
+                          } @else if (childMenuItem.type === 'menu-item') {
                             <div ngMenuItem value="{{childMenuItem.text}}">
                               <span class="icon material-symbols-outlined" translate="no" aria-hidden="true">{{childMenuItem.icon}}</span>
                               <span class="label">{{childMenuItem.text}}</span>
@@ -80,7 +83,9 @@
                               <div ngMenu #shareMenu="ngMenu" wbSetIntoHolder [holder]="wbHolder2">
                                 <ng-template ngMenuContent>
                                   @for (childMenuItem of getMenuItems(childMenuItem); track childMenuItem) {
-                                    @if (childMenuItem.type === 'menu-item') {
+                                    @if (childMenuItem.type === 'group') {
+                                    }
+                                    @else if (childMenuItem.type === 'menu-item') {
                                       <div ngMenuItem value="{{childMenuItem.text}}">
                                         <span class="icon material-symbols-outlined" translate="no" aria-hidden="true">{{childMenuItem.icon}}</span>
                                         <span class="label">{{childMenuItem.text}}</span>

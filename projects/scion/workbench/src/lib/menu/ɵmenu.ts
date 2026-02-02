@@ -4,7 +4,7 @@ import {UUID} from '@scion/toolkit/uuid';
 
 export class ɵSciMenu implements SciMenu {
 
-  public readonly menuItems = new Array<MMenuItem | MSubMenuItem>();
+  public readonly menuItems = new Array<MMenuItem | MSubMenuItem | MMenuGroup>();
 
   public addMenuItem(menuItemDescriptor: SciMenuItemDescriptor | SciIconMenuItemDescriptor | SciCheckableMenuItemDescriptor, onSelect: () => void): this {
     this.menuItems.push({
@@ -37,10 +37,34 @@ export class ɵSciMenu implements SciMenu {
     return this;
   }
 
-  public addGroup(menuFactoryFn: (group: SciMenu) => SciMenu): this;
-  public addGroup(menuGroupDescriptor: SciMenuGroupDescriptor, menuFactoryFn?: (group: SciMenu) => SciMenu): this;
+  public addGroup(groupFactoryFn: (group: SciMenu) => SciMenu): this;
+  public addGroup(groupDescriptor: SciMenuGroupDescriptor, menuFactoryFn?: (group: SciMenu) => SciMenu): this;
   public addGroup(argument1: unknown, argument2?: unknown): this {
-    return this;
+    if (typeof argument1 === 'function') {
+      const subMenu = argument1(new ɵSciMenu()) as ɵSciMenu;
+
+      this.menuItems.push({
+        type: 'group',
+        id: UUID.randomUUID(),
+        children: subMenu.menuItems,
+      });
+      return this;
+    }
+    else {
+      const groupDescriptor = argument1 as SciMenuGroupDescriptor;
+      const groupFactoryFn = argument2 as (group: SciMenu) => SciMenu;
+      const subMenu = groupFactoryFn(new ɵSciMenu()) as ɵSciMenu;
+
+      this.menuItems.push({
+        type: 'group',
+        id: groupDescriptor.id ?? UUID.randomUUID(),
+        label: groupDescriptor.label,
+        collapsible: groupDescriptor.collapsible,
+        disabled: groupDescriptor.disabled,
+        children: subMenu.menuItems,
+      });
+      return this;
+    }
   }
 }
 
@@ -64,5 +88,14 @@ export interface MSubMenuItem {
   tooltip?: string;
   mnemonic?: string;
   disabled?: () => Signal<boolean> | boolean;
-  children: Array<MMenuItem | MSubMenuItem>;
+  children: Array<MMenuItem | MSubMenuItem | MMenuGroup>;
+}
+
+export interface MMenuGroup {
+  type: 'group'
+  id: string;
+  label?: string;
+  collapsible?: boolean | {collapsed: boolean};
+  disabled?: () => Signal<boolean> | boolean;
+  children: Array<MMenuItem | MSubMenuItem | MMenuGroup>;
 }
