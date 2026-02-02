@@ -80,4 +80,20 @@ export class MessagingPagePO implements MicrofrontendViewPagePO {
       rejectWhenAttached(errorLocator),
     ]);
   }
+
+  public async installNotificationReducer(topic: string, paramName: string): Promise<void> {
+    await this.view.tab.click();
+    await this._tabbar.selectTab('e2e-install-notification-reducer');
+
+    const locator = this.locator.locator('app-notification-reducer-page');
+
+    // Enter topic and parameter name
+    await locator.locator('input.e2e-topic').fill(topic);
+    await locator.locator('input.e2e-param-name').fill(paramName);
+
+    // Install listener
+    await locator.locator('button.e2e-install').click();
+
+    await locator.locator('output.e2e-message').waitFor({state: 'attached'});
+  }
 }

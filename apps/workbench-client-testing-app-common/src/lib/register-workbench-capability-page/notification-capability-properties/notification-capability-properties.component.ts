@@ -43,6 +43,7 @@ export class NotificationCapabilityPropertiesComponent implements ControlValueAc
       minHeight: this._formBuilder.control(''),
       maxHeight: this._formBuilder.control(''),
     }),
+    groupParamsReduceResolver: this._formBuilder.control(''),
     showSplash: this._formBuilder.control<boolean | undefined>(undefined),
     cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
   });
@@ -61,6 +62,7 @@ export class NotificationCapabilityPropertiesComponent implements ControlValueAc
             minHeight: this.form.controls.size.controls.minHeight.value || undefined,
             maxHeight: this.form.controls.size.controls.maxHeight.value || undefined,
           }),
+          groupParamsReduceResolver: parseTypedString(this.form.controls.groupParamsReduceResolver.value) ?? undefined,
           showSplash: this.form.controls.showSplash.value ?? undefined,
           cssClass: this.form.controls.cssClass.value ?? undefined,
         });

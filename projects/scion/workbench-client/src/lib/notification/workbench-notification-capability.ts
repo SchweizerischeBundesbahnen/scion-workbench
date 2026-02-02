@@ -85,6 +85,23 @@ export interface WorkbenchNotificationCapability extends Capability {
      */
     size?: WorkbenchNotificationSize;
     /**
+     * Defines the resolver used to apply a reducer function to a group.
+     *
+     * @example - Message listener replying to reduce requests, concatting the inputs
+     *
+     * ```ts
+     * import {Beans} from '@scion/toolkit/bean-manager';
+     * import {MessageClient} from '@scion/microfrontend-platform';
+     *
+     * Beans.get(MessageClient).onMessage<{prevParams: Map<string, unknown>; currParams: Map<string, unknown>}>('notifications/reducer', request => {
+     *   const currText = request.body?.currParams.get('text') ?? '';
+     *   const prevText = request.body?.prevParams.get('text') ?? '';
+     *   return new Map<string, unknown>().set('text', `${prevText}, ${currText}`);
+     * });
+     * ```
+     */
+    groupParamsReduceResolver?: string;
+    /**
      * Instructs the workbench to show a splash, such as a skeleton or loading indicator, until the notification microfrontend signals readiness.
      *
      * By default, the workbench shows a loading indicator. A custom splash can be configured in the workbench host application.

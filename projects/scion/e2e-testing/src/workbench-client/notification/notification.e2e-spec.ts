@@ -14,6 +14,7 @@ import {NotificationOpenerPagePO} from '../page-object/notification-opener-page.
 import {NotificationPagePO} from '../page-object/notification-page.po';
 import {expectNotification} from '../../matcher/notification-matcher';
 import {expect} from '@playwright/test';
+import {MessagingPagePO} from '../page-object/messaging-page.po';
 
 test.describe('Workbench Notification Mircrofrontend', () => {
   test('should pass capability to the notification component', async ({appPO, microfrontendNavigator}) => {
@@ -133,6 +134,77 @@ test.describe('Workbench Notification Mircrofrontend', () => {
 
     await expectNotification(notificationPage3).toBeVisible();
     await expectNotification(notificationPage4).toBeVisible();
+    await expect(appPO.notifications).toHaveCount(2);
+  });
+
+  test('should apply reducer function to notifications of the same group', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    const reducerTopic = 'notifications/reducer';
+    const messagingPage = await microfrontendNavigator.openInNewTab(MessagingPagePO, 'app1');
+    await messagingPage.installNotificationReducer(reducerTopic, 'text');
+
+    const notificationCapability: WorkbenchNotificationCapability = {
+      type: 'notification',
+      qualifier: {
+        component: 'testee',
+      },
+      params: [
+        {name: 'text', required: true},
+      ],
+      properties: {
+        path: 'test-notification',
+        groupParamsReduceResolver: reducerTopic,
+        size: {
+          height: '50px', // make notification small, so qualifier can be cleared
+        },
+      },
+    };
+    await microfrontendNavigator.registerCapability('app1', notificationCapability);
+    const notificationPage1 = new NotificationPagePO(appPO.notification({cssClass: 'testee-1'}));
+    const notificationPage2 = new NotificationPagePO(appPO.notification({cssClass: 'testee-2'}));
+    const notificationPage3 = new NotificationPagePO(appPO.notification({cssClass: 'testee-3'}));
+    const notificationPage4 = new NotificationPagePO(appPO.notification({cssClass: 'testee-4'}));
+
+    const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+    await notificationOpenerPage.show({component: 'testee'}, {
+      params: new Map().set('text', 'testee-1'),
+      group: 'GROUP-1',
+      cssClass: 'testee-1',
+    });
+
+    await expectNotification(notificationPage1).toBeVisible();
+    await expect(notificationPage1.getNotificationParams()).resolves.toEqual({text: 'testee-1'});
+    await expect(appPO.notifications).toHaveCount(1);
+
+    await notificationOpenerPage.show({component: 'testee'}, {
+      params: new Map().set('text', 'testee-2'),
+      group: 'GROUP-1',
+      cssClass: 'testee-2',
+    });
+
+    await expectNotification(notificationPage1).not.toBeAttached();
+    await expectNotification(notificationPage2).toBeVisible();
+    await expect(notificationPage2.getNotificationParams()).resolves.toEqual({text: 'testee-1, testee-2'});
+    await expect(appPO.notifications).toHaveCount(1);
+
+    await notificationOpenerPage.show({component: 'testee'}, {
+      params: new Map().set('text', 'testee-3'),
+      group: 'GROUP-1',
+      cssClass: 'testee-3',
+    });
+
+    await expectNotification(notificationPage2).not.toBeAttached();
+    await expectNotification(notificationPage3).toBeVisible();
+    await expect(notificationPage3.getNotificationParams()).resolves.toEqual({text: 'testee-1, testee-2, testee-3'});
+    await expect(appPO.notifications).toHaveCount(1);
+
+    await notificationOpenerPage.show({component: 'testee'}, {
+      params: new Map().set('text', 'testee'),
+      group: 'GROUP-2',
+      cssClass: 'testee-4',
+    });
+    await expect(notificationPage4.getNotificationParams()).resolves.toEqual({text: 'testee'});
     await expect(appPO.notifications).toHaveCount(2);
   });
 

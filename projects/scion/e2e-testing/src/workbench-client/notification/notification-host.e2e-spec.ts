@@ -15,6 +15,7 @@ import {canMatchWorkbenchNotificationCapability} from '../../workbench/page-obje
 import {WorkbenchNotificationCapability} from '../page-object/register-workbench-capability-page.po';
 import {NotificationPagePO} from '../../workbench/page-object/notification-page.po';
 import {expect} from '@playwright/test';
+import {MessagingPagePO} from '../page-object/messaging-page.po';
 
 test.describe('Workbench Notification Host', () => {
 
@@ -149,6 +150,84 @@ test.describe('Workbench Notification Host', () => {
 
     await expectNotification(notificationPage3).toBeVisible();
     await expectNotification(notificationPage4).toBeVisible();
+    await expect(appPO.notifications).toHaveCount(2);
+  });
+
+  test('should apply reducer function to notifications of the same group', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    const reducerTopic = 'notifications/reducer';
+    const messagingPage = await microfrontendNavigator.openInNewTab(MessagingPagePO, 'app1');
+    await messagingPage.installNotificationReducer(reducerTopic, 'text');
+
+    await workbenchNavigator.registerRoute({
+      path: '',
+      component: 'notification-page',
+      canMatch: [canMatchWorkbenchNotificationCapability({component: 'testee'})],
+    });
+
+    await microfrontendNavigator.registerCapability('host', {
+      type: 'notification',
+      qualifier: {
+        component: 'testee',
+      },
+      params: [
+        {name: 'text', required: true},
+      ],
+      properties: {
+        path: '',
+        groupParamsReduceResolver: reducerTopic,
+        size: {
+          height: '50px', // make notification small, so qualifier can be cleared
+        },
+      },
+      private: false,
+    });
+
+    const notificationPage1 = new NotificationPagePO(appPO.notification({cssClass: 'testee-1'}));
+    const notificationPage2 = new NotificationPagePO(appPO.notification({cssClass: 'testee-2'}));
+    const notificationPage3 = new NotificationPagePO(appPO.notification({cssClass: 'testee-3'}));
+    const notificationPage4 = new NotificationPagePO(appPO.notification({cssClass: 'testee-4'}));
+
+    const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+    await notificationOpenerPage.show({component: 'testee'}, {
+      params: new Map().set('text', 'testee-1'),
+      group: 'GROUP-1',
+      cssClass: 'testee-1',
+    });
+
+    await expectNotification(notificationPage1).toBeVisible();
+    await expect.poll(() => notificationPage1.activatedMicrofrontend.getParams()).toEqual({text: 'testee-1'});
+    await expect(appPO.notifications).toHaveCount(1);
+
+    await notificationOpenerPage.show({component: 'testee'}, {
+      params: new Map().set('text', 'testee-2'),
+      group: 'GROUP-1',
+      cssClass: 'testee-2',
+    });
+
+    await expectNotification(notificationPage1).not.toBeAttached();
+    await expectNotification(notificationPage2).toBeVisible();
+    await expect.poll(() => notificationPage2.activatedMicrofrontend.getParams()).toEqual({text: 'testee-1, testee-2'});
+    await expect(appPO.notifications).toHaveCount(1);
+
+    await notificationOpenerPage.show({component: 'testee'}, {
+      params: new Map().set('text', 'testee-3'),
+      group: 'GROUP-1',
+      cssClass: 'testee-3',
+    });
+
+    await expectNotification(notificationPage2).not.toBeAttached();
+    await expectNotification(notificationPage3).toBeVisible();
+    await expect.poll(() => notificationPage3.activatedMicrofrontend.getParams()).toEqual({text: 'testee-1, testee-2, testee-3'});
+    await expect(appPO.notifications).toHaveCount(1);
+
+    await notificationOpenerPage.show({component: 'testee'}, {
+      params: new Map().set('text', 'testee'),
+      group: 'GROUP-2',
+      cssClass: 'testee-4',
+    });
+    await expect.poll(() => notificationPage4.activatedMicrofrontend.getParams()).toEqual({text: 'testee'});
     await expect(appPO.notifications).toHaveCount(2);
   });
 

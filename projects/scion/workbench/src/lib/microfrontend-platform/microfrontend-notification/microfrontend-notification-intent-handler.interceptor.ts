@@ -24,6 +24,8 @@ import {WorkbenchNotificationService} from '../../notification/workbench-notific
 import {MicrofrontendHostNotification} from '../microfrontend-host-notification/microfrontend-host-notification.model';
 import {ɵWorkbenchNotification} from '../../notification/ɵworkbench-notification.model';
 import {TEXT_NOTIFICATION_CAPABILITY_IDENTITY, TEXT_NOTIFICATION_CAPABILITY_IDENTITY_PROPERTY} from '../microfrontend-host-notification/notification-text-message/notification-text-message.component';
+import {firstValueFrom} from 'rxjs';
+import {WorkbenchNotificationRegistry} from '../../notification/workbench-notification.registry';
 
 /**
  * Handles notification intents, opening a notification based on resolved capability.
@@ -36,20 +38,21 @@ import {TEXT_NOTIFICATION_CAPABILITY_IDENTITY, TEXT_NOTIFICATION_CAPABILITY_IDEN
 export class MicrofrontendNotificationIntentHandler implements IntentInterceptor {
 
   private readonly _notificationService = inject(WorkbenchNotificationService);
+  private readonly _notificationRegistry = inject(WorkbenchNotificationRegistry);
   private readonly _logger = inject(Logger);
 
   /**
    * Notification intents are handled in this interceptor and then swallowed.
    */
-  public intercept(intentMessage: IntentMessage, next: Handler<IntentMessage>): Promise<void> {
+  public async intercept(intentMessage: IntentMessage, next: Handler<IntentMessage>): Promise<void> {
     if (intentMessage.intent.type === WorkbenchCapabilities.Notification) {
       const replyTo = intentMessage.headers.get(MessageHeaders.ReplyTo) as string;
 
-      this.showNotification(intentMessage as IntentMessage<ɵWorkbenchNotificationCommand | WorkbenchNotificationConfig>);
+      await this.showNotification(intentMessage as IntentMessage<ɵWorkbenchNotificationCommand | WorkbenchNotificationConfig>);
       void Beans.get(MessageClient).publish(replyTo, undefined, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)});
 
       // Swallow the intent and do not pass it to other interceptors or handlers down the chain.
-      return Promise.resolve();
+      return;
     }
     else {
       return next.handle(intentMessage);
@@ -59,14 +62,14 @@ export class MicrofrontendNotificationIntentHandler implements IntentInterceptor
   /**
    * Displays the microfrontend declared by the resolved capability in a notification.
    */
-  private showNotification(intentMessage: IntentMessage<ɵWorkbenchNotificationCommand | WorkbenchNotificationConfig>): void {
+  private async showNotification(intentMessage: IntentMessage<ɵWorkbenchNotificationCommand | WorkbenchNotificationConfig>): Promise<void> {
     const command: ɵWorkbenchNotificationCommand | WorkbenchNotificationConfig = intentMessage.body!;
     const capability = intentMessage.capability as WorkbenchNotificationCapability;
-    const params = intentMessage.intent.params ?? new Map<string, unknown>();
     const referrer = intentMessage.headers.get(MessageHeaders.AppSymbolicName) as string;
     const isHostProvider = Microfrontends.isHostProvider(capability);
     const isTextMessage = capability.properties[TEXT_NOTIFICATION_CAPABILITY_IDENTITY_PROPERTY] === TEXT_NOTIFICATION_CAPABILITY_IDENTITY;
     const isLegacyApi = isTextMessage && !intentMessage.intent.params?.has(eNOTIFICATION_MESSAGE_PARAM);
+    const params = await this.reduceNotificationParams(command, capability, intentMessage.intent.params ?? new Map<string, unknown>());
 
     if (isLegacyApi) {
       params.set(eNOTIFICATION_MESSAGE_PARAM, (command as WorkbenchNotificationConfig).content);
@@ -82,6 +85,22 @@ export class MicrofrontendNotificationIntentHandler implements IntentInterceptor
       group: command.group,
       cssClass: Arrays.coerce(capability.properties.cssClass).concat(Arrays.coerce(command.cssClass)),
     }));
+  }
+
+  private async reduceNotificationParams(command: ɵWorkbenchNotificationCommand | WorkbenchNotificationConfig, capability: WorkbenchNotificationCapability, params: Map<string, unknown>): Promise<Map<string, unknown>> {
+    const isHostProvider = Microfrontends.isHostProvider(capability);
+    const previousNotification = command.group ? this._notificationRegistry.elements().find(element => element.group === command.group) : undefined;
+    // Only call reducer if there is a resolver and a previous notification
+    if (!capability.properties.groupParamsReduceResolver || !previousNotification) {
+      return params;
+    }
+
+    // Get previous params from `ActivatedMicrofrontend` (host) or inputs
+    const prevParams = isHostProvider ? runInInjectionContext(previousNotification.slot.injector, () => inject(ActivatedMicrofrontend).params()) : previousNotification.inputs?.['params'] ?? new Map<string, unknown>();
+
+    // `WorkbenchNotificationOptions.groupInputReduceFn` can't be used, since the params are not passed down as inputs for host provided elements
+    const reduceResponse = await firstValueFrom(Beans.get(MessageClient).request$(capability.properties.groupParamsReduceResolver, {prevParams, currParams: params}));
+    return reduceResponse.body as Map<string, unknown>;
   }
 }
 

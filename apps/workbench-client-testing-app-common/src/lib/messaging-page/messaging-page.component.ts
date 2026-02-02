@@ -14,6 +14,7 @@ import {WORKBENCH_ELEMENT, WorkbenchElement} from '@scion/workbench-client';
 import {PublishMessagePageComponent} from './publish-message-page/publish-message-page.component';
 import {PublishIntentPageComponent} from './publish-intent-page/publish-intent-page.component';
 import {Beans} from '@scion/toolkit/bean-manager';
+import {OnNotificationReducerPageComponent} from './on-notification-reducer-page/on-notification-reducer-page.component';
 
 @Component({
   selector: 'app-messaging-page',
@@ -24,6 +25,7 @@ import {Beans} from '@scion/toolkit/bean-manager';
     SciTabbarComponent,
     PublishMessagePageComponent,
     PublishIntentPageComponent,
+    OnNotificationReducerPageComponent,
   ],
 })
 export class MessagingPageComponent {

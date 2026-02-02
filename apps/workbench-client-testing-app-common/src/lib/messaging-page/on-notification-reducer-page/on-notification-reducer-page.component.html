@@ -1,0 +1,19 @@
+<form [formGroup]="form" autocomplete="off" (ngSubmit)="onInstallListener()">
+  <section>
+    <header>Install notification reducer</header>
+    <sci-form-field label="Topic">
+      <input [formControl]="form.controls.topic" class="e2e-topic">
+    </sci-form-field>
+    <sci-form-field label="Parameter Name">
+      <input [formControl]="form.controls.paramName" class="e2e-param-name">
+    </sci-form-field>
+  </section>
+
+  <button [disabled]="form.invalid" class="e2e-install" sci-primary>Install concat reducer</button>
+</form>
+
+@if (message(); as message) {
+  <output class="message e2e-message">
+    {{ message }}
+  </output>
+}

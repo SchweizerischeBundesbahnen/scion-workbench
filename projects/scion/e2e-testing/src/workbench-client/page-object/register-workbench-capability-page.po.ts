@@ -364,6 +364,9 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     if (size?.maxHeight) {
       await this.locator.locator('input.e2e-max-height').fill(size.maxHeight);
     }
+    if (capability.properties.groupParamsReduceResolver !== undefined) {
+      await this.locator.locator('input.e2e-group-params-reduce-resolver').fill(capability.properties.groupParamsReduceResolver);
+    }
     if (capability.properties.showSplash !== undefined) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-show-splash')).toggle(capability.properties.showSplash);
     }
