@@ -1,6 +1,6 @@
 $padding_menu: .3em;
-$padding_menu_item: 5px;
-$menu_item_gap: .25em;
+$padding_menu_item: 4px;
+$menu_item_gap: .125em;
 $font-size: 13px;
 $font-size-accelerator: $font-size - 1px;
 
@@ -34,13 +34,13 @@ $font-size-accelerator: $font-size - 1px;
   &.is-group {
     grid-column: 1/-1; // consume all columns
     grid-template-columns: subgrid;
-  }
 
-  > span.group-label {
-    grid-column: 1/-1; // consume all columns
-    color: var(--sci-color-text-subtlest);
-    user-select: none;
-    padding: $padding_menu_item $padding_menu_item 0 $padding_menu_item;
+    > span.group-label {
+      grid-column: 1/-1; // consume all columns
+      color: var(--sci-color-text-subtlest);
+      user-select: none;
+      padding: $padding_menu_item $padding_menu_item 0 $padding_menu_item;
+    }
   }
 
   // Add top separator
@@ -61,12 +61,12 @@ $font-size-accelerator: $font-size - 1px;
     background-color: var(--sci-color-border);
   }
 
-  > button.menu-item {
+  > button.menu-item, button.group-header {
     all: unset;
     grid-column: 1/-1;
     display: inline-grid;
-    align-items: center;
     grid-template-columns: subgrid;
+    align-items: center;
     text-wrap: nowrap;
     padding: $padding_menu_item;
     border-radius: var(--sci-corner);

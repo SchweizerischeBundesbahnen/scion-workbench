@@ -1,4 +1,4 @@
-import {Component, computed, DestroyRef, effect, ElementRef, inject, InjectionToken, input, linkedSignal, Signal, untracked, viewChild} from '@angular/core';
+import {Component, computed, effect, ElementRef, inject, InjectionToken, input, linkedSignal, signal, Signal, untracked, viewChild} from '@angular/core';
 import {MMenuGroup, MMenuItem, MSubMenuItem} from '../ɵmenu';
 import {SciMenuRegistry} from '../menu.registry';
 import {UUID} from '@scion/toolkit/uuid';
@@ -40,15 +40,18 @@ export class MenuComponent {
   });
 
   protected isGroup = computed(() => this.subMenuItem().type === 'group');
+  protected readonly groupExpanded = signal(true);
 
   constructor() {
-    inject(DestroyRef).onDestroy(() => {
-      console.log('>>> onDestroy MenuComponent', this.menuItems());
-    });
-
+    // Group expanded state.
     effect(() => {
-      console.log('>>> menu input changed', this.subMenuItem());
-    });
+      const subMenuItem = this.subMenuItem();
+      untracked(() => {
+        if (subMenuItem.type === 'group') {
+          this.groupExpanded.set(typeof subMenuItem.collapsible === 'object' ? !subMenuItem.collapsible.collapsed : true);
+        }
+      });
+    })
 
     // Open popover when hovering over a submenu item, or hide it otherwise.
     effect(() => {
@@ -76,7 +79,11 @@ export class MenuComponent {
     });
   }
 
-  protected onMenuItemMouseEnter(menuItem: MMenuItem | MSubMenuItem): void {
+  protected onGroupToggle(): void {
+    this.groupExpanded.update(expanded => !expanded);
+  }
+
+  protected onMenuItemMouseEnter(menuItem: MMenuItem | MSubMenuItem | MMenuGroup): void {
     this.activeSubMenuItem.set(menuItem.type === 'sub-menu-item' ? menuItem : undefined);
   }
 
