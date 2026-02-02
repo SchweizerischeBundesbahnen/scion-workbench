@@ -38,7 +38,7 @@
       </button>
     }
     @case ('group') {
-      <wb-menu class="group" [subMenuItem]="menuItem" [withGutterColumn]="hasGutterColumn()"/>
+      <wb-group [group]="menuItem" [hasGutterColumn]="hasGutterColumn()"/>
     }
   }
 }

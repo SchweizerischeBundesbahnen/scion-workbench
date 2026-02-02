@@ -105,7 +105,14 @@ export class AppComponent implements DoCheck {
         ),
       )
       .addMenu({text: 'Format with Groups'}, menu => menu
-        .addGroup({label: 'Text Group'}, group => group
+        // .addGroup({label: 'Group 1'}, group => group
+        //   .addMenuItem({text: 'Nested Menu Item'}, () => this.onAction())
+        //   .addGroup({label: 'Group 2'}, group => group
+        //     .addGroup({label: 'Group 3'}, group => group
+        //       .addMenuItem({text: 'Nested Menu Item'}, () => this.onAction()),
+        //     ),
+        //   )
+        .addGroup({label: 'General', collapsible: true}, group => group
           .addMenu({text: 'Text', icon: 'format_bold'}, menu => menu
             .addMenuItem({text: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B']}, () => this.onAction())
             .addMenuItem({text: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I']}, () => this.onAction())

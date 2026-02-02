@@ -1,10 +1,15 @@
-$padding: .3em;
+$padding_menu: .3em;
+$padding_menu_item: 5px;
+$menu_item_gap: .25em;
+$font-size: 13px;
+$font-size-accelerator: $font-size - 1px;
 
 :host {
   display: inline-grid;
-  gap: .125em .5em;
+  gap: $menu_item_gap .5em;
   overflow: hidden;
   align-items: center;
+  font-size: $font-size;
 
   &:not(.is-group) {
     grid-template-columns:
@@ -16,7 +21,7 @@ $padding: .3em;
     border-radius: 0.5rem;
     color: var(--sci-color-text);
     background-color: var(--sci-color-background-elevation);
-    padding: $padding;
+    padding: $padding_menu;
 
     &.gutter-column-hidden {
       grid-template-columns:
@@ -35,17 +40,25 @@ $padding: .3em;
     grid-column: 1/-1; // consume all columns
     color: var(--sci-color-text-subtlest);
     user-select: none;
-    padding: 5px;
-    padding-bottom: 0;
-    font-size: smaller;
+    padding: $padding_menu_item $padding_menu_item 0 $padding_menu_item;
   }
 
-  wb-menu.group:not(:first-child) {
-    border-top: 1px solid var(--sci-color-border);
+  // Add top separator
+  > wb-group:not(:first-child)::before {
+    content: '';
+    grid-column: 1/-1;
+    position: relative;
+    height: 1px;
+    background-color: var(--sci-color-border);
   }
 
-  > wb-menu.group::not:last-child:has(+ :not(wb-menu.group)) {
-    border-bottom: 1px solid var(--sci-color-border);
+  // Add bottom separator
+  > wb-group:not(:last-child, :has(+ wb-menu), :has(+ wb-group)):after {
+    content: '';
+    grid-column: 1/-1;
+    position: relative;
+    height: 1px;
+    background-color: var(--sci-color-border);
   }
 
   > button.menu-item {
@@ -55,7 +68,7 @@ $padding: .3em;
     align-items: center;
     grid-template-columns: subgrid;
     text-wrap: nowrap;
-    padding: 5px;
+    padding: $padding_menu_item;
     border-radius: var(--sci-corner);
     user-select: none;
     overflow: hidden;
@@ -70,8 +83,11 @@ $padding: .3em;
     }
 
     > span.icon {
-      justify-self: center;
-      font-size: 16px;
+      display: grid;
+      place-content: center;
+      font-size: 18px;
+      height: 1em;
+      width: 1em;
     }
 
     > span.label {
@@ -84,7 +100,7 @@ $padding: .3em;
 
     > span.accelerator {
       color: var(--sci-color-text-subtlest);
-      font-size: smaller;
+      font-size: $font-size-accelerator;
     }
 
     &:hover:where(:not(:disabled)) {
@@ -108,11 +124,12 @@ $padding: .3em;
     }
   }
 
-  > wb-menu[popover] {
+  > :where(wb-menu[popover]) { // allow setting host styles in menu component
     margin: unset; // unset native popover styling
+    padding: unset; // unset native popover styling
     inset: unset; // unset native popover styling
     position-try-fallbacks: flip-inline, flip-block;
-    top: calc(anchor(top) - $padding);
-    left: calc(anchor(right) + .1em);
+    top: calc(anchor(top) - $padding_menu);
+    left: calc(anchor(right) + 1px);
   }
 }

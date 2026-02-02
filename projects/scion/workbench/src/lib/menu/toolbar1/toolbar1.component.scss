@@ -9,8 +9,9 @@
     }
   }
 
-  > wb-menu[popover] {
+  > :where(wb-menu[popover]) {
     margin: unset; // unset native popover styling
+    padding: unset; // unset native popover styling
     inset: unset; // unset native popover styling
     position-try-fallbacks: flip-inline, flip-block;
     //background-color: green;
