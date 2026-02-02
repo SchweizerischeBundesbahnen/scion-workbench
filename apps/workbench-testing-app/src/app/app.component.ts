@@ -103,11 +103,48 @@ export class AppComponent implements DoCheck {
           .addMenuItem({text: 'Align right', icon: 'format_align_right'}, () => this.onAction())
           .addMenuItem({text: 'Justify', icon: 'format_align_justify'}, () => this.onAction()),
         ),
+      )
+      .addMenu({text: 'Format with Groups'}, menu => menu
+        .addGroup({label: 'Text Group'}, group => group
+          .addMenu({text: 'Text', icon: 'format_bold'}, menu => menu
+            .addMenuItem({text: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B']}, () => this.onAction())
+            .addMenuItem({text: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I']}, () => this.onAction())
+            .addMenuItem({text: 'Underline', icon: 'format_underlined'}, () => this.onAction())
+            .addMenuItem({text: 'Strikethrough', icon: 'strikethrough_s'}, () => this.onAction())
+            .addGroup({label: 'Size'}, menu => menu
+              .addMenuItem({text: 'Increase font size'}, () => this.onAction())
+              .addMenuItem({text: 'Decrease font size'}, () => this.onAction()),
+            ),
+          )
+          .addGroup(group => group
+            .addMenu({text: 'Size', icon: 'format_bold'}, menu => menu
+              .addMenuItem({text: 'Increase font size'}, () => this.onAction())
+              .addMenuItem({text: 'Decrease font size'}, () => this.onAction()),
+            ),
+          ),
+        )
+        .addGroup(group => group
+          .addMenu({text: 'Paragraph styles', icon: 'format_align_justify', id: 'menu:paragraph'}, menu => {
+              return menu
+                .addMenuItem({text: 'Normal text', checked: computed(() => paragraphStyle() === 'normal')}, () => paragraphStyle.set('normal'))
+                .addMenuItem({text: 'Heading 1', checked: computed(() => paragraphStyle() === 'heading1')}, () => paragraphStyle.set('heading1'))
+                .addMenuItem({text: 'Heading 2', checked: computed(() => paragraphStyle() === 'heading2')}, () => paragraphStyle.set('heading2'))
+            },
+          ),
+        )
+        .addGroup(group => group
+          .addMenu({text: 'Align & indent', icon: 'format_bold'}, menu => menu
+            .addMenuItem({text: 'Align left', icon: 'format_align_left'}, () => this.onAction())
+            .addMenuItem({text: 'Align center', icon: 'format_align_center'}, () => this.onAction())
+            .addMenuItem({text: 'Align right', icon: 'format_align_right'}, () => this.onAction())
+            .addMenuItem({text: 'Justify', icon: 'format_align_justify'}, () => this.onAction()),
+          ),
+        ),
       ),
     );
 
     provideMenu('menu:paragraph', menu => menu
-      .addMenuItem({text: 'Heading 3', checked: computed(() => paragraphStyle() === 'heading3')}, () => paragraphStyle.set('heading3'))
+      .addMenuItem({text: 'Heading 3', checked: computed(() => paragraphStyle() === 'heading3')}, () => paragraphStyle.set('heading3')),
     );
 
     provideMenu('menu:paragraph', menu => menu

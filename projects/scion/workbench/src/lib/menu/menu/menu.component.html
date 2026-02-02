@@ -1,34 +1,45 @@
-@for (menuItem of menuItems(); track menuItem) {
-  @if (menuItem.type === 'menu-item') {
-    <button class="menu-item"
-            (mouseenter)="onMenuItemMouseEnter(menuItem)"
-            wbMenuItem #wbMenuItem="wbMenuItem" [menuItem]="menuItem"
-            (click)="menuItem.onSelect()">
-      @if (hasGutterColumn()) {
-        @if (wbMenuItem.checked() === undefined) {
-          <span class="gutter icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
-        } @else {
-          <span class="gutter icon material-symbols-rounded checkmark" translate="no">{{wbMenuItem.checked() ? 'check' : ''}}</span>
-        }
-      }
+@let subMenuItem = this.subMenuItem();
+@if (subMenuItem.type === 'group' && subMenuItem.label?.length) {
+  <span class="group-label">{{subMenuItem.label}}</span>
+}
 
-      <span class="label">{{menuItem.text}}</span>
-      @if (menuItem.accelerator?.length) {
-        <span class="accelerator">{{menuItem.accelerator | wbJoin:'+'}}</span>
-      }
-    </button>
-  } @else {
-    <button [attr.popovertarget]="popoverId"
-            [attr.popovertargetaction]="'show'"
-            [style.anchor-name]="activeSubMenuItem() === menuItem ? `--${popoverId}` : null"
-            class="menu-item"
-            (mouseenter)="onMenuItemMouseEnter(menuItem)">
-      @if (hasGutterColumn()) {
-        <span class="gutter icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
-      }
-      <span class="label">{{menuItem.text}}</span>
-      <span class="icon material-symbols-rounded sub-menu-chevron" translate="no">arrow_right</span>
-    </button>
+@for (menuItem of menuItems(); track menuItem) {
+  @switch (menuItem.type) {
+    @case ('menu-item') {
+      <button class="menu-item"
+              (mouseenter)="onMenuItemMouseEnter(menuItem)"
+              wbMenuItem #wbMenuItem="wbMenuItem" [menuItem]="menuItem"
+              (click)="menuItem.onSelect()">
+        @if (hasGutterColumn()) {
+          @if (wbMenuItem.checked() === undefined) {
+            <span class="gutter icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
+          } @else {
+            <span class="gutter icon material-symbols-rounded checkmark" translate="no">{{wbMenuItem.checked() ? 'check' : ''}}</span>
+          }
+        }
+
+        <span class="label">{{menuItem.text}}</span>
+        @if (menuItem.accelerator?.length) {
+          <span class="accelerator">{{menuItem.accelerator | wbJoin:'+'}}</span>
+        }
+      </button>
+    }
+    @case ('sub-menu-item') {
+      <button [attr.popovertarget]="popoverId"
+              [attr.popovertargetaction]="'show'"
+              [style.anchor-name]="activeSubMenuItem() === menuItem ? `--${popoverId}` : null"
+              class="menu-item"
+              (mouseenter)="onMenuItemMouseEnter(menuItem)">
+        @if (hasGutterColumn()) {
+          <span class="gutter icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
+        }
+        <span class="label">{{menuItem.text}}</span>
+        <span class="icon material-symbols-rounded sub-menu-chevron" translate="no">arrow_right</span>
+      </button>
+    }
+    @case ('group') {
+      <wb-menu class="group" [subMenuItem]="menuItem" [withGutterColumn]="hasGutterColumn()"/>
+    }
   }
 }
 

@@ -1,17 +1,20 @@
 @for (menuItem of menuItems(); track menuItem) {
-  @if (menuItem.type === 'menu-item') {
-    <div class="menu-item">
-      <span class="icon material-symbols-outlined" translate="no" aria-hidden="true">{{menuItem.icon}}</span>
-      <span class="label">{{menuItem.text}}</span>
-    </div>
-  } @else {
-    <button [attr.popovertarget]="popoverId"
-            [style.anchor-name]="activeSubMenuItem() === menuItem ? `--${popoverId}` : null"
-            class="menu-item"
-            (mouseenter)="onSubMenuMouseEnter(menuItem)"
-            (click)="onSubMenuClick(menuItem)">
-      {{menuItem.text}}
-    </button>
+  @switch (menuItem.type) {
+    @case ('menu-item') {
+      <div class="menu-item">
+        <span class="icon material-symbols-outlined" translate="no" aria-hidden="true">{{menuItem.icon}}</span>
+        <span class="label">{{menuItem.text}}</span>
+      </div>
+    }
+    @case ('sub-menu-item') {
+      <button [attr.popovertarget]="popoverId"
+              [style.anchor-name]="activeSubMenuItem() === menuItem ? `--${popoverId}` : null"
+              class="menu-item"
+              (mouseenter)="onSubMenuMouseEnter(menuItem)"
+              (click)="onSubMenuClick(menuItem)">
+        {{menuItem.text}}
+      </button>
+    }
   }
 }
 

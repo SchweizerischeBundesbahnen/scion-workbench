@@ -4,7 +4,7 @@ import {OverlayModule} from '@angular/cdk/overlay';
 import {SciMenuRegistry} from '../menu.registry';
 import {HolderDirective} from './holder.directive';
 import {SetIntoHolderDirective} from './set-into-holder.directive';
-import {MMenuItem, MSubMenuItem} from '../ɵmenu';
+import {MMenuGroup, MMenuItem, MSubMenuItem} from '../ɵmenu';
 
 @Component({
   selector: 'sci-toolbar',
@@ -36,7 +36,7 @@ export class SciToolbarComponent {
     this.rendered.set(true);
   }
 
-  public getMenuItems(menu: MSubMenuItem): Array<MMenuItem | MSubMenuItem> {
+  public getMenuItems(menu: MSubMenuItem): Array<MMenuItem | MSubMenuItem | MMenuGroup> {
     return [
       ...menu.children,
       ...this.menuRegistry.findMenuContributions(menu.id).flatMap(m => m.menuItems),

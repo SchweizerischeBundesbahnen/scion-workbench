@@ -40,6 +40,8 @@ export interface SciCheckableMenuItemDescriptor extends SciMenuItemDescriptor {
 export interface SciMenuGroupDescriptor {
   id?: string;
   label?: string;
+  collapsible?: boolean | {collapsed: boolean};
+  disabled?: () => Signal<boolean> | boolean;
 }
 
 export function openMenu(name: string, anchor: HTMLElement): void {

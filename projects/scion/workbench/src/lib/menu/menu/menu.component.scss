@@ -2,25 +2,50 @@ $padding: .3em;
 
 :host {
   display: inline-grid;
-  overflow: hidden;
-  grid-template-columns:
-    // === Menu Item Subgrid ===
-    auto // icon or check mark
-    minmax(7.5em, auto) // label
-    auto; // chevron or accelerator
-  align-items: center;
   gap: .125em .5em;
-  border: 1px solid var(--sci-color-border);
-  border-radius: 0.5rem;
-  color: var(--sci-color-text);
-  background-color: var(--sci-color-background-elevation);
-  padding: $padding;
+  overflow: hidden;
+  align-items: center;
 
-  &.gutter-column-hidden {
+  &:not(.is-group) {
     grid-template-columns:
-    // === Menu Item Subgrid ===
-    minmax(7.5em, auto) // label
-    auto; // chevron or accelerator
+       // === Menu Item Subgrid ===
+      auto // icon or check mark
+      minmax(7.5em, auto) // label
+      auto; // chevron or accelerator
+    border: 1px solid var(--sci-color-border);
+    border-radius: 0.5rem;
+    color: var(--sci-color-text);
+    background-color: var(--sci-color-background-elevation);
+    padding: $padding;
+
+    &.gutter-column-hidden {
+      grid-template-columns:
+        // === Menu Item Subgrid ===
+        minmax(7.5em, auto) // label
+        auto; // chevron or accelerator
+    }
+  }
+
+  &.is-group {
+    grid-column: 1/-1; // consume all columns
+    grid-template-columns: subgrid;
+  }
+
+  > span.group-label {
+    grid-column: 1/-1; // consume all columns
+    color: var(--sci-color-text-subtlest);
+    user-select: none;
+    padding: 5px;
+    padding-bottom: 0;
+    font-size: smaller;
+  }
+
+  wb-menu.group:not(:first-child) {
+    border-top: 1px solid var(--sci-color-border);
+  }
+
+  > wb-menu.group::not:last-child:has(+ :not(wb-menu.group)) {
+    border-bottom: 1px solid var(--sci-color-border);
   }
 
   > button.menu-item {
@@ -30,7 +55,7 @@ $padding: .3em;
     align-items: center;
     grid-template-columns: subgrid;
     text-wrap: nowrap;
-    padding: .25em .25em;
+    padding: 5px;
     border-radius: var(--sci-corner);
     user-select: none;
     overflow: hidden;

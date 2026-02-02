@@ -1,6 +1,6 @@
 import {Component, computed, effect, ElementRef, inject, input, signal, Signal, viewChild} from '@angular/core';
 import {SciMenuRegistry} from '../menu.registry';
-import {MMenuItem, MSubMenuItem} from '../ɵmenu';
+import {MMenuGroup, MMenuItem, MSubMenuItem} from '../ɵmenu';
 import {MenuComponent} from '../menu/menu.component';
 import {UUID} from '@scion/toolkit/uuid';
 
@@ -33,7 +33,7 @@ export class SciToolbarComponent {
     });
   }
 
-  private getMenuItems(): Signal<Array<MMenuItem | MSubMenuItem>> {
+  private getMenuItems(): Signal<Array<MMenuItem | MSubMenuItem | MMenuGroup>> {
     return computed(() => {
       const menus = this._menuRegistry.findMenuContributions(this.name());
       return menus.flatMap(menu => menu.menuItems);
