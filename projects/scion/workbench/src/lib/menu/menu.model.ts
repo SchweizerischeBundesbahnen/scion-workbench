@@ -3,7 +3,7 @@
 import {Signal} from '@angular/core';
 
 export interface SciMenu {
-  addMenuItem(menuItemDescriptor: SciMenuItemDescriptor | SciIconMenuItemDescriptor | SciCheckableMenuItemDescriptor, onSelect: () => void): this;
+  addMenuItem(menuItemDescriptor: SciMenuItemDescriptor | SciIconMenuItemDescriptor | SciCheckableMenuItemDescriptor, onSelect: () => boolean | void): this;
 
   addMenu(menuDescriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenu) => SciMenu): this;
 
@@ -19,7 +19,7 @@ export interface SciMenuDescriptor {
   /**
    * Specifies the text label of the menu item.
    */
-  label?: string;
+  label?: Signal<string> | string;
   /**
    * Specifies the icon associated with the menu item.
    */
@@ -43,7 +43,7 @@ export interface SciMenuDescriptor {
 }
 
 export interface SciMenuItemDescriptor {
-  label?: string;
+  label?: Signal<string> | string;
   tooltip?: string;
   mnemonic?: string;
   accelerator?: string[];
@@ -60,7 +60,7 @@ export interface SciCheckableMenuItemDescriptor extends SciMenuItemDescriptor {
 
 export interface SciMenuGroupDescriptor {
   id?: string;
-  label?: string;
+  label?: Signal<string> | string;
   collapsible?: boolean | {collapsed: boolean};
   disabled?: Signal<boolean> | boolean;
   filter?: boolean | {placeholder?: string; notFoundText?: string};

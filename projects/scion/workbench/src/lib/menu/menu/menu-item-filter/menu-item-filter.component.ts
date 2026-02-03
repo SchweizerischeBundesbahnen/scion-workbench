@@ -1,10 +1,11 @@
-import {Component, ElementRef, input, model, viewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, input, model, viewChild} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 @Component({
   selector: 'sci-menu-item-filter',
   templateUrl: './menu-item-filter.component.html',
   styleUrl: './menu-item-filter.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     FormsModule,

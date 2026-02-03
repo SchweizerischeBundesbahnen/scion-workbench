@@ -1,4 +1,4 @@
-import {ApplicationRef, Component, createComponent, effect, ElementRef, EnvironmentInjector, inject, Injector, input, inputBinding, untracked} from '@angular/core';
+import {ApplicationRef, ChangeDetectionStrategy, Component, createComponent, effect, ElementRef, EnvironmentInjector, inject, Injector, input, inputBinding, untracked} from '@angular/core';
 import {MMenuGroup} from '../ɵmenu';
 import {MenuComponent} from './menu.component';
 
@@ -8,6 +8,7 @@ import {MenuComponent} from './menu.component';
 @Component({
   selector: 'sci-menu-item-group',
   template: '',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuItemGroupComponent {
 

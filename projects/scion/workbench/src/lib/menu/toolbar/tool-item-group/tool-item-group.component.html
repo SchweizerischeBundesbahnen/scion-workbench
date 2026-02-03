@@ -8,8 +8,8 @@
         @if (menuItem.icon) {
           <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
         }
-        @if (menuItem.label?.length) {
-          <span class="label">{{menuItem.label}}</span>
+        @if (menuItem.label?.()) {
+          <span class="label">{{menuItem.label!()}}</span>
         }
       </button>
     }
@@ -19,14 +19,19 @@
               [style.anchor-name]="activeSubMenuItem() === menuItem ? `--${popoverId}` : null"
               [attr.disabled]="this.disabled() || (menuItem.disabled?.() ?? false) || null"
               [class.active]="activeSubMenuItem() === menuItem"
-              [class.visual-marker]="menuItem.visualMenuMarker ?? true"
+              [class.visual-marker]="menuItem.icon && !menuItem.label?.() && (menuItem.visualMenuMarker ?? true)"
               class="menu-item submenu-item"
               (click)="onSubMenuClick(menuItem)">
         @if (menuItem.icon) {
           <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
         }
-        @if (menuItem.label?.length) {
-          <span class="label">{{menuItem.label}}</span>
+        @if (menuItem.label?.()) {
+          <span class="label">{{menuItem.label!()}}</span>
+        }
+
+        <!-- Add chevron for label menus -->
+        @if (menuItem.label?.() && (menuItem.visualMenuMarker ?? true)) {
+          <span class="material-symbols-rounded" translate="no">keyboard_arrow_down</span>
         }
       </button>
     }

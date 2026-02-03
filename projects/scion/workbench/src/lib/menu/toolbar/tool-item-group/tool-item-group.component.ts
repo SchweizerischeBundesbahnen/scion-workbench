@@ -1,4 +1,4 @@
-import {Component, computed, effect, ElementRef, inject, input, linkedSignal, Signal, viewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, input, linkedSignal, Signal, viewChild} from '@angular/core';
 import {SciMenuRegistry} from '../../menu.registry';
 import {MMenuGroup, MMenuItem, MSubMenuItem} from '../../ɵmenu';
 import {MenuComponent} from '../../menu/menu.component';
@@ -8,6 +8,7 @@ import {UUID} from '@scion/toolkit/uuid';
   selector: 'sci-tool-item-group',
   templateUrl: './tool-item-group.component.html',
   styleUrl: './tool-item-group.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MenuComponent,
   ],

@@ -1,4 +1,4 @@
-import {Component, computed, DOCUMENT, effect, ElementRef, inject, InjectionToken, input, linkedSignal, signal, Signal, untracked, viewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, inject, input, linkedSignal, signal, Signal, untracked, viewChild} from '@angular/core';
 import {MMenuGroup, MMenuItem, MSubMenuItem} from '../ɵmenu';
 import {SciMenuRegistry} from '../menu.registry';
 import {UUID} from '@scion/toolkit/uuid';
@@ -7,17 +7,16 @@ import {MenuItemGroupComponent} from './menu-item-group.component';
 import {MenuItemFilterComponent} from './menu-item-filter/menu-item-filter.component';
 import {MenuItemFilter} from './menu-item-filter/menu-item-filter.service';
 
-export const SUBMENU_ITEM = new InjectionToken<MSubMenuItem>('SUBMENU_ITEM');
-
 @Component({
   selector: 'sci-menu',
+  templateUrl: './menu.component.html',
+  styleUrl: './menu.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     JoinPipe,
     MenuItemGroupComponent,
     MenuItemFilterComponent,
   ],
-  templateUrl: './menu.component.html',
-  styleUrl: './menu.component.scss',
   providers: [
     MenuItemFilter,
   ],
@@ -73,6 +72,13 @@ export class MenuComponent {
     });
   }
 
+  protected onSelect(menuItem: MMenuItem): void {
+    // Close the popup if the callback returns true. Defaults to closing non-checkable menu items.
+    if (menuItem.onSelect() ?? menuItem.checked?.() === undefined) {
+      this.close();
+    }
+  }
+
   protected onGroupToggle(): void {
     this.isGroupVisible.update(expanded => !expanded);
   }
@@ -114,14 +120,21 @@ export class MenuComponent {
   private matchesFilter(menuItem: MMenuItem | MSubMenuItem | MMenuGroup): Signal<boolean> {
     switch (menuItem.type) {
       case 'menu-item':
-        return this._filter.matches(menuItem.label);
+        return this._filter.matches(menuItem.label?.());
       case 'sub-menu-item':
-        return computed(() => this._filter.matches(menuItem.label)() || menuItem.children.some(child => this.matchesFilter(child)())); // TODO [menu] consider contributions
+        return computed(() => this._filter.matches(menuItem.label?.())() || menuItem.children.some(child => this.matchesFilter(child)())); // TODO [menu] consider contributions
       case 'group':
-        return computed(() => this._filter.matches(menuItem.label)() || menuItem.children.some(child => this.matchesFilter(child)())); // TODO [menu] consider contributions
+        return computed(() => this._filter.matches(menuItem.label?.())() || menuItem.children.some(child => this.matchesFilter(child)())); // TODO [menu] consider contributions
     }
   }
 
+  private close(): void {
+    const popover = this._document.documentElement.appendChild(this._document.createElement('div'));
+    popover.setAttribute('popover', '');
+    popover.style.setProperty('display', 'none');
+    popover.showPopover();
+    popover.remove();
+  }
 }
 
 function hasGutter(menuItems: Array<MMenuItem | MSubMenuItem | MMenuGroup>): boolean {
