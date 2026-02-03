@@ -80,7 +80,7 @@ $icon-size: 18px;
     padding: $padding_menu_item;
   }
 
-  // Add top separator
+  // Add before separator
   > *:not(hr) + wb-group::before {
     content: '';
     grid-column: 1/-1;
@@ -88,7 +88,7 @@ $icon-size: 18px;
     background-color: var(--sci-color-border);
   }
 
-  // Add bottom separator
+  // Add after separator
   > wb-group:not(:last-child, :has(+ wb-menu), :has(+ wb-group))::after {
     content: '';
     grid-column: 1/-1;

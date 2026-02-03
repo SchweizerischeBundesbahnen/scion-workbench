@@ -3,7 +3,6 @@ import {MMenuGroup, MMenuItem, MSubMenuItem} from '../ɵmenu';
 import {SciMenuRegistry} from '../menu.registry';
 import {UUID} from '@scion/toolkit/uuid';
 import {JoinPipe} from './join.pipe';
-import {MenuItemDirective} from './menu-item.directive';
 import {GroupComponent} from './group.component';
 import {MenuFilterComponent} from './menu-filter/menu-filter.component';
 import {MenuFilter} from './menu-filter/menu-filter.service';
@@ -14,7 +13,6 @@ export const SUBMENU_ITEM = new InjectionToken<MSubMenuItem>('SUBMENU_ITEM');
   selector: 'wb-menu',
   imports: [
     JoinPipe,
-    MenuItemDirective,
     GroupComponent,
     MenuFilterComponent,
   ],
@@ -49,15 +47,15 @@ export class MenuComponent {
   });
 
   protected readonly isGroup = computed(() => this.subMenuItem().type === 'group');
-  protected readonly visible = signal(true);
+  protected readonly isGroupVisible = signal(true);
 
   constructor() {
-    // Group expanded state.
+    // Compute expanded state group.
     effect(() => {
       const subMenuItem = this.subMenuItem();
       untracked(() => {
         if (subMenuItem.type === 'group') {
-          this.visible.set(typeof subMenuItem.collapsible === 'object' ? !subMenuItem.collapsible.collapsed : true);
+          this.isGroupVisible.set(typeof subMenuItem.collapsible === 'object' ? !subMenuItem.collapsible.collapsed : true);
         }
       });
     })
@@ -65,7 +63,7 @@ export class MenuComponent {
     // Open popover when hovering over a submenu item, or hide it otherwise.
     effect(() => {
       const popover = this._popover();
-      console.log('>>> effect');
+
       if (this.activeSubMenuItem()) {
         popover?.nativeElement.showPopover();
       }
@@ -76,7 +74,7 @@ export class MenuComponent {
   }
 
   protected onGroupToggle(): void {
-    this.visible.update(expanded => !expanded);
+    this.isGroupVisible.update(expanded => !expanded);
   }
 
   protected onMenuItemMouseEnter(menuItem: MMenuItem | MSubMenuItem | MMenuGroup): void {
@@ -116,9 +114,9 @@ export class MenuComponent {
   private matchesFilter(menuItem: MMenuItem | MSubMenuItem | MMenuGroup): Signal<boolean> {
     switch (menuItem.type) {
       case 'menu-item':
-        return this._filter.matches(menuItem.text);
+        return this._filter.matches(menuItem.label);
       case 'sub-menu-item':
-        return computed(() => this._filter.matches(menuItem.text)() || menuItem.children.some(child => this.matchesFilter(child)())); // TODO [menu] consider contributions
+        return computed(() => this._filter.matches(menuItem.label)() || menuItem.children.some(child => this.matchesFilter(child)())); // TODO [menu] consider contributions
       case 'group':
         return computed(() => this._filter.matches(menuItem.label)() || menuItem.children.some(child => this.matchesFilter(child)())); // TODO [menu] consider contributions
     }

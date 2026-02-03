@@ -1,21 +1,8 @@
 :host {
-  display: flex;
-  align-items: center;
-  gap: 1em;
+  display: block;
 
-  > div.menu-item, button.menu-item {
-    &:hover {
-      background-color: gray;
-    }
-  }
-
-  > :where(wb-menu[popover]) {
-    margin: unset; // unset native popover styling
-    padding: unset; // unset native popover styling
-    inset: unset; // unset native popover styling
-    position-try-fallbacks: flip-inline, flip-block;
-    //background-color: green;
-    top: anchor(bottom);
-    left: anchor(left);
+  > sci-tool-group {
+    width: 100%;
+    height: 100%;
   }
 }

@@ -9,7 +9,7 @@ export class ɵSciMenu implements SciMenu {
   public addMenuItem(menuItemDescriptor: SciMenuItemDescriptor | SciIconMenuItemDescriptor | SciCheckableMenuItemDescriptor, onSelect: () => void): this {
     this.menuItems.push({
       type: 'menu-item',
-      text: menuItemDescriptor.label,
+      label: menuItemDescriptor.label,
       tooltip: menuItemDescriptor.tooltip,
       mnemonic: menuItemDescriptor.mnemonic,
       accelerator: menuItemDescriptor.accelerator,
@@ -27,11 +27,11 @@ export class ɵSciMenu implements SciMenu {
     this.menuItems.push({
       type: 'sub-menu-item',
       id: menuDescriptor.id ?? UUID.randomUUID(),
-      text: menuDescriptor.text,
+      label: menuDescriptor.label,
       icon: 'icon' in menuDescriptor ? menuDescriptor.icon : undefined,
       tooltip: menuDescriptor.tooltip,
       mnemonic: menuDescriptor.mnemonic,
-      disabled: typeof menuDescriptor.disabled === 'boolean' ? signal(menuDescriptor.disabled) : menuDescriptor.disabled,
+      disabled: coerceSignal(menuDescriptor.disabled),
       filter: menuDescriptor.filter,
       children: subMenu.menuItems,
     });
@@ -62,7 +62,7 @@ export class ɵSciMenu implements SciMenu {
         label: groupDescriptor.label,
         collapsible: groupDescriptor.collapsible,
         filter: groupDescriptor.filter,
-        disabled: typeof groupDescriptor.disabled === 'boolean' ? signal(groupDescriptor.disabled) : groupDescriptor.disabled,
+        disabled: coerceSignal(groupDescriptor.disabled),
         children: subMenu.menuItems,
       });
       return this;
@@ -72,7 +72,7 @@ export class ɵSciMenu implements SciMenu {
 
 export interface MMenuItem {
   type: 'menu-item'
-  text: string;
+  label?: string;
   icon?: string;
   tooltip?: string;
   mnemonic?: string;
@@ -85,7 +85,7 @@ export interface MMenuItem {
 export interface MSubMenuItem {
   type: 'sub-menu-item'
   id: string;
-  text: string;
+  label?: string;
   icon?: string;
   tooltip?: string;
   mnemonic?: string;

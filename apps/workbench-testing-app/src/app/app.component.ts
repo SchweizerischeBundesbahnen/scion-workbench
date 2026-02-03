@@ -59,19 +59,27 @@ export class AppComponent implements DoCheck {
 
     const paragraphStyle = signal<string>('');
 
-    provideMenu('toolbar:workbench.part.tools', menu => menu
-      .addMenu({text: 'File'}, menu => menu
+    provideMenu('toolbar:workbench.part.tools.end', toolbar => toolbar
+      .addMenuItem({icon: 'unfold_more', tooltip: 'Expand Selected'}, () => this.onAction())
+      .addMenuItem({icon: 'unfold_less', tooltip: 'Collapse All'}, () => this.onAction()),
+    );
+
+    provideMenu('toolbar:workbench.part.tools.start', menu => menu
+      .addGroup(group => group
+        .addMenuItem({label: 'WTF'}, () => this.onAction()),
+      )
+      .addMenu({label: 'File'}, menu => menu
         .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N']}, () => this.onAction())
         .addMenuItem({label: 'Open', icon: 'folder'}, () => this.onAction())
         .addMenuItem({label: 'Make a Copy', icon: 'file_copy'}, () => this.onAction())
-        .addMenu({text: 'Share', icon: 'person_add', id: 'extend-me'}, menu => menu
+        .addMenu({label: 'Share', icon: 'person_add', id: 'extend-me'}, menu => menu
           .addMenuItem({label: 'Share with others', icon: 'person_add'}, () => this.onAction())
           .addMenuItem({label: 'Publish to web', icon: 'public'}, () => this.onAction()),
         )
         .addMenuItem({label: 'Download', icon: 'download'}, () => this.onAction())
         .addMenuItem({label: 'Print', icon: 'print'}, () => this.onAction()),
       )
-      .addMenu({text: 'Edit', filter: {placeholder: 'Sueche...', notFoundText: 'Nüd gfunde.'}}, menu => menu
+      .addMenu({label: 'Edit', filter: {placeholder: 'Sueche...', notFoundText: 'Nüd gfunde.'}}, menu => menu
         .addMenuItem({label: 'Undo', icon: 'undo', accelerator: ['Ctrl', 'Z']}, () => this.onAction())
         .addMenuItem({label: 'Redo', icon: 'redo'}, () => this.onAction())
         .addMenuItem({label: 'Cut', icon: 'content_cut', accelerator: ['Ctrl', 'X']}, () => this.onAction())
@@ -79,72 +87,80 @@ export class AppComponent implements DoCheck {
         .addMenuItem({label: 'Paste', icon: 'content_paste', accelerator: ['Ctrl', 'V']}, () => this.onAction())
         .addMenuItem({label: 'Find and replace', icon: 'find_replace', accelerator: ['Ctrl', 'F']}, () => this.onAction()),
       )
-      .addMenu({text: 'Format', filter: true}, menu => menu
-        .addMenu({text: 'Text', icon: 'format_bold'}, menu => menu
-          .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B']}, () => this.onAction())
-          .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I']}, () => this.onAction())
-          .addMenuItem({label: 'Underline', icon: 'format_underlined'}, () => this.onAction())
-          .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s'}, () => this.onAction())
-          .addMenu({text: 'Size', icon: 'format_bold'}, menu => menu
-            .addMenuItem({label: 'Increase font size'}, () => this.onAction())
-            .addMenuItem({label: 'Decrease font size'}, () => this.onAction()),
-          ),
-        )
-        .addMenu({text: 'Paragraph styles', icon: 'format_align_justify', id: 'menu:paragraph'}, menu => {
-            return menu
-              .addMenuItem({label: 'Normal text', checked: computed(() => paragraphStyle() === 'normal')}, () => paragraphStyle.set('normal'))
-              .addMenuItem({label: 'Heading 1', checked: computed(() => paragraphStyle() === 'heading1')}, () => paragraphStyle.set('heading1'))
-              .addMenuItem({label: 'Heading 2', checked: computed(() => paragraphStyle() === 'heading2')}, () => paragraphStyle.set('heading2'))
-          },
-        )
-        .addMenu({text: 'Align & indent', filter: true, icon: 'format_bold'}, menu => menu
-          .addMenuItem({label: 'Align left', icon: 'format_align_left'}, () => this.onAction())
-          .addMenuItem({label: 'Align center', icon: 'format_align_center'}, () => this.onAction())
-          .addMenuItem({label: 'Align right', icon: 'format_align_right'}, () => this.onAction())
-          .addMenuItem({label: 'Justify', icon: 'format_align_justify'}, () => this.onAction()),
-        ),
-      )
-      .addMenu({text: 'Format with Groups'}, menu => menu
-        // .addGroup({label: 'Group 1'}, group => group
-        //   .addMenuItem({text: 'Nested Menu Item'}, () => this.onAction())
-        //   .addGroup({label: 'Group 2'}, group => group
-        //     .addGroup({label: 'Group 3'}, group => group
-        //       .addMenuItem({text: 'Nested Menu Item'}, () => this.onAction()),
-        //     ),
-        //   )
-        .addGroup({label: 'Formatting', collapsible: true}, group => group
-            .addMenu({text: 'Text', icon: 'format_bold'}, menu => menu
-              .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B']}, () => this.onAction())
-              .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I']}, () => this.onAction())
-              .addMenuItem({label: 'Underline', icon: 'format_underlined'}, () => this.onAction())
-              .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s'}, () => this.onAction())
-              .addGroup({label: 'Size'}, menu => menu
-                .addMenuItem({label: 'Increase font size'}, () => this.onAction())
-                .addMenuItem({label: 'Decrease font size'}, () => this.onAction()),
-              ),
-            )
-            // .addGroup(group => group
-            .addMenu({text: 'Size', icon: 'format_size'}, menu => menu
+      .addGroup(group => group
+        .addGroup(group => group
+          .addMenuItem({label: 'A'}, () => this.onAction())
+          .addMenuItem({label: 'A'}, () => this.onAction())
+          .addMenuItem({label: 'B'}, () => this.onAction()),
+        ))
+      .addGroup(group => group
+        .addMenu({label: 'Format', filter: true}, menu => menu
+          .addMenu({label: 'Text', icon: 'format_bold'}, menu => menu
+            .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B']}, () => this.onAction())
+            .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I']}, () => this.onAction())
+            .addMenuItem({label: 'Underline', icon: 'format_underlined'}, () => this.onAction())
+            .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s'}, () => this.onAction())
+            .addMenu({label: 'Size', icon: 'format_bold'}, menu => menu
               .addMenuItem({label: 'Increase font size'}, () => this.onAction())
               .addMenuItem({label: 'Decrease font size'}, () => this.onAction()),
             ),
-          // ),
-        )
-        .addGroup(group => group
-          .addMenu({text: 'Paragraph styles', icon: 'format_align_justify', id: 'menu:paragraph'}, menu => {
+          )
+          .addMenu({label: 'Paragraph styles', icon: 'format_align_justify', id: 'menu:paragraph'}, menu => {
               return menu
                 .addMenuItem({label: 'Normal text', checked: computed(() => paragraphStyle() === 'normal')}, () => paragraphStyle.set('normal'))
                 .addMenuItem({label: 'Heading 1', checked: computed(() => paragraphStyle() === 'heading1')}, () => paragraphStyle.set('heading1'))
                 .addMenuItem({label: 'Heading 2', checked: computed(() => paragraphStyle() === 'heading2')}, () => paragraphStyle.set('heading2'))
             },
-          ),
-        )
-        .addGroup(group => group
-          .addMenu({text: 'Align & indent', icon: 'format_bold'}, menu => menu
+          )
+          .addMenu({label: 'Align & indent', filter: true, icon: 'format_bold'}, menu => menu
             .addMenuItem({label: 'Align left', icon: 'format_align_left'}, () => this.onAction())
             .addMenuItem({label: 'Align center', icon: 'format_align_center'}, () => this.onAction())
             .addMenuItem({label: 'Align right', icon: 'format_align_right'}, () => this.onAction())
             .addMenuItem({label: 'Justify', icon: 'format_align_justify'}, () => this.onAction()),
+          ),
+        )
+        .addMenu({label: 'Format with Groups'}, menu => menu
+          // .addGroup({label: 'Group 1'}, group => group
+          //   .addMenuItem({text: 'Nested Menu Item'}, () => this.onAction())
+          //   .addGroup({label: 'Group 2'}, group => group
+          //     .addGroup({label: 'Group 3'}, group => group
+          //       .addMenuItem({text: 'Nested Menu Item'}, () => this.onAction()),
+          //     ),
+          //   )
+          .addGroup({label: 'Formatting', collapsible: true}, group => group
+              .addMenu({label: 'Text', icon: 'format_bold'}, menu => menu
+                .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B']}, () => this.onAction())
+                .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I']}, () => this.onAction())
+                .addMenuItem({label: 'Underline', icon: 'format_underlined'}, () => this.onAction())
+                .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s'}, () => this.onAction())
+                .addGroup({label: 'Size'}, menu => menu
+                  .addMenuItem({label: 'Increase font size'}, () => this.onAction())
+                  .addMenuItem({label: 'Decrease font size'}, () => this.onAction()),
+                ),
+              )
+              // .addGroup(group => group
+              .addMenu({label: 'Size', icon: 'format_size'}, menu => menu
+                .addMenuItem({label: 'Increase font size'}, () => this.onAction())
+                .addMenuItem({label: 'Decrease font size'}, () => this.onAction()),
+              ),
+            // ),
+          )
+          .addGroup(group => group
+            .addMenu({label: 'Paragraph styles', icon: 'format_align_justify', id: 'menu:paragraph'}, menu => {
+                return menu
+                  .addMenuItem({label: 'Normal text', checked: computed(() => paragraphStyle() === 'normal')}, () => paragraphStyle.set('normal'))
+                  .addMenuItem({label: 'Heading 1', checked: computed(() => paragraphStyle() === 'heading1')}, () => paragraphStyle.set('heading1'))
+                  .addMenuItem({label: 'Heading 2', checked: computed(() => paragraphStyle() === 'heading2')}, () => paragraphStyle.set('heading2'))
+              },
+            ),
+          )
+          .addGroup(group => group
+            .addMenu({label: 'Align & indent', icon: 'format_bold'}, menu => menu
+              .addMenuItem({label: 'Align left', icon: 'format_align_left'}, () => this.onAction())
+              .addMenuItem({label: 'Align center', icon: 'format_align_center'}, () => this.onAction())
+              .addMenuItem({label: 'Align right', icon: 'format_align_right'}, () => this.onAction())
+              .addMenuItem({label: 'Justify', icon: 'format_align_justify'}, () => this.onAction()),
+            ),
           ),
         ),
       ),
@@ -155,7 +171,7 @@ export class AppComponent implements DoCheck {
     );
 
     provideMenu('menu:paragraph', menu => menu
-      .addMenu({text: 'SCION'}, menu => menu
+      .addMenu({label: 'SCION'}, menu => menu
         .addMenuItem({label: 'Dani'}, () => this.onAction())
         .addMenuItem({label: 'Marc'}, () => this.onAction())
         .addMenuItem({label: 'Konstantin'}, () => this.onAction()),
@@ -173,8 +189,8 @@ export class AppComponent implements DoCheck {
       .add('single_object_levels'),
     );
 
-    provideMenu('toolbar:workbench.part.tools', menu => menu
-      .addMenu({text: 'Database', filter: {placeholder: 'Type to filter'}}, menu => menu
+    provideMenu('toolbar:workbench.part.tools.start', menu => menu
+      .addMenu({label: 'Database', icon: 'database', filter: {placeholder: 'Type to filter'}}, menu => menu
         // .addMenuItem({icon: 'filter_alt', text: 'Filter'}, () => this.onAction())
         .addGroup({label: 'View in Groups', collapsible: true}, group => group
           .addMenuItem({label: 'Databases and Schemas', checked: computed(() => databaseFlags().has('databases_and_schmemas'))}, () => toggleMultiFlag(databaseFlags, 'databases_and_schmemas'))
@@ -210,47 +226,8 @@ export class AppComponent implements DoCheck {
     const viewMode = signal('dock_pinned');
     const moveTo = signal('left_top');
 
-    provideMenu('toolbar:workbench.part.tools', menu => menu
-      .addMenu({text: 'Options'}, menu => menu
-        .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+']}, () => this.onAction())
-        .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-']}, () => this.onAction())
-        .addGroup(group => group
-          .addMenuItem({label: 'Navigate with Single Click', checked: computed(() => options().has('navigate_with_single_click'))}, () => toggleMultiFlag(options, 'navigate_with_single_click'))
-          .addMenuItem({label: 'Always Select Opened Element', checked: computed(() => options().has('always_select_opened_element'))}, () => toggleMultiFlag(options, 'always_select_opened_element')),
-        )
-        .addGroup(group => group
-          .addMenuItem({label: 'Speed Search', icon: 'search', accelerator: ['Ctrl', 'F']}, () => this.onAction()),
-        )
-        .addGroup(group => group
-          .addMenu({text: 'View Mode'}, menu => menu
-            .addMenuItem({label: 'Dock Pinned', checked: computed(() => viewMode() === 'dock_pinned')}, () => viewMode.set('dock_pinned'))
-            .addMenuItem({label: 'Dock Unpinned', checked: computed(() => viewMode() === 'dock_unpinned')}, () => viewMode.set('dock_unpinned'))
-            .addMenuItem({label: 'Undock', checked: computed(() => viewMode() === 'unddock')}, () => viewMode.set('unddock'))
-            .addMenuItem({label: 'Float', checked: computed(() => viewMode() === 'float')}, () => viewMode.set('float'))
-            .addMenuItem({label: 'Window', checked: computed(() => viewMode() === 'window')}, () => viewMode.set('window')),
-          )
-          .addMenu({text: 'Move To'}, menu => menu
-            .addMenuItem({label: 'Left Top', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_top')}, () => moveTo.set('left_top'))
-            .addMenuItem({label: 'Left Bottom', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_bottom')}, () => moveTo.set('left_bottom'))
-            .addMenuItem({label: 'Bottom Left', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_left')}, () => moveTo.set('bottom_left'))
-            .addMenuItem({label: 'Bottom Right', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_right')}, () => moveTo.set('bottom_right'))
-            .addMenuItem({label: 'Right Bottom', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_bottom')}, () => moveTo.set('right_bottom'))
-            .addMenuItem({label: 'Right Top', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_top')}, () => moveTo.set('right_top')),
-          )
-          .addMenu({text: 'Resize'}, menu => menu
-            .addMenuItem({label: 'Stretch to Left'}, () => this.onAction())
-            .addMenuItem({label: 'Stretch to Right'}, () => this.onAction())
-            .addMenuItem({label: 'Stretch to Top'}, () => this.onAction())
-            .addMenuItem({label: 'Stretch to Bottom'}, () => this.onAction())
-            .addMenuItem({label: 'Maximize Tool Window'}, () => this.onAction()),
-          ),
-        )
-        .addMenuItem({label: 'Remove from Sidebar'}, () => this.onAction()),
-      ),
-    );
-
-    provideMenu('toolbar:workbench.part.tools', menu => menu
-      .addMenu({text: 'View Options'}, menu => menu
+    provideMenu('toolbar:workbench.part.tools.end', menu => menu
+      .addMenu({icon: 'visibility'}, menu => menu
         .addGroup({label: 'Sort'}, group => group
           .addMenuItem({label: 'Alphabetically', checked: computed(() => options().has('alphabetically'))}, () => toggleMultiFlag(options, 'alphabetically')),
         )
@@ -262,6 +239,45 @@ export class AppComponent implements DoCheck {
         .addGroup({label: 'Group'}, group => group
           .addMenuItem({label: 'Members by Defininbg Type', checked: computed(() => options().has('member_by_defining_type'))}, () => toggleMultiFlag(options, 'member_by_defining_type')),
         ),
+      ),
+    );
+
+    provideMenu('toolbar:workbench.part.tools.end', menu => menu
+      .addMenu({icon: 'more_vert'}, menu => menu
+        .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+']}, () => this.onAction())
+        .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-']}, () => this.onAction())
+        .addGroup(group => group
+          .addMenuItem({label: 'Navigate with Single Click', checked: computed(() => options().has('navigate_with_single_click'))}, () => toggleMultiFlag(options, 'navigate_with_single_click'))
+          .addMenuItem({label: 'Always Select Opened Element', checked: computed(() => options().has('always_select_opened_element'))}, () => toggleMultiFlag(options, 'always_select_opened_element')),
+        )
+        .addGroup(group => group
+          .addMenuItem({label: 'Speed Search', icon: 'search', accelerator: ['Ctrl', 'F']}, () => this.onAction()),
+        )
+        .addGroup(group => group
+          .addMenu({label: 'View Mode'}, menu => menu
+            .addMenuItem({label: 'Dock Pinned', checked: computed(() => viewMode() === 'dock_pinned')}, () => viewMode.set('dock_pinned'))
+            .addMenuItem({label: 'Dock Unpinned', checked: computed(() => viewMode() === 'dock_unpinned')}, () => viewMode.set('dock_unpinned'))
+            .addMenuItem({label: 'Undock', checked: computed(() => viewMode() === 'unddock')}, () => viewMode.set('unddock'))
+            .addMenuItem({label: 'Float', checked: computed(() => viewMode() === 'float')}, () => viewMode.set('float'))
+            .addMenuItem({label: 'Window', checked: computed(() => viewMode() === 'window')}, () => viewMode.set('window')),
+          )
+          .addMenu({label: 'Move To'}, menu => menu
+            .addMenuItem({label: 'Left Top', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_top')}, () => moveTo.set('left_top'))
+            .addMenuItem({label: 'Left Bottom', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_bottom')}, () => moveTo.set('left_bottom'))
+            .addMenuItem({label: 'Bottom Left', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_left')}, () => moveTo.set('bottom_left'))
+            .addMenuItem({label: 'Bottom Right', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_right')}, () => moveTo.set('bottom_right'))
+            .addMenuItem({label: 'Right Bottom', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_bottom')}, () => moveTo.set('right_bottom'))
+            .addMenuItem({label: 'Right Top', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_top')}, () => moveTo.set('right_top')),
+          )
+          .addMenu({label: 'Resize'}, menu => menu
+            .addMenuItem({label: 'Stretch to Left'}, () => this.onAction())
+            .addMenuItem({label: 'Stretch to Right'}, () => this.onAction())
+            .addMenuItem({label: 'Stretch to Top'}, () => this.onAction())
+            .addMenuItem({label: 'Stretch to Bottom'}, () => this.onAction())
+            .addMenuItem({label: 'Maximize Tool Window'}, () => this.onAction()),
+          ),
+        )
+        .addMenuItem({label: 'Remove from Sidebar'}, () => this.onAction()),
       ),
     );
   }
