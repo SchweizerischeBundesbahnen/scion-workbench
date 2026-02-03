@@ -1,5 +1,5 @@
 import {Component, input} from '@angular/core';
-import {SciToolGroupComponent} from './tool-group/tool-group.component';
+import {SciToolGroupComponent} from './tool-item-group/tool-item-group.component';
 
 @Component({
   selector: 'sci-toolbar',

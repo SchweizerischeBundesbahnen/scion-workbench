@@ -101,5 +101,6 @@ $tokens: (
   --sci-workbench-button-background-color-hover: color-mix(in srgb, var(--sci-color-gray-200) 95%, var(--sci-static-color-white)),
   --sci-workbench-button-background-color-active: var(--sci-color-gray-300),
   --sci-workbench-button-outline-width-focus: 2px,
+  --sci-workbench-menu-background-color-hover: var(--sci-workbench-button-background-color-hover),
   --sci-workbench-contextmenu-width: 18rem,
 );

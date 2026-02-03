@@ -3,23 +3,23 @@ import {MMenuGroup, MMenuItem, MSubMenuItem} from '../ɵmenu';
 import {SciMenuRegistry} from '../menu.registry';
 import {UUID} from '@scion/toolkit/uuid';
 import {JoinPipe} from './join.pipe';
-import {GroupComponent} from './group.component';
-import {MenuFilterComponent} from './menu-filter/menu-filter.component';
-import {MenuFilter} from './menu-filter/menu-filter.service';
+import {MenuItemGroupComponent} from './menu-item-group.component';
+import {MenuItemFilterComponent} from './menu-item-filter/menu-item-filter.component';
+import {MenuItemFilter} from './menu-item-filter/menu-item-filter.service';
 
 export const SUBMENU_ITEM = new InjectionToken<MSubMenuItem>('SUBMENU_ITEM');
 
 @Component({
-  selector: 'wb-menu',
+  selector: 'sci-menu',
   imports: [
     JoinPipe,
-    GroupComponent,
-    MenuFilterComponent,
+    MenuItemGroupComponent,
+    MenuItemFilterComponent,
   ],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss',
   providers: [
-    MenuFilter,
+    MenuItemFilter,
   ],
   host: {
     '[class.gutter-column-hidden]': '!hasGutterColumn()',
@@ -34,7 +34,7 @@ export class MenuComponent {
 
   private readonly _menuRegistry = inject(SciMenuRegistry);
   private readonly _popover = viewChild('popover', {read: ElementRef<HTMLElement>});
-  private readonly _filter = inject(MenuFilter);
+  private readonly _filter = inject(MenuItemFilter);
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _document = inject(DOCUMENT);
 

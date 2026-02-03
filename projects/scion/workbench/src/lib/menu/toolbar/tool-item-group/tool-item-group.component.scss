@@ -8,7 +8,7 @@ $icon-size: 18px;
   gap: 1px;
 
   // Add before separator
-  > sci-tool-group:not(:first-child)::before {
+  > sci-tool-item-group:not(:first-child)::before {
     content: '';
     width: 1px;
     background-color: var(--sci-color-border);
@@ -16,7 +16,7 @@ $icon-size: 18px;
   }
 
   // Add after separator
-  > sci-tool-group:not(:last-child, :has(+ wb-menu), :has(+ sci-tool-group))::after {
+  > sci-tool-item-group:not(:last-child, :has(+ sci-menu), :has(+ sci-tool-item-group))::after {
     content: '';
     width: 1px;
     background-color: var(--sci-color-border);
@@ -72,7 +72,7 @@ $icon-size: 18px;
     }
   }
 
-  > :where(wb-menu[popover]) { // allow setting host styles in menu component
+  > :where(sci-menu[popover]) { // allow setting host styles in menu component
     margin: unset; // unset native popover styling
     padding: unset; // unset native popover styling
     inset: unset; // unset native popover styling

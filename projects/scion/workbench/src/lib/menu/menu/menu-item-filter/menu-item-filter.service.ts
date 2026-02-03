@@ -1,9 +1,9 @@
 import {computed, inject, Injectable, Signal, signal} from '@angular/core';
 
 @Injectable()
-export class MenuFilter {
+export class MenuItemFilter {
 
-  private readonly _parent = inject(MenuFilter, {skipSelf: true, optional: true});
+  private readonly _parent = inject(MenuItemFilter, {skipSelf: true, optional: true});
   private readonly _filter = signal<RegExp | null>(null);
 
   public setFilter(filter: string | null): void {

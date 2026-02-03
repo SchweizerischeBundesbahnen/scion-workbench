@@ -59,7 +59,7 @@ $icon-size: 18px;
       width: 1em;
     }
 
-    > wb-menu-filter {
+    > sci-menu-item-filter {
       grid-column: span 2 / -1; // consume last two columns
     }
   }
@@ -81,7 +81,7 @@ $icon-size: 18px;
   }
 
   // Add before separator
-  > *:not(hr) + wb-group::before {
+  > *:not(hr) + sci-menu-item-group::before {
     content: '';
     grid-column: 1/-1;
     height: 1px;
@@ -89,7 +89,7 @@ $icon-size: 18px;
   }
 
   // Add after separator
-  > wb-group:not(:last-child, :has(+ wb-menu), :has(+ wb-group))::after {
+  > sci-menu-item-group:not(:last-child, :has(+ sci-menu), :has(+ sci-menu-item-group))::after {
     content: '';
     grid-column: 1/-1;
     height: 1px;
@@ -139,7 +139,7 @@ $icon-size: 18px;
     }
 
     &:hover:where(:not(:disabled)) {
-      background-color: var(--sci-workbench-button-background-color-hover);
+      background-color: var(--sci-workbench-menu-background-color-hover);
     }
 
     &:active:where(:not(:disabled)) {
@@ -159,7 +159,7 @@ $icon-size: 18px;
     }
   }
 
-  > :where(wb-menu[popover]) { // allow setting host styles in menu component
+  > :where(sci-menu[popover]) { // allow setting host styles in menu component
     margin: unset; // unset native popover styling
     padding: unset; // unset native popover styling
     inset: unset; // unset native popover styling
