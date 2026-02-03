@@ -5,6 +5,8 @@ import {UUID} from '@scion/toolkit/uuid';
 import {JoinPipe} from './join.pipe';
 import {MenuItemDirective} from './menu-item.directive';
 import {GroupComponent} from './group.component';
+import {MenuFilterComponent} from './menu-filter/menu-filter.component';
+import {MenuFilter} from './menu-filter/menu-filter.service';
 
 export const SUBMENU_ITEM = new InjectionToken<MSubMenuItem>('SUBMENU_ITEM');
 
@@ -14,9 +16,13 @@ export const SUBMENU_ITEM = new InjectionToken<MSubMenuItem>('SUBMENU_ITEM');
     JoinPipe,
     MenuItemDirective,
     GroupComponent,
+    MenuFilterComponent,
   ],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss',
+  providers: [
+    MenuFilter,
+  ],
   host: {
     '[class.gutter-column-hidden]': '!hasGutterColumn()',
     '[class.is-group]': 'isGroup()',
@@ -27,20 +33,20 @@ export class MenuComponent {
   public readonly subMenuItem = input.required<MSubMenuItem | MMenuGroup>();
   public readonly withGutterColumn = input<boolean>();
 
-  protected hasGutterColumn = computed(() => this.withGutterColumn() ?? hasGutter(this.menuItems()));
-
   private readonly _menuRegistry = inject(SciMenuRegistry);
   private readonly _popover = viewChild('popover', {read: ElementRef<HTMLElement>});
+  private readonly _filter = inject(MenuFilter);
 
   protected readonly popoverId = UUID.randomUUID();
+  protected readonly hasGutterColumn = computed(() => this.withGutterColumn() ?? (!!this.subMenuItem().filter || hasGutter(this.menuItems())));
   protected readonly menuItems = this.computeMenuItems();
   protected readonly activeSubMenuItem = linkedSignal<MSubMenuItem | MMenuGroup, MSubMenuItem | undefined>({
     source: this.subMenuItem,  // reset active sub menu item when this component is re-used
     computation: () => undefined,
   });
 
-  protected isGroup = computed(() => this.subMenuItem().type === 'group');
-  protected readonly groupExpanded = signal(true);
+  protected readonly isGroup = computed(() => this.subMenuItem().type === 'group');
+  protected readonly visible = signal(true);
 
   constructor() {
     // Group expanded state.
@@ -48,7 +54,7 @@ export class MenuComponent {
       const subMenuItem = this.subMenuItem();
       untracked(() => {
         if (subMenuItem.type === 'group') {
-          this.groupExpanded.set(typeof subMenuItem.collapsible === 'object' ? !subMenuItem.collapsible.collapsed : true);
+          this.visible.set(typeof subMenuItem.collapsible === 'object' ? !subMenuItem.collapsible.collapsed : true);
         }
       });
     })
@@ -65,22 +71,8 @@ export class MenuComponent {
     });
   }
 
-  private computeMenuItems(): Signal<Array<MMenuItem | MSubMenuItem | MMenuGroup>> {
-    return computed(() => {
-      const subMenuItem = this.subMenuItem();
-
-      // TODO [MENU] Sort by order (e.g., after, before)
-      return untracked(() => {
-        return [
-          ...subMenuItem.children,
-          ...this._menuRegistry.findMenuContributions(subMenuItem.id).flatMap(m => m.menuItems),
-        ];
-      });
-    });
-  }
-
   protected onGroupToggle(): void {
-    this.groupExpanded.update(expanded => !expanded);
+    this.visible.update(expanded => !expanded);
   }
 
   protected onMenuItemMouseEnter(menuItem: MMenuItem | MSubMenuItem | MMenuGroup): void {
@@ -89,10 +81,36 @@ export class MenuComponent {
 
   protected onTogglePopover(event: ToggleEvent): void {
     if (event.newState === 'closed') {
-      console.log('>>> closing menu popover');
       this.activeSubMenuItem.set(undefined);
     }
   }
+
+  protected onFilterChange(filter: string): void {
+    this._filter.setFilter(filter);
+  }
+
+  private computeMenuItems(): Signal<Array<MMenuItem | MSubMenuItem | MMenuGroup>> {
+    return computed(() => {
+      const subMenuItem = this.subMenuItem();
+
+      // TODO [MENU] Sort by order (e.g., after, before)
+      return subMenuItem.children
+        .concat(this._menuRegistry.findMenuContributions(subMenuItem.id).flatMap(m => m.menuItems))
+        .filter(menuItem => this.matchesFilter(menuItem)());
+    });
+  }
+
+  private matchesFilter(menuItem: MMenuItem | MSubMenuItem | MMenuGroup): Signal<boolean> {
+    switch (menuItem.type) {
+      case 'menu-item':
+        return this._filter.matches(menuItem.text);
+      case 'sub-menu-item':
+        return computed(() => this._filter.matches(menuItem.text)() || menuItem.children.some(child => this.matchesFilter(child)())); // TODO [menu] consider contributions
+      case 'group':
+        return computed(() => this._filter.matches(menuItem.label)() || menuItem.children.some(child => this.matchesFilter(child)())); // TODO [menu] consider contributions
+    }
+  }
+
 }
 
 function hasGutter(menuItems: Array<MMenuItem | MSubMenuItem | MMenuGroup>): boolean {
@@ -103,7 +121,7 @@ function hasGutter(menuItems: Array<MMenuItem | MSubMenuItem | MMenuGroup>): boo
       case 'sub-menu-item':
         return menuItem.icon;
       case 'group':
-        return hasGutter(menuItem.children);
+        return menuItem.collapsible || hasGutter(menuItem.children); // TODO [menu] consider contributions
     }
-  })
+  });
 }

@@ -71,7 +71,7 @@ export class AppComponent implements DoCheck {
         .addMenuItem({text: 'Download', icon: 'download'}, () => this.onAction())
         .addMenuItem({text: 'Print', icon: 'print'}, () => this.onAction()),
       )
-      .addMenu({text: 'Edit'}, menu => menu
+        .addMenu({text: 'Edit', filter: {placeholder: 'Sueche...', notFoundText: 'Nüd gfunde.'}}, menu => menu
         .addMenuItem({text: 'Undo', icon: 'undo', accelerator: ['Ctrl', 'Z']}, () => this.onAction())
         .addMenuItem({text: 'Redo', icon: 'redo'}, () => this.onAction())
         .addMenuItem({text: 'Cut', icon: 'content_cut', accelerator: ['Ctrl', 'X']}, () => this.onAction())
@@ -79,7 +79,7 @@ export class AppComponent implements DoCheck {
         .addMenuItem({text: 'Paste', icon: 'content_paste', accelerator: ['Ctrl', 'V']}, () => this.onAction())
         .addMenuItem({text: 'Find and replace', icon: 'find_replace', accelerator: ['Ctrl', 'F']}, () => this.onAction()),
       )
-      .addMenu({text: 'Format'}, menu => menu
+      .addMenu({text: 'Format', filter: true}, menu => menu
         .addMenu({text: 'Text', icon: 'format_bold'}, menu => menu
           .addMenuItem({text: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B']}, () => this.onAction())
           .addMenuItem({text: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I']}, () => this.onAction())
@@ -97,7 +97,7 @@ export class AppComponent implements DoCheck {
               .addMenuItem({text: 'Heading 2', checked: computed(() => paragraphStyle() === 'heading2')}, () => paragraphStyle.set('heading2'))
           },
         )
-        .addMenu({text: 'Align & indent', icon: 'format_bold'}, menu => menu
+        .addMenu({text: 'Align & indent', filter: true, icon: 'format_bold'}, menu => menu
           .addMenuItem({text: 'Align left', icon: 'format_align_left'}, () => this.onAction())
           .addMenuItem({text: 'Align center', icon: 'format_align_center'}, () => this.onAction())
           .addMenuItem({text: 'Align right', icon: 'format_align_right'}, () => this.onAction())
@@ -174,35 +174,36 @@ export class AppComponent implements DoCheck {
     );
 
     provideMenu('toolbar:workbench.part.tools', menu => menu
-      .addMenu({text: 'Database'}, menu => menu
-        .addMenuItem({icon: 'filter_alt', text: 'Filter'}, () => this.onAction())
+      .addMenu({text: 'Database', filter: {placeholder: 'Type to filter'}}, menu => menu
+        // .addMenuItem({icon: 'filter_alt', text: 'Filter'}, () => this.onAction())
         .addGroup({label: 'View in Groups', collapsible: true}, group => group
-          .addMenuItem({text: 'Databases and Schemas', checked: computed(() => databaseFlags().has('databases_and_schmemas'))}, () => toggleMultiFlag(databaseFlags, 'databases_and_schmemas'))
-          .addMenuItem({text: 'Server and Database Objects', checked: computed(() => databaseFlags().has('server_and_database_objects'))}, () => toggleMultiFlag(databaseFlags, 'server_and_database_objects'))
-          .addMenuItem({text: 'Schema Objects', checked: computed(() => databaseFlags().has('schema_objects'))}, () => toggleMultiFlag(databaseFlags, 'schema_objects'))
-          .addMenuItem({text: 'Object Elements', checked: computed(() => databaseFlags().has('object_elements'))}, () => toggleMultiFlag(databaseFlags, 'object_elements'))
-          .addGroup(group => group
-            .addMenuItem({text: 'Separate Procedures and Functions', checked: computed(() => databaseFlags().has('separate_procedures_and_functions'))}, () => toggleMultiFlag(databaseFlags, 'separate_procedures_and_functions'))
-            .addMenuItem({text: 'Place Table Elements Under Schema', checked: computed(() => databaseFlags().has('place_schema_elements_under_schema'))}, () => toggleMultiFlag(databaseFlags, 'place_schema_elements_under_schema'))
-            .addMenuItem({text: 'Use Natural Order When Sorting', checked: computed(() => databaseFlags().has('use_natural_order_when_sorting'))}, () => toggleMultiFlag(databaseFlags, 'use_natural_order_when_sorting'))
-            .addMenuItem({text: 'Sort folders and Data Sources', checked: computed(() => databaseFlags().has('sort_folders_and_data_sources'))}, () => toggleMultiFlag(databaseFlags, 'sort_folders_and_data_sources')),
-          ),
-        )
-        .addGroup({label: 'Show Elements', collapsible: {collapsed: true}}, group => group
-          .addMenuItem({text: 'All Namespaces', checked: computed(() => databaseFlags().has('all_namespaces'))}, () => toggleMultiFlag(databaseFlags, 'all_namespaces'))
-          .addMenuItem({text: 'Empty Groups', checked: computed(() => databaseFlags().has('empty_groups'))}, () => toggleMultiFlag(databaseFlags, 'empty_groups'))
-          .addMenuItem({text: 'Single-Object Levels', checked: computed(() => databaseFlags().has('single_object_levels'))}, () => toggleMultiFlag(databaseFlags, 'single_object_levels'))
-          .addMenuItem({text: 'Generate Objects', checked: computed(() => databaseFlags().has('generate_objects'))}, () => toggleMultiFlag(databaseFlags, 'generate_objects'))
-          .addMenuItem({text: 'Virtual Objects', checked: computed(() => databaseFlags().has('virtual_objects'))}, () => toggleMultiFlag(databaseFlags, 'virtual_objects'))
-          .addMenuItem({text: 'Query Files', checked: computed(() => databaseFlags().has('query_files'))}, () => toggleMultiFlag(databaseFlags, 'query_files')),
-        )
-        .addGroup({label: 'Node Details'}, group => group
-          .addMenuItem({text: 'Comments Instead of Details', checked: computed(() => databaseFlags().has('comments_instead_of_details'))}, () => toggleMultiFlag(databaseFlags, 'comments_instead_of_details'))
-          .addMenuItem({text: 'Schema Refresh Time', checked: computed(() => databaseFlags().has('schema_refresh_time'))}, () => toggleMultiFlag(databaseFlags, 'schema_refresh_time'))
-          .addMenuItem({text: 'Bold Folders and Data Sources', checked: computed(() => databaseFlags().has('bold_folders_and_data_sources'))}, () => toggleMultiFlag(databaseFlags, 'bold_folders_and_data_sources')),
+        .addMenuItem({text: 'Databases and Schemas', checked: computed(() => databaseFlags().has('databases_and_schmemas'))}, () => toggleMultiFlag(databaseFlags, 'databases_and_schmemas'))
+        .addMenuItem({text: 'Server and Database Objects', checked: computed(() => databaseFlags().has('server_and_database_objects'))}, () => toggleMultiFlag(databaseFlags, 'server_and_database_objects'))
+        .addMenuItem({text: 'Schema Objects', checked: computed(() => databaseFlags().has('schema_objects'))}, () => toggleMultiFlag(databaseFlags, 'schema_objects'))
+        .addMenuItem({text: 'Object Elements', checked: computed(() => databaseFlags().has('object_elements'))}, () => toggleMultiFlag(databaseFlags, 'object_elements'))
+        .addGroup(group => group
+          .addMenuItem({text: 'Separate Procedures and Functions', checked: computed(() => databaseFlags().has('separate_procedures_and_functions'))}, () => toggleMultiFlag(databaseFlags, 'separate_procedures_and_functions'))
+          .addMenuItem({text: 'Place Table Elements Under Schema', checked: computed(() => databaseFlags().has('place_schema_elements_under_schema'))}, () => toggleMultiFlag(databaseFlags, 'place_schema_elements_under_schema'))
+          .addMenuItem({text: 'Use Natural Order When Sorting', checked: computed(() => databaseFlags().has('use_natural_order_when_sorting'))}, () => toggleMultiFlag(databaseFlags, 'use_natural_order_when_sorting'))
+          .addMenuItem({text: 'Sort folders and Data Sources', checked: computed(() => databaseFlags().has('sort_folders_and_data_sources'))}, () => toggleMultiFlag(databaseFlags, 'sort_folders_and_data_sources')),
         ),
+      )
+      .addGroup({filter: true, label: 'Show Elements', collapsible: {collapsed: true}}, group => group
+        .addMenuItem({text: 'All Namespaces', checked: computed(() => databaseFlags().has('all_namespaces'))}, () => toggleMultiFlag(databaseFlags, 'all_namespaces'))
+        .addMenuItem({text: 'Empty Groups', checked: computed(() => databaseFlags().has('empty_groups'))}, () => toggleMultiFlag(databaseFlags, 'empty_groups'))
+        .addMenuItem({text: 'Single-Object Levels', checked: computed(() => databaseFlags().has('single_object_levels'))}, () => toggleMultiFlag(databaseFlags, 'single_object_levels'))
+        .addMenuItem({text: 'Generate Objects', checked: computed(() => databaseFlags().has('generate_objects'))}, () => toggleMultiFlag(databaseFlags, 'generate_objects'))
+        .addMenuItem({text: 'Virtual Objects', checked: computed(() => databaseFlags().has('virtual_objects'))}, () => toggleMultiFlag(databaseFlags, 'virtual_objects'))
+        .addMenuItem({text: 'Query Files', checked: computed(() => databaseFlags().has('query_files'))}, () => toggleMultiFlag(databaseFlags, 'query_files')),
+      )
+      .addGroup({label: 'Node Details'}, group => group
+        .addMenuItem({text: 'Comments Instead of Details', checked: computed(() => databaseFlags().has('comments_instead_of_details'))}, () => toggleMultiFlag(databaseFlags, 'comments_instead_of_details'))
+        .addMenuItem({text: 'Schema Refresh Time', checked: computed(() => databaseFlags().has('schema_refresh_time'))}, () => toggleMultiFlag(databaseFlags, 'schema_refresh_time'))
+        .addMenuItem({text: 'Bold Folders and Data Sources', checked: computed(() => databaseFlags().has('bold_folders_and_data_sources'))}, () => toggleMultiFlag(databaseFlags, 'bold_folders_and_data_sources')),
       ),
-    );
+    ),
+  )
+    ;
   }
 
   private onAction(): void {

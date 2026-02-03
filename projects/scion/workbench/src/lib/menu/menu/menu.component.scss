@@ -1,8 +1,9 @@
 $padding_menu: .3em;
 $padding_menu_item: 4px;
-$menu_item_gap: .125em;
+$menu_item_gap: .25em;
 $font-size: 13px;
-$font-size-accelerator: $font-size - 1px;
+$font-size-smaller: $font-size - 1px;
+$icon-size: 18px;
 
 :host {
   display: inline-grid;
@@ -43,20 +44,54 @@ $font-size-accelerator: $font-size - 1px;
     }
   }
 
+  > div.filter {
+    grid-column: 1/-1; // consume all columns
+    display: inline-grid;
+    grid-template-columns: subgrid;
+    align-items: center;
+    padding: $padding_menu_item;
+
+    > span.icon.filter {
+      display: inline-grid;
+      place-content: center;
+      font-size: $icon-size;
+      height: 1em;
+      width: 1em;
+    }
+
+    > wb-menu-filter {
+      grid-column: span 2 / -1; // consume last two columns
+    }
+  }
+
+  > hr {
+    all: unset;
+    grid-column: 1/-1;
+    height: 1px;
+    background-color: var(--sci-color-border);
+    margin-bottom: .5em;
+  }
+
+  > div.empty {
+    grid-column: 1/-1;
+    justify-self: center;
+    color: var(--sci-color-text-subtlest);
+    font-size: $font-size-smaller;
+    padding: $padding_menu_item;
+  }
+
   // Add top separator
-  > wb-group:not(:first-child)::before {
+  > *:not(hr) + wb-group::before {
     content: '';
     grid-column: 1/-1;
-    position: relative;
     height: 1px;
     background-color: var(--sci-color-border);
   }
 
   // Add bottom separator
-  > wb-group:not(:last-child, :has(+ wb-menu), :has(+ wb-group)):after {
+  > wb-group:not(:last-child, :has(+ wb-menu), :has(+ wb-group))::after {
     content: '';
     grid-column: 1/-1;
-    position: relative;
     height: 1px;
     background-color: var(--sci-color-border);
   }
@@ -83,9 +118,9 @@ $font-size-accelerator: $font-size - 1px;
     }
 
     > span.icon {
-      display: grid;
+      display: inline-grid;
       place-content: center;
-      font-size: 18px;
+      font-size: $icon-size;
       height: 1em;
       width: 1em;
     }
@@ -100,7 +135,7 @@ $font-size-accelerator: $font-size - 1px;
 
     > span.accelerator {
       color: var(--sci-color-text-subtlest);
-      font-size: $font-size-accelerator;
+      font-size: $font-size-smaller;
     }
 
     &:hover:where(:not(:disabled)) {

@@ -19,6 +19,7 @@ export interface SciMenuDescriptor {
   tooltip?: string;
   mnemonic?: string;
   disabled?: () => Signal<boolean> | boolean;
+  filter?: boolean | {placeholder?: string; notFoundText?: string};
 }
 
 export interface SciMenuItemDescriptor {
@@ -42,6 +43,7 @@ export interface SciMenuGroupDescriptor {
   label?: string;
   collapsible?: boolean | {collapsed: boolean};
   disabled?: () => Signal<boolean> | boolean;
+  filter?: boolean | {placeholder?: string; notFoundText?: string};
 }
 
 export function openMenu(name: string, anchor: HTMLElement): void {
