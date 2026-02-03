@@ -18,7 +18,7 @@ export interface SciMenuDescriptor {
   id?: string;
   tooltip?: string;
   mnemonic?: string;
-  disabled?: () => Signal<boolean> | boolean;
+  disabled?: Signal<boolean> | boolean;
   filter?: boolean | {placeholder?: string; notFoundText?: string};
 }
 
@@ -27,7 +27,7 @@ export interface SciMenuItemDescriptor {
   tooltip?: string;
   mnemonic?: string;
   accelerator?: string[];
-  disabled?: () => Signal<boolean> | boolean;
+  disabled?: Signal<boolean> | boolean;
 }
 
 export interface SciIconMenuItemDescriptor extends SciMenuItemDescriptor {
@@ -35,14 +35,14 @@ export interface SciIconMenuItemDescriptor extends SciMenuItemDescriptor {
 }
 
 export interface SciCheckableMenuItemDescriptor extends SciMenuItemDescriptor {
-  checked: () => Signal<boolean> | boolean;
+  checked: Signal<boolean> | boolean;
 }
 
 export interface SciMenuGroupDescriptor {
   id?: string;
   label?: string;
   collapsible?: boolean | {collapsed: boolean};
-  disabled?: () => Signal<boolean> | boolean;
+  disabled?: Signal<boolean> | boolean;
   filter?: boolean | {placeholder?: string; notFoundText?: string};
 }
 

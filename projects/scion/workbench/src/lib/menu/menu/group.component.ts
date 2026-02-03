@@ -13,6 +13,7 @@ export class GroupComponent {
 
   public readonly group = input.required<MMenuGroup>();
   public readonly hasGutterColumn = input.required<boolean>();
+  public readonly disabled = input<boolean>();
 
   constructor() {
     const elementInjector = inject(Injector);
@@ -29,6 +30,7 @@ export class GroupComponent {
         bindings: [
           inputBinding('subMenuItem', this.group),
           inputBinding('withGutterColumn', this.hasGutterColumn),
+          inputBinding('disabled', this.disabled),
         ],
       });
 
