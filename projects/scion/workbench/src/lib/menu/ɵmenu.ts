@@ -9,7 +9,7 @@ export class ɵSciMenu implements SciMenu {
   public addMenuItem(menuItemDescriptor: SciMenuItemDescriptor | SciIconMenuItemDescriptor | SciCheckableMenuItemDescriptor, onSelect: () => void): this {
     this.menuItems.push({
       type: 'menu-item',
-      text: menuItemDescriptor.text,
+      text: menuItemDescriptor.label,
       tooltip: menuItemDescriptor.tooltip,
       mnemonic: menuItemDescriptor.mnemonic,
       accelerator: menuItemDescriptor.accelerator,

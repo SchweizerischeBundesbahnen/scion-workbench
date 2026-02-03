@@ -23,7 +23,7 @@ export interface SciMenuDescriptor {
 }
 
 export interface SciMenuItemDescriptor {
-  text: string;
+  label: string;
   tooltip?: string;
   mnemonic?: string;
   accelerator?: string[];
