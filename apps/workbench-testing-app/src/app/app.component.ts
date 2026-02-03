@@ -57,6 +57,19 @@ export class AppComponent implements DoCheck {
     installGlasspaneHighlighter();
     installMicrofrontendApplicationLabels();
 
+    const flags = signal(new Set<string>()
+      .add('always_select_opened_element')
+      .add('server_and_database_objects')
+      .add('schema_objects')
+      .add('object_elements')
+      .add('use_natural_order_when_sorting')
+      .add('single_object_levels')
+      .add('generate_objects')
+      .add('virtual_objects')
+      .add('query_files')
+      .add('format_italic')
+      .add('single_object_levels'),
+    );
     const paragraphStyle = signal<string>('');
 
     provideMenu('toolbar:workbench.part.tools.end', toolbar => toolbar
@@ -92,7 +105,14 @@ export class AppComponent implements DoCheck {
           .addMenuItem({icon: 'lens_blur'}, () => this.onAction())
           .addMenuItem({icon: 'lens_blur'}, () => this.onAction())
           .addMenuItem({icon: 'lens_blur'}, () => this.onAction()),
-        ))
+        ),
+      )
+      .addGroup(group => group
+        .addMenuItem({icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], checked: computed(() => flags().has('format_bold'))}, () => toggleMultiFlag(flags, 'format_bold'))
+        .addMenuItem({icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], checked: computed(() => flags().has('format_italic'))}, () => toggleMultiFlag(flags, 'format_italic'))
+        .addMenuItem({icon: 'format_underlined', checked: computed(() => flags().has('format_underlined'))}, () => toggleMultiFlag(flags, 'format_underlined'))
+        .addMenuItem({icon: 'strikethrough_s', checked: computed(() => flags().has('strikethrough_s'))}, () => toggleMultiFlag(flags, 'strikethrough_s')),
+      )
       .addGroup(group => group
         .addMenu({label: 'Format', filter: true}, menu => menu
           .addMenu({label: 'Text', icon: 'format_bold'}, menu => menu
@@ -177,67 +197,53 @@ export class AppComponent implements DoCheck {
         .addMenuItem({label: 'Konstantin'}, () => this.onAction()),
       ),
     );
-    const databaseFlags = signal(new Set<string>()
-      .add('server_and_database_objects')
-      .add('schema_objects')
-      .add('object_elements')
-      .add('use_natural_order_when_sorting')
-      .add('single_object_levels')
-      .add('generate_objects')
-      .add('virtual_objects')
-      .add('query_files')
-      .add('single_object_levels'),
-    );
 
     provideMenu('toolbar:workbench.part.tools.start', menu => menu
       .addMenu({label: 'Database', icon: 'database', filter: {placeholder: 'Type to filter'}}, menu => menu
         // .addMenuItem({icon: 'filter_alt', text: 'Filter'}, () => this.onAction())
         .addGroup({label: 'View in Groups', collapsible: true}, group => group
-          .addMenuItem({label: 'Databases and Schemas', checked: computed(() => databaseFlags().has('databases_and_schmemas'))}, () => toggleMultiFlag(databaseFlags, 'databases_and_schmemas'))
-          .addMenuItem({label: 'Server and Database Objects', checked: computed(() => databaseFlags().has('server_and_database_objects'))}, () => toggleMultiFlag(databaseFlags, 'server_and_database_objects'))
-          .addMenuItem({label: 'Schema Objects', checked: computed(() => databaseFlags().has('schema_objects'))}, () => toggleMultiFlag(databaseFlags, 'schema_objects'))
-          .addMenuItem({label: 'Object Elements', checked: computed(() => databaseFlags().has('object_elements'))}, () => toggleMultiFlag(databaseFlags, 'object_elements'))
+          .addMenuItem({label: 'Databases and Schemas', checked: computed(() => flags().has('databases_and_schmemas'))}, () => toggleMultiFlag(flags, 'databases_and_schmemas'))
+          .addMenuItem({label: 'Server and Database Objects', checked: computed(() => flags().has('server_and_database_objects'))}, () => toggleMultiFlag(flags, 'server_and_database_objects'))
+          .addMenuItem({label: 'Schema Objects', checked: computed(() => flags().has('schema_objects'))}, () => toggleMultiFlag(flags, 'schema_objects'))
+          .addMenuItem({label: 'Object Elements', checked: computed(() => flags().has('object_elements'))}, () => toggleMultiFlag(flags, 'object_elements'))
           .addGroup(group => group
-            .addMenuItem({label: 'Separate Procedures and Functions', checked: computed(() => databaseFlags().has('separate_procedures_and_functions'))}, () => toggleMultiFlag(databaseFlags, 'separate_procedures_and_functions'))
-            .addMenuItem({label: 'Place Table Elements Under Schema', checked: computed(() => databaseFlags().has('place_schema_elements_under_schema'))}, () => toggleMultiFlag(databaseFlags, 'place_schema_elements_under_schema'))
-            .addMenuItem({label: 'Use Natural Order When Sorting', checked: computed(() => databaseFlags().has('use_natural_order_when_sorting'))}, () => toggleMultiFlag(databaseFlags, 'use_natural_order_when_sorting'))
-            .addMenuItem({label: 'Sort folders and Data Sources', checked: computed(() => databaseFlags().has('sort_folders_and_data_sources'))}, () => toggleMultiFlag(databaseFlags, 'sort_folders_and_data_sources')),
+            .addMenuItem({label: 'Separate Procedures and Functions', checked: computed(() => flags().has('separate_procedures_and_functions'))}, () => toggleMultiFlag(flags, 'separate_procedures_and_functions'))
+            .addMenuItem({label: 'Place Table Elements Under Schema', checked: computed(() => flags().has('place_schema_elements_under_schema'))}, () => toggleMultiFlag(flags, 'place_schema_elements_under_schema'))
+            .addMenuItem({label: 'Use Natural Order When Sorting', checked: computed(() => flags().has('use_natural_order_when_sorting'))}, () => toggleMultiFlag(flags, 'use_natural_order_when_sorting'))
+            .addMenuItem({label: 'Sort folders and Data Sources', checked: computed(() => flags().has('sort_folders_and_data_sources'))}, () => toggleMultiFlag(flags, 'sort_folders_and_data_sources')),
           ),
         )
         .addGroup({filter: true, label: 'Show Elements', collapsible: {collapsed: true}}, group => group
-          .addMenuItem({label: 'All Namespaces', checked: computed(() => databaseFlags().has('all_namespaces'))}, () => toggleMultiFlag(databaseFlags, 'all_namespaces'))
-          .addMenuItem({label: 'Empty Groups', checked: computed(() => databaseFlags().has('empty_groups'))}, () => toggleMultiFlag(databaseFlags, 'empty_groups'))
-          .addMenuItem({label: 'Single-Object Levels', checked: computed(() => databaseFlags().has('single_object_levels'))}, () => toggleMultiFlag(databaseFlags, 'single_object_levels'))
-          .addMenuItem({label: 'Generate Objects', checked: computed(() => databaseFlags().has('generate_objects'))}, () => toggleMultiFlag(databaseFlags, 'generate_objects'))
-          .addMenuItem({label: 'Virtual Objects', checked: computed(() => databaseFlags().has('virtual_objects'))}, () => toggleMultiFlag(databaseFlags, 'virtual_objects'))
-          .addMenuItem({label: 'Query Files', checked: computed(() => databaseFlags().has('query_files'))}, () => toggleMultiFlag(databaseFlags, 'query_files')),
+          .addMenuItem({label: 'All Namespaces', checked: computed(() => flags().has('all_namespaces'))}, () => toggleMultiFlag(flags, 'all_namespaces'))
+          .addMenuItem({label: 'Empty Groups', checked: computed(() => flags().has('empty_groups'))}, () => toggleMultiFlag(flags, 'empty_groups'))
+          .addMenuItem({label: 'Single-Object Levels', checked: computed(() => flags().has('single_object_levels'))}, () => toggleMultiFlag(flags, 'single_object_levels'))
+          .addMenuItem({label: 'Generate Objects', checked: computed(() => flags().has('generate_objects'))}, () => toggleMultiFlag(flags, 'generate_objects'))
+          .addMenuItem({label: 'Virtual Objects', checked: computed(() => flags().has('virtual_objects'))}, () => toggleMultiFlag(flags, 'virtual_objects'))
+          .addMenuItem({label: 'Query Files', checked: computed(() => flags().has('query_files'))}, () => toggleMultiFlag(flags, 'query_files')),
         )
         .addGroup({label: 'Node Details'}, group => group
-          .addMenuItem({label: 'Comments Instead of Details', checked: computed(() => databaseFlags().has('comments_instead_of_details'))}, () => toggleMultiFlag(databaseFlags, 'comments_instead_of_details'))
-          .addMenuItem({label: 'Schema Refresh Time', checked: computed(() => databaseFlags().has('schema_refresh_time'))}, () => toggleMultiFlag(databaseFlags, 'schema_refresh_time'))
-          .addMenuItem({label: 'Bold Folders and Data Sources', checked: computed(() => databaseFlags().has('bold_folders_and_data_sources'))}, () => toggleMultiFlag(databaseFlags, 'bold_folders_and_data_sources')),
+          .addMenuItem({label: 'Comments Instead of Details', checked: computed(() => flags().has('comments_instead_of_details'))}, () => toggleMultiFlag(flags, 'comments_instead_of_details'))
+          .addMenuItem({label: 'Schema Refresh Time', checked: computed(() => flags().has('schema_refresh_time'))}, () => toggleMultiFlag(flags, 'schema_refresh_time'))
+          .addMenuItem({label: 'Bold Folders and Data Sources', checked: computed(() => flags().has('bold_folders_and_data_sources'))}, () => toggleMultiFlag(flags, 'bold_folders_and_data_sources')),
         ),
       ),
     );
 
-    const options = signal(new Set<string>()
-      .add('always_select_opened_element'),
-    );
     const viewMode = signal('dock_pinned');
     const moveTo = signal('left_top');
 
     provideMenu('toolbar:workbench.part.tools.end', menu => menu
       .addMenu({icon: 'visibility'}, menu => menu
         .addGroup({label: 'Sort'}, group => group
-          .addMenuItem({label: 'Alphabetically', checked: computed(() => options().has('alphabetically'))}, () => toggleMultiFlag(options, 'alphabetically')),
+          .addMenuItem({label: 'Alphabetically', checked: computed(() => flags().has('alphabetically'))}, () => toggleMultiFlag(flags, 'alphabetically')),
         )
         .addGroup({label: 'Show'}, group => group
-          .addMenuItem({label: 'Fields', checked: computed(() => options().has('fields'))}, () => toggleMultiFlag(options, 'fields'))
-          .addMenuItem({label: 'Inherited', checked: computed(() => options().has('inherited'))}, () => toggleMultiFlag(options, 'inherited'))
-          .addMenuItem({label: 'Inherited from Object', checked: computed(() => options().has('inherited_from_object'))}, () => toggleMultiFlag(options, 'inherited_from_object')),
+          .addMenuItem({label: 'Fields', checked: computed(() => flags().has('fields'))}, () => toggleMultiFlag(flags, 'fields'))
+          .addMenuItem({label: 'Inherited', checked: computed(() => flags().has('inherited'))}, () => toggleMultiFlag(flags, 'inherited'))
+          .addMenuItem({label: 'Inherited from Object', checked: computed(() => flags().has('inherited_from_object'))}, () => toggleMultiFlag(flags, 'inherited_from_object')),
         )
         .addGroup({label: 'Group'}, group => group
-          .addMenuItem({label: 'Members by Defining Type', checked: computed(() => options().has('member_by_defining_type'))}, () => toggleMultiFlag(options, 'member_by_defining_type')),
+          .addMenuItem({label: 'Members by Defining Type', checked: computed(() => flags().has('member_by_defining_type'))}, () => toggleMultiFlag(flags, 'member_by_defining_type')),
         ),
       ),
     );
@@ -247,8 +253,8 @@ export class AppComponent implements DoCheck {
         .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+']}, () => this.onAction())
         .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-']}, () => this.onAction())
         .addGroup(group => group
-          .addMenuItem({label: 'Navigate with Single Click', checked: computed(() => options().has('navigate_with_single_click'))}, () => toggleMultiFlag(options, 'navigate_with_single_click'))
-          .addMenuItem({label: 'Always Select Opened Element', checked: computed(() => options().has('always_select_opened_element'))}, () => toggleMultiFlag(options, 'always_select_opened_element')),
+          .addMenuItem({label: 'Navigate with Single Click', checked: computed(() => flags().has('navigate_with_single_click'))}, () => toggleMultiFlag(flags, 'navigate_with_single_click'))
+          .addMenuItem({label: 'Always Select Opened Element', checked: computed(() => flags().has('always_select_opened_element'))}, () => toggleMultiFlag(flags, 'always_select_opened_element')),
         )
         .addGroup(group => group
           .addMenuItem({label: 'Speed Search', icon: 'search', accelerator: ['Ctrl', 'F']}, () => this.onAction()),
