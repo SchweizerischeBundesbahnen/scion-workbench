@@ -173,6 +173,8 @@ test.describe('Workbench Notification', () => {
 
     await expectNotification(notificationPage).toBeVisible();
 
+    await notification.focus();
+    await expectNotification(notificationPage).toBeFocused();
     await notificationOpenerPage.pressEscape();
     await expectNotification(notificationPage).not.toBeAttached();
   });

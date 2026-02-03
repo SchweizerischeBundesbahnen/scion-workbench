@@ -414,7 +414,9 @@ test.describe('Workbench Notification Mircrofrontend', () => {
 
       await expectNotification(notificationPage).toBeVisible();
 
-      // Close notification
+      // Focus and close notification
+      await notification.focus();
+      await expect.poll(() => notificationPage.getFocused()).toBe(true);
       await page.keyboard.press('Escape');
 
       await expectNotification(notificationPage).not.toBeAttached();

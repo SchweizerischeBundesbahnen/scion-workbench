@@ -128,15 +128,14 @@ export class ɵWorkbenchNotification implements WorkbenchNotification {
   }
 
   /**
-   * Closes the notification on escape keystroke, but only if this is the topmost notification.
+   * Closes the notification on escape keystroke, but only if it is focused.
    */
   private closeOnEscape(): void {
     const zone = inject(NgZone);
     const document = inject(DOCUMENT);
-    const top = inject(WorkbenchNotificationRegistry).top;
 
     effect(onCleanup => {
-      if (top() !== this) {
+      if (!this.focused()) {
         return;
       }
 

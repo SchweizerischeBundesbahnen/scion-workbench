@@ -27,6 +27,9 @@ function expectWorkbenchNotification(notificationPage: WorkbenchNotificationPage
       await expect(notificationPage.notification.locator).toBeVisible();
       await expect(notificationPage.locator).toBeVisible();
     },
+    toBeFocused: async (): Promise<void> => {
+      await expect(notificationPage.notification.outline).toBeFocused();
+    },
     not: {
       toBeAttached: async (): Promise<void> => {
         await expect(notificationPage.notification.locator).not.toBeAttached();
@@ -44,6 +47,11 @@ export interface NotificationMatcher {
    * Expects the notification to be visible.
    */
   toBeVisible(): Promise<void>;
+
+  /**
+   * Expects the notification to be focused.
+   */
+  toBeFocused(): Promise<void>;
 
   not: {
     /**

@@ -105,7 +105,6 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO, WorkbenchD
   }
 
   public async pressEscape(): Promise<void> {
-    await this.locator.click();
     await this.locator.press('Escape');
   }
 

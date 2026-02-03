@@ -92,7 +92,6 @@ export class NotificationOpenerPagePO implements MicrofrontendViewPagePO {
   }
 
   public async pressEscape(): Promise<void> {
-    await this.locator.click();
     await this.locator.press('Escape');
   }
 }

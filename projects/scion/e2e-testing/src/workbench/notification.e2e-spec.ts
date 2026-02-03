@@ -398,18 +398,24 @@ test.describe('Workbench Notification', () => {
     await expectNotification(notificationPage2).toBeVisible();
     await expectNotification(notificationPage3).toBeVisible();
 
+    await notificationPage1.notification.focus();
+    await expectNotification(notificationPage1).toBeFocused();
     await notificationOpenerPage.pressEscape();
     await expect(appPO.notifications).toHaveCount(2);
-    await expectNotification(notificationPage1).toBeVisible();
+    await expectNotification(notificationPage1).not.toBeAttached();
     await expectNotification(notificationPage2).toBeVisible();
-    await expectNotification(notificationPage3).not.toBeAttached();
+    await expectNotification(notificationPage3).toBeVisible();
 
+    await notificationPage2.notification.focus();
+    await expectNotification(notificationPage2).toBeFocused();
     await notificationOpenerPage.pressEscape();
     await expect(appPO.notifications).toHaveCount(1);
-    await expectNotification(notificationPage1).toBeVisible();
+    await expectNotification(notificationPage1).not.toBeAttached();
     await expectNotification(notificationPage2).not.toBeAttached();
-    await expectNotification(notificationPage3).not.toBeAttached();
+    await expectNotification(notificationPage3).toBeVisible();
 
+    await notificationPage3.notification.focus();
+    await expectNotification(notificationPage3).toBeFocused();
     await notificationOpenerPage.pressEscape();
     await expect(appPO.notifications).toHaveCount(0);
     await expectNotification(notificationPage1).not.toBeAttached();

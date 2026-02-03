@@ -21,11 +21,13 @@ export class NotificationPO {
   public readonly locator: Locator;
   public readonly locateBy?: {id?: NotificationId; cssClass?: string[]};
   public readonly title: Locator;
+  public readonly outline: Locator;
 
   constructor(page: Page, locateBy: RequireOne<{notificationId: NotificationId; cssClass: string | string[]}>, options?: {nth?: number}) {
     this.locateBy = {id: locateBy.notificationId, cssClass: coerceArray(locateBy.cssClass)};
     this.locator = page.locator(selectBy('wb-notification', {attributes: {'data-notificationid': locateBy.notificationId}, cssClass: locateBy.cssClass})).nth(options?.nth ?? 0);
     this.title = this.locator.locator('header.e2e-title');
+    this.outline = this.locator.locator('.e2e-outline');
   }
 
   public async getNotificationId(): Promise<NotificationId> {
@@ -37,7 +39,7 @@ export class NotificationPO {
   }
 
   public getComputedStyle(): Promise<CSSStyleDeclaration> {
-    return this.locator.locator('.e2e-outline').evaluate((notificationElement: HTMLElement) => getComputedStyle(notificationElement));
+    return this.outline.evaluate((notificationElement: HTMLElement) => getComputedStyle(notificationElement));
   }
 
   public async getSeverity(): Promise<'info' | 'warn' | 'error' | null> {
@@ -49,7 +51,7 @@ export class NotificationPO {
   }
 
   public async focus(): Promise<void> {
-    await this.locator.locator('.e2e-outline').click();
+    await this.outline.focus();
   }
 
   public async close(): Promise<void> {
