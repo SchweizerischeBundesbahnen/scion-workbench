@@ -6,10 +6,10 @@ export class ɵSciMenu implements SciMenu {
 
   public readonly menuItems = new Array<MMenuItem | MSubMenuItem | MMenuGroup>();
 
-  public addMenuItem(menuItemDescriptor: SciMenuItemDescriptor | SciIconMenuItemDescriptor | SciCheckableMenuItemDescriptor, onSelect: () => void): this {
+  public addMenuItem(menuItemDescriptor: SciMenuItemDescriptor | SciIconMenuItemDescriptor | SciCheckableMenuItemDescriptor, onSelect: () => boolean | void): this {
     this.menuItems.push({
       type: 'menu-item',
-      label: menuItemDescriptor.label,
+      label: coerceSignal(menuItemDescriptor.label),
       tooltip: menuItemDescriptor.tooltip,
       mnemonic: menuItemDescriptor.mnemonic,
       accelerator: menuItemDescriptor.accelerator,
@@ -27,7 +27,7 @@ export class ɵSciMenu implements SciMenu {
     this.menuItems.push({
       type: 'sub-menu-item',
       id: menuDescriptor.id ?? UUID.randomUUID(),
-      label: menuDescriptor.label,
+      label: coerceSignal(menuDescriptor.label),
       icon: 'icon' in menuDescriptor ? menuDescriptor.icon : undefined,
       tooltip: menuDescriptor.tooltip,
       mnemonic: menuDescriptor.mnemonic,
@@ -60,7 +60,7 @@ export class ɵSciMenu implements SciMenu {
       this.menuItems.push({
         type: 'group',
         id: groupDescriptor.id ?? UUID.randomUUID(),
-        label: groupDescriptor.label,
+        label: coerceSignal(groupDescriptor.label),
         collapsible: groupDescriptor.collapsible,
         filter: groupDescriptor.filter,
         disabled: coerceSignal(groupDescriptor.disabled),
@@ -73,20 +73,20 @@ export class ɵSciMenu implements SciMenu {
 
 export interface MMenuItem {
   type: 'menu-item'
-  label?: string;
+  label?: Signal<string>;
   icon?: string;
   tooltip?: string;
   mnemonic?: string;
   accelerator?: string[];
   disabled?: Signal<boolean>;
   checked?: Signal<boolean>;
-  onSelect: () => void;
+  onSelect: () => boolean | void;
 }
 
 export interface MSubMenuItem {
   type: 'sub-menu-item'
   id: string;
-  label?: string;
+  label?: Signal<string>;
   icon?: string;
   tooltip?: string;
   mnemonic?: string;
@@ -99,7 +99,7 @@ export interface MSubMenuItem {
 export interface MMenuGroup {
   type: 'group'
   id: string;
-  label?: string;
+  label?: Signal<string>;
   collapsible?: boolean | {collapsed: boolean};
   filter?: boolean | {placeholder?: string; notFoundText?: string};
   disabled?: Signal<boolean>;

@@ -114,7 +114,7 @@ export class AppComponent implements DoCheck {
         .addMenuItem({icon: 'strikethrough_s', checked: computed(() => flags().has('strikethrough_s'))}, () => toggleMultiFlag(flags, 'strikethrough_s')),
       )
       .addGroup(group => group
-        .addMenu({label: 'Format', filter: true}, menu => menu
+        .addMenu({label: 'Menu 1', filter: true}, menu => menu
           .addMenu({label: 'Text', icon: 'format_bold'}, menu => menu
             .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B']}, () => this.onAction())
             .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I']}, () => this.onAction())
@@ -139,7 +139,7 @@ export class AppComponent implements DoCheck {
             .addMenuItem({label: 'Justify', icon: 'format_align_justify'}, () => this.onAction()),
           ),
         )
-        .addMenu({label: 'Format with Groups'}, menu => menu
+        .addMenu({label: 'Menu 2'}, menu => menu
           // .addGroup({label: 'Group 1'}, group => group
           //   .addMenuItem({text: 'Nested Menu Item'}, () => this.onAction())
           //   .addGroup({label: 'Group 2'}, group => group
@@ -191,10 +191,11 @@ export class AppComponent implements DoCheck {
     );
 
     provideMenu('menu:paragraph', menu => menu
-      .addMenu({label: 'SCION'}, menu => menu
-        .addMenuItem({label: 'Dani'}, () => this.onAction())
+      .addMenu({label: 'SCION Developers'}, menu => menu
+        .addMenuItem({label: 'Etienne'}, () => this.onAction())
         .addMenuItem({label: 'Marc'}, () => this.onAction())
-        .addMenuItem({label: 'Konstantin'}, () => this.onAction()),
+        .addMenuItem({label: 'Konstantin'}, () => this.onAction())
+        .addMenuItem({label: 'Dani'}, () => this.onAction()),
       ),
     );
 
@@ -284,6 +285,78 @@ export class AppComponent implements DoCheck {
           ),
         )
         .addMenuItem({label: 'Remove from Sidebar'}, () => this.onAction()),
+      ),
+    );
+
+    const perspective = signal<string>('sample_layout_docked_parts_1');
+    const perspectiveLabels = new Map<string, string>()
+      .set('default_layout', 'Default Layout')
+      .set('sample_layout_docked_parts_1', 'Sample Layout 1 (Docked Parts)')
+      .set('sample_layout_docked_parts_2', 'Sample Layout 2 (Docked Parts)')
+      .set('sample_layout_docked_parts_app_1', 'Sample Microfrontend Layout App 1 (Docked Parts)')
+      .set('sample_layout_docked_parts_app_2', 'Sample Microfrontend Layout App 2 (Docked Parts)')
+      .set('sample_layout_aligned_parts_1', 'Sample Layout 1 (Aligned Parts)')
+      .set('sample_layout_aligned_parts_2', 'Sample Layout 2 (Aligned Parts)')
+      .set('sample_layout_aligned_parts_app_1', 'Sample Microfrontend Layout App 1 (Aligned Parts)')
+      .set('sample_layout_aligned_parts_app_2', 'Sample Microfrontend Layout App 2 (Aligned Parts)')
+      .set('focus_test_perspective', 'Focus Test Perspective');
+
+    provideMenu('toolbar:workbench.part.tools.start', menu => menu
+      .addMenu({label: computed(() => perspectiveLabels.get(perspective()) ?? perspective()), visualMenuMarker: true}, menu => menu
+        .addMenuItem({label: 'Default Layout', checked: computed(() => perspective() === 'default_layout'), disabled: computed(() => perspective() === 'default_layout')}, () => {
+          perspective.set('default_layout');
+          return true;
+        })
+        .addGroup({label: 'Workbench Perspectives'}, group => group
+          .addMenu({label: 'Layout with Docked Parts'}, menu => menu
+            .addMenuItem({label: 'Sample Layout 1', checked: computed(() => perspective() === 'sample_layout_docked_parts_1'), disabled: computed(() => perspective() === 'sample_layout_docked_parts_1')}, () => {
+              perspective.set('sample_layout_docked_parts_1');
+              return true;
+            })
+            .addMenuItem({label: 'Sample Layout 2', checked: computed(() => perspective() === 'sample_layout_docked_parts_2'), disabled: computed(() => perspective() === 'sample_layout_docked_parts_2')}, () => {
+              perspective.set('sample_layout_docked_parts_2');
+              return true;
+            }),
+          )
+          .addMenu({label: 'Layout with Aligned Parts'}, menu => menu
+            .addMenuItem({label: 'Sample Layout 1', checked: computed(() => perspective() === 'sample_layout_aligned_parts_1'), disabled: computed(() => perspective() === 'sample_layout_aligned_parts_1')}, () => {
+              perspective.set('sample_layout_aligned_parts_1');
+              return true;
+            })
+            .addMenuItem({label: 'Sample Layout 2', checked: computed(() => perspective() === 'sample_layout_aligned_parts_2'), disabled: computed(() => perspective() === 'sample_layout_aligned_parts_2')}, () => {
+              perspective.set('sample_layout_aligned_parts_2');
+              return true;
+            }),
+          ),
+        )
+        .addGroup({label: 'Microfrontend Perspectives'}, group => group
+          .addMenu({label: 'Layout with Docked Parts'}, menu => menu
+            .addMenuItem({label: 'Sample Layout App 1', checked: computed(() => perspective() === 'sample_layout_docked_parts_app_1'), disabled: computed(() => perspective() === 'sample_layout_docked_parts_app_1')}, () => {
+              perspective.set('sample_layout_docked_parts_app_1');
+              return true;
+            })
+            .addMenuItem({label: 'Sample Layout App 2', checked: computed(() => perspective() === 'sample_layout_docked_parts_app_2'), disabled: computed(() => perspective() === 'sample_layout_docked_parts_app_2')}, () => {
+              perspective.set('sample_layout_docked_parts_app_2');
+              return true;
+            }),
+          )
+          .addMenu({label: 'Layout with Aligned Parts'}, menu => menu
+            .addMenuItem({label: 'Sample Layout App 1', checked: computed(() => perspective() === 'sample_layout_aligned_parts_app_1'), disabled: computed(() => perspective() === 'sample_layout_aligned_parts_app_1')}, () => {
+              perspective.set('sample_layout_aligned_parts_app_1');
+              return true;
+            })
+            .addMenuItem({label: 'Sample Layout App 2', checked: computed(() => perspective() === 'sample_layout_aligned_parts_app_2'), disabled: computed(() => perspective() === 'sample_layout_aligned_parts_app_2')}, () => {
+              perspective.set('sample_layout_aligned_parts_app_2');
+              return true;
+            }),
+          ),
+        )
+        .addGroup({label: 'Test Perspectives', collapsible: {collapsed: true}}, group => group
+          .addMenuItem({label: 'Focus Test Perspective', checked: computed(() => perspective() === 'focus_test_perspective')}, () => {
+            perspective.set('focus_test_perspective');
+            return true;
+          }),
+        ),
       ),
     );
   }

@@ -1,13 +1,13 @@
 @let subMenuItem = this.subMenuItem();
-@if (subMenuItem.type === 'group' && (subMenuItem.label?.length || subMenuItem.collapsible)) {
+@if (subMenuItem.type === 'group' && (subMenuItem.label?.() || subMenuItem.collapsible)) {
   @let group = subMenuItem;
   @if (group.collapsible) {
     <button class="group-header" (click)="onGroupToggle()" (mouseenter)="onMenuItemMouseEnter(group)">
       <span class="icon material-symbols-rounded" translate="no">{{isGroupVisible() ? 'keyboard_arrow_down' : 'chevron_right'}}</span>
-      <span class="label">{{subMenuItem.label}}</span>
+      <span class="label">{{subMenuItem.label?.()}}</span>
     </button>
   } @else {
-    <span class="group-label">{{subMenuItem.label}}</span>
+    <span class="group-label">{{subMenuItem.label!()}}</span>
   }
 }
 
@@ -27,7 +27,7 @@
         <button class="menu-item"
                 (mouseenter)="onMenuItemMouseEnter(menuItem)"
                 [attr.disabled]="this.disabled() || (menuItem.disabled?.() ?? false) || null"
-                (click)="menuItem.onSelect()">
+                (click)="onSelect(menuItem)">
           @if (hasGutterColumn()) {
             @if (!menuItem.checked) {
               <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
@@ -36,7 +36,7 @@
             }
           }
 
-          <span class="label">{{menuItem.label}}</span>
+          <span class="label">{{menuItem.label?.()}}</span>
           @if (menuItem.accelerator?.length) {
             <span class="accelerator">{{menuItem.accelerator | wbJoin:'+'}}</span>
           }
@@ -52,7 +52,7 @@
           @if (hasGutterColumn()) {
             <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
           }
-          <span class="label">{{menuItem.label}}</span>
+          <span class="label">{{menuItem.label?.()}}</span>
           <span class="icon material-symbols-rounded sub-menu-chevron" translate="no">arrow_right</span>
         </button>
       }
