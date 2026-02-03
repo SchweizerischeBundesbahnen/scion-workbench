@@ -1,4 +1,4 @@
-import {Component, computed, effect, ElementRef, inject, InjectionToken, input, linkedSignal, signal, Signal, untracked, viewChild} from '@angular/core';
+import {Component, computed, DOCUMENT, effect, ElementRef, inject, InjectionToken, input, linkedSignal, signal, Signal, untracked, viewChild} from '@angular/core';
 import {MMenuGroup, MMenuItem, MSubMenuItem} from '../ɵmenu';
 import {SciMenuRegistry} from '../menu.registry';
 import {UUID} from '@scion/toolkit/uuid';
@@ -31,11 +31,14 @@ export const SUBMENU_ITEM = new InjectionToken<MSubMenuItem>('SUBMENU_ITEM');
 export class MenuComponent {
 
   public readonly subMenuItem = input.required<MSubMenuItem | MMenuGroup>();
+  public readonly disabled = input<boolean>();
   public readonly withGutterColumn = input<boolean>();
 
   private readonly _menuRegistry = inject(SciMenuRegistry);
   private readonly _popover = viewChild('popover', {read: ElementRef<HTMLElement>});
   private readonly _filter = inject(MenuFilter);
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
+  private readonly _document = inject(DOCUMENT);
 
   protected readonly popoverId = UUID.randomUUID();
   protected readonly hasGutterColumn = computed(() => this.withGutterColumn() ?? (!!this.subMenuItem().filter || hasGutter(this.menuItems())));
@@ -62,6 +65,7 @@ export class MenuComponent {
     // Open popover when hovering over a submenu item, or hide it otherwise.
     effect(() => {
       const popover = this._popover();
+      console.log('>>> effect');
       if (this.activeSubMenuItem()) {
         popover?.nativeElement.showPopover();
       }
@@ -77,6 +81,15 @@ export class MenuComponent {
 
   protected onMenuItemMouseEnter(menuItem: MMenuItem | MSubMenuItem | MMenuGroup): void {
     this.activeSubMenuItem.set(menuItem.type === 'sub-menu-item' ? menuItem : undefined);
+
+    // Create and display "fake" popover to close popover of other groups or menus.
+    if (!this.activeSubMenuItem()) {
+      const popover = this._host.appendChild(this._document.createElement('div'));
+      popover.setAttribute('popover', '');
+      popover.style.setProperty('display', 'none');
+      popover.showPopover();
+      popover.remove();
+    }
   }
 
   protected onTogglePopover(event: ToggleEvent): void {

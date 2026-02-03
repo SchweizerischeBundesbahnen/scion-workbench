@@ -1,5 +1,5 @@
 import {SciCheckableMenuItemDescriptor, SciIconMenuItemDescriptor, SciMenu, SciMenuDescriptor, SciMenuGroupDescriptor, SciMenuItemDescriptor} from '@scion/workbench';
-import {Signal} from '@angular/core';
+import {isSignal, signal, Signal} from '@angular/core';
 import {UUID} from '@scion/toolkit/uuid';
 
 export class ɵSciMenu implements SciMenu {
@@ -13,9 +13,9 @@ export class ɵSciMenu implements SciMenu {
       tooltip: menuItemDescriptor.tooltip,
       mnemonic: menuItemDescriptor.mnemonic,
       accelerator: menuItemDescriptor.accelerator,
-      disabled: menuItemDescriptor.disabled,
+      disabled: coerceSignal(menuItemDescriptor.disabled),
       icon: 'icon' in menuItemDescriptor ? menuItemDescriptor.icon : undefined,
-      checked: 'checked' in menuItemDescriptor ? menuItemDescriptor.checked : undefined,
+      checked: 'checked' in menuItemDescriptor ? coerceSignal(menuItemDescriptor.checked) : undefined,
       onSelect,
     });
     return this;
@@ -31,7 +31,7 @@ export class ɵSciMenu implements SciMenu {
       icon: 'icon' in menuDescriptor ? menuDescriptor.icon : undefined,
       tooltip: menuDescriptor.tooltip,
       mnemonic: menuDescriptor.mnemonic,
-      disabled: menuDescriptor.disabled,
+      disabled: typeof menuDescriptor.disabled === 'boolean' ? signal(menuDescriptor.disabled) : menuDescriptor.disabled,
       filter: menuDescriptor.filter,
       children: subMenu.menuItems,
     });
@@ -62,7 +62,7 @@ export class ɵSciMenu implements SciMenu {
         label: groupDescriptor.label,
         collapsible: groupDescriptor.collapsible,
         filter: groupDescriptor.filter,
-        disabled: groupDescriptor.disabled,
+        disabled: typeof groupDescriptor.disabled === 'boolean' ? signal(groupDescriptor.disabled) : groupDescriptor.disabled,
         children: subMenu.menuItems,
       });
       return this;
@@ -77,8 +77,8 @@ export interface MMenuItem {
   tooltip?: string;
   mnemonic?: string;
   accelerator?: string[];
-  disabled?: () => Signal<boolean> | boolean;
-  checked?: () => Signal<boolean> | boolean;
+  disabled?: Signal<boolean>;
+  checked?: Signal<boolean>;
   onSelect: () => void;
 }
 
@@ -89,7 +89,7 @@ export interface MSubMenuItem {
   icon?: string;
   tooltip?: string;
   mnemonic?: string;
-  disabled?: () => Signal<boolean> | boolean;
+  disabled?: Signal<boolean>;
   filter?: boolean | {placeholder?: string; notFoundText?: string};
   children: Array<MMenuItem | MSubMenuItem | MMenuGroup>;
 }
@@ -100,6 +100,13 @@ export interface MMenuGroup {
   label?: string;
   collapsible?: boolean | {collapsed: boolean};
   filter?: boolean | {placeholder?: string; notFoundText?: string};
-  disabled?: () => Signal<boolean> | boolean;
+  disabled?: Signal<boolean>;
   children: Array<MMenuItem | MSubMenuItem | MMenuGroup>;
+}
+
+function coerceSignal<T>(value: Signal<T> | T | undefined): Signal<T> | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  return isSignal(value) ? value : signal(value);
 }

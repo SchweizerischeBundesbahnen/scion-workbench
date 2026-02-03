@@ -27,6 +27,7 @@
         <button class="menu-item"
                 (mouseenter)="onMenuItemMouseEnter(menuItem)"
                 wbMenuItem #wbMenuItem="wbMenuItem" [menuItem]="menuItem"
+                [attr.disabled]="this.disabled() || (menuItem.disabled?.() ?? false) || null"
                 (click)="menuItem.onSelect()">
           @if (hasGutterColumn()) {
             @if (wbMenuItem.checked() === undefined) {
@@ -46,6 +47,7 @@
         <button [attr.popovertarget]="popoverId"
                 [attr.popovertargetaction]="'show'"
                 [style.anchor-name]="activeSubMenuItem() === menuItem ? `--${popoverId}` : null"
+                [attr.disabled]="this.disabled() || (menuItem.disabled?.() ?? false) || null"
                 class="menu-item"
                 (mouseenter)="onMenuItemMouseEnter(menuItem)">
           @if (hasGutterColumn()) {
@@ -56,12 +58,12 @@
         </button>
       }
       @case ('group') {
-        <wb-group [group]="menuItem" [hasGutterColumn]="hasGutterColumn()"/>
+        <wb-group [group]="menuItem" [hasGutterColumn]="hasGutterColumn()" [disabled]="this.disabled() || (menuItem.disabled?.() ?? false)"/>
       }
     }
   } @empty {
     @if (subMenuItem.filter) {
-      <div class="empty">{{ (typeof subMenuItem.filter === 'object' && subMenuItem.filter.notFoundText) || 'No items found.' }}</div>
+      <div class="empty">{{(typeof subMenuItem.filter === 'object' && subMenuItem.filter.notFoundText) || 'No items found.'}}</div>
     }
   }
 
@@ -69,6 +71,7 @@
     <wb-menu [subMenuItem]="activeSubMenuItem()!"
              [attr.id]="popoverId"
              [style.position-anchor]="`--${popoverId}`"
+             [disabled]="this.disabled() || (activeSubMenuItem()!.disabled?.() ?? false)"
              (toggle)="onTogglePopover($event)"
              popover #popover/>
   }
