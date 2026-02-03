@@ -66,7 +66,7 @@ export class AppComponent implements DoCheck {
 
     provideMenu('toolbar:workbench.part.tools.start', menu => menu
       .addGroup(group => group
-        .addMenuItem({label: 'WTF'}, () => this.onAction()),
+        .addMenuItem({icon: 'lens_blur'}, () => this.onAction()),
       )
       .addMenu({label: 'File'}, menu => menu
         .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N']}, () => this.onAction())
@@ -89,9 +89,9 @@ export class AppComponent implements DoCheck {
       )
       .addGroup(group => group
         .addGroup(group => group
-          .addMenuItem({label: 'A'}, () => this.onAction())
-          .addMenuItem({label: 'A'}, () => this.onAction())
-          .addMenuItem({label: 'B'}, () => this.onAction()),
+          .addMenuItem({icon: 'lens_blur'}, () => this.onAction())
+          .addMenuItem({icon: 'lens_blur'}, () => this.onAction())
+          .addMenuItem({icon: 'lens_blur'}, () => this.onAction()),
         ))
       .addGroup(group => group
         .addMenu({label: 'Format', filter: true}, menu => menu

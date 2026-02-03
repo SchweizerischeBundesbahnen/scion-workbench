@@ -22,9 +22,9 @@ export class SciToolGroupComponent {
 
   protected readonly popoverId = UUID.randomUUID();
   protected readonly menuItems = this.computeMenuItems();
-  protected readonly activeSubMenuItem = linkedSignal<string | MMenuGroup, MSubMenuItem | undefined>({
+  protected readonly activeSubMenuItem = linkedSignal<string | MMenuGroup, MSubMenuItem | null>({
     source: this.subMenuItem,  // reset active sub menu item when this component is re-used
-    computation: () => undefined,
+    computation: () => null,
   });
 
   constructor() {
@@ -33,9 +33,11 @@ export class SciToolGroupComponent {
       const popover = this._popover();
 
       if (this.activeSubMenuItem()) {
+        console.log('>>> show');
         popover?.nativeElement.showPopover();
       }
       else {
+        console.log('>>> hide');
         popover?.nativeElement.hidePopover();
       }
     });
@@ -54,12 +56,12 @@ export class SciToolGroupComponent {
   }
 
   protected onSubMenuClick(subMenuItem: MSubMenuItem): void {
-    this.activeSubMenuItem.set(subMenuItem);
+    this.activeSubMenuItem.update(activeSubMenuItem => activeSubMenuItem === subMenuItem ? null : subMenuItem);
   }
 
   protected onTogglePopover(event: ToggleEvent): void {
     if (event.newState === 'closed') {
-      this.activeSubMenuItem.set(undefined);
+      this.activeSubMenuItem.set(null);
     }
   }
 }
