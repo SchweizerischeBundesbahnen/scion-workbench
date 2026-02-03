@@ -1,0 +1,82 @@
+$padding_icon_button: .125em .5em;
+$padding_text_button: .25em .75em;
+$icon-size: 18px;
+
+:host {
+  display: flex;
+  align-items: stretch;
+
+  // Add before separator
+  > sci-tool-group:not(:first-child)::before {
+    content: '';
+    width: 1px;
+    background-color: var(--sci-color-border);
+    margin: 2px;
+  }
+
+  // Add after separator
+  > sci-tool-group:not(:last-child, :has(+ wb-menu), :has(+ sci-tool-group))::after {
+    content: '';
+    width: 1px;
+    background-color: var(--sci-color-border);
+    margin: 2px;
+  }
+
+  > button.menu-item {
+    all: unset;
+    display: inline-flex;
+    align-items: center;
+    text-wrap: nowrap;
+    padding: $padding_icon_button;
+    border-radius: var(--sci-corner);
+    user-select: none;
+    overflow: hidden;
+    cursor: var(--sci-workbench-button-cursor);
+    gap: .3em;
+
+    &:has(span.label) {
+      padding: $padding_text_button;
+    }
+
+    > span.icon {
+      display: inline-grid;
+      place-content: center;
+      font-size: $icon-size;
+      height: 1em;
+      width: 1em;
+    }
+
+    &:hover:where(:not(:disabled)) {
+      background-color: var(--sci-workbench-button-background-color-hover);
+    }
+
+    &:active:where(:not(:disabled)) {
+      background-color: var(--sci-workbench-button-background-color-active);
+    }
+
+    &:focus:not(:focus-visible) {
+      outline: none;
+    }
+
+    &:focus-visible {
+      outline: var(--sci-workbench-button-outline-width-focus) solid var(--sci-color-accent);
+    }
+
+    &:disabled {
+      color: var(--sci-color-gray-500);
+    }
+
+    &.active {
+      background-color: var(--sci-workbench-button-background-color-hover);
+    }
+  }
+
+  > :where(wb-menu[popover]) { // allow setting host styles in menu component
+    margin: unset; // unset native popover styling
+    padding: unset; // unset native popover styling
+    inset: unset; // unset native popover styling
+    position-try-fallbacks: flip-inline, flip-block;
+    top: calc(anchor(bottom) + 1px);
+    left: anchor(left);
+  }
+}

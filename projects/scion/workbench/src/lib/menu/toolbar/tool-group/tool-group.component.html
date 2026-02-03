@@ -1,0 +1,49 @@
+@for (menuItem of menuItems(); track menuItem) {
+  @switch (menuItem.type) {
+    @case ('menu-item') {
+      <button class="menu-item"
+              (mouseenter)="onMenuItemMouseEnter(menuItem)"
+              [attr.disabled]="this.disabled() || (menuItem.disabled?.() ?? false) || null"
+              [class.checked]="menuItem.checked?.()"
+              (click)="menuItem.onSelect()">
+        @if (menuItem.icon) {
+          <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
+        }
+        @if (menuItem.label?.length) {
+          <span class="label">{{menuItem.label}}</span>
+        }
+      </button>
+    }
+    @case ('sub-menu-item') {
+      <button [attr.popovertarget]="popoverId"
+              [attr.popovertargetaction]="'show'"
+              [style.anchor-name]="activeSubMenuItem() === menuItem ? `--${popoverId}` : null"
+              [attr.disabled]="this.disabled() || (menuItem.disabled?.() ?? false) || null"
+              [class.active]="activeSubMenuItem() === menuItem"
+              class="menu-item"
+              (mouseenter)="onMenuItemMouseEnter(menuItem)"
+              (click)="onSubMenuClick(menuItem)">
+        @if (menuItem.icon) {
+          <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
+        }
+        @if (menuItem.label?.length) {
+          <span class="label">{{menuItem.label}}</span>
+        }
+        <!--        <span class="icon material-symbols-rounded sub-menu-chevron" translate="no">arrow_drop_down</span>-->
+      </button>
+    }
+    @case ('group') {
+      <sci-tool-group [subMenuItem]="menuItem" [disabled]="this.disabled() || (menuItem.disabled?.() ?? false)"/>
+    }
+  }
+}
+
+@if (activeSubMenuItem()) {
+  <wb-menu [subMenuItem]="activeSubMenuItem()!"
+           [attr.id]="popoverId"
+           [style.position-anchor]="`--${popoverId}`"
+           [disabled]="this.disabled() || (activeSubMenuItem()!.disabled?.() ?? false)"
+           (toggle)="onTogglePopover($event)"
+           wbActiveMenuTracker
+           popover #popover/>
+}

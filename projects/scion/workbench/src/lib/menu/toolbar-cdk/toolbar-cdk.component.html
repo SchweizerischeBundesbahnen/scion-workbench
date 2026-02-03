@@ -3,20 +3,20 @@
     @for (menuItem of menu.menuItems; track menuItem) {
       @if (menuItem.type === 'group') {
       } @else if (menuItem.type === 'menu-item') {
-        <div ngMenuItem value="{{menuItem.text}}">
+        <div ngMenuItem value="{{menuItem.label}}">
           <span class="icon material-symbols-outlined" translate="no" aria-hidden="true">{{menuItem.icon}}</span>
-          <span class="label">{{menuItem.text}}</span>
+          <span class="label">{{menuItem.label}}</span>
         </div>
       } @else {
         <div ngMenuItem
              #fileEl
              #fileItem="ngMenuItem"
              class="menu-bar-item"
-             [value]="menuItem.text"
+             [value]="menuItem.label"
              [submenu]="wbHolder.menu()"
              wbHolder
              #wbHolder="wbHolder">
-          {{menuItem.text}}
+          {{menuItem.label}}
         </div>
         <ng-template [cdkConnectedOverlayOpen]="rendered()"
                      [cdkConnectedOverlay]="{origin: fileEl, usePopover: 'inline'}"
@@ -29,20 +29,20 @@
               @for (childMenuItem of getMenuItems(menuItem); track childMenuItem) {
                 @if (childMenuItem.type === 'group') {
                 } @else if (childMenuItem.type === 'menu-item') {
-                  <div ngMenuItem value="{{childMenuItem.text}}">
+                  <div ngMenuItem value="{{childMenuItem.label}}">
                     <span class="icon material-symbols-outlined" translate="no" aria-hidden="true">{{childMenuItem.icon}}</span>
-                    <span class="label">{{childMenuItem.text}}</span>
+                    <span class="label">{{childMenuItem.label}}</span>
                   </div>
                 } @else {
                   <div ngMenuItem
                        #shareEl
                        #level1="ngMenuItem"
-                       [value]="childMenuItem.text"
+                       [value]="childMenuItem.label"
                        [submenu]="wbHolder2.menu()"
                        wbHolder
                        #wbHolder2="wbHolder">
                     <span class="icon material-symbols-outlined" translate="no" aria-hidden="true">{{childMenuItem.icon}}</span>
-                    <span class="label">{{childMenuItem.text}}</span>
+                    <span class="label">{{childMenuItem.label}}</span>
                     <span class="icon arrow material-symbols-outlined" translate="no" aria-hidden="true">arrow_right</span>
                   </div>
                   <ng-template [cdkConnectedOverlayOpen]="!!fileItem.expanded()"
@@ -57,20 +57,20 @@
                         @for (childMenuItem of getMenuItems(childMenuItem); track childMenuItem) {
                           @if (childMenuItem.type === 'group') {
                           } @else if (childMenuItem.type === 'menu-item') {
-                            <div ngMenuItem value="{{childMenuItem.text}}">
+                            <div ngMenuItem value="{{childMenuItem.label}}">
                               <span class="icon material-symbols-outlined" translate="no" aria-hidden="true">{{childMenuItem.icon}}</span>
-                              <span class="label">{{childMenuItem.text}}</span>
+                              <span class="label">{{childMenuItem.label}}</span>
                             </div>
                           } @else {
                             <div ngMenuItem
                                  #shareEl
                                  #level2="ngMenuItem"
-                                 [value]="childMenuItem.text"
+                                 [value]="childMenuItem.label"
                                  [submenu]="wbHolder2.menu()"
                                  wbHolder
                                  #wbHolder2="wbHolder">
                               <span class="icon material-symbols-outlined" translate="no" aria-hidden="true">{{childMenuItem.icon}}</span>
-                              <span class="label">{{childMenuItem.text}}</span>
+                              <span class="label">{{childMenuItem.label}}</span>
                               <span class="icon arrow material-symbols-outlined" translate="no" aria-hidden="true">arrow_right</span>
                             </div>
                             <ng-template [cdkConnectedOverlayOpen]="!!level1.expanded()"
@@ -86,20 +86,20 @@
                                     @if (childMenuItem.type === 'group') {
                                     }
                                     @else if (childMenuItem.type === 'menu-item') {
-                                      <div ngMenuItem value="{{childMenuItem.text}}">
+                                      <div ngMenuItem value="{{childMenuItem.label}}">
                                         <span class="icon material-symbols-outlined" translate="no" aria-hidden="true">{{childMenuItem.icon}}</span>
-                                        <span class="label">{{childMenuItem.text}}</span>
+                                        <span class="label">{{childMenuItem.label}}</span>
                                       </div>
                                     } @else {
                                       <div ngMenuItem
                                            #shareEl
-                                           [value]="childMenuItem.text"
+                                           [value]="childMenuItem.label"
                                            [submenu]="wbHolder2.menu()"
                                            wbHolder
                                            #level3="ngMenuItem"
                                            #wbHolder2="wbHolder">
                                         <span class="icon material-symbols-outlined" translate="no" aria-hidden="true">{{childMenuItem.icon}}</span>
-                                        <span class="label">{{childMenuItem.text}}</span>
+                                        <span class="label">{{childMenuItem.label}}</span>
                                         <span class="icon arrow material-symbols-outlined" translate="no" aria-hidden="true">arrow_right</span>
                                       </div>
                                       <ng-template [cdkConnectedOverlayOpen]="!!level3.expanded()"
