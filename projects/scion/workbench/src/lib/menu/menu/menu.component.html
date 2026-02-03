@@ -15,7 +15,7 @@
   @if (subMenuItem.filter) {
     <div class="filter">
       <span class="icon material-symbols-rounded filter" translate="no">search</span>
-      <wb-menu-filter (textChange)="onFilterChange($event)" [placeholder]="(typeof subMenuItem.filter === 'object' && subMenuItem.filter.placeholder) || 'Type to filter'"/>
+      <sci-menu-item-filter (textChange)="onFilterChange($event)" [placeholder]="(typeof subMenuItem.filter === 'object' && subMenuItem.filter.placeholder) || 'Type to filter'"/>
     </div>
 
     <hr>
@@ -57,7 +57,7 @@
         </button>
       }
       @case ('group') {
-        <wb-group [group]="menuItem" [hasGutterColumn]="hasGutterColumn()" [disabled]="this.disabled() || (menuItem.disabled?.() ?? false)"/>
+        <sci-menu-item-group [group]="menuItem" [hasGutterColumn]="hasGutterColumn()" [disabled]="this.disabled() || (menuItem.disabled?.() ?? false)"/>
       }
     }
   } @empty {
@@ -67,11 +67,11 @@
   }
 
   @if (activeSubMenuItem()) {
-    <wb-menu [subMenuItem]="activeSubMenuItem()!"
-             [attr.id]="popoverId"
-             [style.position-anchor]="`--${popoverId}`"
-             [disabled]="this.disabled() || (activeSubMenuItem()!.disabled?.() ?? false)"
-             (toggle)="onTogglePopover($event)"
-             popover #popover/>
+    <sci-menu [subMenuItem]="activeSubMenuItem()!"
+              [attr.id]="popoverId"
+              [style.position-anchor]="`--${popoverId}`"
+              [disabled]="this.disabled() || (activeSubMenuItem()!.disabled?.() ?? false)"
+              (toggle)="onTogglePopover($event)"
+              popover #popover/>
   }
 }

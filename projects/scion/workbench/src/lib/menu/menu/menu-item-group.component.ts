@@ -3,13 +3,13 @@ import {MMenuGroup} from '../ɵmenu';
 import {MenuComponent} from './menu.component';
 
 /**
- * Creates a group.
+ * Alias for {@link MenuComponent} with the name `sci-menu-item-group` instead of `sci-menu`.
  */
 @Component({
-  selector: 'wb-group',
+  selector: 'sci-menu-item-group',
   template: '',
 })
-export class GroupComponent {
+export class MenuItemGroupComponent {
 
   public readonly group = input.required<MMenuGroup>();
   public readonly hasGutterColumn = input.required<boolean>();

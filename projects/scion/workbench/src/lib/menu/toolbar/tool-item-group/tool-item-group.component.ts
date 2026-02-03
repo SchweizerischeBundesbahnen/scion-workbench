@@ -5,9 +5,9 @@ import {MenuComponent} from '../../menu/menu.component';
 import {UUID} from '@scion/toolkit/uuid';
 
 @Component({
-  selector: 'sci-tool-group',
-  templateUrl: './tool-group.component.html',
-  styleUrl: './tool-group.component.scss',
+  selector: 'sci-tool-item-group',
+  templateUrl: './tool-item-group.component.html',
+  styleUrl: './tool-item-group.component.scss',
   imports: [
     MenuComponent,
   ],
