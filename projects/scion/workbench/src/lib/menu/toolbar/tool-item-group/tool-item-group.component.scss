@@ -1,10 +1,10 @@
-$padding_menu_item: .125em .5em;
+$padding_menu_item: .125em .75em;
 $icon-size: 18px;
 
 :host {
   display: flex;
   align-items: stretch;
-  gap: 1px;
+  gap: 2px;
 
   // Add before separator
   > sci-tool-item-group:not(:first-child)::before {
@@ -34,6 +34,7 @@ $icon-size: 18px;
     overflow: hidden;
     cursor: var(--sci-workbench-button-cursor);
     gap: .3em;
+    border: 1px solid transparent; // unset to not flicker when toggling checkable menu item
 
     // Maintain 1:1 aspect ratio if no label
     &:not(:has(> span.label)) {
@@ -66,6 +67,14 @@ $icon-size: 18px;
         bottom: calc(var(--sci-corner) / 2);
         right: calc(var(--sci-corner) / 2);
       }
+    }
+
+    &.checked:where(:not(:disabled)) {
+      background-color: var(--sci-workbench-button-background-color-checked);
+    }
+
+    &.checked {
+      border: 1px solid var(--sci-color-border);
     }
 
     &:hover:where(:not(:disabled)) {
