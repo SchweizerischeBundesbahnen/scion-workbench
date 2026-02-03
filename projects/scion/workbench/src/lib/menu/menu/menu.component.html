@@ -1,9 +1,9 @@
 @let subMenuItem = this.subMenuItem();
-@if (subMenuItem.type === 'group' && (subMenuItem.label?.length || subMenuItem.collapsible !== undefined)) {
+@if (subMenuItem.type === 'group' && (subMenuItem.label?.length || subMenuItem.collapsible)) {
   @let group = subMenuItem;
-  @if (group.collapsible !== undefined) {
+  @if (group.collapsible) {
     <button class="group-header" (click)="onGroupToggle()" (mouseenter)="onMenuItemMouseEnter(group)">
-      <span class="icon material-symbols-rounded" translate="no">{{groupExpanded() ? 'keyboard_arrow_down' : 'chevron_right'}}</span>
+      <span class="icon material-symbols-rounded" translate="no">{{visible() ? 'keyboard_arrow_down' : 'chevron_right'}}</span>
       <span class="label">{{subMenuItem.label}}</span>
     </button>
   } @else {
@@ -11,7 +11,16 @@
   }
 }
 
-@if (groupExpanded()) {
+@if (visible()) {
+  @if (subMenuItem.filter) {
+    <div class="filter">
+      <span class="icon material-symbols-rounded filter" translate="no">search</span>
+      <wb-menu-filter (textChange)="onFilterChange($event)" [placeholder]="(typeof subMenuItem.filter === 'object' && subMenuItem.filter.placeholder) || 'Type to filter'"/>
+    </div>
+
+    <hr>
+  }
+
   @for (menuItem of menuItems(); track menuItem) {
     @switch (menuItem.type) {
       @case ('menu-item') {
@@ -49,6 +58,10 @@
       @case ('group') {
         <wb-group [group]="menuItem" [hasGutterColumn]="hasGutterColumn()"/>
       }
+    }
+  } @empty {
+    @if (subMenuItem.filter) {
+      <div class="empty">{{ (typeof subMenuItem.filter === 'object' && subMenuItem.filter.notFoundText) || 'No items found.' }}</div>
     }
   }
 

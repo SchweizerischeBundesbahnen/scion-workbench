@@ -32,6 +32,7 @@ export class ɵSciMenu implements SciMenu {
       tooltip: menuDescriptor.tooltip,
       mnemonic: menuDescriptor.mnemonic,
       disabled: menuDescriptor.disabled,
+      filter: menuDescriptor.filter,
       children: subMenu.menuItems,
     });
     return this;
@@ -60,6 +61,7 @@ export class ɵSciMenu implements SciMenu {
         id: groupDescriptor.id ?? UUID.randomUUID(),
         label: groupDescriptor.label,
         collapsible: groupDescriptor.collapsible,
+        filter: groupDescriptor.filter,
         disabled: groupDescriptor.disabled,
         children: subMenu.menuItems,
       });
@@ -88,6 +90,7 @@ export interface MSubMenuItem {
   tooltip?: string;
   mnemonic?: string;
   disabled?: () => Signal<boolean> | boolean;
+  filter?: boolean | {placeholder?: string; notFoundText?: string};
   children: Array<MMenuItem | MSubMenuItem | MMenuGroup>;
 }
 
@@ -96,6 +99,7 @@ export interface MMenuGroup {
   id: string;
   label?: string;
   collapsible?: boolean | {collapsed: boolean};
+  filter?: boolean | {placeholder?: string; notFoundText?: string};
   disabled?: () => Signal<boolean> | boolean;
   children: Array<MMenuItem | MSubMenuItem | MMenuGroup>;
 }
