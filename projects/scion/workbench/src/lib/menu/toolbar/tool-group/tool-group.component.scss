@@ -5,6 +5,7 @@ $icon-size: 18px;
 :host {
   display: flex;
   align-items: stretch;
+  gap: 1px;
 
   // Add before separator
   > sci-tool-group:not(:first-child)::before {

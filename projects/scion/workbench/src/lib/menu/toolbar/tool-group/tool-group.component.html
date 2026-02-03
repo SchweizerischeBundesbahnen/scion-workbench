@@ -2,7 +2,6 @@
   @switch (menuItem.type) {
     @case ('menu-item') {
       <button class="menu-item"
-              (mouseenter)="onMenuItemMouseEnter(menuItem)"
               [attr.disabled]="this.disabled() || (menuItem.disabled?.() ?? false) || null"
               [class.checked]="menuItem.checked?.()"
               (click)="menuItem.onSelect()">
@@ -21,7 +20,6 @@
               [attr.disabled]="this.disabled() || (menuItem.disabled?.() ?? false) || null"
               [class.active]="activeSubMenuItem() === menuItem"
               class="menu-item"
-              (mouseenter)="onMenuItemMouseEnter(menuItem)"
               (click)="onSubMenuClick(menuItem)">
         @if (menuItem.icon) {
           <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
@@ -44,6 +42,5 @@
            [style.position-anchor]="`--${popoverId}`"
            [disabled]="this.disabled() || (activeSubMenuItem()!.disabled?.() ?? false)"
            (toggle)="onTogglePopover($event)"
-           wbActiveMenuTracker
            popover #popover/>
 }
