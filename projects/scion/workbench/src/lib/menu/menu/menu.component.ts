@@ -41,9 +41,9 @@ export class MenuComponent {
   protected readonly popoverId = UUID.randomUUID();
   protected readonly hasGutterColumn = computed(() => this.withGutterColumn() ?? (!!this.subMenuItem().filter || hasGutter(this.menuItems())));
   protected readonly menuItems = this.computeMenuItems();
-  protected readonly activeSubMenuItem = linkedSignal<MSubMenuItem | MMenuGroup, MSubMenuItem | undefined>({
+  protected readonly activeSubMenuItem = linkedSignal<MSubMenuItem | MMenuGroup, MSubMenuItem | null>({
     source: this.subMenuItem,  // reset active sub menu item when this component is re-used
-    computation: () => undefined,
+    computation: () => null,
   });
 
   protected readonly isGroup = computed(() => this.subMenuItem().type === 'group');
@@ -78,7 +78,7 @@ export class MenuComponent {
   }
 
   protected onMenuItemMouseEnter(menuItem: MMenuItem | MSubMenuItem | MMenuGroup): void {
-    this.activeSubMenuItem.set(menuItem.type === 'sub-menu-item' ? menuItem : undefined);
+    this.activeSubMenuItem.set(menuItem.type === 'sub-menu-item' ? menuItem : null);
 
     // Create and display "fake" popover to close popover of other groups or menus.
     if (!this.activeSubMenuItem()) {
@@ -92,7 +92,7 @@ export class MenuComponent {
 
   protected onTogglePopover(event: ToggleEvent): void {
     if (event.newState === 'closed') {
-      this.activeSubMenuItem.set(undefined);
+      this.activeSubMenuItem.set(null);
     }
   }
 
