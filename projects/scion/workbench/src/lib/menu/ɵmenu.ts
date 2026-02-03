@@ -33,6 +33,7 @@ export class ɵSciMenu implements SciMenu {
       mnemonic: menuDescriptor.mnemonic,
       disabled: coerceSignal(menuDescriptor.disabled),
       filter: menuDescriptor.filter,
+      visualMenuMarker: menuDescriptor.visualMenuMarker,
       children: subMenu.menuItems,
     });
     return this;
@@ -91,6 +92,7 @@ export interface MSubMenuItem {
   mnemonic?: string;
   disabled?: Signal<boolean>;
   filter?: boolean | {placeholder?: string; notFoundText?: string};
+  visualMenuMarker?: boolean;
   children: Array<MMenuItem | MSubMenuItem | MMenuGroup>;
 }
 

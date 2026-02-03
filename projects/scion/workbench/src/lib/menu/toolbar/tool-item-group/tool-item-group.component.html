@@ -19,7 +19,8 @@
               [style.anchor-name]="activeSubMenuItem() === menuItem ? `--${popoverId}` : null"
               [attr.disabled]="this.disabled() || (menuItem.disabled?.() ?? false) || null"
               [class.active]="activeSubMenuItem() === menuItem"
-              class="menu-item"
+              [class.visual-marker]="menuItem.visualMenuMarker ?? true"
+              class="menu-item submenu-item"
               (click)="onSubMenuClick(menuItem)">
         @if (menuItem.icon) {
           <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
@@ -27,7 +28,6 @@
         @if (menuItem.label?.length) {
           <span class="label">{{menuItem.label}}</span>
         }
-        <!--        <span class="icon material-symbols-rounded sub-menu-chevron" translate="no">arrow_drop_down</span>-->
       </button>
     }
     @case ('group') {

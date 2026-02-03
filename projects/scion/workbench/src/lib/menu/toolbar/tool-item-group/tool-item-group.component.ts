@@ -33,11 +33,9 @@ export class SciToolGroupComponent {
       const popover = this._popover();
 
       if (this.activeSubMenuItem()) {
-        console.log('>>> show');
         popover?.nativeElement.showPopover();
       }
       else {
-        console.log('>>> hide');
         popover?.nativeElement.hidePopover();
       }
     });

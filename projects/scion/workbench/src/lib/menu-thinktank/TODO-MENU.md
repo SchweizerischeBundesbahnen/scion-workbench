@@ -1,12 +1,10 @@
-- Gruppen
-  - Label
-  - Collapsable
-- Search in Menu
 - Toolbar
   - chevron for submenu
-  - pressed state when checked
   - separate model
     - no group label
     - no group collapse
     - label optional
+    - no filter
+  - tooltip
+  - accelerator
 

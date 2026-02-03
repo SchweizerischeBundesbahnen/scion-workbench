@@ -60,8 +60,8 @@ export class AppComponent implements DoCheck {
     const paragraphStyle = signal<string>('');
 
     provideMenu('toolbar:workbench.part.tools.end', toolbar => toolbar
-      .addMenuItem({icon: 'unfold_more', tooltip: 'Expand Selected'}, () => this.onAction())
-      .addMenuItem({icon: 'unfold_less', tooltip: 'Collapse All'}, () => this.onAction()),
+      .addMenuItem({icon: 'expand_all', tooltip: 'Expand Selected'}, () => this.onAction())
+      .addMenuItem({icon: 'collapse_all', tooltip: 'Collapse All'}, () => this.onAction()),
     );
 
     provideMenu('toolbar:workbench.part.tools.start', menu => menu
@@ -237,13 +237,13 @@ export class AppComponent implements DoCheck {
           .addMenuItem({label: 'Inherited from Object', checked: computed(() => options().has('inherited_from_object'))}, () => toggleMultiFlag(options, 'inherited_from_object')),
         )
         .addGroup({label: 'Group'}, group => group
-          .addMenuItem({label: 'Members by Defininbg Type', checked: computed(() => options().has('member_by_defining_type'))}, () => toggleMultiFlag(options, 'member_by_defining_type')),
+          .addMenuItem({label: 'Members by Defining Type', checked: computed(() => options().has('member_by_defining_type'))}, () => toggleMultiFlag(options, 'member_by_defining_type')),
         ),
       ),
     );
 
     provideMenu('toolbar:workbench.part.tools.end', menu => menu
-      .addMenu({icon: 'more_vert'}, menu => menu
+      .addMenu({icon: 'more_vert', visualMenuMarker: false}, menu => menu
         .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+']}, () => this.onAction())
         .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-']}, () => this.onAction())
         .addGroup(group => group
