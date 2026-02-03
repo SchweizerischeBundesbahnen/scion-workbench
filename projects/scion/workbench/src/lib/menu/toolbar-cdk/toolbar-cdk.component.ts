@@ -7,10 +7,10 @@ import {SetIntoHolderDirective} from './set-into-holder.directive';
 import {MMenuGroup, MMenuItem, MSubMenuItem} from '../ɵmenu';
 
 @Component({
-  selector: 'sci-toolbar',
+  selector: 'sci-toolbar-cdk',
   imports: [MenuBar, Menu, MenuContent, MenuItem, OverlayModule, HolderDirective, SetIntoHolderDirective],
-  templateUrl: './toolbar.component.html',
-  styleUrl: './toolbar.component.scss',
+  templateUrl: './toolbar-cdk.component.html',
+  styleUrl: './toolbar-cdk.component.scss',
 })
 export class SciToolbarComponent {
 
