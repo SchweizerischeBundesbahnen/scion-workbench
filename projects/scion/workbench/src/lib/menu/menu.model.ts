@@ -12,13 +12,33 @@ export interface SciMenu {
   addGroup(menuFactoryFn: (group: SciMenu) => SciMenu): this;
 }
 
+/**
+ * Defines the properties for a menu item.
+ */
 export interface SciMenuDescriptor {
+  /**
+   * Specifies the text label of the menu item.
+   */
   label?: string;
+  /**
+   * Specifies the icon associated with the menu item.
+   */
   icon?: string;
+  /**
+   * Specifies the identifier for the menu item, used to contribute to the menu.
+   */
   id?: string;
   tooltip?: string;
   mnemonic?: string;
   disabled?: Signal<boolean> | boolean;
+  /**
+   * Controls the display of a visual marker for menu dropdown.
+   *
+   * Is only displayed for menus in the toolbar.
+   *
+   * Defaults to `true`.
+   */
+  visualMenuMarker?: boolean;
   filter?: boolean | {placeholder?: string; notFoundText?: string};
 }
 

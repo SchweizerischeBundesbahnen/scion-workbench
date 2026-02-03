@@ -1,5 +1,4 @@
-$padding_icon_button: .125em .5em;
-$padding_text_button: .25em .75em;
+$padding_menu_item: .125em .5em;
 $icon-size: 18px;
 
 :host {
@@ -26,17 +25,20 @@ $icon-size: 18px;
   > button.menu-item {
     all: unset;
     display: inline-flex;
+    place-content: center;
     align-items: center;
     text-wrap: nowrap;
-    padding: $padding_icon_button;
+    padding: $padding_menu_item;
     border-radius: var(--sci-corner);
     user-select: none;
     overflow: hidden;
     cursor: var(--sci-workbench-button-cursor);
     gap: .3em;
 
-    &:has(span.label) {
-      padding: $padding_text_button;
+    // Maintain 1:1 aspect ratio if no label
+    &:not(:has(> span.label)) {
+      padding: 0;
+      aspect-ratio: 1 / 1;
     }
 
     > span.icon {
@@ -45,6 +47,25 @@ $icon-size: 18px;
       font-size: $icon-size;
       height: 1em;
       width: 1em;
+    }
+
+    // Display visual marker to indicate menu.
+    &.submenu-item.visual-marker {
+      position: relative;
+
+      &::after {
+        $size: 3px;
+        box-sizing: border-box;
+        content: "";
+        position: absolute;
+        width: $size;
+        height: $size;
+        border: $size solid transparent;
+        border-right-color: var(--sci-color-text-subtle);
+        border-bottom-color: var(--sci-color-text-subtle);
+        bottom: calc(var(--sci-corner) / 2);
+        right: calc(var(--sci-corner) / 2);
+      }
     }
 
     &:hover:where(:not(:disabled)) {
