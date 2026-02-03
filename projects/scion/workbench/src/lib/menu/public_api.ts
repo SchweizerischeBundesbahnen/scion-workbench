@@ -8,6 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {SciToolbarComponent} from './toolbar1/toolbar1.component';
+export {SciToolbarComponent} from './toolbar/toolbar.component';
 export {type SciMenu, type SciMenuDescriptor, type SciMenuItemDescriptor, type SciCheckableMenuItemDescriptor, type  SciIconMenuItemDescriptor, type  SciMenuGroupDescriptor} from './menu.model';
 export {provideMenu, type ProvideMenuOptions} from './menu.provider';
