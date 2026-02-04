@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, input, signal} from '@angular/core';
 import {SciToolGroupComponent} from './tool-item-group/tool-item-group.component';
 
 @Component({
@@ -9,8 +9,17 @@ import {SciToolGroupComponent} from './tool-item-group/tool-item-group.component
   imports: [
     SciToolGroupComponent,
   ],
+  host: {
+    '[class.empty]': 'empty()',
+  },
 })
 export class SciToolbarComponent {
 
   public readonly name = input.required<string>();
+
+  protected readonly empty = signal(true);
+
+  protected onCountChange(count: number): void {
+    this.empty.set(count === 0);
+  }
 }

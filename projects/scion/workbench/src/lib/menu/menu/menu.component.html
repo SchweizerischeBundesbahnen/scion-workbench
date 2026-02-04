@@ -24,9 +24,11 @@
   @for (menuItem of menuItems(); track menuItem) {
     @switch (menuItem.type) {
       @case ('menu-item') {
+        @let disabled = this.disabled() || (menuItem.disabled?.() ?? false);
         <button class="menu-item"
                 (mouseenter)="onMenuItemMouseEnter(menuItem)"
-                [attr.disabled]="this.disabled() || (menuItem.disabled?.() ?? false) || null"
+                [attr.disabled]="disabled || null"
+                [class.checked]="menuItem.checked?.()"
                 (click)="onSelect(menuItem)">
           @if (hasGutterColumn()) {
             @if (!menuItem.checked) {
@@ -39,6 +41,10 @@
           <span class="label">{{menuItem.label?.()}}</span>
           @if (menuItem.accelerator?.length) {
             <span class="accelerator">{{menuItem.accelerator | wbJoin:'+'}}</span>
+          }
+
+          @if (!menuItem.disabled) {
+            <sci-toolbar [name]="`actions:${menuItem.id}`" class="actions" (mousedown)="$event.stopPropagation()" (click)="$event.stopPropagation()"/>
           }
         </button>
       }

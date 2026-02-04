@@ -3,13 +3,13 @@
 import {Signal} from '@angular/core';
 
 export interface SciMenu {
-  addMenuItem(menuItemDescriptor: SciMenuItemDescriptor | SciIconMenuItemDescriptor | SciCheckableMenuItemDescriptor, onSelect: () => boolean | void): this;
+  addMenuItem(menuItemDescriptor: SciMenuItemDescriptor | SciIconMenuItemDescriptor | SciCheckableMenuItemDescriptor, onSelect: () => boolean | void, actionsFactoryFn?: (actions: SciMenu) => SciMenu): this;
 
   addMenu(menuDescriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenu) => SciMenu): this;
 
-  addGroup(menuGroupDescriptor: SciMenuGroupDescriptor, menuFactoryFn?: (group: SciMenu) => SciMenu): this;
+  addGroup(menuGroupDescriptor: SciMenuGroupDescriptor, groupFactoryFn?: (group: SciMenu) => SciMenu): this;
 
-  addGroup(menuFactoryFn: (group: SciMenu) => SciMenu): this;
+  addGroup(groupFactoryFn: (group: SciMenu) => SciMenu): this;
 }
 
 /**
@@ -43,6 +43,10 @@ export interface SciMenuDescriptor {
 }
 
 export interface SciMenuItemDescriptor {
+  /**
+   * Specifies the identifier for the menu item, used to contribute actions to the menu item.
+   */
+  id?: string;
   label?: Signal<string> | string;
   tooltip?: string;
   mnemonic?: string;

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, input, linkedSignal, Signal, viewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, input, linkedSignal, output, Signal, viewChild} from '@angular/core';
 import {SciMenuRegistry} from '../../menu.registry';
 import {MMenuGroup, MMenuItem, MSubMenuItem} from '../../ɵmenu';
 import {MenuComponent} from '../../menu/menu.component';
@@ -17,6 +17,7 @@ export class SciToolGroupComponent {
 
   public readonly subMenuItem = input.required<string | MMenuGroup>();
   public readonly disabled = input<boolean>();
+  public readonly count = output<number>();
 
   private readonly _menuRegistry = inject(SciMenuRegistry);
   private readonly _popover = viewChild('popover', {read: ElementRef<HTMLElement>});
@@ -39,6 +40,10 @@ export class SciToolGroupComponent {
       else {
         popover?.nativeElement.hidePopover();
       }
+    });
+
+    effect(() => {
+      this.count.emit(this.menuItems().length);
     });
   }
 

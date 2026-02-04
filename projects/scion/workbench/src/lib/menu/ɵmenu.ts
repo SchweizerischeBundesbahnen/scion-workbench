@@ -6,9 +6,12 @@ export class ɵSciMenu implements SciMenu {
 
   public readonly menuItems = new Array<MMenuItem | MSubMenuItem | MMenuGroup>();
 
-  public addMenuItem(menuItemDescriptor: SciMenuItemDescriptor | SciIconMenuItemDescriptor | SciCheckableMenuItemDescriptor, onSelect: () => boolean | void): this {
+  public addMenuItem(menuItemDescriptor: SciMenuItemDescriptor | SciIconMenuItemDescriptor | SciCheckableMenuItemDescriptor, onSelect: () => boolean | void, actionsFactoryFn?: (actions: SciMenu) => SciMenu): this {
+    const actions = actionsFactoryFn?.(new ɵSciMenu()) as ɵSciMenu | undefined;
+
     this.menuItems.push({
       type: 'menu-item',
+      id: menuItemDescriptor.id ?? UUID.randomUUID(),
       label: coerceSignal(menuItemDescriptor.label),
       tooltip: menuItemDescriptor.tooltip,
       mnemonic: menuItemDescriptor.mnemonic,
@@ -16,8 +19,9 @@ export class ɵSciMenu implements SciMenu {
       disabled: coerceSignal(menuItemDescriptor.disabled),
       icon: 'icon' in menuItemDescriptor ? menuItemDescriptor.icon : undefined,
       checked: 'checked' in menuItemDescriptor ? coerceSignal(menuItemDescriptor.checked) : undefined,
+      actions: actions?.menuItems,
       onSelect,
-    });
+    } satisfies MMenuItem);
     return this;
   }
 
@@ -35,7 +39,7 @@ export class ɵSciMenu implements SciMenu {
       filter: menuDescriptor.filter,
       visualMenuMarker: menuDescriptor.visualMenuMarker,
       children: subMenu.menuItems,
-    });
+    } satisfies MSubMenuItem);
     return this;
   }
 
@@ -49,13 +53,13 @@ export class ɵSciMenu implements SciMenu {
         type: 'group',
         id: UUID.randomUUID(),
         children: subMenu.menuItems,
-      });
+      } satisfies MMenuGroup);
       return this;
     }
     else {
       const groupDescriptor = argument1 as SciMenuGroupDescriptor;
-      const groupFactoryFn = argument2 as (group: SciMenu) => SciMenu;
-      const subMenu = groupFactoryFn(new ɵSciMenu()) as ɵSciMenu;
+      const groupFactoryFn = argument2 as ((group: SciMenu) => SciMenu) | undefined;
+      const subMenu = groupFactoryFn?.(new ɵSciMenu()) as ɵSciMenu | undefined;
 
       this.menuItems.push({
         type: 'group',
@@ -64,8 +68,8 @@ export class ɵSciMenu implements SciMenu {
         collapsible: groupDescriptor.collapsible,
         filter: groupDescriptor.filter,
         disabled: coerceSignal(groupDescriptor.disabled),
-        children: subMenu.menuItems,
-      });
+        children: subMenu?.menuItems ?? [],
+      } satisfies MMenuGroup);
       return this;
     }
   }
@@ -73,6 +77,7 @@ export class ɵSciMenu implements SciMenu {
 
 export interface MMenuItem {
   type: 'menu-item'
+  id: string;
   label?: Signal<string>;
   icon?: string;
   tooltip?: string;
@@ -80,6 +85,7 @@ export interface MMenuItem {
   accelerator?: string[];
   disabled?: Signal<boolean>;
   checked?: Signal<boolean>;
+  actions?: Array<MMenuItem | MSubMenuItem | MMenuGroup>;
   onSelect: () => boolean | void;
 }
 

@@ -16,7 +16,7 @@ $icon-size: 18px;
     grid-template-columns:
        // === Menu Item Subgrid ===
       auto // icon or check mark
-      minmax(7.5em, auto) // label
+      minmax(12em, auto) // label
       auto; // chevron or accelerator
     border: 1px solid var(--sci-color-border);
     border-radius: 0.5rem;
@@ -27,7 +27,7 @@ $icon-size: 18px;
     &.gutter-column-hidden {
       grid-template-columns:
         // === Menu Item Subgrid ===
-        minmax(7.5em, auto) // label
+        minmax(12em, auto) // label
         auto; // chevron or accelerator
     }
   }
@@ -108,6 +108,7 @@ $icon-size: 18px;
     user-select: none;
     overflow: hidden;
     cursor: var(--sci-workbench-button-cursor);
+    position: relative; // positioning context for actions toolbar
 
     > span.label:last-child {
       grid-column: span 2 / -1;
@@ -138,8 +139,33 @@ $icon-size: 18px;
       font-size: $font-size-smaller;
     }
 
+    &:not(:hover):not(.checked) > sci-toolbar.actions {
+      display: none;
+    }
+
+    > sci-toolbar.actions.empty {
+      display: none;
+    }
+
+    > sci-toolbar.actions {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--sci-color-background-elevation); // to cover the content of the menu item when the actions overlay the menu item content
+      border-left: 1px solid var(--sci-color-border);
+      --sci-toolbar-toolitem-background-color-hover: color-mix(in srgb, var(--sci-workbench-button-background-color-hover) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+      --sci-toolbar-toolitem-background-color-active: color-mix(in srgb, var(--sci-workbench-button-background-color-active) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+      --sci-toolbar-toolitem-background-color-checked: color-mix(in srgb, var(--sci-workbench-button-background-color-checked) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+      --sci-toolbar-toolitem-border-radius: 0;
+    }
+
     &:hover:where(:not(:disabled)) {
       background-color: var(--sci-workbench-menu-background-color-hover);
+
+      > sci-toolbar.actions {
+        background-color: var(--sci-workbench-menu-background-color-hover);
+      }
     }
 
     &:active:where(:not(:disabled)) {

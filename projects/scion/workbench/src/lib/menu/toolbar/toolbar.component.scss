@@ -1,5 +1,9 @@
 :host {
   display: block;
+  --sci-toolbar-toolitem-background-color-hover: var(--sci-workbench-button-background-color-hover);
+  --sci-toolbar-toolitem-background-color-active: var(--sci-workbench-button-background-color-active);
+  --sci-toolbar-toolitem-background-color-checked: var(--sci-workbench-button-background-color-checked);
+  --sci-toolbar-toolitem-border-radius: var(--sci-corner);
 
   > sci-tool-item-group {
     width: 100%;

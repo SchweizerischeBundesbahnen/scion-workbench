@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, inject, input, linkedSignal, signal, Signal, untracked, viewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, forwardRef, inject, input, linkedSignal, signal, Signal, untracked, viewChild} from '@angular/core';
 import {MMenuGroup, MMenuItem, MSubMenuItem} from '../ɵmenu';
 import {SciMenuRegistry} from '../menu.registry';
 import {UUID} from '@scion/toolkit/uuid';
@@ -6,6 +6,7 @@ import {JoinPipe} from './join.pipe';
 import {MenuItemGroupComponent} from './menu-item-group.component';
 import {MenuItemFilterComponent} from './menu-item-filter/menu-item-filter.component';
 import {MenuItemFilter} from './menu-item-filter/menu-item-filter.service';
+import {SciToolbarComponent} from '../toolbar/toolbar.component';
 
 @Component({
   selector: 'sci-menu',
@@ -16,6 +17,7 @@ import {MenuItemFilter} from './menu-item-filter/menu-item-filter.service';
     JoinPipe,
     MenuItemGroupComponent,
     MenuItemFilterComponent,
+    forwardRef(() => SciToolbarComponent),
   ],
   providers: [
     MenuItemFilter,
@@ -84,20 +86,25 @@ export class MenuComponent {
   }
 
   protected onMenuItemMouseEnter(menuItem: MMenuItem | MSubMenuItem | MMenuGroup): void {
+    console.log('>>> onMenuItemMouseEnter', (menuItem.type === 'sub-menu-item' ? menuItem : null));
+
     this.activeSubMenuItem.set(menuItem.type === 'sub-menu-item' ? menuItem : null);
 
     // Create and display "fake" popover to close popover of other groups or menus.
     if (!this.activeSubMenuItem()) {
-      const popover = this._host.appendChild(this._document.createElement('div'));
-      popover.setAttribute('popover', '');
-      popover.style.setProperty('display', 'none');
-      popover.showPopover();
-      popover.remove();
+      if (1 + 1 === 3) {
+        const popover = this._host.appendChild(this._document.createElement('div'));
+        popover.setAttribute('popover', '');
+        popover.style.setProperty('display', 'none');
+        popover.showPopover();
+        popover.remove();
+      }
     }
   }
 
   protected onTogglePopover(event: ToggleEvent): void {
     if (event.newState === 'closed') {
+      console.log('>>> close 2');
       this.activeSubMenuItem.set(null);
     }
   }
@@ -129,6 +136,7 @@ export class MenuComponent {
   }
 
   private close(): void {
+    console.log('>>> close 1');
     const popover = this._document.documentElement.appendChild(this._document.createElement('div'));
     popover.setAttribute('popover', '');
     popover.style.setProperty('display', 'none');
