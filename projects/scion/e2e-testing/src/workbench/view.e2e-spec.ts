@@ -20,7 +20,7 @@ import {WorkbenchNavigator} from './workbench-navigator';
 import {StartPagePO} from '../start-page.po';
 import {SizeTestPagePO} from './page-object/test-pages/size-test-page.po';
 import {expectMessageBox} from '../matcher/message-box-matcher';
-import {TextMessageBoxPagePO} from '../text-message-box-page.po';
+import {TextMessageBoxPO} from '../text-message-box.po';
 import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
 import {NullContentPagePO} from './page-object/null-content-page.po';
 
@@ -469,11 +469,11 @@ test.describe('Workbench View', () => {
     // Do not wait for the navigation to complete because the message box blocks navigation.
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.navigate([], {target: await testeeViewPage.view.getViewId(), close: true, noWaitAfter: false});
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeHidden();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox)).toBeHidden();
 
     // Activate test view.
     await testeeViewPage.view.tab.click();
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeVisible();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox)).toBeVisible();
     await canCloseMessageBox.clickActionButton('no');
     await expectView(testeeViewPage).toBeActive();
 
@@ -483,11 +483,11 @@ test.describe('Workbench View', () => {
     // Close view via router (path) (prevent).
     // Do not wait for the navigation to complete because the message box blocks navigation.
     await routerPage.navigate(['test-view'], {close: true, noWaitAfter: false});
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeHidden();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox)).toBeHidden();
 
     // Activate test view.
     await testeeViewPage.view.tab.click();
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeVisible();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox)).toBeVisible();
     await canCloseMessageBox.clickActionButton('no');
     await expectView(testeeViewPage).toBeActive();
 
@@ -509,7 +509,7 @@ test.describe('Workbench View', () => {
 
     // Expect the closing to be blocked.
     const canCloseMessageBox = appPO.messagebox({cssClass: ['e2e-close-view', await testeeViewPage.view.getViewId()]});
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeVisible();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox)).toBeVisible();
     await expectView(testeeViewPage).toBeActive();
 
     // Cancel closing.
@@ -520,7 +520,7 @@ test.describe('Workbench View', () => {
     await testeeViewPage.view.tab.close();
 
     // Expect the closing to be blocked.
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeVisible();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox)).toBeVisible();
     await expectView(testeeViewPage).toBeActive();
 
     // Confirm closing.
@@ -540,7 +540,7 @@ test.describe('Workbench View', () => {
 
     // Expect the closing to be blocked.
     const canCloseMessageBox = appPO.messagebox({cssClass: ['e2e-close-view', await testeeViewPage.view.getViewId()]});
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeVisible();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox)).toBeVisible();
     await expectView(testeeViewPage).toBeActive();
 
     // Cancel closing.
@@ -587,8 +587,8 @@ test.describe('Workbench View', () => {
     const canCloseMessageBox3 = appPO.messagebox({cssClass: ['e2e-close-view', await testee3ViewPage.view.getViewId()]});
 
     // Test that the closing of view 2 and view 3 is blocked.
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox2)).toBeHidden();
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox3)).toBeVisible();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox2)).toBeHidden();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox3)).toBeVisible();
 
     // Confirm closing view 3.
     await canCloseMessageBox3.clickActionButton('yes');
@@ -646,8 +646,8 @@ test.describe('Workbench View', () => {
     const canCloseMessageBox3 = appPO.messagebox({cssClass: ['e2e-close-view', await testee3ViewPage.view.getViewId()]});
 
     // Test that the closing of view 2 and view 3 is blocked.
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox2)).toBeHidden();
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox3)).toBeVisible();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox2)).toBeHidden();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox3)).toBeVisible();
 
     // Simulate `CanClose` guard of view 3 to error.
     await canCloseMessageBox3.clickActionButton('error');
@@ -676,7 +676,7 @@ test.describe('Workbench View', () => {
     // Close view 1 (prevented).
     await testeeViewPage1.view.tab.close();
     const canCloseMessageBox1 = appPO.messagebox({cssClass: ['e2e-close-view', await testeeViewPage1.view.getViewId()]});
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox1)).toBeVisible();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox1)).toBeVisible();
     await expectView(testeeViewPage1).toBeActive();
 
     // Open view 2 (prevent it from closing).
@@ -684,19 +684,19 @@ test.describe('Workbench View', () => {
     await testeeViewPage2.checkConfirmClosing(true);
     await expectView(testeeViewPage1).toBeInactive();
     await expectView(testeeViewPage2).toBeActive();
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox1)).toBeHidden();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox1)).toBeHidden();
 
     // Open view 3.
     const testeeViewPage3 = await workbenchNavigator.openInNewTab(ViewPagePO);
     await expectView(testeeViewPage1).toBeInactive();
     await expectView(testeeViewPage2).toBeInactive();
     await expectView(testeeViewPage3).toBeActive();
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox1)).toBeHidden();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox1)).toBeHidden();
 
     // Close view 2 (prevented).
     await testeeViewPage2.view.tab.close();
     const canCloseMessageBox2 = appPO.messagebox({cssClass: ['e2e-close-view', await testeeViewPage2.view.getViewId()]});
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox2)).toBeHidden();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox2)).toBeHidden();
     await expectView(testeeViewPage1).toBeInactive();
     await expectView(testeeViewPage2).toBeInactive();
     await expectView(testeeViewPage3).toBeActive();
@@ -706,31 +706,31 @@ test.describe('Workbench View', () => {
     await expectView(testeeViewPage1).toBeActive();
     await expectView(testeeViewPage2).toBeInactive();
     await expectView(testeeViewPage3).toBeInactive();
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox1)).toBeVisible();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox1)).toBeVisible();
 
     // Confirm closing view 1.
     await canCloseMessageBox1.clickActionButton('yes');
     await expectView(testeeViewPage1).not.toBeAttached();
     await expectView(testeeViewPage2).toBeInactive();
     await expectView(testeeViewPage3).toBeActive();
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox1)).not.toBeAttached();
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox2)).toBeHidden();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox1)).not.toBeAttached();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox2)).toBeHidden();
 
     // Close view 3.
     await testeeViewPage3.view.tab.close();
     await expectView(testeeViewPage1).not.toBeAttached();
     await expectView(testeeViewPage2).toBeActive();
     await expectView(testeeViewPage3).not.toBeAttached();
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox1)).not.toBeAttached();
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox2)).toBeVisible();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox1)).not.toBeAttached();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox2)).toBeVisible();
 
     // Confirm closing view 2.
     await canCloseMessageBox2.clickActionButton('yes');
     await expectView(testeeViewPage1).not.toBeAttached();
     await expectView(testeeViewPage2).not.toBeAttached();
     await expectView(testeeViewPage3).not.toBeAttached();
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox1)).not.toBeAttached();
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox2)).not.toBeAttached();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox1)).not.toBeAttached();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox2)).not.toBeAttached();
   });
 
   test('should unregister `CanClose` guard when navigating to a different page (different route)', async ({appPO, workbenchNavigator}) => {
@@ -843,12 +843,12 @@ test.describe('Workbench View', () => {
 
     // Expect the closing of the test view to be blocked.
     const canCloseMessageBox = appPO.messagebox({cssClass: ['e2e-close-view', 'view.100']});
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeVisible();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox)).toBeVisible();
     await expectView(testViewPage).toBeActive();
 
     // Prevent closing.
     await canCloseMessageBox.clickActionButton('no');
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).not.toBeAttached();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox)).not.toBeAttached();
     await expectView(testViewPage).toBeActive();
 
     // Perform history back.
@@ -876,7 +876,7 @@ test.describe('Workbench View', () => {
 
     // Expect the closing of the test view to be blocked.
     const canCloseMessageBox = appPO.messagebox({cssClass: ['e2e-close-view', 'view.100']});
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeVisible();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox)).toBeVisible();
     await expectView(testViewPage).toBeActive();
 
     // Confirm closing.
@@ -890,7 +890,7 @@ test.describe('Workbench View', () => {
     // Expect test view to be opened.
     await expectView(routerPage).toBeInactive();
     await expectView(testViewPage).toBeActive();
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).not.toBeAttached();
+    await expectMessageBox(new TextMessageBoxPO(canCloseMessageBox)).not.toBeAttached();
 
     // Perform history back.
     await appPO.navigateBack();

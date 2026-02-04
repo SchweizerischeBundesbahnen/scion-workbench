@@ -11,7 +11,7 @@
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {NotificationPagePO} from './page-object/notification-page.po';
-import {TextNotificationPagePO} from '../text-notification-page.po';
+import {TextNotificationPO} from '../text-notification.po';
 import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
 import {expectNotification} from '../matcher/notification-matcher';
 import {MAIN_AREA} from '../workbench.model';
@@ -27,7 +27,7 @@ test.describe('Workbench Notification', () => {
       await notificationOpenerPage.show('Notification', {legacyAPI: true, cssClass: 'testee'});
 
       const notification = appPO.notification({cssClass: 'testee'});
-      const notificationPage = new TextNotificationPagePO(notification);
+      const notificationPage = new TextNotificationPO(notification);
 
       await expectNotification(notificationPage).toBeVisible();
       await expect(notificationPage.text).toHaveText('Notification');
@@ -52,7 +52,7 @@ test.describe('Workbench Notification', () => {
       await notificationOpenerPage.show('Notification', {legacyAPI: true, title: 'title', cssClass: 'testee'});
 
       const notification = appPO.notification({cssClass: 'testee'});
-      const notificationPage = new TextNotificationPagePO(notification);
+      const notificationPage = new TextNotificationPO(notification);
 
       await expectNotification(notificationPage).toBeVisible();
       await expect(notification.title).toHaveText('title');
@@ -264,7 +264,7 @@ test.describe('Workbench Notification', () => {
       await expect(notificationPage6.input).toHaveText('D, E, F');
     });
 
-    test('should close notification via handle', async ({appPO, workbenchNavigator, page}) => {
+    test('should close notification via handle', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
@@ -289,7 +289,7 @@ test.describe('Workbench Notification', () => {
       await notificationOpenerPage.show('Notification', {legacyAPI: true, severity: 'warn', cssClass: 'testee'});
 
       const notification = appPO.notification({cssClass: 'testee'});
-      const notificationPage = new TextNotificationPagePO(notification);
+      const notificationPage = new TextNotificationPO(notification);
 
       await expectNotification(notificationPage).toBeVisible();
       await expect.poll(() => notification.getSeverity()).toEqual('warn');
@@ -338,9 +338,10 @@ test.describe('Workbench Notification', () => {
 
       const notification = appPO.notification({cssClass: 'testee'});
       const notificationPage = new NotificationPagePO(notification);
-
-      await notificationPage.enterTitle('Notification should close after 1s');
       await notificationPage.selectDuration(2);
+
+      // Unfocus notification because not closing if focus owner.
+      await notificationOpenerPage.locator.click();
 
       // Expect the notification to still display after 1.5s.
       await page.waitForTimeout(1500);
@@ -359,7 +360,7 @@ test.describe('Workbench Notification', () => {
     await notificationOpenerPage.show('Notification', {cssClass: 'testee'});
 
     const notification = appPO.notification({cssClass: 'testee'});
-    const notificationPage = new TextNotificationPagePO(notification);
+    const notificationPage = new TextNotificationPO(notification);
 
     await expectNotification(notificationPage).toBeVisible();
     await expect(notificationPage.text).toHaveText('Notification');
@@ -372,10 +373,28 @@ test.describe('Workbench Notification', () => {
     await notificationOpenerPage.show('LINE 1\\nLINE 2', {cssClass: 'testee'});
 
     const notification = appPO.notification({cssClass: 'testee'});
-    const notificationPage = new TextNotificationPagePO(notification);
+    const notificationPage = new TextNotificationPO(notification);
 
     await expectNotification(notificationPage).toBeVisible();
     await expect(notificationPage.text).toHaveText('LINE 1\nLINE 2');
+  });
+
+  test('should show notification with empty text', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPage.show(null, {cssClass: 'testee'});
+
+    const notification = appPO.notification({cssClass: 'testee'});
+    const notificationPage = new TextNotificationPO(notification);
+
+    // Expect text not to be displayed.
+    await expect(notificationPage.text).toBeEmpty();
+
+    // Expect the text message box page to display without height.
+    await expect.poll(() => notificationPage.getTextBoundingBox()).toEqual(expect.objectContaining({
+      height: 0,
+    }));
   });
 
   test('should close the last notification when pressing the ESC key', async ({appPO, workbenchNavigator}) => {
@@ -386,9 +405,9 @@ test.describe('Workbench Notification', () => {
     await notificationOpenerPage.show('Notification', {cssClass: 'testee-2'});
     await notificationOpenerPage.show('Notification', {cssClass: 'testee-3'});
 
-    const notificationPage1 = new TextNotificationPagePO(appPO.notification({cssClass: 'testee-1'}));
-    const notificationPage2 = new TextNotificationPagePO(appPO.notification({cssClass: 'testee-2'}));
-    const notificationPage3 = new TextNotificationPagePO(appPO.notification({cssClass: 'testee-3'}));
+    const notificationPage1 = new TextNotificationPO(appPO.notification({cssClass: 'testee-1'}));
+    const notificationPage2 = new TextNotificationPO(appPO.notification({cssClass: 'testee-2'}));
+    const notificationPage3 = new TextNotificationPO(appPO.notification({cssClass: 'testee-3'}));
 
     await expect(appPO.notifications).toHaveCount(3);
     await expectNotification(notificationPage1).toBeVisible();
@@ -421,7 +440,7 @@ test.describe('Workbench Notification', () => {
     await notificationOpenerPage.show('Notification', {cssClass: 'testee'});
 
     const notification = appPO.notification({cssClass: 'testee'});
-    const notificationPage = new TextNotificationPagePO(notification);
+    const notificationPage = new TextNotificationPO(notification);
 
     await expectNotification(notificationPage).toBeVisible();
     await notification.close();
@@ -460,7 +479,7 @@ test.describe('Workbench Notification', () => {
     await notificationOpenerPage.show('Notification', {title: 'title', cssClass: 'testee'});
 
     const notification = appPO.notification({cssClass: 'testee'});
-    const notificationPage = new TextNotificationPagePO(notification);
+    const notificationPage = new TextNotificationPO(notification);
 
     await expectNotification(notificationPage).toBeVisible();
     await expect(notification.title).toHaveText('title');
@@ -473,7 +492,7 @@ test.describe('Workbench Notification', () => {
     await notificationOpenerPage.show('Notification', {title: 'LINE 1\\nLINE 2', cssClass: 'testee'});
 
     const notification = appPO.notification({cssClass: 'testee'});
-    const notificationPage = new TextNotificationPagePO(notification);
+    const notificationPage = new TextNotificationPO(notification);
 
     await expectNotification(notificationPage).toBeVisible();
     await expect(notification.title).toHaveText('LINE 1\nLINE 2');
@@ -486,7 +505,7 @@ test.describe('Workbench Notification', () => {
     await notificationOpenerPage.show('Notification', {cssClass: 'testee'});
 
     const notification = appPO.notification({cssClass: 'testee'});
-    const notificationPage = new TextNotificationPagePO(notification);
+    const notificationPage = new TextNotificationPO(notification);
 
     await expectNotification(notificationPage).toBeVisible();
     await expect.poll(() => notification.getSeverity()).toEqual('info');
@@ -499,7 +518,7 @@ test.describe('Workbench Notification', () => {
     await notificationOpenerPage.show('Notification', {severity: 'info', cssClass: 'testee'});
 
     const notification = appPO.notification({cssClass: 'testee'});
-    const notificationPage = new TextNotificationPagePO(notification);
+    const notificationPage = new TextNotificationPO(notification);
 
     await expectNotification(notificationPage).toBeVisible();
     await expect.poll(() => notification.getSeverity()).toEqual('info');
@@ -512,7 +531,7 @@ test.describe('Workbench Notification', () => {
     await notificationOpenerPage.show('Notification', {severity: 'warn', cssClass: 'testee'});
 
     const notification = appPO.notification({cssClass: 'testee'});
-    const notificationPage = new TextNotificationPagePO(notification);
+    const notificationPage = new TextNotificationPO(notification);
 
     await expectNotification(notificationPage).toBeVisible();
     await expect.poll(() => notification.getSeverity()).toEqual('warn');
@@ -525,7 +544,7 @@ test.describe('Workbench Notification', () => {
     await notificationOpenerPage.show('Notification', {severity: 'error', cssClass: 'testee'});
 
     const notification = appPO.notification({cssClass: 'testee'});
-    const notificationPage = new TextNotificationPagePO(notification);
+    const notificationPage = new TextNotificationPO(notification);
 
     await expectNotification(notificationPage).toBeVisible();
     await expect.poll(() => notification.getSeverity()).toEqual('error');
@@ -534,10 +553,10 @@ test.describe('Workbench Notification', () => {
   test('should replace notifications of the same group', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const notificationPage1 = new TextNotificationPagePO(appPO.notification({cssClass: 'testee-1'}));
-    const notificationPage2 = new TextNotificationPagePO(appPO.notification({cssClass: 'testee-2'}));
-    const notificationPage3 = new TextNotificationPagePO(appPO.notification({cssClass: 'testee-3'}));
-    const notificationPage4 = new TextNotificationPagePO(appPO.notification({cssClass: 'testee-4'}));
+    const notificationPage1 = new TextNotificationPO(appPO.notification({cssClass: 'testee-1'}));
+    const notificationPage2 = new TextNotificationPO(appPO.notification({cssClass: 'testee-2'}));
+    const notificationPage3 = new TextNotificationPO(appPO.notification({cssClass: 'testee-3'}));
+    const notificationPage4 = new TextNotificationPO(appPO.notification({cssClass: 'testee-4'}));
 
     const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
     await notificationOpenerPage.show('Notification', {
@@ -606,35 +625,64 @@ test.describe('Workbench Notification', () => {
 
     // Expect the notification to display.
     const notification = appPO.notification({cssClass: 'testee'});
-    const notificationPage = new TextNotificationPagePO(notification);
+    const notificationPage = new TextNotificationPO(notification);
     await expectNotification(notificationPage).toBeVisible();
 
     // Hover the notification.
     await notification.hover();
 
-    // Expect notification not to be disposed after 3s.
-    await page.waitForTimeout(3000);
+    // Expect notification not to be closed after 3s.
+    await page.waitForTimeout(2000);
     await expectNotification(notificationPage).toBeVisible();
 
-    // Do not hover notification.
+    // Unhover the notification.
     await appPO.workbenchRoot.hover({position: {x: 0, y: 0}});
 
-    // Hover the notification.
+    // Hover the notification again.
     await notification.hover();
 
-    // Expect notification not to be disposed after 3s.
-    await page.waitForTimeout(3000);
+    // Expect notification not to be closed after 3s.
+    await page.waitForTimeout(2000);
     await expectNotification(notificationPage).toBeVisible();
 
-    // Do not hover notification.
+    // Unhover the notification.
     await appPO.workbenchRoot.hover({position: {x: 0, y: 0}});
 
-    // Expect notification to be disposed after 2s.
+    // Expect notification to be closed after 2s.
     await page.waitForTimeout(2000);
     await expectNotification(notificationPage).not.toBeAttached();
   });
 
-  test('should close notification via handle', async ({appPO, workbenchNavigator, page}) => {
+  test('should not close notification on focus', async ({appPO, workbenchNavigator, page}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPage.show('Notification', {duration: 1000, cssClass: 'testee', title: 'test'});
+
+    // Expect the notification to display.
+    const notification = appPO.notification({cssClass: 'testee'});
+    const notificationPage = new TextNotificationPO(notification);
+    await expectNotification(notificationPage).toBeVisible();
+
+    // Focus the notification.
+    await notification.locator.focus();
+
+    // Unhover the notification because not closing if hovered.
+    await appPO.workbenchRoot.hover({position: {x: 0, y: 0}});
+
+    // Expect notification not to be closed after 3s.
+    await page.waitForTimeout(2000);
+    await expectNotification(notificationPage).toBeVisible();
+
+    // Unfocus notification.
+    await notificationOpenerPage.locator.click();
+
+    // Expect notification to be closed after 2s.
+    await page.waitForTimeout(2000);
+    await expectNotification(notificationPage).not.toBeAttached();
+  });
+
+  test('should close notification via handle', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
@@ -774,6 +822,9 @@ test.describe('Workbench Notification', () => {
         await notificationPage.enterTitle('Notification should close after 1s');
         await notificationPage.selectDuration(2000);
 
+        // Unfocus notification because not closing if focus owner.
+        await notificationOpenerPage.locator.click();
+
         // Expect the notification to still display after 1.5s.
         await page.waitForTimeout(1500);
         expect(await notification.locator.isVisible()).toBe(true);
@@ -793,6 +844,9 @@ test.describe('Workbench Notification', () => {
         const notificationPage = new NotificationPagePO(notification);
 
         await notificationPage.selectDuration(2000);
+
+        // Unfocus notification because not closing if focus owner.
+        await notificationOpenerPage.locator.click();
 
         // Expect the notification to still display after 1.5s.
         await page.waitForTimeout(1500);

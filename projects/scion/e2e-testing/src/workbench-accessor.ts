@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2025 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 
 import {Page} from '@playwright/test';
-import {DialogId, PartId, PopupId, ViewId, WorkbenchService} from '@scion/workbench';
+import {DialogId, NotificationId, PartId, PopupId, ViewId, WorkbenchService} from '@scion/workbench';
 import {RequireOne} from './helper/utility-types';
 
 /**
@@ -27,7 +27,7 @@ export class WorkbenchAccessor {
     });
   }
 
-  public activeElement(): Promise<PartId | ViewId | DialogId | PopupId | null> {
+  public activeElement(): Promise<PartId | ViewId | DialogId | PopupId | NotificationId | null> {
     return this._page.evaluate(() => {
       const workbenchService = (window as unknown as Record<string, unknown>)['__workbenchService'] as WorkbenchService;
       return workbenchService.activeElement()?.id ?? null;

@@ -38,9 +38,9 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO, WorkbenchD
     this._appPO = new AppPO(this.locator.page());
   }
 
-  public async show(message: Translatable, options?: NotificationOpenerPageOptions & WorkbenchNotificationOptions): Promise<void>;
+  public async show(message: Translatable | null, options?: NotificationOpenerPageOptions & WorkbenchNotificationOptions): Promise<void>;
   public async show(component: 'component:notification-page' | 'component:legacy-notification-page', options?: NotificationOpenerPageOptions & WorkbenchNotificationOptions): Promise<void>;
-  public async show(content: Translatable | 'component:notification-page', options?: NotificationOpenerPageOptions & WorkbenchNotificationOptions): Promise<void> {
+  public async show(content: Translatable | null | 'component:notification-page', options?: NotificationOpenerPageOptions & WorkbenchNotificationOptions): Promise<void> {
     if (options?.injector) {
       throw Error('[PageObjectError] PageObject does not support the option `injector`.');
     }
@@ -61,7 +61,7 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO, WorkbenchD
       await this.locator.locator('select.e2e-component').selectOption(componentMatch.groups!['component']!);
     }
     else {
-      await this.locator.locator('input.e2e-text').fill(content);
+      await this.locator.locator('input.e2e-text').fill(content ?? '<null>');
     }
 
     // Enter inputs

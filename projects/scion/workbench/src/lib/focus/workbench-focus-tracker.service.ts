@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2025 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -37,7 +37,7 @@ export abstract class WorkbenchFocusMonitor {
 export function trackFocus(target: HTMLElement, workbenchElement: WorkbenchElement | null): FocusTrackerRef {
   const focusMonitor = inject(ɵWorkbenchFocusMonitor);
 
-  toObservable(focusMonitor.activeElement)
+  const subscription = toObservable(focusMonitor.activeElement)
     .pipe(
       startWith(focusMonitor.activeElement()), // Immediately subscribe to `focusin` events, required when the DOM element is focused right after invocation.
       switchMap(activeWorkbenchElement => activeWorkbenchElement === workbenchElement ? EMPTY : merge(fromEvent<FocusEvent>(target, 'focusin', {once: true}), fromEvent(target, 'sci-microfrontend-focusin', {once: true}))),
@@ -50,6 +50,7 @@ export function trackFocus(target: HTMLElement, workbenchElement: WorkbenchEleme
 
   return {
     unsetActiveElement: () => focusMonitor.unsetActiveElement(workbenchElement),
+    destroy: () => subscription.unsubscribe(),
   };
 }
 
@@ -62,6 +63,11 @@ export interface FocusTrackerRef {
    * Unsets the active workbench element if the tracked element was the focus owner.
    */
   unsetActiveElement(): void;
+
+  /**
+   * Stops focus tracking, unsetting the active workbench element if it was the focus owner.
+   */
+  destroy(): void;
 }
 
 @Injectable({providedIn: 'root'})

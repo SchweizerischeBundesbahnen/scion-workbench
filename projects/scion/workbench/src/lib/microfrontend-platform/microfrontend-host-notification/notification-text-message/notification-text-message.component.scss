@@ -1,0 +1,8 @@
+:host {
+  overflow-wrap: break-word;
+  white-space: pre-line;
+
+  &.empty {
+    display: none;
+  }
+}

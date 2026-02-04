@@ -10,11 +10,11 @@
 
 import {Component, inject, Type} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {NotificationService, WorkbenchNotificationOptions, WorkbenchNotificationService} from '@scion/workbench';
+import {NotificationService, Translatable, WorkbenchNotificationOptions, WorkbenchNotificationService} from '@scion/workbench';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
-import {MultiValueInputComponent, prune, stringifyError} from 'workbench-testing-app-common';
-import {NotificationPageComponent} from '../notification-page/notification-page.component';
+import {MultiValueInputComponent, parseTypedString, prune, stringifyError} from 'workbench-testing-app-common';
+import NotificationPageComponent from '../notification-page/notification-page.component';
 import {UUID} from '@scion/toolkit/uuid';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {LegacyNotificationPageComponent} from '../legacy-notification-page/legacy-notification-page.component';
@@ -89,7 +89,7 @@ export default class NotificationOpenerPageComponent {
           this._notificationService.show(this.readComponentFromUI(), options);
         }
         else {
-          const text = restoreLineBreaks(this.form.controls.text.value);
+          const text = parseTypedString<Translatable>(restoreLineBreaks(this.form.controls.text.value)) ?? null;
           this._notificationService.show(text, options);
         }
       }

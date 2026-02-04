@@ -1,3 +1,7 @@
+@if (activatedMicrofrontend) {
+  <app-activated-microfrontend/>
+}
+
 @if (input()) {
   <sci-form-field label="Input" direction="column">
     <output class="e2e-input input">{{input()}}</output>

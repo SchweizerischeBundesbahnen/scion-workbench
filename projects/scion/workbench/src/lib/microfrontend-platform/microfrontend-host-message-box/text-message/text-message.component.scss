@@ -2,4 +2,8 @@
   overflow-wrap: break-word;
   white-space: pre-line;
   text-align: var(--sci-workbench-messagebox-text-align);
+
+  &.empty {
+    display: none;
+  }
 }

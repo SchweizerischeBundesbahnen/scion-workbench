@@ -1,0 +1,13 @@
+:host {
+  display: grid;
+
+  // Prevent the microfrontend (iframe) from consuming pointer events during a workbench drag operation. Otherwise, moving a part splitter
+  // over the notification would not work because the events are consumed by the iframe.
+  &.workbench-drag > sci-router-outlet {
+    pointer-events: none;
+  }
+
+  > sci-router-outlet::part(splash) {
+    display: grid;
+  }
+}

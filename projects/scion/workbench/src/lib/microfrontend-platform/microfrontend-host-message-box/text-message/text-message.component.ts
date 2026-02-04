@@ -28,6 +28,9 @@ import {ActivatedMicrofrontend} from '../../microfrontend-host/microfrontend-hos
   imports: [
     TextPipe,
   ],
+  host: {
+    '[class.empty]': '!message?.length',
+  },
 })
 export default class TextMessageComponent {
 

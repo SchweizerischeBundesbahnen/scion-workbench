@@ -38,9 +38,9 @@ export class NotificationOpenerPagePO implements MicrofrontendViewPagePO {
     this._appPO = new AppPO(this.locator.page());
   }
 
-  public async show(message: Translatable, options?: NotificationOpenerPageOptions & WorkbenchNotificationOptions): Promise<void>;
+  public async show(message: Translatable | null, options?: NotificationOpenerPageOptions & WorkbenchNotificationOptions): Promise<void>;
   public async show(qualifier: Qualifier, options?: NotificationOpenerPageOptions & WorkbenchNotificationOptions): Promise<void>;
-  public async show(content: Translatable | Qualifier, options?: NotificationOpenerPageOptions & WorkbenchNotificationOptions): Promise<void> {
+  public async show(content: Translatable | Qualifier | null, options?: NotificationOpenerPageOptions & WorkbenchNotificationOptions): Promise<void> {
     // Select API.
     const legacyAPI = options?.legacyAPI;
     await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-legacy-api')).toggle(legacyAPI?.enabled ?? false);
@@ -51,7 +51,10 @@ export class NotificationOpenerPagePO implements MicrofrontendViewPagePO {
     await qualifierField.clear();
 
     // Enter text or qualifier.
-    if (typeof content === 'string') {
+    if (content === null) {
+      await this.locator.locator('input.e2e-text').fill('<null>');
+    }
+    else if (typeof content === 'string') {
       await this.locator.locator('input.e2e-text').fill(content);
     }
     else {

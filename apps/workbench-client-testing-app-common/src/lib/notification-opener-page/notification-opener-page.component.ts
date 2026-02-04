@@ -10,13 +10,13 @@
 
 import {Component, computed, inject, signal, Signal} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {WORKBENCH_ELEMENT, WorkbenchElement, WorkbenchNotificationConfig, WorkbenchNotificationOptions, WorkbenchNotificationService} from '@scion/workbench-client';
+import {Translatable, WORKBENCH_ELEMENT, WorkbenchElement, WorkbenchNotificationConfig, WorkbenchNotificationOptions, WorkbenchNotificationService} from '@scion/workbench-client';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {UUID} from '@scion/toolkit/uuid';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {MultiValueInputComponent, prune, stringifyError} from 'workbench-testing-app-common';
+import {MultiValueInputComponent, parseTypedString, prune, stringifyError} from 'workbench-testing-app-common';
 import {Beans} from '@scion/toolkit/bean-manager';
 
 @Component({
@@ -37,7 +37,16 @@ export class NotificationOpenerPageComponent {
   private readonly _notificationService = inject(WorkbenchNotificationService);
 
   protected readonly form = this._formBuilder.group({
-    qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
+    qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([
+      this._formBuilder.group({
+        key: this._formBuilder.control('component'),
+        value: this._formBuilder.control('notification'),
+      }),
+      this._formBuilder.group({
+        key: this._formBuilder.control('app'),
+        value: this._formBuilder.control('app1'),
+      }),
+    ]),
     text: this._formBuilder.control(''),
     options: this._formBuilder.group({
       params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
@@ -84,7 +93,8 @@ export class NotificationOpenerPageComponent {
           .catch((error: unknown) => this.notificationOpenError.set(stringifyError(error) || 'Workbench Notification could not be opened'));
       }
       else {
-        this._notificationService.show(restoreLineBreaks(this.form.controls.text.value), this.readOptions())
+        const message = parseTypedString<Translatable>(restoreLineBreaks(this.form.controls.text.value)) ?? null;
+        this._notificationService.show(message, this.readOptions())
           .catch((error: unknown) => this.notificationOpenError.set(stringifyError(error) || 'Workbench Notification could not be opened'));
       }
     }

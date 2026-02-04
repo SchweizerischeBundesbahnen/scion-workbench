@@ -26,7 +26,7 @@ export class ɵWorkbenchNotificationService implements WorkbenchNotificationServ
   private readonly _zone = inject(NgZone);
 
   /** @inheritDoc */
-  public show(message: Translatable | ComponentType<unknown>, options?: WorkbenchNotificationOptions): void {
+  public show(message: Translatable | null | ComponentType<unknown>, options?: WorkbenchNotificationOptions): void {
     assertNotInReactiveContext(this.show, 'Call WorkbenchNotificationService.show() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
     // Ensure to run in Angular zone to show the notification even when called from outside the Angular zone.
@@ -51,7 +51,7 @@ export class ɵWorkbenchNotificationService implements WorkbenchNotificationServ
   /**
    * Creates the notification handle.
    */
-  private createNotification(message: Translatable | ComponentType<unknown>, options?: WorkbenchNotificationOptions): ɵWorkbenchNotification {
+  private createNotification(message: Translatable | null | ComponentType<unknown>, options?: WorkbenchNotificationOptions): ɵWorkbenchNotification {
     // Construct the handle in an injection context that shares the notification's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
     const notificationId = computeNotificationId();
     const notificationInjector = Injector.create({

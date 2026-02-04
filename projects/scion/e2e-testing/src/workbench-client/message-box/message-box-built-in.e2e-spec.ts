@@ -12,7 +12,7 @@ import {test} from '../../fixtures';
 import {MessageBoxOpenerPagePO} from '../page-object/message-box-opener-page.po';
 import {expect} from '@playwright/test';
 import {expectMessageBox} from '../../matcher/message-box-matcher';
-import {TextMessagePO} from '../page-object/text-message.po';
+import {TextMessageBoxPO} from '../page-object/text-message-box.po';
 
 test.describe('Workbench Message Box Built-in Capability', () => {
 
@@ -35,7 +35,7 @@ test.describe('Workbench Message Box Built-in Capability', () => {
       await messageBoxOpenerPage.open('TEXT', {cssClass: 'testee'});
 
       const messageBox = appPO.messagebox({cssClass: 'testee'});
-      const textMessagePage = new TextMessagePO(messageBox);
+      const textMessagePage = new TextMessageBoxPO(messageBox);
 
       await expectMessageBox(textMessagePage).toBeVisible();
       await expect(textMessagePage.text).toHaveText('TEXT');
@@ -51,7 +51,7 @@ test.describe('Workbench Message Box Built-in Capability', () => {
       await messageBoxOpenerPage.open('LINE 1\\nLINE 2', {cssClass: 'testee'});
 
       const messageBox = appPO.messagebox({cssClass: 'testee'});
-      const textMessagePage = new TextMessagePO(messageBox);
+      const textMessagePage = new TextMessageBoxPO(messageBox);
 
       await expect(textMessagePage.text).toHaveText('LINE 1\nLINE 2');
     });
@@ -66,7 +66,7 @@ test.describe('Workbench Message Box Built-in Capability', () => {
       await messageBoxOpenerPage.open('This text should be selectable!', {cssClass: 'testee', contentSelectable: true});
 
       const messageBox = appPO.messagebox({cssClass: 'testee'});
-      const textMessagePage = new TextMessagePO(messageBox);
+      const textMessagePage = new TextMessageBoxPO(messageBox);
 
       await expect.poll(() => textMessagePage.isTextSelectable()).toBe(true);
     });
@@ -81,7 +81,7 @@ test.describe('Workbench Message Box Built-in Capability', () => {
       await messageBoxOpenerPage.open(null, {cssClass: 'testee'});
 
       const messageBox = appPO.messagebox({cssClass: 'testee'});
-      const textMessagePage = new TextMessagePO(messageBox);
+      const textMessagePage = new TextMessageBoxPO(messageBox);
 
       // Expect text not to be displayed.
       await expect(textMessagePage.text).toBeEmpty();
@@ -276,7 +276,7 @@ test.describe('Workbench Message Box Built-in Capability', () => {
           },
         });
         const messageBox = appPO.messagebox({cssClass: 'testee'});
-        const textMessagePage = new TextMessagePO(messageBox);
+        const textMessagePage = new TextMessageBoxPO(messageBox);
 
         await expectMessageBox(textMessagePage).toBeVisible();
 
@@ -296,7 +296,7 @@ test.describe('Workbench Message Box Built-in Capability', () => {
           },
         });
         const messageBox = appPO.messagebox({cssClass: 'testee'});
-        const textMessagePage = new TextMessagePO(messageBox);
+        const textMessagePage = new TextMessageBoxPO(messageBox);
 
         await expectMessageBox(textMessagePage).toBeVisible();
 

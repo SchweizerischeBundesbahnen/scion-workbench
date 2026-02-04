@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2025 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,8 +19,9 @@ import {RouterPagePO} from './page-object/router-page.po';
 import {PartId, WorkbenchLayout} from '@scion/workbench';
 import {ActiveWorkbenchElementLogPagePO} from '../workbench/page-object/test-pages/active-workbench-element-log-page.po';
 import {MAIN_AREA} from '../workbench.model';
-import {canMatchWorkbenchDialogCapability, canMatchWorkbenchMessageBoxCapability, canMatchWorkbenchPopupCapability} from '../workbench/page-object/layout-page/register-route-page.po';
+import {canMatchWorkbenchDialogCapability, canMatchWorkbenchMessageBoxCapability, canMatchWorkbenchNotificationCapability, canMatchWorkbenchPopupCapability} from '../workbench/page-object/layout-page/register-route-page.po';
 import {WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchPopupCapability} from './page-object/register-workbench-capability-page.po';
+import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
 
 test.describe('Focus Tracker', () => {
 
@@ -744,6 +745,166 @@ test.describe('Focus Tracker', () => {
     // Expect popup not to have focus.
     await expect.poll(() => appPO.focusOwner()).toBeNull();
     await expect.poll(() => logPart.getLog()).toEqual([popupId, 'part.right', popupId, 'part.right', popupId, null]);
+  });
+
+  test('should focus notification when clicking microfrontend notification', async ({appPO, workbenchNavigator, microfrontendNavigator, page}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart(MAIN_AREA)
+      .addPart('part.right', {align: 'right'}, {title: 'Part Right'})
+      .navigatePart('part.right', ['path/to/part'])
+      .modify(addActiveWorkbenchElementPart('part.log')),
+    );
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'notification',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-pages/focus-test-page',
+        size: {
+          height: '100px',
+        },
+      },
+    });
+
+    const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
+    await logPart.clearLog();
+
+    // Open microfrontend notification opener view.
+    const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+    const notificationOpenerViewId = await notificationOpenerPagePO.view.tab.getViewId();
+    await logPart.clearLog();
+
+    // PRECONDITION: Expect microfrontend notification opener view to have workbench focus.
+    await expect.poll(() => logPart.getLog()).toEqual([]);
+    await expect.poll(() => appPO.focusOwner()).toEqual(notificationOpenerViewId);
+
+    // TEST: Open notification.
+    await notificationOpenerPagePO.show({component: 'testee'}, {
+      cssClass: 'testee',
+    });
+
+    const notificationId = await appPO.notification({cssClass: 'testee'}).getNotificationId();
+    const focusTestPage = new FocusTestPagePO(appPO.notification({notificationId: notificationId}));
+    await focusTestPage.waitUntilAttached();
+
+    // Expect notification not to gain focus when opened.
+    await expect.poll(() => appPO.focusOwner()).toEqual(notificationOpenerViewId);
+    await expect.poll(() => logPart.getLog()).toEqual([]);
+    await expect.poll(() => focusTestPage.isFocused()).toBe(false);
+
+    // TEST: Focus element in the notification.
+    await focusTestPage.firstField.click();
+
+    // Expect notification to have focus.
+    await expect.poll(() => appPO.focusOwner()).toEqual(notificationId);
+    await expect.poll(() => logPart.getLog()).toEqual([notificationId]);
+    await expect(focusTestPage.firstField).toBeFocused();
+    await expect.poll(() => focusTestPage.isFocused()).toBe(true);
+
+    // TEST: Focus element outside the notification.
+    await appPO.part({partId: 'part.right'}).bar.filler.click();
+
+    // Expect notification not to have focus.
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.right');
+    await expect.poll(() => logPart.getLog()).toEqual([notificationId, 'part.right']);
+    await expect.poll(() => focusTestPage.isFocused()).toBe(false);
+
+    // TEST: Focus element in the notification.
+    await focusTestPage.firstField.click();
+
+    // Expect notification to have focus.
+    await expect.poll(() => appPO.focusOwner()).toEqual(notificationId);
+    await expect.poll(() => logPart.getLog()).toEqual([notificationId, 'part.right', notificationId]);
+    await expect(focusTestPage.firstField).toBeFocused();
+    await expect.poll(() => focusTestPage.isFocused()).toBe(true);
+
+    // TEST: Close the notification by pressing Escape.
+    await page.keyboard.press('Escape');
+
+    // Expect notification not to have focus.
+    await expect.poll(() => appPO.focusOwner()).toBeNull();
+    await expect.poll(() => logPart.getLog()).toEqual([notificationId, 'part.right', notificationId, null]);
+  });
+
+  test('should focus notification when clicking microfrontend host notification', async ({appPO, workbenchNavigator, microfrontendNavigator, page}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart(MAIN_AREA)
+      .addPart('part.right', {align: 'right'}, {title: 'Part Right'})
+      .navigatePart('part.right', ['path/to/part'])
+      .modify(addActiveWorkbenchElementPart('part.log')),
+    );
+
+    await microfrontendNavigator.registerCapability('host', {
+      type: 'notification',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: '',
+      },
+    });
+
+    // Register host notification route.
+    await workbenchNavigator.registerRoute({
+      path: '', component: 'focus-test-page', canMatch: [canMatchWorkbenchNotificationCapability({component: 'testee'})],
+    });
+
+    const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
+    await logPart.clearLog();
+
+    // Open microfrontend notification opener view.
+    const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'host');
+    const notificationOpenerViewId = await notificationOpenerPagePO.view.tab.getViewId();
+    await logPart.clearLog();
+
+    // PRECONDITION: Expect microfrontend notification opener view to have workbench focus.
+    await expect.poll(() => logPart.getLog()).toEqual([]);
+    await expect.poll(() => appPO.focusOwner()).toEqual(notificationOpenerViewId);
+
+    // TEST: Open notification.
+    await notificationOpenerPagePO.show({component: 'testee'}, {
+      cssClass: 'testee',
+    });
+
+    const notificationId = await appPO.notification({cssClass: 'testee'}).getNotificationId();
+    const focusTestPage = new HostFocusTestPagePO(appPO.notification({notificationId}));
+
+    // Expect notification not to gain focus when opened.
+    await expect.poll(() => appPO.focusOwner()).toEqual(notificationOpenerViewId);
+    await expect.poll(() => logPart.getLog()).toEqual([]);
+
+    // TEST: Focus element in the notification.
+    await focusTestPage.firstField.click();
+
+    // Expect notification to have focus.
+    await expect.poll(() => appPO.focusOwner()).toEqual(notificationId);
+    await expect.poll(() => logPart.getLog()).toEqual([notificationId]);
+    await expect(focusTestPage.firstField).toBeFocused();
+
+    // TEST: Focus element outside the notification.
+    await appPO.part({partId: 'part.right'}).bar.filler.click();
+
+    // Expect notification not to have focus.
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.right');
+    await expect.poll(() => logPart.getLog()).toEqual([notificationId, 'part.right']);
+    await expect(focusTestPage.firstField).not.toBeFocused();
+
+    // TEST: Focus element in the notification.
+    await focusTestPage.firstField.click();
+
+    // Expect notification to have focus.
+    await expect.poll(() => appPO.focusOwner()).toEqual(notificationId);
+    await expect.poll(() => logPart.getLog()).toEqual([notificationId, 'part.right', notificationId]);
+    await expect(focusTestPage.firstField).toBeFocused();
+
+    // TEST: Close the notification by pressing Escape.
+    await page.keyboard.press('Escape');
+
+    // Expect notification not to have focus.
+    await expect.poll(() => appPO.focusOwner()).toBeNull();
+    await expect.poll(() => logPart.getLog()).toEqual([notificationId, 'part.right', notificationId, null]);
   });
 });
 

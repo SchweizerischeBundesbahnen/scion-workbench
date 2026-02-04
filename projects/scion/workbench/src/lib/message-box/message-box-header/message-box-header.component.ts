@@ -24,6 +24,6 @@ import {TextPipe} from '../../text/text.pipe';
 })
 export class MessageBoxHeaderComponent {
 
-  public readonly title = input<Translatable>();
+  public readonly title = input<Translatable | undefined>();
   public readonly severity = input.required<'info' | 'warn' | 'error'>();
 }

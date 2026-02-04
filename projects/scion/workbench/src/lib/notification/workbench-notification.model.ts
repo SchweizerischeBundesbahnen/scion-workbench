@@ -1,9 +1,10 @@
 import {Signal} from '@angular/core';
 import {Translatable} from '../text/workbench-text-provider.model';
+import {NotificationId} from '../workbench.identifiers';
 
 /**
- * A notification is a closable message displayed in the upper-right corner that disappears after a few seconds unless hovered.
- * It informs about system events, task completion or errors. The severity indicates importance or urgency.
+ * A notification is a closable message displayed in the upper-right corner that disappears after a few seconds unless hovered or focused.
+ * It informs about system events, task completion, or errors. Severity indicates importance or urgency.
  *
  * The notification component can inject this handle to interact with the notification.
  *
@@ -12,6 +13,10 @@ import {Translatable} from '../text/workbench-text-provider.model';
  * @see WorkbenchNotificationService
  */
 export abstract class WorkbenchNotification {
+  /**
+   * Identity of this notification.
+   */
+  public abstract readonly id: NotificationId;
 
   /**
    * Sets the title of the notification.
@@ -20,6 +25,11 @@ export abstract class WorkbenchNotification {
    */
   public abstract get title(): Signal<Translatable | undefined>;
   public abstract set title(title: Translatable | undefined);
+
+  /**
+   * Sets the preferred notification size. Defaults to the content's intrinsic size, constrained by min and max size, if set.
+   */
+  public abstract readonly size: WorkbenchNotificationSize;
 
   /**
    * Sets the severity of the notification to indicate importance or urgency.
@@ -42,7 +52,38 @@ export abstract class WorkbenchNotification {
   public abstract set cssClass(cssClass: string | string[]);
 
   /**
+   * Indicates whether this notification has the focus.
+   */
+  public abstract readonly focused: Signal<boolean>;
+
+  /**
    * Closes the notification.
    */
   public abstract close(): void;
+}
+
+/**
+ * Represents the preferred notification size.
+ */
+export interface WorkbenchNotificationSize {
+  /**
+   * Specifies the height of the notification, constrained by {@link minHeight} and {@link maxHeight}, if any.
+   */
+  get height(): Signal<string | undefined>;
+
+  set height(height: string | undefined);
+
+  /**
+   * Specifies the minimum height of the notification.
+   */
+  get minHeight(): Signal<string | undefined>;
+
+  set minHeight(minHeight: string | undefined);
+
+  /**
+   * Specifies the maximum height of the notification.
+   */
+  get maxHeight(): Signal<string | undefined>;
+
+  set maxHeight(maxHeight: string | undefined);
 }

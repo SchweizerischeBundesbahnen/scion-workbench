@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
- * available under the terms from the Eclipse Public License 2.0
+ * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
  *
  * SPDX-License-Identifier: EPL-2.0
@@ -17,11 +17,13 @@ import {WorkbenchDialogPagePO} from '../workbench-dialog-page.po';
 import {WorkbenchViewPagePO} from '../workbench-view-page.po';
 import {WorkbenchPopupPagePO} from '../workbench-popup-page.po';
 import {DesktopPO} from '../../../desktop.po';
+import {NotificationPO} from '../../../notification.po';
+import {WorkbenchNotificationPagePO} from '../workbench-notification-page.po';
 
 /**
  * Page object to interact with {@link FocusTestPageComponent}.
  */
-export class FocusTestPagePO implements WorkbenchViewPagePO, WorkbenchDialogPagePO, WorkbenchPopupPagePO {
+export class FocusTestPagePO implements WorkbenchViewPagePO, WorkbenchDialogPagePO, WorkbenchPopupPagePO, WorkbenchNotificationPagePO {
 
   public readonly locator: Locator;
 
@@ -29,7 +31,7 @@ export class FocusTestPagePO implements WorkbenchViewPagePO, WorkbenchDialogPage
   public middleField: Locator;
   public lastField: Locator;
 
-  constructor(private _locateBy: PartPO | ViewPO | DialogPO | PopupPO | DesktopPO) {
+  constructor(private _locateBy: PartPO | ViewPO | DialogPO | PopupPO | DesktopPO | NotificationPO) {
     this.locator = _locateBy.locator.locator('app-focus-test-page');
     this.firstField = this.locator.locator('input.e2e-first-field');
     this.middleField = this.locator.locator('input.e2e-middle-field');
@@ -74,6 +76,15 @@ export class FocusTestPagePO implements WorkbenchViewPagePO, WorkbenchDialogPage
     }
     else {
       throw Error('[PageObjectError] Test page not opened in a popup.');
+    }
+  }
+
+  public get notification(): NotificationPO {
+    if (this._locateBy instanceof NotificationPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a notification.');
     }
   }
 }

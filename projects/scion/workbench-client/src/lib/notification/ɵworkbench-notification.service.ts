@@ -30,9 +30,9 @@ export class ɵWorkbenchNotificationService implements WorkbenchNotificationServ
   public show(qualifier: Qualifier, options?: WorkbenchNotificationOptions): Promise<void>;
   public show(notification: WorkbenchNotificationConfig, qualifier?: Qualifier): Promise<void>;
   // TODO [Angular 22] Remove backward compatiblity. Replace content with content of `showNotification`
-  public show(arg1: Translatable | Qualifier | WorkbenchNotificationConfig, arg2?: WorkbenchNotificationOptions | Qualifier): Promise<void> {
+  public show(arg1: Translatable | Qualifier | WorkbenchNotificationConfig | null, arg2?: WorkbenchNotificationOptions | Qualifier): Promise<void> {
     // New API to open built-in text notification.
-    if (typeof arg1 === 'string') {
+    if (typeof arg1 === 'string' || arg1 === null) {
       return this.showNotification(arg1, arg2);
     }
 
@@ -46,10 +46,10 @@ export class ɵWorkbenchNotificationService implements WorkbenchNotificationServ
     return this.showNotification(arg1 as Qualifier, arg2 as WorkbenchNotificationOptions | undefined);
   }
 
-  private async showNotification(message: Translatable | Qualifier, options?: WorkbenchNotificationOptions): Promise<void> {
+  private async showNotification(message: Translatable | Qualifier | null, options?: WorkbenchNotificationOptions): Promise<void> {
     const intent = ((): Intent => {
-      if (typeof message === 'string') {
-        return {type: WorkbenchCapabilities.Notification, qualifier: {}, params: new Map().set(eNOTIFICATION_MESSAGE_PARAM, message)};
+      if (typeof message === 'string' || message === null) {
+        return {type: WorkbenchCapabilities.Notification, qualifier: {}, params: new Map().set(eNOTIFICATION_MESSAGE_PARAM, message ?? undefined)};
       }
       else {
         return {type: WorkbenchCapabilities.Notification, qualifier: message, params: Maps.coerce(options?.params)};

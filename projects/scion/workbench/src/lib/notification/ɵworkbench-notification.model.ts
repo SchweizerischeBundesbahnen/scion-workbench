@@ -1,8 +1,8 @@
-import {DestroyableInjector, DestroyRef, DOCUMENT, effect, inject, Injector, NgZone, Signal, signal, untracked, WritableSignal} from '@angular/core';
+import {computed, DestroyableInjector, DestroyRef, DOCUMENT, effect, inject, Injector, NgZone, Signal, signal, untracked, WritableSignal} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
 import {Arrays} from '@scion/toolkit/util';
 import {NotificationId} from '../workbench.identifiers';
-import {WorkbenchNotification} from './workbench-notification.model';
+import {WorkbenchNotification, WorkbenchNotificationSize} from './workbench-notification.model';
 import {WorkbenchNotificationOptions} from './workbench-notification.options';
 import {Translatable} from '../text/workbench-text-provider.model';
 import {ɵNotification} from './ɵnotification';
@@ -11,12 +11,14 @@ import {fromEvent} from 'rxjs';
 import {observeIn, subscribeIn} from '@scion/toolkit/operators';
 import {filter} from 'rxjs/operators';
 import {WorkbenchNotificationRegistry} from './workbench-notification.registry';
+import {WORKBENCH_ELEMENT} from '../workbench-element-references';
+import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
 
 /** @inheritDoc */
 export class ɵWorkbenchNotification implements WorkbenchNotification {
 
   /** Injector for the notification; destroyed when the notification is closed. */
-  private readonly _injector = inject(Injector) as DestroyableInjector;
+  public readonly injector = inject(Injector) as DestroyableInjector;
 
   public readonly slot: {
     component: ComponentType<unknown> | undefined;
@@ -25,16 +27,19 @@ export class ɵWorkbenchNotification implements WorkbenchNotification {
   };
 
   private readonly _notificationRegistry = inject(WorkbenchNotificationRegistry);
+  private readonly _focusMonitor = inject(WorkbenchFocusMonitor);
   private readonly _title: WritableSignal<Translatable | undefined>;
   private readonly _severity: WritableSignal<'info' | 'warn' | 'error'>;
   private readonly _duration: WritableSignal<'short' | 'medium' | 'long' | 'infinite' | number>;
   private readonly _cssClass: WritableSignal<string[]>;
 
+  public readonly size: WorkbenchNotificationSize = new ɵWorkbenchNotificationSize();
+  public readonly focused = computed(() => this._focusMonitor.activeElement()?.id === this.id);
   public readonly destroyed = signal<boolean>(false);
   public readonly group: string | undefined;
 
   constructor(public id: NotificationId,
-              content: Translatable | ComponentType<unknown>,
+              content: Translatable | null | ComponentType<unknown>,
               private _options: WorkbenchNotificationOptions) {
     this.slot = {
       injector: this.createInjector(),
@@ -62,6 +67,7 @@ export class ɵWorkbenchNotification implements WorkbenchNotification {
         {provide: ɵWorkbenchNotification, useValue: this},
         {provide: WorkbenchNotification, useExisting: ɵWorkbenchNotification},
         {provide: Notification, useClass: ɵNotification},
+        {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchNotification},
         ...this._options.providers ?? [],
       ],
     });
@@ -150,8 +156,46 @@ export class ɵWorkbenchNotification implements WorkbenchNotification {
    */
   public destroy(): void {
     if (!this.destroyed()) {
-      this._injector.destroy();
+      this.injector.destroy();
       this._notificationRegistry.unregister(this.id);
     }
+  }
+}
+
+/** @inheritDoc */
+class ɵWorkbenchNotificationSize implements WorkbenchNotificationSize {
+
+  private readonly _height = signal<string | undefined>(undefined);
+  private readonly _minHeight = signal<string | undefined>(undefined);
+  private readonly _maxHeight = signal<string | undefined>(undefined);
+
+  /** @inheritDoc */
+  public get height(): Signal<string | undefined> {
+    return this._height;
+  }
+
+  /** @inheritDoc */
+  public set height(height: string | undefined) {
+    untracked(() => this._height.set(height));
+  }
+
+  /** @inheritDoc */
+  public get minHeight(): Signal<string | undefined> {
+    return this._minHeight;
+  }
+
+  /** @inheritDoc */
+  public set minHeight(minHeight: string | undefined) {
+    untracked(() => this._minHeight.set(minHeight));
+  }
+
+  /** @inheritDoc */
+  public get maxHeight(): Signal<string | undefined> {
+    return this._maxHeight;
+  }
+
+  /** @inheritDoc */
+  public set maxHeight(maxHeight: string | undefined) {
+    untracked(() => this._maxHeight.set(maxHeight));
   }
 }

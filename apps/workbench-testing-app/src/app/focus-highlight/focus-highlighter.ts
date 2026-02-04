@@ -63,6 +63,9 @@ export function installFocusHighlighter(): void {
       case 'popup': {
         return document.querySelector(`wb-popup[data-popupid="${element.id}"]`);
       }
+      case 'notification': {
+        return document.querySelector(`wb-notification[data-notificationid="${element.id}"]`);
+      }
       default: {
         return null;
       }

@@ -463,7 +463,7 @@ export class AppPO {
    *
    * Note that the focused workbench element does not necessarily correspond to the active DOM element.
    */
-  public async focusOwner(): Promise<PartId | ViewId | DialogId | PopupId | null> {
+  public async focusOwner(): Promise<PartId | ViewId | DialogId | PopupId | NotificationId | null> {
     return this.workbench.activeElement();
   }
 

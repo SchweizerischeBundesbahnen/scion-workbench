@@ -31,11 +31,11 @@ export class ɵWorkbenchMessageBox implements WorkbenchMessageBox {
   public readonly referrer: WorkbenchMessageBox['referrer'];
   public readonly focused$: Observable<boolean>;
 
-  constructor(private _context: ɵMessageBoxContext) {
-    this.id = this._context.dialogId;
-    this.capability = this._context.capability;
-    this.params = this._context.params;
-    this.referrer = this._context.referrer;
+  constructor(context: ɵMessageBoxContext) {
+    this.id = context.dialogId;
+    this.capability = context.capability;
+    this.params = context.params;
+    this.referrer = context.referrer;
     this.focused$ = Beans.get(MessageClient).observe$<boolean>(ɵWorkbenchCommands.dialogFocusedTopic(this.id))
       .pipe(
         mapToBody(),

@@ -18,8 +18,8 @@ import {prune} from '../common/prune.util';
 /**
  * Shows a notification.
  *
- * A notification is a closable message displayed in the upper-right corner that disappears after a few seconds unless hovered.
- * It informs about system events, task completion or errors. The severity indicates importance or urgency.
+ * A notification is a closable message displayed in the upper-right corner that disappears after a few seconds unless hovered or focused.
+ * It informs about system events, task completion, or errors. Severity indicates importance or urgency.
  *
  * Notifications can be grouped. Only the most recent notification within a group is displayed.
  *

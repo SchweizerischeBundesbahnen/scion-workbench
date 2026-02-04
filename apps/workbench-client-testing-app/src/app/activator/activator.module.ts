@@ -11,7 +11,7 @@
 import {inject, NgModule} from '@angular/core';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Capability, ManifestService, MessageClient} from '@scion/microfrontend-platform';
-import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchNotificationCapability, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
 import {APP_SYMBOLIC_NAME} from '../workbench-client/workbench-client.provider';
 import {provideTextFromStorage, provideValueFromStorage} from './storage-text-provider';
 
@@ -49,6 +49,7 @@ async function registerCapabilities(): Promise<void> {
     provideDialogCapability(app),
     provideMessageBoxCapability(app),
     providePopupCapability(app),
+    provideNotificationCapability(app),
   ];
 
   for (const capability of capabilities) {
@@ -265,6 +266,22 @@ function providePopupCapability(app: 'app1' | 'app2'): WorkbenchPopupCapability 
     private: false,
     properties: {
       path: 'test-popup',
+      showSplash: true,
+    },
+  };
+}
+
+function provideNotificationCapability(app: 'app1' | 'app2'): WorkbenchNotificationCapability {
+  return {
+    type: WorkbenchCapabilities.Notification,
+    qualifier: {component: 'notification', app},
+    description: 'Notification to interact with Notification handle',
+    private: false,
+    properties: {
+      path: 'test-notification',
+      size: {
+        height: '425px',
+      },
       showSplash: true,
     },
   };

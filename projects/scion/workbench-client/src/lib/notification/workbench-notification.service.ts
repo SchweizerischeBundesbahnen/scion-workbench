@@ -16,14 +16,13 @@ import {WorkbenchNotificationOptions} from './workbench-notification.options';
 /**
  * Shows a notification.
  *
- * A notification is a closable message displayed in the upper-right corner that disappears after a few seconds unless hovered.
- * It informs about system events, task completion or errors. The severity indicates importance or urgency.
+ * A notification is a closable message displayed in the upper-right corner that disappears after a few seconds unless hovered or focused.
+ * It informs about system events, task completion, or errors. Severity indicates importance or urgency.
  *
  * Notifications can be grouped. Only the most recent notification within a group is displayed.
  *
- * The built-in notification supports the display of a plain text message.
- * Other notification capabilities can be contributed by the host app, e.g., to display structured content or to provide out-of-the-box
- * notification templates. The use of a qualifier distinguishes different notification providers.
+ * A microfrontend provided as a `notification` capability can be opened in a notification. The qualifier differentiates between different
+ * notification capabilities. Declaring an intention allows for opening public notification capabilities of other applications.
  *
  * @see WorkbenchNotificationCapability
  * @category Notification
@@ -35,12 +34,12 @@ export abstract class WorkbenchNotificationService {
    *
    * This method requires the intention `{"type": "notification"}`.
    *
-   * @param message - Specifies the text to display.
+   * @param message - Specifies the text to display, if any.
    *                  Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    * @param options - Controls the appearance and behavior of the notification.
    * @returns Promise that resolves when the notification is displayed, or that rejects otherwise, e.g., because of missing the intention.
    */
-  public abstract show(message: Translatable, options?: WorkbenchNotificationOptions): Promise<void>;
+  public abstract show(message: Translatable | null, options?: WorkbenchNotificationOptions): Promise<void>;
 
   /**
    * Displays the microfrontend of a `notification` capability as workbench notification based on the given qualifier and options.

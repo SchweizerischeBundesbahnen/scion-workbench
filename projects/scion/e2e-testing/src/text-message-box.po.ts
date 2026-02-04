@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2022 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms from the Eclipse Public License 2.0
@@ -9,20 +9,20 @@
  */
 
 import {Locator} from '@playwright/test';
-import {WorkbenchMessageBoxPagePO} from '../../workbench/page-object/workbench-message-box-page.po';
-import {MessageBoxPO} from '../../message-box.po';
-import {DomRect, fromRect} from '../../helper/testing.util';
+import {WorkbenchMessageBoxPagePO} from './workbench/page-object/workbench-message-box-page.po';
+import {MessageBoxPO} from './message-box.po';
+import {DomRect, fromRect} from './helper/testing.util';
 
 /**
- * Page object to interact with {@link TextMessageComponent} - the built-in text message box capability.
+ * Page object to interact with a workbench message box displaying text.
  */
-export class TextMessagePO implements WorkbenchMessageBoxPagePO {
+export class TextMessageBoxPO implements WorkbenchMessageBoxPagePO {
 
   public readonly locator: Locator;
   public readonly text: Locator;
 
   constructor(public messageBox: MessageBoxPO) {
-    this.locator = this.messageBox.locator.locator('wb-text-message');
+    this.locator = this.messageBox.locator.locator('div.e2e-message');
     this.text = this.locator;
   }
 
@@ -35,7 +35,7 @@ export class TextMessagePO implements WorkbenchMessageBoxPagePO {
     return !!selection?.length && text.includes(selection);
   }
 
-  public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.boundingBox());
+  public async getTextBoundingBox(): Promise<DomRect> {
+    return fromRect(await this.text.boundingBox());
   }
 }

@@ -12,7 +12,7 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
 import {MessageBoxPagePO} from './page-object/message-box-page.po';
-import {TextMessageBoxPagePO} from '../text-message-box-page.po';
+import {TextMessageBoxPO} from '../text-message-box.po';
 import {expectMessageBox} from '../matcher/message-box-matcher';
 
 test.describe('Workbench Message Box', () => {
@@ -26,7 +26,7 @@ test.describe('Workbench Message Box', () => {
       await messageBoxOpenerPage.open('message', {cssClass: 'testee'});
 
       const messageBox = appPO.messagebox({cssClass: 'testee'});
-      const messageBoxPage = new TextMessageBoxPagePO(messageBox);
+      const messageBoxPage = new TextMessageBoxPO(messageBox);
 
       await expect(messageBoxPage.text).toHaveText('message');
     });
@@ -39,7 +39,7 @@ test.describe('Workbench Message Box', () => {
       await messageBoxOpenerPage.open(null, {cssClass: 'testee'});
 
       const messageBox = appPO.messagebox({cssClass: 'testee'});
-      const messageBoxPage = new TextMessageBoxPagePO(messageBox);
+      const messageBoxPage = new TextMessageBoxPO(messageBox);
 
       // Expect text not to be displayed.
       await expect(messageBoxPage.text).toBeEmpty();
@@ -58,7 +58,7 @@ test.describe('Workbench Message Box', () => {
       await messageBoxOpenerPage.open('LINE 1\\nLINE 2', {cssClass: 'testee'});
 
       const messageBox = appPO.messagebox({cssClass: 'testee'});
-      const messageBoxPage = new TextMessageBoxPagePO(messageBox);
+      const messageBoxPage = new TextMessageBoxPO(messageBox);
 
       await expect(messageBoxPage.text).toHaveText('LINE 1\nLINE 2');
     });
@@ -71,7 +71,7 @@ test.describe('Workbench Message Box', () => {
       await messageBoxOpenerPage.open('This text should be selectable!', {cssClass: 'testee', contentSelectable: true});
 
       const messageBox = appPO.messagebox({cssClass: 'testee'});
-      const messageBoxPage = new TextMessageBoxPagePO(messageBox);
+      const messageBoxPage = new TextMessageBoxPO(messageBox);
 
       await expect.poll(() => messageBoxPage.isTextSelectable()).toBe(true);
     });
@@ -227,7 +227,7 @@ test.describe('Workbench Message Box', () => {
           },
         });
         const messageBox = appPO.messagebox({cssClass: 'testee'});
-        const messageBoxPage = new TextMessageBoxPagePO(messageBox);
+        const messageBoxPage = new TextMessageBoxPO(messageBox);
 
         await expectMessageBox(messageBoxPage).toBeVisible();
 
@@ -246,7 +246,7 @@ test.describe('Workbench Message Box', () => {
           },
         });
         const messageBox = appPO.messagebox({cssClass: 'testee'});
-        const messageBoxPage = new TextMessageBoxPagePO(messageBox);
+        const messageBoxPage = new TextMessageBoxPO(messageBox);
 
         await expectMessageBox(messageBoxPage).toBeVisible();
 
@@ -409,7 +409,7 @@ test.describe('Workbench Message Box', () => {
         cssClass: 'testee',
       });
       const messageBox = appPO.messagebox({cssClass: 'testee'});
-      const messageBoxPage = new TextMessageBoxPagePO(messageBox);
+      const messageBoxPage = new TextMessageBoxPO(messageBox);
 
       // Expect message box to exceed maximal width.
       await expect.poll(() => messageBox.dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({

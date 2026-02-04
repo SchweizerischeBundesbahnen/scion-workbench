@@ -16,11 +16,11 @@ import {RouterPagePO} from './page-object/router-page.po';
 import {TextTestPagePO} from './page-object/test-pages/text-test-page.po';
 import {TextTestPagePO as HostTextTestPagePO} from '../workbench/page-object/test-pages/text-test-page.po';
 import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
-import {TextMessageBoxPagePO} from '../text-message-box-page.po';
+import {TextMessageBoxPO} from '../text-message-box.po';
 import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
-import {TextNotificationPagePO} from '../text-notification-page.po';
 import {MAIN_AREA} from '../workbench.model';
 import {canMatchWorkbenchDialogCapability, canMatchWorkbenchPartCapability, canMatchWorkbenchViewCapability} from '../workbench/page-object/layout-page/register-route-page.po';
+import {TextNotificationPO} from './page-object/text-notification.po';
 
 test.describe('Text Provider', () => {
 
@@ -5690,7 +5690,7 @@ test.describe('Text Provider', () => {
       const messageBoxOpener = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
       await messageBoxOpener.open('Message', {cssClass: 'testee', title: 'Title', actions: {yes: 'Yes', no: 'No'}});
       const messageBox = appPO.messagebox({cssClass: 'testee'});
-      const textMessageBoxPage = new TextMessageBoxPagePO(messageBox);
+      const textMessageBoxPage = new TextMessageBoxPO(messageBox);
 
       // Expect message box texts as specified.
       await expect(messageBox.title).toHaveText('Title');
@@ -5708,7 +5708,7 @@ test.describe('Text Provider', () => {
       const messageBoxOpener = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
       await messageBoxOpener.open('%', {cssClass: 'testee', title: '%', actions: {yes: '%', no: '%'}});
       const messageBox = appPO.messagebox({cssClass: 'testee'});
-      const textMessageBoxPage = new TextMessageBoxPagePO(messageBox);
+      const textMessageBoxPage = new TextMessageBoxPO(messageBox);
 
       // Expect message box texts as specified.
       await expect(messageBox.title).toHaveText('%');
@@ -5780,7 +5780,7 @@ test.describe('Text Provider', () => {
       // Open test message box.
       await messageBoxOpenerApp1.open('%message.message', {cssClass: 'testee', title: '%message.title', actions: {yes: '%yes.action', no: '%no.action'}});
       const messageBox = appPO.messagebox({cssClass: 'testee'});
-      const textMessageBoxPage = new TextMessageBoxPagePO(messageBox);
+      const textMessageBoxPage = new TextMessageBoxPO(messageBox);
 
       // Provide text.
       await test.step('Provide text', async () => {
@@ -5829,7 +5829,7 @@ test.describe('Text Provider', () => {
       const notificationOpener = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
       await notificationOpener.show('Notification', {title: 'Title', cssClass: 'testee'});
       const notification = appPO.notification({cssClass: 'testee'});
-      const textNotificationBoxPage = new TextNotificationPagePO(notification);
+      const textNotificationBoxPage = new TextNotificationPO(notification);
 
       // Expect notification texts as specified.
       await expect(notification.title).toHaveText('Title');
@@ -5846,7 +5846,7 @@ test.describe('Text Provider', () => {
       const notificationOpener = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
       await notificationOpener.show('%', {title: '%', cssClass: 'testee'});
       const notification = appPO.notification({cssClass: 'testee'});
-      const textNotificationBoxPage = new TextNotificationPagePO(notification);
+      const textNotificationBoxPage = new TextNotificationPO(notification);
 
       // Expect notification texts as specified.
       await expect(notification.title).toHaveText('%');
@@ -5917,7 +5917,7 @@ test.describe('Text Provider', () => {
       // Open test notification.
       await notificationOpenerApp1.show('%notification.message', {title: '%notification.title', cssClass: 'testee'});
       const notification = appPO.notification({cssClass: 'testee'});
-      const textNotificationPage = new TextNotificationPagePO(notification);
+      const textNotificationPage = new TextNotificationPO(notification);
 
       // Provide text.
       await test.step('Provide text', async () => {
