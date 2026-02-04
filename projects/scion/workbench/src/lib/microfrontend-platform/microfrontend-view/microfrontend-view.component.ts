@@ -9,8 +9,8 @@
  */
 
 import {ChangeDetectorRef, Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Injector, linkedSignal, Provider, signal, Signal, untracked, viewChild} from '@angular/core';
-import {asyncScheduler, firstValueFrom, MonoTypeOperatorFunction, switchMap, tap} from 'rxjs';
-import {filter, first, map, subscribeOn, take} from 'rxjs/operators';
+import {firstValueFrom, MonoTypeOperatorFunction, switchMap, tap} from 'rxjs';
+import {filter, first, map, take} from 'rxjs/operators';
 import {ManifestService, mapToBody, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {WorkbenchViewCapability, ɵVIEW_CAPABILITY_ID_PARAM_NAME, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
@@ -37,6 +37,7 @@ import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provid
 import {prune} from '../../common/prune.util';
 import {MicrofrontendViewNavigationData} from './microfrontend-view-navigation-data';
 import {Routing} from '../../routing/routing.util';
+import {Objects} from '../../common/objects.util';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -110,7 +111,6 @@ export class MicrofrontendViewComponent {
         filter((context): context is NavigationContext => !!context.capability),
         delayIfLazy(),
         serializeExecution(context => this.onNavigate(context)),
-        subscribeOn(asyncScheduler), // subscribe asynchronously because `onCapabilityChange` triggers a manual change detection cycle for inactive views; would error if called during component construction otherwise.
         takeUntilDestroyed(),
       )
       .subscribe();
@@ -137,6 +137,7 @@ export class MicrofrontendViewComponent {
         }),
         referrer: navigationData.referrer,
       }),
+      equal: (a, b) => a.capability?.metadata!.id === b.capability?.metadata!.id && Objects.isEqual(a.params, b.params), // do not create new navigation context when navigating to the same capability with the same params
     });
   }
 

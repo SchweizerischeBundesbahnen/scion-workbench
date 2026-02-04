@@ -8,8 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Objects as ToolkitObjects} from '@scion/toolkit/util';
-
 /**
  * Provides helper functions for working with objects.
  */
@@ -43,9 +41,56 @@ export const Objects = {
     return Object.entries(object ?? {}).map(([key, value]) => `${key}=${value}`).join(';');
   },
   /**
-   * Compares the two objects for shallow equality, ignoring the propery order.
+   * Compares two objects for deep equality, ignoring property order.
    */
   isEqual: (a: unknown, b: unknown): boolean => {
-    return ToolkitObjects.isEqual(a, b);
+    if (a === b) {
+      return true;
+    }
+
+    if (!a || !b) {
+      return false;
+    }
+
+    if (typeof a !== 'object' || typeof b !== 'object') {
+      return false;
+    }
+
+    if (a instanceof Map || b instanceof Map) {
+      if (!(a instanceof Map) || !(b instanceof Map)) {
+        return false;
+      }
+
+      if (a.size !== b.size) {
+        return false;
+      }
+
+      return [...a.entries()].every(([key, value]) => b.has(key) && Objects.isEqual(value, b.get(key)));
+    }
+
+    if (a instanceof Set || b instanceof Set) {
+      if (!(a instanceof Set) || !(b instanceof Set)) {
+        return false;
+      }
+
+      if (a.size !== b.size) {
+        return false;
+      }
+
+      return [...a].every(value => [...b].some(other => Objects.isEqual(value, other)));
+    }
+
+    if (Array.isArray(a) !== Array.isArray(b)) {
+      return false;
+    }
+
+    const aKeys = Object.keys(a);
+    const bKeys = Object.keys(b);
+
+    if (aKeys.length !== bKeys.length) {
+      return false;
+    }
+
+    return aKeys.every(key => Objects.isEqual((a as Record<string, unknown>)[key], (b as Record<string, unknown>)[key]));
   },
 } as const;

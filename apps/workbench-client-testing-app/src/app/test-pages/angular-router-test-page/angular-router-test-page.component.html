@@ -1,0 +1,10 @@
+<section>
+  <sci-form-field label="Path">
+    <span class="e2e-path">{{location.path()}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="Query Params">
+    <sci-key-value-field [keyValueFormArray]="form.controls.queryParams" [addable]="true" [removable]="true" class="e2e-query-params"/>
+  </sci-form-field>
+</section>
+<button (click)="onNavigate()" class="e2e-navigate">Navigate</button>

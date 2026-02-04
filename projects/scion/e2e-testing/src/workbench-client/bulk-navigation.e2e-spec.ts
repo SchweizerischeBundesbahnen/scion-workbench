@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,14 +26,24 @@ test.describe('Bulk Navigation', () => {
       },
     });
 
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'view'},
+      properties: {
+        path: 'test-view',
+      },
+    });
+
     // Open test page.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
     const bulkNavigationTestPage = new BulkNavigationTestPagePO(appPO.view({cssClass: 'testee'}));
 
-    await bulkNavigationTestPage.enterViewCount(10);
-    await bulkNavigationTestPage.enterCssClass('bulk-navigation-test-target');
-    await bulkNavigationTestPage.clickNavigateAwait();
+    await bulkNavigationTestPage.clickNavigateAwait({component: 'view'}, {
+      count: 10,
+      target: 'blank',
+      cssClass: 'bulk-navigation-test-target',
+    });
 
     await expect(appPO.views({cssClass: 'bulk-navigation-test-target'})).toHaveCount(10);
   });
@@ -49,14 +59,24 @@ test.describe('Bulk Navigation', () => {
       },
     });
 
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'view'},
+      properties: {
+        path: 'test-view',
+      },
+    });
+
     // Open test page.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
     const bulkNavigationTestPage = new BulkNavigationTestPagePO(appPO.view({cssClass: 'testee'}));
 
-    await bulkNavigationTestPage.enterViewCount(10);
-    await bulkNavigationTestPage.enterCssClass('bulk-navigation-test-target');
-    await bulkNavigationTestPage.clickNavigateNoAwait();
+    await bulkNavigationTestPage.clickNavigateNoAwait({component: 'view'}, {
+      count: 10,
+      target: 'blank',
+      cssClass: 'bulk-navigation-test-target',
+    });
 
     await expect(appPO.views({cssClass: 'bulk-navigation-test-target'})).toHaveCount(10);
   });

@@ -16,6 +16,10 @@ const routes: Routes = [
     loadComponent: (): any => import('./bulk-navigation-test-page/bulk-navigation-test-page.component'),
   },
   {
+    path: 'angular-router-test-page',
+    loadComponent: (): any => import('./angular-router-test-page/angular-router-test-page.component'),
+  },
+  {
     path: 'view-properties-test-page',
     loadComponent: (): any => import('./view-properties-test-page/view-properties-test-page.component'),
   },
