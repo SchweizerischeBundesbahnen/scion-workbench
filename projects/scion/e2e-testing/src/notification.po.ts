@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {coerceArray, selectBy, DomRect, fromRect, getCssClasses} from './helper/testing.util';
+import {coerceArray, DomRect, fromRect, getCssClasses, selectBy} from './helper/testing.util';
 import {RequireOne} from './helper/utility-types';
 import {NotificationId} from '../../workbench/src/lib/workbench.identifiers';
 
@@ -28,8 +28,16 @@ export class NotificationPO {
     this.title = this.locator.locator('header.e2e-title');
   }
 
+  public async getNotificationId(): Promise<NotificationId> {
+    return (await this.locator.getAttribute('data-notificationid')) as NotificationId;
+  }
+
   public async getBoundingBox(): Promise<DomRect> {
     return fromRect(await this.locator.boundingBox());
+  }
+
+  public getComputedStyle(): Promise<CSSStyleDeclaration> {
+    return this.locator.locator('.e2e-outline').evaluate((notificationElement: HTMLElement) => getComputedStyle(notificationElement));
   }
 
   public async getSeverity(): Promise<'info' | 'warn' | 'error' | null> {
@@ -38,6 +46,10 @@ export class NotificationPO {
 
   public async hover(): Promise<void> {
     await this.locator.hover();
+  }
+
+  public async focus(): Promise<void> {
+    await this.locator.locator('.e2e-outline').click();
   }
 
   public async close(): Promise<void> {

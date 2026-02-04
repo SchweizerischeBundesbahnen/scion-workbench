@@ -1,4 +1,4 @@
-<div class="outline">
+<div class="outline e2e-outline" [tabindex]="-1" #notification_element>
   <!-- Title -->
   @if (notification().title(); as title) {
     <header class="e2e-title">{{(title | wbText)()}}</header>
@@ -8,7 +8,9 @@
   @if (notification().slot.text) {
     <span class="e2e-message">{{(notification().slot.text | wbText)()}}</span>
   } @else {
-    <ng-container *ngComponentOutlet="notification().slot.component!; inputs: notification().inputs | wbRemoveLegacyInput; injector: notification().slot.injector"/>
+    <sci-viewport>
+      <ng-container *ngComponentOutlet="notification().slot.component!; inputs: notification().inputs | wbRemoveLegacyInput; injector: notification().slot.injector"/>
+    </sci-viewport>
   }
 </div>
 <button (click)="onClose()"
