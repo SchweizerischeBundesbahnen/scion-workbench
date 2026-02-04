@@ -16,6 +16,7 @@ import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {coerceArray} from '../../helper/testing.util';
 import {Params} from '@angular/router';
 import {ActivatedMicrofrontendPO} from './activated-microfrontend.po';
+import {toTypedString} from '../../helper/typed-value.util';
 
 /**
  * Page object to interact with {@link PartPageComponent}.
@@ -94,6 +95,10 @@ export class PartPagePO {
 
   public async enterTitle(title: Translatable | undefined): Promise<void> {
     await this.locator.locator('input.e2e-title').fill(title ?? '<undefined>');
+  }
+
+  public async enterBadge(badge: string | number | boolean | undefined): Promise<void> {
+    await this.locator.locator('input.e2e-badge').fill(toTypedString(badge));
   }
 
   public async enterCssClass(cssClass: string | string[]): Promise<void> {

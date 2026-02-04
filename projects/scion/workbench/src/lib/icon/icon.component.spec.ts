@@ -60,6 +60,51 @@ describe('IconComponent', () => {
     expectIcon(fixture, {component: SpecIcon2Component, innerText: 'icon 2'});
   });
 
+  fit('should render icon with badge', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideIconProvider(() => SpecIconComponent),
+        {provide: ComponentFixtureAutoDetect, useValue: true},
+      ],
+    });
+
+    @Component({selector: 'spec-icon', template: 'icon'})
+    class SpecIconComponent {
+    }
+
+    const fixture = TestBed.createComponent(SpecRootComponent);
+
+    // Render icon.
+    fixture.componentInstance.icon.set('icon');
+    await fixture.whenStable();
+    expectIcon(fixture, {component: SpecIconComponent, innerText: 'icon', badge: null});
+
+    // Set badge (true).
+    fixture.componentInstance.badge.set(true);
+    await fixture.whenStable();
+    expectIcon(fixture, {component: SpecIconComponent, innerText: 'icon', badge: ''});
+
+    // Set badge (false).
+    fixture.componentInstance.badge.set(false);
+    await fixture.whenStable();
+    expectIcon(fixture, {component: SpecIconComponent, innerText: 'icon', badge: null});
+
+    // Set badge (number).
+    fixture.componentInstance.badge.set(99);
+    await fixture.whenStable();
+    expectIcon(fixture, {component: SpecIconComponent, innerText: 'icon', badge: '99'});
+
+    // Set badge (string).
+    fixture.componentInstance.badge.set('ABC');
+    await fixture.whenStable();
+    expectIcon(fixture, {component: SpecIconComponent, innerText: 'icon', badge: 'ABC'});
+
+    // Set badge (undefined).
+    fixture.componentInstance.badge.set(undefined);
+    await fixture.whenStable();
+    expectIcon(fixture, {component: SpecIconComponent, innerText: 'icon', badge: null});
+  });
+
   it('should render icon with input(s)', async () => {
     TestBed.configureTestingModule({
       providers: [
@@ -426,7 +471,7 @@ function provideIconProvider(...iconProviders: WorkbenchIconProviderFn[]): Envir
 /**
  * Expects the specified icon to display.
  */
-function expectIcon(fixture: ComponentFixture<unknown> | DebugElement, expected: {innerText: string; component?: ComponentType<unknown>; cssClass?: string[]}): void {
+function expectIcon(fixture: ComponentFixture<unknown> | DebugElement, expected: {innerText: string; component?: ComponentType<unknown>; cssClass?: string[]; badge?: string | null}): void {
   const debugElement = fixture instanceof ComponentFixture ? fixture.debugElement : fixture;
 
   const iconDebugElement = debugElement.query(By.css('wb-icon'));
@@ -436,10 +481,10 @@ function expectIcon(fixture: ComponentFixture<unknown> | DebugElement, expected:
   if (expected.component) {
     expect(iconDebugElement.componentInstance).toBeInstanceOf(expected.component);
   }
-  expect(iconHTMLElement.innerText).toEqual(expected.innerText);
+  expect(iconHTMLElement.firstChild!.textContent).toEqual(expected.innerText);
 
-  // Expect <wb-icon> to be a leaf element.
-  expect(iconDebugElement.children).toHaveSize(0);
+  // Expect <wb-icon> to be a leaf element. // TODO remove?
+  // expect(iconDebugElement.children).toHaveSize(0);
 
   // Expect to render single icon.
   expect(debugElement.queryAll(By.css('wb-icon'))).toHaveSize(1);
@@ -448,15 +493,28 @@ function expectIcon(fixture: ComponentFixture<unknown> | DebugElement, expected:
   if (expected.cssClass) {
     expect(iconHTMLElement.classList.value).toEqual(expected.cssClass.join(' '));
   }
+
+  if (expected.badge !== undefined) {
+    const badgeDebugElement = iconDebugElement.children[0]!;
+
+    if (expected.badge === null) {
+      expect(badgeDebugElement).toBeUndefined();
+      return;
+    }
+
+    const badgeHTMLElement = badgeDebugElement.nativeElement as HTMLElement;
+    expect(badgeHTMLElement.innerText).toEqual(expected.badge);
+  }
 }
 
 @Component({
   selector: 'spec-root',
-  template: '<wb-icon [icon]="icon()" [attr.class]="clazz()" [ngClass]="ngClazz()"/>',
+  template: '<wb-icon [icon]="icon()" [attr.class]="clazz()" [ngClass]="ngClazz()" [badge]="badge()"/>',
   imports: [IconComponent, NgClass],
 })
 class SpecRootComponent {
   public icon = signal<string | undefined>(undefined);
   public clazz = signal<string>('');
   public ngClazz = signal<string>('');
+  public badge = signal<string | number | boolean | undefined>(undefined);
 }

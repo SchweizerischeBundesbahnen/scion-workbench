@@ -1,0 +1,20 @@
+<section>
+  <sci-form-field label="Part Id">
+    <input [formControl]="form.controls.partId" class="e2e-part-id">
+  </sci-form-field>
+
+  <sci-form-field label="Badge">
+    <input [formControl]="form.controls.badge" (ngModelChange)="onPartBadgeChange($event)" class="e2e-badge" [attr.list]="badgeList">
+  </sci-form-field>
+</section>
+
+<!-- Close button -->
+<ng-template wbDialogAction>
+  <button (click)="onClose()">Close</button>
+</ng-template>
+
+<datalist [attr.id]="badgeList">
+  <option value="<undefined>"></option>
+  <option value="<boolean>true</boolean>"></option>
+  <option value="<boolean>false</boolean>"></option>
+</datalist>

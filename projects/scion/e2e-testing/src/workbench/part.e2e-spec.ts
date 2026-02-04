@@ -19,6 +19,7 @@ import {RouterPagePO} from './page-object/router-page.po';
 import {LayoutPagePO} from './page-object/layout-page/layout-page.po';
 import {canMatchWorkbenchPart} from './page-object/layout-page/register-route-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
+import {PartInfoDialogPO} from './page-object/part-info-dialog.po';
 
 test.describe('Workbench Part', () => {
 
@@ -350,6 +351,85 @@ test.describe('Workbench Part', () => {
       // Expect part title to display.
       await expect(appPO.part({partId: 'part.left'}).bar.title).toHaveText('testee-1');
       await expect(appPO.part({partId: 'part.right'}).bar.title).toHaveText('testee-2');
+    });
+  });
+
+  test.describe('Badge', () => {
+
+    test('should display part badge (part open)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.main-area')
+        .addPart('part.testee', {dockTo: 'left-top'}, {label: 'testee', icon: 'folder', activate: true, ɵactivityId: 'activity.1'})
+        .navigatePart('part.testee', ['test-part']),
+      );
+
+      const partPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
+      const badge = appPO.activityItem({activityId: 'activity.1'}).badge();
+
+      // Expect badge not to be attached.
+      await expect(badge).not.toBeAttached();
+
+      // Set badge (true).
+      await partPage.enterBadge(true);
+      await expect(badge).toHaveText('');
+
+      // Set badge (false).
+      await partPage.enterBadge(false);
+      await expect(badge).not.toBeAttached();
+
+      // Set badge (number).
+      await partPage.enterBadge(99);
+      await expect(badge).toHaveText('99');
+
+      // Set badge (string).
+      await partPage.enterBadge('ABC');
+      await expect(badge).toHaveText('ABC');
+
+      // Set badge (undefined).
+      await partPage.enterBadge(undefined);
+      await expect(badge).not.toBeAttached();
+    });
+
+    test('should display part badge (part closed)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.main-area')
+        .addPart('part.testee', {dockTo: 'left-top'}, {label: 'testee', icon: 'folder', ɵactivityId: 'activity.1'}),
+      );
+
+      // Open part info dialog.
+      await appPO.header.clickSettingMenuItem({cssClass: 'e2e-show-part-info'});
+      const partInfoPage = new PartInfoDialogPO(appPO.dialog({cssClass: 'e2e-part-info'}));
+      const badge = appPO.activityItem({activityId: 'activity.1'}).badge();
+
+      // Enter part id.
+      await partInfoPage.enterPartId('part.testee');
+
+      // Expect badge not to be attached.
+      await expect(badge).not.toBeAttached();
+
+      // Set badge (true).
+      await partInfoPage.enterBadge(true);
+      await expect(badge).toHaveText('');
+
+      // Set badge (false).
+      await partInfoPage.enterBadge(false);
+      await expect(badge).not.toBeAttached();
+
+      // Set badge (number).
+      await partInfoPage.enterBadge(99);
+      await expect(badge).toHaveText('99');
+
+      // Set badge (string).
+      await partInfoPage.enterBadge('ABC');
+      await expect(badge).toHaveText('ABC');
+
+      // Set badge (undefined).
+      await partInfoPage.enterBadge(undefined);
+      await expect(badge).not.toBeAttached();
     });
   });
 

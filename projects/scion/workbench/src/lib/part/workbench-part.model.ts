@@ -10,7 +10,7 @@
 
 import {WorkbenchPartAction} from '../workbench.model';
 import {WorkbenchView} from '../view/workbench-view.model';
-import {Signal} from '@angular/core';
+import {Signal, WritableSignal} from '@angular/core';
 import {NavigationData, NavigationState} from '../routing/routing.model';
 import {UrlSegment} from '@angular/router';
 import {PartId, ViewId} from '../workbench.identifiers';
@@ -50,6 +50,16 @@ export abstract class WorkbenchPart {
    */
   public abstract get title(): Signal<Translatable | undefined>;
   public abstract set title(title: Translatable | undefined);
+
+  /**
+   * Badge displayed next to the part icon if the part is docked.
+   *
+   * Possible types are:
+   *  - `true`: empty badge
+   *  - `string` | `number`: badge content
+   *  - `false` | `undefined`: no badge
+   */
+  public abstract readonly badge: WritableSignal<string | number | boolean | undefined>;
 
   /**
    * Indicates whether this part is located in the workbench main area.

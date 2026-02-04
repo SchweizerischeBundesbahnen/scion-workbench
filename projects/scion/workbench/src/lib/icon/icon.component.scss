@@ -2,4 +2,5 @@
   display: inline-grid;
   place-content: center;
   font-size: 1em; // Unset the preferred icon size, for example, Material sets the font size to 24px.
+  position: relative; // Positioning context for badge.
 }

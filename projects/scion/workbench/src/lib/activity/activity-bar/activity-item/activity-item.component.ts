@@ -16,6 +16,8 @@ import {text} from '../../../text/text';
 import {WorkbenchLayoutService} from '../../../layout/workbench-layout.service';
 import {isPartId, isViewId} from '../../../workbench.identifiers';
 import {WorkbenchFocusMonitor} from '../../../focus/workbench-focus-tracker.service';
+import {WorkbenchPartRegistry} from '../../../part/workbench-part.registry';
+import {WorkbenchPart} from '../../../part/workbench-part.model';
 
 /**
  * Renders a button to toggle the visibility of an activity.
@@ -42,6 +44,7 @@ export class ActivityItemComponent {
 
   protected readonly tooltip = text(computed(() => this.activity().tooltip ?? this.activity().label));
   protected readonly focusWithinActivity = this.computeFocusWithinActivity();
+  protected readonly referencePart = this.computeReferencePart();
 
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
 
@@ -69,6 +72,18 @@ export class ActivityItemComponent {
         }
         return false;
       });
+    });
+  }
+
+  private computeReferencePart(): Signal<WorkbenchPart> {
+    const layout = inject(WorkbenchLayoutService).layout;
+    const partRegistry = inject(WorkbenchPartRegistry);
+
+    return computed(() => {
+      const activity = this.activity();
+      const partId = layout().grids[activity.id]!.referencePartId!;
+
+      return untracked(() => partRegistry.get(partId));
     });
   }
 }

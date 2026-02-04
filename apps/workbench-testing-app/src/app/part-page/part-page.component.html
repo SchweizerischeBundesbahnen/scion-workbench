@@ -90,6 +90,10 @@
            [formControl]="form.controls.partActions"
            placeholder='Enter action(s) as JSON array: [{"content":"...","align":"end","cssClass":"e2e-open-in-new"}]'>
   </sci-form-field>
+
+  <sci-form-field label="Badge">
+    <input [ngModel]="part.badge() ?? '<undefined>'" (ngModelChange)="onPartBadgeChange($event)" class="e2e-badge" [attr.list]="badgeList">
+  </sci-form-field>
 </section>
 
 @for (action of partActions(); track action) {
@@ -102,4 +106,10 @@
 
 <datalist [attr.id]="titleList">
   <option value="<undefined>">&lt;undefined&gt;</option>
+</datalist>
+
+<datalist [attr.id]="badgeList">
+  <option value="<undefined>"></option>
+  <option value="<boolean>true</boolean>"></option>
+  <option value="<boolean>false</boolean>"></option>
 </datalist>

@@ -66,6 +66,7 @@ export class ɵWorkbenchPart implements WorkbenchPart, Blockable {
   public readonly topLeft = signal(false);
   public readonly topRight = signal(false);
   public readonly activity = signal<MActivity | null>(null);
+  public readonly badge = signal<string | number | boolean | undefined>(undefined);
   public readonly canMinimize = computed(() => this.activity() !== null && this.topRight());
   public readonly actions: Signal<WorkbenchPartAction[]>;
   public readonly activeView: Signal<ɵWorkbenchView | null>;

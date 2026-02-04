@@ -53,6 +53,7 @@ export default class PartPageComponent {
   protected readonly uuid = UUID.randomUUID();
   protected readonly partActions: Signal<WorkbenchPartActionDescriptor[]>;
   protected readonly titleList = `title-list-${UUID.randomUUID()}`;
+  protected readonly badgeList = `badge-list-${UUID.randomUUID()}`;
   protected readonly form = this._formBuilder.group({
     partActions: this._formBuilder.control(''),
     cssClass: this._formBuilder.control(''),
@@ -65,6 +66,10 @@ export default class PartPageComponent {
 
   protected onPartTitleChange(title: Translatable): void {
     this.part.title = parseTypedString(title)!;
+  }
+
+  protected onPartBadgeChange(badge: string): void {
+    this.part.badge.set(parseTypedString(badge)!);
   }
 
   private computePartActions(): Signal<WorkbenchPartActionDescriptor[]> {

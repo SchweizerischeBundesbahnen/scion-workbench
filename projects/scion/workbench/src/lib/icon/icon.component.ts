@@ -8,8 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, computed, createComponent, DestroyRef, effect, ElementRef, EnvironmentInjector, inject, Injector, input, Renderer2, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
+import {ApplicationRef, ChangeDetectionStrategy, Component, computed, createComponent, DestroyRef, effect, ElementRef, inject, Injector, input, inputBinding, Renderer2, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
 import {WORKBENCH_ICON_PROVIDER, WorkbenchIconDescriptor, WorkbenchIconProviderFn} from './workbench-icon-provider.model';
+import {IconBadgeDirective} from './icon-badge.directive';
 
 /**
  * Renders an icon based on registered icon providers.
@@ -33,10 +34,13 @@ export class IconComponent {
    * Refer to the installed icon providers for a list of supported icons.
    */
   public readonly icon = input.required<string | undefined>();
+  public readonly badge = input<string | number | boolean | undefined>();
+  public readonly inverseBadge = input(false);
 
   private readonly _injector = inject(Injector);
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _renderer = inject(Renderer2);
+  private readonly _applicationRef = inject(ApplicationRef);
 
   private readonly _iconDescriptor = computeIconDescriptor(this.icon);
 
@@ -60,15 +64,15 @@ export class IconComponent {
         // Create the icon component and attach it, rendering a placeholder component if no provider
         // is found to effectively remove the previous component (if any) from the DOM.
         const componentRef = createComponent(component ?? NullIconComponent, {
+          bindings: Object.entries(inputs ?? {}).map(([key, value]) => inputBinding(key, () => value)),
           elementInjector: injector ?? this._injector,
-          environmentInjector: this._injector.get(EnvironmentInjector),
+          environmentInjector: this._applicationRef.injector,
+          directives: [{type: IconBadgeDirective, bindings: [inputBinding('badge', this.badge), inputBinding('inverse', this.inverseBadge)]}],
           hostElement: this._host,
         });
 
-        // Set inputs.
-        for (const input in inputs) {
-          componentRef.setInput(input, inputs[input]);
-        }
+        // Attach view to include the component into change detection cycles.
+        this._applicationRef.attachView(componentRef.hostView);
         componentRef.changeDetectorRef.detectChanges();
 
         // Destroy the component when the icon is changed.

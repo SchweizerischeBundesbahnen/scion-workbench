@@ -37,4 +37,8 @@ export class ActivityItemPO {
         return this.locator.locator(':scope[data-focus-within-activity]');
     }
   }
+
+  public badge(): Locator {
+    return this.locator.locator('wb-icon').locator('div.e2e-badge');
+  }
 }

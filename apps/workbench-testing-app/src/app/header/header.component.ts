@@ -14,7 +14,7 @@ import {MenuItem, MenuItemSeparator} from '../menu/menu-item';
 import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-params';
 import {Router} from '@angular/router';
 import {MenuService} from '../menu/menu.service';
-import {Logger, LogLevel, WorkbenchPerspective, WorkbenchRouter, WorkbenchService} from '@scion/workbench';
+import {Logger, LogLevel, WorkbenchDialogService, WorkbenchPerspective, WorkbenchRouter, WorkbenchService} from '@scion/workbench';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -22,6 +22,7 @@ import {SciToggleButtonComponent} from '@scion/components.internal/toggle-button
 import {SettingsService} from '../settings.service';
 import {Maps} from '@scion/toolkit/util';
 import {comparePerspectives} from './perspective-comparator.util';
+import {PartInfoDialogComponent} from '../part-info-dialog/part-info-dialog.component';
 
 @Component({
   selector: 'app-header',
@@ -40,6 +41,7 @@ export class HeaderComponent {
   private readonly _wbRouter = inject(WorkbenchRouter);
   private readonly _menuService = inject(MenuService);
   private readonly _settingsService = inject(SettingsService);
+  private readonly _dialogService = inject(WorkbenchDialogService);
   private readonly _injector = inject(Injector);
   private readonly _logger = inject(Logger);
 
@@ -70,6 +72,8 @@ export class HeaderComponent {
         ...this.contributeLogLevelMenuItems(),
         new MenuItemSeparator(),
         ...this.contributeViewMenuItems(),
+        new MenuItemSeparator(),
+        ...this.contributePartMenuItems(),
         new MenuItemSeparator(),
         ...this.contributeStartupMenuItems(),
         new MenuItemSeparator(),
@@ -115,6 +119,16 @@ export class HeaderComponent {
       new MenuItem({
         text: 'Open Sample View',
         onAction: () => this._wbRouter.navigate(['sample-view'], {target: 'blank'}),
+      }),
+    ];
+  }
+
+  private contributePartMenuItems(): MenuItem[] {
+    return [
+      new MenuItem({
+        text: 'Show Part Info',
+        cssClass: 'e2e-show-part-info',
+        onAction: () => this._dialogService.open(PartInfoDialogComponent, {cssClass: 'e2e-part-info', modality: 'none'}),
       }),
     ];
   }
