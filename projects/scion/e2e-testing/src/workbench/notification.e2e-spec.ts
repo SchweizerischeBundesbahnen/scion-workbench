@@ -264,7 +264,7 @@ test.describe('Workbench Notification', () => {
       await expect(notificationPage6.input).toHaveText('D, E, F');
     });
 
-    test('should close notification via handle', async ({appPO, workbenchNavigator, page}) => {
+    test('should close notification via handle', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
@@ -341,6 +341,9 @@ test.describe('Workbench Notification', () => {
 
       await notificationPage.enterTitle('Notification should close after 1s');
       await notificationPage.selectDuration(2);
+
+      // Do not focus notification.
+      await notificationOpenerPage.locator.click();
 
       // Expect the notification to still display after 1.5s.
       await page.waitForTimeout(1500);
@@ -634,7 +637,35 @@ test.describe('Workbench Notification', () => {
     await expectNotification(notificationPage).not.toBeAttached();
   });
 
-  test('should close notification via handle', async ({appPO, workbenchNavigator, page}) => {
+  test('should not close notification on focus', async ({appPO, workbenchNavigator, page}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPage.show('Notification', {duration: 1000, cssClass: 'testee', title: 'test'});
+
+    // Expect the notification to display.
+    const notification = appPO.notification({cssClass: 'testee'});
+    const notificationPage = new TextNotificationPagePO(notification);
+    await expectNotification(notificationPage).toBeVisible();
+
+    // Focus the notification.
+    await notification.focus();
+    // Don't hover the notification, to make sure it's not kept open by hovering
+    await appPO.workbenchRoot.hover({position: {x: 0, y: 0}});
+
+    // Expect notification not to be disposed after 3s.
+    await page.waitForTimeout(3000);
+    await expectNotification(notificationPage).toBeVisible();
+
+    // Do not focus notification.
+    await notificationOpenerPage.locator.click();
+
+    // Expect notification to be disposed after 2s.
+    await page.waitForTimeout(2000);
+    await expectNotification(notificationPage).not.toBeAttached();
+  });
+
+  test('should close notification via handle', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
@@ -774,6 +805,9 @@ test.describe('Workbench Notification', () => {
         await notificationPage.enterTitle('Notification should close after 1s');
         await notificationPage.selectDuration(2000);
 
+        // Do not focus notification.
+        await notificationOpenerPage.locator.click();
+
         // Expect the notification to still display after 1.5s.
         await page.waitForTimeout(1500);
         expect(await notification.locator.isVisible()).toBe(true);
@@ -793,6 +827,9 @@ test.describe('Workbench Notification', () => {
         const notificationPage = new NotificationPagePO(notification);
 
         await notificationPage.selectDuration(2000);
+
+        // Do not focus notification.
+        await notificationOpenerPage.locator.click();
 
         // Expect the notification to still display after 1.5s.
         await page.waitForTimeout(1500);

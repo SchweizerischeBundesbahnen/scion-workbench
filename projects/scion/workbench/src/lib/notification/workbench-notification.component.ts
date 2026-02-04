@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2025 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,13 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, effect, input, signal, untracked} from '@angular/core';
+import {Component, effect, ElementRef, inject, Injector, input, runInInjectionContext, signal, untracked, viewChild} from '@angular/core';
 import {NEVER, Observable, timer} from 'rxjs';
 import {NgComponentOutlet} from '@angular/common';
 import {TextPipe} from '../text/text.pipe';
 import {IconComponent} from '../icon/icon.component';
 import {ɵWorkbenchNotification} from './ɵworkbench-notification.model';
 import {RemoveLegacyInputPipe} from './remove-legacy-input.pipe';
+import {trackFocus} from '../focus/workbench-focus-tracker.service';
+import {SciViewportComponent} from '@scion/components/viewport';
 
 /**
  * Renders the content of a workbench notification.
@@ -28,6 +30,7 @@ import {RemoveLegacyInputPipe} from './remove-legacy-input.pipe';
     IconComponent,
     NgComponentOutlet,
     RemoveLegacyInputPipe,
+    SciViewportComponent,
   ],
   host: {
     '[attr.data-notificationid]': 'notification().id',
@@ -35,10 +38,17 @@ import {RemoveLegacyInputPipe} from './remove-legacy-input.pipe';
     '(mouseenter)': 'hover.set(true)',
     '(mouseleave)': 'hover.set(false)',
     '(mousedown)': 'onMousedown($event)',
+    '[style.--ɵnotification-min-height]': 'notification().size.minHeight()',
+    '[style.--ɵnotification-height]': 'notification().size.height()',
+    '[style.--ɵnotification-max-height]': 'notification().size.maxHeight()',
     '[class]': 'notification().cssClass()',
   },
 })
 export class WorkbenchNotificationComponent {
+
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
+  private readonly _injector = inject(Injector);
+  private readonly _notificationElement = viewChild.required<ElementRef<HTMLElement>>('notification_element');
 
   public readonly notification = input.required<ɵWorkbenchNotification>();
 
@@ -46,11 +56,15 @@ export class WorkbenchNotificationComponent {
 
   constructor() {
     this.installAutoCloseTimer();
+    this.installFocusTracker();
   }
 
   protected onMousedown(event: MouseEvent): void {
     if (event.buttons === AUXILARY_MOUSE_BUTTON) {
       this.notification().close();
+    }
+    else {
+      this._notificationElement().nativeElement.focus();
     }
   }
 
@@ -63,9 +77,12 @@ export class WorkbenchNotificationComponent {
    */
   private installAutoCloseTimer(): void {
     effect(onCleanup => {
-      const duration = this.notification().duration();
+      const notification = this.notification();
+      const duration = notification.duration();
+      const focus = notification.focused();
       const hover = this.hover();
-      if (hover) {
+
+      if (hover || focus) {
         return;
       }
 
@@ -90,6 +107,17 @@ export class WorkbenchNotificationComponent {
           return NEVER;
       }
     }
+  }
+
+  private installFocusTracker(): void {
+    effect(onCleanup => {
+      const notification = this.notification();
+
+      untracked(() => {
+        const tracker = runInInjectionContext(this._injector, () => trackFocus(this._host, notification));
+        onCleanup(() => tracker.destroy());
+      });
+    });
   }
 }
 

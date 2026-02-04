@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -54,6 +54,10 @@ export const routes: Routes = [
   {
     path: 'test-notification-opener',
     loadComponent: () => import('workbench-client-testing-app-common').then(m => m.NotificationOpenerPageComponent),
+  },
+  {
+    path: 'test-notification',
+    loadComponent: () => import('./notification-page/notification-page.component'),
   },
   {
     path: 'register-workbench-capability',

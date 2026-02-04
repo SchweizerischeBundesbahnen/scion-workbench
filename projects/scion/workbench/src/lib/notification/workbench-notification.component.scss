@@ -1,6 +1,10 @@
 @use '../common/workbench.mixin';
 
 :host {
+  --ɵnotification-min-height: initial;
+  --ɵnotification-height: initial;
+  --ɵnotification-max-height: initial;
+
   display: grid;
   background-color: var(--sci-color-background-elevation);
   color: var(--sci-color-text);
@@ -23,6 +27,8 @@
   }
 
   > div.outline {
+    display: flex;
+    flex-direction: column;
     border: 1px solid var(--sci-color-border);
     border-left: none;
     padding: 1em 1.5em;
@@ -32,10 +38,18 @@
     white-space: pre-line;
     overflow-wrap: break-word;
     overflow: hidden;
+    min-height: var(--ɵnotification-min-height);
+    height: var(--ɵnotification-height);
+    max-height: var(--ɵnotification-max-height);
+    outline: none;
 
     > header {
       font-weight: bold;
       margin-bottom: .75em;
+    }
+
+    > sci-viewport {
+      flex: auto;
     }
   }
 
