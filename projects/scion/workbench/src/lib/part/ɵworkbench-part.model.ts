@@ -39,6 +39,7 @@ import {Blockable} from '../glass-pane/blockable';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog.model';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
 import {WORKBENCH_PART_CONTEXT} from './workbench-part-context.provider';
+import {WORKBENCH_PART_INITIALIZER} from './workbench-part-initializer';
 
 /** @inheritDoc */
 export class ɵWorkbenchPart implements WorkbenchPart, Blockable {
@@ -100,6 +101,7 @@ export class ɵWorkbenchPart implements WorkbenchPart, Blockable {
     this.onLayoutChange({layout});
     this.activateOnFocus();
     this.focusOnActivate();
+    this.runPartInitializers();
   }
 
   public focus(): void {
@@ -321,6 +323,20 @@ export class ɵWorkbenchPart implements WorkbenchPart, Blockable {
         this.focus();
       });
     });
+  }
+
+  private runPartInitializers(): void {
+    const injector = Injector.create({
+      providers: [
+        {provide: ɵWorkbenchPart, useValue: this},
+        {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
+        {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchPart},
+        inject(WORKBENCH_PART_CONTEXT, {optional: true}) ?? [],
+      ],
+      parent: this.injector,
+    });
+
+    inject(WORKBENCH_PART_INITIALIZER, {optional: true})?.forEach(initializerFn => void runInInjectionContext(injector, initializerFn)); // eslint-disable-line @typescript-eslint/await-thenable
   }
 
   public destroy(): void {

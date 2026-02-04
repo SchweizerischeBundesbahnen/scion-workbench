@@ -16,6 +16,7 @@ import {rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
 import {Intent} from '@scion/microfrontend-platform';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
+import {OnMessagePagePO} from './on-message-page.po';
 
 /**
  * Page object to interact with {@link MessagingPageComponent}.
@@ -79,5 +80,23 @@ export class MessagingPagePO implements MicrofrontendViewPagePO {
       waitUntilAttached(successLocator),
       rejectWhenAttached(errorLocator),
     ]);
+  }
+
+  public async installOnMessageCallback(topic: string, value?: string | number | boolean): Promise<OnMessagePagePO> {
+    await this.view.tab.click();
+    await this._tabbar.selectTab('e2e-on-message');
+
+    const onMessagePage = new OnMessagePagePO(this.locator);
+
+    // Enter topic.
+    await onMessagePage.enterTopic(topic);
+
+    // Enter value.
+    await onMessagePage.enterValue(value);
+
+    // Install "onMessage" callback.
+    await onMessagePage.installCallback();
+
+    return onMessagePage;
   }
 }

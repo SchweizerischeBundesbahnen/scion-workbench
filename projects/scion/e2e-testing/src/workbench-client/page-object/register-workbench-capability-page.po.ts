@@ -187,6 +187,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     await this.locator.locator('input.e2e-path').fill(capability.properties?.path === '' ? '<string></string>' : (capability.properties?.path ?? '<undefined>'));
     await this.locator.locator('input.e2e-title').fill(capability.properties?.title === false ? '<boolean>false</boolean>' : capability.properties?.title ?? '');
     await this.locator.locator('input.e2e-icon').fill(capability.properties?.extras?.icon ?? '');
+    await this.locator.locator('input.e2e-badge').fill(capability.properties?.extras?.badge ?? '');
     await this.locator.locator('input.e2e-label').fill(capability.properties?.extras?.label ?? '');
     await this.locator.locator('input.e2e-tooltip').fill(capability.properties?.extras?.tooltip ?? '');
     await this.locator.locator('input.e2e-resolve').fill(toMatrixNotation(capability.properties?.resolve));

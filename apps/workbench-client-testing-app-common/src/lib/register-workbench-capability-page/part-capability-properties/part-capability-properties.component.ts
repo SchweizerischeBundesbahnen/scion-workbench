@@ -45,6 +45,7 @@ export class PartCapabilityPropertiesComponent implements ControlValueAccessor, 
     title: this._formBuilder.control(''),
     extras: this._formBuilder.group({
       icon: this._formBuilder.control(''),
+      badge: this._formBuilder.control(''),
       label: this._formBuilder.control(''),
       tooltip: this._formBuilder.control(''),
     }),
@@ -75,6 +76,7 @@ export class PartCapabilityPropertiesComponent implements ControlValueAccessor, 
           title: parseTypedString(this.form.controls.title.value) || undefined,
           extras: {
             icon: parseTypedString(this.form.controls.extras.controls.icon.value) || undefined!,
+            badge: this.form.controls.extras.controls.badge.value || undefined,
             label: parseTypedString(this.form.controls.extras.controls.label.value) || undefined!,
             tooltip: parseTypedString(this.form.controls.extras.controls.tooltip.value) || undefined,
           },
@@ -113,6 +115,7 @@ export class PartCapabilityPropertiesComponent implements ControlValueAccessor, 
     this.form.controls.title.setValue(properties?.title || '');
     this.form.controls.cssClass.setValue(properties?.cssClass);
     this.form.controls.extras.controls.icon.setValue(properties?.extras?.icon ?? '');
+    this.form.controls.extras.controls.badge.setValue(properties?.extras?.badge ?? '');
     this.form.controls.extras.controls.label.setValue(properties?.extras?.label ?? '');
     this.form.controls.extras.controls.tooltip.setValue(properties?.extras?.tooltip ?? '');
     this.form.controls.resolve.setValue(properties?.resolve);

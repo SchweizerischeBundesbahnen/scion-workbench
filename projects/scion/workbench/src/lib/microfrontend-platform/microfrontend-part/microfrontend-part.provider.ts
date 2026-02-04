@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {EnvironmentProviders, inject, makeEnvironmentProviders, Provider} from '@angular/core';
+import {EnvironmentProviders, inject, Injector, makeEnvironmentProviders, Provider, runInInjectionContext} from '@angular/core';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {CapabilityInterceptor, HostManifestInterceptor} from '@scion/microfrontend-platform';
+import {CapabilityInterceptor, HostManifestInterceptor, MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchPopupService, ɵWorkbenchDialogService, ɵWorkbenchMessageBoxService, ɵWorkbenchPopupService} from '@scion/workbench-client';
 import {provideStableCapabilityId} from '../stable-capability-id-assigner.provider';
 import {MicrofrontendPartCapabilityValidator} from './microfrontend-part-capability-validator.interceptor';
@@ -20,6 +20,8 @@ import {MicrofrontendPartIntentionProvider} from './microfrontend-part-intention
 import {WORKBENCH_PART_CONTEXT} from '../../part/workbench-part-context.provider';
 import {WorkbenchPart} from '../../part/workbench-part.model';
 import {provideLegacyMicrofrontendPartRoute} from './legacy-microfrontend-part-navigation-migration';
+import {provideWorkbenchPartInitializer} from '../../part/workbench-part-initializer';
+import {provideMicrofrontendPartBadge} from './microfrontend-part-badge.provider';
 
 /**
  * Provides a set of DI providers enabling microfrontend part support.
@@ -34,6 +36,11 @@ export function provideMicrofrontendPart(): EnvironmentProviders {
     provideLegacyMicrofrontendPartRoute(),
     provideStableCapabilityId(WorkbenchCapabilities.Part),
     provideWorkbenchPartContext(),
+    provideWorkbenchPartInitializer(async () => {
+      const injector = inject(Injector);
+      await MicrofrontendPlatform.whenState(PlatformState.Started);
+      runInInjectionContext(injector, provideMicrofrontendPartBadge);
+    }),
     provideMicrofrontendPlatformInitializer(onPreStartup, {phase: MicrofrontendPlatformStartupPhase.PreStartup}),
   ]);
 

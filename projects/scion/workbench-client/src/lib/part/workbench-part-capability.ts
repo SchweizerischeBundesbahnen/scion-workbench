@@ -165,6 +165,31 @@ export interface DockedPartExtras {
    */
   icon: string;
   /**
+   * Displays a badge next to the part icon.
+   *
+   * Defines a topic where a request is sent to resolve a part badge. Topic segments can reference capability parameters using the colon syntax.
+   *
+   * The application can respond to badge requests by installing a message listener in the activator. Refer to {@link ActivatorCapability} for registering an activator.
+   *
+   * Response types for the badge request are:
+   *  - `true`: empty badge
+   *  - `string` | `number`: badge content
+   *  - `false` | `undefined`: no badge
+   *
+   * @example - Message listener replying to badge requests
+   *
+   * ```ts
+   * import {Beans} from '@scion/toolkit/bean-manager';
+   * import {MessageClient} from '@scion/microfrontend-platform';
+   *
+   * Beans.get(MessageClient).onMessage('notifications/badge', message => {
+   *   return ...;
+   * });
+   * ```
+   *
+   */
+  badge?: string;
+  /**
    * Specifies the label displayed in the toggle button.
    *
    * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.

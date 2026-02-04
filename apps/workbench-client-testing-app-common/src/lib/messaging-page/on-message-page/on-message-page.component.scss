@@ -1,0 +1,22 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+
+  > form {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+
+    > section {
+      flex: none;
+      display: flex;
+      flex-direction: column;
+      gap: .5em;
+      border: 1px solid var(--sci-color-border);
+      border-radius: var(--sci-corner);
+      padding: 1em;
+    }
+  }
+}

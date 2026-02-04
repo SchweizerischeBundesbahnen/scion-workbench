@@ -21,6 +21,7 @@ import {UnregisterWorkbenchCapabilityPagePO} from './page-object/unregister-work
 import {PageNotFoundPagePO} from '../workbench/page-object/page-not-found-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
+import {MessagingPagePO} from './page-object/messaging-page.po';
 
 test.describe('Workbench Part', () => {
 
@@ -558,5 +559,144 @@ test.describe('Workbench Part', () => {
     await expect.poll(() => consoleLogs.get({severity: 'warning'})).toEqual(expect.arrayContaining([
       `[workbench:microfrontend/routing] [NullCapabilityError] No application found to provide a part capability of id '${testeePartCapability.metadata!.id}'. Maybe, the requested part is not public API or the providing application not available.`,
     ]));
+  });
+
+  test('should display part badge (part open)', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Register docked part.
+    await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+      type: 'part',
+      qualifier: {part: 'activity'},
+      properties: {
+        path: 'test-part',
+        extras: {
+          icon: 'folder',
+          label: 'Activity',
+          badge: 'testeeTopic',
+        },
+      },
+    });
+
+    // Register main-area part.
+    await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+      type: 'part',
+      qualifier: {part: 'main-area'},
+    });
+
+    // Create perspective.
+    await microfrontendNavigator.createPerspective('app1', {
+      type: 'perspective',
+      qualifier: {perspective: 'testee'},
+      properties: {
+        parts: [
+          {
+            id: MAIN_AREA,
+            qualifier: {part: 'main-area'},
+          },
+          {
+            id: 'part.activity',
+            qualifier: {part: 'activity'},
+            position: 'left-top',
+            active: true,
+            cssClass: 'testee',
+          },
+        ],
+      },
+    });
+
+    const badge = appPO.activityItem({cssClass: 'testee'}).badge();
+
+    // Install "onMessage" callback.
+    const messagingPage = await microfrontendNavigator.openInNewTab(MessagingPagePO, 'app1');
+    const onMessagePage = await messagingPage.installOnMessageCallback('testeeTopic');
+
+    // Expect no badge.
+    await expect(badge).not.toBeAttached();
+
+    // Set badge (true).
+    await onMessagePage.enterValue(true);
+    await expect(badge).toHaveText('');
+
+    // Set badge (false).
+    await onMessagePage.enterValue(false);
+    await expect(badge).not.toBeAttached();
+
+    // Set badge (number).
+    await onMessagePage.enterValue(99);
+    await expect(badge).toHaveText('99');
+
+    // Set badge (string).
+    await onMessagePage.enterValue('ABC');
+    await expect(badge).toHaveText('ABC');
+  });
+
+  test('should display part badge (part closed)', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Register docked part.
+    await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+      type: 'part',
+      qualifier: {part: 'activity'},
+      properties: {
+        path: 'test-part',
+        extras: {
+          icon: 'folder',
+          label: 'Activity',
+          badge: 'testeeTopic',
+        },
+      },
+    });
+
+    // Register main-area part.
+    await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+      type: 'part',
+      qualifier: {part: 'main-area'},
+    });
+
+    // Create perspective.
+    await microfrontendNavigator.createPerspective('app1', {
+      type: 'perspective',
+      qualifier: {perspective: 'testee'},
+      properties: {
+        parts: [
+          {
+            id: MAIN_AREA,
+            qualifier: {part: 'main-area'},
+          },
+          {
+            id: 'part.activity',
+            qualifier: {part: 'activity'},
+            position: 'left-top',
+            cssClass: 'testee',
+          },
+        ],
+      },
+    });
+
+    const badge = appPO.activityItem({cssClass: 'testee'}).badge();
+
+    // Install "onMessage" callback.
+    const messagingPage = await microfrontendNavigator.openInNewTab(MessagingPagePO, 'app1');
+    const onMessagePage = await messagingPage.installOnMessageCallback('testeeTopic');
+
+    // Expect no badge.
+    await expect(badge).not.toBeAttached();
+
+    // Set badge (true).
+    await onMessagePage.enterValue(true);
+    await expect(badge).toHaveText('');
+
+    // Set badge (false).
+    await onMessagePage.enterValue(false);
+    await expect(badge).not.toBeAttached();
+
+    // Set badge (number).
+    await onMessagePage.enterValue(99);
+    await expect(badge).toHaveText('99');
+
+    // Set badge (string).
+    await onMessagePage.enterValue('ABC');
+    await expect(badge).toHaveText('ABC');
   });
 });

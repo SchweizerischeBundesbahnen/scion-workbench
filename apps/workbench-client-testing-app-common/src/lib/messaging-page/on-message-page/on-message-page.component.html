@@ -1,0 +1,17 @@
+<form [formGroup]="form" autocomplete="off">
+  <section>
+    <sci-form-field label="Topic">
+      <input [formControl]="form.controls.topic" class="e2e-topic">
+    </sci-form-field>
+    <sci-form-field label="Value">
+      <input [formControl]="form.controls.value" class="e2e-value">
+    </sci-form-field>
+    <button (click)="onSaveValue()" [disabled]="form.invalid" class="e2e-save-value">Save</button>
+  </section>
+
+  @if (subscription) {
+    <button (click)="onCancel()" class="e2e-cancel">Cancel</button>
+  } @else {
+    <button (click)="onInstallOnMessage()" [disabled]="form.invalid" class="e2e-install-on-message">Install "onMessage" Callback</button>
+  }
+</form>
