@@ -125,7 +125,7 @@
     "typedoc": "0.28.14",
     "typescript": "5.9.3",
     "typescript-eslint": "8.48.0",
-    "vercel": "48.11.1"
+    "vercel": "50.12.1"
   },
   "repository": {
     "type": "git",
