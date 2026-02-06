@@ -9,9 +9,9 @@
  */
 
 import {mapToBody, MessageClient, MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
-import {Observable} from 'rxjs';
-import {Beans} from '@scion/toolkit/bean-manager';
-import {shareReplay} from 'rxjs/operators';
+import {fromEvent, Observable, Subject} from 'rxjs';
+import {Beans, PreDestroy} from '@scion/toolkit/bean-manager';
+import {filter, shareReplay, takeUntil} from 'rxjs/operators';
 import {decorateObservable} from '../observable-decorator';
 import {NotificationId} from '../workbench.identifiers';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
@@ -23,13 +23,15 @@ import {WorkbenchNotificationCapability} from './workbench-notification-capabili
  * @ignore
  * @docs-private Not public API. For internal use only.
  */
-export class ɵWorkbenchNotification implements WorkbenchNotification {
+export class ɵWorkbenchNotification implements WorkbenchNotification, PreDestroy {
 
   public readonly id: NotificationId;
   public readonly capability: WorkbenchNotificationCapability;
   public readonly params: Map<string, unknown>;
   public readonly referrer: WorkbenchNotification['referrer'];
   public readonly focused$: Observable<boolean>;
+
+  private readonly _destroy$ = new Subject<void>();
 
   constructor(private _context: ɵNotificationContext) {
     this.id = this._context.notificationId;
@@ -42,6 +44,8 @@ export class ɵWorkbenchNotification implements WorkbenchNotification {
         shareReplay({refCount: false, bufferSize: 1}),
         decorateObservable(),
       );
+
+    this.closeOnAuxiliaryMouseButton();
   }
 
   /** @inheritDoc */
@@ -52,5 +56,24 @@ export class ɵWorkbenchNotification implements WorkbenchNotification {
   /** @inheritDoc */
   public close(): void {
     void Beans.get(MessageClient).publish(ɵWorkbenchCommands.notificationCloseTopic(this.id));
+  }
+
+  /**
+   * Closes the notification when clicking the auxiliary mouse button.
+   */
+  private closeOnAuxiliaryMouseButton(): void {
+    fromEvent<MouseEvent>(document.documentElement, 'auxclick')
+      .pipe(
+        filter(event => event.button === 1), // primary aux button
+        takeUntil(this._destroy$),
+      )
+      .subscribe(event => {
+        event.preventDefault(); // prevent user-agent default action
+        this.close();
+      });
+  }
+
+  public preDestroy(): void {
+    this._destroy$.next();
   }
 }

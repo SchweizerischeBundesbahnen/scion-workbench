@@ -42,7 +42,7 @@ import {SciViewportComponent} from '@scion/components/viewport';
     '[class]': 'notification().cssClass()',
     '(mouseenter)': 'hover.set(true)',
     '(mouseleave)': 'hover.set(false)',
-    '(mousedown)': 'onMousedown($event)',
+    '(auxclick)': 'onAuxClick($event)',
   },
 })
 export class WorkbenchNotificationComponent {
@@ -56,14 +56,15 @@ export class WorkbenchNotificationComponent {
     this.installFocusTracker();
   }
 
-  protected onMousedown(event: MouseEvent): void {
-    if (event.buttons === AUXILARY_MOUSE_BUTTON) {
-      this.notification().close();
-    }
-  }
-
   protected onClose(): void {
     this.notification().close();
+  }
+
+  protected onAuxClick(event: MouseEvent): void {
+    if (event.button === 1) { // primary aux button
+      event.preventDefault(); // prevent user-agent default action
+      this.notification().close();
+    }
   }
 
   /**
@@ -117,8 +118,3 @@ export class WorkbenchNotificationComponent {
     });
   }
 }
-
-/**
- * Indicates that the auxilary mouse button is pressed (usually the mouse wheel button or middle button).
- */
-const AUXILARY_MOUSE_BUTTON = 4;

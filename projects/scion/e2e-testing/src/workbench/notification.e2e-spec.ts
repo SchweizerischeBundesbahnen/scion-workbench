@@ -700,6 +700,24 @@ test.describe('Workbench Notification', () => {
     await expectNotification(notificationPage).not.toBeAttached();
   });
 
+  test('should close notification via auxiliary mouse button', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPage.show('component:notification-page', {duration: 'infinite', cssClass: 'testee'});
+
+    // Expect the notification to display.
+    const notification = appPO.notification({cssClass: 'testee'});
+    const notificationPage = new NotificationPagePO(notification);
+    await expectNotification(notificationPage).toBeVisible();
+
+    // Close notification by pressing the middle mouse button.
+    await notificationPage.locator.click({button: 'middle'});
+
+    // Expect notification to be closed.
+    await expectNotification(notificationPage).not.toBeAttached();
+  });
+
   test('should not focus notification on open', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 

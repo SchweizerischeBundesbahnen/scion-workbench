@@ -474,5 +474,37 @@ test.describe('Workbench Notification Mircrofrontend', () => {
 
       await expectNotification(notificationPage).not.toBeAttached();
     });
+
+    test('should close notification via auxiliary mouse button', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability<WorkbenchNotificationCapability>('app1', {
+        type: 'notification',
+        qualifier: {
+          component: 'testee',
+        },
+        properties: {
+          path: 'test-notification',
+          size: {
+            height: '425px',
+          },
+        },
+      });
+
+      // Display the notification.
+      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+      await notificationOpenerPage.show({component: 'testee'}, {cssClass: 'testee', duration: 'infinite'});
+
+      const notification = appPO.notification({cssClass: 'testee'});
+      const notificationPage = new NotificationPagePO(notification);
+
+      await expectNotification(notificationPage).toBeVisible();
+
+      // Close notification by pressing the middle mouse button.
+      await notificationPage.locator.click({button: 'middle'});
+
+      // Expect notification to be closed.
+      await expectNotification(notificationPage).not.toBeAttached();
+    });
   });
 });
