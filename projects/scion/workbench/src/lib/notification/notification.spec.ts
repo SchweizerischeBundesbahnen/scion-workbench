@@ -24,7 +24,7 @@ describe('Notification', () => {
     await waitUntilStable();
 
     // Expect notification to be translated.
-    const notificationElement = document.querySelector<HTMLElement>('wb-notification.testee span.e2e-message')!;
+    const notificationElement = document.querySelector<HTMLElement>('wb-notification.testee div.e2e-message')!;
     expect(notificationElement.innerText).toEqual('NOTIFICATION (translated)');
   });
 
