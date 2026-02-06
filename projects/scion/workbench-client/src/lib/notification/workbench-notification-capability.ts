@@ -21,7 +21,7 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
  *
  * The microfrontend can inject the `WorkbenchNotification` handle (and `ActivatedMicrofrontend` if a host microfrontend) to interact with the notification or access parameters.
  *
- * An explicit height must be defined in {@link WorkbenchNotificationCapability.properties.size} unless the notification is provided by the host app, which resizes to fit the content.
+ * An explicit height must be defined in {@link WorkbenchNotificationCapability.properties.size} unless the notification is provided by the host app.
  *
  * @category Notification
  * @see WorkbenchNotification
@@ -84,7 +84,18 @@ export interface WorkbenchNotificationCapability extends Capability {
      */
     path: string;
     /**
-     * Specifies the size of the notification, required if the notification is provided by an application other than the workbench host application.
+     * Specifies the size of the notification, required for notifications provided by applications other than the workbench host application.
+     *
+     * For the notification to adapt to the size of the microfrontend content, set the size to `auto` and report the microfrontend's preferred size using
+     * `PreferredSizeService` in the microfrontend.
+     *
+     * @example - Reporting the preferred size in the microfrontend
+     * ```ts
+     * import {Beans} from '@scion/toolkit/bean-manager';
+     * import {PreferredSizeService} from '@scion/microfrontend-platform';
+     *
+     * Beans.get(PreferredSizeService).fromDimension(<Microfrontend HTMLElement>);
+     * ``
      */
     size?: WorkbenchNotificationSize;
     /**
@@ -115,7 +126,7 @@ export interface WorkbenchNotificationSize {
   /**
    * Specifies the height of the notification, required if the notification is provided by an application other than the workbench host application.
    */
-  height?: string;
+  height?: string | 'auto';
   /**
    * Specifies the minimum height of the notification.
    */
