@@ -733,6 +733,235 @@ test.describe('Workbench Notification', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual(notificationOpenerViewId);
   });
 
+  test('should adapt height to notification content', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false, designTokens: {'--sci-workbench-notification-width': '350px'}});
+
+    const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPage.show('component:notification-page', {duration: 'infinite', cssClass: 'testee'});
+
+    const notification = appPO.notification({cssClass: 'testee'});
+    const notificationPage = new NotificationPagePO(notification);
+
+    await expectNotification(notificationPage).toBeVisible();
+
+    // Capture current size.
+    const notificationBounds = await notification.getBoundingBox();
+    const notificationPageBounds = await notificationPage.getBoundingBox();
+    const padding = notificationBounds.height - notificationPageBounds.height;
+
+    // Expect content not to overflow.
+    await expect.poll(() => notification.hasVerticalOverflow()).toBe(false);
+
+    // Change the size of the content.
+    await notificationPage.enterContentSize({height: '800px'});
+
+    // Expect the notification to adapt to the content size.
+    await expect.poll(() => notification.hasVerticalOverflow()).toBe(false);
+    await expect.poll(() => notification.getBoundingBox()).toEqual(expect.objectContaining({
+      height: 800 + padding,
+      width: 350,
+    }));
+
+    // Shrink the content.
+    await notificationPage.enterContentSize({
+      height: '400px',
+    });
+
+    // Expect the notification to adapt to the content size.
+    await expect.poll(() => notification.hasVerticalOverflow()).toBe(false);
+    await expect.poll(() => notification.getBoundingBox()).toEqual(expect.objectContaining({
+      height: 400 + padding,
+      width: 350,
+    }));
+
+    // Grow the content.
+    await notificationPage.enterContentSize({
+      height: '800px',
+    });
+
+    // Expect the notification to adapt to the content size.
+    await expect.poll(() => notification.hasVerticalOverflow()).toBe(false);
+    await expect.poll(() => notification.getBoundingBox()).toEqual(expect.objectContaining({
+      height: 800 + padding,
+      width: 350,
+    }));
+  });
+
+  test('should have fixed notification height', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false, designTokens: {'--sci-workbench-notification-width': '350px'}});
+
+    const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPage.show('component:notification-page', {duration: 'infinite', cssClass: 'testee'});
+
+    const notification = appPO.notification({cssClass: 'testee'});
+    const notificationPage = new NotificationPagePO(notification);
+
+    await expectNotification(notificationPage).toBeVisible();
+
+    // Enter fixed notification height.
+    await notificationPage.enterNotificationSize({height: '400px'});
+
+    // Change the size of the content.
+    await notificationPage.enterContentSize({height: '800px'});
+
+    // Expect content to overflow.
+    await expect.poll(() => notification.hasVerticalOverflow()).toBe(true);
+
+    // Expect the notification size to be 400px.
+    await expect.poll(() => notification.getBoundingBox()).toEqual(expect.objectContaining({
+      height: 400,
+      width: 350,
+    }));
+
+    // Shrink the content.
+    await notificationPage.enterContentSize({
+      height: '200px',
+    });
+
+    // Expect content not to overflow.
+    await expect.poll(() => notification.hasVerticalOverflow()).toBe(false);
+
+    // Expect the notification size to be 400px.
+    await expect.poll(() => notification.getBoundingBox()).toEqual(expect.objectContaining({
+      height: 400,
+      width: 350,
+    }));
+
+    // Grow the content.
+    await notificationPage.enterContentSize({
+      height: '800px',
+    });
+
+    // Expect content to overflow.
+    await expect.poll(() => notification.hasVerticalOverflow()).toBe(true);
+
+    // Expect the notification size to be 400px.
+    await expect.poll(() => notification.getBoundingBox()).toEqual(expect.objectContaining({
+      height: 400,
+      width: 350,
+    }));
+  });
+
+  test('should constrain notification by max-height', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false, designTokens: {'--sci-workbench-notification-width': '350px'}});
+
+    const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPage.show('component:notification-page', {duration: 'infinite', cssClass: 'testee'});
+
+    const notification = appPO.notification({cssClass: 'testee'});
+    const notificationPage = new NotificationPagePO(notification);
+
+    await expectNotification(notificationPage).toBeVisible();
+
+    // Capture current size.
+    const notificationBounds = await notification.getBoundingBox();
+    const notificationPageBounds = await notificationPage.getBoundingBox();
+    const padding = notificationBounds.height - notificationPageBounds.height;
+
+    // Constrain notification height.
+    await notificationPage.enterNotificationSize({maxHeight: '400px'});
+
+    // Change the size of the content.
+    await notificationPage.enterContentSize({height: '800px'});
+
+    // Expect content to overflow.
+    await expect.poll(() => notification.hasVerticalOverflow()).toBe(true);
+
+    // Expect the notification size to be 400px.
+    await expect.poll(() => notification.getBoundingBox()).toEqual(expect.objectContaining({
+      height: 400,
+      width: 350,
+    }));
+
+    // Shrink the content.
+    await notificationPage.enterContentSize({
+      height: '200px',
+    });
+
+    // Expect content not to overflow.
+    await expect.poll(() => notification.hasVerticalOverflow()).toBe(false);
+
+    // Expect the notification size to be 200px plus padding.
+    await expect.poll(() => notification.getBoundingBox()).toEqual(expect.objectContaining({
+      height: 200 + padding,
+      width: 350,
+    }));
+
+    // Grow the content.
+    await notificationPage.enterContentSize({
+      height: '800px',
+    });
+
+    // Expect content to overflow.
+    await expect.poll(() => notification.hasVerticalOverflow()).toBe(true);
+
+    // Expect the notification size to be 400px.
+    await expect.poll(() => notification.getBoundingBox()).toEqual(expect.objectContaining({
+      height: 400,
+      width: 350,
+    }));
+  });
+
+  test('should constrain notification by min-height', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false, designTokens: {'--sci-workbench-notification-width': '350px'}});
+
+    const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPage.show('component:notification-page', {duration: 'infinite', cssClass: 'testee'});
+
+    const notification = appPO.notification({cssClass: 'testee'});
+    const notificationPage = new NotificationPagePO(notification);
+
+    await expectNotification(notificationPage).toBeVisible();
+
+    // Capture current size.
+    const notificationBounds = await notification.getBoundingBox();
+    const notificationPageBounds = await notificationPage.getBoundingBox();
+    const padding = notificationBounds.height - notificationPageBounds.height;
+
+    // Constrain notification height.
+    await notificationPage.enterNotificationSize({minHeight: '400px'});
+
+    // Change the size of the content.
+    await notificationPage.enterContentSize({height: '800px'});
+
+    // Expect content not to overflow.
+    await expect.poll(() => notification.hasVerticalOverflow()).toBe(false);
+
+    // Expect the notification size to be 800px plus padding.
+    await expect.poll(() => notification.getBoundingBox()).toEqual(expect.objectContaining({
+      height: 800 + padding,
+      width: 350,
+    }));
+
+    // Shrink the content.
+    await notificationPage.enterContentSize({
+      height: '200px',
+    });
+
+    // Expect content not to overflow.
+    await expect.poll(() => notification.hasVerticalOverflow()).toBe(false);
+
+    // Expect the notification size to be 400px.
+    await expect.poll(() => notification.getBoundingBox()).toEqual(expect.objectContaining({
+      height: 400,
+      width: 350,
+    }));
+
+    // Grow the content.
+    await notificationPage.enterContentSize({
+      height: '800px',
+    });
+
+    // Expect content not to overflow.
+    await expect.poll(() => notification.hasVerticalOverflow()).toBe(false);
+
+    // Expect the notification size to be 800px plus padding.
+    await expect.poll(() => notification.getBoundingBox()).toEqual(expect.objectContaining({
+      height: 800 + padding,
+      width: 350,
+    }));
+  });
+
   test.describe('Custom Notification Provider', () => {
 
     test.describe('Custom Message Component', () => {

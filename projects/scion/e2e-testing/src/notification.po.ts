@@ -9,7 +9,7 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {coerceArray, DomRect, fromRect, getCssClasses, selectBy} from './helper/testing.util';
+import {coerceArray, DomRect, fromRect, getCssClasses, hasCssClass, selectBy} from './helper/testing.util';
 import {RequireOne} from './helper/utility-types';
 import {NotificationId} from '../../workbench/src/lib/workbench.identifiers';
 
@@ -34,6 +34,10 @@ export class NotificationPO {
 
   public async getBoundingBox(): Promise<DomRect> {
     return fromRect(await this.locator.boundingBox());
+  }
+
+  public hasVerticalOverflow(): Promise<boolean> {
+    return hasCssClass(this.locator.locator('sci-viewport.e2e-message-viewport > sci-scrollbar.vertical'), 'overflow');
   }
 
   public getComputedStyle(): Promise<CSSStyleDeclaration> {

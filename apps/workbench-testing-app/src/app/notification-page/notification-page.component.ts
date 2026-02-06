@@ -10,13 +10,14 @@
 
 import {Component, inject, input} from '@angular/core';
 import {ActivatedMicrofrontend, WorkbenchNotification} from '@scion/workbench';
-import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
+import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {filter} from 'rxjs/operators';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {MultiValueInputComponent} from 'workbench-testing-app-common';
 import {UUID} from '@scion/toolkit/uuid';
 import ActivatedMicrofrontendComponent from '../activated-microfrontend/activated-microfrontend.component';
+import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 
 @Component({
   selector: 'app-notification-page',
@@ -27,7 +28,12 @@ import ActivatedMicrofrontendComponent from '../activated-microfrontend/activate
     SciFormFieldComponent,
     MultiValueInputComponent,
     ActivatedMicrofrontendComponent,
+    SciAccordionComponent,
+    SciAccordionItemDirective,
   ],
+  host: {
+    '[style.height]': 'form.controls.componentSize.controls.height.value',
+  },
 })
 export default class NotificationPageComponent {
 
@@ -44,6 +50,14 @@ export default class NotificationPageComponent {
     severity: this._formBuilder.control<'info' | 'warn' | 'error' | undefined>(undefined),
     duration: this._formBuilder.control<'short' | 'medium' | 'long' | 'infinite' | string | undefined>(undefined),
     cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
+    notificationSize: new FormGroup({
+      height: this._formBuilder.control(''),
+      minHeight: this._formBuilder.control(''),
+      maxHeight: this._formBuilder.control(''),
+    }),
+    componentSize: new FormGroup({
+      height: this._formBuilder.control(''),
+    }),
   });
 
   constructor() {
@@ -76,6 +90,21 @@ export default class NotificationPageComponent {
       .subscribe(cssClass => {
         this.notification.cssClass = cssClass || [];
       });
+
+    this.form.controls.notificationSize.controls.height.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(height => this.notification.size.height = height || undefined);
+
+    this.form.controls.notificationSize.controls.minHeight.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(minHeight => this.notification.size.minHeight = minHeight || undefined);
+
+    this.form.controls.notificationSize.controls.maxHeight.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(maxHeight => {
+        this.notification.size.maxHeight = maxHeight || undefined;
+      });
+
   }
 
   protected onClose(): void {

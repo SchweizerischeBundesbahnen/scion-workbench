@@ -8,7 +8,7 @@
   @if (notification().slot.text?.length) {
     {{(notification().slot.text | wbText)()}}
   } @else if (notification().slot.component) {
-    <sci-viewport>
+    <sci-viewport class="e2e-message-viewport">
       <ng-container *ngComponentOutlet="notification().slot.component!; inputs: notification().inputs | wbRemoveLegacyInput; injector: notification().slot.injector"/>
     </sci-viewport>
   }
