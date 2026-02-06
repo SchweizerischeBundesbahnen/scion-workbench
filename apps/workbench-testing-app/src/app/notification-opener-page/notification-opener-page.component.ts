@@ -18,6 +18,7 @@ import NotificationPageComponent from '../notification-page/notification-page.co
 import {UUID} from '@scion/toolkit/uuid';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {LegacyNotificationPageComponent} from '../legacy-notification-page/legacy-notification-page.component';
+import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 
 @Component({
   selector: 'app-notification-opener-page',
@@ -99,10 +100,12 @@ export default class NotificationOpenerPageComponent {
     }
   }
 
-  private readComponentFromUI(): Type<NotificationPageComponent | LegacyNotificationPageComponent> {
+  private readComponentFromUI(): Type<unknown> {
     switch (this.form.controls.component.value) {
       case 'notification-page':
         return NotificationPageComponent;
+      case 'focus-test-page':
+        return FocusTestPageComponent;
       case 'legacy-notification-page':
         return LegacyNotificationPageComponent;
       default:

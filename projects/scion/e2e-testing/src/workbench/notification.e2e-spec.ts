@@ -700,6 +700,21 @@ test.describe('Workbench Notification', () => {
     await expectNotification(notificationPage).not.toBeAttached();
   });
 
+  test('should not focus notification on open', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPage.show('Notification', {cssClass: 'testee'});
+    const notificationOpenerViewId = await notificationOpenerPage.view.getViewId();
+
+    const notification = appPO.notification({cssClass: 'testee'});
+    const notificationPage = new TextNotificationPO(notification);
+
+    await expectNotification(notificationPage).toBeVisible();
+    await expect(notification.locator).not.toContainFocus();
+    await expect.poll(() => appPO.focusOwner()).toEqual(notificationOpenerViewId);
+  });
+
   test.describe('Custom Notification Provider', () => {
 
     test.describe('Custom Message Component', () => {

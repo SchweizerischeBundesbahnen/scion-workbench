@@ -19,6 +19,8 @@ import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 import {FocusTestPagePO} from './page-object/test-pages/focus-test-page.po';
 import {MAIN_AREA} from '../workbench.model';
 import {PartId, WorkbenchLayout} from '@scion/workbench';
+import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
+import {expectNotification} from '../matcher/notification-matcher';
 
 test.describe('Focus Tracker', () => {
 
@@ -1528,6 +1530,47 @@ test.describe('Focus Tracker', () => {
     await expect.poll(() => logPart.getLog()).toEqual(['view.2', dialogId]);
     await expect(appPO.messagebox({dialogId}).locator).toBeVisible();
     await expect(messageboxPage.firstField).toBeFocused();
+  });
+
+  test('should focus notification', async ({appPO, workbenchNavigator, page}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addView('view.1', {partId: 'part.main'})
+      .navigateView('view.1', ['test-notification-opener'])
+      .modify(addActiveWorkbenchElementPart('part.log', {activate: true})),
+    );
+
+    const logPart = new ActiveWorkbenchElementLogPagePO(appPO.part({partId: 'part.log'}));
+    await logPart.clearLog();
+
+    // TEST: Open notification.
+    const notificationOpenerPage = new NotificationOpenerPagePO(appPO.view({viewId: 'view.1'}));
+    await notificationOpenerPage.show('component:focus-test-page', {cssClass: 'testee'});
+
+    const notification = appPO.notification({cssClass: 'testee'});
+    const notificationPage = new FocusTestPagePO(notification);
+    await expectNotification(notificationPage).toBeVisible();
+
+    // Expect notification not to have focus.
+    const notificationId = await notificationPage.notification.getNotificationId();
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
+    await expect.poll(() => logPart.getLog()).toEqual(['view.1']);
+
+    // TEST: Focus notification.
+    await notificationPage.clickField('first-field');
+
+    // Expect notification to have the focus.
+    await expect.poll(() => appPO.focusOwner()).toEqual(notificationId);
+    await expect.poll(() => logPart.getLog()).toEqual(['view.1', notificationId]);
+    await expect(notificationPage.firstField).toBeFocused();
+
+    // TEST: Close the notification by pressing Escape.
+    await page.keyboard.press('Escape');
+
+    // Expect workbench focus to be unset.
+    await expect.poll(() => appPO.focusOwner()).toBeNull();
   });
 
   test('should focus popup when opening popup', async ({appPO, workbenchNavigator, page}) => {

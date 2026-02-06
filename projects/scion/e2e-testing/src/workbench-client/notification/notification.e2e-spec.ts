@@ -166,11 +166,13 @@ test.describe('Workbench Notification Mircrofrontend', () => {
 
     const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
     await notificationOpenerPage.show({component: 'testee'}, {cssClass: 'testee'});
+    const notificationOpenerViewId = await notificationOpenerPage.view.getViewId();
 
     const notification = appPO.notification({cssClass: 'testee'});
     const focusTestPage = new FocusTestPagePO(notification);
     await expectNotification(focusTestPage).toBeVisible();
     await expect.poll(() => focusTestPage.isFocused()).toBe(false);
+    await expect.poll(() => appPO.focusOwner()).toEqual(notificationOpenerViewId);
   });
 
   test('should focus notification on title click', async ({appPO, microfrontendNavigator}) => {
