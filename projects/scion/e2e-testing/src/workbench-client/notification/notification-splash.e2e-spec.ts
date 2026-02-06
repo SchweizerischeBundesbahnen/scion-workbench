@@ -27,7 +27,7 @@ test.describe('Workbench Notification Splash', () => {
       properties: {
         path: 'test-pages/signal-ready-test-page',
         size: {
-          height: '100px',
+          height: '500px',
         },
         showSplash: true,
       },
@@ -61,7 +61,7 @@ test.describe('Workbench Notification Splash', () => {
       properties: {
         path: 'test-pages/signal-ready-test-page',
         size: {
-          height: '100px',
+          height: '500px',
         },
         showSplash: false,
       },
@@ -87,7 +87,7 @@ test.describe('Workbench Notification Splash', () => {
       properties: {
         path: 'test-pages/signal-ready-test-page',
         size: {
-          height: '100px',
+          height: '500px',
         },
       },
     });

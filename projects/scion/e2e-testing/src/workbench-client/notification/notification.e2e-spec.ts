@@ -30,7 +30,7 @@ test.describe('Workbench Notification Mircrofrontend', () => {
       properties: {
         path: 'test-notification',
         size: {
-          height: '100px',
+          height: '425px',
         },
       },
     });
@@ -56,7 +56,7 @@ test.describe('Workbench Notification Mircrofrontend', () => {
       properties: {
         path: 'test-notification',
         size: {
-          height: '100px',
+          height: '425px',
         },
       },
     });
@@ -89,7 +89,7 @@ test.describe('Workbench Notification Mircrofrontend', () => {
       properties: {
         path: 'test-notification',
         size: {
-          height: '100px',
+          height: '425px',
         },
       },
     });
@@ -159,7 +159,7 @@ test.describe('Workbench Notification Mircrofrontend', () => {
       properties: {
         path: 'test-pages/focus-test-page',
         size: {
-          height: '100px',
+          height: '425px',
         },
       },
     });
@@ -186,7 +186,7 @@ test.describe('Workbench Notification Mircrofrontend', () => {
       properties: {
         path: 'test-pages/focus-test-page',
         size: {
-          height: '100px',
+          height: '425px',
         },
       },
     });
@@ -214,7 +214,7 @@ test.describe('Workbench Notification Mircrofrontend', () => {
         properties: {
           path: 'test-notification',
           size: {
-            height: '100px',
+            height: '425px',
           },
         },
       });
@@ -238,7 +238,7 @@ test.describe('Workbench Notification Mircrofrontend', () => {
         properties: {
           path: 'test-notification',
           size: {
-            height: '100px',
+            height: '425px',
           },
         },
       });
@@ -262,7 +262,7 @@ test.describe('Workbench Notification Mircrofrontend', () => {
         properties: {
           path: 'test-notification',
           size: {
-            height: '100px',
+            height: '425px',
           },
         },
       });
@@ -285,7 +285,7 @@ test.describe('Workbench Notification Mircrofrontend', () => {
         properties: {
           path: 'test-notification',
           size: {
-            height: '100px',
+            height: '425px',
           },
         },
       });
@@ -313,7 +313,7 @@ test.describe('Workbench Notification Mircrofrontend', () => {
         properties: {
           path: 'test-notification',
           size: {
-            height: '100px',
+            height: '425px',
           },
         },
       });
@@ -346,7 +346,7 @@ test.describe('Workbench Notification Mircrofrontend', () => {
         properties: {
           path: 'test-pages/notification-test-page/:seg1/segment2;mp1=:mp1?qp1=:qp1#:fragment',
           size: {
-            height: '100px',
+            height: '425px',
           },
         },
       });
@@ -424,7 +424,7 @@ test.describe('Workbench Notification Mircrofrontend', () => {
         properties: {
           path: 'test-notification',
           size: {
-            height: '100px',
+            height: '425px',
           },
         },
       });
@@ -455,7 +455,7 @@ test.describe('Workbench Notification Mircrofrontend', () => {
         properties: {
           path: 'test-notification',
           size: {
-            height: '100px',
+            height: '425px',
           },
         },
       });
