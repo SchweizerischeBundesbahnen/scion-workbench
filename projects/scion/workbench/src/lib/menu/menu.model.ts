@@ -1,15 +1,16 @@
 /* eslint-disable */
 
 import {Signal} from '@angular/core';
+import {ComponentType} from '@angular/cdk/portal';
 
 export interface SciMenu {
   addMenuItem(menuItemDescriptor: SciMenuItemDescriptor | SciIconMenuItemDescriptor | SciCheckableMenuItemDescriptor, onSelect: () => boolean | void): this;
 
   addMenu(menuDescriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenu) => SciMenu): this;
 
-  addGroup(menuGroupDescriptor: SciMenuGroupDescriptor, menuFactoryFn?: (group: SciMenu) => SciMenu): this;
+  addGroup(menuGroupDescriptor: SciMenuGroupDescriptor, groupFactoryFn?: (group: SciMenu) => SciMenu): this;
 
-  addGroup(menuFactoryFn: (group: SciMenu) => SciMenu): this;
+  addGroup(groupFactoryFn: (group: SciMenu) => SciMenu): this;
 }
 
 /**
@@ -19,7 +20,7 @@ export interface SciMenuDescriptor {
   /**
    * Specifies the text label of the menu item.
    */
-  label?: Signal<string> | string;
+  label?: Signal<string> | string | ComponentType<unknown>;
   /**
    * Specifies the icon associated with the menu item.
    */
@@ -40,14 +41,33 @@ export interface SciMenuDescriptor {
    */
   visualMenuMarker?: boolean;
   filter?: boolean | {placeholder?: string; notFoundText?: string};
+  size?: {
+    width?: string;
+    minWidth?: string;
+    maxWidth?: string;
+  };
+  /**
+   * Specifies CSS class(es) to add to the menu item, e.g., to locate the menu item in tests.
+   */
+  cssClass?: string | string[];
 }
 
 export interface SciMenuItemDescriptor {
-  label?: Signal<string> | string;
+  /**
+   * Specifies the identifier for the menu item, used to ...
+   */
+  id?: string;
+  label?: Signal<string> | string | ComponentType<unknown>;
+  matchesFilter?: (filter: string) => boolean;
   tooltip?: string;
   mnemonic?: string;
   accelerator?: string[];
   disabled?: Signal<boolean> | boolean;
+  actionToolbarName?: Signal<string | undefined> | string;
+  /**
+   * Specifies CSS class(es) to add to the menu item, e.g., to locate the menu item in tests.
+   */
+  cssClass?: string | string[];
 }
 
 export interface SciIconMenuItemDescriptor extends SciMenuItemDescriptor {

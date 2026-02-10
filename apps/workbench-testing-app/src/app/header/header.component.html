@@ -17,6 +17,8 @@
   <button (click)="onActivateLightTheme()" sciMaterialIcon>light_mode</button>
 </div>
 
+<sci-toolbar name="toolbar:main"/>
+
 <!-- Settings Menu -->
 <button (click)="onSettingsMenuOpen(settings_menu_button)"
         class="e2e-settings-menu-button settings" [class.menu-open]="settingsMenuState() ==='open'"

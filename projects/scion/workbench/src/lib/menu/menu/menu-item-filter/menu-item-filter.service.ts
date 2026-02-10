@@ -1,27 +1,40 @@
 import {computed, inject, Injectable, Signal, signal} from '@angular/core';
+import {MMenuItem} from '../../ɵmenu';
 
 @Injectable()
 export class MenuItemFilter {
 
-  private readonly _parent = inject(MenuItemFilter, {skipSelf: true, optional: true});
+  private readonly _parentFilter = inject(MenuItemFilter, {skipSelf: true, optional: true});
   private readonly _filter = signal<RegExp | null>(null);
+
+  public readonly filterActive: Signal<boolean> = computed(() => {
+    if (this._filter()) {
+      return true;
+    }
+    return this._parentFilter?.filterActive() ?? false;
+  });
 
   public setFilter(filter: string | null): void {
     this._filter.set(filter ? new RegExp(filter, 'i') : null);
   }
 
-  public matches(text: string | undefined): Signal<boolean> {
+  public matches(menuItem: MMenuItem): Signal<boolean> {
     return computed(() => {
-      if (!text) {
-        return false;
-      }
-
       const filter = this._filter();
-      if (filter && !text.match(filter)) {
-        return false;
+      // Test against current filter
+      if (filter) {
+        if (menuItem.matchesFilter && !menuItem.matchesFilter(filter.source)) {
+          return false;
+        }
+
+        const label = menuItem.label?.();
+        if (typeof label === 'string' && !label.match(filter)) {
+          return false;
+        }
       }
 
-      if (this._parent && !this._parent.matches(text)()) {
+      // Test again parent filter
+      if (this._parentFilter && !this._parentFilter.matches(menuItem)()) {
         return false;
       }
 

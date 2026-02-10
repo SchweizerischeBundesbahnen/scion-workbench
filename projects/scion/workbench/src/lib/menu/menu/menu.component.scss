@@ -5,8 +5,17 @@ $font-size: 13px;
 $font-size-smaller: $font-size - 1px;
 $icon-size: 18px;
 
+/**
+ * Displays ellipsis when text overflows.
+ */
+@mixin ellipsis-on-overflow {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 :host {
-  display: inline-grid;
+  display: grid;
   gap: $menu_item_gap .5em;
   overflow: hidden;
   align-items: center;
@@ -16,8 +25,7 @@ $icon-size: 18px;
     grid-template-columns:
        // === Menu Item Subgrid ===
       auto // icon or check mark
-      minmax(7.5em, auto) // label
-      auto; // chevron or accelerator
+      minmax(12em, 1fr); // content
     border: 1px solid var(--sci-color-border);
     border-radius: 0.5rem;
     color: var(--sci-color-text);
@@ -27,8 +35,7 @@ $icon-size: 18px;
     &.gutter-column-hidden {
       grid-template-columns:
         // === Menu Item Subgrid ===
-        minmax(7.5em, auto) // label
-        auto; // chevron or accelerator
+        minmax(12em, 1fr); // content
     }
   }
 
@@ -41,6 +48,7 @@ $icon-size: 18px;
       color: var(--sci-color-text-subtlest);
       user-select: none;
       padding: $padding_menu_item $padding_menu_item 0 $padding_menu_item;
+      @include ellipsis-on-overflow();
     }
   }
 
@@ -50,18 +58,6 @@ $icon-size: 18px;
     grid-template-columns: subgrid;
     align-items: center;
     padding: $padding_menu_item;
-
-    > span.icon.filter {
-      display: inline-grid;
-      place-content: center;
-      font-size: $icon-size;
-      height: 1em;
-      width: 1em;
-    }
-
-    > sci-menu-item-filter {
-      grid-column: span 2 / -1; // consume last two columns
-    }
   }
 
   > hr {
@@ -72,7 +68,7 @@ $icon-size: 18px;
     margin-bottom: .5em;
   }
 
-  > div.empty {
+  > div.empty-message {
     grid-column: 1/-1;
     justify-self: center;
     color: var(--sci-color-text-subtlest);
@@ -89,7 +85,7 @@ $icon-size: 18px;
   }
 
   // Add after separator
-  > sci-menu-item-group:not(:last-child, :has(+ sci-menu), :has(+ sci-menu-item-group))::after {
+  > sci-menu-item-group:not(:last-child):not(:has(+ sci-menu-item-group))::after {
     content: '';
     grid-column: 1/-1;
     height: 1px;
@@ -108,34 +104,60 @@ $icon-size: 18px;
     user-select: none;
     overflow: hidden;
     cursor: var(--sci-workbench-button-cursor);
+    position: relative; // positioning context for actions toolbar
+    box-sizing: border-box;
+    min-height: calc($icon-size + 2 * $padding_menu_item + 2px); // 2px for checked toolbar item
 
-    > span.label:last-child {
-      grid-column: span 2 / -1;
+    > div.content {
+      display: flex;
+      align-items: center;
+      gap: 1em;
+
+      &:first-child > span.label {
+        padding-left: .5em;
+      }
+
+      > span.label {
+        flex: auto;
+        @include ellipsis-on-overflow();
+
+        &:last-child {
+          padding-right: .5em;
+        }
+      }
+
+      > span.accelerator {
+        flex: none;
+        color: var(--sci-color-text-subtlest);
+        font-size: $font-size-smaller;
+      }
+
+      // Display accelerator only if no toolbar
+      > span.accelerator:has(+ sci-toolbar.actions:not(.empty)) {
+        display: none;
+      }
+
+      > sci-toolbar.actions {
+        flex: none;
+        padding-left: .25em;
+        border-left: 1px solid var(--sci-color-border);
+        align-self: stretch;
+        --sci-toolbar-toolitem-background-color-hover: color-mix(in srgb, var(--sci-workbench-button-background-color-hover) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+        --sci-toolbar-toolitem-background-color-checked: color-mix(in srgb, var(--sci-workbench-button-background-color-checked) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+        --sci-toolbar-toolitem-border-radius: var(--sci-corner-small);
+
+        &:hover {
+          --sci-toolbar-toolitem-background-color-active: color-mix(in srgb, var(--sci-workbench-button-background-color-active) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+        }
+
+        &.empty {
+          display: none;
+        }
+      }
     }
 
-    > span.checkmark {
-      width: 16px;
-    }
-
-    > span.icon {
-      display: inline-grid;
-      place-content: center;
-      font-size: $icon-size;
-      height: 1em;
-      width: 1em;
-    }
-
-    > span.label {
-      justify-self: start;
-    }
-
-    > span.accelerator, span.sub-menu-chevron {
-      justify-self: end;
-    }
-
-    > span.accelerator {
-      color: var(--sci-color-text-subtlest);
-      font-size: $font-size-smaller;
+    &:not(:hover):not(.checked) > div.content > sci-toolbar.actions:not(.open) {
+      visibility: hidden; // do not set display to not resize the menu if not hovered
     }
 
     &:hover:where(:not(:disabled)) {
@@ -157,6 +179,24 @@ $icon-size: 18px;
     &:disabled {
       color: var(--sci-color-gray-500);
     }
+
+    &.active {
+      background-color: var(--sci-workbench-menu-background-color-hover);
+    }
+  }
+
+  > button.group-header {
+    > span.label {
+      @include ellipsis-on-overflow();
+    }
+  }
+
+  span.icon {
+    display: inline-grid;
+    place-content: center;
+    font-size: $icon-size;
+    height: 1em;
+    width: 1em;
   }
 
   > :where(sci-menu[popover]) { // allow setting host styles in menu component

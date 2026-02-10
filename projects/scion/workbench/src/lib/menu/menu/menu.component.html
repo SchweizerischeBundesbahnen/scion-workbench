@@ -1,9 +1,10 @@
 @let subMenuItem = this.subMenuItem();
+
 @if (subMenuItem.type === 'group' && (subMenuItem.label?.() || subMenuItem.collapsible)) {
   @let group = subMenuItem;
   @if (group.collapsible) {
     <button class="group-header" (click)="onGroupToggle()" (mouseenter)="onMenuItemMouseEnter(group)">
-      <span class="icon material-symbols-rounded" translate="no">{{isGroupVisible() ? 'keyboard_arrow_down' : 'chevron_right'}}</span>
+      <span class="icon material-symbols-rounded" translate="no">{{isGroupExpanded() ? 'keyboard_arrow_down' : 'chevron_right'}}</span>
       <span class="label">{{subMenuItem.label?.()}}</span>
     </button>
   } @else {
@@ -11,7 +12,7 @@
   }
 }
 
-@if (isGroupVisible()) {
+@if (isGroupExpanded()) {
   @if (subMenuItem.filter) {
     <div class="filter">
       <span class="icon material-symbols-rounded filter" translate="no">search</span>
@@ -21,56 +22,96 @@
     <hr>
   }
 
-  @for (menuItem of menuItems(); track menuItem) {
+  @for (menuItem of menuItems(); track $index) {
     @switch (menuItem.type) {
       @case ('menu-item') {
-        <button class="menu-item"
-                (mouseenter)="onMenuItemMouseEnter(menuItem)"
-                [attr.disabled]="this.disabled() || (menuItem.disabled?.() ?? false) || null"
-                (click)="onSelect(menuItem)">
+        @let disabled = this.disabled() || (menuItem.disabled?.() ?? false);
+        <button (mouseenter)="onMenuItemMouseEnter(menuItem)"
+                [attr.disabled]="disabled || null"
+                [class.checked]="menuItem.checked?.()"
+                (click)="onSelect(menuItem)"
+                [class]="menuItem.cssClass" class="menu-item"
+                sciMenuItemState [menuItem]="menuItem" #sciMenuItemState="sciMenuItemState">
           @if (hasGutterColumn()) {
-            @if (!menuItem.checked) {
-              <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
-            } @else {
+            @if (menuItem.checked !== undefined) {
               <span class="icon material-symbols-rounded checkmark" translate="no">{{menuItem.checked() ? 'check' : ''}}</span>
+            } @else {
+              <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
             }
           }
 
-          <span class="label">{{menuItem.label?.()}}</span>
-          @if (menuItem.accelerator?.length) {
-            <span class="accelerator">{{menuItem.accelerator | wbJoin:'+'}}</span>
-          }
+          <div class="content">
+            <span class="label">
+              @if (sciMenuItemState.labelText()) {
+                {{sciMenuItemState.labelText()}}
+              } @else if (sciMenuItemState.labelComponent()) {
+                <ng-container *ngComponentOutlet="sciMenuItemState.labelComponent()!"/>
+              }
+            </span>
+
+            @if (menuItem.accelerator?.length) {
+              <span class="accelerator">{{menuItem.accelerator | wbJoin:'+'}}</span>
+            }
+
+            @let actionToolbarName = menuItem.actionToolbarName?.();
+            @if (!menuItem.disabled && actionToolbarName) {
+              <sci-toolbar [name]="actionToolbarName"
+                           [viewContainerRef]="actionsPopoverAnchor()"
+                           (toolbarMenuOpen)="onActionToolbarMenuOpen($event)"
+                           (click)="$event.stopPropagation()"
+                           sciToolbarState
+                           class="actions"/>
+            }
+          </div>
         </button>
       }
       @case ('sub-menu-item') {
         <button [attr.popovertarget]="popoverId"
                 [attr.popovertargetaction]="'show'"
                 [style.anchor-name]="activeSubMenuItem() === menuItem ? `--${popoverId}` : null"
-                [attr.disabled]="this.disabled() || (menuItem.disabled?.() ?? false) || null"
-                class="menu-item"
-                (mouseenter)="onMenuItemMouseEnter(menuItem)">
+                [attr.disabled]="disabled() || (menuItem.disabled?.() ?? false) || null"
+                [class.active]="activeSubMenuItem() === menuItem"
+                [class]="menuItem.cssClass" class="menu-item"
+                (mouseenter)="onMenuItemMouseEnter(menuItem)"
+                sciMenuItemState [menuItem]="menuItem" #sciMenuItemState="sciMenuItemState">
           @if (hasGutterColumn()) {
             <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
           }
-          <span class="label">{{menuItem.label?.()}}</span>
-          <span class="icon material-symbols-rounded sub-menu-chevron" translate="no">arrow_right</span>
+          <div class="content">
+            <span class="label">
+              @if (sciMenuItemState.labelText()) {
+                {{sciMenuItemState.labelText()}}
+              } @else if (sciMenuItemState.labelComponent()) {
+                <ng-container *ngComponentOutlet="sciMenuItemState.labelComponent()!"/>
+              }
+            </span>
+            <span class="icon material-symbols-rounded sub-menu-chevron" translate="no">arrow_right</span>
+          </div>
         </button>
       }
       @case ('group') {
-        <sci-menu-item-group [group]="menuItem" [hasGutterColumn]="hasGutterColumn()" [disabled]="this.disabled() || (menuItem.disabled?.() ?? false)"/>
+        <sci-menu-item-group [group]="menuItem" [hasGutterColumn]="hasGutterColumn()" [disabled]="disabled() || (menuItem.disabled?.() ?? false)"/>
       }
     }
   } @empty {
     @if (subMenuItem.filter) {
-      <div class="empty">{{(typeof subMenuItem.filter === 'object' && subMenuItem.filter.notFoundText) || 'No items found.'}}</div>
+      <div class="empty-message">{{(typeof subMenuItem.filter === 'object' && subMenuItem.filter.notFoundText) || 'No items found.'}}</div>
     }
   }
 
+  <!-- Anchor where to insert the menu popover -->
+  <ng-container #actions_popover_anchor/>
+
+  <!-- Menu popover -->
   @if (activeSubMenuItem()) {
     <sci-menu [subMenuItem]="activeSubMenuItem()!"
               [attr.id]="popoverId"
               [style.position-anchor]="`--${popoverId}`"
-              [disabled]="this.disabled() || (activeSubMenuItem()!.disabled?.() ?? false)"
+              [style.width]="activeSubMenuItem()!.size?.width"
+              [style.min-width]="activeSubMenuItem()!.size?.minWidth"
+              [style.max-width]="activeSubMenuItem()!.size?.maxWidth"
+              [disabled]="disabled() || (activeSubMenuItem()!.disabled?.() ?? false)"
+              [class]="activeSubMenuItem()!.cssClass"
               (toggle)="onTogglePopover($event)"
               popover #popover/>
   }

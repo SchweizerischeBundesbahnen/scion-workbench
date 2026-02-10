@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, inject, input, linkedSignal, signal, Signal, untracked, viewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, forwardRef, inject, input, linkedSignal, signal, Signal, untracked, viewChild, ViewContainerRef} from '@angular/core';
 import {MMenuGroup, MMenuItem, MSubMenuItem} from '../ɵmenu';
 import {SciMenuRegistry} from '../menu.registry';
 import {UUID} from '@scion/toolkit/uuid';
@@ -6,6 +6,10 @@ import {JoinPipe} from './join.pipe';
 import {MenuItemGroupComponent} from './menu-item-group.component';
 import {MenuItemFilterComponent} from './menu-item-filter/menu-item-filter.component';
 import {MenuItemFilter} from './menu-item-filter/menu-item-filter.service';
+import {SciToolbarComponent} from '../toolbar/toolbar.component';
+import {ToolbarStateDirective} from './toolbar-state.directive';
+import {MenuItemStateDirective} from './menu-item-state.directive';
+import {NgComponentOutlet} from '@angular/common';
 
 @Component({
   selector: 'sci-menu',
@@ -16,6 +20,10 @@ import {MenuItemFilter} from './menu-item-filter/menu-item-filter.service';
     JoinPipe,
     MenuItemGroupComponent,
     MenuItemFilterComponent,
+    forwardRef(() => SciToolbarComponent),
+    ToolbarStateDirective,
+    MenuItemStateDirective,
+    NgComponentOutlet,
   ],
   providers: [
     MenuItemFilter,
@@ -36,39 +44,61 @@ export class MenuComponent {
   private readonly _filter = inject(MenuItemFilter);
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _document = inject(DOCUMENT);
+  private readonly _actionToolbarMenuOpen = signal(false);
 
   protected readonly popoverId = UUID.randomUUID();
   protected readonly hasGutterColumn = computed(() => this.withGutterColumn() ?? (!!this.subMenuItem().filter || hasGutter(this.menuItems())));
   protected readonly menuItems = this.computeMenuItems();
+  protected readonly actionsPopoverAnchor = viewChild.required('actions_popover_anchor', {read: ViewContainerRef});
   protected readonly activeSubMenuItem = linkedSignal<MSubMenuItem | MMenuGroup, MSubMenuItem | null>({
     source: this.subMenuItem,  // reset active sub menu item when this component is re-used
     computation: () => null,
   });
 
   protected readonly isGroup = computed(() => this.subMenuItem().type === 'group');
-  protected readonly isGroupVisible = signal(true);
+  protected readonly isGroupExpanded = signal(true);
 
   constructor() {
     // Compute expanded state group.
     effect(() => {
       const subMenuItem = this.subMenuItem();
+      const filterActive = this._filter.filterActive();
       untracked(() => {
         if (subMenuItem.type === 'group') {
-          this.isGroupVisible.set(typeof subMenuItem.collapsible === 'object' ? !subMenuItem.collapsible.collapsed : true);
+          this.isGroupExpanded.set(filterActive || !subMenuItem.collapsible || !subMenuItem.collapsible.collapsed);
         }
+        else {
+          this.isGroupExpanded.set(true);
+        }
+      });
+    });
+
+    // Close action menu when this component is re-used.
+    effect(() => {
+      this.subMenuItem();
+
+      untracked(() => {
+        const popover = this._host.appendChild(this._document.createElement('div'));
+        popover.setAttribute('popover', '');
+        popover.style.setProperty('display', 'none');
+        popover.showPopover();
+        popover.remove();
       });
     })
 
     // Open popover when hovering over a submenu item, or hide it otherwise.
     effect(() => {
       const popover = this._popover();
+      const activeSubMenuItem = this.activeSubMenuItem();
 
-      if (this.activeSubMenuItem()) {
-        popover?.nativeElement.showPopover();
-      }
-      else {
-        popover?.nativeElement.hidePopover();
-      }
+      untracked(() => {
+        if (activeSubMenuItem) {
+          popover?.nativeElement.showPopover();
+        }
+        else {
+          popover?.nativeElement.hidePopover();
+        }
+      });
     });
   }
 
@@ -80,14 +110,14 @@ export class MenuComponent {
   }
 
   protected onGroupToggle(): void {
-    this.isGroupVisible.update(expanded => !expanded);
+    this.isGroupExpanded.update(expanded => !expanded);
   }
 
   protected onMenuItemMouseEnter(menuItem: MMenuItem | MSubMenuItem | MMenuGroup): void {
     this.activeSubMenuItem.set(menuItem.type === 'sub-menu-item' ? menuItem : null);
 
     // Create and display "fake" popover to close popover of other groups or menus.
-    if (!this.activeSubMenuItem()) {
+    if (!this.activeSubMenuItem() && !this._actionToolbarMenuOpen()) {
       const popover = this._host.appendChild(this._document.createElement('div'));
       popover.setAttribute('popover', '');
       popover.style.setProperty('display', 'none');
@@ -106,6 +136,10 @@ export class MenuComponent {
     this._filter.setFilter(filter);
   }
 
+  protected onActionToolbarMenuOpen(open: boolean): void {
+    this._actionToolbarMenuOpen.set(open);
+  }
+
   private computeMenuItems(): Signal<Array<MMenuItem | MSubMenuItem | MMenuGroup>> {
     return computed(() => {
       const subMenuItem = this.subMenuItem();
@@ -118,14 +152,16 @@ export class MenuComponent {
   }
 
   private matchesFilter(menuItem: MMenuItem | MSubMenuItem | MMenuGroup): Signal<boolean> {
-    switch (menuItem.type) {
-      case 'menu-item':
-        return this._filter.matches(menuItem.label?.());
-      case 'sub-menu-item':
-        return computed(() => this._filter.matches(menuItem.label?.())() || menuItem.children.some(child => this.matchesFilter(child)())); // TODO [menu] consider contributions
-      case 'group':
-        return computed(() => this._filter.matches(menuItem.label?.())() || menuItem.children.some(child => this.matchesFilter(child)())); // TODO [menu] consider contributions
-    }
+    return computed(() => {
+      switch (menuItem.type) {
+        case 'menu-item':
+          return this._filter.matches(menuItem)();
+        case 'sub-menu-item':
+          return menuItem.children.some(child => this.matchesFilter(child)()); // TODO [menu] consider contributions
+        case 'group':
+          return menuItem.children.some(child => this.matchesFilter(child)()); // TODO [menu] consider contributions
+      }
+    });
   }
 
   private close(): void {

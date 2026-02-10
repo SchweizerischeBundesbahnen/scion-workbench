@@ -14,7 +14,7 @@ import {MenuItem, MenuItemSeparator} from '../menu/menu-item';
 import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-params';
 import {Router} from '@angular/router';
 import {MenuService} from '../menu/menu.service';
-import {Logger, LogLevel, WorkbenchPerspective, WorkbenchRouter, WorkbenchService} from '@scion/workbench';
+import {Logger, LogLevel, SciToolbarComponent, WorkbenchPerspective, WorkbenchRouter, WorkbenchService} from '@scion/workbench';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -32,6 +32,7 @@ import {comparePerspectives} from './perspective-comparator.util';
     ReactiveFormsModule,
     SciMaterialIconDirective,
     SciToggleButtonComponent,
+    SciToolbarComponent,
   ],
 })
 export class HeaderComponent {

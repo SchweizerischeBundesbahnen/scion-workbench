@@ -1,8 +1,11 @@
-import {ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, input, linkedSignal, Signal, viewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, Injector, input, linkedSignal, output, signal, Signal, TemplateRef, untracked, viewChild, ViewContainerRef} from '@angular/core';
 import {SciMenuRegistry} from '../../menu.registry';
 import {MMenuGroup, MMenuItem, MSubMenuItem} from '../../ɵmenu';
 import {MenuComponent} from '../../menu/menu.component';
 import {UUID} from '@scion/toolkit/uuid';
+import {NgComponentOutlet} from '@angular/common';
+import {MenuItemStateDirective} from '../../menu/menu-item-state.directive';
+import {SciDimension} from '@scion/components/dimension';
 
 @Component({
   selector: 'sci-tool-item-group',
@@ -11,19 +14,25 @@ import {UUID} from '@scion/toolkit/uuid';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MenuComponent,
+    NgComponentOutlet,
+    MenuItemStateDirective,
   ],
 })
 export class SciToolGroupComponent {
 
   public readonly subMenuItem = input.required<string | MMenuGroup>();
   public readonly disabled = input<boolean>();
+  public readonly viewContainerRef = input<ViewContainerRef | undefined>();
+  public readonly groupEmpty = output<boolean>();
+  public readonly groupMenuOpen = output<boolean>();
 
   private readonly _menuRegistry = inject(SciMenuRegistry);
   private readonly _popover = viewChild('popover', {read: ElementRef<HTMLElement>});
+  private readonly _popoverTemplate = viewChild.required('popover_template', {read: TemplateRef<void>});
 
   protected readonly popoverId = UUID.randomUUID();
   protected readonly menuItems = this.computeMenuItems();
-  protected readonly activeSubMenuItem = linkedSignal<string | MMenuGroup, MSubMenuItem | null>({
+  protected readonly activeSubMenuItem = linkedSignal<string | MMenuGroup, {subMenuItem: MSubMenuItem, bounds: Signal<SciDimension>} | null>({
     source: this.subMenuItem,  // reset active sub menu item when this component is re-used
     computation: () => null,
   });
@@ -32,13 +41,38 @@ export class SciToolGroupComponent {
     // Open popover when hovering over a submenu item, or hide it otherwise.
     effect(() => {
       const popover = this._popover();
+      const activeSubMenuItem = this.activeSubMenuItem();
 
-      if (this.activeSubMenuItem()) {
-        popover?.nativeElement.showPopover();
-      }
-      else {
-        popover?.nativeElement.hidePopover();
-      }
+      untracked(() => {
+        if (activeSubMenuItem) {
+          popover?.nativeElement.showPopover();
+        }
+        else {
+          popover?.nativeElement.hidePopover();
+        }
+      });
+    });
+
+    effect(() => {
+      const open = this.activeSubMenuItem() !== null;
+      untracked(() => this.groupMenuOpen.emit(open));
+    });
+
+    effect(() => {
+      this.groupEmpty.emit(this.menuItems().every(menuItem => isEmtpy(menuItem)()));
+    });
+
+    // Attach popover to configured view ref. Defaults to this component's view ref.
+    const injector = inject(Injector);
+    effect(onCleanup => {
+      const popoverTemplate = this._popoverTemplate();
+      const viewContainerRef = this.viewContainerRef() ?? injector.get(ViewContainerRef);
+
+      untracked(() => {
+        const popoverViewRef = viewContainerRef.createEmbeddedView(popoverTemplate, undefined, {injector});
+        popoverViewRef.detectChanges(); // required?
+        onCleanup(() => () => popoverViewRef.destroy());
+      });
     });
   }
 
@@ -54,8 +88,8 @@ export class SciToolGroupComponent {
     });
   }
 
-  protected onSubMenuClick(subMenuItem: MSubMenuItem): void {
-    this.activeSubMenuItem.update(activeSubMenuItem => activeSubMenuItem === subMenuItem ? null : subMenuItem);
+  protected onSubMenuClick(subMenuItem: MSubMenuItem, bounds: Signal<SciDimension>): void {
+    this.activeSubMenuItem.update(activeSubMenuItem => activeSubMenuItem?.subMenuItem === subMenuItem ? null : {subMenuItem, bounds});
   }
 
   protected onTogglePopover(event: ToggleEvent): void {
@@ -65,3 +99,12 @@ export class SciToolGroupComponent {
   }
 }
 
+export function isEmtpy(menuItem: MMenuItem | MSubMenuItem | MMenuGroup): Signal<boolean> {
+  switch (menuItem.type) {
+    case 'menu-item':
+      return signal(false);
+    case 'sub-menu-item':
+    case 'group':
+      return computed(() => menuItem.children.every(menuItem => isEmtpy(menuItem)())); // TODO [menu] consider contributions
+  }
+}

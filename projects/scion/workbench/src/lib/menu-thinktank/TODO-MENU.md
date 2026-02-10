@@ -7,6 +7,8 @@
     - no filter
   - tooltip
   - accelerator
-- Menu Item
-  - actions
+  - vertical toolbar
+  - split button
 - Accessiblity
+- Menubar
+

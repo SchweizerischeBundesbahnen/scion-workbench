@@ -1,32 +1,46 @@
-@for (menuItem of menuItems(); track menuItem) {
+@for (menuItem of menuItems(); track $index) {
   @switch (menuItem.type) {
     @case ('menu-item') {
-      <button class="menu-item"
-              [attr.disabled]="this.disabled() || (menuItem.disabled?.() ?? false) || null"
+      <button [attr.disabled]="disabled() || (menuItem.disabled?.() ?? false) || null"
               [class.checked]="menuItem.checked?.()"
-              (click)="menuItem.onSelect()">
+              (click)="menuItem.onSelect()"
+              [class]="menuItem.cssClass" class="menu-item"
+              sciMenuItemState [menuItem]="menuItem" #sciMenuItemState="sciMenuItemState">
         @if (menuItem.icon) {
           <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
         }
         @if (menuItem.label?.()) {
-          <span class="label">{{menuItem.label!()}}</span>
+          <span class="label">
+              @if (sciMenuItemState.labelText()) {
+                {{sciMenuItemState.labelText()}}
+              } @else if (sciMenuItemState.labelComponent()) {
+                <ng-container *ngComponentOutlet="sciMenuItemState.labelComponent()!"/>
+              }
+            </span>
         }
       </button>
     }
     @case ('sub-menu-item') {
       <button [attr.popovertarget]="popoverId"
               [attr.popovertargetaction]="'show'"
-              [style.anchor-name]="activeSubMenuItem() === menuItem ? `--${popoverId}` : null"
-              [attr.disabled]="this.disabled() || (menuItem.disabled?.() ?? false) || null"
-              [class.active]="activeSubMenuItem() === menuItem"
+              [style.anchor-name]="activeSubMenuItem()?.subMenuItem === menuItem ? `--${popoverId}` : null"
+              [attr.disabled]="disabled() || (menuItem.disabled?.() ?? false) || null"
+              [class.active]="activeSubMenuItem()?.subMenuItem === menuItem"
               [class.visual-marker]="menuItem.icon && !menuItem.label?.() && (menuItem.visualMenuMarker ?? true)"
-              class="menu-item submenu-item"
-              (click)="onSubMenuClick(menuItem)">
+              [class]="menuItem.cssClass" class="menu-item submenu-item"
+              (click)="onSubMenuClick(menuItem, sciMenuItemState.bounds)"
+              sciMenuItemState [menuItem]="menuItem" #sciMenuItemState="sciMenuItemState">
         @if (menuItem.icon) {
           <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
         }
         @if (menuItem.label?.()) {
-          <span class="label">{{menuItem.label!()}}</span>
+          <span class="label">
+              @if (sciMenuItemState.labelText()) {
+                {{sciMenuItemState.labelText()}}
+              } @else if (sciMenuItemState.labelComponent()) {
+                <ng-container *ngComponentOutlet="sciMenuItemState.labelComponent()!"/>
+              }
+            </span>
         }
 
         <!-- Add chevron for label menus -->
@@ -36,16 +50,24 @@
       </button>
     }
     @case ('group') {
-      <sci-tool-item-group [subMenuItem]="menuItem" [disabled]="this.disabled() || (menuItem.disabled?.() ?? false)"/>
+      <sci-tool-item-group [subMenuItem]="menuItem" [disabled]="disabled() || (menuItem.disabled?.() ?? false)"/>
     }
   }
 }
 
-@if (activeSubMenuItem()) {
-  <sci-menu [subMenuItem]="activeSubMenuItem()!"
-            [attr.id]="popoverId"
-            [style.position-anchor]="`--${popoverId}`"
-            [disabled]="this.disabled() || (activeSubMenuItem()!.disabled?.() ?? false)"
-            (toggle)="onTogglePopover($event)"
-            popover #popover/>
-}
+<!-- Menu popover -->
+<!--Template to control where to add the popup, e.g., required for toolbar in menu button to not be child of the menu item (hover state) -->
+<ng-template #popover_template>
+  @if (activeSubMenuItem()) {
+    <sci-menu [subMenuItem]="activeSubMenuItem()!.subMenuItem"
+              [attr.id]="popoverId"
+              [style.position-anchor]="`--${popoverId}`"
+              [style.width]="activeSubMenuItem()!.subMenuItem.size?.width"
+              [style.min-width]="activeSubMenuItem()!.subMenuItem.size?.minWidth ?? `${activeSubMenuItem()!.bounds().offsetWidth}px`"
+              [style.max-width]="activeSubMenuItem()!.subMenuItem.size?.maxWidth"
+              [disabled]="disabled() || (activeSubMenuItem()!.subMenuItem.disabled?.() ?? false)"
+              [class]="activeSubMenuItem()!.subMenuItem.cssClass"
+              (toggle)="onTogglePopover($event)"
+              popover #popover/>
+  }
+</ng-template>

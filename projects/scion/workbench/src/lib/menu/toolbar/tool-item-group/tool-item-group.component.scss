@@ -15,7 +15,7 @@ $icon-size: 18px;
   }
 
   // Add after separator
-  > sci-tool-item-group:not(:last-child, :has(+ sci-menu), :has(+ sci-tool-item-group))::after {
+  > sci-tool-item-group:not(:last-child):not(:has(+ sci-tool-item-group))::after {
     content: '';
     width: 1px;
     background-color: var(--sci-color-border);
@@ -29,7 +29,7 @@ $icon-size: 18px;
     align-items: center;
     text-wrap: nowrap;
     padding: $padding_menu_item;
-    border-radius: var(--sci-corner);
+    border-radius: var(--sci-toolbar-toolitem-border-radius);
     user-select: none;
     overflow: hidden;
     cursor: var(--sci-workbench-button-cursor);
@@ -70,7 +70,7 @@ $icon-size: 18px;
     }
 
     &.checked:where(:not(:disabled)) {
-      background-color: var(--sci-workbench-button-background-color-checked);
+      background-color: var(--sci-toolbar-toolitem-background-color-checked);
     }
 
     &.checked {
@@ -78,11 +78,11 @@ $icon-size: 18px;
     }
 
     &:hover:where(:not(:disabled)) {
-      background-color: var(--sci-workbench-button-background-color-hover);
+      background-color: var(--sci-toolbar-toolitem-background-color-hover);
     }
 
     &:active:where(:not(:disabled)) {
-      background-color: var(--sci-workbench-button-background-color-active);
+      background-color: var(--sci-toolbar-toolitem-background-color-active);
     }
 
     &:focus:not(:focus-visible) {
@@ -98,16 +98,16 @@ $icon-size: 18px;
     }
 
     &.active {
-      background-color: var(--sci-workbench-button-background-color-hover);
+      background-color: var(--sci-toolbar-toolitem-background-color-hover);
     }
   }
+}
 
-  > :where(sci-menu[popover]) { // allow setting host styles in menu component
-    margin: unset; // unset native popover styling
-    padding: unset; // unset native popover styling
-    inset: unset; // unset native popover styling
-    position-try-fallbacks: flip-inline, flip-block;
-    top: calc(anchor(bottom) + 1px);
-    left: anchor(left);
-  }
+:where(sci-menu[popover]) { // allow setting host styles in menu component
+  margin: unset; // unset native popover styling
+  padding: unset; // unset native popover styling
+  inset: unset; // unset native popover styling
+  position-try-fallbacks: flip-inline, flip-block;
+  top: calc(anchor(bottom) + 1px);
+  left: anchor(left);
 }
