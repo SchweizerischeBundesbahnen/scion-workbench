@@ -78,6 +78,11 @@ export const testPageRoutes: Routes = [
         path: 'text-test-page',
         loadComponent: () => import('./text-test-page/text-test-page.component'),
       },
+      {
+        path: 'workbench-handle-bounds-test-page',
+        loadComponent: () => import('./workbench-handle-bounds-test-page/workbench-handle-bounds-test-page.component'),
+        data: {[WorkbenchRouteData.title]: 'Workbench Handle Bounds'},
+      },
     ],
   },
   // The following routes must be registered as top-level routes, not as children of another route.

@@ -135,6 +135,11 @@ export abstract class WorkbenchPart {
    * Activates this part.
    */
   public abstract activate(): Promise<boolean>;
+
+  /**
+   * Gets size and position of this part, or `undefined` if not constructed.
+   */
+  public abstract readonly bounds: Signal<DOMRect | undefined>;
 }
 
 /**

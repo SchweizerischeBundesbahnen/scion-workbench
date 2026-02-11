@@ -72,7 +72,9 @@ export class ɵWorkbenchPart implements WorkbenchPart, Blockable {
   public readonly views: Signal<ɵWorkbenchView[]>;
   public readonly classList = new ClassList();
   public readonly portal: WbComponentPortal<MainAreaPartComponent | PartComponent>;
-  public readonly bounds: Signal<DOMRect | undefined>;
+  public readonly partBounds: Signal<DOMRect | undefined>;
+  /** Represents the bounds of the slot. Used for public API. Internally, use {@link slot.bounds()} instead. */
+  public readonly bounds = computed(() => this.slot.bounds());
   public readonly blockedBy: Signal<ɵWorkbenchDialog | null>;
   public readonly slot: {
     portal: WbComponentPortal<PartSlotComponent>;
@@ -89,7 +91,7 @@ export class ɵWorkbenchPart implements WorkbenchPart, Blockable {
     this.views = computeViews(this.mPart);
     this.alternativeId = this.mPart().alternativeId;
     this.portal = this.createPartPortal();
-    this.bounds = boundingClientRect(computed(() => this.portal.element()));
+    this.partBounds = boundingClientRect(computed(() => this.portal.element()));
     this.blockedBy = inject(WorkbenchDialogRegistry).top(this.id);
     this.slot = {
       portal: this.createPartSlotPortal(),

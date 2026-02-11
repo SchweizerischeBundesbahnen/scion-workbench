@@ -38,7 +38,7 @@ export function createInvocationContext(elementId: PartId | ViewId | DialogId | 
     return {
       elementId: part.id,
       attached: part.slot.portal.attached,
-      bounds: computed(() => constrainClientRect(part.slot.bounds(), part.bounds())),
+      bounds: computed(() => constrainClientRect(part.slot.bounds(), part.partBounds())),
       destroyed: part.slot.portal.destroyed,
       peripheral: part.peripheral,
     };
@@ -48,7 +48,7 @@ export function createInvocationContext(elementId: PartId | ViewId | DialogId | 
     return {
       elementId: view.id,
       attached: view.slot.portal.attached,
-      bounds: computed(() => constrainClientRect(view.slot.bounds(), view.part().bounds())),
+      bounds: computed(() => constrainClientRect(view.slot.bounds(), view.part().partBounds())),
       destroyed: view.slot.portal.destroyed,
       peripheral: computed(() => view.part().peripheral()),
     };

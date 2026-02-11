@@ -19,6 +19,7 @@ import {RouterPagePO} from './page-object/router-page.po';
 import {LayoutPagePO} from './page-object/layout-page/layout-page.po';
 import {canMatchWorkbenchPart} from './page-object/layout-page/register-route-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
+import {WorkbenchHandleBoundsTestPagePO} from './page-object/test-pages/workbench-handle-bounds-test-page.po';
 
 test.describe('Workbench Part', () => {
 
@@ -801,5 +802,53 @@ test.describe('Workbench Part', () => {
 
     // Expect the component not to be constructed anew.
     await expect.poll(() => partPage.getComponentInstanceId()).toEqual(componentInstanceId);
+  });
+
+  test('should provide part bounds', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Create layout with an activity and two aligned parts.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right'})
+      .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+      .navigatePart('part.activity', ['test-pages/workbench-handle-bounds-test-page'])
+      .navigatePart('part.left', ['test-pages/workbench-handle-bounds-test-page'])
+      .navigatePart('part.right', ['test-pages/workbench-handle-bounds-test-page'])
+      .activatePart('part.activity'),
+    );
+
+    await test.step('Assert part bounds of activity', async () => {
+      const part = appPO.part({partId: 'part.activity'});
+      const testPage = new WorkbenchHandleBoundsTestPagePO(part);
+
+      await expect(async () => {
+        const expectedBounds = await part.getBoundingBox('content');
+        const handleBounds = await testPage.getBounds();
+        expect(handleBounds).toEqual(expectedBounds);
+      }).toPass();
+    });
+
+    await test.step('Assert part bounds of left part', async () => {
+      const part = appPO.part({partId: 'part.left'});
+      const testPage = new WorkbenchHandleBoundsTestPagePO(part);
+
+      await expect(async () => {
+        const expectedBounds = await part.getBoundingBox('content');
+        const handleBounds = await testPage.getBounds();
+        expect(handleBounds).toEqual(expectedBounds);
+      }).toPass();
+    });
+
+    await test.step('Assert part bounds of right part', async () => {
+      const part = appPO.part({partId: 'part.right'});
+      const testPage = new WorkbenchHandleBoundsTestPagePO(part);
+
+      await expect(async () => {
+        const expectedBounds = await part.getBoundingBox('content');
+        const handleBounds = await testPage.getBounds();
+        expect(handleBounds).toEqual(expectedBounds);
+      }).toPass();
+    });
   });
 });
