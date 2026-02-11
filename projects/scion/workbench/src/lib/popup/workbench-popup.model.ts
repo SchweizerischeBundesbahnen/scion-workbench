@@ -53,6 +53,11 @@ export abstract class WorkbenchPopup {
    * Closes the popup. Optionally, pass a result or an error to the popup opener.
    */
   public abstract close<R>(result?: R | Error): void;
+
+  /**
+   * Gets size and position of this popup, or `undefined` if not constructed.
+   */
+  public abstract readonly bounds: Signal<DOMRect | undefined>;
 }
 
 /**

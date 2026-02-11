@@ -842,7 +842,7 @@ test.describe('Workbench Dialog', () => {
 
       // Expect glass pane of the dialog.
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
-        await dialogOpenerPage.popup.getBoundingBox({box: 'content-box'}), // workbench popup
+        await dialogOpenerPage.popup.getBoundingBox('content'), // workbench popup
       ]));
     });
 
@@ -893,7 +893,7 @@ test.describe('Workbench Dialog', () => {
 
       // Expect glass pane of the dialog.
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
-        await dialogOpenerPage.popup.getBoundingBox({box: 'content-box'}), // workbench popup
+        await dialogOpenerPage.popup.getBoundingBox('content'), // workbench popup
       ]));
     });
 
@@ -1097,7 +1097,7 @@ test.describe('Workbench Dialog', () => {
 
       // Expect glass pane of the dialog.
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
-        await popup.getBoundingBox({box: 'content-box'}), // workbench popup
+        await popup.getBoundingBox('content'), // workbench popup
       ]));
     });
 
@@ -1140,7 +1140,7 @@ test.describe('Workbench Dialog', () => {
       // Expect glass pane of the dialog.
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
         await appPO.workbenchBoundingBox(), // workbench
-        await dialogOpenerPage.popup.getBoundingBox({box: 'content-box'}), // workbench popup
+        await dialogOpenerPage.popup.getBoundingBox('content'), // workbench popup
         await popupOpenerPage.outlet.getBoundingBox(), // microfrontend view
         await popupOpenerPage.view.getBoundingBox(), // workbench view
       ]));
@@ -1232,7 +1232,7 @@ test.describe('Workbench Dialog', () => {
 
       // Expect glass pane of the dialog.
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
-        await inputFieldTestPage.popup.getBoundingBox({box: 'content-box'}), // workbench popup
+        await inputFieldTestPage.popup.getBoundingBox('content'), // workbench popup
       ]));
     });
   });
@@ -1654,7 +1654,7 @@ test.describe('Workbench Dialog', () => {
 
       // Expect glass pane of the dialog.
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
-        await inputFieldTestPage.popup.getBoundingBox({box: 'content-box'}), // workbench popup
+        await inputFieldTestPage.popup.getBoundingBox('content'), // workbench popup
       ]));
     });
   });

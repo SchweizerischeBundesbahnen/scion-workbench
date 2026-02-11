@@ -349,7 +349,7 @@ test.describe('Workbench Message Box Microfrontend', () => {
 
       // Expect glass pane of the message box.
       await expect.poll(() => messageBox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
-        await messageBoxOpenerPage.popup.getBoundingBox({box: 'content-box'}), // workbench popup
+        await messageBoxOpenerPage.popup.getBoundingBox('content'), // workbench popup
       ]));
     });
 
@@ -399,7 +399,7 @@ test.describe('Workbench Message Box Microfrontend', () => {
 
       // Expect glass pane of the message box.
       await expect.poll(() => messageBox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
-        await messageBoxOpenerPage.popup.getBoundingBox({box: 'content-box'}), // workbench popup
+        await messageBoxOpenerPage.popup.getBoundingBox('content'), // workbench popup
       ]));
     });
 
@@ -442,7 +442,7 @@ test.describe('Workbench Message Box Microfrontend', () => {
       // Expect glass pane of the message box.
       await expect.poll(() => messageBox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
         await appPO.workbenchBoundingBox(), // workbench
-        await messageBoxOpenerPage.popup.getBoundingBox({box: 'content-box'}), // workbench popup
+        await messageBoxOpenerPage.popup.getBoundingBox('content'), // workbench popup
         await popupOpenerPage.outlet.getBoundingBox(), // microfrontend view
         await popupOpenerPage.view.getBoundingBox(), // workbench view
       ]));

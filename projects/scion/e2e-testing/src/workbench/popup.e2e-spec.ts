@@ -58,7 +58,7 @@ test.describe('Workbench Popup', () => {
 
       const popup = appPO.popup({cssClass: 'testee'});
 
-      await expect.poll(() => popup.getBoundingBox({box: 'content-box'})).toEqual(expect.objectContaining({
+      await expect.poll(() => popup.getBoundingBox('content')).toEqual(expect.objectContaining({
         width: 300,
         height: 400,
       }));
