@@ -54,7 +54,7 @@ test.describe('Workbench Popup', () => {
         maxHeight: '455px',
       } satisfies Partial<CSSStyleDeclaration>));
 
-      await expect.poll(() => popup.getBoundingBox({box: 'content-box'})).toEqual(expect.objectContaining({
+      await expect.poll(() => popup.getBoundingBox('content')).toEqual(expect.objectContaining({
         width: 350,
         height: 450,
       }));
@@ -92,7 +92,7 @@ test.describe('Workbench Popup', () => {
 
       const popup = appPO.popup({cssClass: 'testee'});
 
-      await expect.poll(() => popup.getBoundingBox({box: 'content-box'})).toEqual(expect.objectContaining({
+      await expect.poll(() => popup.getBoundingBox('content')).toEqual(expect.objectContaining({
         width: 350,
         height: 450,
       }));
@@ -125,7 +125,7 @@ test.describe('Workbench Popup', () => {
       height: '800px',
     });
 
-    await expect.poll(() => popup.getBoundingBox({box: 'content-box'})).toEqual(expect.objectContaining({
+    await expect.poll(() => popup.getBoundingBox('content')).toEqual(expect.objectContaining({
       width: 600,
       height: 800,
     }));

@@ -34,12 +34,10 @@ export class PopupPO {
   }
 
   /**
-   * Retrieves the bounding box of the popup. By default, includes borders ('border-box').
-   *
-   * @param options - Specifies whether to include borders ('border-box') or not ('content-box').
+   * Gets the bounding box of this popup (inclusive borders) or its content (exclusive borders). Defaults to the bounding box of the popup inclusive borders.
    */
-  public async getBoundingBox(options?: {box?: 'border-box' | 'content-box'}): Promise<DomRect> {
-    const locator = options?.box === 'content-box' ? this.locator : this.overlay;
+  public async getBoundingBox(selector: 'popup' | 'content' = 'popup'): Promise<DomRect> {
+    const locator = selector === 'popup' ? this.overlay : this.locator;
     return fromRect(await locator.boundingBox());
   }
 
@@ -76,7 +74,7 @@ export class PopupPO {
   }
 
   public async getAnchorPosition(): Promise<{x: number; y: number}> {
-    const boundingBox = await this.getBoundingBox({box: 'border-box'});
+    const boundingBox = await this.getBoundingBox();
     const align = await this.getAlign();
     switch (align) {
       case 'south':

@@ -790,7 +790,7 @@ test.describe('Workbench Dialog', () => {
       await expect.poll(() => appPO.isPopupBlocked(popupPage.popup.getPopupId())).toBe(true);
       await expect.poll(() => appPO.isDialogBlocked(dialogPage.dialog.getDialogId())).toBe(false);
       await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
-      await expect.poll(() => dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popupPage.popup.getBoundingBox({box: 'content-box'})]));
+      await expect.poll(() => dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popupPage.popup.getBoundingBox('content')]));
     });
 
     test('should reject the promise when attaching the dialog to a non-existent popup', async ({appPO, workbenchNavigator, consoleLogs}) => {
@@ -953,7 +953,7 @@ test.describe('Workbench Dialog', () => {
       await expectDialog(dialogPage).toBeVisible();
       await expect.poll(() => appPO.isPopupBlocked(popupPage.popup.getPopupId())).toBe(true);
       await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
-      await expect.poll(() => dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popupPage.popup.getBoundingBox({box: 'content-box'})]));
+      await expect.poll(() => dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popupPage.popup.getBoundingBox('content')]));
 
       // Expect dialog to be positioned in the center of the popup.
       const popupBounds = await popupPage.popup.getBoundingBox();
@@ -3105,7 +3105,7 @@ test.describe('Workbench Dialog', () => {
       await expect(focusTestPage.middleField).toBeFocused();
 
       // Expect glass panes.
-      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox({box: 'content-box'})]));
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('content')]));
       await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
       await expect.poll(() => appPO.isViewBlocked(popupOpenerViewPage.view.getViewId())).toBe(false);
       await expect.poll(() => appPO.isPopupBlocked(popup.getPopupId())).toBe(true);

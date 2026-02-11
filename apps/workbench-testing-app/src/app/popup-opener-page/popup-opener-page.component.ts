@@ -27,6 +27,7 @@ import SizeTestPageComponent from '../test-pages/size-test-page/size-test-page.c
 import {UUID} from '@scion/toolkit/uuid';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {PopupSizeDirective} from './popup-size.directive';
+import WorkbenchHandleBoundsTestPageComponent from '../test-pages/workbench-handle-bounds-test-page/workbench-handle-bounds-test-page.component';
 
 @Component({
   selector: 'app-popup-opener-page',
@@ -147,7 +148,7 @@ export default class PopupOpenerPageComponent {
     }
   }
 
-  private readComponentFromUI(): Type<PopupPageComponent | FocusTestPageComponent | BlankTestPageComponent> {
+  private readComponentFromUI(): Type<unknown> {
     switch (this.form.controls.component.value) {
       case 'popup-page':
         return PopupPageComponent;
@@ -163,6 +164,8 @@ export default class PopupOpenerPageComponent {
         return DialogOpenerPageComponent;
       case 'popup-opener-page':
         return PopupOpenerPageComponent;
+      case 'workbench-handle-bounds-test-page':
+        return WorkbenchHandleBoundsTestPageComponent;
       default:
         throw Error(`[IllegalPopupComponent] Popup component not supported: ${this.form.controls.component.value}`);
     }

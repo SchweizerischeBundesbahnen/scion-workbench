@@ -422,7 +422,7 @@ test.describe('Workbench Host Message Box', () => {
       const componentInstanceId = await messageboxPage.getComponentInstanceId();
 
       // Expect glass pane of the messagebox.
-      await expect.poll(() => messagebox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox({box: 'content-box'})]));
+      await expect.poll(() => messagebox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('content')]));
 
       // Detach messagebox.
       await appPO.openNewViewTab();
@@ -488,7 +488,7 @@ test.describe('Workbench Host Message Box', () => {
       const componentInstanceId = await messageboxPage.getComponentInstanceId();
 
       // Expect glass pane of the messagebox.
-      await expect.poll(() => messagebox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox({box: 'content-box'})]));
+      await expect.poll(() => messagebox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('content')]));
 
       // Detach messagebox.
       await appPO.openNewViewTab();
