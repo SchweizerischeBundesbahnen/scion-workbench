@@ -74,6 +74,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public readonly focused = computed(() => this._focusMonitor.activeElement()?.id === this.id);
   public readonly menuItems: Signal<WorkbenchMenuItem[]>;
   public readonly blockedBy: Signal<ɵWorkbenchDialog | null>;
+  public readonly bounds = computed(() => this.slot.bounds());
   public readonly slot: {
     portal: WbComponentPortal<ViewSlotComponent>;
     bounds: Signal<DOMRect | undefined>;

@@ -221,6 +221,7 @@ class DragImageWorkbenchView implements WorkbenchView {
   public readonly menuItems = signal([]);
   public readonly isClosable: Signal<boolean>;
   public readonly activationInstant = signal(0);
+  public readonly bounds = signal(undefined);
 
   constructor(dragData: ViewDragData) {
     this.id = dragData.viewId;

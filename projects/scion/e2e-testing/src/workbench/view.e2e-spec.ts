@@ -23,6 +23,7 @@ import {expectMessageBox} from '../matcher/message-box-matcher';
 import {TextMessageBoxPagePO} from '../text-message-box-page.po';
 import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
 import {NullContentPagePO} from './page-object/null-content-page.po';
+import {WorkbenchHandleBoundsTestPagePO} from './page-object/test-pages/workbench-handle-bounds-test-page.po';
 
 test.describe('Workbench View', () => {
 
@@ -1384,6 +1385,42 @@ test.describe('Workbench View', () => {
     // Expect hint not to show.
     const viewPage = new ViewPagePO(appPO.view({viewId: 'view.100'}));
     await expectView(viewPage).toBeActive();
+  });
+
+  test('should provide view bounds', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Create layout with two views.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right'})
+      .addView('view.left', {partId: 'part.left'})
+      .addView('view.right', {partId: 'part.right'})
+      .navigateView('view.left', ['test-pages/workbench-handle-bounds-test-page'])
+      .navigateView('view.right', ['test-pages/workbench-handle-bounds-test-page']),
+    );
+
+    await test.step('Assert view bounds of left view', async () => {
+      const view = appPO.view({viewId: 'view.left'});
+      const testPage = new WorkbenchHandleBoundsTestPagePO(view);
+
+      await expect(async () => {
+        const expectedBounds = await view.getBoundingBox();
+        const handleBounds = await testPage.getBounds();
+        expect(handleBounds).toEqual(expectedBounds);
+      }).toPass();
+    });
+
+    await test.step('Assert view bounds of right view', async () => {
+      const view = appPO.view({viewId: 'view.right'});
+      const testPage = new WorkbenchHandleBoundsTestPagePO(view);
+
+      await expect(async () => {
+        const expectedBounds = await view.getBoundingBox();
+        const handleBounds = await testPage.getBounds();
+        expect(handleBounds).toEqual(expectedBounds);
+      }).toPass();
+    });
   });
 
   test.describe('View Background Color', () => {
