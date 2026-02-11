@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, forwardRef, inject, input, linkedSignal, signal, Signal, untracked, viewChild, ViewContainerRef} from '@angular/core';
+import {afterRenderEffect, ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, forwardRef, inject, input, linkedSignal, signal, Signal, untracked, viewChild, ViewContainerRef} from '@angular/core';
 import {MMenuGroup, MMenuItem, MSubMenuItem} from '../ɵmenu';
 import {SciMenuRegistry} from '../menu.registry';
 import {UUID} from '@scion/toolkit/uuid';
@@ -31,6 +31,9 @@ import {NgComponentOutlet} from '@angular/common';
   host: {
     '[class.gutter-column-hidden]': '!hasGutterColumn()',
     '[class.is-group]': 'isGroup()',
+    '[style.width]': 'size()?.width',
+    '[style.min-width]': 'size()?.minWidth',
+    '[style.max-width]': 'size()?.maxWidth',
   },
 })
 export class MenuComponent {
@@ -38,6 +41,7 @@ export class MenuComponent {
   public readonly subMenuItem = input.required<MSubMenuItem | MMenuGroup>();
   public readonly disabled = input<boolean>();
   public readonly withGutterColumn = input<boolean>();
+  public readonly anchorWidth = input<number>();
 
   private readonly _menuRegistry = inject(SciMenuRegistry);
   private readonly _popover = viewChild('popover', {read: ElementRef<HTMLElement>});
@@ -58,7 +62,25 @@ export class MenuComponent {
   protected readonly isGroup = computed(() => this.subMenuItem().type === 'group');
   protected readonly isGroupExpanded = signal(true);
 
+  protected readonly size = linkedSignal<PreferredSize | undefined>(() => {
+    const subMenuItem = this.subMenuItem();
+    if (subMenuItem.type !== 'sub-menu-item') {
+      return undefined;
+    }
+    return {
+      width: subMenuItem.size?.width,
+      minWidth: subMenuItem.size?.minWidth ?? `${this.anchorWidth()}px`,
+      maxWidth: subMenuItem.size?.maxWidth,
+    };
+  });
+
   constructor() {
+    // Maintain stable width when expanding/collapsing groups or hovering menu item when displaying the actions toolbar.
+    afterRenderEffect(() => {
+      this.subMenuItem(); // re-evaluate when re-used
+      this.size.update(size => ({...size, width: `${this._host.getBoundingClientRect().width}px`}));
+    });
+
     // Compute expanded state group.
     effect(() => {
       const subMenuItem = this.subMenuItem();
@@ -184,4 +206,10 @@ function hasGutter(menuItems: Array<MMenuItem | MSubMenuItem | MMenuGroup>): boo
         return menuItem.collapsible || hasGutter(menuItem.children); // TODO [menu] consider contributions
     }
   });
+}
+
+interface PreferredSize {
+  width?: string;
+  minWidth?: string;
+  maxWidth?: string
 }

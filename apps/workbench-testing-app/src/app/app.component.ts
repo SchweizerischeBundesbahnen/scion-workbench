@@ -363,7 +363,7 @@ export class AppComponent implements DoCheck {
       ),
     );
     provideMenu('toolbar:workbench.part.tools.start', menu => menu
-      .addMenu({label: computed(() => perspectiveLabels.get(perspective()) ?? perspective()), size: {maxWidth: '150px'}}, menu => menu
+      .addMenu({label: computed(() => perspectiveLabels.get(perspective()) ?? perspective())}, menu => menu
         .addMenuItem({label: 'Default Layout', actionToolbarName: 'toolbar:perspective.menu', checked: computed(() => perspective() === 'default_layout')}, () => {
           perspective.set('default_layout');
           return true;
@@ -392,7 +392,7 @@ export class AppComponent implements DoCheck {
         )
         .addGroup({label: 'Microfrontend Perspectives'}, group => group
           .addMenu({label: 'Layout with Docked Parts'}, menu => menu
-            .addMenuItem({label: 'Sample Layout App 1', checked: computed(() => perspective() === 'sample_layout_docked_parts_app_1')}, () => {
+            .addMenuItem({label: 'Sample Layout App 1', actionToolbarName: 'toolbar:perspective.menu', checked: computed(() => perspective() === 'sample_layout_docked_parts_app_1')}, () => {
               perspective.set('sample_layout_docked_parts_app_1');
               return true;
             })
@@ -472,11 +472,9 @@ function toggleMultiFlag(flags: WritableSignal<Set<string>>, flag: string): void
   flags.update(flags => {
     const newFlags = new Set(flags);
     if (flags.has(flag)) {
-      console.log('>>> delete', flag);
       newFlags.delete(flag);
     }
     else {
-      console.log('>>> add', flag);
       newFlags.add(flag);
     }
     return newFlags;

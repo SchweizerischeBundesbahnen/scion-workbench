@@ -20,12 +20,13 @@ $icon-size: 18px;
   overflow: hidden;
   align-items: center;
   font-size: $font-size;
+  box-sizing: border-box;
 
   &:not(.is-group) {
     grid-template-columns:
        // === Menu Item Subgrid ===
       auto // icon or check mark
-      minmax(12em, 1fr); // content
+      1fr; // content
     border: 1px solid var(--sci-color-border);
     border-radius: 0.5rem;
     color: var(--sci-color-text);
@@ -35,7 +36,7 @@ $icon-size: 18px;
     &.gutter-column-hidden {
       grid-template-columns:
         // === Menu Item Subgrid ===
-        minmax(12em, 1fr); // content
+        1fr; // content
     }
   }
 
@@ -112,6 +113,7 @@ $icon-size: 18px;
       display: flex;
       align-items: center;
       gap: 1em;
+      overflow: hidden; // to support ellipsis on label
 
       &:first-child > span.label {
         padding-left: .5em;
@@ -120,10 +122,6 @@ $icon-size: 18px;
       > span.label {
         flex: auto;
         @include ellipsis-on-overflow();
-
-        &:last-child {
-          padding-right: .5em;
-        }
       }
 
       > span.accelerator {
@@ -156,8 +154,13 @@ $icon-size: 18px;
       }
     }
 
+    // Add padding-right to label if no actions toolbar, or the actions toolsbar is not visible because not hovered
+    > div.content > span.label:last-child, &:not(:hover) > div.content > span.label:has(+ sci-toolbar.actions:not(.empty)) {
+      padding-right: 2em;
+    }
+
     &:not(:hover):not(.checked) > div.content > sci-toolbar.actions:not(.open) {
-      visibility: hidden; // do not set display to not resize the menu if not hovered
+      display: none;
     }
 
     &:hover:where(:not(:disabled)) {
