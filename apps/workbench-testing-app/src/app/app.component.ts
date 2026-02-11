@@ -73,7 +73,12 @@ export class AppComponent implements DoCheck {
     );
     const paragraphStyle = signal<string>('');
 
+    const workbenchService = inject(WorkbenchService);
+
     provideMenu('toolbar:main', toolbar => toolbar
+      .addMenuItem({icon: computed(() => workbenchService.settings.theme() === 'scion-light' ? 'light_mode' : 'dark_mode')}, () => {
+        workbenchService.settings.theme.update(theme => theme === 'scion-light' ? 'scion-dark' : 'scion-light');
+      })
       .addMenu({icon: 'account_circle', label: UserMenuItemComponent, filter: true}, menu => menu
         .addGroup({label: 'Gruppe', collapsible: {collapsed: true}}, group => group
           .addMenuItem({label: 'Kapazitätsplaner'}, () => this.onAction())

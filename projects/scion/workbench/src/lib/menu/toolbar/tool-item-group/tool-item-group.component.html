@@ -6,8 +6,8 @@
               (click)="menuItem.onSelect()"
               [class]="menuItem.cssClass" class="menu-item"
               sciMenuItemState [menuItem]="menuItem" #sciMenuItemState="sciMenuItemState">
-        @if (menuItem.icon) {
-          <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
+        @if (menuItem.icon?.()) {
+          <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon?.()}}</span>
         }
         @if (menuItem.label?.()) {
           <span class="label">
@@ -26,12 +26,12 @@
               [style.anchor-name]="activeSubMenuItem()?.subMenuItem === menuItem ? `--${popoverId}` : null"
               [attr.disabled]="disabled() || (menuItem.disabled?.() ?? false) || null"
               [class.active]="activeSubMenuItem()?.subMenuItem === menuItem"
-              [class.visual-marker]="menuItem.icon && !menuItem.label?.() && (menuItem.visualMenuMarker ?? true)"
+              [class.visual-marker]="menuItem.icon?.() && !menuItem.label?.() && (menuItem.visualMenuMarker ?? true)"
               [class]="menuItem.cssClass" class="menu-item submenu-item"
               (click)="onSubMenuClick(menuItem, sciMenuItemState.bounds)"
               sciMenuItemState [menuItem]="menuItem" #sciMenuItemState="sciMenuItemState">
-        @if (menuItem.icon) {
-          <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
+        @if (menuItem.icon?.()) {
+          <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon?.()}}</span>
         }
         @if (menuItem.label?.()) {
           <span class="label">

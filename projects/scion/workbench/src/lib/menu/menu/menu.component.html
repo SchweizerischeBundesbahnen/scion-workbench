@@ -36,7 +36,7 @@
             @if (menuItem.checked !== undefined) {
               <span class="icon material-symbols-rounded checkmark" translate="no">{{menuItem.checked() ? 'check' : ''}}</span>
             } @else {
-              <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
+              <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon?.()}}</span>
             }
           }
 
@@ -75,7 +75,7 @@
                 (mouseenter)="onMenuItemMouseEnter(menuItem)"
                 sciMenuItemState [menuItem]="menuItem" #sciMenuItemState="sciMenuItemState">
           @if (hasGutterColumn()) {
-            <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon}}</span>
+            <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon?.()}}</span>
           }
           <div class="content">
             <span class="label">

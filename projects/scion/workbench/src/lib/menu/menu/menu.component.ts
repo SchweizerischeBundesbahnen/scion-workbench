@@ -41,7 +41,7 @@ export class MenuComponent {
   public readonly subMenuItem = input.required<MSubMenuItem | MMenuGroup>();
   public readonly disabled = input<boolean>();
   public readonly withGutterColumn = input<boolean>();
-  public readonly anchorWidth = input<number>();
+  public readonly anchorWidth = input(undefined, {transform: (width: number | undefined): string | undefined => width ? `${width}px` : undefined});
 
   private readonly _menuRegistry = inject(SciMenuRegistry);
   private readonly _popover = viewChild('popover', {read: ElementRef<HTMLElement>});
@@ -69,7 +69,7 @@ export class MenuComponent {
     }
     return {
       width: subMenuItem.size?.width,
-      minWidth: subMenuItem.size?.minWidth ?? `${this.anchorWidth()}px`,
+      minWidth: subMenuItem.size?.minWidth ?? this.anchorWidth() ?? '12em',
       maxWidth: subMenuItem.size?.maxWidth,
     };
   });
@@ -199,9 +199,9 @@ function hasGutter(menuItems: Array<MMenuItem | MSubMenuItem | MMenuGroup>): boo
   return menuItems.some(menuItem => {
     switch (menuItem.type) {
       case 'menu-item':
-        return menuItem.icon || menuItem.checked !== undefined;
+        return menuItem.icon?.() || menuItem.checked !== undefined;
       case 'sub-menu-item':
-        return menuItem.icon;
+        return menuItem.icon?.();
       case 'group':
         return menuItem.collapsible || hasGutter(menuItem.children); // TODO [menu] consider contributions
     }

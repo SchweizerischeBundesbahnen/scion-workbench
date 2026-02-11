@@ -71,7 +71,7 @@ export interface SciMenuItemDescriptor {
 }
 
 export interface SciIconMenuItemDescriptor extends SciMenuItemDescriptor {
-  icon: string;
+  icon: Signal<string> | string;
 }
 
 export interface SciCheckableMenuItemDescriptor extends SciMenuItemDescriptor {

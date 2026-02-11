@@ -17,7 +17,7 @@ export class ɵSciMenu implements SciMenu {
       mnemonic: menuItemDescriptor.mnemonic,
       accelerator: menuItemDescriptor.accelerator,
       disabled: coerceSignal(menuItemDescriptor.disabled),
-      icon: 'icon' in menuItemDescriptor ? menuItemDescriptor.icon : undefined,
+      icon: coerceSignal('icon' in menuItemDescriptor ? menuItemDescriptor.icon : undefined),
       checked: 'checked' in menuItemDescriptor ? coerceSignal(menuItemDescriptor.checked) : undefined,
       actionToolbarName: coerceSignal(menuItemDescriptor.actionToolbarName),
       matchesFilter: menuItemDescriptor.matchesFilter,
@@ -34,7 +34,7 @@ export class ɵSciMenu implements SciMenu {
       type: 'sub-menu-item',
       id: menuDescriptor.id ?? UUID.randomUUID(),
       label: coerceSignal(menuDescriptor.label),
-      icon: 'icon' in menuDescriptor ? menuDescriptor.icon : undefined,
+      icon: coerceSignal('icon' in menuDescriptor ? menuDescriptor.icon : undefined),
       tooltip: menuDescriptor.tooltip,
       mnemonic: menuDescriptor.mnemonic,
       disabled: coerceSignal(menuDescriptor.disabled),
@@ -83,7 +83,7 @@ export interface MMenuItem {
   type: 'menu-item'
   id: string;
   label?: Signal<string | ComponentType<unknown>>;
-  icon?: string;
+  icon?: Signal<string>;
   tooltip?: string;
   mnemonic?: string;
   accelerator?: string[];
@@ -99,7 +99,7 @@ export interface MSubMenuItem {
   type: 'sub-menu-item'
   id: string;
   label?: Signal<string | ComponentType<unknown>>;
-  icon?: string;
+  icon?: Signal<string>;
   tooltip?: string;
   mnemonic?: string;
   disabled?: Signal<boolean>;
