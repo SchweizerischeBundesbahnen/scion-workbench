@@ -211,6 +211,11 @@ export abstract class WorkbenchView {
    * @returns Reference to the `CanClose` guard, which can be used to unregister the guard.
    */
   public abstract canClose(canClose: CanCloseFn): CanCloseRef;
+
+  /**
+   * Gets size and position of this view, or `undefined` if not constructed.
+   */
+  public abstract readonly bounds: Signal<DOMRect | undefined>;
 }
 
 /**
