@@ -76,6 +76,11 @@ export abstract class WorkbenchDialog {
    * Closes the dialog. Optionally, pass a result or an error to the dialog opener.
    */
   public abstract close<R>(result?: R | Error): void;
+
+  /**
+   * Gets size and position of this dialog, or `undefined` if not constructed.
+   */
+  public abstract readonly bounds: Signal<DOMRect | undefined>;
 }
 
 /**

@@ -25,6 +25,7 @@ import {fromRect} from '../helper/testing.util';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 import {expectPopup} from '../matcher/popup-matcher';
 import {LargeTestPagePO} from './page-object/test-pages/large-test-page.po';
+import {WorkbenchHandleBoundsTestPagePO} from './page-object/test-pages/workbench-handle-bounds-test-page.po';
 
 test.describe('Workbench Dialog', () => {
 
@@ -1896,6 +1897,23 @@ test.describe('Workbench Dialog', () => {
       const contextBounds = await dialogOpenerPage.view.getBoundingBox();
       expect(dialogBounds.left).toBeCloseTo(contextBounds.hcenter - (dialogBounds.width / 2), 0);
       expect(dialogBounds.right).toBeCloseTo(contextBounds.hcenter + (dialogBounds.width / 2), 0);
+    });
+
+    test('should provide dialog bounds', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('workbench-handle-bounds-test-page', {cssClass: 'testee'});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const testPage = new WorkbenchHandleBoundsTestPagePO(dialog);
+
+      await expect(async () => {
+        const expectedBounds = await dialog.getDialogSlotBoundingBox();
+        const handleBounds = await testPage.getBounds();
+        expect(handleBounds).toEqual(expectedBounds);
+      }).toPass();
     });
   });
 
