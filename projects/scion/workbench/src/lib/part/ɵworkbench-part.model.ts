@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {afterRenderEffect, assertNotInReactiveContext, computed, DestroyableInjector, effect, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, TemplateRef, untracked, WritableSignal} from '@angular/core';
-import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchPartAction, WorkbenchPartActionFn} from '../workbench.model';
 import {WORKBENCH_ELEMENT} from '../workbench-element-references';
 import {WorkbenchPart, WorkbenchPartNavigation} from './workbench-part.model';
@@ -39,6 +38,7 @@ import {Blockable} from '../glass-pane/blockable';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog.model';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
 import {WORKBENCH_PART_CONTEXT} from './workbench-part-context.provider';
+import {Objects} from '@scion/toolkit/util';
 
 /** @inheritDoc */
 export class ɵWorkbenchPart implements WorkbenchPart, Blockable {
@@ -395,7 +395,7 @@ function computePartActions(part: ɵWorkbenchPart): Signal<WorkbenchPartAction[]
     changes?.forEachAddedItem(({item: fn}) => partActions.set(fn, computed(() => constructPartAction(fn, injector))));
     changes?.forEachRemovedItem(({item: fn}) => partActions.delete(fn));
     return Array.from(partActions.values()).map(partAction => partAction()).filter(partAction => !!partAction);
-  }, {equal: (a, b) => Arrays.isEqual(a, b)});
+  }, {equal: (a, b) => Objects.isEqual(a, b)});
 
   function constructPartAction(factoryFn: WorkbenchPartActionFn, injector: Injector): WorkbenchPartAction | null {
     const action: WorkbenchPartAction | ComponentType<unknown> | TemplateRef<unknown> | null = runInInjectionContext(injector, () => factoryFn(inject(ɵWorkbenchPart)));
@@ -419,5 +419,5 @@ function computeActiveView(mPart: Signal<MPart>): Signal<ɵWorkbenchView | null>
  */
 function computeViews(mPart: Signal<MPart>): Signal<ɵWorkbenchView[]> {
   const viewRegistry = inject(WorkbenchViewRegistry);
-  return computed(() => mPart().views.map(mView => viewRegistry.get(mView.id)), {equal: (a, b) => Arrays.isEqual(a, b, {exactOrder: true})});
+  return computed(() => mPart().views.map(mView => viewRegistry.get(mView.id)), {equal: (a, b) => Objects.isEqual(a, b)});
 }

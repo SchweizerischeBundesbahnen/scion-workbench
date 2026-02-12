@@ -17,6 +17,8 @@ import {expectView} from '../matcher/view-matcher';
 import {MicrofrontendViewTestPagePO} from './page-object/test-pages/microfrontend-view-test-page.po';
 import {PageNotFoundPagePO} from '../workbench/page-object/page-not-found-page.po';
 import {ViewInfo} from '../workbench/page-object/view-info-dialog.po';
+import {AngularRouterTestPagePO} from './page-object/test-pages/angular-router-test-page.po';
+import {BulkNavigationTestPagePO} from './page-object/test-pages/bulk-navigation-test-page.po';
 
 test.describe('Workbench Router', () => {
 
@@ -717,10 +719,10 @@ test.describe('Workbench Router', () => {
     await expect(async () => {
       if (i++ % 2) {
         await expectView(testee1ViewPage).toBeActive();
-        await expectView(testee2ViewPage).toBeInactive({loaded: false});
+        await expectView(testee2ViewPage).toBeInactive({loaded: true});
       }
       else {
-        await expectView(testee1ViewPage).toBeInactive({loaded: false});
+        await expectView(testee1ViewPage).toBeInactive({loaded: true});
         await expectView(testee2ViewPage).toBeActive();
       }
     }).toPass();
@@ -2643,5 +2645,141 @@ test.describe('Workbench Router', () => {
       param3: 'true [boolean]',
       param4: 'null [null]',
     });
+  });
+
+  /**
+   * Regression test for a bug where consecutive navigations resulted in the microfrontend url being reset.
+   */
+  test('should not reset url of microfrontend when navigating to the same microfrontend', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-pages/angular-router-test-page',
+        cssClass: 'testee',
+      },
+    });
+
+    // Open test view.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'});
+
+    const testPage = new AngularRouterTestPagePO(appPO.view({cssClass: 'testee'}));
+
+    // Expect path.
+    await expect(testPage.location).toHaveText('/test-pages/angular-router-test-page');
+
+    // Navigate via Angular router and set query param.
+    await testPage.navigate([], {queryParams: {queryParam: 'testee'}});
+
+    // Expect path.
+    await expect(testPage.location).toHaveText('/test-pages/angular-router-test-page?queryParam=testee');
+
+    // Navigate to test view again.
+    await routerPage.view.tab.click();
+    await routerPage.navigate({component: 'testee'});
+
+    // Wait for navigation to complete.
+    await appPO.waitUntilIdle();
+
+    // Expect path not to change.
+    await expect(testPage.location).toHaveText('/test-pages/angular-router-test-page?queryParam=testee');
+  });
+
+  /**
+   * Regression test for a bug where consecutive navigations resulted in the microfrontend url being reset.
+   */
+  test('should not reset url of microfrontend when navigating to the same microfrontend from another app', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Register view capability in app1.
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      private: false,
+      properties: {
+        path: 'test-pages/angular-router-test-page',
+        cssClass: 'testee',
+      },
+    });
+
+    // Open test view from app1.
+    const routerPage1 = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage1.navigate({component: 'testee'});
+
+    const testPage = new AngularRouterTestPagePO(appPO.view({cssClass: 'testee'}));
+
+    // Expect path.
+    await expect(testPage.location).toHaveText('/test-pages/angular-router-test-page');
+
+    // Navigate via Angular router and set query param.
+    await testPage.navigate([], {queryParams: {queryParam: 'testee'}});
+
+    // Expect path.
+    await expect(testPage.location).toHaveText('/test-pages/angular-router-test-page?queryParam=testee');
+
+    // Register intention in app2.
+    await microfrontendNavigator.registerIntention('app2', {type: 'view', qualifier: {component: 'testee'}});
+
+    // Navigate to test view from app2.
+    const routerPage2 = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app2');
+    await routerPage2.navigate({component: 'testee'});
+
+    // Wait for navigation to complete.
+    await appPO.waitUntilIdle();
+
+    // Expect path not to change.
+    await expect(testPage.location).toHaveText('/test-pages/angular-router-test-page?queryParam=testee');
+  });
+
+  /**
+   * Regression test for a bug where consecutive navigations resulted in capability properties not being applied correctly.
+   */
+  test('should apply view capability properties when navigating twice', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-view',
+        closable: false,
+        title: 'title',
+        heading: 'heading',
+        cssClass: 'testee',
+      },
+    });
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'navigator'},
+      private: false,
+      properties: {
+        path: 'test-pages/bulk-navigation-test-page',
+      },
+    });
+
+    // Open test page.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'navigator'}, {cssClass: 'navigator'});
+    const bulkNavigationTestPage = new BulkNavigationTestPagePO(appPO.view({cssClass: 'navigator'}));
+
+    // Navigate to test view twice.
+    await bulkNavigationTestPage.clickNavigateNoAwait({component: 'testee'}, {
+      target: 'view.1',
+      count: 2,
+    });
+
+    const viewPage = new ViewPagePO(appPO.view({viewId: 'view.1'}));
+
+    // Expect properties of capability to be set.
+    await expect.poll(() => viewPage.view.getCssClasses()).toContain('testee');
+    await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');
+    await expect.poll(() => viewPage.outlet.getCssClasses()).toContain('testee');
+    await expect(viewPage.view.tab.closeButton).not.toBeVisible();
+    await expect(viewPage.view.tab.title).toHaveText('title');
+    await expect(viewPage.view.tab.heading).toHaveText('heading');
   });
 });

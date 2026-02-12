@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Arrays} from '@scion/toolkit/util';
+import {Arrays, Objects} from '@scion/toolkit/util';
 import {computed, Signal, signal} from '@angular/core';
 
 /**
@@ -134,5 +134,5 @@ function removeEmptyEntries<K, V>(map: Map<K, V[]>): Map<K, V[]> {
  * Compares two arrays of strings for equality, ignoring element order.
  */
 function isEqualArray(a: string[], b: string[]): boolean {
-  return Arrays.isEqual(a, b, {exactOrder: false});
+  return Objects.isEqual(a, b, {ignoreArrayOrder: true});
 }

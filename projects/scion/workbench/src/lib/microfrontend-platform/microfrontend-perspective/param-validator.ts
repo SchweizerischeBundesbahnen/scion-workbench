@@ -11,8 +11,7 @@
 import {inject} from '@angular/core';
 import {Logger, LoggerNames} from '../../logging';
 import {Capability, ParamMatcher} from '@scion/microfrontend-platform';
-import {Objects} from '../../common/objects.util';
-import {Dictionaries} from '@scion/toolkit/util';
+import {Dictionaries, Objects} from '@scion/toolkit/util';
 
 /**
  * Validates parameters and migrates deprecated parameters.

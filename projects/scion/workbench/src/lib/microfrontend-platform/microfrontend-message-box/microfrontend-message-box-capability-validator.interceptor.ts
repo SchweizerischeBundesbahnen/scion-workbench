@@ -12,7 +12,7 @@ import {Capability, CapabilityInterceptor} from '@scion/microfrontend-platform';
 import {Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchMessageBoxCapability} from '@scion/workbench-client';
 import {TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY, TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY_PROPERTY} from '../microfrontend-host-message-box/text-message/text-message.component';
-import {Objects} from '../../common/objects.util';
+import {Objects} from '@scion/toolkit/util';
 import {Microfrontends} from '../common/microfrontend.util';
 
 /**

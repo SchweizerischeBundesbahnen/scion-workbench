@@ -14,7 +14,7 @@ import {WorkbenchCapabilities, WorkbenchPartCapability, WorkbenchPartRef, Workbe
 import {MAIN_AREA} from '../../layout/workbench-layout';
 import {UID} from '../../common/uid.util';
 import {Logger, LoggerNames} from '../../logging';
-import {Objects} from '../../common/objects.util';
+import {Objects} from '@scion/toolkit/util';
 
 /**
  * Migrates to the new perspective capability model, where parts are modeled as separate part capabilities and views referenced from part capabilities.

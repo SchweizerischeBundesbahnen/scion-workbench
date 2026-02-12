@@ -29,7 +29,7 @@ import {MAIN_AREA, MWorkbenchLayout} from './workbench-layout';
 import {WorkbenchLayouts} from './workbench-layouts.util';
 import {WorkbenchLayoutMigrationV6} from './migration/workbench-layout-migration-v6.service';
 import {throwError} from '../common/throw-error.util';
-import {Objects} from '../common/objects.util';
+import {Objects} from '@scion/toolkit/util';
 
 /**
  * Represents the current version of the workbench layout.

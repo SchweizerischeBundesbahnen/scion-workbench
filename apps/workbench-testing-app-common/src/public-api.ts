@@ -15,4 +15,5 @@ export * from './lib/util/public_api';
 export {MultiValueInputComponent} from './lib/multi-value-input/multi-value-input.component';
 export {RecordComponent} from './lib/record/record.component';
 export {SciKeyValueFieldComponent} from './lib/key-value-field/key-value-field.component';
+export {RouterCommandsComponent} from './lib/router-commands/router-commands.component';
 export {type RouteDescriptor, type CanMatchWorkbenchCapabilityDescriptor, type CanMatchWorkbenchElementDescriptor} from './lib/routes.model';

@@ -10,7 +10,7 @@
 
 import {NavigationExtras, Router, UrlSegment, UrlTree} from '@angular/router';
 import {WorkbenchRouter} from './workbench-router.service';
-import {Defined} from '@scion/toolkit/util';
+import {Defined, Objects} from '@scion/toolkit/util';
 import {assertNotInReactiveContext, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {MAIN_AREA_LAYOUT_QUERY_PARAM} from '../workbench.constants';
@@ -21,7 +21,6 @@ import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {Routing} from './routing.util';
 import {Commands, Outlets, WorkbenchNavigationContext, WorkbenchNavigationExtras} from './routing.model';
 import {UrlSegmentMatcher} from './url-segment-matcher';
-import {Objects} from '../common/objects.util';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';

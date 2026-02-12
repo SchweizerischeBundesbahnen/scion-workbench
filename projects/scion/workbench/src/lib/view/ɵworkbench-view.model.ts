@@ -31,7 +31,7 @@ import {Routing} from '../routing/routing.util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
-import {Arrays, Observables} from '@scion/toolkit/util';
+import {Objects, Observables} from '@scion/toolkit/util';
 import {Logger} from '../logging/logger';
 import {WorkbenchViewMenuItemRegistry} from './workbench-view-menu-item.registry';
 import {Translatable} from '../text/workbench-text-provider.model';
@@ -362,7 +362,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
       changes?.forEachAddedItem(({item: fn}) => menuItems.set(fn, computed(() => runInInjectionContext(constructInjector(this, this.part()), () => fn(this)))));
       changes?.forEachRemovedItem(({item: fn}) => menuItems.delete(fn));
       return Array.from(menuItems.values()).map(menuItem => menuItem()).filter(menuItem => !!menuItem);
-    }, {equal: (a, b) => Arrays.isEqual(a, b)});
+    }, {equal: (a, b) => Objects.isEqual(a, b)});
 
     function constructInjector(view: ɵWorkbenchView, part: ɵWorkbenchPart): Injector {
       return Injector.create({

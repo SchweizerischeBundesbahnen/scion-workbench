@@ -11,7 +11,7 @@
 import {Capability, CapabilityInterceptor} from '@scion/microfrontend-platform';
 import {Injectable} from '@angular/core';
 import {RelativeTo, WorkbenchCapabilities, WorkbenchPartRef, WorkbenchPerspectiveCapability} from '@scion/workbench-client';
-import {Objects} from '../../common/objects.util';
+import {Objects} from '@scion/toolkit/util';
 
 /**
  * Asserts perspective capabilities to have required properties.

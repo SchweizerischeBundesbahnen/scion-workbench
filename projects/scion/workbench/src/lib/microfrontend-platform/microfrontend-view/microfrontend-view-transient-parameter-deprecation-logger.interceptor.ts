@@ -12,7 +12,7 @@ import {Capability, CapabilityInterceptor} from '@scion/microfrontend-platform';
 import {inject, Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchViewCapability} from '@scion/workbench-client';
 import {Logger, LoggerNames} from '../../logging';
-import {Objects} from '../../common/objects.util';
+import {Objects} from '@scion/toolkit/util';
 
 /**
  * Logs usage of deprecated transient parameters.

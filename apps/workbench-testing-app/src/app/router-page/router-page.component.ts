@@ -17,7 +17,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SettingsService} from '../settings.service';
 import {MultiValueInputComponent, parseTypedObject, prune, stringifyError} from 'workbench-testing-app-common';
-import {RouterCommandsComponent} from '../router-commands/router-commands.component';
+import {RouterCommandsComponent} from 'workbench-testing-app-common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {UUID} from '@scion/toolkit/uuid';
 

@@ -17,7 +17,8 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {ManifestService} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchPartCapability} from '@scion/workbench-client';
 import {firstValueFrom} from 'rxjs';
-import {Objects, parseTypedObject, stringifyError, throwError} from 'workbench-testing-app-common';
+import {parseTypedObject, stringifyError, throwError} from 'workbench-testing-app-common';
+import {Objects} from '@scion/toolkit/util';
 
 @Component({
   selector: 'app-microfrontend-part-opener-page',

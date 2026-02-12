@@ -14,7 +14,7 @@ import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDA
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {Commands, NavigationData, NavigationState} from '@scion/workbench';
-import {RouterCommandsComponent} from '../../../router-commands/router-commands.component';
+import {RouterCommandsComponent} from 'workbench-testing-app-common';
 import {MultiValueInputComponent, prune, RecordComponent} from 'workbench-testing-app-common';
 import {UUID} from '@scion/toolkit/uuid';
 
