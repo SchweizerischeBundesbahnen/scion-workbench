@@ -1,6 +1,14 @@
 <form autocomplete="off" [formGroup]="form">
-  <sci-form-field label="View Count">
-    <input [formControl]="form.controls.viewCount" type="number" class="e2e-view-count">
+  <sci-form-field label="Qualifier">
+    <sci-key-value-field [keyValueFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"/>
+  </sci-form-field>
+
+  <sci-form-field label="Navigation Count">
+    <input [formControl]="form.controls.navigationCount" type="number" class="e2e-navigation-count">
+  </sci-form-field>
+
+  <sci-form-field label="Target">
+    <input [formControl]="form.controls.target" class="e2e-target">
   </sci-form-field>
 
   <sci-form-field label="CSS Class(es)">

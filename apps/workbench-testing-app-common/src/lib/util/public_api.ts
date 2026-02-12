@@ -16,4 +16,3 @@ export {stringifyError} from './stringify-error.util';
 export {undefinedIfEmpty} from './undefined-if-empty.util';
 export {FieldValidationDirective} from './field-validation.directive';
 export {throwError} from './throw-error.util';
-export {Objects} from './objects.util';

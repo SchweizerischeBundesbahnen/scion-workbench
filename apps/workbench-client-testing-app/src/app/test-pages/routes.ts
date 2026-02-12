@@ -13,15 +13,19 @@ import {Routes} from '@angular/router';
 const routes: Routes = [
   {
     path: 'bulk-navigation-test-page',
-    loadComponent: (): any => import('./bulk-navigation-test-page/bulk-navigation-test-page.component'),
+    loadComponent: () => import('./bulk-navigation-test-page/bulk-navigation-test-page.component'),
+  },
+  {
+    path: 'angular-router-test-page',
+    loadComponent: () => import('./angular-router-test-page/angular-router-test-page.component'),
   },
   {
     path: 'view-properties-test-page',
-    loadComponent: (): any => import('./view-properties-test-page/view-properties-test-page.component'),
+    loadComponent: () => import('./view-properties-test-page/view-properties-test-page.component'),
   },
   {
     path: 'input-field-test-page',
-    loadComponent: (): any => import('./input-field-test-page/input-field-test-page.component'),
+    loadComponent: () => import('./input-field-test-page/input-field-test-page.component'),
   },
   {
     path: 'focus-test-page',
@@ -29,7 +33,7 @@ const routes: Routes = [
   },
   {
     path: 'angular-zone-test-page',
-    loadComponent: (): any => import('./angular-zone-test-page/angular-zone-test-page.component'),
+    loadComponent: () => import('./angular-zone-test-page/angular-zone-test-page.component'),
   },
   {
     path: 'microfrontend-test-page',
@@ -122,7 +126,7 @@ const routes: Routes = [
   },
   {
     path: 'workbench-theme-test-page',
-    loadComponent: (): any => import('./workbench-theme-test-page/workbench-theme-test-page.component'),
+    loadComponent: () => import('./workbench-theme-test-page/workbench-theme-test-page.component'),
   },
   {
     path: 'size-test-page',

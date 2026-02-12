@@ -20,7 +20,7 @@ import {UrlSegment} from '@angular/router';
 import {WorkbenchLayoutFn} from '../layout/workbench-layout';
 import {WorkbenchPerspectiveRegistry} from './workbench-perspective.registry';
 import {WorkbenchStartup} from '../startup/workbench-startup.service';
-import {Objects} from '../common/objects.util';
+import {Objects} from '@scion/toolkit/util';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {filter, skip, switchMap} from 'rxjs/operators';

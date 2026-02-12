@@ -9,12 +9,12 @@
  */
 
 import {ChangeDetectorRef, Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Injector, linkedSignal, Provider, signal, Signal, untracked, viewChild} from '@angular/core';
-import {asyncScheduler, firstValueFrom, MonoTypeOperatorFunction, switchMap, tap} from 'rxjs';
-import {filter, first, map, subscribeOn, take} from 'rxjs/operators';
+import {firstValueFrom, MonoTypeOperatorFunction, switchMap, tap} from 'rxjs';
+import {filter, first, map, take} from 'rxjs/operators';
 import {ManifestService, mapToBody, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {WorkbenchViewCapability, ɵVIEW_CAPABILITY_ID_PARAM_NAME, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
-import {Arrays, Dictionaries, Maps} from '@scion/toolkit/util';
+import {Dictionaries, Maps, Objects} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
 import {CanCloseRef} from '../../workbench.model';
 import {IFRAME_OVERLAY_HOST} from '../../workbench-element-references';
@@ -110,7 +110,6 @@ export class MicrofrontendViewComponent {
         filter((context): context is NavigationContext => !!context.capability),
         delayIfLazy(),
         serializeExecution(context => this.onNavigate(context)),
-        subscribeOn(asyncScheduler), // subscribe asynchronously because `onCapabilityChange` triggers a manual change detection cycle for inactive views; would error if called during component construction otherwise.
         takeUntilDestroyed(),
       )
       .subscribe();
@@ -137,6 +136,7 @@ export class MicrofrontendViewComponent {
         }),
         referrer: navigationData.referrer,
       }),
+      equal: (a, b) => a.capability?.metadata!.id === b.capability?.metadata!.id && Objects.isEqual(a.params, b.params), // do not create new navigation context when navigating to the same capability with the same params
     });
   }
 
@@ -386,7 +386,7 @@ export class MicrofrontendViewComponent {
           }
         }))
         .map(accelerator => `keydown.${accelerator.join('.')}{preventDefault=true}`);
-    }, {equal: (a, b) => Arrays.isEqual(a, b, {exactOrder: false})});
+    }, {equal: (a, b) => Objects.isEqual(a, b, {ignoreArrayOrder: true})});
   }
 
   private propagateWorkbenchTheme(): void {

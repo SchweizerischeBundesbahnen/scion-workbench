@@ -18,11 +18,10 @@ import {WorkbenchLayouts} from '../../../layout/workbench-layouts.util';
 import {ɵWorkbenchLayout} from '../../../layout/ɵworkbench-layout';
 import {MAIN_AREA} from '../../../layout/workbench-layout';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {Arrays} from '@scion/toolkit/util';
 import {By} from '@angular/platform-browser';
 import {NavigationStates, Outlets} from '../../../routing/routing.model';
 import {WorkbenchLayoutService} from '../../../layout/workbench-layout.service';
-import {Objects} from '../../../common/objects.util';
+import {Objects} from '@scion/toolkit/util';
 import {WorkbenchComponent} from '../../../workbench.component';
 import {MActivity as _MActivity, MActivityLayout as _MActivityLayout, MActivityStack as _MActivityStack} from '../../../activity/workbench-activity.model';
 import {throwError} from '../../../common/throw-error.util';
@@ -441,7 +440,7 @@ function assertMPartDOM(expectedPart: Partial<MPart>, actualElement: Element, ex
     const actualViewIds = new Array<string>();
     const viewTabElements = actualPartElement.querySelectorAll('wb-part-bar wb-view-tab');
     viewTabElements.forEach(viewTabElement => actualViewIds.push(viewTabElement.getAttribute('data-viewid')!));
-    if (!Arrays.isEqual(actualViewIds, expectedViewIds, {exactOrder: true})) {
+    if (!Objects.isEqual(actualViewIds, expectedViewIds)) {
       throw Error(`[DOMAssertError] Expected part '${partId}' to have views [${[...expectedViewIds]}], but has views [${[...actualViewIds]}]. [MPart=${JSON.stringify(expectedPart)}]`);
     }
   }

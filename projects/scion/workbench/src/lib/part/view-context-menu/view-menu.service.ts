@@ -21,12 +21,12 @@ import {WorkbenchService} from '../../workbench.service';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {ViewId} from '../../workbench.identifiers';
 import {WorkbenchView} from '../../view/workbench-view.model';
-import {Arrays} from '@scion/toolkit/util';
 import {TextComponent} from './text/text.component';
 import {coerceElement} from '@angular/cdk/coercion';
 import {rootEffect} from '../../common/rxjs-interop.util';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {WORKBENCH_VIEW_CONTEXT} from '../../view/workbench-view-context.provider';
+import {Objects} from '@scion/toolkit/util';
 
 /**
  * Shows menu items of a {@link WorkbenchView} in a menu.
@@ -167,7 +167,7 @@ export class ViewMenuService {
 
           const key = accelerator.at(-1)!.toLocaleLowerCase();
           const modifierKeys = accelerator.slice(0, -1);
-          return key === eventKey && Arrays.isEqual(modifierKeys, eventModifierKeys, {exactOrder: false});
+          return key === eventKey && Objects.isEqual(modifierKeys, eventModifierKeys, {ignoreArrayOrder: true});
         });
     }
   }

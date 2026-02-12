@@ -9,11 +9,14 @@
  */
 
 import {Locator} from '@playwright/test';
-import {waitUntilStable} from '../../../helper/testing.util';
+import {coerceArray, waitUntilStable} from '../../../helper/testing.util';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../../view.po';
 import {AppPO} from '../../../app.po';
+import {Qualifier} from '@scion/microfrontend-platform';
+import {SciKeyValueFieldPO} from '../../../@scion/components.internal/key-value-field.po';
+import {WorkbenchNavigationExtras} from '@scion/workbench-client';
 
 export class BulkNavigationTestPagePO implements MicrofrontendViewPagePO {
 
@@ -28,18 +31,15 @@ export class BulkNavigationTestPagePO implements MicrofrontendViewPagePO {
     this._appPO = new AppPO(this.locator.page());
   }
 
-  public async enterViewCount(viewCount: number): Promise<void> {
-    await this.locator.locator('input.e2e-view-count').fill(`${viewCount}`);
-  }
-
-  public async enterCssClass(cssClass: string): Promise<void> {
-    await this.locator.locator('input.e2e-class').fill(cssClass);
-  }
-
   /**
    * Clicks on a button to navigate via {@link WorkbenchRouter}.
    */
-  public async clickNavigateNoAwait(): Promise<void> {
+  public async clickNavigateNoAwait(qualifier: Qualifier, extras: NavigationExtras): Promise<void> {
+    await this.enterQualifier(qualifier);
+    await this.enterNavigationCount(extras.count);
+    await this.enterTarget(extras.target);
+    await this.enterCssClass(extras.cssClass);
+
     await this.locator.locator('button.e2e-navigate').click();
     // Wait for the URL to become stable after navigating.
     await waitUntilStable(() => this._appPO.getCurrentNavigationId());
@@ -48,9 +48,36 @@ export class BulkNavigationTestPagePO implements MicrofrontendViewPagePO {
   /**
    * Clicks on a button to navigate via {@link WorkbenchRouter}.
    */
-  public async clickNavigateAwait(): Promise<void> {
+  public async clickNavigateAwait(qualifier: Qualifier, extras: NavigationExtras): Promise<void> {
+    await this.enterQualifier(qualifier);
+    await this.enterNavigationCount(extras.count);
+    await this.enterTarget(extras.target);
+    await this.enterCssClass(extras.cssClass);
+
     await this.locator.locator('button.e2e-navigate-await').click();
     // Wait for the URL to become stable after navigating.
     await waitUntilStable(() => this._appPO.getCurrentNavigationId());
   }
+
+  private async enterQualifier(qualifier: Qualifier): Promise<void> {
+    const qualifierField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
+    await qualifierField.clear();
+    await qualifierField.addEntries(qualifier);
+  }
+
+  private async enterNavigationCount(navigationCount: number): Promise<void> {
+    await this.locator.locator('input.e2e-navigation-count').fill(`${navigationCount}`);
+  }
+
+  private async enterTarget(target?: string | 'blank' | 'auto'): Promise<void> {
+    await this.locator.locator('input.e2e-target').fill(target ?? '');
+  }
+
+  private async enterCssClass(cssClass?: string | string[]): Promise<void> {
+    await this.locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
+  }
 }
+
+export type NavigationExtras = Pick<WorkbenchNavigationExtras, 'target' | 'cssClass'> & {
+  count: number;
+};

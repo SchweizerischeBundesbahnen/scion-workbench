@@ -9,7 +9,7 @@
  */
 
 import {Observable, OperatorFunction} from 'rxjs';
-import {filter, mergeMap} from 'rxjs/operators';
+import {mergeMap} from 'rxjs/operators';
 
 /**
  * Serializes the execution of elements emitted by the source Observable.
@@ -20,11 +20,4 @@ import {filter, mergeMap} from 'rxjs/operators';
  */
 export function serializeExecution<IN, OUT>(fn: (value: IN) => Observable<OUT> | Promise<OUT>): OperatorFunction<IN, OUT> {
   return mergeMap(element => fn(element), 1);
-}
-
-/**
- * Mirrors the source except for `null` emissions.
- */
-export function filterNull<T>(): OperatorFunction<T | null, T> {
-  return filter((item: T | null): item is T => item !== null);
 }
