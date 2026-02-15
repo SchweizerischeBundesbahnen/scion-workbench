@@ -67,10 +67,12 @@ export class MenuComponent {
     if (subMenuItem.type !== 'sub-menu-item') {
       return undefined;
     }
+
+    const preferredMinWidth = subMenuItem.size?.minWidth ?? '12em';
     return {
       width: subMenuItem.size?.width,
-      minWidth: subMenuItem.size?.minWidth ?? this.anchorWidth() ?? '12em',
-      maxWidth: subMenuItem.size?.maxWidth,
+      minWidth: this.anchorWidth() ? `max(${preferredMinWidth}, ${this.anchorWidth()})` : preferredMinWidth,
+      maxWidth: subMenuItem.size?.maxWidth ?? '24em',
     };
   });
 
