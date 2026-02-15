@@ -1,11 +1,11 @@
 <form autocomplete="off">
   <section>
     <sci-form-field label="Path">
-      <input [formField]="form.path" appFieldValidation class="e2e-path">
+      <input [field]="form.path" appFieldValidation class="e2e-path">
     </sci-form-field>
 
     <sci-form-field label="Component">
-      <select [formField]="form.component" appFieldValidation class="e2e-component">
+      <select [field]="form.component" appFieldValidation class="e2e-component">
         <option value=""></option>
         <option value="part-page">PartPageComponent</option>
         <option value="view-page">ViewPageComponent</option>
@@ -25,7 +25,7 @@
     </sci-form-field>
 
     <sci-form-field label="Data">
-      <app-key-value-field [formField]="form.data" appFieldValidation class="e2e-data"/>
+      <app-key-value-field [field]="form.data" appFieldValidation class="e2e-data"/>
     </sci-form-field>
   </section>
 
@@ -33,7 +33,7 @@
     <header>CanMatch</header>
 
     <sci-form-field label="CanMatch">
-      <select [formField]="form.canMatch.fn" appFieldValidation class="e2e-can-match">
+      <select [field]="form.canMatch.fn" appFieldValidation class="e2e-can-match">
         <option value=""></option>
         <option value="canMatchWorkbenchPart">canMatchWorkbenchPart</option>
         <option value="canMatchWorkbenchView">canMatchWorkbenchView</option>
@@ -48,13 +48,13 @@
 
     @if (!form.canMatch.qualifier().hidden()) {
       <sci-form-field label="Qualifier">
-        <app-key-value-field [formField]="form.canMatch.qualifier" appFieldValidation class="e2e-qualifier"/>
+        <app-key-value-field [field]="form.canMatch.qualifier" appFieldValidation class="e2e-qualifier"/>
       </sci-form-field>
     }
 
     @if (!form.canMatch.hint().hidden()) {
       <sci-form-field label="Hint">
-        <input [formField]="form.canMatch.hint" appFieldValidation class="e2e-hint">
+        <input [field]="form.canMatch.hint" appFieldValidation class="e2e-hint">
       </sci-form-field>
     }
   </section>
