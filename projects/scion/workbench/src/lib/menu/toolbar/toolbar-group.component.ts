@@ -1,10 +1,10 @@
 import {ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, Injector, input, linkedSignal, output, signal, Signal, TemplateRef, untracked, viewChild, ViewContainerRef} from '@angular/core';
-import {SciMenuRegistry} from '../../menu.registry';
-import {MMenuGroup, MMenuItem, MSubMenuItem} from '../../ɵmenu';
-import {MenuComponent} from '../../menu/menu.component';
+import {SciMenuRegistry} from '../menu.registry';
+import {MMenuGroup, MMenuItem, MSubMenuItem} from '../ɵmenu';
+import {MenuComponent} from '../menu/menu.component';
 import {UUID} from '@scion/toolkit/uuid';
 import {NgComponentOutlet} from '@angular/common';
-import {MenuItemStateDirective} from '../../menu/menu-item-state.directive';
+import {MenuItemStateDirective} from '../menu/menu-item-state.directive';
 import {SciDimension} from '@scion/components/dimension';
 
 @Component({

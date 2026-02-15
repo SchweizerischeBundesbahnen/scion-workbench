@@ -2,16 +2,16 @@ import {ChangeDetectionStrategy, Component, ElementRef, input, model, viewChild}
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 @Component({
-  selector: 'sci-menu-item-filter',
-  templateUrl: './menu-item-filter.component.html',
-  styleUrl: './menu-item-filter.component.scss',
+  selector: 'sci-menu-filter',
+  templateUrl: './menu-filter.component.html',
+  styleUrl: './menu-filter.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     FormsModule,
   ],
 })
-export class MenuItemFilterComponent {
+export class MenuFilterComponent {
 
   public readonly placeholder = input.required<string>();
   public readonly text = model<string>('');

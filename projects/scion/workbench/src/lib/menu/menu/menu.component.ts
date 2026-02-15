@@ -4,10 +4,10 @@ import {SciMenuRegistry} from '../menu.registry';
 import {UUID} from '@scion/toolkit/uuid';
 import {JoinPipe} from './join.pipe';
 import {MenuItemGroupComponent} from './menu-group.component';
-import {MenuItemFilterComponent} from './menu-item-filter/menu-item-filter.component';
-import {MenuItemFilter} from './menu-item-filter/menu-item-filter.service';
+import {MenuFilterComponent} from './menu-filter.component';
+import {MenuFilter} from './menu-filter.service';
 import {SciToolbarComponent} from '../toolbar/toolbar.component';
-import {ToolbarStateDirective} from './toolbar-state.directive';
+import {ToolbarStateDirective} from '../toolbar/toolbar-state.directive';
 import {MenuItemStateDirective} from './menu-item-state.directive';
 import {NgComponentOutlet} from '@angular/common';
 
@@ -19,14 +19,14 @@ import {NgComponentOutlet} from '@angular/common';
   imports: [
     JoinPipe,
     MenuItemGroupComponent,
-    MenuItemFilterComponent,
+    MenuFilterComponent,
     forwardRef(() => SciToolbarComponent),
     ToolbarStateDirective,
     MenuItemStateDirective,
     NgComponentOutlet,
   ],
   providers: [
-    MenuItemFilter,
+    MenuFilter,
   ],
   host: {
     '[class.gutter-column-hidden]': '!hasGutterColumn()',
@@ -45,7 +45,7 @@ export class MenuComponent {
 
   private readonly _menuRegistry = inject(SciMenuRegistry);
   private readonly _popover = viewChild('popover', {read: ElementRef<HTMLElement>});
-  private readonly _filter = inject(MenuItemFilter);
+  private readonly _filter = inject(MenuFilter);
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _document = inject(DOCUMENT);
   private readonly _actionToolbarMenuOpen = signal(false);

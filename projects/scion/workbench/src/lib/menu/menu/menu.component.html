@@ -18,7 +18,7 @@
   @if (subMenuItem.filter) {
     <div class="filter">
       <span class="icon material-symbols-rounded filter" translate="no">search</span>
-      <sci-menu-item-filter (textChange)="onFilterChange($event)" [placeholder]="(typeof subMenuItem.filter === 'object' && subMenuItem.filter.placeholder) || 'Type to filter'"/>
+      <sci-menu-filter (textChange)="onFilterChange($event)" [placeholder]="(typeof subMenuItem.filter === 'object' && subMenuItem.filter.placeholder) || 'Type to filter'"/>
     </div>
 
     <hr>

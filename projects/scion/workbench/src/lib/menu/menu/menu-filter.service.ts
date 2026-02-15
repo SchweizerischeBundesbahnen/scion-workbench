@@ -1,10 +1,10 @@
 import {computed, inject, Injectable, Signal, signal} from '@angular/core';
-import {MMenuItem} from '../../ɵmenu';
+import {MMenuItem} from '../ɵmenu';
 
 @Injectable()
-export class MenuItemFilter {
+export class MenuFilter {
 
-  private readonly _parentFilter = inject(MenuItemFilter, {skipSelf: true, optional: true});
+  private readonly _parentFilter = inject(MenuFilter, {skipSelf: true, optional: true});
   private readonly _filter = signal<RegExp | null>(null);
 
   public readonly filterActive: Signal<boolean> = computed(() => {
