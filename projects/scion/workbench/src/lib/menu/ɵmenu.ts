@@ -16,7 +16,7 @@ export class ɵSciMenu implements SciMenu {
       tooltip: menuItemDescriptor.tooltip,
       mnemonic: menuItemDescriptor.mnemonic,
       accelerator: menuItemDescriptor.accelerator,
-      disabled: coerceSignal(menuItemDescriptor.disabled),
+      disabled: coerceSignal(menuItemDescriptor.disabled, {defaultValue: false}),
       icon: coerceSignal('icon' in menuItemDescriptor ? menuItemDescriptor.icon : undefined),
       checked: 'checked' in menuItemDescriptor ? coerceSignal(menuItemDescriptor.checked) : undefined,
       actionToolbarName: coerceSignal(menuItemDescriptor.actionToolbarName),
@@ -37,7 +37,7 @@ export class ɵSciMenu implements SciMenu {
       icon: coerceSignal('icon' in menuDescriptor ? menuDescriptor.icon : undefined),
       tooltip: menuDescriptor.tooltip,
       mnemonic: menuDescriptor.mnemonic,
-      disabled: coerceSignal(menuDescriptor.disabled),
+      disabled: coerceSignal(menuDescriptor.disabled, {defaultValue: false}),
       filter: menuDescriptor.filter,
       visualMenuMarker: menuDescriptor.visualMenuMarker,
       size: menuDescriptor.size,
@@ -57,6 +57,8 @@ export class ɵSciMenu implements SciMenu {
         type: 'group',
         id: UUID.randomUUID(),
         children: subMenu.menuItems,
+        collapsible: false,
+        disabled: signal(false),
       } satisfies MMenuGroup);
       return this;
     }
@@ -69,9 +71,9 @@ export class ɵSciMenu implements SciMenu {
         type: 'group',
         id: groupDescriptor.id ?? UUID.randomUUID(),
         label: coerceSignal(groupDescriptor.label),
-        collapsible: typeof groupDescriptor.collapsible === 'object' ? groupDescriptor.collapsible : {collapsed: groupDescriptor.collapsible ?? false},
+        collapsible: computeCollapsible(groupDescriptor),
         filter: groupDescriptor.filter,
-        disabled: coerceSignal(groupDescriptor.disabled),
+        disabled: coerceSignal(groupDescriptor.disabled, {defaultValue: false}),
         children: subMenu?.menuItems ?? [],
       } satisfies MMenuGroup);
       return this;
@@ -87,7 +89,7 @@ export interface MMenuItem {
   tooltip?: string;
   mnemonic?: string;
   accelerator?: string[];
-  disabled?: Signal<boolean>;
+  disabled: Signal<boolean>;
   checked?: Signal<boolean>;
   actionToolbarName?: Signal<string | undefined>;
   matchesFilter?: (filter: string) => boolean;
@@ -102,7 +104,7 @@ export interface MSubMenuItem {
   icon?: Signal<string>;
   tooltip?: string;
   mnemonic?: string;
-  disabled?: Signal<boolean>;
+  disabled: Signal<boolean>;
   filter?: boolean | {placeholder?: string; notFoundText?: string};
   visualMenuMarker?: boolean;
   size?: {
@@ -118,15 +120,30 @@ export interface MMenuGroup {
   type: 'group'
   id: string;
   label?: Signal<string>;
-  collapsible?: {collapsed: boolean};
+  collapsible: {collapsed: boolean} | false;
   filter?: boolean | {placeholder?: string; notFoundText?: string};
-  disabled?: Signal<boolean>;
+  disabled: Signal<boolean>;
   children: Array<MMenuItem | MSubMenuItem | MMenuGroup>;
 }
 
-function coerceSignal<T>(value: Signal<T> | T | undefined): Signal<T> | undefined {
+function computeCollapsible(groupDescriptor: SciMenuGroupDescriptor): {collapsed: boolean} | false {
+  const collapsible = groupDescriptor.collapsible ?? false;
+  if (!collapsible) {
+    return false;
+  }
+
+  if (typeof groupDescriptor.collapsible === 'object') {
+    return groupDescriptor.collapsible;
+  }
+
+  return {collapsed: false};
+}
+
+function coerceSignal<T>(value: Signal<T> | T | undefined): Signal<T> | undefined;
+function coerceSignal<T>(value: Signal<T> | T | undefined, options: {defaultValue: T}): Signal<T>;
+function coerceSignal<T>(value: Signal<T> | T | undefined, options?: {defaultValue?: T}): Signal<T> | undefined {
   if (value === undefined) {
-    return undefined;
+    return options?.defaultValue !== undefined ? signal(options.defaultValue) : undefined;
   }
   return isSignal(value) ? value : signal(value);
 }

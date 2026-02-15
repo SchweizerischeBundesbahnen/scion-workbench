@@ -13,7 +13,7 @@ import {MenuComponent} from './menu.component';
 export class MenuItemGroupComponent {
 
   public readonly group = input.required<MMenuGroup>();
-  public readonly hasGutterColumn = input.required<boolean>();
+  public readonly glyphArea = input.required<boolean>();
   public readonly disabled = input<boolean>();
 
   constructor() {
@@ -30,7 +30,7 @@ export class MenuItemGroupComponent {
         hostElement,
         bindings: [
           inputBinding('contextElement', this.group),
-          inputBinding('withGutterColumn', this.hasGutterColumn),
+          inputBinding('glyphArea', this.glyphArea),
           inputBinding('disabled', this.disabled),
         ],
       });

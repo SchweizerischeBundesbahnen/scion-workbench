@@ -20,7 +20,7 @@ import {SciDimension} from '@scion/components/dimension';
 })
 export class SciToolGroupComponent {
 
-  public readonly subMenuItem = input.required<string | MMenuGroup>();
+  public readonly contextElement = input.required<string | MMenuGroup>();
   public readonly disabled = input<boolean>();
   public readonly viewContainerRef = input<ViewContainerRef | undefined>();
   public readonly groupEmpty = output<boolean>();
@@ -33,7 +33,7 @@ export class SciToolGroupComponent {
   protected readonly popoverId = UUID.randomUUID();
   protected readonly menuItems = this.computeMenuItems();
   protected readonly activeSubMenuItem = linkedSignal<string | MMenuGroup, {subMenuItem: MSubMenuItem, bounds: Signal<SciDimension>} | null>({
-    source: this.subMenuItem,  // reset active sub menu item when this component is re-used
+    source: this.contextElement,  // reset active sub menu item when this component is re-used
     computation: () => null,
   });
 
@@ -78,7 +78,7 @@ export class SciToolGroupComponent {
 
   private computeMenuItems(): Signal<Array<MMenuItem | MSubMenuItem | MMenuGroup>> {
     return computed(() => {
-      const subMenuItem = this.subMenuItem();
+      const subMenuItem = this.contextElement();
       if (typeof subMenuItem === 'string') {
         return this._menuRegistry.findMenuContributions(subMenuItem).flatMap(m => m.menuItems);
       }

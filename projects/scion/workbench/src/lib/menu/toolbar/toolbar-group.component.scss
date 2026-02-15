@@ -104,9 +104,11 @@ $icon-size: 18px;
 }
 
 :where(sci-menu[popover]) { // allow setting host styles in menu component
-  margin: unset; // unset native popover styling
-  padding: unset; // unset native popover styling
-  inset: unset; // unset native popover styling
+  @layer unset-browser-defaults {
+    margin: unset; // unset native popover styling
+    padding: unset; // unset native popover styling
+    inset: unset; // unset native popover styling
+  }
   position-try-fallbacks: flip-inline, flip-block;
   top: calc(anchor(bottom) + 1px);
   left: anchor(left);

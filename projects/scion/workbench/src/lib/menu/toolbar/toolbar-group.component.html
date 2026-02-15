@@ -1,7 +1,9 @@
 @for (menuItem of menuItems(); track $index) {
+  @let disabled = this.disabled() || menuItem.disabled();
+
   @switch (menuItem.type) {
     @case ('menu-item') {
-      <button [attr.disabled]="disabled() || (menuItem.disabled?.() ?? false) || null"
+      <button [attr.disabled]="disabled || null"
               [class.checked]="menuItem.checked?.()"
               (click)="menuItem.onSelect()"
               [class]="menuItem.cssClass" class="menu-item"
@@ -24,7 +26,7 @@
       <button [attr.popovertarget]="popoverId"
               [attr.popovertargetaction]="'show'"
               [style.anchor-name]="activeSubMenuItem()?.subMenuItem === menuItem ? `--${popoverId}` : null"
-              [attr.disabled]="disabled() || (menuItem.disabled?.() ?? false) || null"
+              [attr.disabled]="disabled || null"
               [class.active]="activeSubMenuItem()?.subMenuItem === menuItem"
               [class.visual-marker]="menuItem.icon?.() && !menuItem.label?.() && (menuItem.visualMenuMarker ?? true)"
               [class]="menuItem.cssClass" class="menu-item submenu-item"
@@ -50,7 +52,7 @@
       </button>
     }
     @case ('group') {
-      <sci-toolbar-group [subMenuItem]="menuItem" [disabled]="disabled() || (menuItem.disabled?.() ?? false)"/>
+      <sci-toolbar-group [contextElement]="menuItem" [disabled]="disabled"/>
     }
   }
 }
@@ -63,7 +65,7 @@
               [attr.id]="popoverId"
               [style.position-anchor]="`--${popoverId}`"
               [anchorWidth]="activeSubMenuItem()!.bounds().offsetWidth"
-              [disabled]="disabled() || (activeSubMenuItem()!.subMenuItem.disabled?.() ?? false)"
+              [disabled]="disabled() || activeSubMenuItem()!.subMenuItem.disabled()"
               [class]="activeSubMenuItem()!.subMenuItem.cssClass"
               (toggle)="onTogglePopover($event)"
               popover #popover/>

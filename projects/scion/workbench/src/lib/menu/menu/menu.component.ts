@@ -32,7 +32,7 @@ import {NgComponentOutlet} from '@angular/common';
     MenuFilter,
   ],
   host: {
-    '[class.gutter-column-hidden]': '!hasGutterColumn()',
+    '[class.no-glyph-area]': '!hasGlyphArea()',
     '[class.is-group]': 'isGroup()',
     '[style.width]': 'size()?.width',
     '[style.min-width]': 'size()?.minWidth',
@@ -43,7 +43,7 @@ export class MenuComponent {
 
   public readonly contextElement = input.required<MSubMenuItem | MMenuGroup>();
   public readonly disabled = input<boolean>();
-  public readonly withGutterColumn = input<boolean>();
+  public readonly glyphArea = input<boolean>();
   public readonly anchorWidth = input(undefined, {transform: (width: number | undefined): string | undefined => width ? `${width}px` : undefined});
 
   private readonly _menuRegistry = inject(SciMenuRegistry);
@@ -54,7 +54,7 @@ export class MenuComponent {
   private readonly _actionToolbarMenuOpen = signal(false);
 
   protected readonly popoverId = UUID.randomUUID();
-  protected readonly hasGutterColumn = computed(() => this.withGutterColumn() ?? (!!this.contextElement().filter || hasGutter(this.menuItems())));
+  protected readonly hasGlyphArea = computed(() => this.glyphArea() ?? requiresGlyphArea(this.contextElement())());
   protected readonly menuItems = this.computeMenuItems();
   protected readonly actionsPopoverAnchor = viewChild.required('actions_popover_anchor', {read: ViewContainerRef});
   protected readonly activeSubMenuItem = linkedSignal<MSubMenuItem | MMenuGroup, MSubMenuItem | null>({
@@ -63,7 +63,15 @@ export class MenuComponent {
   });
 
   protected readonly isGroup = computed(() => this.contextElement().type === 'group');
-  protected readonly isGroupExpanded = signal(true);
+  protected readonly isGroupExpanded = linkedSignal(() => {
+    const contextElement = this.contextElement();
+    const group = contextElement.type == 'group' ? contextElement : null;
+    if (!group) {
+      return true;
+    }
+
+    return this._menuFilter.filterActive() || !group.collapsible || !group.collapsible.collapsed;
+  });
 
   protected readonly size = linkedSignal<PreferredSize | undefined>(() => {
     const subMenuItem = this.contextElement();
@@ -84,21 +92,6 @@ export class MenuComponent {
     afterRenderEffect(() => {
       this.contextElement(); // re-evaluate when re-used
       this.size.update(size => ({...size, width: `${this._host.getBoundingClientRect().width}px`}));
-    });
-
-    // Compute expanded state group.
-    effect(() => {
-      const contextElement = this.contextElement();
-      const filterActive = this._menuFilter.filterActive();
-      untracked(() => {
-        if (contextElement.type === 'group') {
-          const group = contextElement;
-          this.isGroupExpanded.set(filterActive || !group.collapsible || !group.collapsible.collapsed);
-        }
-        else {
-          this.isGroupExpanded.set(true);
-        }
-      });
     });
 
     // Close action menu when this component is re-used.
@@ -201,16 +194,27 @@ export class MenuComponent {
   }
 }
 
-function hasGutter(menuItems: Array<MMenuItem | MSubMenuItem | MMenuGroup>): boolean {
-  return menuItems.some(menuItem => {
-    switch (menuItem.type) {
-      case 'menu-item':
-        return menuItem.icon?.() || menuItem.checked !== undefined;
-      case 'sub-menu-item':
-        return menuItem.icon?.();
-      case 'group':
-        return menuItem.collapsible || hasGutter(menuItem.children); // TODO [menu] consider contributions
+/**
+ * Computes if a glyph area is needed for icons and checkmarks.
+ *
+ * A glyph area is required if any group needs one, even if the context does not.
+ */
+function requiresGlyphArea(contextElement: MSubMenuItem | MMenuGroup): Signal<boolean> {
+  return computed(() => {
+    if (contextElement.filter) {
+      return true;
     }
+
+    return contextElement.children.some(menuItem => {
+      switch (menuItem.type) {
+        case 'menu-item':
+          return menuItem.icon?.() || menuItem.checked !== undefined;
+        case 'sub-menu-item':
+          return menuItem.icon?.();
+        case 'group':
+          return menuItem.collapsible || requiresGlyphArea(menuItem)();
+      }
+    });
   });
 }
 
