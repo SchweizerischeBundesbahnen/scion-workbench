@@ -92,7 +92,7 @@
         </button>
       }
       @case ('group') {
-        <sci-menu-item-group [group]="menuItem" [hasGutterColumn]="hasGutterColumn()" [disabled]="disabled() || (menuItem.disabled?.() ?? false)"/>
+        <sci-menu-group [group]="menuItem" [hasGutterColumn]="hasGutterColumn()" [disabled]="disabled() || (menuItem.disabled?.() ?? false)"/>
       }
     }
   } @empty {

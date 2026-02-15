@@ -3,7 +3,7 @@ import {MMenuGroup, MMenuItem, MSubMenuItem} from '../ɵmenu';
 import {SciMenuRegistry} from '../menu.registry';
 import {UUID} from '@scion/toolkit/uuid';
 import {JoinPipe} from './join.pipe';
-import {MenuItemGroupComponent} from './menu-item-group.component';
+import {MenuItemGroupComponent} from './menu-group.component';
 import {MenuItemFilterComponent} from './menu-item-filter/menu-item-filter.component';
 import {MenuItemFilter} from './menu-item-filter/menu-item-filter.service';
 import {SciToolbarComponent} from '../toolbar/toolbar.component';

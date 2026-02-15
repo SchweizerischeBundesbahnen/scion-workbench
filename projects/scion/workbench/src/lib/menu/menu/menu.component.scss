@@ -78,7 +78,7 @@ $icon-size: 18px;
   }
 
   // Add before separator
-  > *:not(hr) + sci-menu-item-group::before {
+  > *:not(hr) + sci-menu-group::before {
     content: '';
     grid-column: 1/-1;
     height: 1px;
@@ -86,7 +86,7 @@ $icon-size: 18px;
   }
 
   // Add after separator
-  > sci-menu-item-group:not(:last-child):not(:has(+ sci-menu-item-group))::after {
+  > sci-menu-group:not(:last-child):not(:has(+ sci-menu-group))::after {
     content: '';
     grid-column: 1/-1;
     height: 1px;

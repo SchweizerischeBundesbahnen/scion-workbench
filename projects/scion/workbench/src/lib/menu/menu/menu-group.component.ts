@@ -3,10 +3,10 @@ import {MMenuGroup} from '../ɵmenu';
 import {MenuComponent} from './menu.component';
 
 /**
- * Alias for {@link MenuComponent} with the name `sci-menu-item-group` instead of `sci-menu`.
+ * Alias for {@link MenuComponent} with the name `sci-menu-group` instead of `sci-menu`.
  */
 @Component({
-  selector: 'sci-menu-item-group',
+  selector: 'sci-menu-group',
   template: '',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
