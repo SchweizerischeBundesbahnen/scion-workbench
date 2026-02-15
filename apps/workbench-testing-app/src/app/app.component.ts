@@ -162,7 +162,7 @@ export class AppComponent implements DoCheck {
           //       .addMenuItem({text: 'Nested Menu Item'}, () => this.onAction()),
           //     ),
           //   )
-          .addGroup({label: 'Formatting', collapsible: true}, group => group
+          .addGroup({collapsible: true}, group => group
               .addMenu({label: 'Text', icon: 'format_bold'}, menu => menu
                 .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B']}, () => this.onAction())
                 .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I']}, () => this.onAction())

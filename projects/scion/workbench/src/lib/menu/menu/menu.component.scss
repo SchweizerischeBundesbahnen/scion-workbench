@@ -40,16 +40,62 @@ $icon-size: 18px;
     }
   }
 
+  button {
+    all: unset;
+    text-wrap: nowrap;
+    padding: $padding_menu_item;
+    border-radius: var(--sci-corner);
+    user-select: none;
+    overflow: hidden;
+    cursor: var(--sci-workbench-button-cursor);
+
+    &:hover:where(:not(:disabled)) {
+      background-color: var(--sci-workbench-menu-background-color-hover);
+    }
+
+    &:active:where(:not(:disabled)) {
+      background-color: var(--sci-workbench-button-background-color-active);
+    }
+
+    &:focus:not(:focus-visible) {
+      outline: none;
+    }
+
+    &:focus-visible {
+      outline: var(--sci-workbench-button-outline-width-focus) solid var(--sci-color-accent);
+    }
+
+    &:disabled {
+      color: var(--sci-color-gray-500);
+    }
+
+    &.active {
+      background-color: var(--sci-workbench-menu-background-color-hover);
+    }
+  }
+
   &.is-group {
     grid-column: 1/-1; // consume all columns
     grid-template-columns: subgrid;
 
-    > span.group-label {
+    > header {
       grid-column: 1/-1; // consume all columns
+      display: inline-grid;
+      grid-template-columns: subgrid;
       color: var(--sci-color-text-subtlest);
       user-select: none;
       padding: $padding_menu_item $padding_menu_item 0 $padding_menu_item;
-      @include ellipsis-on-overflow();
+
+      &:not(:has(button)) {
+        @include ellipsis-on-overflow();
+      }
+
+      > button {
+        grid-column: 1/-1; // consume all columns
+        display: inline-grid;
+        grid-template-columns: subgrid;
+        align-items: center;
+      }
     }
   }
 
@@ -93,18 +139,11 @@ $icon-size: 18px;
     background-color: var(--sci-color-border);
   }
 
-  > button.menu-item, button.group-header {
-    all: unset;
-    grid-column: 1/-1;
+  > button.menu-item {
+    grid-column: 1/-1; // consume all columns
     display: inline-grid;
     grid-template-columns: subgrid;
     align-items: center;
-    text-wrap: nowrap;
-    padding: $padding_menu_item;
-    border-radius: var(--sci-corner);
-    user-select: none;
-    overflow: hidden;
-    cursor: var(--sci-workbench-button-cursor);
     position: relative; // positioning context for actions toolbar
     box-sizing: border-box;
     min-height: calc($icon-size + 2 * $padding_menu_item + 2px); // 2px for checked toolbar item
@@ -121,7 +160,6 @@ $icon-size: 18px;
 
       > span.label {
         flex: auto;
-        @include ellipsis-on-overflow();
       }
 
       > span.accelerator {
@@ -162,36 +200,10 @@ $icon-size: 18px;
     &:not(:hover):not(.checked) > div.content > sci-toolbar.actions:not(.open) {
       display: none;
     }
-
-    &:hover:where(:not(:disabled)) {
-      background-color: var(--sci-workbench-menu-background-color-hover);
-    }
-
-    &:active:where(:not(:disabled)) {
-      background-color: var(--sci-workbench-button-background-color-active);
-    }
-
-    &:focus:not(:focus-visible) {
-      outline: none;
-    }
-
-    &:focus-visible {
-      outline: var(--sci-workbench-button-outline-width-focus) solid var(--sci-color-accent);
-    }
-
-    &:disabled {
-      color: var(--sci-color-gray-500);
-    }
-
-    &.active {
-      background-color: var(--sci-workbench-menu-background-color-hover);
-    }
   }
 
-  > button.group-header {
-    > span.label {
-      @include ellipsis-on-overflow();
-    }
+  span.label {
+    @include ellipsis-on-overflow();
   }
 
   span.icon {

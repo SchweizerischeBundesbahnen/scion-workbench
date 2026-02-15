@@ -1,24 +1,40 @@
-@let subMenuItem = this.subMenuItem();
+@let contextElement = this.contextElement();
 
-<!-- Group header if group -->
-@if (subMenuItem.type === 'group' && (subMenuItem.label?.() || subMenuItem.collapsible)) {
-  @let group = subMenuItem;
+<!-- Group header if a group -->
+@if (contextElement.type === 'group') {
+  @let group = contextElement;
   @if (group.collapsible) {
-    <button class="group-header" (click)="onGroupToggle()" (mouseenter)="onMenuItemMouseEnter(group)">
-      <span class="icon material-symbols-rounded" translate="no">{{isGroupExpanded() ? 'keyboard_arrow_down' : 'chevron_right'}}</span>
-      <span class="label">{{subMenuItem.label?.()}}</span>
-    </button>
-  } @else {
-    <span class="group-label">{{subMenuItem.label!()}}</span>
+    <header>
+      <button class="group-header" (click)="onGroupToggle()" (mouseenter)="onMenuItemMouseEnter(group)">
+        <span class="icon material-symbols-rounded" translate="no">{{isGroupExpanded() ? 'keyboard_arrow_down' : 'chevron_right'}}</span>
+        <span class="label">{{contextElement.label?.()}}</span>
+      </button>
+    </header>
+  } @else if (group.label?.()) {
+    <header>{{contextElement.label!()}}</header>
   }
 }
 
-<!-- Menu items of a submenu or an expanded group -->
-@if (subMenuItem.type !== 'group' || isGroupExpanded()) {
-  @if (subMenuItem.filter) {
+<!--@if (contextElement.type === 'group' && (contextElement.collapsible || contextElement.label?.())) {-->
+<!--  @let group = contextElement;-->
+<!--  <header>-->
+<!--    @if (group.collapsible) {-->
+<!--      <button class="group-header" (click)="onGroupToggle()" (mouseenter)="onMenuItemMouseEnter(group)">-->
+<!--        <span class="icon material-symbols-rounded" translate="no">{{isGroupExpanded() ? 'keyboard_arrow_down' : 'chevron_right'}}</span>-->
+<!--        <span class="label">{{contextElement.label?.()}}</span>-->
+<!--      </button>-->
+<!--    } @else if (group.label?.()) {-->
+<!--      {{contextElement.label!()}}-->
+<!--    }-->
+<!--  </header>-->
+<!--}-->
+
+<!-- Menu items of a submenu or a group -->
+@if (contextElement.type === 'sub-menu-item' || (contextElement.type === 'group' && isGroupExpanded())) {
+  @if (contextElement.filter) {
     <div class="filter">
       <span class="icon material-symbols-rounded filter" translate="no">search</span>
-      <sci-menu-filter (textChange)="onFilterChange($event)" [placeholder]="(typeof subMenuItem.filter === 'object' && subMenuItem.filter.placeholder) || 'Type to filter'"/>
+      <sci-menu-filter (textChange)="onFilterChange($event)" [placeholder]="(typeof contextElement.filter === 'object' && contextElement.filter.placeholder) || 'Type to filter'"/>
     </div>
 
     <hr>
@@ -96,8 +112,8 @@
       }
     }
   } @empty {
-    @if (subMenuItem.filter) {
-      <div class="empty-message">{{(typeof subMenuItem.filter === 'object' && subMenuItem.filter.notFoundText) || 'No items found.'}}</div>
+    @if (contextElement.filter) {
+      <div class="empty-message">{{(typeof contextElement.filter === 'object' && contextElement.filter.notFoundText) || 'No items found.'}}</div>
     }
   }
 
@@ -106,7 +122,7 @@
 
   <!-- Menu popover -->
   @if (activeSubMenuItem()) {
-    <sci-menu [subMenuItem]="activeSubMenuItem()!"
+    <sci-menu [contextElement]="activeSubMenuItem()!"
               [attr.id]="popoverId"
               [style.position-anchor]="`--${popoverId}`"
               [disabled]="disabled() || (activeSubMenuItem()!.disabled?.() ?? false)"

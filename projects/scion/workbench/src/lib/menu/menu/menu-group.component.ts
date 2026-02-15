@@ -29,7 +29,7 @@ export class MenuItemGroupComponent {
         environmentInjector,
         hostElement,
         bindings: [
-          inputBinding('subMenuItem', this.group),
+          inputBinding('contextElement', this.group),
           inputBinding('withGutterColumn', this.hasGutterColumn),
           inputBinding('disabled', this.disabled),
         ],

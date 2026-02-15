@@ -11,6 +11,9 @@ import {ToolbarStateDirective} from '../toolbar/toolbar-state.directive';
 import {MenuItemStateDirective} from './menu-item-state.directive';
 import {NgComponentOutlet} from '@angular/common';
 
+/**
+ * Represents a menu or a group of menu items.
+ */
 @Component({
   selector: 'sci-menu',
   templateUrl: './menu.component.html',
@@ -38,32 +41,32 @@ import {NgComponentOutlet} from '@angular/common';
 })
 export class MenuComponent {
 
-  public readonly subMenuItem = input.required<MSubMenuItem | MMenuGroup>();
+  public readonly contextElement = input.required<MSubMenuItem | MMenuGroup>();
   public readonly disabled = input<boolean>();
   public readonly withGutterColumn = input<boolean>();
   public readonly anchorWidth = input(undefined, {transform: (width: number | undefined): string | undefined => width ? `${width}px` : undefined});
 
   private readonly _menuRegistry = inject(SciMenuRegistry);
   private readonly _popover = viewChild('popover', {read: ElementRef<HTMLElement>});
-  private readonly _filter = inject(MenuFilter);
+  private readonly _menuFilter = inject(MenuFilter);
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _document = inject(DOCUMENT);
   private readonly _actionToolbarMenuOpen = signal(false);
 
   protected readonly popoverId = UUID.randomUUID();
-  protected readonly hasGutterColumn = computed(() => this.withGutterColumn() ?? (!!this.subMenuItem().filter || hasGutter(this.menuItems())));
+  protected readonly hasGutterColumn = computed(() => this.withGutterColumn() ?? (!!this.contextElement().filter || hasGutter(this.menuItems())));
   protected readonly menuItems = this.computeMenuItems();
   protected readonly actionsPopoverAnchor = viewChild.required('actions_popover_anchor', {read: ViewContainerRef});
   protected readonly activeSubMenuItem = linkedSignal<MSubMenuItem | MMenuGroup, MSubMenuItem | null>({
-    source: this.subMenuItem,  // reset active sub menu item when this component is re-used
+    source: this.contextElement,  // reset active sub menu item when this component is re-used
     computation: () => null,
   });
 
-  protected readonly isGroup = computed(() => this.subMenuItem().type === 'group');
+  protected readonly isGroup = computed(() => this.contextElement().type === 'group');
   protected readonly isGroupExpanded = signal(true);
 
   protected readonly size = linkedSignal<PreferredSize | undefined>(() => {
-    const subMenuItem = this.subMenuItem();
+    const subMenuItem = this.contextElement();
     if (subMenuItem.type !== 'sub-menu-item') {
       return undefined;
     }
@@ -79,17 +82,18 @@ export class MenuComponent {
   constructor() {
     // Maintain stable width when expanding/collapsing groups or hovering menu item when displaying the actions toolbar.
     afterRenderEffect(() => {
-      this.subMenuItem(); // re-evaluate when re-used
+      this.contextElement(); // re-evaluate when re-used
       this.size.update(size => ({...size, width: `${this._host.getBoundingClientRect().width}px`}));
     });
 
     // Compute expanded state group.
     effect(() => {
-      const subMenuItem = this.subMenuItem();
-      const filterActive = this._filter.filterActive();
+      const contextElement = this.contextElement();
+      const filterActive = this._menuFilter.filterActive();
       untracked(() => {
-        if (subMenuItem.type === 'group') {
-          this.isGroupExpanded.set(filterActive || !subMenuItem.collapsible || !subMenuItem.collapsible.collapsed);
+        if (contextElement.type === 'group') {
+          const group = contextElement;
+          this.isGroupExpanded.set(filterActive || !group.collapsible || !group.collapsible.collapsed);
         }
         else {
           this.isGroupExpanded.set(true);
@@ -99,7 +103,7 @@ export class MenuComponent {
 
     // Close action menu when this component is re-used.
     effect(() => {
-      this.subMenuItem();
+      this.contextElement();
 
       untracked(() => {
         const popover = this._host.appendChild(this._document.createElement('div'));
@@ -157,7 +161,7 @@ export class MenuComponent {
   }
 
   protected onFilterChange(filter: string): void {
-    this._filter.setFilter(filter);
+    this._menuFilter.setFilter(filter);
   }
 
   protected onActionToolbarMenuOpen(open: boolean): void {
@@ -166,7 +170,7 @@ export class MenuComponent {
 
   private computeMenuItems(): Signal<Array<MMenuItem | MSubMenuItem | MMenuGroup>> {
     return computed(() => {
-      const subMenuItem = this.subMenuItem();
+      const subMenuItem = this.contextElement();
 
       // TODO [MENU] Sort by order (e.g., after, before)
       return subMenuItem.children
@@ -179,7 +183,7 @@ export class MenuComponent {
     return computed(() => {
       switch (menuItem.type) {
         case 'menu-item':
-          return this._filter.matches(menuItem)();
+          return this._menuFilter.matches(menuItem)();
         case 'sub-menu-item':
           return menuItem.children.some(child => this.matchesFilter(child)()); // TODO [menu] consider contributions
         case 'group':
