@@ -7,7 +7,7 @@ $icon-size: 18px;
   gap: 2px;
 
   // Add before separator
-  > sci-tool-item-group:not(:first-child)::before {
+  > sci-toolbar-group:not(:first-child)::before {
     content: '';
     width: 1px;
     background-color: var(--sci-color-border);
@@ -15,7 +15,7 @@ $icon-size: 18px;
   }
 
   // Add after separator
-  > sci-tool-item-group:not(:last-child):not(:has(+ sci-tool-item-group))::after {
+  > sci-toolbar-group:not(:last-child):not(:has(+ sci-toolbar-group))::after {
     content: '';
     width: 1px;
     background-color: var(--sci-color-border);

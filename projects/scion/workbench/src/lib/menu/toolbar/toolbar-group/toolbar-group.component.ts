@@ -8,9 +8,9 @@ import {MenuItemStateDirective} from '../../menu/menu-item-state.directive';
 import {SciDimension} from '@scion/components/dimension';
 
 @Component({
-  selector: 'sci-tool-item-group',
-  templateUrl: './tool-item-group.component.html',
-  styleUrl: './tool-item-group.component.scss',
+  selector: 'sci-toolbar-group',
+  templateUrl: './toolbar-group.component.html',
+  styleUrl: './toolbar-group.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MenuComponent,

@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, input, output, ViewContainerRef} from '@angular/core';
-import {SciToolGroupComponent} from './tool-item-group/tool-item-group.component';
+import {SciToolGroupComponent} from './toolbar-group/toolbar-group.component';
 
 @Component({
   selector: 'sci-toolbar',

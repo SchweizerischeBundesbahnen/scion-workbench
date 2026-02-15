@@ -50,7 +50,7 @@
       </button>
     }
     @case ('group') {
-      <sci-tool-item-group [subMenuItem]="menuItem" [disabled]="disabled() || (menuItem.disabled?.() ?? false)"/>
+      <sci-toolbar-group [subMenuItem]="menuItem" [disabled]="disabled() || (menuItem.disabled?.() ?? false)"/>
     }
   }
 }

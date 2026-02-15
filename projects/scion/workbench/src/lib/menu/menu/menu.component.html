@@ -1,5 +1,6 @@
 @let subMenuItem = this.subMenuItem();
 
+<!-- Group header if group -->
 @if (subMenuItem.type === 'group' && (subMenuItem.label?.() || subMenuItem.collapsible)) {
   @let group = subMenuItem;
   @if (group.collapsible) {
@@ -12,7 +13,8 @@
   }
 }
 
-@if (isGroupExpanded()) {
+<!-- Menu items of a submenu or an expanded group -->
+@if (subMenuItem.type !== 'group' || isGroupExpanded()) {
   @if (subMenuItem.filter) {
     <div class="filter">
       <span class="icon material-symbols-rounded filter" translate="no">search</span>
