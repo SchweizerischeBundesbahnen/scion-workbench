@@ -20,3 +20,4 @@ export {MessagingPageComponent} from './lib/messaging-page/messaging-page.compon
 export {RegisterWorkbenchCapabilityPageComponent} from './lib/register-workbench-capability-page/register-workbench-capability-page.component';
 export {RegisterWorkbenchIntentionPageComponent} from './lib/register-workbench-intention-page/register-workbench-intention-page.component';
 export {UnregisterWorkbenchCapabilityPageComponent} from './lib/unregister-workbench-capability-page/unregister-workbench-capability-page.component';
+export * from './lib/test-pages/public-api';

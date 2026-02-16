@@ -3,6 +3,7 @@
     <sci-form-field label="Component">
       <select [formControl]="form.controls.component" class="e2e-component">
         <option value="notification-page">NotificationPageComponent</option>
+        <option value="focus-test-page">FocusTestPageComponent</option>
         <option value="legacy-notification-page">LegacyNotificationPageComponent</option>
         <option value="">default</option>
       </select>
@@ -55,7 +56,12 @@
     </sci-form-field>
 
     <sci-form-field label="Group Input Reducer">
-      <sci-checkbox [formControl]="form.controls.options.controls.useGroupInputReducer" class="e2e-use-group-input-reducer"/>
+      <select [formControl]="form.controls.options.controls.groupInputReduceFn" class="e2e-group-input-reducer">
+        <option value="concat-input-reducer">Input Concatenator</option>
+        <option value="concat-input-async-reducer">Async Input Concatenator</option>
+        <option value="concat-input-legacy-reducer">Legacy Input Concatenator</option>
+        <option value="">none</option>
+      </select>
     </sci-form-field>
 
     <sci-form-field label="CSS Class(es)">
@@ -64,6 +70,10 @@
   </section>
 
   <section>
+    <sci-form-field label="Notification Count">
+      <input [formControl]="form.controls.count" type="number" class="e2e-count">
+    </sci-form-field>
+
     <sci-form-field label="Legacy API">
       <sci-checkbox [formControl]="form.controls.legacyAPI" class="e2e-legacy-api"/>
     </sci-form-field>

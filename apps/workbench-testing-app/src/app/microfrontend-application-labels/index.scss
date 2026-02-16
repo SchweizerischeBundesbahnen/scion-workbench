@@ -15,10 +15,12 @@
         margin-right: .25em;
         margin-top: .25em;
         pointer-events: none;
+        font-size: .9rem;
       }
 
       &[data-focus]::after {
         @include sci-design.style-chip(var(--sci-color-accent), var(--sci-color-background-primary), var(--sci-color-accent));
+        font-size: .9rem;
       }
     }
   }

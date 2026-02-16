@@ -1,16 +1,19 @@
-<div class="outline">
-  <!-- Title -->
-  @if (notification().title(); as title) {
-    <header class="e2e-title">{{(title | wbText)()}}</header>
-  }
+<!-- Title -->
+@if (notification().title(); as title) {
+  <header class="e2e-title">{{(title | wbText)()}}</header>
+}
 
-  <!-- Message -->
-  @if (notification().slot.text) {
-    <span class="e2e-message">{{(notification().slot.text | wbText)()}}</span>
-  } @else {
-    <ng-container *ngComponentOutlet="notification().slot.component!; inputs: notification().inputs | wbRemoveLegacyInput; injector: notification().slot.injector"/>
+<!-- Message -->
+<div class="message e2e-message" [class.text]="!!notification().slot.text?.length">
+  @if (notification().slot.text?.length) {
+    {{(notification().slot.text | wbText)()}}
+  } @else if (notification().slot.component) {
+    <sci-viewport class="e2e-message-viewport">
+      <ng-container *ngComponentOutlet="notification().slot.component!; inputs: notification().inputs | wbRemoveLegacyInput; injector: notification().slot.injector"/>
+    </sci-viewport>
   }
 </div>
+
 <button (click)="onClose()"
         [title]="('%workbench.close.tooltip' | wbText)()"
         class="close e2e-close">

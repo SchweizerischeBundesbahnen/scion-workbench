@@ -39,7 +39,7 @@ export interface WorkbenchDialogCapability extends Capability {
    */
   type: WorkbenchCapabilities.Dialog;
   /**
-   * Qualifies this dialog. The qualifier is required for a dialog.
+   * Qualifies the dialog. The qualifier is required for a dialog.
    *
    * @inheritDoc
    */
@@ -47,7 +47,9 @@ export interface WorkbenchDialogCapability extends Capability {
   /**
    * Specifies parameters required by the dialog.
    *
-   * Parameters can be read in the microfrontend by injecting the {@link WorkbenchDialog} handle, or referenced in path, title and resolvers using the colon syntax.
+   * Parameters can be:
+   * - read in the microfrontend by injecting the {@link WorkbenchDialog} handle (or `ActivatedMicrofrontend` if a host microfrontend)
+   * - referenced in the path, title and resolvers using the colon syntax
    *
    * @inheritDoc
    */
@@ -89,11 +91,11 @@ export interface WorkbenchDialogCapability extends Capability {
      */
     path: string;
     /**
-     * Specifies the size of this dialog, required if this dialog is provided by an application other than the workbench host application.
+     * Specifies the size of the dialog, required if the dialog is provided by an application other than the workbench host application.
      */
     size?: WorkbenchDialogSize;
     /**
-     * Specifies the title of this dialog.
+     * Specifies the title of the dialog.
      *
      * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
      *
@@ -192,11 +194,11 @@ export interface WorkbenchDialogCapability extends Capability {
  */
 export interface WorkbenchDialogSize {
   /**
-   * Specifies the height of the dialog, required if this dialog is provided by an application other than the workbench host application.
+   * Specifies the height of the dialog, required if the dialog is provided by an application other than the workbench host application.
    */
   height?: string;
   /**
-   * Specifies the width of the dialog, required if this dialog is provided by an application other than the workbench host application.
+   * Specifies the width of the dialog, required if the dialog is provided by an application other than the workbench host application.
    */
   width?: string;
   /**

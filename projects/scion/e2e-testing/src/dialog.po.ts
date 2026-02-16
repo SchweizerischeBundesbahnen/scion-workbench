@@ -9,7 +9,7 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {coerceArray, selectBy, DomRect, fromRect} from './helper/testing.util';
+import {coerceArray, selectBy, DomRect, fromRect, hasCssClass} from './helper/testing.util';
 import {AppPO} from './app.po';
 import {DialogId} from '@scion/workbench';
 import {RequireOne} from './helper/utility-types';
@@ -57,6 +57,14 @@ export class DialogPO {
 
   public async getDialogSlotBoundingBox(): Promise<DomRect> {
     return fromRect(await this.slot.boundingBox());
+  }
+
+  public hasVerticalOverflow(): Promise<boolean> {
+    return hasCssClass(this.locator.locator('sci-viewport.e2e-dialog-content > sci-scrollbar.vertical'), 'overflow');
+  }
+
+  public hasHorizontalOverflow(): Promise<boolean> {
+    return hasCssClass(this.locator.locator('sci-viewport.e2e-dialog-content > sci-scrollbar.horizontal'), 'overflow');
   }
 
   public getComputedStyle(): Promise<CSSStyleDeclaration> {

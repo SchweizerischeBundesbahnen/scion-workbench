@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2025 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,11 +18,12 @@ import PopupPageComponent from './popup-page/popup-page.component';
 import RouterPageComponent from './router-page/router-page.component';
 import FocusTestPageComponent from './test-pages/focus-test-page/focus-test-page.component';
 import TextTestPageComponent from './test-pages/text-test-page/text-test-page.component';
-import {canMatchWorkbenchDialogCapability, canMatchWorkbenchMessageBoxCapability, canMatchWorkbenchPart, canMatchWorkbenchPartCapability, canMatchWorkbenchPopupCapability, canMatchWorkbenchView, canMatchWorkbenchViewCapability} from '@scion/workbench';
+import {canMatchWorkbenchDialogCapability, canMatchWorkbenchMessageBoxCapability, canMatchWorkbenchNotificationCapability, canMatchWorkbenchPart, canMatchWorkbenchPartCapability, canMatchWorkbenchPopupCapability, canMatchWorkbenchView, canMatchWorkbenchViewCapability} from '@scion/workbench';
 import {CanMatchWorkbenchCapabilityDescriptor, CanMatchWorkbenchElementDescriptor, prune, RouteDescriptor} from 'workbench-testing-app-common';
 import PartPageComponent from './part-page/part-page.component';
-import {DialogOpenerPageComponent as MicrofrontendDialogOpenerPageComponent, MessageBoxOpenerPageComponent as MicrofrontendMessageBoxOpenerPageComponent, PopupOpenerPageComponent as MicrofrontendPopupOpenerPageComponent} from 'workbench-client-testing-app-common';
+import {DialogOpenerPageComponent as MicrofrontendDialogOpenerPageComponent, MessageBoxOpenerPageComponent as MicrofrontendMessageBoxOpenerPageComponent, NotificationParamReducerTestPageComponent, PopupOpenerPageComponent as MicrofrontendPopupOpenerPageComponent} from 'workbench-client-testing-app-common';
 import SizeTestPageComponent from './test-pages/size-test-page/size-test-page.component';
+import NotificationPageComponent from './notification-page/notification-page.component';
 
 @Injectable({providedIn: 'root'})
 export class RouteRegistrationService {
@@ -74,6 +75,8 @@ function parseRoute(route: RouteDescriptor): Route {
         return MessageBoxPageComponent;
       case 'popup-page':
         return PopupPageComponent;
+      case 'notification-page':
+        return NotificationPageComponent;
       case 'router-page':
         return RouterPageComponent;
       case 'focus-test-page':
@@ -82,6 +85,8 @@ function parseRoute(route: RouteDescriptor): Route {
         return SizeTestPageComponent;
       case 'text-test-page':
         return TextTestPageComponent;
+      case 'notification-param-reducer-test-page':
+        return NotificationParamReducerTestPageComponent;
       case 'microfrontend-dialog-opener-page':
         return MicrofrontendDialogOpenerPageComponent;
       case 'microfrontend-messagebox-opener-page':
@@ -110,6 +115,8 @@ function parseRoute(route: RouteDescriptor): Route {
         return canMatchWorkbenchMessageBoxCapability(canMatch.qualifier);
       case 'canMatchWorkbenchPopupCapability':
         return canMatchWorkbenchPopupCapability(canMatch.qualifier);
+      case 'canMatchWorkbenchNotificationCapability':
+        return canMatchWorkbenchNotificationCapability(canMatch.qualifier);
       default:
         throw Error(`[PageObjectError] CanMatchFn not supported: ${fn}`);
     }

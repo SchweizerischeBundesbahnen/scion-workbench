@@ -1,5 +1,9 @@
 :host {
-  overflow-wrap: break-word;
+  word-break: break-word; // wrap unbreakable text at message box bounds
   white-space: pre-line;
   text-align: var(--sci-workbench-messagebox-text-align);
+
+  &.empty {
+    display: none;
+  }
 }

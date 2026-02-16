@@ -15,6 +15,7 @@ import {Translatable} from '../../../text/workbench-text-provider.model';
 import {TextPipe} from '../../../text/text.pipe';
 import {createRemoteTranslatable} from '../../microfrontend-text/remote-text-provider';
 import {ActivatedMicrofrontend} from '../../microfrontend-host/microfrontend-host.model';
+import {WorkbenchDialog} from '../../../dialog/workbench-dialog.model';
 
 /**
  * Displays the text message for the built-in message box capability.
@@ -28,6 +29,9 @@ import {ActivatedMicrofrontend} from '../../microfrontend-host/microfrontend-hos
   imports: [
     TextPipe,
   ],
+  host: {
+    '[class.empty]': '!message?.length',
+  },
 })
 export default class TextMessageComponent {
 
@@ -37,6 +41,9 @@ export default class TextMessageComponent {
     const {params, referrer} = inject(ActivatedMicrofrontend);
     const translatable = params().get(eMESSAGE_BOX_MESSAGE_PARAM) as Translatable | undefined;
     this.message = createRemoteTranslatable(translatable, {appSymbolicName: referrer()});
+
+    // Limit the maximum messagebox width to break the message.
+    inject(WorkbenchDialog).size.maxWidth = 'var(--sci-workbench-messagebox-max-width)';
   }
 }
 

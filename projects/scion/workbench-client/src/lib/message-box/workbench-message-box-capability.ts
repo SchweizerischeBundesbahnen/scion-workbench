@@ -22,8 +22,6 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
  *
  * The microfrontend can inject the `WorkbenchMessageBox` handle (and `ActivatedMicrofrontend` if a host microfrontend) to interact with the message box or access parameters.
  *
- * The message box does not automatically adapt its size to the content. Refer to {@link WorkbenchMessageBoxCapability.properties.size} for more information.
- *
  * @category MessageBox
  * @see WorkbenchMessageBox
  * @see WorkbenchMessageBoxService
@@ -34,7 +32,7 @@ export interface WorkbenchMessageBoxCapability extends Capability {
    */
   type: WorkbenchCapabilities.MessageBox;
   /**
-   * Qualifies this message box. The qualifier is required for a message box.
+   * Qualifies the message box. The qualifier is required for a message box.
    *
    * @inheritDoc
    */
@@ -42,7 +40,9 @@ export interface WorkbenchMessageBoxCapability extends Capability {
   /**
    * Specifies parameters required by the message box.
    *
-   * Parameters can be read in the microfrontend by injecting the {@link WorkbenchMessageBox} handle, or referenced in the path using the colon syntax.
+   * Parameters can be:
+   * - read in the microfrontend by injecting the {@link WorkbenchMessageBox} handle (or `ActivatedMicrofrontend` if a host microfrontend)
+   * - referenced in the path using the colon syntax
    *
    * @inheritDoc
    */
@@ -86,9 +86,16 @@ export interface WorkbenchMessageBoxCapability extends Capability {
     /**
      * Specifies the size of the message box.
      *
-     * The message box does not automatically adapt its size to the content (only for message boxes provided by the host). Specify a fixed size in
-     * the capability or report it from the microfrontend using {@link @scion/microfrontend-platform!PreferredSizeService}. If reporting it from the
-     * microfrontend, consider also specifying the size in the capability to avoid flickering, as the microfrontend may take some time to load.
+     * For the message box to adapt to the size of the microfrontend content, set the size to `auto` and report the microfrontend's preferred size using
+     * `PreferredSizeService` in the microfrontend.
+     *
+     * @example - Reporting the preferred size in the microfrontend
+     * ```ts
+     * import {Beans} from '@scion/toolkit/bean-manager';
+     * import {PreferredSizeService} from '@scion/microfrontend-platform';
+     *
+     * Beans.get(PreferredSizeService).fromDimension(<Microfrontend HTMLElement>);
+     * ``
      */
     size?: WorkbenchMessageBoxSize;
     /**
@@ -113,17 +120,21 @@ export interface WorkbenchMessageBoxCapability extends Capability {
 }
 
 /**
- * Specifies the preferred message box size.
+ * Specifies the message box size.
  */
 export interface WorkbenchMessageBoxSize {
+  /**
+   * Specifies the height of the message box, recommended if the message box is provided by an application other than the workbench host application.
+   */
+  height?: string | 'auto';
+  /**
+   * Specifies the width of the message box, recommended if the message box is provided by an application other than the workbench host application.
+   */
+  width?: string | 'auto';
   /**
    * Specifies the min-height of the message box.
    */
   minHeight?: string;
-  /**
-   * Specifies the height of the message box.
-   */
-  height?: string;
   /**
    * Specifies the max-height of the message box.
    */
@@ -132,10 +143,6 @@ export interface WorkbenchMessageBoxSize {
    * Specifies the min-width of the message box.
    */
   minWidth?: string;
-  /**
-   * Specifies the width of the message box.
-   */
-  width?: string;
   /**
    * Specifies the max-width of the message box.
    */

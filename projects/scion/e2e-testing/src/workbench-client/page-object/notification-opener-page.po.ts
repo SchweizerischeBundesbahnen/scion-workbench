@@ -38,9 +38,9 @@ export class NotificationOpenerPagePO implements MicrofrontendViewPagePO {
     this._appPO = new AppPO(this.locator.page());
   }
 
-  public async show(message: Translatable, options?: NotificationOpenerPageOptions & WorkbenchNotificationOptions): Promise<void>;
-  public async show(qualifier: Qualifier, options?: NotificationOpenerPageOptions & WorkbenchNotificationOptions): Promise<void>;
-  public async show(content: Translatable | Qualifier, options?: NotificationOpenerPageOptions & WorkbenchNotificationOptions): Promise<void> {
+  public async show(message: Translatable | null, options?: NotificationOpenerPageOptions): Promise<void>;
+  public async show(qualifier: Qualifier, options?: NotificationOpenerPageOptions): Promise<void>;
+  public async show(content: Translatable | Qualifier | null, options?: NotificationOpenerPageOptions): Promise<void> {
     // Select API.
     const legacyAPI = options?.legacyAPI;
     await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-legacy-api')).toggle(legacyAPI?.enabled ?? false);
@@ -51,7 +51,10 @@ export class NotificationOpenerPagePO implements MicrofrontendViewPagePO {
     await qualifierField.clear();
 
     // Enter text or qualifier.
-    if (typeof content === 'string') {
+    if (content === null) {
+      await this.locator.locator('input.e2e-text').fill('<null>');
+    }
+    else if (typeof content === 'string') {
       await this.locator.locator('input.e2e-text').fill(content);
     }
     else {
@@ -77,6 +80,9 @@ export class NotificationOpenerPagePO implements MicrofrontendViewPagePO {
     // Enter group.
     await this.locator.locator('input.e2e-group').fill(options?.group ?? '');
 
+    // Enter count.
+    await this.locator.locator('input.e2e-count').fill(`${options?.count ?? 1}`);
+
     // Enter CSS class.
     await this.locator.locator('input.e2e-class').fill(coerceArray(options?.cssClass).join(' '));
 
@@ -90,17 +96,12 @@ export class NotificationOpenerPagePO implements MicrofrontendViewPagePO {
       rejectWhenAttached(this.error),
     ]);
   }
-
-  public async pressEscape(): Promise<void> {
-    await this.locator.click();
-    await this.locator.press('Escape');
-  }
 }
 
 /**
  * Controls opening of a notification.
  */
-export interface NotificationOpenerPageOptions {
+export type NotificationOpenerPageOptions = WorkbenchNotificationOptions & {
   /**
    * Controls if to use the legacy Workbench Notification API.
    *
@@ -110,4 +111,8 @@ export interface NotificationOpenerPageOptions {
     enabled: true;
     textAsConfig: boolean;
   };
-}
+  /**
+   * Controls how many notifications to open. Defaults to 1.
+   */
+  count?: number;
+};

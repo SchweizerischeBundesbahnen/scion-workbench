@@ -11,8 +11,8 @@
 import {test} from '../../fixtures';
 import {MessageBoxOpenerPagePO} from '../page-object/message-box-opener-page.po';
 import {expect} from '@playwright/test';
+import {TextMessageBoxPO} from '../page-object/text-message-box.po';
 import {expectMessageBox} from '../../matcher/message-box-matcher';
-import {TextMessagePO} from '../page-object/text-message.po';
 
 test.describe('Workbench Message Box Built-in Capability', () => {
 
@@ -35,7 +35,7 @@ test.describe('Workbench Message Box Built-in Capability', () => {
       await messageBoxOpenerPage.open('TEXT', {cssClass: 'testee'});
 
       const messageBox = appPO.messagebox({cssClass: 'testee'});
-      const textMessagePage = new TextMessagePO(messageBox);
+      const textMessagePage = new TextMessageBoxPO(messageBox);
 
       await expectMessageBox(textMessagePage).toBeVisible();
       await expect(textMessagePage.text).toHaveText('TEXT');
@@ -51,9 +51,121 @@ test.describe('Workbench Message Box Built-in Capability', () => {
       await messageBoxOpenerPage.open('LINE 1\\nLINE 2', {cssClass: 'testee'});
 
       const messageBox = appPO.messagebox({cssClass: 'testee'});
-      const textMessagePage = new TextMessagePO(messageBox);
+      const textMessagePage = new TextMessageBoxPO(messageBox);
 
       await expect(textMessagePage.text).toHaveText('LINE 1\nLINE 2');
+    });
+
+    test('should wrap text', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true, designTokens: {'--sci-workbench-messagebox-max-width': '400px'}});
+
+      await microfrontendNavigator.registerIntention('app1', {type: 'messagebox'});
+
+      // Open message box with a single line.
+      const messageBoxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
+      await messageBoxOpenerPage.open('Single Line', {cssClass: 'testee'});
+
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const textMessagePage = new TextMessageBoxPO(messageBox);
+
+      await expectMessageBox(textMessagePage).toBeVisible();
+
+      const singleLineBounds = await messageBox.getBoundingBox();
+
+      // Close the message box.
+      await messageBox.clickActionButton('ok');
+
+      // Open message box with multiple lines.
+      await messageBoxOpenerPage.open('Multiple Lines '.repeat(100), {cssClass: 'testee'});
+
+      // Expect the message box to break words.
+      await expect.poll(() => messageBox.dialog.hasVerticalOverflow()).toBe(false);
+      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.width)).toEqual(400);
+      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
+    });
+
+    test('should wrap "unbreakable" text', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true, designTokens: {'--sci-workbench-messagebox-max-width': '400px'}});
+
+      await microfrontendNavigator.registerIntention('app1', {type: 'messagebox'});
+
+      // Open message box with a single line.
+      const messageBoxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
+      await messageBoxOpenerPage.open('Single Line', {cssClass: 'testee'});
+
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const textMessagePage = new TextMessageBoxPO(messageBox);
+
+      await expectMessageBox(textMessagePage).toBeVisible();
+
+      const singleLineBounds = await messageBox.getBoundingBox();
+
+      // Close the message box.
+      await messageBox.clickActionButton('ok');
+
+      // Open message box with multiple lines.
+      await messageBoxOpenerPage.open('MultipleLines'.repeat(100), {cssClass: 'testee'});
+
+      // Expect the message box to break words.
+      await expect.poll(() => messageBox.dialog.hasVerticalOverflow()).toBe(false);
+      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.width)).toEqual(400);
+      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
+    });
+
+    test('should wrap title', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true, designTokens: {'--sci-workbench-messagebox-max-width': '400px'}});
+
+      await microfrontendNavigator.registerIntention('app1', {type: 'messagebox'});
+
+      // Open message box with a single line.
+      const messageBoxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
+      await messageBoxOpenerPage.open(null, {title: 'Single Line', cssClass: 'testee'});
+
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const textMessagePage = new TextMessageBoxPO(messageBox);
+
+      await expectMessageBox(textMessagePage).toBeAttached();
+
+      const singleLineBounds = await messageBox.dialog.getDialogBoundingBox();
+
+      // Close the message box.
+      await messageBox.clickActionButton('ok');
+
+      // Open message box with multiple lines.
+      await messageBoxOpenerPage.open(null, {title: 'Multiple Lines '.repeat(100), cssClass: 'testee'});
+
+      // Expect the message box to break words.
+      await expect.poll(() => messageBox.dialog.hasVerticalOverflow()).toBe(false);
+      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.width)).toEqual(400);
+      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
+    });
+
+    test('should wrap "unbreakable" title', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true, designTokens: {'--sci-workbench-messagebox-max-width': '400px'}});
+
+      await microfrontendNavigator.registerIntention('app1', {type: 'messagebox'});
+
+      // Open message box with a single line.
+      const messageBoxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
+      await messageBoxOpenerPage.open(null, {title: 'Single Line', cssClass: 'testee'});
+
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const textMessagePage = new TextMessageBoxPO(messageBox);
+
+      await expectMessageBox(textMessagePage).toBeAttached();
+
+      const singleLineBounds = await messageBox.dialog.getDialogBoundingBox();
+
+      // Close the message box.
+      await messageBox.clickActionButton('ok');
+
+      // Open message box with multiple lines.
+      await messageBoxOpenerPage.open(null, {title: 'MultipleLines'.repeat(100), cssClass: 'testee'});
+
+      // Expect the message box to break words.
+      await expect.poll(() => messageBox.dialog.hasVerticalOverflow()).toBe(false);
+      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.width)).toEqual(400);
+      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
     });
 
     test('should allow selecting text', async ({appPO, microfrontendNavigator}) => {
@@ -66,7 +178,7 @@ test.describe('Workbench Message Box Built-in Capability', () => {
       await messageBoxOpenerPage.open('This text should be selectable!', {cssClass: 'testee', contentSelectable: true});
 
       const messageBox = appPO.messagebox({cssClass: 'testee'});
-      const textMessagePage = new TextMessagePO(messageBox);
+      const textMessagePage = new TextMessageBoxPO(messageBox);
 
       await expect.poll(() => textMessagePage.isTextSelectable()).toBe(true);
     });
@@ -81,15 +193,15 @@ test.describe('Workbench Message Box Built-in Capability', () => {
       await messageBoxOpenerPage.open(null, {cssClass: 'testee'});
 
       const messageBox = appPO.messagebox({cssClass: 'testee'});
-      const textMessagePage = new TextMessagePO(messageBox);
+      const textMessagePage = new TextMessageBoxPO(messageBox);
 
       // Expect text not to be displayed.
       await expect(textMessagePage.text).toBeEmpty();
 
       // Expect the text message box page to display without height.
-      await expect.poll(() => textMessagePage.getBoundingBox()).toEqual(expect.objectContaining({
+      await expect.poll(() => textMessagePage.getBoundingBox()).toMatchObject({
         height: 0,
-      }));
+      });
     });
   });
 
@@ -276,7 +388,7 @@ test.describe('Workbench Message Box Built-in Capability', () => {
           },
         });
         const messageBox = appPO.messagebox({cssClass: 'testee'});
-        const textMessagePage = new TextMessagePO(messageBox);
+        const textMessagePage = new TextMessageBoxPO(messageBox);
 
         await expectMessageBox(textMessagePage).toBeVisible();
 
@@ -296,7 +408,7 @@ test.describe('Workbench Message Box Built-in Capability', () => {
           },
         });
         const messageBox = appPO.messagebox({cssClass: 'testee'});
-        const textMessagePage = new TextMessagePO(messageBox);
+        const textMessagePage = new TextMessageBoxPO(messageBox);
 
         await expectMessageBox(textMessagePage).toBeVisible();
 

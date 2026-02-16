@@ -12,6 +12,7 @@ import {MessageBoxPO} from '../../message-box.po';
 import {Locator} from '@playwright/test';
 import {WorkbenchMessageBoxPagePO} from './workbench-message-box-page.po';
 import {ActivatedMicrofrontendPO} from './activated-microfrontend.po';
+import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 
 /**
  * Page object to interact with {@link MessageBoxPageComponent}.
@@ -31,4 +32,17 @@ export class MessageBoxPagePO implements WorkbenchMessageBoxPagePO {
   public getComponentInstanceId(): Promise<string> {
     return this.locator.locator('input.e2e-component-instance-id').inputValue();
   }
+
+  public async enterContentSize(size: {width?: string; height?: string}): Promise<void> {
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-content-size'));
+    await accordion.expand();
+    try {
+      await accordion.itemLocator().locator('input.e2e-width').fill(size.width ?? '');
+      await accordion.itemLocator().locator('input.e2e-height').fill(size.height ?? '');
+    }
+    finally {
+      await accordion.collapse();
+    }
+  }
+
 }

@@ -10,14 +10,16 @@
 
 import {Component, inject, Type} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {NotificationService, WorkbenchNotificationOptions, WorkbenchNotificationService} from '@scion/workbench';
+import {NotificationService, Translatable, WorkbenchNotificationOptions, WorkbenchNotificationService} from '@scion/workbench';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
-import {MultiValueInputComponent, prune, stringifyError} from 'workbench-testing-app-common';
-import {NotificationPageComponent} from '../notification-page/notification-page.component';
+import {MultiValueInputComponent, parseTypedString, prune, stringifyError} from 'workbench-testing-app-common';
+import NotificationPageComponent from '../notification-page/notification-page.component';
 import {UUID} from '@scion/toolkit/uuid';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {LegacyNotificationPageComponent} from '../legacy-notification-page/legacy-notification-page.component';
+import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
+import {firstValueFrom, timer} from 'rxjs';
 
 @Component({
   selector: 'app-notification-opener-page',
@@ -47,11 +49,12 @@ export default class NotificationOpenerPageComponent {
       severity: this._formBuilder.control<'info' | 'warn' | 'error' | ''>(''),
       duration: this._formBuilder.control<'short' | 'medium' | 'long' | 'infinite' | '' | number>(''),
       group: this._formBuilder.control(''),
+      groupInputReduceFn: this._formBuilder.control(''),
       inputs: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
       inputLegacy: this._formBuilder.control(''),
-      useGroupInputReducer: this._formBuilder.control(false),
       cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
     }),
+    count: this._formBuilder.control(1),
     // TODO [Angular 22] Remove backward compatiblity.
     legacyAPI: this._formBuilder.control(false),
   });
@@ -59,6 +62,13 @@ export default class NotificationOpenerPageComponent {
   protected notificationOpenError: string | undefined;
 
   protected onNotificationShow(): void {
+    const count = this.form.controls.count.value || 1;
+    for (let i = 0; i < count; i++) {
+      this.showNotification();
+    }
+  }
+
+  private showNotification(): void {
     this.notificationOpenError = undefined;
     try {
       if (this.form.controls.legacyAPI.value) {
@@ -70,7 +80,7 @@ export default class NotificationOpenerPageComponent {
           severity: options.severity.value || undefined,
           duration: this.readDurationFromUI(),
           group: options.group.value || undefined,
-          groupInputReduceFn: this.isUseGroupInputReducer() ? concatInputLegacyReduceFn : undefined,
+          groupInputReduceFn: this.readGroupInputReducerFromUI(this.form.controls.options.controls.groupInputReduceFn.value || undefined),
           cssClass: options.cssClass.value,
         }));
       }
@@ -81,7 +91,7 @@ export default class NotificationOpenerPageComponent {
           severity: this.form.controls.options.controls.severity.value || undefined,
           duration: this.readDurationFromUI(),
           group: this.form.controls.options.controls.group.value || undefined,
-          groupInputReduceFn: this.isUseGroupInputReducer() ? concatInputReduceFn : undefined,
+          groupInputReduceFn: this.readGroupInputReducerFromUI(this.form.controls.options.controls.groupInputReduceFn.value || undefined),
           cssClass: this.form.controls.options.controls.cssClass.value ?? undefined,
         });
 
@@ -89,7 +99,7 @@ export default class NotificationOpenerPageComponent {
           this._notificationService.show(this.readComponentFromUI(), options);
         }
         else {
-          const text = restoreLineBreaks(this.form.controls.text.value);
+          const text = parseTypedString<Translatable>(restoreLineBreaks(this.form.controls.text.value)) ?? null;
           this._notificationService.show(text, options);
         }
       }
@@ -99,10 +109,12 @@ export default class NotificationOpenerPageComponent {
     }
   }
 
-  private readComponentFromUI(): Type<NotificationPageComponent | LegacyNotificationPageComponent> {
+  private readComponentFromUI(): Type<unknown> {
     switch (this.form.controls.component.value) {
       case 'notification-page':
         return NotificationPageComponent;
+      case 'focus-test-page':
+        return FocusTestPageComponent;
       case 'legacy-notification-page':
         return LegacyNotificationPageComponent;
       default:
@@ -121,23 +133,50 @@ export default class NotificationOpenerPageComponent {
     return Number(duration);
   }
 
+  private readGroupInputReducerFromUI(groupInputReduceFn: string | undefined): GroupInputReducerFn | undefined {
+    switch (groupInputReduceFn) {
+      case undefined:
+        return undefined;
+      case 'concat-input-reducer':
+        return concatInputReduceFn;
+      case 'concat-input-legacy-reducer':
+        return concatInputLegacyReduceFn as unknown as GroupInputReducerFn;
+      case 'concat-input-async-reducer':
+        return concatInputAsyncReduceFn;
+      default:
+        throw Error(`[IllegalGroupInputReduceFn] Reducer function not supported: ${groupInputReduceFn}`);
+    }
+  }
+
   protected isUseComponent(): boolean {
     return !!this.form.controls.component.value;
   }
-
-  protected isUseGroupInputReducer(): boolean {
-    return this.form.controls.options.controls.useGroupInputReducer.value;
-  }
 }
 
+/**
+ * Concatenates the inputs of the previous and current notification.
+ */
 function concatInputReduceFn(prevInput: {[name: string]: unknown}, currInput: {[name: string]: unknown}): {[name: string]: unknown} {
-  const reducedInput = new Map(Object.entries(prevInput));
-  for (const [key, value] of Object.entries(currInput)) {
-    reducedInput.set(key, reducedInput.has(key) ? `${reducedInput.get(key)}, ${value}` : value);
-  }
-  return Object.fromEntries(reducedInput);
+  return Object.entries(currInput).reduce((inputs, [key, value]) => ({
+    ...inputs,
+    [key]: `${prevInput[key] as string}, ${value as string}`,
+  }), {});
 }
 
+/**
+ * Concatenates the inputs of the previous and current notification asynchronously.
+ */
+async function concatInputAsyncReduceFn(prevInput: {[name: string]: unknown}, currInput: {[name: string]: unknown}): Promise<{[name: string]: unknown}> {
+  await firstValueFrom(timer(500));
+  return Object.entries(currInput).reduce((inputs, [key, value]) => ({
+    ...inputs,
+    [key]: `${prevInput[key] as string}, ${value as string}`,
+  }), {});
+}
+
+/**
+ * Concatenates the inputs of the previous and current notification (legacy Notification API).
+ */
 function concatInputLegacyReduceFn(prevInput: string, currInput: string): string {
   return `${prevInput}, ${currInput}`;
 }
@@ -148,3 +187,5 @@ function concatInputLegacyReduceFn(prevInput: string, currInput: string): string
 function restoreLineBreaks(value: string): string {
   return value.replace(/\\n/g, '\n');
 }
+
+type GroupInputReducerFn = (prevInput: {[name: string]: unknown}, currInput: {[name: string]: unknown}) => {[name: string]: unknown} | Promise<{[name: string]: unknown}>;

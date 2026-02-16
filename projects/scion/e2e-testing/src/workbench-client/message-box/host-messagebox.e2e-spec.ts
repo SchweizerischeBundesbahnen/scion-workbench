@@ -148,6 +148,171 @@ test.describe('Workbench Host Message Box', () => {
     await expect(messageboxOpenerPage.closeAction).toHaveText('action');
   });
 
+  test('should size the message box as configured in the capability', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    await microfrontendNavigator.registerCapability('host', {
+      type: 'messagebox',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: '',
+        size: {
+          height: '500px',
+          minHeight: '495px',
+          maxHeight: '505px',
+          width: '350px',
+          minWidth: '345px',
+          maxWidth: '355px',
+        },
+      },
+    });
+
+    // Register host messagebox route.
+    await workbenchNavigator.registerRoute({
+      path: '', component: 'messagebox-page', canMatch: [canMatchWorkbenchMessageBoxCapability({component: 'testee'})],
+    });
+
+    // Open the message box.
+    const messageBoxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'host');
+    await messageBoxOpenerPage.open({component: 'testee'}, {cssClass: 'testee'});
+
+    const messageBox = appPO.messagebox({cssClass: 'testee'});
+    const messageBoxPage = new MessageBoxPagePO(messageBox);
+
+    // Expect the message box page to display with the defined size.
+    await expect.poll(() => messageBoxPage.messageBox.dialog.getDialogBoundingBox()).toMatchObject({
+      height: 500,
+      width: 350,
+    });
+
+    await expect.poll(() => messageBoxPage.messageBox.dialog.getComputedStyle()).toMatchObject({
+      height: '500px',
+      minHeight: '495px',
+      maxHeight: '505px',
+      width: '350px',
+      minWidth: expect.anything() as unknown as string, // overwritten with minimal buttons witdth (footer)
+      maxWidth: '355px',
+    } satisfies Partial<CSSStyleDeclaration>);
+
+    // Grow the content.
+    await messageBoxPage.enterContentSize({
+      height: '800px',
+      width: '800px',
+    });
+
+    // Expect the message box to adapt to the content size.
+    await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+      height: 800,
+      width: 800,
+    });
+
+    // Expect the dialog to adapt to the content size.
+    await expect.poll(() => messageBoxPage.messageBox.dialog.getDialogBoundingBox()).toMatchObject({
+      height: 500,
+      width: 350,
+    });
+
+    // Expect content to overflow.
+    await expect.poll(() => messageBox.dialog.hasVerticalOverflow()).toBe(true);
+    await expect.poll(() => messageBox.dialog.hasHorizontalOverflow()).toBe(true);
+  });
+
+  test('should adapt message box size to content', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    await microfrontendNavigator.registerCapability('host', {
+      type: 'messagebox',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: '',
+        size: {height: 'auto', width: 'auto'},
+      },
+    });
+
+    // Register host messagebox route.
+    await workbenchNavigator.registerRoute({
+      path: '', component: 'messagebox-page', canMatch: [canMatchWorkbenchMessageBoxCapability({component: 'testee'})],
+    });
+
+    // Open the message box.
+    const messageBoxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'host');
+    await messageBoxOpenerPage.open({component: 'testee'}, {cssClass: 'testee'});
+
+    const messageBox = appPO.messagebox({cssClass: 'testee'});
+    const messageBoxPage = new MessageBoxPagePO(messageBox);
+
+    await expectMessageBox(messageBoxPage).toBeVisible();
+
+    // Capture current size.
+    const dialogBounds = await messageBox.dialog.getDialogSlotBoundingBox();
+    const messageBoxPageBounds = await messageBox.getBoundingBox();
+    const verticalPadding = dialogBounds.height - messageBoxPageBounds.height;
+    const horizontalPadding = dialogBounds.width - messageBoxPageBounds.width;
+
+    // Change the size of the content.
+    await messageBoxPage.enterContentSize({width: '800px', height: '800px'});
+
+    // Expect the message box to adapt to the content size.
+    await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+      height: 800,
+      width: 800,
+    });
+
+    // Expect the dialog to adapt to the content size.
+    await expect.poll(() => messageBox.dialog.getDialogSlotBoundingBox()).toMatchObject({
+      height: 800 + verticalPadding,
+      width: 800 + horizontalPadding,
+    });
+
+    // Expect content not to overflow.
+    await expect.poll(() => messageBox.dialog.hasVerticalOverflow()).toBe(false);
+    await expect.poll(() => messageBox.dialog.hasHorizontalOverflow()).toBe(false);
+
+    // Shrink the content.
+    await messageBoxPage.enterContentSize({
+      height: '400px',
+      width: '400px',
+    });
+
+    // Expect the message box to adapt to the content size.
+    await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+      height: 400,
+      width: 400,
+    });
+
+    // Expect the dialog to adapt to the content size.
+    await expect.poll(() => messageBox.dialog.getDialogSlotBoundingBox()).toMatchObject({
+      height: 400 + verticalPadding,
+      width: 400 + horizontalPadding,
+    });
+
+    // Expect content not to overflow.
+    await expect.poll(() => messageBox.dialog.hasVerticalOverflow()).toBe(false);
+    await expect.poll(() => messageBox.dialog.hasHorizontalOverflow()).toBe(false);
+
+    // Grow the content.
+    await messageBoxPage.enterContentSize({
+      height: '800px',
+      width: '800px',
+    });
+
+    // Expect the message box to adapt to the content size.
+    await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+      height: 800,
+      width: 800,
+    });
+
+    // Expect the dialog to adapt to the content size.
+    await expect.poll(() => messageBox.dialog.getDialogSlotBoundingBox()).toMatchObject({
+      height: 800 + verticalPadding,
+      width: 800 + horizontalPadding,
+    });
+
+    // Expect content not to overflow.
+    await expect.poll(() => messageBox.dialog.hasVerticalOverflow()).toBe(false);
+    await expect.poll(() => messageBox.dialog.hasHorizontalOverflow()).toBe(false);
+  });
+
   test.describe('View Context', () => {
 
     test('should open host messagebox from host view', async ({appPO, microfrontendNavigator}) => {

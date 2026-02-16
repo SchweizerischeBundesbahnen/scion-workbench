@@ -31,15 +31,17 @@ export interface WorkbenchPartCapability extends Capability {
    */
   type: WorkbenchCapabilities.Part;
   /**
-   * Qualifies this part. The qualifier is required for a part.
+   * Qualifies the part. The qualifier is required for a part.
    *
    * @inheritDoc
    */
   qualifier: Qualifier;
   /**
-   * Specifies parameters required by this part.
+   * Specifies parameters required by the part.
    *
-   * Parameters can be read in the microfrontend by injecting the {@link WorkbenchPart} handle, or referenced in path, title, label, tooltip and resolvers using the colon syntax.
+   * Parameters can be:
+   * - read in the microfrontend by injecting the {@link WorkbenchPart} handle (or `ActivatedMicrofrontend` if a host microfrontend)
+   * - referenced in the path, title, label, tooltip and resolvers using the colon syntax
    *
    * @inheritDoc
    */

@@ -17,8 +17,8 @@ import {ɵWorkbenchNotificationService} from './ɵworkbench-notification.service
 /**
  * Shows a notification.
  *
- * A notification is a closable message displayed in the upper-right corner that disappears after a few seconds unless hovered.
- * It informs about system events, task completion or errors. The severity indicates importance or urgency.
+ * A notification is a closable message displayed in the upper-right corner that disappears after a few seconds unless hovered or focused.
+ * It informs about system events, task completion, or errors. Severity indicates importance or urgency.
  *
  * Notifications can be grouped. Only the most recent notification within a group is displayed.
  *
@@ -30,11 +30,11 @@ export abstract class WorkbenchNotificationService {
   /**
    * Displays the specified message as workbench notification.
    *
-   * @param message - Specifies the text to display.
+   * @param message - Specifies the text to display, if any.
    *                  Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
    * @param options - Controls the appearance and behavior of the notification.
    */
-  public abstract show(message: Translatable, options?: WorkbenchNotificationOptions): void;
+  public abstract show(message: Translatable | null, options?: WorkbenchNotificationOptions): void;
 
   /**
    * Displays the specified component as workbench notification.

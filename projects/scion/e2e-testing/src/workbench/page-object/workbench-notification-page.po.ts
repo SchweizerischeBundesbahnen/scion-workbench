@@ -10,6 +10,7 @@
 
 import {Locator} from '@playwright/test';
 import {NotificationPO} from '../../notification.po';
+import {SciRouterOutletPO} from '../../workbench-client/page-object/sci-router-outlet.po';
 
 /**
  * Represents a workbench notification.
@@ -23,4 +24,14 @@ export interface WorkbenchNotificationPagePO {
    * Locates the page displayed in the workbench notification.
    */
   readonly locator: Locator;
+}
+
+/**
+ * Represents a workbench notification displaying a microfrontend.
+ */
+export interface MicrofrontendNotificationPagePO extends WorkbenchNotificationPagePO {
+  /**
+   * Locates the outlet displaying the microfrontend.
+   */
+  readonly outlet: SciRouterOutletPO;
 }

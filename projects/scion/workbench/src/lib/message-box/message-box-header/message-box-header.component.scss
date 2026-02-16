@@ -19,7 +19,7 @@
   }
 
   > span.title {
-    overflow-wrap: break-word;
+    word-break: break-word; // wrap unbreakable text at message box bounds
     white-space: pre-line;
     font-family: var(--sci-workbench-messagebox-title-font-family), sans-serif;
     font-size: var(--sci-workbench-messagebox-title-font-size);

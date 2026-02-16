@@ -30,6 +30,10 @@ function expectWorkbenchMessageBox(messageBoxPage: WorkbenchMessageBoxPagePO): M
       await expect(messageBoxPage.messageBox.locator).toBeVisible();
       await expect(messageBoxPage.locator).toBeVisible();
     },
+    toBeAttached: async (): Promise<void> => {
+      await expect(messageBoxPage.messageBox.locator).toBeAttached();
+      await expect(messageBoxPage.locator).toBeAttached();
+    },
     toBeHidden: async (): Promise<void> => {
       await expect(messageBoxPage.messageBox.locator).toBeAttached();
       await expect(messageBoxPage.messageBox.locator).not.toBeVisible();
@@ -55,6 +59,11 @@ function expectMicrofrontendMessageBox(messageBoxPage: MicrofrontendMessageBoxPa
       await expect(messageBoxPage.messageBox.locator).toBeVisible();
       await expect(messageBoxPage.locator).toBeVisible();
       await expect(messageBoxPage.outlet.locator).toBeVisible();
+    },
+    toBeAttached: async (): Promise<void> => {
+      await expect(messageBoxPage.messageBox.locator).toBeAttached();
+      await expect(messageBoxPage.locator).toBeAttached();
+      await expect(messageBoxPage.outlet.locator).toBeAttached();
     },
     toBeHidden: async (): Promise<void> => {
       await expect(messageBoxPage.messageBox.locator).toBeAttached();
@@ -83,6 +92,11 @@ export interface MessageBoxMatcher {
    * Expects the message box to be visible.
    */
   toBeVisible(): Promise<void>;
+
+  /**
+   * Expects the notification to be attached.
+   */
+  toBeAttached(): Promise<void>;
 
   /**
    * Expects the message box to be in the DOM but not visible.

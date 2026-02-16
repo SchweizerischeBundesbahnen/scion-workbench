@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms from the Eclipse Public License 2.0
@@ -91,6 +91,9 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
         break;
       case 'messagebox':
         await this.enterMessageBoxCapabilityProperties(capability);
+        break;
+      case 'notification':
+        await this.enterNotificationCapabilityProperties(capability);
         break;
     }
 
@@ -339,6 +342,30 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     }
     if (size?.maxHeight) {
       await this.locator.locator('input.e2e-max-height').fill(size.maxHeight);
+    }
+    if (capability.properties.showSplash !== undefined) {
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-show-splash')).toggle(capability.properties.showSplash);
+    }
+    if (capability.properties.cssClass !== undefined) {
+      await this.locator.locator('input.e2e-class').fill(coerceArray(capability.properties.cssClass).join(' '));
+    }
+  }
+
+  private async enterNotificationCapabilityProperties(capability: WorkbenchNotificationCapability): Promise<void> {
+    await this.locator.locator('input.e2e-path').fill(capability.properties.path === '' ? '<string></string>' : capability.properties.path);
+
+    const size = capability.properties.size;
+    if (size?.height) {
+      await this.locator.locator('input.e2e-height').fill(size.height);
+    }
+    if (size?.minHeight) {
+      await this.locator.locator('input.e2e-min-height').fill(size.minHeight);
+    }
+    if (size?.maxHeight) {
+      await this.locator.locator('input.e2e-max-height').fill(size.maxHeight);
+    }
+    if (capability.properties.groupParamsReducer !== undefined) {
+      await this.locator.locator('input.e2e-group-params-reducer').fill(capability.properties.groupParamsReducer);
     }
     if (capability.properties.showSplash !== undefined) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-show-splash')).toggle(capability.properties.showSplash);

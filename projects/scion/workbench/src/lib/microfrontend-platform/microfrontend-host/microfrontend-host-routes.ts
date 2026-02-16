@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2025 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,7 +13,7 @@ import {inject} from '@angular/core';
 import {MicrofrontendPlatform, PlatformState, Qualifier, QualifierMatcher} from '@scion/microfrontend-platform';
 import {WORKBENCH_OUTLET} from '../../routing/workbench-auxiliary-route-installer.service';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
-import {DialogId, PartId, PopupId, ViewId} from '../../workbench.identifiers';
+import {DialogId, NotificationId, PartId, PopupId, ViewId} from '../../workbench.identifiers';
 import {WorkbenchCapabilities} from '@scion/workbench-client';
 
 /**
@@ -197,9 +197,45 @@ export function canMatchWorkbenchPopupCapability(qualifier: Qualifier): CanMatch
 }
 
 /**
+ * Configures a route to only match workbench notifications navigated to the specified notification capability.
+ *
+ * Use this guard to differentiate microfrontend routes, which must all have an empty path.
+ *
+ * @example - Route matching a notification capability with qualifier {notification: 'info'}
+ * ```ts
+ * import {Routes} from '@angular/router';
+ * import {canMatchWorkbenchNotificationCapability} from '@scion/workbench';
+ *
+ * const routes: Routes = [
+ *   {path: '', canMatch: [canMatchWorkbenchNotificationCapability({notification: 'info'})], component: InfoComponent},
+ * ];
+ * ```
+ *
+ * The above route matches the following notification capability:
+ *
+ * ```json
+ * {
+ *   "type": "notification",
+ *   "qualifier": {
+ *     "notification": "info"
+ *   },
+ *   "properties": {
+ *     "path": ""
+ *   }
+ * }
+ * ```
+ *
+ * @param qualifier - Identifies the notification capability.
+ * @return guard matching the specified notification capability.
+ */
+export function canMatchWorkbenchNotificationCapability(qualifier: Qualifier): CanMatchFn {
+  return canMatchWorkbenchCapability('notification', WorkbenchCapabilities.Notification, qualifier);
+}
+
+/**
  * Matches a route if navigated to the specified capability displayed in the specified workbench element.
  */
-function canMatchWorkbenchCapability(workbenchElementType: 'part' | 'view' | 'dialog' | 'popup', capabilityType: WorkbenchCapabilities, qualifier: Qualifier): CanMatchFn {
+function canMatchWorkbenchCapability(workbenchElementType: 'part' | 'view' | 'dialog' | 'popup' | 'notification', capabilityType: WorkbenchCapabilities, qualifier: Qualifier): CanMatchFn {
   return (): boolean => {
     const outlet = inject(WORKBENCH_OUTLET, {optional: true});
 
@@ -254,7 +290,7 @@ function matchMicrofrontendHostOutlet(outlet: string | undefined | null): Microf
   }
 
   return {
-    type: match.groups!['workbenchElementType']! as 'part' | 'view' | 'dialog' | 'popup',
+    type: match.groups!['workbenchElementType']! as 'part' | 'view' | 'dialog' | 'popup' | 'notification',
     capabilityId: match.groups!['capabilityId']!,
   };
 }
@@ -272,7 +308,7 @@ type MicrofrontendCapabilityId = string;
  * Format: `workbench.microfrontend.host.<capabilityId>.<workbenchElementType>.<workbenchElementId>`
  * Example: `workbench.microfrontend.host.39768ab.part.5485357a`
  */
-export type MicrofrontendHostOutlet = `workbench.microfrontend.host.${MicrofrontendCapabilityId}.${PartId | ViewId | DialogId | PopupId}`;
+export type MicrofrontendHostOutlet = `workbench.microfrontend.host.${MicrofrontendCapabilityId}.${PartId | ViewId | DialogId | PopupId | NotificationId}`;
 
 /**
  * Regular expression to match a microfrontend host outlet.
@@ -286,7 +322,7 @@ interface MicrofrontendHostOutletMatch {
   /**
    * Type of the workbench element displaying the microfrontend.
    */
-  type: 'part' | 'view' | 'dialog' | 'popup';
+  type: 'part' | 'view' | 'dialog' | 'popup' | 'notification';
   /**
    * Identity of the capability providing the microfrontend.
    *
@@ -295,6 +331,7 @@ interface MicrofrontendHostOutletMatch {
    * @see WorkbenchDialogCapability
    * @see WorkbenchMessageBoxCapability
    * @see WorkbenchPopupCapability
+   * @see WorkbenchNotificationCapability
    */
   capabilityId: string;
 }

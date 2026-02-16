@@ -16,7 +16,7 @@ import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendMessageBoxPagePO} from '../../workbench/page-object/workbench-message-box-page.po';
 import {MessageBoxPO} from '../../message-box.po';
-import {DomRect, fromRect} from '../../helper/testing.util';
+import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 
 /**
  * Page object to interact with {@link MessageBoxPageComponent}.
@@ -90,8 +90,8 @@ export class MessageBoxPagePO implements MicrofrontendMessageBoxPagePO {
     }
   }
 
-  public async enterComponentSize(size: {width?: string; height?: string}): Promise<void> {
-    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-component-size'));
+  public async enterContentSize(size: {width?: string; height?: string}): Promise<void> {
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-content-size'));
     await accordion.expand();
     try {
       await accordion.itemLocator().locator('input.e2e-width').fill(size.width ?? '');
@@ -102,11 +102,10 @@ export class MessageBoxPagePO implements MicrofrontendMessageBoxPagePO {
     }
   }
 
-  public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.outlet.locator.boundingBox());
-  }
-
-  public getOutletComputedStyle(): Promise<CSSStyleDeclaration> {
-    return this.outlet.locator.evaluate((outletElement: HTMLElement) => getComputedStyle(outletElement));
+  public async reportContentSize(reportSize: boolean): Promise<void> {
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-content-size'));
+    await accordion.expand();
+    await new SciCheckboxPO(accordion.itemLocator().locator('sci-checkbox.e2e-report-size')).toggle(reportSize);
+    await accordion.collapse();
   }
 }
