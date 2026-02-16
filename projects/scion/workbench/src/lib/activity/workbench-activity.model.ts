@@ -31,6 +31,8 @@ export interface MActivityLayout {
     leftBottom: MActivityStack;
     rightTop: MActivityStack;
     rightBottom: MActivityStack;
+    topLeft: MActivityStack;
+    topRight: MActivityStack;
     bottomLeft: MActivityStack;
     bottomRight: MActivityStack;
   };
@@ -41,6 +43,10 @@ export interface MActivityLayout {
     };
     right: {
       width: number;
+      ratio: number;
+    };
+    top: {
+      height: number;
       ratio: number;
     };
     bottom: {
@@ -96,9 +102,9 @@ export interface MActivity {
 export const ACTIVITY_PANEL_WIDTH = 300;
 
 /**
- * Specifies the default height of the bottom activity panel.
+ * Specifies the default height of the top and bottom activity panels.
  *
- * Used as the default height if the design token '--sci-workbench-layout-panel-bottom-height' is not set.
+ * Used as the default height if the design tokens '-sci-workbench-layout-panel-top-height' or '--sci-workbench-layout-panel-bottom-height' are not set.
  */
 export const ACTIVITY_PANEL_HEIGHT = 250;
 

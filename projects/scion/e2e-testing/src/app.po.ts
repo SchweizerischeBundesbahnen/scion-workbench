@@ -339,7 +339,7 @@ export class AppPO {
    *
    * @param panel - Specifies which activity panel to locate.
    */
-  public activityPanel(panel: 'left' | 'right' | 'bottom'): ActivityPanelPO {
+  public activityPanel(panel: 'left' | 'right' | 'top' | 'bottom'): ActivityPanelPO {
     return new ActivityPanelPO(this.page.locator(`wb-activity-panel[data-panel="${panel}"]`));
   }
 

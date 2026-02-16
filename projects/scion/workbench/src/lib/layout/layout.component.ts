@@ -60,6 +60,7 @@ export class LayoutComponent {
 
   protected readonly leftActivityPanel = computed(() => this.toolbars().leftTop.activeActivityId || this.toolbars().leftBottom.activeActivityId ? this._panels().left : null);
   protected readonly rightActivityPanel = computed(() => this.toolbars().rightTop.activeActivityId || this.toolbars().rightBottom.activeActivityId ? this._panels().right : null);
+  protected readonly topActivityPanel = computed(() => this.toolbars().topLeft.activeActivityId || this.toolbars().topRight.activeActivityId ? this._panels().top : null);
   protected readonly bottomActivityPanel = computed(() => this.toolbars().bottomLeft.activeActivityId || this.toolbars().bottomRight.activeActivityId ? this._panels().bottom : null);
 
   protected readonly leftActivityBarVisible = computed(() => this.toolbars().leftTop.activities.length || this.toolbars().leftBottom.activities.length || this.toolbars().bottomLeft.activities.length);
@@ -96,9 +97,12 @@ export class LayoutComponent {
     );
   }
 
-  protected onVerticalSashEnd({bottom}: {[sashKey: string]: number}): void {
+  protected onVerticalSashEnd({top, bottom}: {[sashKey: string]: number}): void {
     this._workbenchLayoutService.signalResizing(false);
-    void this._workbenchRouter.navigate(layout => layout.setActivityPanelSize('bottom', bottom!));
+    void this._workbenchRouter.navigate(layout => layout
+      .modify(layout => top !== undefined ? layout.setActivityPanelSize('top', top) : layout)
+      .modify(layout => bottom !== undefined ? layout.setActivityPanelSize('bottom', bottom) : layout),
+    );
   }
 
   protected onDesktopViewDrop(event: WbViewDropEvent): void {

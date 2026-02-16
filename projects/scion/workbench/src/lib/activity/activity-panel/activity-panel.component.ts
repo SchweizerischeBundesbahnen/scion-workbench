@@ -39,7 +39,7 @@ export class ActivityPanelComponent {
   /**
    * Specifies the location of the panel.
    */
-  public readonly panel = input.required<'left' | 'right' | 'bottom'>();
+  public readonly panel = input.required<'left' | 'right' | 'top' | 'bottom'>();
 
   /**
    * Specifies the first activity to display in the panel.
@@ -73,7 +73,7 @@ export class ActivityPanelComponent {
    * Computes the direction of the sashbox.
    */
   private computeDirection(): Signal<'row' | 'column'> {
-    return computed(() => this.panel() === 'bottom' ? 'row' : 'column');
+    return computed(() => this.panel() === 'bottom' || this.panel() === 'top' ? 'row' : 'column');
   }
 
   /**

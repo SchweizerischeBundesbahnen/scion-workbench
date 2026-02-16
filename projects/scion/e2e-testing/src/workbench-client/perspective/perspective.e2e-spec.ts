@@ -651,6 +651,18 @@ test.describe('Workbench Perspective', () => {
       },
     });
 
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'part',
+      qualifier: {part: 'activity-4'},
+      properties: {
+        path: 'test-part;capability=activity-4',
+        extras: {
+          icon: 'folder',
+          label: 'Activity 4',
+        },
+      },
+    });
+
     await microfrontendNavigator.createPerspective('app1', {
       type: 'perspective',
       qualifier: {perspective: 'testee'},
@@ -695,9 +707,16 @@ test.describe('Workbench Perspective', () => {
           {
             id: 'part.activity-3',
             qualifier: {part: 'activity-3'},
-            position: 'bottom-left',
+            position: 'top-left',
             active: false,
             ɵactivityId: 'activity.3',
+          },
+          {
+            id: 'part.activity-4',
+            qualifier: {part: 'activity-4'},
+            position: 'bottom-left',
+            active: false,
+            ɵactivityId: 'activity.4',
           },
         ],
       },
@@ -712,6 +731,7 @@ test.describe('Workbench Perspective', () => {
     const partPage1 = new PartPagePO(appPO.part({partId: 'part.activity-1'}));
     const partPage2 = new PartPagePO(appPO.part({partId: 'part.activity-2'}));
     const partPage3 = new PartPagePO(appPO.part({partId: 'part.activity-3'}));
+    const partPage4 = new PartPagePO(appPO.part({partId: 'part.activity-4'}));
 
     // Expect layout of the perspective.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -770,8 +790,12 @@ test.describe('Workbench Perspective', () => {
             activities: [{id: 'activity.2'}],
             activeActivityId: 'activity.2',
           },
-          bottomLeft: {
+          topLeft: {
             activities: [{id: 'activity.3'}],
+            activeActivityId: 'none',
+          },
+          bottomLeft: {
+            activities: [{id: 'activity.4'}],
             activeActivityId: 'none',
           },
         },
@@ -786,8 +810,11 @@ test.describe('Workbench Perspective', () => {
     await expectPart(partPage2.part).not.toDisplayComponent();
     await expectView(viewPage5).toBeActive();
 
-    // Assert part docked to bottom-left.
+    // Assert part docked to top-left.
     await expectPart(partPage3.part).not.toBeAttached();
+
+    // Assert part docked to bottom-left.
+    await expectPart(partPage4.part).not.toBeAttached();
 
     // Assert views of the left part.
     await expectView(viewPage1).toBeActive();

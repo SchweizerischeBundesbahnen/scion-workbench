@@ -2,6 +2,14 @@
 
 @switch (align()) {
   @case ('left') {
+    @if (activityLayout.toolbars.topLeft.activities.length) {
+      <wb-activity-stack [stack]="activityLayout.toolbars.topLeft" data-docking-area="top-left"/>
+    }
+
+    @if (activityLayout.toolbars.topLeft.activities.length && (activityLayout.toolbars.leftTop.activities.length || activityLayout.toolbars.leftBottom.activities.length)) {
+      <hr>
+    }
+
     @if (activityLayout.toolbars.leftTop.activities.length) {
       <wb-activity-stack [stack]="activityLayout.toolbars.leftTop" data-docking-area="left-top"/>
     }
@@ -19,6 +27,14 @@
     }
   }
   @case ('right') {
+    @if (activityLayout.toolbars.topRight.activities.length) {
+      <wb-activity-stack [stack]="activityLayout.toolbars.topRight" data-docking-area="top-right"/>
+    }
+
+    @if (activityLayout.toolbars.topRight.activities.length && (activityLayout.toolbars.rightTop.activities.length || activityLayout.toolbars.rightBottom.activities.length)) {
+      <hr>
+    }
+
     @if (activityLayout.toolbars.rightTop.activities.length) {
       <wb-activity-stack [stack]="activityLayout.toolbars.rightTop" data-docking-area="right-top"/>
     }

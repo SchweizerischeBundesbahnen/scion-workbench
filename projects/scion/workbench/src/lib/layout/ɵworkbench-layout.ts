@@ -229,6 +229,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       'left-bottom': this.activityLayout.toolbars.leftBottom,
       'right-top': this.activityLayout.toolbars.rightTop,
       'right-bottom': this.activityLayout.toolbars.rightBottom,
+      'top-left': this.activityLayout.toolbars.topLeft,
+      'top-right': this.activityLayout.toolbars.topRight,
       'bottom-left': this.activityLayout.toolbars.bottomLeft,
       'bottom-right': this.activityLayout.toolbars.bottomRight,
     };
@@ -292,7 +294,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Sets the size of the specified activity panel.
    */
-  public setActivityPanelSize(panel: 'left' | 'right' | 'bottom', size: number): ɵWorkbenchLayout {
+  public setActivityPanelSize(panel: 'left' | 'right' | 'top' | 'bottom', size: number): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();
     workingCopy.__setActivityPanelSize(panel, size);
     return workingCopy;
@@ -301,7 +303,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Sets the split ratio of two activities displayed in the specified panel.
    */
-  public setActivityPanelSplitRatio(panel: 'left' | 'right' | 'bottom', ratio: number): ɵWorkbenchLayout {
+  public setActivityPanelSplitRatio(panel: 'left' | 'right' | 'top' | 'bottom', ratio: number): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();
     workingCopy.__setActivityPanelSplitRatio(panel, ratio);
     return workingCopy;
@@ -862,7 +864,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __setActivityPanelSize(panel: 'left' | 'right' | 'bottom', size: number): void {
+  private __setActivityPanelSize(panel: 'left' | 'right' | 'top' | 'bottom', size: number): void {
     if (size < 0) {
       throw Error(`[LayoutModifyError] '${panel}' activity panel size must be 0 or greater, but was '${size}'.`);
     }
@@ -874,6 +876,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       case 'right':
         this._activityLayout.panels.right.width = size;
         break;
+      case 'top':
+        this._activityLayout.panels.top.height = size;
+        break;
       case 'bottom':
         this._activityLayout.panels.bottom.height = size;
         break;
@@ -883,7 +888,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __setActivityPanelSplitRatio(panel: 'left' | 'right' | 'bottom', ratio: number): void {
+  private __setActivityPanelSplitRatio(panel: 'left' | 'right' | 'top' | 'bottom', ratio: number): void {
     if (ratio < 0 || ratio > 1) {
       throw Error(`[LayoutModifyError] Ratio for '${panel}' activity panel must be in the closed interval [0,1], but was '${ratio}'.`);
     }
@@ -1491,6 +1496,8 @@ function createDefaultActivityLayout(): MActivityLayout {
       leftBottom: {activities: []},
       rightTop: {activities: []},
       rightBottom: {activities: []},
+      topLeft: {activities: []},
+      topRight: {activities: []},
       bottomLeft: {activities: []},
       bottomRight: {activities: []},
     },
@@ -1501,6 +1508,10 @@ function createDefaultActivityLayout(): MActivityLayout {
       },
       right: {
         width: Number.parseInt(readCssVariable(documentRoot, '--sci-workbench-layout-panel-right-width', `${ACTIVITY_PANEL_WIDTH}px`)),
+        ratio: ACTIVITY_PANEL_RATIO,
+      },
+      top: {
+        height: Number.parseInt(readCssVariable(documentRoot, '--sci-workbench-layout-panel-top-height', `${ACTIVITY_PANEL_HEIGHT}px`)),
         ratio: ACTIVITY_PANEL_RATIO,
       },
       bottom: {

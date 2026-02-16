@@ -347,9 +347,9 @@ export interface DockedPartExtras {
 }
 
 /**
- * A part can be docked to the left, right, or bottom side of the workbench.
+ * A part can be docked to the left, right, top or bottom side of the workbench.
  *
- * Each side has two docking areas: `left-top` and `left-bottom`, `right-top` and `right-bottom`, and `bottom-left` and `bottom-right`.
+ * Each side has two docking areas: `left-top` and `left-bottom`, `right-top` and `right-bottom`, `top-left` and `top-right`, and `bottom-left` and `bottom-right`.
  * Parts added to the same area are stacked, with only one part active per stack. If there is an active part in both stacks of a side,
  * the two parts are split vertically or horizontally, depending on the side.
  */
@@ -360,10 +360,12 @@ export interface DockingArea {
    * - `left-bottom`: Dock to the bottom on the left side.
    * - `right-top`: Dock to the top on the right side.
    * - `right-bottom`: Dock to the bottom on the right side.
+   * - `top-left`: Dock to the left on the top side.
+   * - `top-right`: Dock to the right on the top side.
    * - `bottom-left`: Dock to the left on the bottom side.
    * - `bottom-right`: Dock to the right on the bottom side.
    */
-  dockTo: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'bottom-left' | 'bottom-right';
+  dockTo: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 }
 
 /**

@@ -116,6 +116,8 @@ const dockingAreas = new Set()
   .add('left-bottom')
   .add('right-top')
   .add('right-bottom')
+  .add('top-left')
+  .add('top-right')
   .add('bottom-left')
   .add('bottom-right');
 

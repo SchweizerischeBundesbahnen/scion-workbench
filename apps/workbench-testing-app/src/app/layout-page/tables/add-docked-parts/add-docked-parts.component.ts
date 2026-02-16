@@ -46,7 +46,7 @@ export class AddDockedPartsComponent implements ControlValueAccessor, Validator 
     dockedParts: this._formBuilder.array<FormGroup<{
       id: FormControl<string>;
       dockTo: FormGroup<{
-        dockTo: FormControl<'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'bottom-left' | 'bottom-right'>;
+        dockTo: FormControl<'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'>;
       }>;
       extras: FormGroup<{
         icon: FormControl<string>;
@@ -105,7 +105,7 @@ export class AddDockedPartsComponent implements ControlValueAccessor, Validator 
       this._formBuilder.group({
         id: this._formBuilder.control<string>(dockedPart.id, Validators.required),
         dockTo: this._formBuilder.group({
-          dockTo: this._formBuilder.control<'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'bottom-left' | 'bottom-right'>(dockedPart.dockTo.dockTo, Validators.required),
+          dockTo: this._formBuilder.control<'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'>(dockedPart.dockTo.dockTo, Validators.required),
         }),
         extras: this._formBuilder.group({
           icon: this._formBuilder.control<string>(dockedPart.extras.icon, Validators.required),
@@ -156,7 +156,7 @@ export class AddDockedPartsComponent implements ControlValueAccessor, Validator 
 export interface DockedPartDescriptor {
   id: string;
   dockTo: {
-    dockTo: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'bottom-left' | 'bottom-right';
+    dockTo: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
   };
   extras: {
     icon: string;

@@ -29,10 +29,10 @@
 <ng-template #layout_align_left>
   <!-- @formatter:off -->
   <!-- +---+------------+---+ -->
-  <!-- | L |            | R | -->
-  <!-- | E |    MAIN    | I | -->
-  <!-- | F |    GRID    | G | -->
-  <!-- | T |            | H | -->
+  <!-- | L |    TOP     | R | -->
+  <!-- | E +------------+ I | -->
+  <!-- | F |    MAIN    | G | -->
+  <!-- | T |    GRID    | H | -->
   <!-- +---+------------+ T | -->
   <!-- |       BOTTOM   |   | -->
   <!-- +----------------+---+ -->
@@ -48,9 +48,19 @@
                 <wb-activity-panel [panel]="'left'" [activityId1]="toolbars().leftTop.activeActivityId" [activityId2]="toolbars().leftBottom.activeActivityId"/>
               </ng-template>
             }
-            <!-- Main Grid -->
             <ng-template sciSash>
-              <ng-container *ngTemplateOutlet="main_grid"/>
+              <sci-sashbox [direction]="'column'" (sashStart)="onSashStart()" (sashEnd)="onHorizontalSashEnd($event)">
+                <!-- Top Activity Panel -->
+                @if (topActivityPanel(); as panel) {
+                  <ng-template sciSash [size]="`${panel.height}px`" key="top" [animate]="panelAnimation()">
+                    <wb-activity-panel [panel]="'top'" [activityId1]="toolbars().topLeft.activeActivityId" [activityId2]="toolbars().topRight.activeActivityId"/>
+                  </ng-template>
+                }
+                <!-- Main Grid -->
+                <ng-template sciSash>
+                  <ng-container *ngTemplateOutlet="main_grid"/>
+                </ng-template>
+              </sci-sashbox>
             </ng-template>
           </sci-sashbox>
         </ng-template>
@@ -75,10 +85,10 @@
 <ng-template #layout_align_right>
   <!-- @formatter:off -->
   <!-- +---+------------+---+ -->
-  <!-- | L |            | R | -->
-  <!-- | E |    MAIN    | I | -->
-  <!-- | F |    GRID    | G | -->
-  <!-- | T |            | H | -->
+  <!-- | L |    TOP     | R | -->
+  <!-- | E +------------+ I | -->
+  <!-- | F |    MAIN    | G | -->
+  <!-- | T |    GRID    | H | -->
   <!-- |   |            | T | -->
   <!-- |   +------------+---| -->
   <!-- |   |    BOTTOM      | -->
@@ -95,9 +105,19 @@
       <sci-sashbox [direction]="'column'" (sashStart)="onSashStart()" (sashEnd)="onVerticalSashEnd($event)">
         <ng-template sciSash>
           <sci-sashbox [direction]="'row'" (sashStart)="onSashStart()" (sashEnd)="onHorizontalSashEnd($event)">
-            <!-- Main Grid -->
             <ng-template sciSash>
-              <ng-container *ngTemplateOutlet="main_grid"/>
+              <sci-sashbox [direction]="'column'" (sashStart)="onSashStart()" (sashEnd)="onVerticalSashEnd($event)">
+                <!-- Top Activity Panel -->
+                @if (topActivityPanel(); as panel) {
+                  <ng-template sciSash [size]="`${panel.height}px`" key="top" [animate]="panelAnimation()">
+                    <wb-activity-panel [panel]="'top'" [activityId1]="toolbars().topLeft.activeActivityId" [activityId2]="toolbars().topRight.activeActivityId"/>
+                  </ng-template>
+                }
+                <!-- Main Grid -->
+                <ng-template sciSash>
+                  <ng-container *ngTemplateOutlet="main_grid"/>
+                </ng-template>
+              </sci-sashbox>
             </ng-template>
             <!-- Right Activity Panel -->
             @if (rightActivityPanel(); as panel) {
@@ -122,11 +142,12 @@
 <ng-template #layout_center>
   <!-- @formatter:off -->
   <!-- +---+------------+---+ -->
-  <!-- | L |    MAIN    | R | -->
-  <!-- | E |    GRID    | I | -->
-  <!-- | F |            | G | -->
-  <!-- | T +------------+ H | -->
-  <!-- |   |   BOTTOM   | T | -->
+  <!-- | L |    TOP     | R | -->
+  <!-- | E +------------+ I | -->
+  <!-- | F |    MAIN    | G | -->
+  <!-- | T |    GRID    | H | -->
+  <!-- |   +------------+ T | -->
+  <!-- |   |   BOTTOM   |   | -->
   <!-- +---+------------+---+ -->
   <!-- @formatter:on -->
   <sci-sashbox [direction]="'row'" (sashStart)="onSashStart()" (sashEnd)="onHorizontalSashEnd($event)">
@@ -138,9 +159,19 @@
     }
     <ng-template sciSash>
       <sci-sashbox [direction]="'column'" (sashStart)="onSashStart()" (sashEnd)="onVerticalSashEnd($event)">
-        <!-- Main Grid -->
         <ng-template sciSash>
-          <ng-container *ngTemplateOutlet="main_grid"/>
+          <sci-sashbox [direction]="'column'" (sashStart)="onSashStart()" (sashEnd)="onVerticalSashEnd($event)">
+            <!-- Top Activity Panel -->
+            @if (topActivityPanel(); as panel) {
+              <ng-template sciSash [size]="`${panel.height}px`" key="top" [animate]="panelAnimation()">
+                <wb-activity-panel [panel]="'top'" [activityId1]="toolbars().topLeft.activeActivityId" [activityId2]="toolbars().topLeft.activeActivityId"/>
+              </ng-template>
+            }
+            <!-- Main Grid -->
+            <ng-template sciSash>
+              <ng-container *ngTemplateOutlet="main_grid"/>
+            </ng-template>
+          </sci-sashbox>
         </ng-template>
         <!-- Bottom Activity Panel -->
         @if (bottomActivityPanel(); as panel) {
@@ -163,10 +194,10 @@
 <ng-template #layout_justify>
   <!-- @formatter:off -->
   <!-- +---+------------+---+ -->
-  <!-- | L |            | R | -->
-  <!-- | E |    MAIN    | I | -->
-  <!-- | F |    GRID    | G | -->
-  <!-- | T |            | H | -->
+  <!-- | L |    TOP     | R | -->
+  <!-- | E +------------+ I | -->
+  <!-- | F |    MAIN    | G | -->
+  <!-- | T |    GRID    | H | -->
   <!-- |   |            | T | -->
   <!-- +---+------------+---+ -->
   <!-- |       BOTTOM       | -->
@@ -181,9 +212,19 @@
             <wb-activity-panel [panel]="'left'" [activityId1]="toolbars().leftTop.activeActivityId" [activityId2]="toolbars().leftBottom.activeActivityId"/>
           </ng-template>
         }
-        <!-- Main Grid -->
         <ng-template sciSash>
-          <ng-container *ngTemplateOutlet="main_grid"/>
+          <sci-sashbox [direction]="'column'" (sashStart)="onSashStart()" (sashEnd)="onVerticalSashEnd($event)">
+            <!-- Top Activity Panel -->
+            @if (topActivityPanel(); as panel) {
+              <ng-template sciSash [size]="`${panel.height}px`" key="top" [animate]="panelAnimation()">
+                <wb-activity-panel [panel]="'top'" [activityId1]="toolbars().topLeft.activeActivityId" [activityId2]="toolbars().topRight.activeActivityId"/>
+              </ng-template>
+            }
+            <!-- Main Grid -->
+            <ng-template sciSash>
+              <ng-container *ngTemplateOutlet="main_grid"/>
+            </ng-template>
+          </sci-sashbox>
         </ng-template>
         <!-- Right Activity Panel -->
         @if (rightActivityPanel(); as panel) {

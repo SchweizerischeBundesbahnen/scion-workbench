@@ -19,8 +19,8 @@ export class ActivityPanelPO {
   constructor(public readonly locator: Locator) {
   }
 
-  public async getPanel(): Promise<'left' | 'right' | 'bottom'> {
-    return (await this.locator.getAttribute('data-panel')) as 'left' | 'right' | 'bottom';
+  public async getPanel(): Promise<'left' | 'right' | 'top' | 'bottom'> {
+    return (await this.locator.getAttribute('data-panel')) as 'left' | 'right' | 'top' | 'bottom';
   }
 
   /**
@@ -43,6 +43,13 @@ export class ActivityPanelPO {
         await mouse.move(panelBounds.left - 1, panelBounds.vcenter); // Move mouse slightly to the left of the panel to not target splitter separating this panel.
         await mouse.down();
         await mouse.move(panelBounds.left - 1 + distance, panelBounds.vcenter, {steps});
+        await mouse.up();
+        break;
+      }
+      case 'top': {
+        await mouse.move(panelBounds.hcenter, panelBounds.bottom + 1); // Move mouse slightly below the panel to not target splitter separating this panel.
+        await mouse.down();
+        await mouse.move(panelBounds.hcenter, panelBounds.bottom + 1 + distance, {steps});
         await mouse.up();
         break;
       }
@@ -73,6 +80,7 @@ export class ActivityPanelPO {
         await mouse.up();
         break;
       }
+      case 'top':
       case 'bottom': {
         await mouse.move(activityBounds.right, activityBounds.vcenter);
         await mouse.down();

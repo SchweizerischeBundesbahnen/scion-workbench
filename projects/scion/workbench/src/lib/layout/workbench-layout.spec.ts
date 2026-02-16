@@ -3431,16 +3431,26 @@ describe('WorkbenchLayout', () => {
               .navigatePart('part.activity-7', ['test-part'])
               .addPart('part.activity-8', {dockTo: 'right-bottom'}, {icon: 'folder', label: 'testee-8', ɵactivityId: 'activity.8'})
               .navigatePart('part.activity-8', ['test-part'])
-              // bottom-left
-              .addPart('part.activity-9', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'Activity 9', ɵactivityId: 'activity.9'})
+              // top-left
+              .addPart('part.activity-9', {dockTo: 'top-left'}, {icon: 'folder', label: 'Activity 9', ɵactivityId: 'activity.9'})
               .navigatePart('part.activity-9', ['test-part'])
-              .addPart('part.activity-10', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'Activity 10', ɵactivityId: 'activity.10'})
+              .addPart('part.activity-10', {dockTo: 'top-left'}, {icon: 'folder', label: 'Activity 10', ɵactivityId: 'activity.10'})
               .navigatePart('part.activity-10', ['test-part'])
-              // bottom-right
-              .addPart('part.activity-11', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'Activity 11', ɵactivityId: 'activity.11'})
+              // top-right
+              .addPart('part.activity-11', {dockTo: 'top-right'}, {icon: 'folder', label: 'Activity 11', ɵactivityId: 'activity.11'})
               .navigatePart('part.activity-11', ['test-part'])
-              .addPart('part.activity-12', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'Activity 12', ɵactivityId: 'activity.12'})
-              .navigatePart('part.activity-12', ['test-part']),
+              .addPart('part.activity-12', {dockTo: 'top-right'}, {icon: 'folder', label: 'Activity 12', ɵactivityId: 'activity.12'})
+              .navigatePart('part.activity-12', ['test-part'])
+              // bottom-left
+              .addPart('part.activity-13', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'Activity 13', ɵactivityId: 'activity.13'})
+              .navigatePart('part.activity-13', ['test-part'])
+              .addPart('part.activity-14', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'Activity 14', ɵactivityId: 'activity.14'})
+              .navigatePart('part.activity-14', ['test-part'])
+              // bottom-right
+              .addPart('part.activity-15', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'Activity 15', ɵactivityId: 'activity.15'})
+              .navigatePart('part.activity-15', ['test-part'])
+              .addPart('part.activity-16', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'Activity 16', ɵactivityId: 'activity.16'})
+              .navigatePart('part.activity-16', ['test-part']),
           }),
           provideRouter([
             {path: 'test-part', component: TestComponent},
@@ -3480,17 +3490,31 @@ describe('WorkbenchLayout', () => {
               ],
               activeActivityId: 'none',
             },
-            bottomLeft: {
+            topLeft: {
               activities: [
                 {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
                 {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'none',
             },
-            bottomRight: {
+            topRight: {
               activities: [
                 {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
                 {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.13', icon: 'folder', label: 'Activity 13'},
+                {id: 'activity.14', icon: 'folder', label: 'Activity 14'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.15', icon: 'folder', label: 'Activity 15'},
+                {id: 'activity.16', icon: 'folder', label: 'Activity 16'},
               ],
               activeActivityId: 'none',
             },
@@ -3531,17 +3555,31 @@ describe('WorkbenchLayout', () => {
               ],
               activeActivityId: 'none',
             },
-            bottomLeft: {
+            topLeft: {
               activities: [
                 {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
                 {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'none',
             },
-            bottomRight: {
+            topRight: {
               activities: [
                 {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
                 {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.13', icon: 'folder', label: 'Activity 13'},
+                {id: 'activity.14', icon: 'folder', label: 'Activity 14'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.15', icon: 'folder', label: 'Activity 15'},
+                {id: 'activity.16', icon: 'folder', label: 'Activity 16'},
               ],
               activeActivityId: 'none',
             },
@@ -3583,17 +3621,31 @@ describe('WorkbenchLayout', () => {
               ],
               activeActivityId: 'none',
             },
-            bottomLeft: {
+            topLeft: {
               activities: [
                 {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
                 {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'none',
             },
-            bottomRight: {
+            topRight: {
               activities: [
                 {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
                 {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.13', icon: 'folder', label: 'Activity 13'},
+                {id: 'activity.14', icon: 'folder', label: 'Activity 14'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.15', icon: 'folder', label: 'Activity 15'},
+                {id: 'activity.16', icon: 'folder', label: 'Activity 16'},
               ],
               activeActivityId: 'none',
             },
@@ -3635,17 +3687,31 @@ describe('WorkbenchLayout', () => {
               ],
               activeActivityId: 'none',
             },
-            bottomLeft: {
+            topLeft: {
               activities: [
                 {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
                 {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'none',
             },
-            bottomRight: {
+            topRight: {
               activities: [
                 {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
                 {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.13', icon: 'folder', label: 'Activity 13'},
+                {id: 'activity.14', icon: 'folder', label: 'Activity 14'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.15', icon: 'folder', label: 'Activity 15'},
+                {id: 'activity.16', icon: 'folder', label: 'Activity 16'},
               ],
               activeActivityId: 'none',
             },
@@ -3687,17 +3753,31 @@ describe('WorkbenchLayout', () => {
               ],
               activeActivityId: 'none',
             },
-            bottomLeft: {
+            topLeft: {
               activities: [
                 {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
                 {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'none',
             },
-            bottomRight: {
+            topRight: {
               activities: [
                 {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
                 {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.13', icon: 'folder', label: 'Activity 13'},
+                {id: 'activity.14', icon: 'folder', label: 'Activity 14'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.15', icon: 'folder', label: 'Activity 15'},
+                {id: 'activity.16', icon: 'folder', label: 'Activity 16'},
               ],
               activeActivityId: 'none',
             },
@@ -3739,17 +3819,31 @@ describe('WorkbenchLayout', () => {
               ],
               activeActivityId: 'none',
             },
-            bottomLeft: {
+            topLeft: {
               activities: [
                 {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
                 {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'none',
             },
-            bottomRight: {
+            topRight: {
               activities: [
                 {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
                 {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.13', icon: 'folder', label: 'Activity 13'},
+                {id: 'activity.14', icon: 'folder', label: 'Activity 14'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.15', icon: 'folder', label: 'Activity 15'},
+                {id: 'activity.16', icon: 'folder', label: 'Activity 16'},
               ],
               activeActivityId: 'none',
             },
@@ -3794,17 +3888,31 @@ describe('WorkbenchLayout', () => {
               ],
               activeActivityId: 'none',
             },
-            bottomLeft: {
+            topLeft: {
               activities: [
                 {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
                 {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'none',
             },
-            bottomRight: {
+            topRight: {
               activities: [
                 {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
                 {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.13', icon: 'folder', label: 'Activity 13'},
+                {id: 'activity.14', icon: 'folder', label: 'Activity 14'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.15', icon: 'folder', label: 'Activity 15'},
+                {id: 'activity.16', icon: 'folder', label: 'Activity 16'},
               ],
               activeActivityId: 'none',
             },
@@ -3849,17 +3957,31 @@ describe('WorkbenchLayout', () => {
               ],
               activeActivityId: 'activity.7',
             },
-            bottomLeft: {
+            topLeft: {
               activities: [
                 {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
                 {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'none',
             },
-            bottomRight: {
+            topRight: {
               activities: [
                 {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
                 {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.13', icon: 'folder', label: 'Activity 13'},
+                {id: 'activity.14', icon: 'folder', label: 'Activity 14'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.15', icon: 'folder', label: 'Activity 15'},
+                {id: 'activity.16', icon: 'folder', label: 'Activity 16'},
               ],
               activeActivityId: 'none',
             },
@@ -3904,17 +4026,31 @@ describe('WorkbenchLayout', () => {
               ],
               activeActivityId: 'activity.8',
             },
-            bottomLeft: {
+            topLeft: {
               activities: [
                 {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
                 {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'none',
             },
-            bottomRight: {
+            topRight: {
               activities: [
                 {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
                 {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.13', icon: 'folder', label: 'Activity 13'},
+                {id: 'activity.14', icon: 'folder', label: 'Activity 14'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.15', icon: 'folder', label: 'Activity 15'},
+                {id: 'activity.16', icon: 'folder', label: 'Activity 16'},
               ],
               activeActivityId: 'none',
             },
@@ -3959,17 +4095,31 @@ describe('WorkbenchLayout', () => {
               ],
               activeActivityId: 'activity.8',
             },
-            bottomLeft: {
+            topLeft: {
               activities: [
                 {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
                 {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'activity.9',
             },
-            bottomRight: {
+            topRight: {
               activities: [
                 {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
                 {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.13', icon: 'folder', label: 'Activity 13'},
+                {id: 'activity.14', icon: 'folder', label: 'Activity 14'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.15', icon: 'folder', label: 'Activity 15'},
+                {id: 'activity.16', icon: 'folder', label: 'Activity 16'},
               ],
               activeActivityId: 'none',
             },
@@ -3977,7 +4127,7 @@ describe('WorkbenchLayout', () => {
           panels: {
             left: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
             right: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
-            bottom: {height: ACTIVITY_PANEL_HEIGHT},
+            top: {height: ACTIVITY_PANEL_HEIGHT},
           },
         },
       });
@@ -4015,17 +4165,31 @@ describe('WorkbenchLayout', () => {
               ],
               activeActivityId: 'activity.8',
             },
-            bottomLeft: {
+            topLeft: {
               activities: [
                 {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
                 {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'activity.10',
             },
-            bottomRight: {
+            topRight: {
               activities: [
                 {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
                 {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.13', icon: 'folder', label: 'Activity 13'},
+                {id: 'activity.14', icon: 'folder', label: 'Activity 14'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.15', icon: 'folder', label: 'Activity 15'},
+                {id: 'activity.16', icon: 'folder', label: 'Activity 16'},
               ],
               activeActivityId: 'none',
             },
@@ -4033,7 +4197,7 @@ describe('WorkbenchLayout', () => {
           panels: {
             left: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
             right: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
-            bottom: {height: ACTIVITY_PANEL_HEIGHT},
+            top: {height: ACTIVITY_PANEL_HEIGHT},
           },
         },
       });
@@ -4071,25 +4235,39 @@ describe('WorkbenchLayout', () => {
               ],
               activeActivityId: 'activity.8',
             },
-            bottomLeft: {
+            topLeft: {
               activities: [
                 {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
                 {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'activity.10',
             },
-            bottomRight: {
+            topRight: {
               activities: [
                 {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
                 {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'activity.11',
             },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.13', icon: 'folder', label: 'Activity 13'},
+                {id: 'activity.14', icon: 'folder', label: 'Activity 14'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.15', icon: 'folder', label: 'Activity 15'},
+                {id: 'activity.16', icon: 'folder', label: 'Activity 16'},
+              ],
+              activeActivityId: 'none',
+            },
           },
           panels: {
             left: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
             right: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
-            bottom: {height: ACTIVITY_PANEL_HEIGHT, ratio: ACTIVITY_PANEL_RATIO},
+            top: {height: ACTIVITY_PANEL_HEIGHT, ratio: ACTIVITY_PANEL_RATIO},
           },
         },
       });
@@ -4127,24 +4305,322 @@ describe('WorkbenchLayout', () => {
               ],
               activeActivityId: 'activity.8',
             },
-            bottomLeft: {
+            topLeft: {
               activities: [
                 {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
                 {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'activity.10',
             },
-            bottomRight: {
+            topRight: {
               activities: [
                 {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
                 {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'activity.12',
             },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.13', icon: 'folder', label: 'Activity 13'},
+                {id: 'activity.14', icon: 'folder', label: 'Activity 14'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.15', icon: 'folder', label: 'Activity 15'},
+                {id: 'activity.16', icon: 'folder', label: 'Activity 16'},
+              ],
+              activeActivityId: 'none',
+            },
           },
           panels: {
             left: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
             right: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+            top: {height: ACTIVITY_PANEL_HEIGHT, ratio: ACTIVITY_PANEL_RATIO},
+          },
+        },
+      });
+
+      // Toggle activity.13.
+      await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.13'));
+      expect(fixture).toEqualWorkbenchLayout({
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
+              ],
+              activeActivityId: 'activity.2',
+            },
+            leftBottom: {
+              activities: [
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
+              ],
+              activeActivityId: 'activity.4',
+            },
+            rightTop: {
+              activities: [
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
+              ],
+              activeActivityId: 'activity.6',
+            },
+            rightBottom: {
+              activities: [
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
+                {id: 'activity.8', icon: 'folder', label: 'testee-8'},
+              ],
+              activeActivityId: 'activity.8',
+            },
+            topLeft: {
+              activities: [
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
+              ],
+              activeActivityId: 'activity.10',
+            },
+            topRight: {
+              activities: [
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'activity.12',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.13', icon: 'folder', label: 'Activity 13'},
+                {id: 'activity.14', icon: 'folder', label: 'Activity 14'},
+              ],
+              activeActivityId: 'activity.13',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.15', icon: 'folder', label: 'Activity 15'},
+                {id: 'activity.16', icon: 'folder', label: 'Activity 16'},
+              ],
+              activeActivityId: 'none',
+            },
+          },
+          panels: {
+            left: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+            right: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+            top: {height: ACTIVITY_PANEL_HEIGHT, ratio: ACTIVITY_PANEL_RATIO},
+            bottom: {height: ACTIVITY_PANEL_HEIGHT},
+          },
+        },
+      });
+
+      // Toggle activity.14.
+      await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.14'));
+      expect(fixture).toEqualWorkbenchLayout({
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
+              ],
+              activeActivityId: 'activity.2',
+            },
+            leftBottom: {
+              activities: [
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
+              ],
+              activeActivityId: 'activity.4',
+            },
+            rightTop: {
+              activities: [
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
+              ],
+              activeActivityId: 'activity.6',
+            },
+            rightBottom: {
+              activities: [
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
+                {id: 'activity.8', icon: 'folder', label: 'testee-8'},
+              ],
+              activeActivityId: 'activity.8',
+            },
+            topLeft: {
+              activities: [
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
+              ],
+              activeActivityId: 'activity.10',
+            },
+            topRight: {
+              activities: [
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'activity.12',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.13', icon: 'folder', label: 'Activity 13'},
+                {id: 'activity.14', icon: 'folder', label: 'Activity 14'},
+              ],
+              activeActivityId: 'activity.14',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.15', icon: 'folder', label: 'Activity 15'},
+                {id: 'activity.16', icon: 'folder', label: 'Activity 16'},
+              ],
+              activeActivityId: 'none',
+            },
+          },
+          panels: {
+            left: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+            right: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+            top: {height: ACTIVITY_PANEL_HEIGHT, ratio: ACTIVITY_PANEL_RATIO},
+            bottom: {height: ACTIVITY_PANEL_HEIGHT},
+          },
+        },
+      });
+
+      // Toggle activity.15.
+      await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.15'));
+      expect(fixture).toEqualWorkbenchLayout({
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
+              ],
+              activeActivityId: 'activity.2',
+            },
+            leftBottom: {
+              activities: [
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
+              ],
+              activeActivityId: 'activity.4',
+            },
+            rightTop: {
+              activities: [
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
+              ],
+              activeActivityId: 'activity.6',
+            },
+            rightBottom: {
+              activities: [
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
+                {id: 'activity.8', icon: 'folder', label: 'testee-8'},
+              ],
+              activeActivityId: 'activity.8',
+            },
+            topLeft: {
+              activities: [
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
+              ],
+              activeActivityId: 'activity.10',
+            },
+            topRight: {
+              activities: [
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'activity.12',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.13', icon: 'folder', label: 'Activity 13'},
+                {id: 'activity.14', icon: 'folder', label: 'Activity 14'},
+              ],
+              activeActivityId: 'activity.14',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.15', icon: 'folder', label: 'Activity 15'},
+                {id: 'activity.16', icon: 'folder', label: 'Activity 16'},
+              ],
+              activeActivityId: 'activity.15',
+            },
+          },
+          panels: {
+            left: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+            right: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+            top: {height: ACTIVITY_PANEL_HEIGHT, ratio: ACTIVITY_PANEL_RATIO},
+            bottom: {height: ACTIVITY_PANEL_HEIGHT, ratio: ACTIVITY_PANEL_RATIO},
+          },
+        },
+      });
+
+      // Toggle activity.16.
+      await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.16'));
+      expect(fixture).toEqualWorkbenchLayout({
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
+              ],
+              activeActivityId: 'activity.2',
+            },
+            leftBottom: {
+              activities: [
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
+              ],
+              activeActivityId: 'activity.4',
+            },
+            rightTop: {
+              activities: [
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
+              ],
+              activeActivityId: 'activity.6',
+            },
+            rightBottom: {
+              activities: [
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
+                {id: 'activity.8', icon: 'folder', label: 'testee-8'},
+              ],
+              activeActivityId: 'activity.8',
+            },
+            topLeft: {
+              activities: [
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
+              ],
+              activeActivityId: 'activity.10',
+            },
+            topRight: {
+              activities: [
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'activity.12',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.13', icon: 'folder', label: 'Activity 13'},
+                {id: 'activity.14', icon: 'folder', label: 'Activity 14'},
+              ],
+              activeActivityId: 'activity.14',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.15', icon: 'folder', label: 'Activity 15'},
+                {id: 'activity.16', icon: 'folder', label: 'Activity 16'},
+              ],
+              activeActivityId: 'activity.16',
+            },
+          },
+          panels: {
+            left: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+            right: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+            top: {height: ACTIVITY_PANEL_HEIGHT, ratio: ACTIVITY_PANEL_RATIO},
             bottom: {height: ACTIVITY_PANEL_HEIGHT, ratio: ACTIVITY_PANEL_RATIO},
           },
         },
@@ -4260,42 +4736,49 @@ describe('WorkbenchLayout', () => {
         .addPart('part.activity-2', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
         .addPart('part.activity-3-top', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity 3', ɵactivityId: 'activity.3'})
         .addPart('part.activity-3-bottom', {relativeTo: 'part.activity-3-top', align: 'bottom'})
+        .addPart('part.activity-4', {dockTo: 'top-left'}, {icon: 'folder', label: 'Activity 4', ɵactivityId: 'activity.4'})
         .addView('view.1', {partId: 'part.activity-3-bottom'});
 
       const leftTopStack = workbenchLayout.activityLayout.toolbars.leftTop;
       const leftBottomStack = workbenchLayout.activityLayout.toolbars.leftBottom;
       const rightTopStack = workbenchLayout.activityLayout.toolbars.rightTop;
       const rightBottomStack = workbenchLayout.activityLayout.toolbars.rightBottom;
+      const topLeftStack = workbenchLayout.activityLayout.toolbars.topLeft;
+      const topRightStack = workbenchLayout.activityLayout.toolbars.topRight;
       const bottomLeftStack = workbenchLayout.activityLayout.toolbars.bottomLeft;
       const bottomRightStack = workbenchLayout.activityLayout.toolbars.bottomRight;
 
       // Find without criteria.
-      expect(workbenchLayout.activityStacks()).toEqual(jasmine.arrayWithExactContents([leftTopStack, leftBottomStack, rightTopStack, rightBottomStack, bottomLeftStack, bottomRightStack]));
+      expect(workbenchLayout.activityStacks()).toEqual(jasmine.arrayWithExactContents([leftTopStack, leftBottomStack, rightTopStack, rightBottomStack, topLeftStack, topRightStack, bottomLeftStack, bottomRightStack]));
 
       // Find by activityId id.
-      expect(workbenchLayout.activityStacks({activityId: undefined})).toEqual(jasmine.arrayWithExactContents([leftTopStack, leftBottomStack, rightTopStack, rightBottomStack, bottomLeftStack, bottomRightStack]));
+      expect(workbenchLayout.activityStacks({activityId: undefined})).toEqual(jasmine.arrayWithExactContents([leftTopStack, leftBottomStack, rightTopStack, rightBottomStack, topLeftStack, topRightStack, bottomLeftStack, bottomRightStack]));
       expect(workbenchLayout.activityStacks({activityId: 'activity.1'})).toEqual([leftTopStack]);
       expect(workbenchLayout.activityStacks({activityId: 'activity.2'})).toEqual([leftBottomStack]);
       expect(workbenchLayout.activityStacks({activityId: 'activity.3'})).toEqual([rightTopStack]);
+      expect(workbenchLayout.activityStacks({activityId: 'activity.4'})).toEqual([topLeftStack]);
 
       // Find by docking area.
-      expect(workbenchLayout.activityStacks({dockTo: undefined})).toEqual(jasmine.arrayWithExactContents([leftTopStack, leftBottomStack, rightTopStack, rightBottomStack, bottomLeftStack, bottomRightStack]));
+      expect(workbenchLayout.activityStacks({dockTo: undefined})).toEqual(jasmine.arrayWithExactContents([leftTopStack, leftBottomStack, rightTopStack, rightBottomStack, topLeftStack, topRightStack, bottomLeftStack, bottomRightStack]));
       expect(workbenchLayout.activityStacks({dockTo: {dockTo: 'left-top'}})).toEqual([leftTopStack]);
       expect(workbenchLayout.activityStacks({dockTo: {dockTo: 'left-bottom'}})).toEqual([leftBottomStack]);
       expect(workbenchLayout.activityStacks({dockTo: {dockTo: 'right-top'}})).toEqual([rightTopStack]);
       expect(workbenchLayout.activityStacks({dockTo: {dockTo: 'right-bottom'}})).toEqual([rightBottomStack]);
+      expect(workbenchLayout.activityStacks({dockTo: {dockTo: 'top-left'}})).toEqual([topLeftStack]);
+      expect(workbenchLayout.activityStacks({dockTo: {dockTo: 'top-right'}})).toEqual([topRightStack]);
       expect(workbenchLayout.activityStacks({dockTo: {dockTo: 'bottom-left'}})).toEqual([bottomLeftStack]);
       expect(workbenchLayout.activityStacks({dockTo: {dockTo: 'bottom-right'}})).toEqual([bottomRightStack]);
 
       // Find by part id.
-      expect(workbenchLayout.activityStacks({partId: undefined})).toEqual(jasmine.arrayWithExactContents([leftTopStack, leftBottomStack, rightTopStack, rightBottomStack, bottomLeftStack, bottomRightStack]));
+      expect(workbenchLayout.activityStacks({partId: undefined})).toEqual(jasmine.arrayWithExactContents([leftTopStack, leftBottomStack, rightTopStack, rightBottomStack, topLeftStack, topRightStack, bottomLeftStack, bottomRightStack]));
       expect(workbenchLayout.activityStacks({partId: 'part.activity-1'})).toEqual([leftTopStack]);
       expect(workbenchLayout.activityStacks({partId: 'part.activity-2'})).toEqual([leftBottomStack]);
       expect(workbenchLayout.activityStacks({partId: 'part.activity-3-top'})).toEqual([rightTopStack]);
       expect(workbenchLayout.activityStacks({partId: 'part.activity-3-bottom'})).toEqual([rightTopStack]);
+      expect(workbenchLayout.activityStacks({partId: 'part.activity-4'})).toEqual([topLeftStack]);
 
       // Find by view id.
-      expect(workbenchLayout.activityStacks({viewId: undefined})).toEqual(jasmine.arrayWithExactContents([leftTopStack, leftBottomStack, rightTopStack, rightBottomStack, bottomLeftStack, bottomRightStack]));
+      expect(workbenchLayout.activityStacks({viewId: undefined})).toEqual(jasmine.arrayWithExactContents([leftTopStack, leftBottomStack, rightTopStack, rightBottomStack, topLeftStack, topRightStack, bottomLeftStack, bottomRightStack]));
       expect(workbenchLayout.activityStacks({viewId: 'view.1'})).toEqual([rightTopStack]);
 
       // Expect to throw if finding multiple activity stacks.
@@ -4313,12 +4796,15 @@ describe('WorkbenchLayout', () => {
         .addPart('part.activity-2', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
         .addPart('part.activity-3-top', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity 3', ɵactivityId: 'activity.3'})
         .addPart('part.activity-3-bottom', {relativeTo: 'part.activity-3-top', align: 'bottom'})
+        .addPart('part.activity-4', {dockTo: 'top-left'}, {icon: 'folder', label: 'Activity 4', ɵactivityId: 'activity.4'})
         .addView('view.1', {partId: 'part.activity-3-bottom'});
 
       const leftTopStack = workbenchLayout.activityLayout.toolbars.leftTop;
       const leftBottomStack = workbenchLayout.activityLayout.toolbars.leftBottom;
       const rightTopStack = workbenchLayout.activityLayout.toolbars.rightTop;
       const rightBottomStack = workbenchLayout.activityLayout.toolbars.rightBottom;
+      const topLeftStack = workbenchLayout.activityLayout.toolbars.topLeft;
+      const topRightStack = workbenchLayout.activityLayout.toolbars.topRight;
       const bottomLeftStack = workbenchLayout.activityLayout.toolbars.bottomLeft;
       const bottomRightStack = workbenchLayout.activityLayout.toolbars.bottomRight;
 
@@ -4326,6 +4812,7 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.activityStack({activityId: 'activity.1'})).toEqual(leftTopStack);
       expect(workbenchLayout.activityStack({activityId: 'activity.2'})).toEqual(leftBottomStack);
       expect(workbenchLayout.activityStack({activityId: 'activity.3'})).toEqual(rightTopStack);
+      expect(workbenchLayout.activityStack({activityId: 'activity.4'})).toEqual(topLeftStack);
 
       // Find by docking area.
       expect(workbenchLayout.activityStack({dockTo: {dockTo: 'left-top'}})).toEqual(leftTopStack);
@@ -4333,6 +4820,8 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.activityStack({dockTo: {dockTo: 'right-top'}})).toEqual(rightTopStack);
       expect(workbenchLayout.activityStack({dockTo: {dockTo: 'right-bottom'}})).toEqual(rightBottomStack);
       expect(workbenchLayout.activityStack({dockTo: {dockTo: 'bottom-left'}})).toEqual(bottomLeftStack);
+      expect(workbenchLayout.activityStack({dockTo: {dockTo: 'top-left'}})).toEqual(topLeftStack);
+      expect(workbenchLayout.activityStack({dockTo: {dockTo: 'top-right'}})).toEqual(topRightStack);
       expect(workbenchLayout.activityStack({dockTo: {dockTo: 'bottom-right'}})).toEqual(bottomRightStack);
 
       // Find by part id.
@@ -4340,6 +4829,7 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.activityStack({partId: 'part.activity-2'})).toEqual(leftBottomStack);
       expect(workbenchLayout.activityStack({partId: 'part.activity-3-top'})).toEqual(rightTopStack);
       expect(workbenchLayout.activityStack({partId: 'part.activity-3-bottom'})).toEqual(rightTopStack);
+      expect(workbenchLayout.activityStack({partId: 'part.activity-4'})).toEqual(topLeftStack);
 
       // Find by view id.
       expect(workbenchLayout.activityStack({viewId: 'view.1'})).toEqual(rightTopStack);
@@ -4362,6 +4852,8 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomRight.activeActivityId).toBeUndefined();
 
@@ -4371,6 +4863,8 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomRight.activeActivityId).toBeUndefined();
 
@@ -4380,6 +4874,8 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomRight.activeActivityId).toBeUndefined();
 
@@ -4389,6 +4885,8 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toEqual('activity.3');
       expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomRight.activeActivityId).toBeUndefined();
 
@@ -4398,6 +4896,8 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomRight.activeActivityId).toBeUndefined();
 
@@ -4407,6 +4907,8 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomRight.activeActivityId).toBeUndefined();
 
@@ -4416,6 +4918,8 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomRight.activeActivityId).toBeUndefined();
     });
@@ -4438,7 +4942,13 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.activityLayout.toolbars.rightTop.minimizedActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.minimizedActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomRight.minimizedActivityId).toBeUndefined();
 
       // Toggle activities.
@@ -4455,7 +4965,13 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.activityLayout.toolbars.rightTop.minimizedActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toEqual('activity.5');
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.minimizedActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomRight.minimizedActivityId).toBeUndefined();
 
       // Toggle maximize => minimize activities.
@@ -4468,6 +4984,10 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.activityLayout.toolbars.rightTop.minimizedActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.minimizedActivityId).toEqual('activity.5');
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.minimizedActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomRight.minimizedActivityId).toBeUndefined();
 
@@ -4481,7 +5001,13 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.activityLayout.toolbars.rightTop.minimizedActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toEqual('activity.5');
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.minimizedActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomRight.minimizedActivityId).toBeUndefined();
 
       // Toggle maximize => minimize activities.
@@ -4494,7 +5020,13 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.activityLayout.toolbars.rightTop.minimizedActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.minimizedActivityId).toEqual('activity.5');
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.minimizedActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomRight.minimizedActivityId).toBeUndefined();
 
       // Open activity 2 and activity 4.
@@ -4509,7 +5041,13 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.activityLayout.toolbars.rightTop.minimizedActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.minimizedActivityId).toEqual('activity.5');
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.minimizedActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomRight.minimizedActivityId).toBeUndefined();
 
       // Toggle maximize => minimize activities.
@@ -4522,7 +5060,13 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.activityLayout.toolbars.rightTop.minimizedActivityId).toEqual('activity.4');
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.minimizedActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomRight.minimizedActivityId).toBeUndefined();
 
       // Toggle maximize => restore activities.
@@ -4535,7 +5079,13 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.activityLayout.toolbars.rightTop.minimizedActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.rightBottom.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topLeft.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.topRight.minimizedActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.activeActivityId).toBeUndefined();
       expect(workbenchLayout.activityLayout.toolbars.bottomRight.minimizedActivityId).toBeUndefined();
     });
 
@@ -4732,19 +5282,29 @@ describe('WorkbenchLayout', () => {
       workbenchLayout = workbenchLayout.setActivityPanelSize('left', 500);
       expect(workbenchLayout.activityLayout.panels.left.width).toEqual(500);
       expect(workbenchLayout.activityLayout.panels.right.width).toEqual(ACTIVITY_PANEL_WIDTH);
+      expect(workbenchLayout.activityLayout.panels.top.height).toEqual(ACTIVITY_PANEL_HEIGHT);
       expect(workbenchLayout.activityLayout.panels.bottom.height).toEqual(ACTIVITY_PANEL_HEIGHT);
 
       // Change size of right panel.
       workbenchLayout = workbenchLayout.setActivityPanelSize('right', 600);
       expect(workbenchLayout.activityLayout.panels.left.width).toEqual(500);
       expect(workbenchLayout.activityLayout.panels.right.width).toEqual(600);
+      expect(workbenchLayout.activityLayout.panels.top.height).toEqual(ACTIVITY_PANEL_HEIGHT);
+      expect(workbenchLayout.activityLayout.panels.bottom.height).toEqual(ACTIVITY_PANEL_HEIGHT);
+
+      // Change size of top panel.
+      workbenchLayout = workbenchLayout.setActivityPanelSize('top', 700);
+      expect(workbenchLayout.activityLayout.panels.left.width).toEqual(500);
+      expect(workbenchLayout.activityLayout.panels.right.width).toEqual(600);
+      expect(workbenchLayout.activityLayout.panels.top.height).toEqual(700);
       expect(workbenchLayout.activityLayout.panels.bottom.height).toEqual(ACTIVITY_PANEL_HEIGHT);
 
       // Change size of bottom panel.
-      workbenchLayout = workbenchLayout.setActivityPanelSize('bottom', 700);
+      workbenchLayout = workbenchLayout.setActivityPanelSize('bottom', 800);
       expect(workbenchLayout.activityLayout.panels.left.width).toEqual(500);
       expect(workbenchLayout.activityLayout.panels.right.width).toEqual(600);
-      expect(workbenchLayout.activityLayout.panels.bottom.height).toEqual(700);
+      expect(workbenchLayout.activityLayout.panels.top.height).toEqual(700);
+      expect(workbenchLayout.activityLayout.panels.bottom.height).toEqual(800);
     });
 
     it('should change activity panel split ratio', () => {
@@ -4753,25 +5313,36 @@ describe('WorkbenchLayout', () => {
       // Expect initial split ratio size.
       expect(workbenchLayout.activityLayout.panels.left.ratio).toEqual(.5);
       expect(workbenchLayout.activityLayout.panels.right.ratio).toEqual(.5);
+      expect(workbenchLayout.activityLayout.panels.top.ratio).toEqual(.5);
       expect(workbenchLayout.activityLayout.panels.bottom.ratio).toEqual(.5);
 
       // Change split ratio of left panel.
       workbenchLayout = workbenchLayout.setActivityPanelSplitRatio('left', .2);
       expect(workbenchLayout.activityLayout.panels.left.ratio).toEqual(.2);
       expect(workbenchLayout.activityLayout.panels.right.ratio).toEqual(.5);
+      expect(workbenchLayout.activityLayout.panels.top.ratio).toEqual(.5);
       expect(workbenchLayout.activityLayout.panels.bottom.ratio).toEqual(.5);
 
       // Change split ratio of right panel.
       workbenchLayout = workbenchLayout.setActivityPanelSplitRatio('right', .4);
       expect(workbenchLayout.activityLayout.panels.left.ratio).toEqual(.2);
       expect(workbenchLayout.activityLayout.panels.right.ratio).toEqual(.4);
+      expect(workbenchLayout.activityLayout.panels.top.ratio).toEqual(.5);
+      expect(workbenchLayout.activityLayout.panels.bottom.ratio).toEqual(.5);
+
+      // Change split ratio of top panel.
+      workbenchLayout = workbenchLayout.setActivityPanelSplitRatio('top', .6);
+      expect(workbenchLayout.activityLayout.panels.left.ratio).toEqual(.2);
+      expect(workbenchLayout.activityLayout.panels.right.ratio).toEqual(.4);
+      expect(workbenchLayout.activityLayout.panels.top.ratio).toEqual(.6);
       expect(workbenchLayout.activityLayout.panels.bottom.ratio).toEqual(.5);
 
       // Change split ratio of bottom panel.
-      workbenchLayout = workbenchLayout.setActivityPanelSplitRatio('bottom', .6);
+      workbenchLayout = workbenchLayout.setActivityPanelSplitRatio('bottom', .8);
       expect(workbenchLayout.activityLayout.panels.left.ratio).toEqual(.2);
       expect(workbenchLayout.activityLayout.panels.right.ratio).toEqual(.4);
-      expect(workbenchLayout.activityLayout.panels.bottom.ratio).toEqual(.6);
+      expect(workbenchLayout.activityLayout.panels.top.ratio).toEqual(.6);
+      expect(workbenchLayout.activityLayout.panels.bottom.ratio).toEqual(.8);
     });
 
     it('should remove activity (plus contained parts, views, outlets, states, ...) when removing reference part', () => {
@@ -4948,12 +5519,15 @@ describe('WorkbenchLayout', () => {
           leftBottom: {activities: []},
           rightTop: {activities: []},
           rightBottom: {activities: []},
+          topLeft: {activities: []},
+          topRight: {activities: []},
           bottomLeft: {activities: []},
           bottomRight: {activities: []},
         },
         panels: {
           left: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
           right: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+          top: {height: ACTIVITY_PANEL_HEIGHT, ratio: ACTIVITY_PANEL_RATIO},
           bottom: {height: ACTIVITY_PANEL_HEIGHT, ratio: ACTIVITY_PANEL_RATIO},
         },
       };
@@ -4984,12 +5558,15 @@ describe('WorkbenchLayout', () => {
           leftBottom: {activities: []},
           rightTop: {activities: []},
           rightBottom: {activities: []},
+          topLeft: {activities: []},
+          topRight: {activities: []},
           bottomLeft: {activities: []},
           bottomRight: {activities: []},
         },
         panels: {
           left: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
           right: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+          top: {height: ACTIVITY_PANEL_HEIGHT, ratio: ACTIVITY_PANEL_RATIO},
           bottom: {height: ACTIVITY_PANEL_HEIGHT, ratio: ACTIVITY_PANEL_RATIO},
         },
       };

@@ -85,7 +85,7 @@ export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories
  */
 function assertWorkbenchLayoutModel(expected: ExpectedWorkbenchLayout, actual: ÉµWorkbenchLayout, util: MatchersUtil): void {
   // Prepare the actual layout for comparison with the expected layout.
-  const {leftTop, leftBottom, rightTop, rightBottom, bottomLeft, bottomRight} = actual.activityLayout.toolbars;
+  const {leftTop, leftBottom, rightTop, rightBottom, topLeft, topRight, bottomLeft, bottomRight} = actual.activityLayout.toolbars;
   const actualLayout: ExpectedWorkbenchLayout = {
     perspectiveId: actual.perspectiveId,
     activityLayout: {
@@ -110,6 +110,16 @@ function assertWorkbenchLayoutModel(expected: ExpectedWorkbenchLayout, actual: É
           activeActivityId: rightBottom.activeActivityId ?? 'none',
           minimizedActivityId: rightBottom.minimizedActivityId ?? 'none',
         },
+        topLeft: {
+          ...topLeft,
+          activeActivityId: topLeft.activeActivityId ?? 'none',
+          minimizedActivityId: topLeft.minimizedActivityId ?? 'none',
+        },
+        topRight: {
+          ...topRight,
+          activeActivityId: topRight.activeActivityId ?? 'none',
+          minimizedActivityId: topRight.minimizedActivityId ?? 'none',
+        },
         bottomLeft: {
           ...bottomLeft,
           activeActivityId: bottomLeft.activeActivityId ?? 'none',
@@ -124,6 +134,7 @@ function assertWorkbenchLayoutModel(expected: ExpectedWorkbenchLayout, actual: É
       panels: {
         left: leftTop.activeActivityId || leftBottom.activeActivityId ? actual.activityLayout.panels.left : 'closed',
         right: rightTop.activeActivityId || rightBottom.activeActivityId ? actual.activityLayout.panels.right : 'closed',
+        top: topLeft.activeActivityId || topRight.activeActivityId ? actual.activityLayout.panels.top : 'closed',
         bottom: bottomLeft.activeActivityId || bottomRight.activeActivityId ? actual.activityLayout.panels.bottom : 'closed',
       },
     },
@@ -527,6 +538,8 @@ export type MActivityLayout = Omit<_MActivityLayout, 'toolbars' | 'panels'> & {
     leftBottom?: MActivityStack;
     rightTop?: MActivityStack;
     rightBottom?: MActivityStack;
+    topLeft?: MActivityStack;
+    topRight?: MActivityStack;
     bottomLeft?: MActivityStack;
     bottomRight?: MActivityStack;
   };
@@ -537,6 +550,10 @@ export type MActivityLayout = Omit<_MActivityLayout, 'toolbars' | 'panels'> & {
     } | 'closed';
     right?: {
       width: number;
+      ratio?: number;
+    } | 'closed';
+    top?: {
+      height: number;
       ratio?: number;
     } | 'closed';
     bottom?: {

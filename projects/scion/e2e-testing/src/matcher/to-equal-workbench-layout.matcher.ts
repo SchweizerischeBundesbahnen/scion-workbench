@@ -87,6 +87,12 @@ async function assertActivityToolbars(expectedActivityLayout: Partial<MActivityL
   if (expectedActivityLayout.toolbars?.rightBottom) {
     await assertActivityStack(expectedActivityLayout.toolbars.rightBottom, locator.locator('wb-layout > wb-activity-bar[data-align="right"] > wb-activity-stack[data-docking-area="right-bottom"]'));
   }
+  if (expectedActivityLayout.toolbars?.topLeft) {
+    await assertActivityStack(expectedActivityLayout.toolbars.topLeft, locator.locator('wb-layout > wb-activity-bar[data-align="left"] > wb-activity-stack[data-docking-area="top-left"]'));
+  }
+  if (expectedActivityLayout.toolbars?.topRight) {
+    await assertActivityStack(expectedActivityLayout.toolbars.topRight, locator.locator('wb-layout > wb-activity-bar[data-align="right"] > wb-activity-stack[data-docking-area="top-right"]'));
+  }
   if (expectedActivityLayout.toolbars?.bottomLeft) {
     await assertActivityStack(expectedActivityLayout.toolbars.bottomLeft, locator.locator('wb-layout > wb-activity-bar[data-align="left"] > wb-activity-stack[data-docking-area="bottom-left"]'));
   }
@@ -119,6 +125,9 @@ async function assertActivityPanels(expectedActivityLayout: Partial<MActivityLay
   }
   if (expectedActivityLayout.panels?.right) {
     await assertRightActivityPanel(expectedActivityLayout.panels.right, locator.locator('wb-layout wb-activity-panel[data-panel="right"]'));
+  }
+  if (expectedActivityLayout.panels?.top) {
+    await assertTopActivityPanel(expectedActivityLayout.panels.top, locator.locator('wb-layout wb-activity-panel[data-panel="top"]'));
   }
   if (expectedActivityLayout.panels?.bottom) {
     await assertBottomActivityPanel(expectedActivityLayout.panels.bottom, locator.locator('wb-layout wb-activity-panel[data-panel="bottom"]'));
@@ -233,6 +242,62 @@ async function assertRightActivityPanel(expectedPanel: Required<MActivityLayout[
         height: (panelBoundingBox.height - SASHBOX_SPLITTER_SIZE) * (1 - expectedPanel.ratio),
       },
       context: () => 'Height of "right-bottom" activity does not match expected.',
+    });
+  }
+}
+
+async function assertTopActivityPanel(expectedPanel: Required<MActivityLayout['panels']>['top'], panelLocator: Locator): Promise<void> {
+  if (expectedPanel === 'closed') {
+    await throwIfPresent(panelLocator, () => Error(`[DOMAssertError] Expected top activity panel not to be present, but it is. [locator=${panelLocator}]`));
+    return;
+  }
+
+  await throwIfAbsent(panelLocator, () => Error(`[DOMAssertError] Expected top activity panel '${panelLocator}' to be in the DOM, but is not.`));
+  if (expectedPanel === 'opened') {
+    return;
+  }
+
+  // Assert top activity panel height.
+  const panelBoundingBox = (await panelLocator.boundingBox())!;
+  await throwIfBoundingBoxNotCloseTo({
+    actual: panelBoundingBox,
+    expected: {
+      x: panelBoundingBox.x,
+      y: panelBoundingBox.y,
+      width: panelBoundingBox.width,
+      height: expectedPanel.height,
+    },
+    context: () => 'Top activity panel height does not match expected.',
+  });
+
+  // Assert splitted panel.
+  if (expectedPanel.ratio) {
+    // Assert left activity bounds.
+    const leftGridLocator = panelLocator.locator('wb-grid').nth(0);
+    const leftGridBoundingBox = (await leftGridLocator.boundingBox())!;
+    await throwIfBoundingBoxNotCloseTo({
+      actual: leftGridBoundingBox,
+      expected: {
+        x: leftGridBoundingBox.x,
+        y: leftGridBoundingBox.y,
+        width: (panelBoundingBox.width - SASHBOX_SPLITTER_SIZE) * expectedPanel.ratio,
+        height: expectedPanel.height,
+      },
+      context: () => 'Width of "top-left" activity does not match expected.',
+    });
+
+    // Assert right activity bounds.
+    const rightGridLocator = panelLocator.locator('wb-grid').nth(1);
+    const rightGridBoundingBox = (await rightGridLocator.boundingBox())!;
+    await throwIfBoundingBoxNotCloseTo({
+      actual: rightGridBoundingBox,
+      expected: {
+        x: rightGridBoundingBox.x,
+        y: rightGridBoundingBox.y,
+        width: (panelBoundingBox.width - SASHBOX_SPLITTER_SIZE) * (1 - expectedPanel.ratio),
+        height: expectedPanel.height,
+      },
+      context: () => 'Width of "top-right" activity does not match expected.',
     });
   }
 }
@@ -604,6 +669,8 @@ export interface MActivityLayout {
     leftBottom?: MActivityStack;
     rightTop?: MActivityStack;
     rightBottom?: MActivityStack;
+    topLeft?: MActivityStack;
+    topRight?: MActivityStack;
     bottomLeft?: MActivityStack;
     bottomRight?: MActivityStack;
   };
@@ -614,6 +681,10 @@ export interface MActivityLayout {
     } | 'closed' | 'opened';
     right?: {
       width: number;
+      ratio?: number;
+    } | 'closed' | 'opened';
+    top?: {
+      height: number;
       ratio?: number;
     } | 'closed' | 'opened';
     bottom?: {

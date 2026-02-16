@@ -168,7 +168,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
  */
 export interface DockedPartDescriptor {
   id: string;
-  dockTo: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'bottom-left' | 'bottom-right';
+  dockTo: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
   icon: string;
   label: Translatable;
   tooltip?: Translatable;
