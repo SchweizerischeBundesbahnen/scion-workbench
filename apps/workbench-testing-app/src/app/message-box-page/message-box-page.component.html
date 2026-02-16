@@ -12,4 +12,19 @@
   @if (activatedMicrofrontend) {
     <app-activated-microfrontend/>
   }
+
+  <sci-accordion class="e2e-content-size" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_size">
+      <header>Content Size</header>
+    </ng-template>
+    <ng-template #panel_size>
+      <sci-form-field label="Height">
+        <input [formControl]="form.controls.componentSize.controls.height" class="e2e-height">
+      </sci-form-field>
+
+      <sci-form-field label="Width">
+        <input [formControl]="form.controls.componentSize.controls.width" class="e2e-width">
+      </sci-form-field>
+    </ng-template>
+  </sci-accordion>
 </section>

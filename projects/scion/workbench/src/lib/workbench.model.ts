@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2025 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,6 +15,7 @@ import {Injector, TemplateRef} from '@angular/core';
 import {WorkbenchPart} from './part/workbench-part.model';
 import {WorkbenchDialog} from './dialog/workbench-dialog.model';
 import {WorkbenchPopup} from './popup/workbench-popup.model';
+import {WorkbenchNotification} from './notification/workbench-notification.model';
 
 /**
  * The signature of a function to confirm closing a view., e.g., if dirty.
@@ -194,4 +195,4 @@ export type WorkbenchViewMenuItemFn = (view: WorkbenchView) => WorkbenchMenuItem
 /**
  * Union of workbench elements.
  */
-export type WorkbenchElement = WorkbenchPart | WorkbenchView | WorkbenchDialog | WorkbenchPopup;
+export type WorkbenchElement = WorkbenchPart | WorkbenchView | WorkbenchDialog | WorkbenchPopup | WorkbenchNotification;

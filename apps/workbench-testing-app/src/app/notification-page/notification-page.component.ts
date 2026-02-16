@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,13 +9,15 @@
  */
 
 import {Component, inject, input} from '@angular/core';
-import {WorkbenchNotification} from '@scion/workbench';
-import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
+import {ActivatedMicrofrontend, WorkbenchNotification} from '@scion/workbench';
+import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {filter} from 'rxjs/operators';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {MultiValueInputComponent} from 'workbench-testing-app-common';
 import {UUID} from '@scion/toolkit/uuid';
+import ActivatedMicrofrontendComponent from '../activated-microfrontend/activated-microfrontend.component';
+import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 
 @Component({
   selector: 'app-notification-page',
@@ -25,13 +27,20 @@ import {UUID} from '@scion/toolkit/uuid';
     ReactiveFormsModule,
     SciFormFieldComponent,
     MultiValueInputComponent,
+    ActivatedMicrofrontendComponent,
+    SciAccordionComponent,
+    SciAccordionItemDirective,
   ],
+  host: {
+    '[style.height]': 'form.controls.componentSize.controls.height.value',
+  },
 })
-export class NotificationPageComponent {
+export default class NotificationPageComponent {
 
   public readonly input = input<string>();
 
   private readonly _formBuilder = inject(NonNullableFormBuilder);
+  protected readonly activatedMicrofrontend = inject(ActivatedMicrofrontend, {optional: true});
 
   protected readonly notification = inject(WorkbenchNotification);
   protected readonly durationList = `duration-list-${UUID.randomUUID()}`;
@@ -41,6 +50,14 @@ export class NotificationPageComponent {
     severity: this._formBuilder.control<'info' | 'warn' | 'error' | undefined>(undefined),
     duration: this._formBuilder.control<'short' | 'medium' | 'long' | 'infinite' | string | undefined>(undefined),
     cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
+    notificationSize: new FormGroup({
+      height: this._formBuilder.control(''),
+      minHeight: this._formBuilder.control(''),
+      maxHeight: this._formBuilder.control(''),
+    }),
+    componentSize: new FormGroup({
+      height: this._formBuilder.control(''),
+    }),
   });
 
   constructor() {
@@ -72,6 +89,20 @@ export class NotificationPageComponent {
       .pipe(takeUntilDestroyed())
       .subscribe(cssClass => {
         this.notification.cssClass = cssClass || [];
+      });
+
+    this.form.controls.notificationSize.controls.height.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(height => this.notification.size.height = height || undefined);
+
+    this.form.controls.notificationSize.controls.minHeight.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(minHeight => this.notification.size.minHeight = minHeight || undefined);
+
+    this.form.controls.notificationSize.controls.maxHeight.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(maxHeight => {
+        this.notification.size.maxHeight = maxHeight || undefined;
       });
   }
 

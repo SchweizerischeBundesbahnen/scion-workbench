@@ -87,3 +87,7 @@ export function canMatchWorkbenchMessageBoxCapability(qualifier: Qualifier): Can
 export function canMatchWorkbenchPopupCapability(qualifier: Qualifier): CanMatchWorkbenchCapabilityDescriptor {
   return {fn: 'canMatchWorkbenchPopupCapability', qualifier};
 }
+
+export function canMatchWorkbenchNotificationCapability(qualifier: Qualifier): CanMatchWorkbenchCapabilityDescriptor {
+  return {fn: 'canMatchWorkbenchNotificationCapability', qualifier};
+}

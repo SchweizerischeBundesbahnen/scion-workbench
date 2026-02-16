@@ -1,6 +1,5 @@
 :host {
   display: grid;
-  overflow: hidden; // wrap text at message box bounds
   outline: none;
   padding-inline: var(--sci-workbench-messagebox-padding);
   padding-bottom: var(--sci-workbench-messagebox-padding);
@@ -14,7 +13,7 @@
   }
 
   > div.message.text {
-    overflow-wrap: break-word;
+    word-break: break-word; // wrap unbreakable text at message box bounds
     white-space: pre-line;
     text-align: var(--sci-workbench-messagebox-text-align);
   }

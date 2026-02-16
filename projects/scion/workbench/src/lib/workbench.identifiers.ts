@@ -108,6 +108,13 @@ export function isPopupId(popupId: string | undefined | null): popupId is PopupI
 }
 
 /**
+ * Tests if the given id matches the format of a notification identifier.
+ */
+export function isNotificationId(notificationId: string | undefined | null): notificationId is NotificationId {
+  return notificationId?.startsWith(NOTIFICATION_ID_PREFIX) ?? false;
+}
+
+/**
  * Tests if the given id matches the format of an activity identifier.
  */
 export function isActivityId(activityId: string | undefined | null): activityId is ActivityId {

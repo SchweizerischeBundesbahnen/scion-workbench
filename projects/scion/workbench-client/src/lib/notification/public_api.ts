@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2025 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,9 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {type WorkbenchNotificationCapability} from './workbench-notification-capability';
+export {type WorkbenchNotificationCapability, type WorkbenchNotificationSize} from './workbench-notification-capability';
 export {WorkbenchNotificationService} from './workbench-notification.service';
 export {type WorkbenchNotificationOptions} from './workbench-notification.options';
 export {ɵWorkbenchNotificationService} from './ɵworkbench-notification.service';
 export {type WorkbenchNotificationConfig} from './workbench-notification.config';
 export {type ɵWorkbenchNotificationCommand, eNOTIFICATION_MESSAGE_PARAM} from './workbench-notification-command';
+export {type ɵNotificationContext, ɵNOTIFICATION_CONTEXT} from './ɵworkbench-notification-context';
+export {WorkbenchNotification} from './workbench-notification.model';

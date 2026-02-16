@@ -36,12 +36,12 @@ import {NgComponentOutlet} from '@angular/common';
   ],
   host: {
     '[attr.data-popupid]': 'popup.id',
-    '[style.width]': 'popup.size?.width()',
-    '[style.min-width]': 'popup.size?.minWidth()',
-    '[style.max-width]': 'popup.size?.maxWidth()',
-    '[style.height]': 'popup.size?.height()',
-    '[style.min-height]': 'popup.size?.minHeight()',
-    '[style.max-height]': 'popup.size?.maxHeight()',
+    '[style.width]': 'popup.size.width()',
+    '[style.min-width]': 'popup.size.minWidth()',
+    '[style.max-width]': 'popup.size.maxWidth()',
+    '[style.height]': 'popup.size.height()',
+    '[style.min-height]': 'popup.size.minHeight()',
+    '[style.max-height]': 'popup.size.maxHeight()',
     '[class]': 'popup.cssClass()',
   },
 })

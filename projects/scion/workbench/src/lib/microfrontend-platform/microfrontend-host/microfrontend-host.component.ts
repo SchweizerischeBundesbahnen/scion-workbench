@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject, Injector, Signal, untracked} from '@angular/core';
+import {Component, computed, inject, Injector, input, Signal, untracked} from '@angular/core';
 import {Logger, LoggerNames} from '../../logging';
 import {rootEffect} from '../../common/rxjs-interop.util';
 import {RouterOutlet} from '@angular/router';
@@ -42,6 +42,13 @@ import {MicrofrontendHostOutlet} from './microfrontend-host-routes';
   ],
 })
 export class MicrofrontendHostComponent {
+
+  /**
+   * Parameters passed to the microfrontend, required to reduce inputs for notification capabilities.
+   *
+   * @see MicrofrontendNotificationIntentHandler
+   */
+  public readonly params = input<Map<string, unknown>>();
 
   private readonly _logger = inject(Logger);
 

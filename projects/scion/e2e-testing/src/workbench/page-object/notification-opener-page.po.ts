@@ -38,17 +38,14 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO, WorkbenchD
     this._appPO = new AppPO(this.locator.page());
   }
 
-  public async show(message: Translatable, options?: NotificationOpenerPageOptions & WorkbenchNotificationOptions): Promise<void>;
-  public async show(component: 'component:notification-page' | 'component:legacy-notification-page', options?: NotificationOpenerPageOptions & WorkbenchNotificationOptions): Promise<void>;
-  public async show(content: Translatable | 'component:notification-page', options?: NotificationOpenerPageOptions & WorkbenchNotificationOptions): Promise<void> {
+  public async show(message: Translatable | null, options?: NotificationOpenerPageOptions): Promise<void>;
+  public async show(component: 'component:notification-page' | 'component:focus-test-page' | 'component:legacy-notification-page', options?: NotificationOpenerPageOptions): Promise<void>;
+  public async show(content: Translatable | null | 'component:notification-page', options?: NotificationOpenerPageOptions): Promise<void> {
     if (options?.injector) {
       throw Error('[PageObjectError] PageObject does not support the option `injector`.');
     }
     if (options?.providers) {
       throw Error('[PageObjectError] PageObject does not support the option `providers`.');
-    }
-    if (options?.groupInputReduceFn) {
-      throw Error('[PageObjectError] PageObject does not support the option `groupInputReduceFn`.');
     }
 
     // Select API.
@@ -61,7 +58,7 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO, WorkbenchD
       await this.locator.locator('select.e2e-component').selectOption(componentMatch.groups!['component']!);
     }
     else {
-      await this.locator.locator('input.e2e-text').fill(content);
+      await this.locator.locator('input.e2e-text').fill(content ?? '<null>');
     }
 
     // Enter inputs
@@ -86,8 +83,11 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO, WorkbenchD
     // Enter group.
     await this.locator.locator('input.e2e-group').fill(options?.group ?? '');
 
-    // Check if to reduce inputs of grouped notifications.
-    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-use-group-input-reducer')).toggle(options?.useGroupInputReducer ?? false);
+    // Enter group input reducer.
+    await this.locator.locator('select.e2e-group-input-reducer').selectOption(options?.groupInputReduceFn || '');
+
+    // Enter count.
+    await this.locator.locator('input.e2e-count').fill(`${options?.count ?? 1}`);
 
     // Enter CSS class.
     await this.locator.locator('input.e2e-class').fill(coerceArray(options?.cssClass).join(' '));
@@ -102,11 +102,6 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO, WorkbenchD
       options?.group ? this._appPO.waitUntilIdle() : waitUntilAttached(this._appPO.notifications.nth(notificationCount)),
       rejectWhenAttached(this.error),
     ]);
-  }
-
-  public async pressEscape(): Promise<void> {
-    await this.locator.click();
-    await this.locator.press('Escape');
   }
 
   public get view(): ViewPO {
@@ -140,11 +135,15 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO, WorkbenchD
 /**
  * Controls opening of a notification.
  */
-export interface NotificationOpenerPageOptions {
+export type NotificationOpenerPageOptions = Omit<WorkbenchNotificationOptions, 'groupInputReduceFn'> & {
   /**
-   * Controls if to reduce inputs of notifications belonging to the same group, concatenating inputs of the same key.
+   * Controls if to reduce inputs of notifications belonging to the same group.
    */
-  useGroupInputReducer?: boolean;
+  groupInputReduceFn?: 'concat-input-reducer' | 'concat-input-async-reducer' | 'concat-input-legacy-reducer';
+  /**
+   * Controls how many notifications to open. Defaults to 1.
+   */
+  count?: number;
   /**
    * Controls if to use the legacy Workbench Notification API.
    *
@@ -157,4 +156,4 @@ export interface NotificationOpenerPageOptions {
    * TODO [Angular 22] Remove with Angular 22. Used for backward compatiblity.
    */
   inputLegacy?: string;
-}
+};

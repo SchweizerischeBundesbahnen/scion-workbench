@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {coerceArray, selectBy, DomRect, fromRect, getCssClasses} from './helper/testing.util';
+import {coerceArray, DomRect, fromRect, getCssClasses, hasCssClass, selectBy} from './helper/testing.util';
 import {RequireOne} from './helper/utility-types';
 import {NotificationId} from '../../workbench/src/lib/workbench.identifiers';
 
@@ -28,8 +28,24 @@ export class NotificationPO {
     this.title = this.locator.locator('header.e2e-title');
   }
 
-  public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.boundingBox());
+  public async getNotificationId(): Promise<NotificationId> {
+    return (await this.locator.getAttribute('data-notificationid')) as NotificationId;
+  }
+
+  /**
+   * Gets the bounding box of this notification or its content (exclusive title). Defaults to the bounding box of the notification.
+   */
+  public async getBoundingBox(selector: 'notification' | 'content' = 'notification'): Promise<DomRect> {
+    return fromRect(await this.locator.locator(selector === 'notification' ? ':scope' : ':scope > div.e2e-message').boundingBox());
+  }
+
+  public async hasVerticalOverflow(): Promise<boolean> {
+    const verticalScrollbar = this.locator.locator('sci-viewport.e2e-message-viewport > sci-scrollbar.vertical');
+    return !!(await verticalScrollbar.count()) && await hasCssClass(verticalScrollbar, 'overflow');
+  }
+
+  public getComputedStyle(): Promise<CSSStyleDeclaration> {
+    return this.locator.evaluate((notificationElement: HTMLElement) => getComputedStyle(notificationElement));
   }
 
   public async getSeverity(): Promise<'info' | 'warn' | 'error' | null> {

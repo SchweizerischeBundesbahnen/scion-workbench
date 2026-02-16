@@ -48,7 +48,7 @@ export interface WorkbenchNotificationOptions {
    * The reducer is invoked with inputs of the previous notification, if still displaying, and inputs of the new notification.
    * The returned input is passed to the new notification.
    */
-  groupInputReduceFn?: (prevInput: {[name: string]: unknown}, currInput: {[name: string]: unknown}) => {[name: string]: unknown};
+  groupInputReduceFn?: (prevInput: {[name: string]: unknown}, currInput: {[name: string]: unknown}) => {[name: string]: unknown} | Promise<{[name: string]: unknown}>;
 
   /**
    * Specifies data to pass to the notification component. Inputs are available as input properties in the notification component.

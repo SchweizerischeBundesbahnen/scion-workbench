@@ -11,17 +11,22 @@
 import {Locator} from '@playwright/test';
 import {NotificationPO} from './notification.po';
 import {WorkbenchNotificationPagePO} from './workbench/page-object/workbench-notification-page.po';
+import {DomRect, fromRect} from './helper/testing.util';
 
 /**
- * Page object to interact with the built-in workbench notification displaying a text.
+ * Page object to interact with a workbench notification displaying text.
  */
-export class TextNotificationPagePO implements WorkbenchNotificationPagePO {
+export class TextNotificationPO implements WorkbenchNotificationPagePO {
 
   public readonly locator: Locator;
   public readonly text: Locator;
 
   constructor(public notification: NotificationPO) {
-    this.locator = this.notification.locator.locator('span.e2e-message');
+    this.locator = this.notification.locator.locator('div.e2e-message');
     this.text = this.locator;
+  }
+
+  public async getTextBoundingBox(): Promise<DomRect> {
+    return fromRect(await this.text.boundingBox());
   }
 }

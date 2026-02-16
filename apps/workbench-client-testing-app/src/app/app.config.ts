@@ -9,7 +9,7 @@
  */
 
 import {ApplicationConfig, EnvironmentProviders, makeEnvironmentProviders, provideZoneChangeDetection} from '@angular/core';
-import {provideRouter, withHashLocation} from '@angular/router';
+import {provideRouter, withComponentInputBinding, withHashLocation} from '@angular/router';
 import {routes} from './app.routes';
 import {environment} from '../environments/environment';
 import {provideAnimations, provideNoopAnimations} from '@angular/platform-browser/animations';
@@ -21,7 +21,7 @@ import {provideWorkbenchTheme} from './theme/workbench-theme-switcher';
  */
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes, withHashLocation()),
+    provideRouter(routes, withHashLocation(), withComponentInputBinding()),
     provideWorkbenchClient(),
     provideWorkbenchTheme(),
     provideAnimationsIfEnabled(),

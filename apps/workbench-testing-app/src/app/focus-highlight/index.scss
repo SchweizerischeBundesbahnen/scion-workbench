@@ -78,5 +78,14 @@
         border: $border-width solid var(--sci-color-accent);
       }
     }
+
+    wb-notification[data-focus] {
+      position: relative; // Positioning context to visualize the active and focused state.
+
+      &::after {
+        @include highlight();
+        border: $border-width solid var(--sci-color-accent);
+      }
+    }
   }
 }

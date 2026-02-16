@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Component, HostBinding, HostListener, inject, input} from '@angular/core';
+import {Component, effect, inject, input, signal} from '@angular/core';
 import {MessageBoxFooterComponent} from './message-box-footer/message-box-footer.component';
 import {WorkbenchMessageBoxOptions} from './workbench-message-box.options';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog.model';
@@ -40,6 +40,14 @@ import {Translatable} from '../text/workbench-text-provider.model';
     TypeofPipe,
     TextPipe,
   ],
+  host: {
+    // Ensure host element to be focusable in order to close the message box on Escape keystroke.
+    '[attr.tabindex]': '-1',
+    '[class.empty]': 'empty()',
+    '[class.content-selectable]': 'options()?.contentSelectable',
+    '[class.has-title]': '!!this.options()?.title',
+    '(keydown.escape)': 'onEscape()',
+  },
 })
 export class WorkbenchMessageBoxComponent {
 
@@ -48,35 +56,25 @@ export class WorkbenchMessageBoxComponent {
 
   private readonly _dialog = inject(ɵWorkbenchDialog);
 
-  // Ensure host element to be focusable in order to close the message box on Escape keystroke.
-  @HostBinding('attr.tabindex')
-  protected tabindex = -1;
-
-  @HostBinding('class.empty')
-  protected empty = false;
-
-  @HostBinding('class.content-selectable')
-  protected get contentSelectable(): boolean | undefined {
-    return this.options()?.contentSelectable;
-  }
-
-  @HostBinding('class.has-title')
-  protected get hasTitle(): boolean {
-    return !!this.options()?.title;
-  }
+  protected readonly empty = signal(false);
 
   constructor() {
     this._dialog.closable = false;
     this._dialog.resizable = false;
     this._dialog.padding = false;
-    this._dialog.size.maxWidth = 'var(--sci-workbench-messagebox-max-width)';
+
+    // Limit the maximum messagebox width if text message to break the message.
+    effect(() => {
+      if (typeof this.message() === 'string' || this.message() === null) {
+        this._dialog.size.maxWidth = 'var(--sci-workbench-messagebox-max-width)';
+      }
+    });
   }
 
   protected onAction(action: string): void {
     this._dialog.close(action);
   }
 
-  @HostListener('keydown.escape')
   protected onEscape(): void {
     if ('cancel' in (this.options()?.actions ?? {})) {
       this._dialog.close('cancel');
@@ -88,7 +86,7 @@ export class WorkbenchMessageBoxComponent {
   }
 
   protected onContentDimensionChange(dimension: SciDimension): void {
-    this.empty = !dimension.offsetHeight;
+    this.empty.set(!dimension.offsetHeight);
   }
 }
 

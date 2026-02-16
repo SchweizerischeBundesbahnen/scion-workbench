@@ -9,14 +9,13 @@
  */
 
 import {ApplicationConfig, EnvironmentProviders, inject, makeEnvironmentProviders, provideZoneChangeDetection} from '@angular/core';
-import {PreloadAllModules, provideRouter, withHashLocation, withPreloading} from '@angular/router';
+import {PreloadAllModules, provideRouter, withComponentInputBinding, withHashLocation, withPreloading} from '@angular/router';
 import {routes} from './app.routes';
 import {workbenchConfig} from './workbench.config';
 import {provideConfirmWorkbenchStartup} from './workbench/confirm-workbench-startup';
 import {provideThrottleCapabilityLookupInterceptor} from './workbench/throttle-capability-lookup';
 import {provideWorkbenchLifecycleHookLoggers} from './workbench/workbench-lifecycle-hook-loggers';
 import {provideDevToolsInterceptor} from './devtools/devtools-capability-interceptor';
-import {provideHostNotificationIntentHandler} from './notification-page/host-notification-intent-handler';
 import {environment} from '../environments/environment';
 import {provideAnimations, provideNoopAnimations} from '@angular/platform-browser/animations';
 import {provideWorkbench, provideWorkbenchInitializer} from '@scion/workbench';
@@ -36,7 +35,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideWorkbench(workbenchConfig),
     provideRoutesFromStorage(), // must precede `provideRouter` for routes to have precedence over app routes
-    provideRouter(routes, withHashLocation(), withPreloading(PreloadAllModules)),
+    provideRouter(routes, withHashLocation(), withPreloading(PreloadAllModules), withComponentInputBinding()),
     provideRoutesForPerspectives(),
     provideRoutesForHostCapabilities(),
     provideWorkbenchLauncher(),
@@ -46,7 +45,6 @@ export const appConfig: ApplicationConfig = {
     provideMainAreaInitialPartId(),
     provideWorkbenchLifecycleHookLoggers(),
     provideDevToolsInterceptor(),
-    provideHostNotificationIntentHandler(),
     provideWorkbenchInitializer(() => void inject(ActiveWorkbenchElementCollector)),
     provideAnimationsIfEnabled(),
     provideValueFromStorage(),

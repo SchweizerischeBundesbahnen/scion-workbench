@@ -1,41 +1,68 @@
 @use '../common/workbench.mixin';
 
+$padding-inline: 1.5em;
+
 :host {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  gap: .75em;
   background-color: var(--sci-color-background-elevation);
   color: var(--sci-color-text);
-  font-size: 1rem;
+  font-size: .9em;
+  border: 1px solid var(--sci-color-border);
   border-radius: var(--sci-corner);
   box-shadow: var(--sci-elevation) var(--sci-static-color-black);
-  border-left: var(--sci-workbench-notification-severity-indicator-size) solid transparent;
-  position: relative; // positioning context
+  padding: 1em 0;
+  overflow: hidden;
+  outline: none;
+  position: relative; // positioning context for close button and severity
 
-  &[data-severity="info"] {
-    border-left-color: var(--sci-color-accent);
+  // Severity indicator
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--sci-workbench-notification-severity-indicator-size);
   }
 
-  &[data-severity="warn"] {
-    border-left-color: var(--sci-color-notice);
+  &[data-severity="info"]::before {
+    background-color: var(--sci-color-accent);
   }
 
-  &[data-severity="error"] {
-    border-left-color: var(--sci-color-negative);
+  &[data-severity="warn"]::before {
+    background-color: var(--sci-color-notice);
   }
 
-  > div.outline {
-    border: 1px solid var(--sci-color-border);
-    border-left: none;
-    padding: 1em 1.5em;
-    border-top-right-radius: var(--sci-corner);
-    border-bottom-right-radius: var(--sci-corner);
-    font-size: .9em;
+  &[data-severity="error"]::before {
+    background-color: var(--sci-color-negative);
+  }
+
+  > header {
+    flex: none;
+    font-weight: bold;
+    padding: 0 $padding-inline;
+    word-break: break-word; // wrap unbreakable text at message box bounds
     white-space: pre-line;
-    overflow-wrap: break-word;
+  }
+
+  > div.message {
+    flex: auto;
     overflow: hidden;
 
-    > header {
-      font-weight: bold;
-      margin-bottom: .75em;
+    &.text {
+      word-break: break-word; // wrap unbreakable text at message box bounds
+      white-space: pre-line;
+      padding: 0 $padding-inline;
+    }
+
+    > sci-viewport {
+      height: 100%;
+
+      &::part(content) {
+        padding: 0 $padding-inline;
+      }
     }
   }
 
@@ -46,6 +73,7 @@
       right: .275em;
       padding: .125em;
       border-radius: var(--sci-corner-small);
+      font-size: 1rem;
     }
   }
 }

@@ -1,6 +1,15 @@
 :host {
-  display: grid;
-  grid-row-gap: 1em;
+  flex: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  overflow: hidden; // crop overflow when changing minimum size in end-to-end test
+
+  > sci-accordion {
+    header {
+      font-weight: bold;
+    }
+  }
 
   > sci-form-field output.input {
     border: 1px solid var(--sci-color-border);

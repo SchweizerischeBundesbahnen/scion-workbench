@@ -707,22 +707,45 @@ test.describe('Workbench Message Box Microfrontend', () => {
       const messageBoxPage = new MessageBoxPagePO(messageBox);
 
       // Expect the message box page to display with the defined size.
-      await expect.poll(() => messageBoxPage.messageBox.dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+      await expect.poll(() => messageBoxPage.messageBox.dialog.getDialogBoundingBox()).toMatchObject({
         height: 500,
         width: 350,
-      }));
+      });
 
-      await expect.poll(() => messageBoxPage.messageBox.dialog.getComputedStyle()).toEqual(expect.objectContaining({
+      await expect.poll(() => messageBoxPage.messageBox.dialog.getComputedStyle()).toMatchObject({
         height: '500px',
         minHeight: '495px',
         maxHeight: '505px',
         width: '350px',
         minWidth: expect.anything() as unknown as string, // overwritten with minimal buttons witdth (footer)
         maxWidth: '355px',
-      } satisfies Partial<CSSStyleDeclaration>));
+      } satisfies Partial<CSSStyleDeclaration>);
+
+      // Grow the content.
+      await messageBoxPage.reportContentSize(true);
+      await messageBoxPage.enterContentSize({
+        height: '800px',
+        width: '800px',
+      });
+
+      // Expect the message box to adapt to the content size.
+      await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+        height: 800,
+        width: 800,
+      });
+
+      // Expect the dialog to adapt to the content size.
+      await expect.poll(() => messageBoxPage.messageBox.dialog.getDialogBoundingBox()).toMatchObject({
+        height: 500,
+        width: 350,
+      });
+
+      // Expect content to overflow.
+      await expect.poll(() => messageBox.dialog.hasVerticalOverflow()).toBe(true);
+      await expect.poll(() => messageBox.dialog.hasHorizontalOverflow()).toBe(true);
     });
 
-    test('should adapt message box size if content grows or shrinks', async ({appPO, microfrontendNavigator}) => {
+    test('should adapt message box size to content', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       await microfrontendNavigator.registerCapability('app1', {
@@ -730,7 +753,7 @@ test.describe('Workbench Message Box Microfrontend', () => {
         qualifier: {component: 'testee'},
         properties: {
           path: 'test-message-box',
-          size: {height: '300px', width: '300px'},
+          size: {height: 'auto', width: 'auto'},
         },
       });
 
@@ -741,41 +764,77 @@ test.describe('Workbench Message Box Microfrontend', () => {
       const messageBox = appPO.messagebox({cssClass: 'testee'});
       const messageBoxPage = new MessageBoxPagePO(messageBox);
 
-      // Make component larger.
-      await messageBoxPage.enterComponentSize({width: '500px', height: '500px'});
+      await expectMessageBox(messageBoxPage).toBeVisible();
 
-      // Expect the message box page to grow.
-      await expect.poll(() => messageBoxPage.getBoundingBox()).toEqual(expect.objectContaining({
-        height: 500,
-        width: 500,
-      }));
+      // Capture current size.
+      const dialogBounds = await messageBox.dialog.getDialogSlotBoundingBox();
+      const messageBoxPageBounds = await messageBox.getBoundingBox();
+      const verticalPadding = dialogBounds.height - messageBoxPageBounds.height;
+      const horizontalPadding = dialogBounds.width - messageBoxPageBounds.width;
 
-      await expect.poll(() => messageBoxPage.getOutletComputedStyle()).toEqual(expect.objectContaining({
-        height: '500px',
-        minHeight: '500px',
-        maxHeight: '500px',
-        width: '500px',
-        minWidth: '500px',
-        maxWidth: '500px',
-      } satisfies Partial<CSSStyleDeclaration>));
+      // Change the size of the content.
+      await messageBoxPage.reportContentSize(true);
+      await messageBoxPage.enterContentSize({width: '800px', height: '800px'});
 
-      // Make component smaller.
-      await messageBoxPage.enterComponentSize({width: '250px', height: '250px'});
+      // Expect the message box to adapt to the content size.
+      await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+        height: 800,
+        width: 800,
+      });
 
-      // Expect the message box page to shrink.
-      await expect.poll(() => messageBoxPage.getBoundingBox()).toEqual(expect.objectContaining({
-        height: 250,
-        width: 250,
-      }));
+      // Expect the dialog to adapt to the content size.
+      await expect.poll(() => messageBox.dialog.getDialogSlotBoundingBox()).toMatchObject({
+        height: 800 + verticalPadding,
+        width: 800 + horizontalPadding,
+      });
 
-      await expect.poll(() => messageBoxPage.getOutletComputedStyle()).toEqual(expect.objectContaining({
-        height: '250px',
-        minHeight: '250px',
-        maxHeight: '250px',
-        width: '250px',
-        minWidth: '250px',
-        maxWidth: '250px',
-      } satisfies Partial<CSSStyleDeclaration>));
+      // Expect content not to overflow.
+      await expect.poll(() => messageBox.dialog.hasVerticalOverflow()).toBe(false);
+      await expect.poll(() => messageBox.dialog.hasHorizontalOverflow()).toBe(false);
+
+      // Shrink the content.
+      await messageBoxPage.enterContentSize({
+        height: '400px',
+        width: '400px',
+      });
+
+      // Expect the message box to adapt to the content size.
+      await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+        height: 400,
+        width: 400,
+      });
+
+      // Expect the dialog to adapt to the content size.
+      await expect.poll(() => messageBox.dialog.getDialogSlotBoundingBox()).toMatchObject({
+        height: 400 + verticalPadding,
+        width: 400 + horizontalPadding,
+      });
+
+      // Expect content not to overflow.
+      await expect.poll(() => messageBox.dialog.hasVerticalOverflow()).toBe(false);
+      await expect.poll(() => messageBox.dialog.hasHorizontalOverflow()).toBe(false);
+
+      // Grow the content.
+      await messageBoxPage.enterContentSize({
+        height: '800px',
+        width: '800px',
+      });
+
+      // Expect the message box to adapt to the content size.
+      await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+        height: 800,
+        width: 800,
+      });
+
+      // Expect the dialog to adapt to the content size.
+      await expect.poll(() => messageBox.dialog.getDialogSlotBoundingBox()).toMatchObject({
+        height: 800 + verticalPadding,
+        width: 800 + horizontalPadding,
+      });
+
+      // Expect content not to overflow.
+      await expect.poll(() => messageBox.dialog.hasVerticalOverflow()).toBe(false);
+      await expect.poll(() => messageBox.dialog.hasHorizontalOverflow()).toBe(false);
     });
   });
 

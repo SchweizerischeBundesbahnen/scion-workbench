@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Capability, Qualifier} from '@scion/microfrontend-platform';
+import {Capability, ParamDefinition, Qualifier} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 
 /**
@@ -33,6 +33,16 @@ export interface WorkbenchPopupCapability extends Capability {
    * @inheritDoc
    */
   qualifier: Qualifier;
+  /**
+   * Specifies parameters required by the popup.
+   *
+   * Parameters can be:
+   * - read in the microfrontend by injecting the {@link WorkbenchPopup} handle (or `ActivatedMicrofrontend` if a host microfrontend)
+   * - referenced in the path using the colon syntax
+   *
+   * @inheritDoc
+   */
+  params?: ParamDefinition[];
   /**
    * @inheritDoc
    */
@@ -70,20 +80,21 @@ export interface WorkbenchPopupCapability extends Capability {
      */
     path: string;
     /**
-     * Specifies the size of this popup.
+     * Specifies the size of the popup.
      *
-     * If not set, the microfrontend can report the preferred size using {@link @scion/microfrontend-platform!PreferredSizeService}.
+     * For the popup to adapt to the size of the microfrontend content, set the size to `auto` and report the microfrontend's preferred size using
+     * `PreferredSizeService` in the microfrontend.
      *
-     * @example - Reporting the size of a microfrontend
+     * @example - Reporting the preferred size in the microfrontend
      * ```ts
+     * import {Beans} from '@scion/toolkit/bean-manager';
+     * import {PreferredSizeService} from '@scion/microfrontend-platform';
+     *
      * Beans.get(PreferredSizeService).fromDimension(<Microfrontend HTMLElement>);
-     * ```
+     * ``
      *
      * If the content can grow and shrink, e.g., if using expandable panels, position the microfrontend `absolute` to allow infinite
      * space for rendering at its preferred size.
-     *
-     * Since loading a microfrontend may take time, prefer setting the popup size in the popup capability to avoid flickering when
-     * opening the popup.
      */
     size?: WorkbenchPopupSize;
     /**
@@ -114,11 +125,11 @@ export interface WorkbenchPopupSize {
   /**
    * Specifies the height of the popup, constrained by {@link minHeight} and {@link maxHeight}, if any.
    */
-  height?: string;
+  height?: string | 'auto';
   /**
    * Specifies the width of the popup, constrained by {@link minWidth} and {@link maxWidth}, if any.
    */
-  width?: string;
+  width?: string | 'auto';
   /**
    * Specifies the minimum height of the popup.
    */

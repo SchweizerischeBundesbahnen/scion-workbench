@@ -6,17 +6,25 @@
   <input [ngModel]="focused()" disabled>
 </sci-form-field>
 
-<sci-accordion class="e2e-component-size" variant="solid">
+<sci-accordion class="e2e-content-size" variant="solid">
   <ng-template sciAccordionItem [panel]="panel_size">
-    <header>Component Size</header>
+    <header>Content Size</header>
   </ng-template>
   <ng-template #panel_size>
     <sci-form-field label="Height">
-      <input [formControl]="form.controls.height" class="e2e-height">
+      <input [formControl]="form.controls.componentSize.controls.height" class="e2e-height">
     </sci-form-field>
 
     <sci-form-field label="Width">
-      <input [formControl]="form.controls.width" class="e2e-width">
+      <input [formControl]="form.controls.componentSize.controls.width" class="e2e-width">
+    </sci-form-field>
+
+    <sci-form-field label="Report Size">
+      <sci-checkbox [formControl]="form.controls.componentSize.controls.reportSize" class="e2e-report-size"/>
+    </sci-form-field>
+
+    <sci-form-field label="Position Absolute">
+      <sci-checkbox [formControl]="form.controls.componentSize.controls.positionAbsolute"/>
     </sci-form-field>
   </ng-template>
 </sci-accordion>
@@ -42,20 +50,6 @@
     </ng-template>
   </sci-accordion>
 }
-
-<sci-accordion variant="solid">
-  <ng-template sciAccordionItem [panel]="panel_styles">
-    <header>Styles</header>
-  </ng-template>
-  <ng-template #panel_styles>
-    <sci-form-field label="Position Absolute">
-      <sci-checkbox [formControl]="form.controls.positionAbsolute"/>
-    </sci-form-field>
-    <sci-form-field label="Report Size">
-      <sci-checkbox [formControl]="form.controls.reportSize"/>
-    </sci-form-field>
-  </ng-template>
-</sci-accordion>
 
 @if (route.params | async | appNullIfEmpty; as params) {
   <sci-accordion variant="solid" class="e2e-route-params">

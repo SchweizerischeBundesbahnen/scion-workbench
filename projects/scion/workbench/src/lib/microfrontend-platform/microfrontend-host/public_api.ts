@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2025 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,5 +8,5 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {canMatchWorkbenchPartCapability, canMatchWorkbenchViewCapability, canMatchWorkbenchDialogCapability, canMatchWorkbenchMessageBoxCapability, canMatchWorkbenchPopupCapability} from './microfrontend-host-routes';
+export {canMatchWorkbenchPartCapability, canMatchWorkbenchViewCapability, canMatchWorkbenchDialogCapability, canMatchWorkbenchMessageBoxCapability, canMatchWorkbenchPopupCapability, canMatchWorkbenchNotificationCapability} from './microfrontend-host-routes';
 export {ActivatedMicrofrontend} from './microfrontend-host.model';

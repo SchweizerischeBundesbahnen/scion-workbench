@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, ElementRef, HostListener, inject, Injector, input, Signal} from '@angular/core';
+import {Component, computed, ElementRef, inject, Injector, input, Signal} from '@angular/core';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {VIEW_DRAG_TRANSFER_TYPE, ViewDragService} from '../../view-dnd/view-drag.service';
 import {createElement} from '../../common/dom.util';
@@ -49,6 +49,11 @@ import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
     '[class.view-drag]': 'viewDragService.dragging()',
     '[class]': 'view().classList.asList()',
     '[style.--sci-workbench-tab-title-offset-right]': 'viewTitleOffsetRight()',
+    '(click)': 'onClick()',
+    '(auxclick)': 'onAuxClick($event)',
+    '(contextmenu)': 'onContextmenu($event)',
+    '(dragstart)': 'onDragStart($event)',
+    '(dragend)': 'onDragEnd()',
   },
 })
 export class ViewTabComponent {
@@ -73,39 +78,28 @@ export class ViewTabComponent {
     this.viewTabContentPortal = this.createViewTabContentPortal();
   }
 
-  @HostListener('click')
   protected onClick(): void {
     void this.view().activate();
   }
 
   protected onClose(event: MouseEvent): void {
     event.stopPropagation(); // prevent the view from being activated
+    this.closeView(event);
+  }
 
-    if (event.altKey) {
-      void this.view().close('other-views');
-    }
-    else {
-      void this.view().close();
+  protected onAuxClick(event: MouseEvent): void {
+    if (event.button === 1) { // primary aux button
+      event.preventDefault(); // prevent user-agent default action
+      this.closeView(event);
     }
   }
 
-  @HostListener('mousedown', ['$event'])
-  protected onMousedown(event: MouseEvent): void {
-    if (event.buttons === AUXILARY_MOUSE_BUTTON) {
-      void this.view().close();
-      event.stopPropagation();
-      event.preventDefault();
-    }
-  }
-
-  @HostListener('contextmenu', ['$event'])
   protected onContextmenu(event: MouseEvent): void {
     void this._viewMenuService.showMenu({x: event.clientX, y: event.clientY}, this.view().id);
     event.stopPropagation();
     event.preventDefault();
   }
 
-  @HostListener('dragstart', ['$event'])
   protected onDragStart(event: DragEvent): void {
     if (!event.dataTransfer) {
       return;
@@ -144,9 +138,20 @@ export class ViewTabComponent {
     void view.activate();
   }
 
-  @HostListener('dragend')
   protected onDragEnd(): void {
     this.viewDragService.unsetViewDragData();
+  }
+
+  /**
+   * Closes the current view or other views if the 'Alt' key is pressed.
+   */
+  private closeView(event: MouseEvent): void {
+    if (event.altKey) {
+      void this.view().close('other-views');
+    }
+    else {
+      void this.view().close();
+    }
   }
 
   private installMenuAccelerators(): void {
@@ -166,8 +171,3 @@ export class ViewTabComponent {
     });
   }
 }
-
-/**
- * Indicates that the auxilary mouse button is pressed (usually the mouse wheel button or middle button).
- */
-const AUXILARY_MOUSE_BUTTON = 4;

@@ -12,7 +12,7 @@ import {test} from '../fixtures';
 import {ViewPagePO} from './page-object/view-page.po';
 import {expectView} from '../matcher/view-matcher';
 import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
-import {TextMessagePO} from './page-object/text-message.po';
+import {TextMessageBoxPO} from './page-object/text-message-box.po';
 import {expectMessageBox} from '../matcher/message-box-matcher';
 import {expect} from '@playwright/test';
 
@@ -76,7 +76,7 @@ test.describe('App With Redirect', () => {
     await messageBoxOpenerPage.open('TEXT', {cssClass: 'testee'});
 
     const messageBox = appPO.messagebox({cssClass: 'testee'});
-    const textMessagePage = new TextMessagePO(messageBox);
+    const textMessagePage = new TextMessageBoxPO(messageBox);
 
     await expectMessageBox(textMessagePage).toBeVisible();
     await expect(textMessagePage.text).toHaveText('TEXT');
@@ -95,7 +95,7 @@ test.describe('App With Redirect', () => {
     await messageBoxOpenerPage.open('TEXT', {cssClass: 'testee'});
 
     const messageBox = appPO.messagebox({cssClass: 'testee'});
-    const textMessagePage = new TextMessagePO(messageBox);
+    const textMessagePage = new TextMessageBoxPO(messageBox);
 
     await expectMessageBox(textMessagePage).toBeVisible();
     await expect(textMessagePage.text).toHaveText('TEXT');
@@ -114,7 +114,7 @@ test.describe('App With Redirect', () => {
     await messageBoxOpenerPage.open('TEXT', {cssClass: 'testee'});
 
     const messageBox = appPO.messagebox({cssClass: 'testee'});
-    const textMessagePage = new TextMessagePO(messageBox);
+    const textMessagePage = new TextMessageBoxPO(messageBox);
 
     await expectMessageBox(textMessagePage).toBeVisible();
     await expect(textMessagePage.text).toHaveText('TEXT');
@@ -133,7 +133,7 @@ test.describe('App With Redirect', () => {
     await messageBoxOpenerPage.open('TEXT', {cssClass: 'testee'});
 
     const messageBox = appPO.messagebox({cssClass: 'testee'});
-    const textMessagePage = new TextMessagePO(messageBox);
+    const textMessagePage = new TextMessageBoxPO(messageBox);
 
     await expectMessageBox(textMessagePage).toBeVisible();
     await expect(textMessagePage.text).toHaveText('TEXT');

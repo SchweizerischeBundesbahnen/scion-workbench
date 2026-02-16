@@ -28,7 +28,7 @@ export interface WorkbenchViewCapability extends Capability {
    */
   type: WorkbenchCapabilities.View;
   /**
-   * Qualifies this view. The qualifier is required for a view.
+   * Qualifies the view. The qualifier is required for a view.
    *
    * @inheritDoc
    */
@@ -36,7 +36,9 @@ export interface WorkbenchViewCapability extends Capability {
   /**
    * Specifies parameters required by the view.
    *
-   * Parameters can be read in the microfrontend by injecting the {@link WorkbenchView} handle, or referenced in path, title and resolvers using the colon syntax.
+   * Parameters can be:
+   * - read in the microfrontend by injecting the {@link WorkbenchView} handle (or `ActivatedMicrofrontend` if a host microfrontend)
+   * - referenced in the path, title and resolvers using the colon syntax
    *
    * @inheritDoc
    */
