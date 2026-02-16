@@ -1,11 +1,24 @@
-# [1.0.0-beta.38](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.37...workbench-client-1.0.0-beta.38) (2026-01-21)
+# [1.0.0-beta.39](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.38...workbench-client-1.0.0-beta.39) (2026-02-16)
+
+
+### Bug Fixes
+
+* **workbench-client/view:** navigate microfrontend view only if parameters or capability have changed ([61cbeeb](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/61cbeebf2bca232f3690a0af12634672699e745c))
 
 
 ### Features
 
-* **workbench-client:** add support for `@scion/microfrontend-platform` version `2.0.0` ([690bfb0](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/690bfb0a9496144ed1a4d9177254b34cf32d82df))
+* **workbench-client/notification:** support displaying a microfrontend in a workbench notification ([7082a05](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/7082a053ffee2539fe5beac3c4054c0607f70f96)), closes [#413](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/413)
 
 
-### BREAKING CHANGES
+### Dependencies
 
-* **workbench-client:** SCION Workbench Client now requires `@scion/microfrontend-platform` version `2.0.0` or higher. For more information, refer to the [changelog](https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/blob/master/CHANGELOG.md) of `@scion/microfrontend-platform`.
+* **workbench-client:** SCION Workbench Client requires `@scion/toolkit` `v2.1.0` or higher.
+
+### Recommendations
+
+* **workbench-client:** For Angular applications, provide `WorkbenchNotification` for dependency injection. See [documentation](https://microfrontend-platform-developer-guide.scion.vercel.app/#chapter:angular-integration-guide:providing-platform-beans-for-dependency-injection) for details.
+  ```ts
+  {provide: WorkbenchNotification, useFactory: () => Beans.opt(WorkbenchNotification)}
+  ```
+
