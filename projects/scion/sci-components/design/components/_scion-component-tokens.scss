@@ -1,0 +1,48 @@
+@use '../theming' as sci-theming;
+
+$sci-scrollbar: (
+  --sci-scrollbar-color: var(--sci-color-gray-700),
+);
+
+$sci-viewport: (
+  --sci-viewport-scrollbar-color: var(--sci-scrollbar-color),
+);
+
+$sci-throbber: (
+  --sci-throbber-color: var(--sci-color-gray-300),
+  --sci-throbber-size: 50px,
+  --sci-throbber-duration: 1.25s,
+);
+
+$sci-splitter: (
+  --sci-splitter-background-color: var(--sci-color-border), // background color of the splitter
+  --sci-splitter-background-color-hover: var(--sci-splitter-background-color), // background color of the splitter when hovering it
+  --sci-splitter-size: 1px, // size of the splitter along the main axis (width if direction is row, or height if direction is column)
+  --sci-splitter-size-hover: 8px, // size of the splitter along the main axis when hovering it.
+  --sci-splitter-touch-target-size: 15px, // touch target size to move the splitter (accessibility)
+  --sci-splitter-cross-axis-size: 100%, // handle size along the cross axis
+  --sci-splitter-border-radius: 0, // border radius of the splitter
+  --sci-splitter-opacity-active: 1, //  opacity of the splitter while the user moves the splitter
+  --sci-splitter-opacity-hover: .3, // opacity of the splitter when hovering it
+);
+
+$sci-sashbox: (
+  --sci-sashbox-gap: 10px, // gaps (gutters) between sashes
+  --sci-sashbox-splitter-background-color: var(--sci-splitter-background-color), // background color of the splitter
+  --sci-sashbox-splitter-background-color-hover: var(--sci-splitter-background-color), // background color of the splitter when hovering it
+  --sci-sashbox-splitter-size: var(--sci-splitter-size), // size of the splitter along the main axis (width if direction is row, or height if direction is column)
+  --sci-sashbox-splitter-size-hover: var(--sci-splitter-size-hover), // size of the splitter along the main axis when hovering it.
+  --sci-sashbox-splitter-touch-target-size: var(--sci-splitter-touch-target-size), // touch target size to move the splitter (accessibility)
+  --sci-sashbox-splitter-cross-axis-size: var(--sci-splitter-cross-axis-size), // handle size along the cross axis
+  --sci-sashbox-splitter-border-radius: var(--sci-splitter-border-radius), // border radius of the splitter
+  --sci-sashbox-splitter-opacity-active: var(--sci-splitter-opacity-active), //  opacity of the splitter while the user moves the splitter
+  --sci-sashbox-splitter-opacity-hover: var(--sci-splitter-opacity-hover), // opacity of the splitter when hovering it
+);
+
+$tokens: sci-theming.map-merge(
+    $sci-scrollbar,
+    $sci-viewport,
+    $sci-throbber,
+    $sci-splitter,
+    $sci-sashbox,
+);

@@ -660,8 +660,54 @@
           }
         }
       }
-    }
-  },
+    },
+    "@scion/sci-components": {
+      "projectType": "library",
+      "root": "projects/scion/sci-components",
+      "sourceRoot": "projects/scion/sci-components",
+      "prefix": "sci",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/scion/sci-components/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/scion/sci-components/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "tsConfig": "projects/scion/sci-components/tsconfig.spec.json",
+            "karmaConfig": "projects/scion/sci-components/karma.conf.js",
+            "inlineStyleLanguage": "scss",
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "projects/scion/sci-components"
+              ]
+            },
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/scion/sci-components/**/*.ts",
+              "projects/scion/sci-components/**/*.html"
+            ],
+            "eslintConfig": "projects/scion/sci-components/eslint.config.js"
+          }
+        }
+      }
+    }  },
   "schematics": {
     "@schematics/angular:component": {
       "type": "component"

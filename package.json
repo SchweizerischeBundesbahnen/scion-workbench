@@ -26,6 +26,10 @@
     "copy-src:scion-components.internal": "cpx --clean --watch --verbose ../scion-toolkit/projects/scion/components.internal/** ./src-lib/@scion/components.internal",
     "copy-src:scion-microfrontend-platform": "cpx --clean --watch --verbose ../scion-microfrontend-platform/projects/scion/microfrontend-platform/** ./src-lib/@scion/microfrontend-platform",
 
+    "sci-components:lint": "ng lint @scion/sci-components",
+    "sci-components:test": "ng test @scion/sci-components",
+    "sci-components:build": "ng build --configuration production @scion/sci-components",
+
     "workbench-client:build": "ng build --configuration production @scion/workbench-client",
     "workbench-client:lint": "ng lint @scion/workbench-client",
     "workbench-client:test": "ng test @scion/workbench-client",
