@@ -19,7 +19,7 @@ export interface SciMenuOptions {
    * - bottom/left: Relative to the bottom/left corner of the page viewport.
    * - bottom/right: Relative to the bottom/right corner of the page viewport.
    */
-  anchor: MaybeSignal<HTMLElement | ElementRef<HTMLElement>> | MaybeSignal<MenuOrigin>;
+  anchor: MaybeSignal<HTMLElement | ElementRef<HTMLElement> | MenuOrigin>;
   /**
    * Controls where to align the menu relative to the menu anchor, unless there is not enough space available in that area. Defaults to `south`.
    */
