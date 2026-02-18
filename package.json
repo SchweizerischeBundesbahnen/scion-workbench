@@ -38,6 +38,10 @@
     "workbench-client:changelog:full": "conventional-changelog --commit-path projects/scion/workbench-client -k projects/scion/workbench-client/package.json -t workbench-client- -p angular -i CHANGELOG_WORKBENCH_CLIENT.md -s && markdown-include docs/site/changelog-workbench-client/changelog.template.json",
     "workbench-client:changelog:latest": "conventional-changelog --commit-path projects/scion/workbench-client -k projects/scion/workbench-client/package.json -t workbench-client- -p angular -o CHANGELOG_WORKBENCH_CLIENT_LATEST.md",
 
+    "workbench-client-menu-adapter:lint": "ng lint @scion/workbench-client-menu-adapter",
+    "workbench-client-menu-adapter:test": "ng test @scion/workbench-client-menu-adapter",
+    "workbench-client-menu-adapter:build": "ng build --configuration production @scion/workbench-client-menu-adapter",
+
     "workbench:build": "ng build --configuration production @scion/workbench",
     "workbench:lint": "ng lint @scion/workbench",
     "workbench:test": "ng test @scion/workbench",
@@ -117,6 +121,7 @@
     "cross-env": "10.1.0",
     "eslint": "9.39.1",
     "jasmine-core": "5.12.1",
+    "jsdom": "^27.1.0",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.2.0",
     "karma-coverage": "2.2.1",
@@ -129,7 +134,8 @@
     "typedoc": "0.28.14",
     "typescript": "5.9.3",
     "typescript-eslint": "8.48.0",
-    "vercel": "48.11.1"
+    "vercel": "48.11.1",
+    "vitest": "^4.0.8"
   },
   "repository": {
     "type": "git",
