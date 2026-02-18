@@ -1,5 +1,5 @@
 import {DestroyRef, Directive, inject, signal} from '@angular/core';
-import {SciToolbarComponent} from '@scion/workbench';
+import {SciToolbarComponent} from './toolbar.component';
 
 @Directive({
   selector: '[sciToolbarState]',

@@ -16,23 +16,23 @@
     "module": "preserve",
     "noUnusedLocals": true,
     "noUncheckedIndexedAccess": true,
-    "paths": {
-      "@scion/workbench": [
-        "./dist/scion/workbench"
-      ],
-      "@scion/workbench-client": [
-        "./dist/scion/workbench-client"
-      ],
-      "@scion/sci-components/*": [
-        "./dist/scion/sci-components/*"
-      ],
-      "workbench-testing-app-common": [
-        "./dist/workbench-testing-app-common"
-      ],
-      "workbench-client-testing-app-common": [
-        "./dist/workbench-client-testing-app-common"
-      ]
-    }
+//    "paths": {
+//      "@scion/workbench": [
+//        "./dist/scion/workbench"
+//      ],
+//      "@scion/workbench-client": [
+//        "./dist/scion/workbench-client"
+//      ],
+//      "@scion/sci-components/*": [
+//        "./dist/scion/sci-components/*"
+//      ],
+//      "workbench-testing-app-common": [
+//        "./dist/workbench-testing-app-common"
+//      ],
+//      "workbench-client-testing-app-common": [
+//        "./dist/workbench-client-testing-app-common"
+//      ]
+//    }
     /*
      * +============================================================================================================================+
      * | ## PATH-OVERRIDE-FOR-DEVELOPMENT                                                                                           |
@@ -49,41 +49,38 @@
      * | 2. Run `npm run copy-src` to copy their source into the `src-lib` folder.                                                  |
      * +============================================================================================================================+
      */
-    //    "paths": {
-    //      "@scion/workbench": [
-    //        "./projects/scion/workbench/src/public-api"
-    //      ],
-    //      "@scion/workbench-client": [
-    //        "./projects/scion/workbench-client/src/public-api"
-    //      ],
-    //      //      "@scion/toolkit/*": [
-    //      //        "./src-lib/@scion/toolkit/*",
-    //      //        "./src-lib/@scion/toolkit/*/src/public_api"
-    //      //      ],
-    //      //      "@scion/components/*": [
-    //      //        "./src-lib/@scion/components/*",
-    //      //        "./src-lib/@scion/components/*/src/public_api"
-    //      //      ],
-    //      //      "@scion/sci-components/menu": [
-    //      //        "./projects/scion/sci-components/menu/src/public_api",
-    //      //      ],
-    //      //      "@scion/sci-components/toolbar": [
-    //      //        "./projects/scion/sci-components/toolbar/src/public_api",
-    //      //      ],
-    //      //      "@scion/components.internal/*": [
-    //      //        "./src-lib/@scion/components.internal/*",
-    //      //        "./src-lib/@scion/components.internal/*/src/public_api"
-    //      //      ],
-    //      //      "@scion/microfrontend-platform": [
-    //      //        "./src-lib/@scion/microfrontend-platform/src/public-api"
-    //      //      ],
-    //      "workbench-testing-app-common": [
-    //        "./apps/workbench-testing-app-common/src/public-api"
-    //      ],
-    //      "workbench-client-testing-app-common": [
-    //        "./apps/workbench-client-testing-app-common/src/public-api"
-    //      ],
-    //    }
+        "paths": {
+          "@scion/workbench": [
+            "./projects/scion/workbench/src/public-api"
+          ],
+          "@scion/workbench-client": [
+            "./projects/scion/workbench-client/src/public-api"
+          ],
+          "@scion/sci-components/menu": [
+            "./projects/scion/sci-components/menu/src/public_api",
+          ],
+          //      "@scion/toolkit/*": [
+          //        "./src-lib/@scion/toolkit/*",
+          //        "./src-lib/@scion/toolkit/*/src/public_api"
+          //      ],
+          //      "@scion/components/*": [
+          //        "./src-lib/@scion/components/*",
+          //        "./src-lib/@scion/components/*/src/public_api"
+          //      ],
+          //      "@scion/components.internal/*": [
+          //        "./src-lib/@scion/components.internal/*",
+          //        "./src-lib/@scion/components.internal/*/src/public_api"
+          //      ],
+          //      "@scion/microfrontend-platform": [
+          //        "./src-lib/@scion/microfrontend-platform/src/public-api"
+          //      ],
+          "workbench-testing-app-common": [
+            "./apps/workbench-testing-app-common/src/public-api"
+          ],
+          "workbench-client-testing-app-common": [
+            "./apps/workbench-client-testing-app-common/src/public-api"
+          ],
+        }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

@@ -1,4 +1,3 @@
-import {Disposable} from '@scion/workbench';
 import {SciMenu} from './menu.model';
 import {ɵSciMenu} from './ɵmenu';
 import {inject} from '@angular/core';
@@ -22,4 +21,14 @@ export function provideMenu(name: string, menuFactoryFn: (menu: SciMenu) => SciM
 
 export interface ProvideMenuOptions {
   canMatch?: () => boolean;
+}
+
+/**
+ * Represents an object that can be disposed of to free up resources.
+ */
+export interface Disposable {
+  /**
+   * Disposes of the object, releasing any allocated resources.
+   */
+  dispose(): void;
 }

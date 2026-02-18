@@ -34,4 +34,3 @@ export * from './storage/public_api';
 export * from './activity/public_api';
 export * from './text/public_api';
 export * from './icon/public_api';
-export * from './menu/public_api';

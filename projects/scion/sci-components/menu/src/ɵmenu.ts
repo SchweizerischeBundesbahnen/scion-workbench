@@ -1,4 +1,4 @@
-import {SciCheckableMenuItemDescriptor, SciIconMenuItemDescriptor, SciMenu, SciMenuDescriptor, SciMenuGroupDescriptor, SciMenuItemDescriptor} from '@scion/workbench';
+import {SciCheckableMenuItemDescriptor, SciIconMenuItemDescriptor, SciMenu, SciMenuDescriptor, SciMenuGroupDescriptor, SciMenuItemDescriptor} from './menu.model';
 import {isSignal, signal, Signal} from '@angular/core';
 import {UUID} from '@scion/toolkit/uuid';
 import {ComponentType} from '@angular/cdk/portal';

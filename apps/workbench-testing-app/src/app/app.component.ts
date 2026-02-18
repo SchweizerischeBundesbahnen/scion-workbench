@@ -12,7 +12,7 @@ import {Component, computed, DoCheck, DOCUMENT, inject, NgZone, signal, Signal, 
 import {filter, map, scan} from 'rxjs/operators';
 import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} from '@angular/router';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
-import {provideMenu, WORKBENCH_ID, WorkbenchService, WorkbenchStartup} from '@scion/workbench';
+import {WORKBENCH_ID, WorkbenchService, WorkbenchStartup} from '@scion/workbench';
 import {HeaderComponent} from './header/header.component';
 import {fromEvent} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
@@ -21,6 +21,7 @@ import {installFocusHighlighter} from './focus-highlight/focus-highlighter';
 import {installGlasspaneHighlighter} from './glasspane-highlight/glasspane-highlighter';
 import {installMicrofrontendApplicationLabels} from './microfrontend-application-labels/microfrontend-application-labels';
 import {UserMenuItemComponent} from './user-menu-item/user-menu-item.component';
+import {provideMenu} from '@scion/sci-components/menu';
 
 @Component({
   selector: 'app-root',

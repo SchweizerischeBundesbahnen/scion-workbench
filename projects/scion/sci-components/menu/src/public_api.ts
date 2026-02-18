@@ -13,4 +13,7 @@
  *
  * @see https://github.com/ng-packagr/ng-packagr/blob/master/docs/secondary-entrypoints.md
  */
-export {SciSashboxComponent} from './sashbox.component';
+export {type SciMenuService} from './menu.service';
+export {type SciMenu, type SciMenuDescriptor, type SciMenuItemDescriptor, type SciCheckableMenuItemDescriptor, type  SciIconMenuItemDescriptor, type  SciMenuGroupDescriptor} from './menu.model';
+export {provideMenu, type ProvideMenuOptions} from './menu.provider';
+export {SciToolbarComponent} from './toolbar/toolbar.component';
