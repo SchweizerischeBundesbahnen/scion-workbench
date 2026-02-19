@@ -1,5 +1,5 @@
 import {computed, Directive, ElementRef, inject, input, Signal} from '@angular/core';
-import {MMenuItem, MSubMenuItem} from '../ɵmenu';
+import {SciMenuItem, SciSubMenuItem} from '../ɵmenu';
 import {ComponentType} from '@angular/cdk/portal';
 import {dimension, SciDimension} from '@scion/components/dimension';
 
@@ -9,7 +9,7 @@ import {dimension, SciDimension} from '@scion/components/dimension';
 })
 export class MenuItemStateDirective {
 
-  public readonly menuItem = input.required<MMenuItem | MSubMenuItem>();
+  public readonly menuItem = input.required<SciMenuItem | SciSubMenuItem>();
   public readonly host = inject(ElementRef).nativeElement as HTMLButtonElement;
 
   public readonly labelText = computed<string | undefined>(() => {

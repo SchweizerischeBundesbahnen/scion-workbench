@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, Injector, input, linkedSignal, output, signal, Signal, TemplateRef, untracked, viewChild, ViewContainerRef} from '@angular/core';
 import {SciMenuRegistry} from '../menu.registry';
-import {MMenuGroup, MMenuItem, MSubMenuItem} from '../ɵmenu';
+import {SciMenuGroup, SciMenuItem, SciSubMenuItem} from '../ɵmenu';
 import {MenuComponent} from '../menu/menu.component';
 import {UUID} from '@scion/toolkit/uuid';
 import {NgComponentOutlet} from '@angular/common';
@@ -20,7 +20,7 @@ import {SciDimension} from '@scion/components/dimension';
 })
 export class SciToolGroupComponent {
 
-  public readonly contextElement = input.required<string | MMenuGroup>();
+  public readonly contextElement = input.required<string | SciMenuGroup>();
   public readonly disabled = input<boolean>();
   public readonly viewContainerRef = input<ViewContainerRef | undefined>();
   public readonly groupEmpty = output<boolean>();
@@ -32,7 +32,7 @@ export class SciToolGroupComponent {
 
   protected readonly popoverId = UUID.randomUUID();
   protected readonly menuItems = this.computeMenuItems();
-  protected readonly activeSubMenuItem = linkedSignal<string | MMenuGroup, {subMenuItem: MSubMenuItem, bounds: Signal<SciDimension>} | null>({
+  protected readonly activeSubMenuItem = linkedSignal<string | SciMenuGroup, {subMenuItem: SciSubMenuItem, bounds: Signal<SciDimension>} | null>({
     source: this.contextElement,  // reset active sub menu item when this component is re-used
     computation: () => null,
   });
@@ -76,7 +76,7 @@ export class SciToolGroupComponent {
     });
   }
 
-  private computeMenuItems(): Signal<Array<MMenuItem | MSubMenuItem | MMenuGroup>> {
+  private computeMenuItems(): Signal<Array<SciMenuItem | SciSubMenuItem | SciMenuGroup>> {
     return computed(() => {
       const subMenuItem = this.contextElement();
       if (typeof subMenuItem === 'string') {
@@ -88,7 +88,7 @@ export class SciToolGroupComponent {
     });
   }
 
-  protected onSubMenuClick(subMenuItem: MSubMenuItem, bounds: Signal<SciDimension>): void {
+  protected onSubMenuClick(subMenuItem: SciSubMenuItem, bounds: Signal<SciDimension>): void {
     this.activeSubMenuItem.update(activeSubMenuItem => activeSubMenuItem?.subMenuItem === subMenuItem ? null : {subMenuItem, bounds});
   }
 
@@ -99,7 +99,7 @@ export class SciToolGroupComponent {
   }
 }
 
-export function isEmtpy(menuItem: MMenuItem | MSubMenuItem | MMenuGroup): Signal<boolean> {
+export function isEmtpy(menuItem: SciMenuItem | SciSubMenuItem | SciMenuGroup): Signal<boolean> {
   switch (menuItem.type) {
     case 'menu-item':
       return signal(false);

@@ -1,5 +1,5 @@
 import {computed, inject, Injectable, Signal, signal} from '@angular/core';
-import {MMenuItem} from '../ɵmenu';
+import {SciMenuItem} from '../ɵmenu';
 
 @Injectable()
 export class MenuFilter {
@@ -18,7 +18,7 @@ export class MenuFilter {
     this._filter.set(filter ? new RegExp(filter, 'i') : null);
   }
 
-  public matches(menuItem: MMenuItem): Signal<boolean> {
+  public matches(menuItem: SciMenuItem): Signal<boolean> {
     return computed(() => {
       const filter = this._filter();
       // Test against current filter

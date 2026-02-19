@@ -1,5 +1,5 @@
 import {afterRenderEffect, ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, forwardRef, inject, input, linkedSignal, signal, Signal, untracked, viewChild, ViewContainerRef} from '@angular/core';
-import {MMenuGroup, MMenuItem, MSubMenuItem} from '../ɵmenu';
+import {SciMenuGroup, SciMenuItem, SciSubMenuItem} from '../ɵmenu';
 import {SciMenuRegistry} from '../menu.registry';
 import {UUID} from '@scion/toolkit/uuid';
 import {JoinPipe} from './join.pipe';
@@ -41,7 +41,7 @@ import {NgComponentOutlet} from '@angular/common';
 })
 export class MenuComponent {
 
-  public readonly contextElement = input.required<MSubMenuItem | MMenuGroup>();
+  public readonly contextElement = input.required<SciSubMenuItem | SciMenuGroup>();
   public readonly disabled = input<boolean>();
   public readonly glyphArea = input<boolean>();
   public readonly anchorWidth = input(undefined, {transform: (width: number | undefined): string | undefined => width ? `${width}px` : undefined});
@@ -57,7 +57,7 @@ export class MenuComponent {
   protected readonly hasGlyphArea = computed(() => this.glyphArea() ?? requiresGlyphArea(this.contextElement())());
   protected readonly menuItems = this.computeMenuItems();
   protected readonly actionsPopoverAnchor = viewChild.required('actions_popover_anchor', {read: ViewContainerRef});
-  protected readonly activeSubMenuItem = linkedSignal<MSubMenuItem | MMenuGroup, MSubMenuItem | null>({
+  protected readonly activeSubMenuItem = linkedSignal<SciSubMenuItem | SciMenuGroup, SciSubMenuItem | null>({
     source: this.contextElement,  // reset active sub menu item when this component is re-used
     computation: () => null,
   });
@@ -123,7 +123,7 @@ export class MenuComponent {
     });
   }
 
-  protected onSelect(menuItem: MMenuItem): void {
+  protected onSelect(menuItem: SciMenuItem): void {
     // Close the popup if the callback returns true. Defaults to closing non-checkable menu items.
     if (menuItem.onSelect() ?? menuItem.checked?.() === undefined) {
       this.close();
@@ -134,7 +134,7 @@ export class MenuComponent {
     this.isGroupExpanded.update(expanded => !expanded);
   }
 
-  protected onMenuItemMouseEnter(menuItem: MMenuItem | MSubMenuItem | MMenuGroup): void {
+  protected onMenuItemMouseEnter(menuItem: SciMenuItem | SciSubMenuItem | SciMenuGroup): void {
     this.activeSubMenuItem.set(menuItem.type === 'sub-menu-item' ? menuItem : null);
 
     // Create and display "fake" popover to close popover of other groups or menus.
@@ -161,7 +161,7 @@ export class MenuComponent {
     this._actionToolbarMenuOpen.set(open);
   }
 
-  private computeMenuItems(): Signal<Array<MMenuItem | MSubMenuItem | MMenuGroup>> {
+  private computeMenuItems(): Signal<Array<SciMenuItem | SciSubMenuItem | SciMenuGroup>> {
     return computed(() => {
       const subMenuItem = this.contextElement();
 
@@ -172,7 +172,7 @@ export class MenuComponent {
     });
   }
 
-  private matchesFilter(menuItem: MMenuItem | MSubMenuItem | MMenuGroup): Signal<boolean> {
+  private matchesFilter(menuItem: SciMenuItem | SciSubMenuItem | SciMenuGroup): Signal<boolean> {
     return computed(() => {
       switch (menuItem.type) {
         case 'menu-item':
@@ -199,7 +199,7 @@ export class MenuComponent {
  *
  * A glyph area is required if any group needs one, even if the context does not.
  */
-function requiresGlyphArea(contextElement: MSubMenuItem | MMenuGroup): Signal<boolean> {
+function requiresGlyphArea(contextElement: SciSubMenuItem | SciMenuGroup): Signal<boolean> {
   return computed(() => {
     if (contextElement.filter) {
       return true;

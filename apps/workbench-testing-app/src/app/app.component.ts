@@ -21,7 +21,7 @@ import {installFocusHighlighter} from './focus-highlight/focus-highlighter';
 import {installGlasspaneHighlighter} from './glasspane-highlight/glasspane-highlighter';
 import {installMicrofrontendApplicationLabels} from './microfrontend-application-labels/microfrontend-application-labels';
 import {UserMenuItemComponent} from './user-menu-item/user-menu-item.component';
-import {provideMenu} from '@scion/sci-components/menu';
+import {contributeMenu} from '@scion/sci-components/menu';
 
 @Component({
   selector: 'app-root',
@@ -76,7 +76,7 @@ export class AppComponent implements DoCheck {
 
     const workbenchService = inject(WorkbenchService);
 
-    provideMenu('toolbar:main', toolbar => toolbar
+    contributeMenu('toolbar:main', toolbar => toolbar
       .addMenuItem({icon: computed(() => workbenchService.settings.theme() === 'scion-light' ? 'light_mode' : 'dark_mode')}, () => {
         workbenchService.settings.theme.update(theme => theme === 'scion-light' ? 'scion-dark' : 'scion-light');
       })
@@ -88,12 +88,17 @@ export class AppComponent implements DoCheck {
       ),
     );
 
-    provideMenu('toolbar:workbench.part.tools.end', toolbar => toolbar
+    contributeMenu('toolbar:workbench.part.tools.end', toolbar => toolbar
       .addMenuItem({icon: 'expand_all', tooltip: 'Expand Selected'}, () => this.onAction())
       .addMenuItem({icon: 'collapse_all', tooltip: 'Collapse All'}, () => this.onAction()),
     );
 
-    provideMenu('toolbar:workbench.part.tools.start', menu => menu
+    contributeMenu('menu:share', menu => menu
+      .addMenuItem({label: 'Teams'}, () => {
+      }),
+    );
+
+    contributeMenu('toolbar:workbench.part.tools.start', menu => menu
       .addGroup(group => group
         .addMenuItem({icon: 'lens_blur'}, () => this.onAction()),
       )
@@ -101,7 +106,7 @@ export class AppComponent implements DoCheck {
         .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N']}, () => this.onAction())
         .addMenuItem({label: 'Open', icon: 'folder'}, () => this.onAction())
         .addMenuItem({label: 'Make a Copy', icon: 'file_copy'}, () => this.onAction())
-        .addMenu({label: 'Share', icon: 'person_add', id: 'extend-me'}, menu => menu
+        .addMenu({label: 'Share', id: 'menu:share', icon: 'person_add'}, menu => menu
           .addMenuItem({label: 'Share with others', icon: 'person_add'}, () => this.onAction())
           .addMenuItem({label: 'Publish to web', icon: 'public'}, () => this.onAction()),
         )
@@ -202,11 +207,11 @@ export class AppComponent implements DoCheck {
       ),
     );
 
-    provideMenu('menu:paragraph', menu => menu
+    contributeMenu('menu:paragraph', menu => menu
       .addMenuItem({label: 'Heading 3', checked: computed(() => paragraphStyle() === 'heading3')}, () => paragraphStyle.set('heading3')),
     );
 
-    provideMenu('menu:paragraph', menu => menu
+    contributeMenu('menu:paragraph', menu => menu
       .addMenu({label: 'SCION Developers'}, menu => menu
         .addMenuItem({label: 'Etienne'}, () => this.onAction())
         .addMenuItem({label: 'Marc'}, () => this.onAction())
@@ -215,7 +220,7 @@ export class AppComponent implements DoCheck {
       ),
     );
 
-    provideMenu('toolbar:workbench.part.tools.start', menu => menu
+    contributeMenu('toolbar:workbench.part.tools.start', menu => menu
       .addMenu({label: 'Database', icon: 'database', filter: {placeholder: 'Type to filter'}}, menu => menu
         // .addMenuItem({icon: 'filter_alt', text: 'Filter'}, () => this.onAction())
         .addGroup({label: 'View in Groups', collapsible: true}, group => group
@@ -249,7 +254,7 @@ export class AppComponent implements DoCheck {
     const viewMode = signal('dock_pinned');
     const moveTo = signal('left_top');
 
-    provideMenu('toolbar:workbench.part.tools.end', menu => menu
+    contributeMenu('toolbar:workbench.part.tools.end', menu => menu
       .addMenu({icon: 'visibility'}, menu => menu
         .addGroup({label: 'Sort'}, group => group
           .addMenuItem({label: 'Alphabetically', checked: computed(() => flags().has('alphabetically'))}, () => toggleMultiFlag(flags, 'alphabetically')),
@@ -265,7 +270,7 @@ export class AppComponent implements DoCheck {
       ),
     );
 
-    provideMenu('toolbar:workbench.part.tools.end', menu => menu
+    contributeMenu('toolbar:workbench.part.tools.end', menu => menu
       .addMenu({icon: 'more_vert', visualMenuMarker: false}, menu => menu
         .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+']}, () => this.onAction())
         .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-']}, () => this.onAction())
@@ -317,7 +322,7 @@ export class AppComponent implements DoCheck {
       .set('sample_layout_aligned_parts_app_2', 'Sample Microfrontend Layout App 2 (Aligned Parts)')
       .set('focus_test_perspective', 'Focus Test Perspective');
 
-    provideMenu('toolbar:perspective.menu', menu => menu
+    contributeMenu('toolbar:perspective.menu', menu => menu
       .addMenuItem({icon: 'undo', tooltip: 'Reset Perspective'}, () => console.log('>>> Reset default perspective'))
       .addMenu({icon: 'more_vert', visualMenuMarker: false}, menu => menu
         .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+']}, () => this.onAction())
@@ -357,7 +362,7 @@ export class AppComponent implements DoCheck {
       ),
     )
 
-    provideMenu('toolbar:workbench.part.tools.start', menu => menu
+    contributeMenu('toolbar:workbench.part.tools.start', menu => menu
       .addMenu({label: computed(() => perspectiveLabels.get(perspective()) ?? perspective()), visualMenuMarker: true}, menu => menu
         .addMenuItem({label: 'A', checked: true, actionToolbarName: 'toolbar:perspective.menu'}, () => this.onAction())
         .addMenuItem({label: 'B', actionToolbarName: 'toolbar:perspective.menu'}, () => this.onAction())
@@ -368,7 +373,7 @@ export class AppComponent implements DoCheck {
         .addMenuItem({label: 'G', actionToolbarName: 'toolbar:perspective.menu'}, () => this.onAction()),
       ),
     );
-    provideMenu('toolbar:workbench.part.tools.start', menu => menu
+    contributeMenu('toolbar:workbench.part.tools.start', menu => menu
       .addMenu({label: computed(() => perspectiveLabels.get(perspective()) ?? perspective())}, menu => menu
         .addMenuItem({label: 'Default Layout', actionToolbarName: 'toolbar:perspective.menu', checked: computed(() => perspective() === 'default_layout')}, () => {
           perspective.set('default_layout');

@@ -3,6 +3,16 @@
 import {Signal} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
 
+export interface SciToolbar {
+  addItem(icon: menuItemDescriptor: SciMenuItemDescriptor | SciIconMenuItemDescriptor | SciCheckableMenuItemDescriptor, onSelect: () => boolean | void): this;
+
+  addMenu(menuDescriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenu) => SciMenu): this;
+
+  addGroup(menuGroupDescriptor: SciMenuGroupDescriptor, groupFactoryFn?: (group: SciMenu) => SciMenu): this;
+
+  addGroup(groupFactoryFn: (group: SciMenu) => SciMenu): this;
+}
+
 export interface SciMenu {
   addMenuItem(menuItemDescriptor: SciMenuItemDescriptor | SciIconMenuItemDescriptor | SciCheckableMenuItemDescriptor, onSelect: () => boolean | void): this;
 
@@ -28,7 +38,7 @@ export interface SciMenuDescriptor {
   /**
    * Specifies the identifier for the menu item, used to contribute to the menu.
    */
-  id?: string;
+  id?: `menu:${string}`;
   tooltip?: string;
   mnemonic?: string;
   disabled?: Signal<boolean> | boolean;
@@ -56,7 +66,7 @@ export interface SciMenuItemDescriptor {
   /**
    * Specifies the identifier for the menu item, used to ...
    */
-  id?: string;
+  id?: `menuitem:${string}`;
   label?: Signal<string> | string | ComponentType<unknown>;
   matchesFilter?: (filter: string) => boolean;
   tooltip?: string;
@@ -79,7 +89,7 @@ export interface SciCheckableMenuItemDescriptor extends SciMenuItemDescriptor {
 }
 
 export interface SciMenuGroupDescriptor {
-  id?: string;
+  id?: `menu:${string}`;
   label?: Signal<string> | string;
   collapsible?: boolean | {collapsed: boolean};
   disabled?: Signal<boolean> | boolean;

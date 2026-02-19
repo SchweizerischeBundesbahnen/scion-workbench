@@ -1,5 +1,5 @@
 import {ApplicationRef, ChangeDetectionStrategy, Component, createComponent, effect, ElementRef, EnvironmentInjector, inject, Injector, input, inputBinding, untracked} from '@angular/core';
-import {MMenuGroup} from '../ɵmenu';
+import {SciMenuGroup} from '../ɵmenu';
 import {MenuComponent} from './menu.component';
 
 /**
@@ -12,7 +12,7 @@ import {MenuComponent} from './menu.component';
 })
 export class MenuItemGroupComponent {
 
-  public readonly group = input.required<MMenuGroup>();
+  public readonly group = input.required<SciMenuGroup>();
   public readonly glyphArea = input.required<boolean>();
   public readonly disabled = input<boolean>();
 

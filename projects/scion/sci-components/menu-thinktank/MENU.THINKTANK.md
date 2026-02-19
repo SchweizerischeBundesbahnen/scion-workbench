@@ -10,7 +10,8 @@ popup:org.eclipse.ui.popup.any
 
 ### Adding Menu Items:
 File: menu:org.eclipse.ui.main.menu?after=additions
-Edit: menu:org.eclipse.ui.main.menu?after=file
+Edit: menu:org.eclipse.ui.main.menu?after=menuitem:file // menu item
+Edit: menu:org.eclipse.ui.main.menu?after=menu:disposition // sub menu or group
 File: menu:org.eclipse.ui.main.menu?after=additions
 
 ## Ideas

@@ -6,12 +6,12 @@ import {Arrays} from '@scion/toolkit/util';
 
 export class ɵSciMenu implements SciMenu {
 
-  public readonly menuItems = new Array<MMenuItem | MSubMenuItem | MMenuGroup>();
+  public readonly menuItems = new Array<SciMenuItem | SciSubMenuItem | SciMenuGroup>();
 
   public addMenuItem(menuItemDescriptor: SciMenuItemDescriptor | SciIconMenuItemDescriptor | SciCheckableMenuItemDescriptor, onSelect: () => boolean | void): this {
     this.menuItems.push({
       type: 'menu-item',
-      id: menuItemDescriptor.id ?? UUID.randomUUID(),
+      id: menuItemDescriptor.id ?? `menuitem:${UUID.randomUUID()}`,
       label: coerceSignal(menuItemDescriptor.label),
       tooltip: menuItemDescriptor.tooltip,
       mnemonic: menuItemDescriptor.mnemonic,
@@ -23,7 +23,7 @@ export class ɵSciMenu implements SciMenu {
       matchesFilter: menuItemDescriptor.matchesFilter,
       cssClass: Arrays.coerce(menuItemDescriptor.cssClass),
       onSelect,
-    } satisfies MMenuItem);
+    } satisfies SciMenuItem);
     return this;
   }
 
@@ -32,7 +32,7 @@ export class ɵSciMenu implements SciMenu {
 
     this.menuItems.push({
       type: 'sub-menu-item',
-      id: menuDescriptor.id ?? UUID.randomUUID(),
+      id: menuDescriptor.id ?? `menu:${UUID.randomUUID()}`,
       label: coerceSignal(menuDescriptor.label),
       icon: coerceSignal('icon' in menuDescriptor ? menuDescriptor.icon : undefined),
       tooltip: menuDescriptor.tooltip,
@@ -43,7 +43,7 @@ export class ɵSciMenu implements SciMenu {
       size: menuDescriptor.size,
       cssClass: Arrays.coerce(menuDescriptor.cssClass),
       children: subMenu.menuItems,
-    } satisfies MSubMenuItem);
+    } satisfies SciSubMenuItem);
     return this;
   }
 
@@ -55,11 +55,11 @@ export class ɵSciMenu implements SciMenu {
 
       this.menuItems.push({
         type: 'group',
-        id: UUID.randomUUID(),
+        id: `menu:${UUID.randomUUID()}`,
         children: subMenu.menuItems,
         collapsible: false,
         disabled: signal(false),
-      } satisfies MMenuGroup);
+      } satisfies SciMenuGroup);
       return this;
     }
     else {
@@ -69,21 +69,21 @@ export class ɵSciMenu implements SciMenu {
 
       this.menuItems.push({
         type: 'group',
-        id: groupDescriptor.id ?? UUID.randomUUID(),
+        id: groupDescriptor.id ?? `menu:${UUID.randomUUID()}`,
         label: coerceSignal(groupDescriptor.label),
         collapsible: computeCollapsible(groupDescriptor),
         filter: groupDescriptor.filter,
         disabled: coerceSignal(groupDescriptor.disabled, {defaultValue: false}),
         children: subMenu?.menuItems ?? [],
-      } satisfies MMenuGroup);
+      } satisfies SciMenuGroup);
       return this;
     }
   }
 }
 
-export interface MMenuItem {
+export interface SciMenuItem {
   type: 'menu-item'
-  id: string;
+  id: `menuitem:${string}`;
   label?: Signal<string | ComponentType<unknown>>;
   icon?: Signal<string>;
   tooltip?: string;
@@ -97,9 +97,9 @@ export interface MMenuItem {
   onSelect: () => boolean | void;
 }
 
-export interface MSubMenuItem {
+export interface SciSubMenuItem {
   type: 'sub-menu-item'
-  id: string;
+  id: `menu:${string}`;
   label?: Signal<string | ComponentType<unknown>>;
   icon?: Signal<string>;
   tooltip?: string;
@@ -113,17 +113,17 @@ export interface MSubMenuItem {
     maxWidth?: string;
   };
   cssClass?: string[];
-  children: Array<MMenuItem | MSubMenuItem | MMenuGroup>;
+  children: Array<SciMenuItem | SciSubMenuItem | SciMenuGroup>;
 }
 
-export interface MMenuGroup {
+export interface SciMenuGroup {
   type: 'group'
-  id: string;
+  id: `menu:${string}`;
   label?: Signal<string>;
   collapsible: {collapsed: boolean} | false;
   filter?: boolean | {placeholder?: string; notFoundText?: string};
   disabled: Signal<boolean>;
-  children: Array<MMenuItem | MSubMenuItem | MMenuGroup>;
+  children: Array<SciMenuItem | SciSubMenuItem | SciMenuGroup>;
 }
 
 function computeCollapsible(groupDescriptor: SciMenuGroupDescriptor): {collapsed: boolean} | false {
