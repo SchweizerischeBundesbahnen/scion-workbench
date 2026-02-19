@@ -23,8 +23,8 @@
 //      "@scion/workbench-client": [
 //        "./dist/scion/workbench-client"
 //      ],
-//      "@scion/workbench-client-menu-adapter": [
-//        "./dist/scion/workbench-client-menu-adapter"
+//      "@scion/workbench-client-angular": [
+//        "./dist/scion/workbench-client-angular"
 //      ],
 //      "@scion/sci-components/*": [
 //        "./dist/scion/sci-components/*"
@@ -59,14 +59,14 @@
           "@scion/workbench-client": [
             "./projects/scion/workbench-client/src/public-api"
           ],
-          "@scion/workbench-client-menu-adapter": [
-            "./projects/scion/workbench-client-menu-adapter/src/public-api"
+          "@scion/workbench-client-angular": [
+            "./projects/scion/workbench-client-angular/src/public-api"
           ],
           "@scion/sci-components/menu": [
             "./projects/scion/sci-components/menu/src/public_api",
           ],
-          "workbench-client-menu-adapter": [
-            "./dist/workbench-client-menu-adapter"
+          "workbench-client-angular": [
+            "./dist/workbench-client-angular"
           ],
           //      "@scion/toolkit/*": [
           //        "./src-lib/@scion/toolkit/*",
@@ -130,10 +130,10 @@
       "path": "./apps/workbench-getting-started-app/tsconfig.app.json"
     },
     {
-      "path": "./projects/scion/workbench-client-menu-adapter/tsconfig.lib.json"
+      "path": "./projects/scion/workbench-client-angular/tsconfig.lib.json"
     },
     {
-      "path": "./projects/scion/workbench-client-menu-adapter/tsconfig.spec.json"
+      "path": "./projects/scion/workbench-client-angular/tsconfig.spec.json"
     }
   ]
 }

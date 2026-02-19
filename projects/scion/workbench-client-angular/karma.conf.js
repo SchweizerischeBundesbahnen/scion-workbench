@@ -41,7 +41,7 @@ module.exports = function (config) {
       suppressAll: true, // removes the duplicated traces
     },
     coverageReporter: {
-      dir: require('path').join(__dirname, '../../../coverage/scion/workbench-client-menu-adapter'),
+      dir: require('path').join(__dirname, '../../../coverage/scion/workbench-client-angular'),
       subdir: '.',
       reporters: [
         {type: 'html'},

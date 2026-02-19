@@ -38,9 +38,9 @@
     "workbench-client:changelog:full": "conventional-changelog --commit-path projects/scion/workbench-client -k projects/scion/workbench-client/package.json -t workbench-client- -p angular -i CHANGELOG_WORKBENCH_CLIENT.md -s && markdown-include docs/site/changelog-workbench-client/changelog.template.json",
     "workbench-client:changelog:latest": "conventional-changelog --commit-path projects/scion/workbench-client -k projects/scion/workbench-client/package.json -t workbench-client- -p angular -o CHANGELOG_WORKBENCH_CLIENT_LATEST.md",
 
-    "workbench-client-menu-adapter:lint": "ng lint @scion/workbench-client-menu-adapter",
-    "workbench-client-menu-adapter:test": "ng test @scion/workbench-client-menu-adapter",
-    "workbench-client-menu-adapter:build": "ng build --configuration production @scion/workbench-client-menu-adapter",
+    "workbench-client-angular:lint": "ng lint @scion/workbench-client-angular",
+    "workbench-client-angular:test": "ng test @scion/workbench-client-angular",
+    "workbench-client-angular:build": "ng build --configuration production @scion/workbench-client-angular",
 
     "workbench:build": "ng build --configuration production @scion/workbench",
     "workbench:lint": "ng lint @scion/workbench",

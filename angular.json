@@ -708,20 +708,20 @@
         }
       }
     },
-    "@scion/workbench-client-menu-adapter": {
+    "@scion/workbench-client-angular": {
       "projectType": "library",
-      "root": "projects/scion/workbench-client-menu-adapter",
-      "sourceRoot": "projects/scion/workbench-client-menu-adapter/src",
+      "root": "projects/scion/workbench-client-angular",
+      "sourceRoot": "projects/scion/workbench-client-angular/src",
       "prefix": "wb",
       "architect": {
         "build": {
           "builder": "@angular/build:ng-packagr",
           "configurations": {
             "production": {
-              "tsConfig": "projects/scion/workbench-client-menu-adapter/tsconfig.lib.prod.json"
+              "tsConfig": "projects/scion/workbench-client-angular/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/scion/workbench-client-menu-adapter/tsconfig.lib.json"
+              "tsConfig": "projects/scion/workbench-client-angular/tsconfig.lib.json"
             }
           },
           "defaultConfiguration": "production"
@@ -729,8 +729,8 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "tsConfig": "projects/scion/workbench-client-menu-adapter/tsconfig.spec.json",
-            "karmaConfig": "projects/scion/workbench-client-menu-adapter/karma.conf.js",
+            "tsConfig": "projects/scion/workbench-client-angular/tsconfig.spec.json",
+            "karmaConfig": "projects/scion/workbench-client-angular/karma.conf.js",
             "inlineStyleLanguage": "scss",
             "polyfills": [
               "zone.js",
@@ -742,10 +742,10 @@
           "builder": "@angular-eslint/builder:lint",
           "options": {
             "lintFilePatterns": [
-              "projects/scion/workbench-client-menu-adapter/**/*.ts",
-              "projects/scion/workbench-client-menu-adapter/**/*.html"
+              "projects/scion/workbench-client-angular/**/*.ts",
+              "projects/scion/workbench-client-angular/**/*.html"
             ],
-            "eslintConfig": "projects/scion/workbench-client-menu-adapter/eslint.config.js"
+            "eslintConfig": "projects/scion/workbench-client-angular/eslint.config.js"
           }
         }
       }

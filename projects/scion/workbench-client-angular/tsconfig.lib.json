@@ -3,12 +3,17 @@
 {
   "extends": "../../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../../out-tsc/workbench-client-menu-adapter.spec",
-    "types": [
-      "jasmine"
-    ]
+    "outDir": "../../../out-tsc/workbench-client-angular",
+    "declaration": true,
+    "declarationMap": true,
+    "stripInternal": true,
+    "inlineSources": true,
+    "types": []
   },
   "include": [
     "src/**/*.ts"
+  ],
+  "exclude": [
+    "**/*.spec.ts"
   ]
 }
