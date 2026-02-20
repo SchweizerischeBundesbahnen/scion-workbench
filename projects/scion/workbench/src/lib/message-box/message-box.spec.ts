@@ -24,7 +24,7 @@ describe('Message Box', () => {
     await waitUntilStable();
 
     // Expect message to be translated.
-    const messageElement = document.querySelector<HTMLElement>('wb-dialog.testee wb-message-box div.e2e-message')!;
+    const messageElement = document.querySelector<HTMLElement>('wb-dialog.testee wb-message-box div.e2e-slot')!;
     expect(messageElement.innerText).toEqual('MESSAGE (translated)');
   });
 

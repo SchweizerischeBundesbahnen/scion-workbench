@@ -39,7 +39,7 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO, WorkbenchD
   }
 
   public async show(message: Translatable | null, options?: NotificationOpenerPageOptions): Promise<void>;
-  public async show(component: 'component:notification-page' | 'component:focus-test-page' | 'component:legacy-notification-page', options?: NotificationOpenerPageOptions): Promise<void>;
+  public async show(component: 'component:notification-page' | 'component:focus-test-page' | 'component:dialog-opener-page' | 'component:legacy-notification-page', options?: NotificationOpenerPageOptions): Promise<void>;
   public async show(content: Translatable | null | 'component:notification-page', options?: NotificationOpenerPageOptions): Promise<void> {
     if (options?.injector) {
       throw Error('[PageObjectError] PageObject does not support the option `injector`.');

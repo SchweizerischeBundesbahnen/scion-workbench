@@ -81,7 +81,7 @@ function configurePopupGlassPane(): Provider[] {
     },
     {
       provide: GLASS_PANE_OPTIONS,
-      useFactory: () => ({attributes: {'data-popupid': inject(ɵWorkbenchPopup).id}}) satisfies GlassPaneOptions,
+      useFactory: (): GlassPaneOptions => ({attributes: {'data-popupid': inject(ɵWorkbenchPopup).id}}),
     },
   ];
 }

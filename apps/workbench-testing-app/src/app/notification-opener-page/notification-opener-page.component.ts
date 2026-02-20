@@ -20,6 +20,7 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {LegacyNotificationPageComponent} from '../legacy-notification-page/legacy-notification-page.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import {firstValueFrom, timer} from 'rxjs';
+import DialogOpenerPageComponent from '../dialog-opener-page/dialog-opener-page.component';
 
 @Component({
   selector: 'app-notification-opener-page',
@@ -115,6 +116,8 @@ export default class NotificationOpenerPageComponent {
         return NotificationPageComponent;
       case 'focus-test-page':
         return FocusTestPageComponent;
+      case 'dialog-opener-page':
+        return DialogOpenerPageComponent;
       case 'legacy-notification-page':
         return LegacyNotificationPageComponent;
       default:

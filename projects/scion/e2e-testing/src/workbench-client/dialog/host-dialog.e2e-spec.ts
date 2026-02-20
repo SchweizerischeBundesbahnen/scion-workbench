@@ -364,7 +364,7 @@ test.describe('Workbench Host Dialog', () => {
       const componentInstanceId = await dialogPage.getComponentInstanceId();
 
       // Expect glass pane of the dialog.
-      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.part.getBoundingBox('content')]));
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.part.getBoundingBox('slot')]));
 
       // Detach dialog.
       await appPO.activityItem({cssClass: 'testee'}).click();
@@ -437,7 +437,7 @@ test.describe('Workbench Host Dialog', () => {
 
       // Expect glass pane of the dialog.
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
-        await dialogOpenerPage.part.getBoundingBox('content'), // workbench part
+        await dialogOpenerPage.part.getBoundingBox('slot'), // workbench part
         await dialogOpenerPage.outlet.locator.boundingBox(), // router outlet
       ]));
 
@@ -509,7 +509,7 @@ test.describe('Workbench Host Dialog', () => {
       const componentInstanceId = await dialogPage.getComponentInstanceId();
 
       // Expect glass pane of the dialog.
-      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('content')]));
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('slot')]));
 
       // Detach dialog.
       await appPO.openNewViewTab();
@@ -575,7 +575,7 @@ test.describe('Workbench Host Dialog', () => {
       const componentInstanceId = await dialogPage.getComponentInstanceId();
 
       // Expect glass pane of the dialog.
-      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('content')]));
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('slot')]));
 
       // Detach dialog.
       await appPO.openNewViewTab();

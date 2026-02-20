@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
+import {DialogId, NotificationId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
@@ -72,7 +72,7 @@ export interface WorkbenchMessageBoxOptions {
    *
    * Set to `null` to open the message box outside a context.
    */
-  context?: ViewId | PartId | DialogId | PopupId | Context | null;
+  context?: ViewId | PartId | DialogId | PopupId | NotificationId | Context | null;
 
   /**
    * Specifies if the user can select text displayed in the message box. Defaults to `false`.

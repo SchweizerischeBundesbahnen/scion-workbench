@@ -38,12 +38,12 @@ export class DialogPO {
     this.header = this.dialog.locator('header.e2e-dialog-header');
     this.title = this.header.locator('div.e2e-title > span');
     this.closeButton = this.header.locator('button.e2e-close');
-    this.slot = this.locator.locator('sci-viewport.e2e-dialog-content');
+    this.slot = this.locator.locator('div.e2e-dialog-slot-bounds');
     this.footer = this.dialog.locator('footer.e2e-dialog-footer');
     this.resizeHandles = this.dialog.locator('div.e2e-resize-handle');
     this.contentScrollbars = {
-      vertical: this.dialog.locator('sci-viewport.e2e-dialog-content sci-scrollbar.e2e-vertical'),
-      horizontal: this.dialog.locator('sci-viewport.e2e-dialog-content sci-scrollbar.e2e-horizontal'),
+      vertical: this.dialog.locator('sci-viewport.e2e-dialog-slot sci-scrollbar.e2e-vertical'),
+      horizontal: this.dialog.locator('sci-viewport.e2e-dialog-slot sci-scrollbar.e2e-horizontal'),
     };
   }
 
@@ -60,11 +60,11 @@ export class DialogPO {
   }
 
   public hasVerticalOverflow(): Promise<boolean> {
-    return hasCssClass(this.locator.locator('sci-viewport.e2e-dialog-content > sci-scrollbar.vertical'), 'overflow');
+    return hasCssClass(this.locator.locator('sci-viewport.e2e-dialog-slot > sci-scrollbar.vertical'), 'overflow');
   }
 
   public hasHorizontalOverflow(): Promise<boolean> {
-    return hasCssClass(this.locator.locator('sci-viewport.e2e-dialog-content > sci-scrollbar.horizontal'), 'overflow');
+    return hasCssClass(this.locator.locator('sci-viewport.e2e-dialog-slot > sci-scrollbar.horizontal'), 'overflow');
   }
 
   public getComputedStyle(): Promise<CSSStyleDeclaration> {

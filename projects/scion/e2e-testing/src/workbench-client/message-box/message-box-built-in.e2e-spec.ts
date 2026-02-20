@@ -70,7 +70,7 @@ test.describe('Workbench Message Box Built-in Capability', () => {
 
       await expectMessageBox(textMessagePage).toBeVisible();
 
-      const singleLineBounds = await messageBox.getBoundingBox();
+      const singleLineBounds = await messageBox.getSlotBoundingBox();
 
       // Close the message box.
       await messageBox.clickActionButton('ok');
@@ -98,7 +98,7 @@ test.describe('Workbench Message Box Built-in Capability', () => {
 
       await expectMessageBox(textMessagePage).toBeVisible();
 
-      const singleLineBounds = await messageBox.getBoundingBox();
+      const singleLineBounds = await messageBox.getSlotBoundingBox();
 
       // Close the message box.
       await messageBox.clickActionButton('ok');

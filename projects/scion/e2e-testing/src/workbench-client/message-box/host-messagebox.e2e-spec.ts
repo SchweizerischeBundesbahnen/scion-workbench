@@ -201,7 +201,7 @@ test.describe('Workbench Host Message Box', () => {
     });
 
     // Expect the message box to adapt to the content size.
-    await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+    await expect.poll(() => messageBox.getSlotBoundingBox()).toMatchObject({
       height: 800,
       width: 800,
     });
@@ -244,24 +244,24 @@ test.describe('Workbench Host Message Box', () => {
     await expectMessageBox(messageBoxPage).toBeVisible();
 
     // Capture current size.
-    const dialogBounds = await messageBox.dialog.getDialogSlotBoundingBox();
-    const messageBoxPageBounds = await messageBox.getBoundingBox();
-    const verticalPadding = dialogBounds.height - messageBoxPageBounds.height;
-    const horizontalPadding = dialogBounds.width - messageBoxPageBounds.width;
+    const dialogSlotBounds = await messageBox.dialog.getDialogSlotBoundingBox();
+    const messageBoxSlotBounds = await messageBox.getSlotBoundingBox();
+    const verticalSlotPadding = dialogSlotBounds.height - messageBoxSlotBounds.height;
+    const horizontalSlotPadding = dialogSlotBounds.width - messageBoxSlotBounds.width;
 
     // Change the size of the content.
     await messageBoxPage.enterContentSize({width: '800px', height: '800px'});
 
     // Expect the message box to adapt to the content size.
-    await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+    await expect.poll(() => messageBox.getSlotBoundingBox()).toMatchObject({
       height: 800,
       width: 800,
     });
 
     // Expect the dialog to adapt to the content size.
     await expect.poll(() => messageBox.dialog.getDialogSlotBoundingBox()).toMatchObject({
-      height: 800 + verticalPadding,
-      width: 800 + horizontalPadding,
+      height: 800 + verticalSlotPadding,
+      width: 800 + horizontalSlotPadding,
     });
 
     // Expect content not to overflow.
@@ -275,15 +275,15 @@ test.describe('Workbench Host Message Box', () => {
     });
 
     // Expect the message box to adapt to the content size.
-    await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+    await expect.poll(() => messageBox.getSlotBoundingBox()).toMatchObject({
       height: 400,
       width: 400,
     });
 
     // Expect the dialog to adapt to the content size.
     await expect.poll(() => messageBox.dialog.getDialogSlotBoundingBox()).toMatchObject({
-      height: 400 + verticalPadding,
-      width: 400 + horizontalPadding,
+      height: 400 + verticalSlotPadding,
+      width: 400 + horizontalSlotPadding,
     });
 
     // Expect content not to overflow.
@@ -297,15 +297,15 @@ test.describe('Workbench Host Message Box', () => {
     });
 
     // Expect the message box to adapt to the content size.
-    await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+    await expect.poll(() => messageBox.getSlotBoundingBox()).toMatchObject({
       height: 800,
       width: 800,
     });
 
     // Expect the dialog to adapt to the content size.
     await expect.poll(() => messageBox.dialog.getDialogSlotBoundingBox()).toMatchObject({
-      height: 800 + verticalPadding,
-      width: 800 + horizontalPadding,
+      height: 800 + verticalSlotPadding,
+      width: 800 + horizontalSlotPadding,
     });
 
     // Expect content not to overflow.
@@ -442,7 +442,7 @@ test.describe('Workbench Host Message Box', () => {
       const componentInstanceId = await messageboxPage.getComponentInstanceId();
 
       // Expect glass pane of the messagebox.
-      await expect.poll(() => messagebox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await messageboxOpenerPage.part.getBoundingBox('content')]));
+      await expect.poll(() => messagebox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await messageboxOpenerPage.part.getBoundingBox('slot')]));
 
       // Detach messagebox.
       await appPO.activityItem({cssClass: 'testee'}).click();
@@ -515,7 +515,7 @@ test.describe('Workbench Host Message Box', () => {
 
       // Expect glass pane of the messagebox.
       await expect.poll(() => messagebox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
-        await messageboxOpenerPage.part.getBoundingBox('content'), // workbench part
+        await messageboxOpenerPage.part.getBoundingBox('slot'), // workbench part
         await messageboxOpenerPage.outlet.locator.boundingBox(), // router outlet
       ]));
 
@@ -587,7 +587,7 @@ test.describe('Workbench Host Message Box', () => {
       const componentInstanceId = await messageboxPage.getComponentInstanceId();
 
       // Expect glass pane of the messagebox.
-      await expect.poll(() => messagebox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('content')]));
+      await expect.poll(() => messagebox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('slot')]));
 
       // Detach messagebox.
       await appPO.openNewViewTab();
@@ -653,7 +653,7 @@ test.describe('Workbench Host Message Box', () => {
       const componentInstanceId = await messageboxPage.getComponentInstanceId();
 
       // Expect glass pane of the messagebox.
-      await expect.poll(() => messagebox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('content')]));
+      await expect.poll(() => messagebox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('slot')]));
 
       // Detach messagebox.
       await appPO.openNewViewTab();

@@ -1,15 +1,17 @@
 <!-- Title -->
-@if (notification().title(); as title) {
+@if (notification.title(); as title) {
   <header class="e2e-title">{{(title | wbText)()}}</header>
 }
 
 <!-- Message -->
-<div class="message e2e-message" [class.text]="!!notification().slot.text?.length">
-  @if (notification().slot.text?.length) {
-    {{(notification().slot.text | wbText)()}}
-  } @else if (notification().slot.component) {
-    <sci-viewport class="e2e-message-viewport">
-      <ng-container *ngComponentOutlet="notification().slot.component!; inputs: notification().inputs | wbRemoveLegacyInput; injector: notification().slot.injector"/>
+<div class="slot e2e-slot" [class.text]="!!notification.slot.text?.length">
+  @if (notification.slot.text?.length) {
+    {{(notification.slot.text | wbText)()}}
+  } @else if (notification.slot.component) {
+    <sci-viewport class="e2e-notification-slot">
+      <ng-container *ngComponentOutlet="notification.slot.component; inputs: notification.inputs | wbRemoveLegacyInput;"/>
+      <!-- extra div required to capture viewport slot bounds, without viewport content padding -->
+      <div class="slot-bounds e2e-notification-slot-bounds" #slot_bounds></div>
     </sci-viewport>
   }
 </div>

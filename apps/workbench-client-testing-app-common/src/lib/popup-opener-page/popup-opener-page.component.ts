@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,7 @@
 
 import {Component, ElementRef, inject, viewChild} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {CloseStrategy, DialogId, PartId, PopupId, PopupOrigin, ViewId, WORKBENCH_ELEMENT, WorkbenchElement, WorkbenchPopupService} from '@scion/workbench-client';
+import {CloseStrategy, DialogId, NotificationId, PartId, PopupId, PopupOrigin, ViewId, WORKBENCH_ELEMENT, WorkbenchElement, WorkbenchPopupService} from '@scion/workbench-client';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import {PopupPositionLabelPipe, Position} from './popup-position-label.pipe';
@@ -65,7 +65,7 @@ export class PopupOpenerPageComponent {
         height: this._formBuilder.control<number | undefined>(undefined),
       }),
       align: this._formBuilder.control<'east' | 'west' | 'north' | 'south' | ''>(''),
-      context: this._formBuilder.control<ViewId | PartId | DialogId | PopupId | '<null>' | ''>(''),
+      context: this._formBuilder.control<ViewId | PartId | DialogId | PopupId | NotificationId | '<null>' | ''>(''),
       cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
       closeStrategy: this._formBuilder.group({
         onFocusLost: this._formBuilder.control(true),

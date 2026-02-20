@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,7 +11,7 @@
 import {Component, inject, Signal} from '@angular/core';
 import {WorkbenchNotificationRegistry} from './workbench-notification.registry';
 import {ɵWorkbenchNotification} from './ɵworkbench-notification.model';
-import {WorkbenchNotificationComponent} from './workbench-notification.component';
+import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';
 
 /**
  * Displays notifications on the right side, stacked vertically.
@@ -21,7 +21,7 @@ import {WorkbenchNotificationComponent} from './workbench-notification.component
   templateUrl: './notification-list.component.html',
   styleUrl: './notification-list.component.scss',
   imports: [
-    WorkbenchNotificationComponent,
+    WorkbenchPortalOutletDirective,
   ],
 })
 export class NotificationListComponent {

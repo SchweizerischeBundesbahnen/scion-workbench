@@ -434,24 +434,24 @@ test.describe('Workbench Message Box', () => {
       await expectMessageBox(messageBoxPage).toBeVisible();
 
       // Capture current size.
-      const dialogBounds = await messageBox.dialog.getDialogSlotBoundingBox();
-      const messageBoxPageBounds = await messageBox.getBoundingBox();
-      const verticalPadding = dialogBounds.height - messageBoxPageBounds.height;
-      const horizontalPadding = dialogBounds.width - messageBoxPageBounds.width;
+      const dialogSlotBounds = await messageBox.dialog.getDialogSlotBoundingBox();
+      const messageBoxSlotBounds = await messageBox.getSlotBoundingBox();
+      const verticalSlotPadding = dialogSlotBounds.height - messageBoxSlotBounds.height;
+      const horizontalSlotPadding = dialogSlotBounds.width - messageBoxSlotBounds.width;
 
       // Change the size of the content.
       await messageBoxPage.enterContentSize({width: '800px', height: '800px'});
 
       // Expect the message box to adapt to the content size.
-      await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+      await expect.poll(() => messageBox.getSlotBoundingBox()).toMatchObject({
         height: 800,
         width: 800,
       });
 
       // Expect the dialog to adapt to the content size.
       await expect.poll(() => messageBox.dialog.getDialogSlotBoundingBox()).toMatchObject({
-        height: 800 + verticalPadding,
-        width: 800 + horizontalPadding,
+        height: 800 + verticalSlotPadding,
+        width: 800 + horizontalSlotPadding,
       });
 
       // Expect content not to overflow.
@@ -465,15 +465,15 @@ test.describe('Workbench Message Box', () => {
       });
 
       // Expect the message box to adapt to the content size.
-      await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+      await expect.poll(() => messageBox.getSlotBoundingBox()).toMatchObject({
         height: 400,
         width: 400,
       });
 
       // Expect the dialog to adapt to the content size.
       await expect.poll(() => messageBox.dialog.getDialogSlotBoundingBox()).toMatchObject({
-        height: 400 + verticalPadding,
-        width: 400 + horizontalPadding,
+        height: 400 + verticalSlotPadding,
+        width: 400 + horizontalSlotPadding,
       });
 
       // Expect content not to overflow.
@@ -487,15 +487,15 @@ test.describe('Workbench Message Box', () => {
       });
 
       // Expect the message box to adapt to the content size.
-      await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+      await expect.poll(() => messageBox.getSlotBoundingBox()).toMatchObject({
         height: 800,
         width: 800,
       });
 
       // Expect the dialog to adapt to the content size.
       await expect.poll(() => messageBox.dialog.getDialogSlotBoundingBox()).toMatchObject({
-        height: 800 + verticalPadding,
-        width: 800 + horizontalPadding,
+        height: 800 + verticalSlotPadding,
+        width: 800 + horizontalSlotPadding,
       });
 
       // Expect content not to overflow.
@@ -515,7 +515,7 @@ test.describe('Workbench Message Box', () => {
 
       await expectMessageBox(textMessagePage).toBeVisible();
 
-      const singleLineBounds = await messageBox.getBoundingBox();
+      const singleLineBounds = await messageBox.getSlotBoundingBox();
 
       // Close the message box.
       await messageBox.clickActionButton('ok');
@@ -541,7 +541,7 @@ test.describe('Workbench Message Box', () => {
 
       await expectMessageBox(textMessagePage).toBeVisible();
 
-      const singleLineBounds = await messageBox.getBoundingBox();
+      const singleLineBounds = await messageBox.getSlotBoundingBox();
 
       // Close the message box.
       await messageBox.clickActionButton('ok');

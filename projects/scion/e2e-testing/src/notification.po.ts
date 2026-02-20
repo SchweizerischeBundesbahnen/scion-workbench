@@ -21,11 +21,13 @@ export class NotificationPO {
   public readonly locator: Locator;
   public readonly locateBy?: {id?: NotificationId; cssClass?: string[]};
   public readonly title: Locator;
+  public readonly slot: Locator;
 
   constructor(page: Page, locateBy: RequireOne<{notificationId: NotificationId; cssClass: string | string[]}>, options?: {nth?: number}) {
     this.locateBy = {id: locateBy.notificationId, cssClass: coerceArray(locateBy.cssClass)};
     this.locator = page.locator(selectBy('wb-notification', {attributes: {'data-notificationid': locateBy.notificationId}, cssClass: locateBy.cssClass})).nth(options?.nth ?? 0);
     this.title = this.locator.locator('header.e2e-title');
+    this.slot = this.locator.locator('div.e2e-notification-slot-bounds');
   }
 
   public async getNotificationId(): Promise<NotificationId> {
@@ -33,14 +35,31 @@ export class NotificationPO {
   }
 
   /**
-   * Gets the bounding box of this notification or its content (exclusive title). Defaults to the bounding box of the notification.
+   * Gets the bounding box of this notification (with or without border), or its slot (exclusive title). Defaults to the bounding box of the notification.
    */
-  public async getBoundingBox(selector: 'notification' | 'content' = 'notification'): Promise<DomRect> {
-    return fromRect(await this.locator.locator(selector === 'notification' ? ':scope' : ':scope > div.e2e-message').boundingBox());
+  public async getBoundingBox(selector: 'notification' | 'notification-inset' | 'slot' = 'notification'): Promise<DomRect> {
+    switch (selector) {
+      case 'notification': {
+        return fromRect(await this.locator.boundingBox());
+      }
+      case 'notification-inset': {
+        const {x, y, width, height} = fromRect(await this.locator.boundingBox());
+        const borderWidth = await this.locator.evaluate((element: HTMLElement) => parseInt(getComputedStyle(element).borderWidth, 10));
+        return fromRect({
+          x: x + borderWidth,
+          y: y + borderWidth,
+          width: width - 2 * borderWidth,
+          height: height - 2 * borderWidth,
+        });
+      }
+      case 'slot': {
+        return fromRect(await this.locator.locator('div.e2e-notification-slot-bounds').boundingBox());
+      }
+    }
   }
 
   public async hasVerticalOverflow(): Promise<boolean> {
-    const verticalScrollbar = this.locator.locator('sci-viewport.e2e-message-viewport > sci-scrollbar.vertical');
+    const verticalScrollbar = this.locator.locator('sci-viewport.e2e-notification-slot > sci-scrollbar.vertical');
     return !!(await verticalScrollbar.count()) && await hasCssClass(verticalScrollbar, 'overflow');
   }
 

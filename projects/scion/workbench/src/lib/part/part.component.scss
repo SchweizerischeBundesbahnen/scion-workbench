@@ -13,7 +13,7 @@
     flex: none;
   }
 
-  > div.content {
+  > div.slot {
     flex: auto;
     display: grid;
     position: relative; // positioning context for slot content

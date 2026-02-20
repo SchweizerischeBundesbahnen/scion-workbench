@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DOCUMENT, effect, ElementRef, inject, Injector, input, NgZone, runInInjectionContext, signal, untracked} from '@angular/core';
+import {Component, DOCUMENT, effect, ElementRef, inject, NgZone, Provider, signal, untracked, viewChild} from '@angular/core';
 import {fromEvent, NEVER, Observable, timer} from 'rxjs';
 import {NgComponentOutlet} from '@angular/common';
 import {TextPipe} from '../text/text.pipe';
@@ -19,6 +19,7 @@ import {trackFocus} from '../focus/workbench-focus-tracker.service';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {observeIn, subscribeIn} from '@scion/toolkit/operators';
 import {filter} from 'rxjs/operators';
+import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
 
 /**
  * Renders the content of a workbench notification.
@@ -34,14 +35,20 @@ import {filter} from 'rxjs/operators';
     RemoveLegacyInputPipe,
     SciViewportComponent,
   ],
+  hostDirectives: [
+    GlassPaneDirective,
+  ],
+  providers: [
+    configureNotificationGlassPane(),
+  ],
   host: {
-    '[attr.data-notificationid]': 'notification().id',
-    '[attr.data-severity]': 'notification().severity()',
-    '[style.min-height]': 'notification().size.minHeight()',
-    '[style.height]': 'notification().size.height()',
-    '[style.max-height]': 'notification().size.maxHeight()',
+    '[attr.data-notificationid]': 'notification.id',
+    '[attr.data-severity]': 'notification.severity()',
+    '[style.min-height]': 'notification.size.minHeight()',
+    '[style.height]': 'notification.size.height()',
+    '[style.max-height]': 'notification.size.maxHeight()',
     '[attr.tabindex]': '-1',
-    '[class]': 'notification().cssClass()',
+    '[class]': 'notification.cssClass()',
     '(mouseenter)': 'hover.set(true)',
     '(mouseleave)': 'hover.set(false)',
     '(auxclick)': 'onAuxClick($event)',
@@ -50,31 +57,33 @@ import {filter} from 'rxjs/operators';
 })
 export class WorkbenchNotificationComponent {
 
-  public readonly notification = input.required<ɵWorkbenchNotification>();
-
+  protected readonly notification = inject(ɵWorkbenchNotification);
   protected readonly hover = signal(false);
+
+  public readonly notificationSlotBounds = viewChild('slot_bounds', {read: ElementRef<HTMLElement>});
 
   constructor() {
     this.installAutoCloseTimer();
-    this.installFocusTracker();
     this.closeOnEscapeIfOnTop();
+
+    trackFocus(inject(ElementRef).nativeElement as HTMLElement, this.notification);
   }
 
   protected onClose(): void {
-    this.notification().close();
+    this.notification.close();
   }
 
   protected onEscape(event: Event): void {
-    if (this.notification().focused()) {
+    if (this.notification.focused()) {
       event.stopPropagation(); // stop propagation to prevent closing the most recently displayed notification
-      this.notification().close();
+      this.notification.close();
     }
   }
 
   protected onAuxClick(event: MouseEvent): void {
     if (event.button === 1) { // primary aux button
       event.preventDefault(); // prevent user-agent default action
-      this.notification().close();
+      this.notification.close();
     }
   }
 
@@ -86,7 +95,7 @@ export class WorkbenchNotificationComponent {
     const document = inject(DOCUMENT);
 
     effect(onCleanup => {
-      if (!this.notification().top()) {
+      if (!this.notification.top()) {
         return;
       }
 
@@ -96,7 +105,7 @@ export class WorkbenchNotificationComponent {
           filter((event: KeyboardEvent) => event.key === 'Escape'),
           observeIn(fn => zone.run(fn)),
         )
-        .subscribe(() => this.notification().close());
+        .subscribe(() => this.notification.close());
       onCleanup(() => subscription.unsubscribe());
     });
   }
@@ -106,17 +115,17 @@ export class WorkbenchNotificationComponent {
    */
   private installAutoCloseTimer(): void {
     effect(onCleanup => {
-      const notification = this.notification();
-      const duration = notification.duration();
-      const focus = notification.focused();
+      const duration = this.notification.duration();
+      const focus = this.notification.focused();
+      const blockedBy = this.notification.blockedBy();
       const hover = this.hover();
 
-      if (hover || focus) {
+      if (hover || focus || blockedBy) {
         return;
       }
 
       untracked(() => {
-        const subscription = fromDuration$(duration).subscribe(() => this.notification().close());
+        const subscription = fromDuration$(duration).subscribe(() => this.notification.close());
         onCleanup(() => subscription.unsubscribe());
       });
     });
@@ -137,18 +146,20 @@ export class WorkbenchNotificationComponent {
       }
     }
   }
+}
 
-  private installFocusTracker(): void {
-    const host = inject(ElementRef).nativeElement as HTMLElement;
-    const injector = inject(Injector);
-
-    effect(onCleanup => {
-      const notification = this.notification();
-
-      untracked(() => {
-        const tracker = runInInjectionContext(injector, () => trackFocus(host, notification));
-        onCleanup(() => tracker.destroy());
-      });
-    });
-  }
+/**
+ * Blocks this notification when dialog(s) overlay it.
+ */
+function configureNotificationGlassPane(): Provider[] {
+  return [
+    {
+      provide: GLASS_PANE_BLOCKABLE,
+      useFactory: () => inject(ɵWorkbenchNotification),
+    },
+    {
+      provide: GLASS_PANE_OPTIONS,
+      useFactory: (): GlassPaneOptions => ({attributes: {'data-notificationid': inject(ɵWorkbenchNotification).id}}),
+    },
+  ];
 }

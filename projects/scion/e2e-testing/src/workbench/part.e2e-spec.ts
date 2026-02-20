@@ -823,7 +823,7 @@ test.describe('Workbench Part', () => {
       const testPage = new WorkbenchHandleBoundsTestPagePO(part);
 
       await expect(async () => {
-        const expectedBounds = await part.getBoundingBox('content');
+        const expectedBounds = await part.getBoundingBox('slot');
         const handleBounds = await testPage.getBounds();
         expect(handleBounds).toEqual(expectedBounds);
       }).toPass();
@@ -834,7 +834,7 @@ test.describe('Workbench Part', () => {
       const testPage = new WorkbenchHandleBoundsTestPagePO(part);
 
       await expect(async () => {
-        const expectedBounds = await part.getBoundingBox('content');
+        const expectedBounds = await part.getBoundingBox('slot');
         const handleBounds = await testPage.getBounds();
         expect(handleBounds).toEqual(expectedBounds);
       }).toPass();
@@ -845,7 +845,7 @@ test.describe('Workbench Part', () => {
       const testPage = new WorkbenchHandleBoundsTestPagePO(part);
 
       await expect(async () => {
-        const expectedBounds = await part.getBoundingBox('content');
+        const expectedBounds = await part.getBoundingBox('slot');
         const handleBounds = await testPage.getBounds();
         expect(handleBounds).toEqual(expectedBounds);
       }).toPass();

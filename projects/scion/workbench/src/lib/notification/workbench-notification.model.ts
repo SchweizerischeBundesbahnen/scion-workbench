@@ -57,6 +57,11 @@ export abstract class WorkbenchNotification {
   public abstract readonly focused: Signal<boolean>;
 
   /**
+   * Gets size and position of this notification, or `undefined` if not constructed.
+   */
+  public abstract readonly bounds: Signal<DOMRect | undefined>;
+
+  /**
    * Closes the notification.
    */
   public abstract close(): void;

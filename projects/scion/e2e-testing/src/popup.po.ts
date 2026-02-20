@@ -34,9 +34,9 @@ export class PopupPO {
   }
 
   /**
-   * Gets the bounding box of this popup (inclusive borders) or its content (exclusive borders). Defaults to the bounding box of the popup inclusive borders.
+   * Gets the bounding box of this popup (inclusive borders) or its slot (exclusive borders). Defaults to the bounding box of the popup inclusive borders.
    */
-  public async getBoundingBox(selector: 'popup' | 'content' = 'popup'): Promise<DomRect> {
+  public async getBoundingBox(selector: 'popup' | 'slot' = 'popup'): Promise<DomRect> {
     const locator = selector === 'popup' ? this.overlay : this.locator;
     return fromRect(await locator.boundingBox());
   }

@@ -22,6 +22,7 @@ import {InputFieldTestPagePO} from '../page-object/test-pages/input-field-test-p
 import {FocusTestPagePO} from '../page-object/test-pages/focus-test-page.po';
 import {PopupOpenerPagePO} from '../page-object/popup-opener-page.po';
 import {canMatchWorkbenchDialogCapability, canMatchWorkbenchPartCapability, canMatchWorkbenchPopupCapability} from '../../workbench/page-object/layout-page/register-route-page.po';
+import {NotificationOpenerPagePO} from '../page-object/notification-opener-page.po';
 
 test.describe('Workbench Dialog', () => {
 
@@ -87,7 +88,7 @@ test.describe('Workbench Dialog', () => {
 
       // Expect glass pane of the dialog.
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
-        await dialogOpenerPage.part.getBoundingBox('content'), // workbench part
+        await dialogOpenerPage.part.getBoundingBox('slot'), // workbench part
         await dialogOpenerPage.outlet.locator.boundingBox(), // router outlet
       ]));
     });
@@ -159,7 +160,7 @@ test.describe('Workbench Dialog', () => {
       await expectDialog(dialogPage).toBeVisible();
 
       // Expect glass pane of the dialog.
-      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.part.getBoundingBox('content')]));
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.part.getBoundingBox('slot')]));
     });
 
     test('should detach dialog if contextual part is not active', async ({appPO, microfrontendNavigator}) => {
@@ -403,7 +404,7 @@ test.describe('Workbench Dialog', () => {
 
       // Expect glass pane of the dialog.
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
-        await otherPartPage.part.getBoundingBox('content'), // workbench part
+        await otherPartPage.part.getBoundingBox('slot'), // workbench part
         await otherPartPage.outlet.locator.boundingBox(), // router outlet
       ]));
     });
@@ -470,7 +471,7 @@ test.describe('Workbench Dialog', () => {
       // Expect glass pane of the dialog.
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
         await appPO.workbenchBoundingBox(), // workbench
-        await dialogOpenerPage.part.getBoundingBox('content'), // workbench part
+        await dialogOpenerPage.part.getBoundingBox('slot'), // workbench part
         await dialogOpenerPage.outlet.locator.boundingBox(), // router outlet
       ]));
     });
@@ -542,7 +543,7 @@ test.describe('Workbench Dialog', () => {
 
       // Expect glass pane of the dialog.
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
-        await inputFieldTestPage.part.getBoundingBox('content'), // workbench part
+        await inputFieldTestPage.part.getBoundingBox('slot'), // workbench part
         await inputFieldTestPage.outlet.locator.boundingBox(), // router outlet
       ]));
     });
@@ -842,7 +843,7 @@ test.describe('Workbench Dialog', () => {
 
       // Expect glass pane of the dialog.
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
-        await dialogOpenerPage.popup.getBoundingBox('content'), // workbench popup
+        await dialogOpenerPage.popup.getBoundingBox('slot'), // workbench popup
       ]));
     });
 
@@ -893,7 +894,7 @@ test.describe('Workbench Dialog', () => {
 
       // Expect glass pane of the dialog.
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
-        await dialogOpenerPage.popup.getBoundingBox('content'), // workbench popup
+        await dialogOpenerPage.popup.getBoundingBox('slot'), // workbench popup
       ]));
     });
 
@@ -1097,7 +1098,7 @@ test.describe('Workbench Dialog', () => {
 
       // Expect glass pane of the dialog.
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
-        await popup.getBoundingBox('content'), // workbench popup
+        await popup.getBoundingBox('slot'), // workbench popup
       ]));
     });
 
@@ -1140,7 +1141,7 @@ test.describe('Workbench Dialog', () => {
       // Expect glass pane of the dialog.
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
         await appPO.workbenchBoundingBox(), // workbench
-        await dialogOpenerPage.popup.getBoundingBox('content'), // workbench popup
+        await dialogOpenerPage.popup.getBoundingBox('slot'), // workbench popup
         await popupOpenerPage.outlet.getBoundingBox(), // microfrontend view
         await popupOpenerPage.view.getBoundingBox(), // workbench view
       ]));
@@ -1232,7 +1233,7 @@ test.describe('Workbench Dialog', () => {
 
       // Expect glass pane of the dialog.
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
-        await inputFieldTestPage.popup.getBoundingBox('content'), // workbench popup
+        await inputFieldTestPage.popup.getBoundingBox('slot'), // workbench popup
       ]));
     });
   });
@@ -1567,8 +1568,54 @@ test.describe('Workbench Dialog', () => {
         await dialogOpenerPage1.view.getBoundingBox(), // workbench view
       ]));
     });
+  });
 
-    test('should block interaction with contextual popup', async ({appPO, microfrontendNavigator}) => {
+  test.describe('Notification Context', () => {
+
+    test('should open a notification-modal dialog', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'notification',
+        qualifier: {component: 'dialog-opener'},
+        properties: {
+          path: 'test-dialog-opener',
+          size: {height: '500px'},
+        },
+      });
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'dialog',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-dialog',
+          size: {height: '475px', width: '300px'},
+        },
+      });
+
+      // Open notification.
+      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+      await notificationOpenerPage.show({component: 'dialog-opener'}, {
+        cssClass: 'dialog-opener',
+      });
+
+      // Open dialog from notification.
+      const dialogOpenerPage = new DialogOpenerPagePO(appPO.notification({cssClass: 'dialog-opener'}));
+      await dialogOpenerPage.open({component: 'testee'}, {cssClass: 'testee'});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(dialog);
+
+      // Expect dialog to display.
+      await expectDialog(dialogPage).toBeVisible();
+
+      // Expect glass pane of the dialog.
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await dialogOpenerPage.notification.getBoundingBox('notification-inset'), // workbench notification
+      ]));
+    });
+
+    test('should block interaction with contextual notification', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       await microfrontendNavigator.registerCapability('app1', {
@@ -1581,81 +1628,43 @@ test.describe('Workbench Dialog', () => {
       });
 
       await microfrontendNavigator.registerCapability('app1', {
-        type: 'popup',
-        qualifier: {component: 'popup'},
+        type: 'notification',
+        qualifier: {component: 'notification'},
         properties: {
           path: 'test-pages/input-field-test-page',
           size: {height: '100px', width: '100px'},
         },
       });
 
-      await microfrontendNavigator.registerCapability('app1', {
-        type: 'part',
-        qualifier: {part: 'main-area'},
-      });
+      // Add part to the right for notifications to not cover the dialog opener page.
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.right', {align: 'right'})
+        .navigatePart('part.right', ['path/to/part']),
+      );
 
-      await microfrontendNavigator.registerCapability('app1', {
-        type: 'part',
-        qualifier: {part: 'popup-opener'},
-        properties: {
-          path: 'test-popup-opener',
-          extras: {
-            icon: 'folder',
-            label: 'Popup Opener',
-          },
-        },
+      // Open notification.
+      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+      await notificationOpenerPage.show({component: 'notification'}, {
+        cssClass: 'notification',
       });
+      const notification = appPO.notification({cssClass: 'notification'});
+      const inputFieldTestPage = new InputFieldTestPagePO(appPO.notification({cssClass: 'notification'}));
 
-      await microfrontendNavigator.createPerspective('app1', {
-        type: 'perspective',
-        qualifier: {perspective: 'testee'},
-        properties: {
-          parts: [
-            {
-              id: MAIN_AREA,
-              qualifier: {part: 'main-area'},
-            },
-            {
-              id: 'part.popup-opener',
-              qualifier: {part: 'popup-opener'},
-              position: 'left-top',
-              active: true,
-              ɵactivityId: 'activity.1',
-            },
-          ],
-        },
-      });
-
-      // Open popup.
-      const popupOpenerPage = new PopupOpenerPagePO(appPO.part({partId: 'part.popup-opener'}));
-      await popupOpenerPage.open({component: 'popup'}, {
-        anchor: 'element',
-        closeStrategy: {onFocusLost: false},
-        cssClass: 'popup',
-      });
-      const popup = appPO.popup({cssClass: 'popup'});
-      const inputFieldTestPage = new InputFieldTestPagePO(appPO.popup({cssClass: 'popup'}));
-
-      // Open dialog from popup.
+      // Open dialog from notification.
       const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
-      await dialogOpener.open({component: 'testee'}, {cssClass: 'testee', context: await popup.getPopupId()});
+      await dialogOpener.open({component: 'testee'}, {cssClass: 'testee', context: await notification.getNotificationId()});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
-      await dialog.moveDialog('bottom-right-corner');
 
       // Focus input field.
       const dialogPage = new FocusTestPagePO(appPO.dialog({cssClass: 'testee'}));
       await dialogPage.firstField.focus();
 
-      // Expect interaction with contextual popup to be blocked.
+      // Expect interaction with contextual notification to be blocked.
       await expect(inputFieldTestPage.clickInputField({timeout: 1000})).rejects.toThrowError();
       await expect(dialogPage.firstField).toBeFocused();
       await expect.poll(() => appPO.focusOwner()).toEqual(await dialog.getDialogId());
-
-      // Expect glass pane of the dialog.
-      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
-        await inputFieldTestPage.popup.getBoundingBox('content'), // workbench popup
-      ]));
     });
   });
 

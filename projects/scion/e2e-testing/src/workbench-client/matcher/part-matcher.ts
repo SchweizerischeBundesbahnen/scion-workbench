@@ -22,8 +22,8 @@ export function expectPart(part: PartPO): PartMatcher {
       const outlet = new SciRouterOutletPO(part.locator.page(), {name: partId});
 
       await expect(part.locator).toBeVisible();
-      await expect(part.locator.locator('.e2e-part-content')).toBeVisible();
-      await expect(part.locator.locator('.e2e-view-content')).not.toBeVisible();
+      await expect(part.locator.locator('.e2e-part-slot')).toBeVisible();
+      await expect(part.locator.locator('.e2e-view-slot')).not.toBeVisible();
       await expect(outlet.locator).toBeVisible();
       await expect(outlet.frameLocator.locator(selector)).toBeVisible();
     },
@@ -33,8 +33,8 @@ export function expectPart(part: PartPO): PartMatcher {
         const outlet = new SciRouterOutletPO(part.locator.page(), {name: partId});
 
         await expect(part.locator).toBeVisible();
-        await expect(part.locator.locator('.e2e-part-content')).not.toBeAttached();
-        await expect(part.locator.locator('.e2e-view-content')).toBeVisible();
+        await expect(part.locator.locator('.e2e-part-slot')).not.toBeAttached();
+        await expect(part.locator.locator('.e2e-view-slot')).toBeVisible();
         await expect(outlet.locator).not.toBeAttached();
       },
       toBeAttached: async (): Promise<void> => {

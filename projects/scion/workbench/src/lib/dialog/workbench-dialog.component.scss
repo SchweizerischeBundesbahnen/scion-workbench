@@ -61,7 +61,14 @@
         flex: auto;
 
         &::part(content) {
+          position: relative; // positioning context for slot bounds.
           padding-inline: var(--ɵdialog-padding);
+        }
+
+        > div.slot-bounds {
+          position: absolute;
+          inset: 0 var(--ɵdialog-padding); // padding of viewport
+          visibility: hidden;
         }
       }
 

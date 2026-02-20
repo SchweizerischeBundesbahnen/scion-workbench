@@ -328,7 +328,7 @@ test.describe('Workbench Dialog', () => {
       await expectDialog(dialogPage).toBeVisible();
       await expect.poll(() => appPO.isPartBlocked('part.testee')).toBe(true);
       await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
-      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.part.getBoundingBox('content')]));
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.part.getBoundingBox('slot')]));
     });
 
     test('should reject the promise when attaching the dialog to a non-existent part', async ({appPO, workbenchNavigator, consoleLogs}) => {
@@ -515,7 +515,7 @@ test.describe('Workbench Dialog', () => {
       await expectDialog(dialogPage).toBeVisible();
       await expect.poll(() => appPO.isPartBlocked('part.peripheral')).toBe(true);
       await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
-      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.part.getBoundingBox('content')]));
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.part.getBoundingBox('slot')]));
 
       // Expect dialog to be positioned in the center of the workbench.
       const workbenchBounds = fromRect(await appPO.workbenchRoot.boundingBox());
@@ -562,7 +562,7 @@ test.describe('Workbench Dialog', () => {
       await expectDialog(dialogPage).toBeVisible();
       await expect.poll(() => appPO.isPartBlocked('part.left')).toBe(true);
       await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
-      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.part.getBoundingBox('content')]));
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.part.getBoundingBox('slot')]));
 
       // Expect dialog to be positioned in the center of the part.
       const partBounds = await appPO.part({partId: 'part.left'}).getBoundingBox();
@@ -790,7 +790,7 @@ test.describe('Workbench Dialog', () => {
       await expect.poll(() => appPO.isPopupBlocked(popupPage.popup.getPopupId())).toBe(true);
       await expect.poll(() => appPO.isDialogBlocked(dialogPage.dialog.getDialogId())).toBe(false);
       await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
-      await expect.poll(() => dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popupPage.popup.getBoundingBox('content')]));
+      await expect.poll(() => dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popupPage.popup.getBoundingBox('slot')]));
     });
 
     test('should reject the promise when attaching the dialog to a non-existent popup', async ({appPO, workbenchNavigator, consoleLogs}) => {
@@ -953,7 +953,7 @@ test.describe('Workbench Dialog', () => {
       await expectDialog(dialogPage).toBeVisible();
       await expect.poll(() => appPO.isPopupBlocked(popupPage.popup.getPopupId())).toBe(true);
       await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
-      await expect.poll(() => dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popupPage.popup.getBoundingBox('content')]));
+      await expect.poll(() => dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popupPage.popup.getBoundingBox('slot')]));
 
       // Expect dialog to be positioned in the center of the popup.
       const popupBounds = await popupPage.popup.getBoundingBox();
@@ -1859,7 +1859,7 @@ test.describe('Workbench Dialog', () => {
     });
 
     test('should grow beyong context bounds', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false, designTokens: {'--sci-workbench-dialog-padding': '0'}});
+      await appPO.navigateTo({microfrontendSupport: false});
 
       // Add layout with a small main area.
       await workbenchNavigator.createPerspective(factory => factory
@@ -3026,7 +3026,7 @@ test.describe('Workbench Dialog', () => {
 
       // Expect glass pane.
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
-        await dialogOpenerPage.part.getBoundingBox('content'),
+        await dialogOpenerPage.part.getBoundingBox('slot'),
       ]));
     });
 
@@ -3105,7 +3105,7 @@ test.describe('Workbench Dialog', () => {
       await expect(focusTestPage.middleField).toBeFocused();
 
       // Expect glass panes.
-      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('content')]));
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('slot')]));
       await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
       await expect.poll(() => appPO.isViewBlocked(popupOpenerViewPage.view.getViewId())).toBe(false);
       await expect.poll(() => appPO.isPopupBlocked(popup.getPopupId())).toBe(true);

@@ -51,9 +51,9 @@ export class MessageBoxPO {
   }
 
   /**
-   * Gets the bounding box of the content of this message box.
+   * Gets the bounding box of the message box slot.
    */
-  public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.locator('> div.e2e-message').boundingBox());
+  public async getSlotBoundingBox(): Promise<DomRect> {
+    return fromRect(await this.locator.locator('> div.e2e-slot').boundingBox());
   }
 }

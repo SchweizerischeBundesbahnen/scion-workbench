@@ -16,8 +16,10 @@
       <ng-container *ngTemplateOutlet="dialog.header?.template ?? default_dialog_header"/>
     </header>
 
-    <sci-viewport class="content e2e-dialog-content">
+    <sci-viewport class="e2e-dialog-slot">
       <ng-container *ngComponentOutlet="dialog.component; inputs: dialog.inputs"/>
+      <!-- extra div required to capture viewport slot bounds, without viewport content padding -->
+      <div class="slot-bounds e2e-dialog-slot-bounds" #slot_bounds></div>
     </sci-viewport>
 
     @if (dialog.footer || dialog.actions.length) {

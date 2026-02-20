@@ -29,14 +29,14 @@ test.describe('Workbench Popup', () => {
     const popup = appPO.popup({cssClass: 'testee'});
     const popupPage = new PopupPagePO(popup);
 
-    await expect.poll(() => popup.getBoundingBox('content')).toEqual(expect.objectContaining({
+    await expect.poll(() => popup.getBoundingBox('slot')).toEqual(expect.objectContaining({
       width: 300,
       height: 400,
     }));
 
     // Change size.
     await popupPage.enterPopupSize({width: '500px', height: '600px'});
-    await expect.poll(() => popup.getBoundingBox('content')).toEqual(expect.objectContaining({
+    await expect.poll(() => popup.getBoundingBox('slot')).toEqual(expect.objectContaining({
       width: 500,
       height: 600,
     }));
@@ -53,7 +53,7 @@ test.describe('Workbench Popup', () => {
     const testPage = new WorkbenchHandleBoundsTestPagePO(popup);
 
     await expect(async () => {
-      const expectedBounds = await popup.getBoundingBox('content');
+      const expectedBounds = await popup.getBoundingBox('slot');
       const handleBounds = await testPage.getBounds();
       expect(handleBounds).toEqual(expectedBounds);
     }).toPass();
@@ -79,7 +79,7 @@ test.describe('Workbench Popup', () => {
       });
 
       // Expect the popup to have the configured height.
-      await expect.poll(() => popup.getBoundingBox('content')).toEqual(expect.objectContaining({
+      await expect.poll(() => popup.getBoundingBox('slot')).toEqual(expect.objectContaining({
         width: 600,
         height: 400,
       }));
@@ -108,7 +108,7 @@ test.describe('Workbench Popup', () => {
       });
 
       // Expect the popup to have the configured width.
-      await expect.poll(() => popup.getBoundingBox('content')).toEqual(expect.objectContaining({
+      await expect.poll(() => popup.getBoundingBox('slot')).toEqual(expect.objectContaining({
         width: 400,
         height: 800,
       }));
@@ -137,7 +137,7 @@ test.describe('Workbench Popup', () => {
       });
 
       // Expect the popup to have the configured height.
-      await expect.poll(() => popup.getBoundingBox('content')).toEqual(expect.objectContaining({
+      await expect.poll(() => popup.getBoundingBox('slot')).toEqual(expect.objectContaining({
         width: 200,
         height: 400,
       }));
@@ -166,7 +166,7 @@ test.describe('Workbench Popup', () => {
       });
 
       // Expect the popup to have the configured width.
-      await expect.poll(() => popup.getBoundingBox('content')).toEqual(expect.objectContaining({
+      await expect.poll(() => popup.getBoundingBox('slot')).toEqual(expect.objectContaining({
         width: 400,
         height: 250,
       }));
@@ -195,7 +195,7 @@ test.describe('Workbench Popup', () => {
       await popupPage.enterComponentSize({height: '300px'});
 
       // Expect the popup to have a height of 300px (maximum height is 400px).
-      await expect.poll(() => popup.getBoundingBox('content')).toEqual(expect.objectContaining({
+      await expect.poll(() => popup.getBoundingBox('slot')).toEqual(expect.objectContaining({
         height: 300,
       }));
 
@@ -207,7 +207,7 @@ test.describe('Workbench Popup', () => {
       await popupPage.enterComponentSize({height: '500px'});
 
       // Expect the popup to have a height of 400px (maximum height is 400px).
-      await expect.poll(() => popup.getBoundingBox('content')).toEqual(expect.objectContaining({
+      await expect.poll(() => popup.getBoundingBox('slot')).toEqual(expect.objectContaining({
         height: 400,
       }));
 
@@ -233,7 +233,7 @@ test.describe('Workbench Popup', () => {
       await popupPage.enterComponentSize({width: '300px'});
 
       // Expect the popup to have a width of 300px (maximum width is 400px).
-      await expect.poll(() => popup.getBoundingBox('content')).toEqual(expect.objectContaining({
+      await expect.poll(() => popup.getBoundingBox('slot')).toEqual(expect.objectContaining({
         width: 300,
       }));
 
@@ -245,7 +245,7 @@ test.describe('Workbench Popup', () => {
       await popupPage.enterComponentSize({width: '500px'});
 
       // Expect the popup to have a width of 400px (maximum width is 400px).
-      await expect.poll(() => popup.getBoundingBox('content')).toEqual(expect.objectContaining({
+      await expect.poll(() => popup.getBoundingBox('slot')).toEqual(expect.objectContaining({
         width: 400,
       }));
 
@@ -273,7 +273,7 @@ test.describe('Workbench Popup', () => {
       await popupPage.enterComponentSize({height: '300px'});
 
       // Expect the popup to have a height of 400px (minimum height is 400px).
-      await expect.poll(() => popup.getBoundingBox('content')).toEqual(expect.objectContaining({
+      await expect.poll(() => popup.getBoundingBox('slot')).toEqual(expect.objectContaining({
         height: 400,
       }));
 
@@ -285,7 +285,7 @@ test.describe('Workbench Popup', () => {
       await popupPage.enterComponentSize({height: '500px'});
 
       // Expect the popup to have a height of 500px (minimum height is 400px).
-      await expect.poll(() => popup.getBoundingBox('content')).toEqual(expect.objectContaining({
+      await expect.poll(() => popup.getBoundingBox('slot')).toEqual(expect.objectContaining({
         height: 500,
       }));
 
@@ -311,7 +311,7 @@ test.describe('Workbench Popup', () => {
       await popupPage.enterComponentSize({width: '300px'});
 
       // Expect the popup to have a width of 400px (minimum width is 400px).
-      await expect.poll(() => popup.getBoundingBox('content')).toEqual(expect.objectContaining({
+      await expect.poll(() => popup.getBoundingBox('slot')).toEqual(expect.objectContaining({
         width: 400,
       }));
 
@@ -323,7 +323,7 @@ test.describe('Workbench Popup', () => {
       await popupPage.enterComponentSize({width: '500px'});
 
       // Expect the popup to have a width of 500px (minimum width is 400px).
-      await expect.poll(() => popup.getBoundingBox('content')).toEqual(expect.objectContaining({
+      await expect.poll(() => popup.getBoundingBox('slot')).toEqual(expect.objectContaining({
         width: 500,
       }));
 

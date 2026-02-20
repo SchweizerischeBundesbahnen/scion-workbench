@@ -18,14 +18,14 @@ export function expectPart(part: PartPO): PartMatcher {
   return {
     toDisplayComponent: async (selector: string): Promise<void> => {
       await expect(part.locator).toBeVisible();
-      await expect(part.locator.locator('.e2e-part-content').locator(selector)).toBeVisible();
-      await expect(part.locator.locator('.e2e-view-content')).not.toBeVisible();
+      await expect(part.locator.locator('.e2e-part-slot').locator(selector)).toBeVisible();
+      await expect(part.locator.locator('.e2e-view-slot')).not.toBeVisible();
     },
     not: {
       toDisplayComponent: async (): Promise<void> => {
         await expect(part.locator).toBeVisible();
-        await expect(part.locator.locator('.e2e-part-content')).not.toBeAttached();
-        await expect(part.locator.locator('.e2e-view-content')).toBeVisible();
+        await expect(part.locator.locator('.e2e-part-slot')).not.toBeAttached();
+        await expect(part.locator.locator('.e2e-view-slot')).toBeVisible();
       },
       toBeAttached: async (): Promise<void> => {
         await expect(part.locator).not.toBeAttached();

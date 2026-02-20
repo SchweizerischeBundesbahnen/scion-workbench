@@ -47,9 +47,10 @@ $padding-inline: 1.5em;
     white-space: pre-line;
   }
 
-  > div.message {
+  > div.slot {
     flex: auto;
     overflow: hidden;
+    display: grid;
 
     &.text {
       word-break: break-word; // wrap unbreakable text at message box bounds
@@ -58,10 +59,15 @@ $padding-inline: 1.5em;
     }
 
     > sci-viewport {
-      height: 100%;
-
       &::part(content) {
+        position: relative; // positioning context for slot bounds.
         padding: 0 $padding-inline;
+      }
+
+      > div.slot-bounds {
+        position: absolute;
+        inset: 0 $padding-inline; // padding of viewport
+        visibility: hidden;
       }
     }
   }

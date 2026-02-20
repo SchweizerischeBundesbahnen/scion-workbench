@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2025 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,13 +9,14 @@
  */
 
 import {computed, inject, Injector, Signal, signal} from '@angular/core';
-import {DialogId, isDialogId, isPartId, isPopupId, isViewId, PartId, PopupId, ViewId} from '../workbench.identifiers';
+import {DialogId, isDialogId, isNotificationId, isPartId, isPopupId, isViewId, NotificationId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 import {constrainClientRect} from '../common/dom.util';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
 import {WorkbenchPopupRegistry} from '../popup/workbench-popup.registry';
 import {WORKBENCH_ELEMENT} from '../workbench-element-references';
+import {WorkbenchNotificationRegistry} from '../notification/workbench-notification.registry';
 
 /**
  * Creates the invocation context for given element.
@@ -26,7 +27,7 @@ import {WORKBENCH_ELEMENT} from '../workbench-element-references';
  *
  * @see WORKBENCH_ELEMENT
  */
-export function createInvocationContext(elementId: PartId | ViewId | DialogId | PopupId | null | undefined, options?: {injector?: Injector}): WorkbenchInvocationContext | null {
+export function createInvocationContext(elementId: PartId | ViewId | DialogId | PopupId | NotificationId | null | undefined, options?: {injector?: Injector}): WorkbenchInvocationContext | null {
   if (elementId === null) {
     return null;
   }
@@ -73,6 +74,16 @@ export function createInvocationContext(elementId: PartId | ViewId | DialogId | 
       peripheral: signal(false),
     };
   }
+  else if (isNotificationId(contextualElementId)) {
+    const notification = injector.get(WorkbenchNotificationRegistry).get(contextualElementId);
+    return {
+      elementId: notification.id,
+      attached: computed(() => !notification.destroyed()),
+      bounds: notification.bounds,
+      destroyed: notification.destroyed,
+      peripheral: signal(true),
+    };
+  }
 
   return null;
 }
@@ -84,7 +95,7 @@ export interface WorkbenchInvocationContext {
   /**
    * Identifies the element that initiated the interaction.
    */
-  elementId: PartId | ViewId | DialogId | PopupId;
+  elementId: PartId | ViewId | DialogId | PopupId | NotificationId;
   /**
    * Indicates whether the source is attached to the DOM.
    */
