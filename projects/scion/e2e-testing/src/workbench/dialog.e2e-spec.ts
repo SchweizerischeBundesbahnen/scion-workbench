@@ -1025,6 +1025,11 @@ test.describe('Workbench Dialog', () => {
 
       await expectDialog(dialogPage).toBeVisible();
       await expect.poll(() => appPO.isNotificationBlocked(notificationPage.notification.getNotificationId())).toBe(true);
+      await expect.poll(() => dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await appPO.workbenchBoundingBox(), // workbench
+        await notificationOpenerPage.view.getBoundingBox(), // workbench view
+        await notificationPage.notification.getBoundingBox('notification-inset'),
+      ]));
       await expect.poll(() => appPO.isDialogBlocked(dialogPage.dialog.getDialogId())).toBe(false);
     });
 
@@ -1069,9 +1074,12 @@ test.describe('Workbench Dialog', () => {
       await expectDialog(dialogPage).toBeVisible();
       await expect.poll(() => appPO.isNotificationBlocked(notificationPage.notification.getNotificationId())).toBe(true);
       await expect.poll(() => appPO.isViewBlocked(dialogOpenerPage.view.getViewId())).toBe(false);
+      await expect.poll(() => dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await notificationPage.notification.getBoundingBox('notification-inset'),
+      ]));
     });
 
-    test('should position dialog in notification center', async ({appPO, workbenchNavigator}) => {
+    test('should position dialog in workbench center', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // Open a notification.
@@ -1087,15 +1095,15 @@ test.describe('Workbench Dialog', () => {
       await expectDialog(dialogPage).toBeVisible();
       await expect.poll(() => appPO.isNotificationBlocked(notificationPage.notification.getNotificationId())).toBe(true);
 
-      // Expect dialog to be positioned in the center of the viewport.
-      const viewportBounds = appPO.viewportBoundingBox();
-      const dialogBounds = await dialogPage.dialog.getDialogBoundingBox();
+      // Expect dialog to be positioned in the center of the workbench.
+      const workbenchBounds = fromRect(await appPO.workbenchRoot.boundingBox());
+      const dialogBounds = await dialogPage.getBoundingBox();
 
-      const left = viewportBounds.hcenter - (dialogBounds.width / 2);
-      expect(left).toBeCloseTo(dialogBounds.left, 0);
+      const left = workbenchBounds.hcenter - (dialogBounds.width / 2);
+      expect(left).toEqual(expect.closeTo(dialogBounds.left, 0));
 
-      const right = viewportBounds.hcenter + (dialogBounds.width / 2);
-      expect(right).toBeCloseTo(dialogBounds.right, 0);
+      const right = workbenchBounds.hcenter + (dialogBounds.width / 2);
+      expect(right).toEqual(expect.closeTo(dialogBounds.right, 0));
     });
   });
 
