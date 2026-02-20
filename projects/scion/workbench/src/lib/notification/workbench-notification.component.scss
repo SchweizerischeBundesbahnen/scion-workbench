@@ -1,7 +1,5 @@
 @use '../common/workbench.mixin';
 
-$padding-inline: 1.5em;
-
 :host {
   display: flex;
   flex-direction: column;
@@ -42,7 +40,7 @@ $padding-inline: 1.5em;
   > header {
     flex: none;
     font-weight: bold;
-    padding: 0 $padding-inline;
+    padding: 0 var(--sci-workbench-notification-padding);
     word-break: break-word; // wrap unbreakable text at message box bounds
     white-space: pre-line;
   }
@@ -55,18 +53,18 @@ $padding-inline: 1.5em;
     &.text {
       word-break: break-word; // wrap unbreakable text at message box bounds
       white-space: pre-line;
-      padding: 0 $padding-inline;
+      padding: 0 var(--sci-workbench-notification-padding);
     }
 
     > sci-viewport {
       &::part(content) {
         position: relative; // positioning context for slot bounds.
-        padding: 0 $padding-inline;
+        padding: 0 var(--sci-workbench-notification-padding);
       }
 
       > div.slot-bounds {
         position: absolute;
-        inset: 0 $padding-inline; // padding of viewport
+        inset: 0 var(--sci-workbench-notification-padding); // padding of viewport
         visibility: hidden;
       }
     }
