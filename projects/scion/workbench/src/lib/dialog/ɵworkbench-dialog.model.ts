@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -64,7 +64,7 @@ export class ɵWorkbenchDialog implements WorkbenchDialog, Blockable, Blocking {
   public readonly focused = computed(() => this._focusMonitor.activeElement()?.id === this.id);
   public readonly attached: Signal<boolean>;
   public readonly destroyed = signal<boolean>(false);
-  public readonly bounds = boundingClientRect(computed(() => this._componentRef()?.instance.dialogContent()));
+  public readonly bounds = boundingClientRect(computed(() => this._componentRef()?.instance.dialogBounds()));
   public readonly modal: boolean;
   public readonly blinking$ = new BehaviorSubject(false);
 

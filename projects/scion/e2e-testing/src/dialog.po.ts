@@ -26,6 +26,7 @@ export class DialogPO {
   public readonly closeButton: Locator;
   public readonly resizeHandles: Locator;
   public readonly slot: Locator;
+  public readonly bounds: Locator;
   public readonly footer: Locator;
   public readonly contentScrollbars: {vertical: Locator; horizontal: Locator};
   public readonly locateBy?: {id?: DialogId; cssClass?: string[]};
@@ -39,6 +40,7 @@ export class DialogPO {
     this.title = this.header.locator('div.e2e-title > span');
     this.closeButton = this.header.locator('button.e2e-close');
     this.slot = this.locator.locator('sci-viewport.e2e-dialog-content');
+    this.bounds = this.locator.locator('div.e2e-dialog-bounds');
     this.footer = this.dialog.locator('footer.e2e-dialog-footer');
     this.resizeHandles = this.dialog.locator('div.e2e-resize-handle');
     this.contentScrollbars = {
@@ -57,6 +59,10 @@ export class DialogPO {
 
   public async getDialogSlotBoundingBox(): Promise<DomRect> {
     return fromRect(await this.slot.boundingBox());
+  }
+
+  public async getDialogBoundsBoundingBox(): Promise<DomRect> {
+    return fromRect(await this.bounds.boundingBox());
   }
 
   public hasVerticalOverflow(): Promise<boolean> {

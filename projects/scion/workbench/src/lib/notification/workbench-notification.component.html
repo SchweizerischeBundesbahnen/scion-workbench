@@ -1,15 +1,16 @@
 <!-- Title -->
-@if (notification().title(); as title) {
+@if (notification.title(); as title) {
   <header class="e2e-title">{{(title | wbText)()}}</header>
 }
 
 <!-- Message -->
-<div class="message e2e-message" [class.text]="!!notification().slot.text?.length">
-  @if (notification().slot.text?.length) {
-    {{(notification().slot.text | wbText)()}}
-  } @else if (notification().slot.component) {
+<div class="message e2e-message" [class.text]="!!notification.slot.text?.length">
+  @if (notification.slot.text?.length) {
+    {{(notification.slot.text | wbText)()}}
+  } @else if (notification.slot.component) {
     <sci-viewport class="e2e-message-viewport">
-      <ng-container *ngComponentOutlet="notification().slot.component!; inputs: notification().inputs | wbRemoveLegacyInput; injector: notification().slot.injector"/>
+      <ng-container *ngComponentOutlet="notification.slot.component; inputs: notification.inputs | wbRemoveLegacyInput;"/>
+      <div class="bounds e2e-bounds" #bounds></div>
     </sci-viewport>
   }
 </div>

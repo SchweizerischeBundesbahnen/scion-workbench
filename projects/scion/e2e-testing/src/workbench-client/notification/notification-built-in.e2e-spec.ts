@@ -15,6 +15,9 @@ import {expectNotification} from '../../matcher/notification-matcher';
 import {MAIN_AREA} from '../../workbench.model';
 import {WorkbenchNotificationCapability} from '../page-object/register-workbench-capability-page.po';
 import {TextNotificationPO} from '../page-object/text-notification.po';
+import {MessageBoxOpenerPagePO} from '../page-object/message-box-opener-page.po';
+import {expectMessageBox} from '../../matcher/message-box-matcher';
+import {TextMessageBoxPO} from '../page-object/text-message-box.po';
 
 test.describe('Workbench Notification', () => {
 
@@ -356,6 +359,7 @@ test.describe('Workbench Notification', () => {
 
     // Close the notification.
     await notification.close();
+    await expectNotification(notificationPage).not.toBeAttached();
 
     // Display notification with multiple lines.
     await notificationOpenerPage.show(null, {title: 'Multiple Lines '.repeat(100), cssClass: 'testee'});
@@ -515,6 +519,43 @@ test.describe('Workbench Notification', () => {
 
     // Expect the notification not to display after 2.5s.
     await page.waitForTimeout(1000);
+    expect(await notification.locator.isVisible()).toBe(false);
+  });
+
+  test('should not close notification after the auto-close, if blocked by dialog', async ({appPO, microfrontendNavigator, page}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    await microfrontendNavigator.registerIntention('app1', {type: 'notification'});
+    await microfrontendNavigator.registerIntention('app1', {type: 'messagebox'});
+
+    // Display the notification.
+    const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+    await notificationOpenerPage.show('Notification', {duration: 2000, cssClass: 'testee'});
+    const notification = appPO.notification({cssClass: 'testee'});
+    await expectNotification(new TextNotificationPO(notification)).toBeVisible();
+
+    // Display the bound messageBox.
+    const messageboxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
+    await messageboxOpenerPage.open('Test Message', {
+      context: await notification.getNotificationId(),
+      cssClass: 'blockedby',
+      actions: {
+        yes: 'Yes',
+      },
+    });
+
+    const messageBox = appPO.messagebox({cssClass: 'blockedby'});
+    await expectMessageBox(new TextMessageBoxPO(messageBox)).toBeVisible();
+
+    // Expect the notification to still display after 1.5s.
+    await page.waitForTimeout(2500);
+    expect(await notification.locator.isVisible()).toBe(true);
+
+    // Close messageBox.
+    await messageBox.clickActionButton('yes');
+
+    // Expect the notification not to display after 2.5s.
+    await page.waitForTimeout(2500);
     expect(await notification.locator.isVisible()).toBe(false);
   });
 });

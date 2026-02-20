@@ -1910,7 +1910,7 @@ test.describe('Workbench Dialog', () => {
       const testPage = new WorkbenchHandleBoundsTestPagePO(dialog);
 
       await expect(async () => {
-        const expectedBounds = await dialog.getDialogSlotBoundingBox();
+        const expectedBounds = await dialog.getDialogBoundsBoundingBox();
         const handleBounds = await testPage.getBounds();
         expect(handleBounds).toEqual(expectedBounds);
       }).toPass();

@@ -22,6 +22,7 @@ import {InputFieldTestPagePO} from '../page-object/test-pages/input-field-test-p
 import {FocusTestPagePO} from '../page-object/test-pages/focus-test-page.po';
 import {PopupOpenerPagePO} from '../page-object/popup-opener-page.po';
 import {canMatchWorkbenchDialogCapability, canMatchWorkbenchPartCapability, canMatchWorkbenchPopupCapability} from '../../workbench/page-object/layout-page/register-route-page.po';
+import {NotificationOpenerPagePO} from '../page-object/notification-opener-page.po';
 
 test.describe('Workbench Dialog', () => {
 
@@ -1656,6 +1657,59 @@ test.describe('Workbench Dialog', () => {
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
         await inputFieldTestPage.popup.getBoundingBox('content'), // workbench popup
       ]));
+    });
+
+    test('should block interaction with contextual notification', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'dialog',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-pages/focus-test-page',
+          size: {height: '475px', width: '300px'},
+        },
+      });
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'notification',
+        qualifier: {component: 'notification'},
+        properties: {
+          path: 'test-pages/input-field-test-page',
+          size: {height: '100px', width: '100px'},
+        },
+      });
+
+      // Add part to the right for notifications to not cover the dialog opener page.
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.right', {align: 'right'})
+        .navigatePart('part.right', ['path/to/part']),
+      );
+
+      // Open notification.
+      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+      await notificationOpenerPage.show({component: 'notification'}, {
+        cssClass: 'notification',
+      });
+      const notification = appPO.notification({cssClass: 'notification'});
+      const inputFieldTestPage = new InputFieldTestPagePO(appPO.notification({cssClass: 'notification'}));
+
+      // Open dialog from notification.
+      const dialogOpener = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+      await dialogOpener.open({component: 'testee'}, {cssClass: 'testee', context: await notification.getNotificationId()});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      await dialog.moveDialog('bottom-right-corner');
+
+      // Focus input field.
+      const dialogPage = new FocusTestPagePO(appPO.dialog({cssClass: 'testee'}));
+      await dialogPage.firstField.focus();
+
+      // Expect interaction with contextual notification to be blocked.
+      await expect(inputFieldTestPage.clickInputField({timeout: 1000})).rejects.toThrowError();
+      await expect(dialogPage.firstField).toBeFocused();
+      await expect.poll(() => appPO.focusOwner()).toEqual(await dialog.getDialogId());
     });
   });
 

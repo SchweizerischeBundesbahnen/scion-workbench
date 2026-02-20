@@ -50,6 +50,8 @@ $padding-inline: 1.5em;
   > div.message {
     flex: auto;
     overflow: hidden;
+    display: flex; // TODO [eg]: review why do we need this now? (does not work in standalone without)
+    flex-direction: column;
 
     &.text {
       word-break: break-word; // wrap unbreakable text at message box bounds
@@ -61,7 +63,14 @@ $padding-inline: 1.5em;
       height: 100%;
 
       &::part(content) {
+        position: relative; // positioning context for bounds.
         padding: 0 $padding-inline;
+      }
+
+      > div.bounds {
+        position: absolute;
+        inset: 0 $padding-inline; // viewport bounds without padding.
+        visibility: hidden;
       }
     }
   }

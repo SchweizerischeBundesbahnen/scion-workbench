@@ -10,9 +10,15 @@ import {Notification} from './notification';
 import {WorkbenchNotificationRegistry} from './workbench-notification.registry';
 import {WORKBENCH_ELEMENT} from '../workbench-element-references';
 import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
+import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog.model';
+import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
+import {Blockable} from '../glass-pane/blockable';
+import {boundingClientRect} from '@scion/components/dimension';
+import {WorkbenchNotificationComponent} from './workbench-notification.component';
+import {WbComponentPortal} from '../portal/wb-component-portal';
 
 /** @inheritDoc */
-export class ɵWorkbenchNotification implements WorkbenchNotification {
+export class ɵWorkbenchNotification implements WorkbenchNotification, Blockable {
 
   /** Injector for the notification; destroyed when the notification is closed. */
   public readonly injector = inject(Injector) as DestroyableInjector;
@@ -20,7 +26,6 @@ export class ɵWorkbenchNotification implements WorkbenchNotification {
   public readonly slot: {
     component: ComponentType<unknown> | undefined;
     text: Translatable | undefined;
-    injector: Injector;
   };
 
   private readonly _notificationRegistry = inject(WorkbenchNotificationRegistry);
@@ -30,18 +35,20 @@ export class ɵWorkbenchNotification implements WorkbenchNotification {
   private readonly _duration: WritableSignal<'short' | 'medium' | 'long' | 'infinite' | number>;
   private readonly _cssClass: WritableSignal<string[]>;
 
+  public readonly portal: WbComponentPortal<WorkbenchNotificationComponent>;
   public readonly size: WorkbenchNotificationSize = new ɵWorkbenchNotificationSize();
   public readonly focused = computed(() => this._focusMonitor.activeElement()?.id === this.id);
   /** Checks if this notification is the most recently displayed notification. */
   public readonly top = computed(() => this._notificationRegistry.top() === this);
   public readonly destroyed = signal<boolean>(false);
+  public readonly bounds: Signal<DOMRect | undefined>;
+  public readonly blockedBy: Signal<ɵWorkbenchDialog | null>;
   public readonly group: string | undefined;
 
   constructor(public id: NotificationId,
               content: Translatable | null | ComponentType<unknown>,
               private _options: WorkbenchNotificationOptions) {
     this.slot = {
-      injector: this.createInjector(),
       component: typeof content === 'function' ? content : undefined,
       text: typeof content === 'string' ? content : undefined,
     };
@@ -49,17 +56,20 @@ export class ɵWorkbenchNotification implements WorkbenchNotification {
     this._severity = signal(this._options.severity ?? 'info');
     this._duration = signal(this._options.duration ?? 'medium');
     this._cssClass = signal(Arrays.coerce(this._options.cssClass));
+
     this.group = this._options.group;
+    this.blockedBy = inject(WorkbenchDialogRegistry).top(this.id);
+    this.portal = this.createPortal();
+    this.bounds = boundingClientRect(computed(() => this.portal.componentRef()?.instance.bounds()));
 
     inject(DestroyRef).onDestroy(() => this.destroyed.set(true));
   }
 
   /**
-   * Creates an injector to render content in the notification's injection context.
+   * Creates a portal to render {@link WorkbenchNotificationComponent} in the notification's injection context.
    */
-  private createInjector(): Injector {
-    const injector = Injector.create({
-      parent: this._options.injector ?? inject(Injector),
+  private createPortal(): WbComponentPortal<WorkbenchNotificationComponent> {
+    const portal = new WbComponentPortal(WorkbenchNotificationComponent, {
       providers: [
         {provide: ɵWorkbenchNotification, useValue: this},
         {provide: WorkbenchNotification, useExisting: ɵWorkbenchNotification},
@@ -68,8 +78,9 @@ export class ɵWorkbenchNotification implements WorkbenchNotification {
         ...this._options.providers ?? [],
       ],
     });
-    inject(DestroyRef).onDestroy(() => injector.destroy());
-    return injector;
+
+    portal.construct(this._options.injector ?? inject(Injector)); // TODO [eg] Review: is there a better way to pass down the injector?
+    return portal;
   }
 
   /** @inheritDoc */
@@ -114,6 +125,10 @@ export class ɵWorkbenchNotification implements WorkbenchNotification {
 
   /** @inheritDoc */
   public close(): void {
+    if (this.blockedBy()) {
+      return;
+    }
+
     this.destroy();
   }
 
