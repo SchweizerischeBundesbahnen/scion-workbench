@@ -26,6 +26,7 @@ import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 import {expectPopup} from '../matcher/popup-matcher';
 import {LargeTestPagePO} from './page-object/test-pages/large-test-page.po';
 import {WorkbenchHandleBoundsTestPagePO} from './page-object/test-pages/workbench-handle-bounds-test-page.po';
+import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
 
 test.describe('Workbench Dialog', () => {
 
@@ -1005,6 +1006,96 @@ test.describe('Workbench Dialog', () => {
 
       // Expect popup not to be closed.
       await expectPopup(popupPage).toBeVisible();
+    });
+  });
+
+  test.describe('Notification Context', () => {
+
+    test('should, by default and if in the context of a notification, open a notification-modal dialog', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open a notification.
+      const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+      await notificationOpenerPage.show('component:dialog-opener-page', {cssClass: 'notification'});
+      const notificationPage = new DialogOpenerPagePO(appPO.notification({cssClass: 'notification'}));
+
+      // Open dialog from dialog.
+      await notificationPage.open('dialog-page', {cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(appPO.dialog({cssClass: 'testee'}));
+
+      await expectDialog(dialogPage).toBeVisible();
+      await expect.poll(() => appPO.isNotificationBlocked(notificationPage.notification.getNotificationId())).toBe(true);
+      await expect.poll(() => appPO.isDialogBlocked(dialogPage.dialog.getDialogId())).toBe(false);
+    });
+
+    test('should reject the promise when attaching the dialog to a non-existent notification', async ({appPO, workbenchNavigator, consoleLogs}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open a popup.
+      const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+      await notificationOpenerPage.show('component:dialog-opener-page', {cssClass: 'notification'});
+      const notificationPage = new DialogOpenerPagePO(appPO.notification({cssClass: 'notification'}));
+
+      // Expect to error when opening the notification.
+      await expect(notificationPage.open('dialog-page', {context: 'notification.does-not-exist'})).rejects.toThrow('[NullNotificationError] Notification \'notification.does-not-exist\' not found.');
+
+      // Expect no error to be logged to the console.
+      await expect.poll(() => consoleLogs.get({severity: 'error'})).toEqual([]);
+    });
+
+    test('should allow opening a dialog in any notification', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.testee-1', {dockTo: 'left-top'}, {label: 'Activity', icon: 'folder', ɵactivityId: 'activity.1'})
+        .addPart('part.testee-2', {dockTo: 'left-top'}, {label: 'Activity', icon: 'folder', ɵactivityId: 'activity.2'})
+        .navigatePart('part.testee-1', ['test-popup-opener'])
+        .activatePart('part.testee-1'),
+      );
+
+      // Open notification in part 1.
+      const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+      await notificationOpenerPage.show('component:dialog-opener-page', {cssClass: 'notification'});
+
+      const notificationPage = new DialogOpenerPagePO(appPO.notification({cssClass: 'notification'}));
+
+      // Open dialog in notification.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('dialog-opener-page', {context: await notificationPage.notification.getNotificationId(), cssClass: 'testee'});
+      const dialogPage = new DialogOpenerPagePO(appPO.dialog({cssClass: 'testee'}));
+
+      // Expect dialog to be visible.
+      await expectDialog(dialogPage).toBeVisible();
+      await expect.poll(() => appPO.isNotificationBlocked(notificationPage.notification.getNotificationId())).toBe(true);
+      await expect.poll(() => appPO.isViewBlocked(dialogOpenerPage.view.getViewId())).toBe(false);
+    });
+
+    test('should position dialog in notification center', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open a notification.
+      const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+      await notificationOpenerPage.show('component:dialog-opener-page', {cssClass: 'notification'});
+      const notificationPage = new DialogOpenerPagePO(appPO.notification({cssClass: 'notification'}));
+
+      // Open dialog from notification.
+      await notificationPage.open('dialog-page', {cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(appPO.dialog({cssClass: 'testee'}));
+
+      // Expect dialog to be visible.
+      await expectDialog(dialogPage).toBeVisible();
+      await expect.poll(() => appPO.isNotificationBlocked(notificationPage.notification.getNotificationId())).toBe(true);
+
+      // Expect dialog to be positioned in the center of the viewport.
+      const viewportBounds = appPO.viewportBoundingBox();
+      const dialogBounds = await dialogPage.dialog.getDialogBoundingBox();
+
+      const left = viewportBounds.hcenter - (dialogBounds.width / 2);
+      expect(left).toBeCloseTo(dialogBounds.left, 0);
+
+      const right = viewportBounds.hcenter + (dialogBounds.width / 2);
+      expect(right).toBeCloseTo(dialogBounds.right, 0);
     });
   });
 

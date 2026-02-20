@@ -23,6 +23,7 @@ import {MAIN_AREA} from '../workbench.model';
 import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
 import {BlankTestPagePO} from './page-object/test-pages/blank-test-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
+import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
 
 test.describe('Workbench Popup', () => {
 
@@ -1489,6 +1490,93 @@ test.describe('Workbench Popup', () => {
 
       // Expect popup not to be resized
       await expect.poll(() => popupPage.getRecordedSizeChanges()).toEqual(sizeChanges);
+    });
+  });
+
+  test.describe('Notification Context', () => {
+
+    test('should bind popup to contextual notification', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open notification.
+      const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+      await notificationOpenerPage.show('component:popup-opener-page', {cssClass: 'popup-opener'});
+      const notification = appPO.notification({cssClass: 'popup-opener'});
+
+      // Open popup in notification.
+      const popupOpenerPage = new PopupOpenerPagePO(notification);
+      await popupOpenerPage.open('popup-page', {
+        anchor: 'element',
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'testee',
+        size: {
+          width: '100px',
+          height: '100px',
+        },
+      });
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+
+      await expectPopup(popupPage).toBeVisible();
+      await expectPopup(popupPage).toHavePosition('north', popupOpenerPage.openButton);
+    });
+
+    test('should not bind popup to contextual dialog if context null', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open dialog.
+      const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+      await notificationOpenerPage.show('component:popup-opener-page', {cssClass: 'popup-opener'});
+
+      // Open popup in notification.
+      const popupOpenerPage = new PopupOpenerPagePO(appPO.notification({cssClass: 'popup-opener'}));
+      await popupOpenerPage.open('popup-page', {
+        anchor: {top: 300, left: 300},
+        context: null,
+        size: {height: '100px', width: '100px'},
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'testee',
+      });
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+
+      await expectPopup(popupPage).toBeVisible();
+      await expectPopup(popupPage).toHavePosition('north', 'viewport', {top: 300, left: 300});
+    });
+
+    test('should bind popup to any notification', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective('testee', factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.right', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity', ɵactivityId: 'activity.1'})
+        .navigatePart('part.right', ['test-notification-opener'])
+        .activatePart('part.right'),
+      );
+
+      // Open notification.
+      const notificationOpenerPage = new NotificationOpenerPagePO(appPO.part({partId: 'part.right'}));
+      await notificationOpenerPage.show('component:popup-opener-page', {cssClass: 'notification'});
+      const notification = appPO.notification({cssClass: 'notification'});
+
+      // Open popup.
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.open('popup-page', {
+        anchor: {top: 100, left: 100},
+        context: await notification.getNotificationId(),
+        size: {width: '50px', height: '50px'},
+        closeStrategy: {onFocusLost: false},
+        cssClass: 'testee',
+      });
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+
+      // Expect popup to be visible.
+      await expectPopup(popupPage).toBeVisible();
+      await expectPopup(popupPage).toHavePosition('north', notification.slot, {top: 100, left: 100});
     });
   });
 

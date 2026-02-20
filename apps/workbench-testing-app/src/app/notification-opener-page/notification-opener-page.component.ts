@@ -21,6 +21,7 @@ import {LegacyNotificationPageComponent} from '../legacy-notification-page/legac
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import {firstValueFrom, timer} from 'rxjs';
 import DialogOpenerPageComponent from '../dialog-opener-page/dialog-opener-page.component';
+import PopupOpenerPageComponent from '../popup-opener-page/popup-opener-page.component';
 
 @Component({
   selector: 'app-notification-opener-page',
@@ -118,6 +119,8 @@ export default class NotificationOpenerPageComponent {
         return FocusTestPageComponent;
       case 'dialog-opener-page':
         return DialogOpenerPageComponent;
+      case 'popup-opener-page':
+        return PopupOpenerPageComponent;
       case 'legacy-notification-page':
         return LegacyNotificationPageComponent;
       default:

@@ -524,6 +524,13 @@ export class AppPO {
   public async isPopupBlocked(popupId: PopupId | Promise<string>): Promise<boolean> {
     return (await this.page.locator(`.e2e-glasspane[data-popupid="${await popupId}"]`).count()) > 0;
   }
+
+  /**
+   * Indicates if the specified popup is blocked by a dialog.
+   */
+  public async isNotificationBlocked(notificationId: NotificationId | Promise<string>): Promise<boolean> {
+    return (await this.page.locator(`.e2e-glasspane[data-notificationid="${await notificationId}"]`).count()) > 0;
+  }
 }
 
 /**
