@@ -1,3 +1,5 @@
 @for (notification of notifications(); track notification.group || notification.id) {
-  <wb-notification [notification]="notification"/>
+  <div class="notification">
+    <ng-container *wbPortalOutlet="notification.portal; destroyOnDetach: false"/>
+  </div>
 }

@@ -21,11 +21,13 @@ export class NotificationPO {
   public readonly locator: Locator;
   public readonly locateBy?: {id?: NotificationId; cssClass?: string[]};
   public readonly title: Locator;
+  public readonly bounds: Locator;
 
   constructor(page: Page, locateBy: RequireOne<{notificationId: NotificationId; cssClass: string | string[]}>, options?: {nth?: number}) {
     this.locateBy = {id: locateBy.notificationId, cssClass: coerceArray(locateBy.cssClass)};
     this.locator = page.locator(selectBy('wb-notification', {attributes: {'data-notificationid': locateBy.notificationId}, cssClass: locateBy.cssClass})).nth(options?.nth ?? 0);
     this.title = this.locator.locator('header.e2e-title');
+    this.bounds = this.locator.locator('div.e2e-bounds');
   }
 
   public async getNotificationId(): Promise<NotificationId> {

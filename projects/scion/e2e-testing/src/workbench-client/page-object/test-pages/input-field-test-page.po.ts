@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,6 +17,7 @@ import {PartPO} from '../../../part.po';
 import {MicrofrontendPopupPagePO} from '../../../workbench/page-object/workbench-popup-page.po';
 import {DialogPO} from '../../../dialog.po';
 import {MicrofrontendDialogPagePO} from '../../../workbench/page-object/workbench-dialog-page.po';
+import {NotificationPO} from '../../../notification.po';
 
 export class InputFieldTestPagePO implements MicrofrontendViewPagePO, MicrofrontendDialogPagePO, MicrofrontendPopupPagePO {
 
@@ -25,10 +26,11 @@ export class InputFieldTestPagePO implements MicrofrontendViewPagePO, Microfront
   public readonly view: ViewPO;
   public readonly dialog: DialogPO;
   public readonly popup: PopupPO;
+  public readonly notification: NotificationPO;
   public readonly outlet: SciRouterOutletPO;
   public readonly input: Locator;
 
-  constructor(locateBy: PartPO | ViewPO | DialogPO | PopupPO) {
+  constructor(locateBy: PartPO | ViewPO | DialogPO | PopupPO | NotificationPO) {
     this.outlet = new SciRouterOutletPO(locateBy.locator.page(), {name: locateBy.locateBy?.id, cssClass: locateBy.locateBy?.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-input-field-test-page');
 
@@ -36,6 +38,7 @@ export class InputFieldTestPagePO implements MicrofrontendViewPagePO, Microfront
     this.view = locateBy instanceof ViewPO ? locateBy : undefined!;
     this.dialog = locateBy instanceof DialogPO ? locateBy : undefined!;
     this.popup = locateBy instanceof PopupPO ? locateBy : undefined!;
+    this.notification = locateBy instanceof NotificationPO ? locateBy : undefined!;
 
     this.input = this.locator.locator('input.e2e-input');
   }

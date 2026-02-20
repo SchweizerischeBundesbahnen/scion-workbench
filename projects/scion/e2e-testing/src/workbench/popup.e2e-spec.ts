@@ -1260,7 +1260,7 @@ test.describe('Workbench Popup', () => {
       // Expect popup to be visible.
       await expectPopup(popupPage).toBeVisible();
       const componentInstanceId = await popupPage.getComponentInstanceId();
-      await expectPopup(popupPage).toHavePosition('north', dialog.slot, {top: 100, left: 100});
+      await expectPopup(popupPage).toHavePosition('north', dialog.bounds, {top: 100, left: 100});
 
       // Close activity.
       await appPO.activityItem({activityId: 'activity.1'}).click();
@@ -1273,7 +1273,7 @@ test.describe('Workbench Popup', () => {
 
       // Expect popup to be visible.
       await expectPopup(popupPage).toBeVisible();
-      await expectPopup(popupPage).toHavePosition('north', dialog.slot, {top: 100, left: 100});
+      await expectPopup(popupPage).toHavePosition('north', dialog.bounds, {top: 100, left: 100});
 
       // Expect popup not to be constructed anew.
       await expect.poll(() => popupPage.getComponentInstanceId()).toEqual(componentInstanceId);
@@ -1297,7 +1297,7 @@ test.describe('Workbench Popup', () => {
       });
 
       const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
-      await expectPopup(popupPage).toHavePosition('north', dialog.slot, {top: 0, left: 0});
+      await expectPopup(popupPage).toHavePosition('north', dialog.bounds, {top: 0, left: 0});
     });
 
     test('should open popup in the top right corner', async ({appPO, workbenchNavigator}) => {
@@ -1318,7 +1318,7 @@ test.describe('Workbench Popup', () => {
       });
 
       const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
-      await expectPopup(popupPage).toHavePosition('north', dialog.slot, {top: 0, right: 0});
+      await expectPopup(popupPage).toHavePosition('north', dialog.bounds, {top: 0, right: 0});
     });
 
     test('should open popup in the bottom left corner', async ({appPO, workbenchNavigator}) => {
@@ -1339,7 +1339,7 @@ test.describe('Workbench Popup', () => {
       });
 
       const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
-      await expectPopup(popupPage).toHavePosition('north', dialog.slot, {bottom: 0, left: 0});
+      await expectPopup(popupPage).toHavePosition('north', dialog.bounds, {bottom: 0, left: 0});
     });
 
     test('should open popup in the bottom right corner', async ({appPO, workbenchNavigator}) => {
@@ -1360,7 +1360,7 @@ test.describe('Workbench Popup', () => {
       });
 
       const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
-      await expectPopup(popupPage).toHavePosition('north', dialog.slot, {bottom: 0, right: 0});
+      await expectPopup(popupPage).toHavePosition('north', dialog.bounds, {bottom: 0, right: 0});
     });
 
     test('should adjust popup position when moving contextual dialog', async ({appPO, workbenchNavigator}) => {
@@ -1384,34 +1384,34 @@ test.describe('Workbench Popup', () => {
       const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
 
       // Expect popup to open in top left corner.
-      await expectPopup(popupPage).toHavePosition('north', dialog.slot, {top: 0, left: 0});
+      await expectPopup(popupPage).toHavePosition('north', dialog.bounds, {top: 0, left: 0});
 
       await test.step('Move dialog 100px to the left', async () => {
         await dialog.moveDialog({x: -100, y: 0});
 
         // Expect popup to stick to dialog bounds.
-        await expectPopup(popupPage).toHavePosition('north', dialog.slot, {top: 0, left: 0});
+        await expectPopup(popupPage).toHavePosition('north', dialog.bounds, {top: 0, left: 0});
       });
 
       await test.step('Move dialog 100px to the bottom', async () => {
         await dialog.moveDialog({x: 0, y: 100});
 
         // Expect popup to stick to dialog bounds.
-        await expectPopup(popupPage).toHavePosition('north', dialog.slot, {top: 0, left: 0});
+        await expectPopup(popupPage).toHavePosition('north', dialog.bounds, {top: 0, left: 0});
       });
 
       await test.step('Move dialog 100px to the right', async () => {
         await dialog.moveDialog({x: 100, y: 0});
 
         // Expect popup to stick to dialog bounds.
-        await expectPopup(popupPage).toHavePosition('north', dialog.slot, {top: 0, left: 0});
+        await expectPopup(popupPage).toHavePosition('north', dialog.bounds, {top: 0, left: 0});
       });
 
       await test.step('Move dialog 100px to the top', async () => {
         await dialog.moveDialog({x: 0, y: -100});
 
         // Expect popup to stick to dialog bounds.
-        await expectPopup(popupPage).toHavePosition('north', dialog.slot, {top: 0, left: 0});
+        await expectPopup(popupPage).toHavePosition('north', dialog.bounds, {top: 0, left: 0});
       });
     });
 

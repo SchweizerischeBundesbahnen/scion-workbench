@@ -18,6 +18,7 @@
 
     <sci-viewport class="content e2e-dialog-content">
       <ng-container *ngComponentOutlet="dialog.component; inputs: dialog.inputs"/>
+      <div class="bounds e2e-dialog-bounds" #bounds></div>
     </sci-viewport>
 
     @if (dialog.footer || dialog.actions.length) {

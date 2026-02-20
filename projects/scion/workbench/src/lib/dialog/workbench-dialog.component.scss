@@ -61,7 +61,14 @@
         flex: auto;
 
         &::part(content) {
+          position: relative; // positioning context for bounds.
           padding-inline: var(--ɵdialog-padding);
+        }
+
+        > div.bounds {
+          position: absolute;
+          inset: 0 var(--ɵdialog-padding); // viewport bounds without padding.
+          visibility: hidden;
         }
       }
 
