@@ -11,8 +11,7 @@
 import {Component, inject} from '@angular/core';
 import {eMESSAGE_BOX_MESSAGE_PARAM} from '@scion/workbench-client';
 import {UUID} from '@scion/toolkit/uuid';
-import {Translatable} from '../../../text/workbench-text-provider.model';
-import {TextPipe} from '../../../text/text.pipe';
+import {SciTextPipe, Translatable} from '@scion/sci-components/text';
 import {createRemoteTranslatable} from '../../microfrontend-text/remote-text-provider';
 import {ActivatedMicrofrontend} from '../../microfrontend-host/microfrontend-host.model';
 import {WorkbenchDialog} from '../../../dialog/workbench-dialog.model';
@@ -27,7 +26,7 @@ import {WorkbenchDialog} from '../../../dialog/workbench-dialog.model';
   styleUrls: ['./text-message.component.scss'],
   templateUrl: './text-message.component.html',
   imports: [
-    TextPipe,
+    SciTextPipe,
   ],
   host: {
     '[class.empty]': '!message?.length',

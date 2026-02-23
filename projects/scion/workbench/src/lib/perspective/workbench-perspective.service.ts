@@ -17,6 +17,7 @@ import {WorkbenchConfig} from '../workbench-config';
 import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
 import {WorkbenchPerspectiveRegistry} from './workbench-perspective.registry';
 import {Logger} from '../logging';
+import {createDestroyableInjector} from '../common/injector.util';
 
 /**
  * Enables registration and activation of perspectives.
@@ -103,7 +104,7 @@ export class WorkbenchPerspectiveService {
 
   private createPerspective(definition: WorkbenchPerspectiveDefinition): ɵWorkbenchPerspective {
     // Construct the handle in an injection context that shares the perspective's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
-    const perspectiveInjector = Injector.create({parent: this._injector, providers: [], name: `Workbench Perspective ${definition.id}`});
+    const perspectiveInjector = createDestroyableInjector({parent: this._injector, name: `Workbench Perspective ${definition.id}`});
     return runInInjectionContext(perspectiveInjector, () => new ɵWorkbenchPerspective(definition));
   }
 

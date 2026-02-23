@@ -22,6 +22,7 @@ import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {PreferredSizeService} from '@scion/microfrontend-platform';
 import {startWith} from 'rxjs/operators';
+import {contributeMenu} from '@scion/sci-components/menu';
 
 @Component({
   selector: 'app-notification-page',
@@ -62,6 +63,11 @@ export default class NotificationPageComponent {
   constructor() {
     this.notification.signalReady();
     this.installPreferredSizeReporter();
+
+    contributeMenu('menu:workbench.notification.toolbar', menu => menu
+      .addMenuItem({label: 'Expand All', accelerator: {ctrl: true, key: '+', location: 'numpad'}, onSelect: () => console.log('>>> expand all')})
+      .addMenuItem({label: 'Collapse All', accelerator: {ctrl: true, key: '-', location: 'numpad'}, onSelect: () => console.log('>>> collapse all')}),
+    );
   }
 
   protected onClose(): void {

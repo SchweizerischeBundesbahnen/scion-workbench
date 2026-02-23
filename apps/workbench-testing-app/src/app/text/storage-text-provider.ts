@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {EnvironmentProviders, inject, makeEnvironmentProviders, Signal} from '@angular/core';
+import {EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
 import {SESSION_STORAGE} from '../session.storage';
 import {map, take} from 'rxjs/operators';
 import {toSignal} from '@angular/core/rxjs-interop';
@@ -16,6 +16,8 @@ import {provideMicrofrontendPlatformInitializer} from '@scion/workbench';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {APP_IDENTITY, MessageClient} from '@scion/microfrontend-platform';
 import {MonoTypeOperatorFunction} from 'rxjs';
+import {MaybeSignal} from '@scion/sci-components/common';
+import {SciTextProviderFn} from '@scion/sci-components/text';
 
 /**
  * Provides texts from session storage.
@@ -24,8 +26,8 @@ import {MonoTypeOperatorFunction} from 'rxjs';
  *
  * Used in `text-provider.e2e-spec.ts` to control texts of the host app.
  */
-export function provideTextFromStorage(key: string, params: {[name: string]: string}): Signal<string> | string | undefined {
-  if (key.startsWith('workbench.')) {
+export const storageTextProvider: SciTextProviderFn = (key: string, params: {[name: string]: string}): MaybeSignal<string> | undefined => {
+  if (key.startsWith('scion.')) {
     return undefined;
   }
 
@@ -38,7 +40,7 @@ export function provideTextFromStorage(key: string, params: {[name: string]: str
       map(text => text ?? `%${key}`),
     );
   return toSignal(text$, {initialValue: ''});
-}
+};
 
 /**
  * Registers a message listener that replies with values from session storage.

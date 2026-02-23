@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, input, signal, untracked, viewChild} from '@angular/core';
+import {Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, input, signal, untracked, viewChild} from '@angular/core';
 import {ManifestService, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
 import {Translatable, WorkbenchDialogCapability, ɵDIALOG_CONTEXT, ɵDialogContext, ɵWorkbenchCommands, ɵWorkbenchDialogMessageHeaders} from '@scion/workbench-client';
@@ -19,6 +19,8 @@ import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfronten
 import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog.model';
 import {Microfrontends} from '../common/microfrontend.util';
 import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provider';
+import {ɵSciMenuService} from '@scion/sci-components/menu';
+import {workbenchKeyboardAccelerators} from '../workbench-keyboard-accelerators';
 
 /**
  * Displays the microfrontend of a given {@link WorkbenchDialogCapability}.
@@ -63,6 +65,7 @@ export class MicrofrontendDialogComponent {
     this.propagateDialogContext();
     this.propagateWorkbenchTheme();
     this.installDialogFocusedPublisher();
+    this.installAcceleratorsToBubble();
     this.installNavigator();
 
     inject(DestroyRef).onDestroy(() => {
@@ -174,5 +177,15 @@ export class MicrofrontendDialogComponent {
         const sender = message.headers.get(MessageHeaders.AppSymbolicName) as string;
         this.dialog.title = createRemoteTranslatable(message.body, {appSymbolicName: sender});
       });
+  }
+
+  /**
+   * Instructs router outlet to bubble menu accelerators across iframe boundaries.
+   */
+  private installAcceleratorsToBubble(): void {
+    const menuAccelerators = inject(ɵSciMenuService).accelerators();
+    const accelerators = computed(() => [...workbenchKeyboardAccelerators, ...menuAccelerators()]);
+
+    Microfrontends.installAcceleratorsToBubble(this._routerOutletElement, accelerators);
   }
 }

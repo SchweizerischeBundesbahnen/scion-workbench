@@ -15,9 +15,10 @@ import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
 import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform/microfrontend-platform-config-loader';
 import {WorkbenchPerspectives} from './perspective/workbench-perspective.model';
 import {WorkbenchStorage} from './storage/workbench-storage';
-import {WorkbenchTextProviderFn} from './text/workbench-text-provider.model';
-import {WorkbenchIconProviderFn} from './icon/workbench-icon-provider.model';
+import {SciTextProviderFn} from '@scion/sci-components/text';
+import {SciIconProviderFn} from '@scion/sci-components/icon';
 import {WorkbenchLayoutFn} from './layout/workbench-layout';
+import {SciKeyboardAccelerator} from '@scion/sci-components/menu';
 
 /**
  * Configuration of the SCION Workbench.
@@ -47,40 +48,41 @@ export abstract class WorkbenchConfig {
    * Texts starting with the percent symbol (`%`) are passed to the text provider for translation, with the percent symbol omitted.
    *
    * The SCION Workbench uses the following translation keys for built-in texts:
-   * - workbench.clear.tooltip
-   * - workbench.close.action
-   * - workbench.close_all_tabs.action
-   * - workbench.close_other_tabs.action
-   * - workbench.close_tab.action
-   * - workbench.close_tab.tooltip
-   * - workbench.close_tabs_to_the_left.action
-   * - workbench.close_tabs_to_the_right.action
-   * - workbench.close.tooltip
-   * - workbench.dev_mode_only_hint.tooltip
-   * - workbench.minimize.tooltip
-   * - workbench.move_tab_down.action
-   * - workbench.move_tab_to_new_window.action
-   * - workbench.move_tab_to_the_left.action
-   * - workbench.move_tab_to_the_right.action
-   * - workbench.move_tab_up.action
-   * - workbench.null_content.message
-   * - workbench.null_view_developer_hint.message
-   * - workbench.ok.action
-   * - workbench.page_not_found.message
-   * - workbench.page_not_found.title
-   * - workbench.page_not_found_developer_hint.message
-   * - workbench.page_not_found_part.message
-   * - workbench.page_not_found_view.message
-   * - workbench.reset_perspective.action
-   * - workbench.show_open_tabs.tooltip
+   * - scion.workbench.clear.tooltip
+   * - scion.workbench.close.action
+   * - scion.workbench.close_all_tabs.action
+   * - scion.workbench.close_other_tabs.action
+   * - scion.workbench.close_tab.action
+   * - scion.workbench.close_tab.tooltip
+   * - scion.workbench.close_tabs_to_the_left.action
+   * - scion.workbench.close_tabs_to_the_right.action
+   * - scion.workbench.close.tooltip
+   * - scion.workbench.dev_mode_only_hint.tooltip
+   * - scion.workbench.minimize.tooltip
+   * - scion.workbench.move_tab_down.action
+   * - scion.workbench.move_tab_to_new_window.action
+   * - scion.workbench.move_tab_to_the_left.action
+   * - scion.workbench.move_tab_to_the_right.action
+   * - scion.workbench.move_tab_up.action
+   * - scion.workbench.no_views.message
+   * - scion.workbench.null_content.message
+   * - scion.workbench.null_view_developer_hint.message
+   * - scion.workbench.ok.action
+   * - scion.workbench.page_not_found.message
+   * - scion.workbench.page_not_found.title
+   * - scion.workbench.page_not_found_developer_hint.message
+   * - scion.workbench.page_not_found_part.message
+   * - scion.workbench.page_not_found_view.message
+   * - scion.workbench.reset_perspective.action
+   * - scion.workbench.show_open_tabs.tooltip
    *
    * The function:
    * - Can call `inject` to get any required dependencies.
    * - Can call `toSignal` to convert an Observable to a Signal.
    *
-   * @see WorkbenchTextProviderFn
+   * @see SciTextProviderFn
    */
-  public abstract textProvider?: WorkbenchTextProviderFn;
+  public abstract textProvider?: SciTextProviderFn;
 
   /**
    * Provides icons to the SCION Workbench.
@@ -95,21 +97,21 @@ export abstract class WorkbenchConfig {
    * ```
    *
    * The SCION Workbench uses the following icons:
-   * - `workbench.clear`: Clear button in input fields
-   * - `workbench.close`: Close button in views, dialogs and notifications
-   * - `workbench.dirty`: Visual indicator for view with unsaved content
-   * - `workbench.menu_down`: Menu button of drop down menus
-   * - `workbench.minimize`: Minimize button in docked parts
-   * - `workbench.pin`: Visual indicator for a pinned view
-   * - `workbench.search`: Visual indicator in search or filter fields
+   * - `scion.clear`: Clear button in input fields
+   * - `scion.close`: Close button in views, dialogs and notifications
+   * - `scion.dirty`: Visual indicator for view with unsaved content
+   * - `scion.menu_down`: Menu button of drop down menus
+   * - `scion.minimize`: Minimize button in docked parts
+   * - `scion.pin`: Visual indicator for a pinned view
+   * - `scion.search`: Visual indicator in search or filter fields
    *
-   * To not replace built-in workbench icons, the icon provider can return `undefined` for icons starting with the `workbench.` prefix.
+   * To not replace built-in workbench icons, the icon provider can return `undefined` for icons starting with the `scion.` prefix.
    *
    * The function can call `inject` to get any required dependencies.
    *
    * @see WorkbenchIconProviderFn
    */
-  public abstract iconProvider?: WorkbenchIconProviderFn;
+  public abstract iconProvider?: SciIconProviderFn;
 
   /**
    * Specifies the component to display in `<wb-workbench>` while the workbench is starting.
@@ -123,7 +125,7 @@ export abstract class WorkbenchConfig {
   /**
    * Specifies the component to display a view tab, enabling custom design or functionality.
    *
-   * The component can inject {@link WorkbenchView} and {@link VIEW_TAB_RENDERING_CONTEXT} to get a reference to the view and the rendering context.
+   * The component can inject {@link WorkbenchView} to get a reference to the view.
    */
   public abstract viewTabComponent?: ComponentType<unknown>;
 
@@ -210,7 +212,7 @@ export abstract class WorkbenchConfig {
  *
  * Each property represents a menu item, allowing customization of visibility, accelerators, and more.
  *
- * Texts can be changed or localized using a {@link WorkbenchTextProviderFn text provider} passed to {@link provideWorkbench} via the workbench config object.
+ * Texts can be changed or localized using a {@link SciTextProviderFn text provider} passed to {@link provideWorkbench} via the workbench config object.
  */
 export interface ViewMenuItemsConfig {
   /**
@@ -218,98 +220,114 @@ export interface ViewMenuItemsConfig {
    *
    * Set to `false` to exclude it.
    *
-   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * The menu item text can be changed or localized using a {@link SciTextProviderFn}.
    * Translation key: `workbench.close_tab.action`
    */
-  close?: MenuItemConfig | false;
+  close?: MenuItemConfig | LegacyMenuItemConfig | false;
   /**
    * Configures the menu item for closing other view tabs.
    *
    * Set to `false` to exclude it.
    *
-   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * The menu item text can be changed or localized using a {@link SciTextProviderFn}.
    * Translation key: `workbench.close_other_tabs.action`
    */
-  closeOthers?: MenuItemConfig | false;
+  closeOthers?: MenuItemConfig | LegacyMenuItemConfig | false;
   /**
    * Configures the menu item for closing all view tabs.
    *
    * Set to `false` to exclude it.
    *
-   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * The menu item text can be changed or localized using a {@link SciTextProviderFn}.
    * Translation key: `workbench.close_all_tabs.action`
    */
-  closeAll?: MenuItemConfig | false;
+  closeAll?: MenuItemConfig | LegacyMenuItemConfig | false;
   /**
    * Configures the menu item for closing view tabs to the right.
    *
    * Set to `false` to exclude it.
    *
-   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * The menu item text can be changed or localized using a {@link SciTextProviderFn}.
    * Translation key: `workbench.close_tabs_to_the_right.action`
    */
-  closeToTheRight?: MenuItemConfig | false;
+  closeToTheRight?: MenuItemConfig | LegacyMenuItemConfig | false;
   /**
    * Configures the menu item for closing view tabs to the left.
    *
    * Set to `false` to exclude it.
    *
-   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * The menu item text can be changed or localized using a {@link SciTextProviderFn}.
    * Translation key: `workbench.close_tabs_to_the_left.action`
    */
-  closeToTheLeft?: MenuItemConfig | false;
+  closeToTheLeft?: MenuItemConfig | LegacyMenuItemConfig | false;
   /**
    * Configures the menu item for moving a view up.
    *
    * Set to `false` to exclude it.
    *
-   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * The menu item text can be changed or localized using a {@link SciTextProviderFn}.
    * Translation key: `workbench.move_tab_up.action`
    */
-  moveUp?: MenuItemConfig | false;
+  moveUp?: MenuItemConfig | LegacyMenuItemConfig | false;
   /**
    * Configures the menu item for moving a view to the right.
    *
    * Set to `false` to exclude it.
    *
-   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * The menu item text can be changed or localized using a {@link SciTextProviderFn}.
    * Translation key: `workbench.move_tab_to_the_right.action`
    */
-  moveRight?: MenuItemConfig | false;
+  moveRight?: MenuItemConfig | LegacyMenuItemConfig | false;
   /**
    * Configures the menu item for moving a view down.
    *
    * Set to `false` to exclude it.
    *
-   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * The menu item text can be changed or localized using a {@link SciTextProviderFn}.
    * Translation key: `workbenchworkbench.move_tab_down.action`
    */
-  moveDown?: MenuItemConfig | false;
+  moveDown?: MenuItemConfig | LegacyMenuItemConfig | false;
   /**
    * Configures the menu item for moving a view to the left.
    *
    * Set to `false` to exclude it.
    *
-   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * The menu item text can be changed or localized using a {@link SciTextProviderFn}.
    * Translation key: `workbench.move_tab_to_the_left.action`
    */
-  moveLeft?: MenuItemConfig | false;
+  moveLeft?: MenuItemConfig | LegacyMenuItemConfig | false;
   /**
    * Configures the menu item for moving a view to a new window.
    *
    * Set to `false` to exclude it.
    *
-   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * The menu item text can be changed or localized using a {@link SciTextProviderFn}.
    * Translation key: `workbench.move_tab_to_new_window.action`
    */
-  moveToNewWindow?: MenuItemConfig | false;
+  moveToNewWindow?: MenuItemConfig | LegacyMenuItemConfig | false;
 }
 
 /**
  * Configures a built-in menu item.
  */
 export interface MenuItemConfig {
+  accelerator?: SciKeyboardAccelerator;
+  cssClass?: string | string[];
+}
+
+/**
+ * Configures a built-in menu item.
+ *
+ * @deprecated
+ */
+export interface LegacyMenuItemConfig {
+  /**
+   * @deprecated since version 21.0.0-beta.6. Specify accelerator as {SciKeyboardAccelerator} object instead.
+   */
   accelerator?: string[];
+  /**
+   * @deprecated since version 21.0.0-beta.6. No replacement.
+   */
   group?: string;
   cssClass?: string | string[];
 }

@@ -17,7 +17,7 @@ import {Type} from '@angular/core';
 
 provideWorkbench({
   iconProvider: (icon: string): ComponentType<unknown> | undefined => {
-    if (icon.startsWith('workbench.')) {
+    if (icon.startsWith('scion.')) {
       return undefined; // return `undefined` to not replace built-in workbench icons
     }
 
@@ -39,7 +39,7 @@ import {provideWorkbench, WorkbenchIconDescriptor} from '@scion/workbench';
 
 provideWorkbench({
   iconProvider: (icon: string): WorkbenchIconDescriptor | undefined => {
-    if (icon.startsWith('workbench.')) {
+    if (icon.startsWith('scion.')) {
       return undefined; // return `undefined` to not replace built-in workbench icons
     }
     return {
@@ -67,18 +67,18 @@ class CustomIconComponent {
 ### Built-In Workbench Icons
 The SCION Workbench requires the following icons, which can be replaced using an icon provider.
 
-| Icon Key            | Usage                                            |
-|---------------------|--------------------------------------------------|
-| workbench.clear     | Clear button in input fields                     |
-| workbench.close     | Close button in views, dialogs and notifications |
-| workbench.dirty     | Visual indicator for view with unsaved content   |
-| workbench.menu_down | Menu button of drop down menus                   |
-| workbench.minimize  | Minimize button in docked parts                  |
-| workbench.pin       | Visual indicator for a pinned view               |
-| workbench.search    | Visual indicator in search or filter fields      |
+| Icon Key        | Usage                                            |
+|-----------------|--------------------------------------------------|
+| scion.clear     | Clear button in input fields                     |
+| scion.close     | Close button in views, dialogs and notifications |
+| scion.dirty     | Visual indicator for view with unsaved content   |
+| scion.menu_down | Menu button of drop down menus                   |
+| scion.minimize  | Minimize button in docked parts                  |
+| scion.pin       | Visual indicator for a pinned view               |
+| scion.search    | Visual indicator in search or filter fields      |
 
 > [!TIP]
-> To not replace built-in workbench icons, the icon provider can return `undefined` for icons starting with the `workbench.` prefix.
+> To not replace built-in icons, the icon provider can return `undefined` for icons starting with the `scion.` prefix.
 
 
 ### Default Icon Provider

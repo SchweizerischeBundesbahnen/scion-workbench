@@ -10,7 +10,7 @@
 
 import {Beans} from '@scion/toolkit/bean-manager';
 import {WorkbenchViewInitializer} from './view/workbench-view-initializer';
-import {ConnectOptions, MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
+import {ConnectOptions, Logger, MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
 import {WorkbenchRouter} from './routing/workbench-router.service';
 import {WorkbenchPopupService} from './popup/workbench-popup.service';
 import {WorkbenchPopupInitializer} from './popup/workbench-popup-initializer';
@@ -24,9 +24,10 @@ import {ɵWorkbenchDialogService} from './dialog/ɵworkbench-dialog.service';
 import {WorkbenchMessageBoxInitializer} from './message-box/workbench-message-box-initializer';
 import {ɵWorkbenchMessageBoxService} from './message-box/ɵworkbench-message-box.service';
 import {StyleSheetInstaller} from './style-sheet-installer';
-import {registerTextProvider} from './text/workbench-text-provider';
+import {ɵWorkbenchTextProviderCapabilityInstaller} from './text/ɵworkbench-text-provider-capability-installer';
+import {registerLegacyTextProvider} from './text/workbench-legacy-text-provider';
 import {Disposable} from './common/disposable';
-import {WorkbenchTextProviderFn} from './text/workbench-text-provider.model';
+import {WorkbenchTextProviderFn, ɵWORKBNCH_CLIENT_TEXT_PROVIDER} from './text/workbench-text-provider.model';
 import {WorkbenchTextService} from './text/workbench-text.service';
 import {ɵWorkbenchTextService} from './text/ɵworkbench-text.service';
 import {WorkbenchPartInitializer} from './part/workbench-part-initializer';
@@ -35,6 +36,9 @@ import {ɵWorkbenchRouter} from './routing/ɵworkbench-router.service';
 import {ɵWorkbenchNotificationService} from './notification/ɵworkbench-notification.service';
 import {WORKBENCH_ELEMENT, WorkbenchElement} from './workbench.model';
 import {WorkbenchNotificationInitializer} from './notification/workbench-notification-initializer';
+import {WorkbenchMenuService} from './menu/workbench-menu.service';
+import {ɵWorkbenchMenuService} from './menu/ɵworkbench-menu.service';
+import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher';
 
 /**
  * **SCION Workbench Client provides core API for a web app to interact with SCION Workbench and other microfrontends.**
@@ -118,6 +122,8 @@ export class WorkbenchClient {
   /**
    * Connects the micro application to the SCION Workbench and SCION Microfrontend Platform.
    *
+   * NOTE: Angular applications should use `provideWorkbenchClientAngular` from `@scion/workbench-client-angular` to connect to the SCION Workbench.
+   *
    * After connected, the micro application can interact with the workbench and other micro applications. Typically, the
    * micro application connects to the workbench during the bootstrapping. In Angular, for example, this can be done in
    * an app initializer.
@@ -126,10 +132,10 @@ export class WorkbenchClient {
    *
    * @param  symbolicName - Specifies the symbolic name of the micro application. The micro application needs to be registered
    *         in the workbench under that identity.
-   * @param  connectOptions - Controls how to connect to the workbench.
+   * @param  options - Controls how to connect to the workbench.
    * @return A Promise that resolves once connected to the workbench, or that rejects otherwise.
    */
-  public static async connect(symbolicName: string, connectOptions?: ConnectOptions): Promise<void> {
+  public static async connect(symbolicName: string, options?: WorkbenchClientConfiguration & ConnectOptions): Promise<void> {
     Beans.register(WorkbenchRouter, {useClass: ɵWorkbenchRouter});
     Beans.register(WorkbenchDialogService, {useFactory: () => new ɵWorkbenchDialogService(Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.id)});
     Beans.register(WorkbenchMessageBoxService, {useFactory: () => new ɵWorkbenchMessageBoxService(Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.id)});
@@ -137,18 +143,23 @@ export class WorkbenchClient {
     Beans.register(WorkbenchNotificationService, {useClass: ɵWorkbenchNotificationService});
     Beans.register(WorkbenchThemeMonitor, {useClass: ɵWorkbenchThemeMonitor});
     Beans.register(WorkbenchTextService, {useClass: ɵWorkbenchTextService});
+    Beans.register(WorkbenchMenuService, {useExisting: ɵWorkbenchMenuService});
+    Beans.register(ɵWorkbenchMenuService);
     Beans.register(StyleSheetInstaller, {eager: true});
+    Beans.register(WorkbenchThemeSwitcher, {eager: true});
+    Beans.register(ɵWORKBNCH_CLIENT_TEXT_PROVIDER, {useFactory: () => options?.textProvider});
     Beans.registerInitializer({useClass: WorkbenchPartInitializer});
     Beans.registerInitializer({useClass: WorkbenchViewInitializer});
     Beans.registerInitializer({useClass: WorkbenchPopupInitializer});
     Beans.registerInitializer({useClass: WorkbenchDialogInitializer});
     Beans.registerInitializer({useClass: WorkbenchMessageBoxInitializer});
     Beans.registerInitializer({useClass: WorkbenchNotificationInitializer});
-    await MicrofrontendPlatformClient.connect(symbolicName, connectOptions);
+    Beans.registerInitializer({useClass: ɵWorkbenchTextProviderCapabilityInstaller});
+    await MicrofrontendPlatformClient.connect(symbolicName, options);
   }
 
   /**
-   * Provides texts to the SCION Workbench and micro apps.
+   * Provides texts to the SCION Workbench and other micro apps.
    *
    * A text provider is a function that returns the text for a translation key.
    *
@@ -156,12 +167,33 @@ export class WorkbenchClient {
    *
    * This function must be called in an Activator. Refer to {@link @scion/microfrontend-platform!ActivatorCapability} for details on activators.
    *
-   * Applications can use {@link WorkbenchTextService} to get texts from other micro applications.
+   * Applications can use {@link WorkbenchTextService} to get texts from micro apps.
    *
    * @param textProvider - Function to provide the text for a translation key.
    * @return Object to unregister the text provider.
+   *
+   * @deprecated since version 1.0.0-beta.41. Marked for removal. To migrate, register a text provider via options object when connecting to the workbench using `WorkbenchClient.connect`. Angular applications using `@scion/workbench-client-angular` can register a text provider via `provideTextProvider` function.
    */
   public static registerTextProvider(textProvider: WorkbenchTextProviderFn): Disposable {
-    return registerTextProvider(textProvider);
+    Beans.get(Logger).warn(`[Deprecated] The function 'WorkbenchClient.registerTextProvider' has been deprecated. To migrate, register a text provider via options object when connecting to the workbench using 'WorkbenchClient.connect'. Angular applications using '@scion/workbench-client-angular' can register a text provider via 'provideTextProvider' function.`);
+    Beans.register(ɵWORKBNCH_CLIENT_TEXT_PROVIDER, {useValue: textProvider});
+    return registerLegacyTextProvider();
   }
+}
+
+/**
+ * Controls how to connect to the workbench.
+ */
+export interface WorkbenchClientConfiguration {
+  /**
+   * Provides texts to the SCION Workbench and other micro apps.
+   *
+   * A text provider is a function that returns the text for a translation key.
+   *
+   * Applications can use {@link WorkbenchTextService} to get texts from micro applications.
+   *
+   * @param textProvider - Function to provide the text for a translation key.
+   * @see WorkbenchTextProviderFn
+   */
+  textProvider?: WorkbenchTextProviderFn;
 }

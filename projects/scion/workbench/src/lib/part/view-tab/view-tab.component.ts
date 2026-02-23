@@ -8,22 +8,21 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, ElementRef, inject, Injector, input, Signal} from '@angular/core';
+import {Component, computed, effect, ElementRef, inject, Injector, input, Signal, untracked} from '@angular/core';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {VIEW_DRAG_TRANSFER_TYPE, ViewDragService} from '../../view-dnd/view-drag.service';
 import {createElement} from '../../common/dom.util';
 import {CdkPortalOutlet, ComponentPortal} from '@angular/cdk/portal';
-import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workbench.constants';
 import {WorkbenchConfig} from '../../workbench-config';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
-import {ViewMenuService} from '../view-context-menu/view-menu.service';
 import {ViewId, WORKBENCH_ID} from '../../workbench.identifiers';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {boundingClientRect} from '@scion/components/dimension';
 import {UUID} from '@scion/toolkit/uuid';
-import {TextPipe} from '../../text/text.pipe';
-import {IconComponent} from '../../icon/icon.component';
+import {SciTextPipe} from '@scion/sci-components/text';
+import {SciIconComponent} from '@scion/sci-components/icon';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
+import {WorkbenchViewContextMenuService} from '../view-context-menu/workbench-view-context-menu.service';
 
 /**
  * IMPORTANT: HTML and CSS also used by {@link ViewTabDragImageComponent}.
@@ -36,8 +35,8 @@ import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
   styleUrls: ['./view-tab.component.scss'],
   imports: [
     CdkPortalOutlet,
-    TextPipe,
-    IconComponent,
+    SciTextPipe,
+    SciIconComponent,
   ],
   host: {
     '[attr.data-viewid]': 'view().id',
@@ -62,9 +61,8 @@ export class ViewTabComponent {
   private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _workbenchConfig = inject(WorkbenchConfig);
   private readonly _viewRegistry = inject(WorkbenchViewRegistry);
-  private readonly _viewMenuService = inject(ViewMenuService);
+  private readonly _viewContextMenuService = inject(WorkbenchViewContextMenuService);
   private readonly _layout = inject(WorkbenchLayoutService).layout;
-  private readonly _injector = inject(Injector);
 
   public readonly host = inject(ElementRef).nativeElement as HTMLElement;
   public readonly view = input.required({alias: 'viewId', transform: (viewId: ViewId) => this._viewRegistry.get(viewId)});
@@ -95,16 +93,14 @@ export class ViewTabComponent {
     }
   }
 
-  protected onContextmenu(event: MouseEvent): void {
-    void this._viewMenuService.showMenu({x: event.clientX, y: event.clientY}, this.view().id);
-    event.stopPropagation();
-    event.preventDefault();
-  }
-
   protected onMouseDown(event: MouseEvent): void {
     if (event.button === 1) { // primary aux button
-      event.preventDefault(); // prevent middle-click scrolling; necessary for aux click to work
+      event.preventDefault(); // Prevent middle-click scrolling; necessary for aux click to work
     }
+  }
+
+  protected onContextmenu(event: MouseEvent): void {
+    this._viewContextMenuService.open(event, {viewId: this.view().id});
   }
 
   protected onDragStart(event: DragEvent): void {
@@ -162,17 +158,29 @@ export class ViewTabComponent {
   }
 
   private installMenuAccelerators(): void {
-    this._viewMenuService.installMenuAccelerators(this.host, this.view);
+    const viewTabElement = inject(ElementRef).nativeElement as Element;
+
+    effect(onCleanup => {
+      const view = this.view();
+      const viewSlotElement = view.slot.portal.element();
+      const targets = [viewTabElement].concat(viewSlotElement ?? []);
+
+      untracked(() => {
+        const accelerators = this._viewContextMenuService.installAccelerators(targets, {viewId: view.id});
+        onCleanup(() => accelerators.dispose());
+      });
+    });
   }
 
   private createViewTabContentPortal(): Signal<ComponentPortal<unknown>> {
+    const injector = inject(Injector);
+
     return computed(() => {
       const componentType = this._workbenchConfig.viewTabComponent ?? ViewTabContentComponent;
       return new ComponentPortal(componentType, null, Injector.create({
-        parent: this._injector,
+        parent: injector,
         providers: [
           {provide: WorkbenchView, useValue: this.view()},
-          {provide: VIEW_TAB_RENDERING_CONTEXT, useValue: 'tab' satisfies ViewTabRenderingContext},
         ],
       }));
     });

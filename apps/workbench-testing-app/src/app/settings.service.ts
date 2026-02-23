@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,84 +8,21 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, Injectable, isDevMode} from '@angular/core';
-import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {Injectable, isDevMode} from '@angular/core';
 import {environment} from '../environments/environment';
-import {SESSION_STORAGE} from './session.storage';
+import {renderingFlag} from './rendering-flag';
 
 /**
  * Provides settings for the workbench testing application.
  */
 @Injectable({providedIn: 'root'})
-export class SettingsService {
+export class Settings {
 
-  private _sessionStorage = inject(SESSION_STORAGE);
-
-  /**
-   * Toggles specified setting.
-   */
-  public toggle(setting: Setting): void {
-    const currentValue = this.isEnabled(setting);
-    if (currentValue === SETTINGS[setting].default) {
-      this._sessionStorage.put(SETTINGS[setting].storageKey, !currentValue);
-    }
-    else {
-      this._sessionStorage.remove(SETTINGS[setting].storageKey);
-    }
-  }
-
-  /**
-   * Returns whether given setting is enabled.
-   */
-  public isEnabled(setting: Setting): boolean {
-    return this._sessionStorage.get(SETTINGS[setting].storageKey) ?? SETTINGS[setting].default;
-  }
-
-  /**
-   * Observes given setting. Upon subscription, emits the current setting, and then emits continuously when the setting changes.
-   */
-  public observe$(setting: Setting): Observable<boolean> {
-    return this._sessionStorage.observe$<boolean | undefined>(SETTINGS[setting].storageKey, {emitIfAbsent: true})
-      .pipe(map(enabled => enabled ?? SETTINGS[setting].default));
-  }
+  public readonly resetFormsOnSubmit = renderingFlag<boolean>('scion.workbench.testing-app.settings.reset-forms-on-submit', true);
+  public readonly highlightFocus = renderingFlag<boolean>('scion.workbench.testing-app.settings.highlight-focus', false);
+  public readonly highlightGlasspane = renderingFlag<boolean>('scion.workbench.testing-app.settings.highlight-glasspane', false);
+  public readonly showMicrofrontendApplicationLabels = renderingFlag<boolean>('scion.workbench.testing-app.settings.show-microfrontend-application-labels', environment.showMicrofrontendApplicationLabels);
+  public readonly logAngularChangeDetectionCycles = renderingFlag<boolean>('scion.workbench.testing-app.settings.log-angular-change-detection-cycles', environment.logAngularChangeDetectionCycles);
+  public readonly showSkeletons = renderingFlag<boolean>('scion.workbench.testing-app.settings.show-skeletons', !isDevMode());
+  public readonly showTestPerspectives = renderingFlag<boolean>('scion.workbench.testing-app.settings.show-test-perspectives', isDevMode());
 }
-
-/**
- * Settings of the workbench testing application.
- */
-const SETTINGS = {
-  resetFormsOnSubmit: {
-    default: true,
-    storageKey: 'scion.workbench.testing-app.settings.reset-forms-on-submit',
-  },
-  highlightFocus: {
-    default: false,
-    storageKey: 'scion.workbench.testing-app.settings.highlight-focus',
-  },
-  highlightGlasspane: {
-    default: false,
-    storageKey: 'scion.workbench.testing-app.settings.highlight-glasspane',
-  },
-  showMicrofrontendApplicationLabels: {
-    default: environment.showMicrofrontendApplicationLabels,
-    storageKey: 'scion.workbench.testing-app.settings.show-microfrontend-application-labels',
-  },
-  logAngularChangeDetectionCycles: {
-    default: environment.logAngularChangeDetectionCycles,
-    storageKey: 'scion.workbench.testing-app.settings.log-angular-change-detection-cycles',
-  },
-  showSkeletons: {
-    default: !isDevMode(),
-    storageKey: 'scion.workbench.testing-app.settings.show-skeletons',
-  },
-  showTestPerspectives: {
-    default: isDevMode(),
-    storageKey: 'scion.workbench.testing-app.settings.show-test-perspectives',
-  },
-} as const;
-
-/**
- * Setting of the workbench testing application.
- */
-export type Setting = keyof typeof SETTINGS;

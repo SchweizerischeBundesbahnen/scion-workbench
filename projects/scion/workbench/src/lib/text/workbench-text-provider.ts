@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {WorkbenchTextProviderFn} from './workbench-text-provider.model';
+import {SciTextProviderFn} from '@scion/sci-components/text';
 
 /**
  * Texts used in the SCION Workbench.
@@ -49,32 +49,33 @@ import {WorkbenchTextProviderFn} from './workbench-text-provider.model';
  * ```
  */
 const workbenchTexts: Record<string, string> = {
-  'workbench.clear.tooltip': 'Clear',
-  'workbench.close.action': 'Close',
-  'workbench.close_all_tabs.action': 'Close All Tabs',
-  'workbench.close_other_tabs.action': 'Close Other Tabs',
-  'workbench.close_tab.action': 'Close',
-  'workbench.close_tab.tooltip': 'Close. {{close_others_modifier}}+Click to Close Others.',
-  'workbench.close_tabs_to_the_left.action': 'Close Tabs to the Left',
-  'workbench.close_tabs_to_the_right.action': 'Close Tabs to the Right',
-  'workbench.close.tooltip': 'Close',
-  'workbench.dev_mode_only_hint.tooltip': 'This hint is only displayed in dev mode.',
-  'workbench.minimize.tooltip': 'Minimize',
-  'workbench.move_tab_down.action': 'Move Down',
-  'workbench.move_tab_to_new_window.action': 'Move to New Window',
-  'workbench.move_tab_to_the_left.action': 'Move Left',
-  'workbench.move_tab_to_the_right.action': 'Move Right',
-  'workbench.move_tab_up.action': 'Move Up',
-  'workbench.null_content.message': 'Nothing to show.',
-  'workbench.null_view_developer_hint.message': 'This view has not been navigated.<br>Navigate the view "{{view}}" to display content.',
-  'workbench.ok.action': 'OK',
-  'workbench.page_not_found.message': 'The requested page <strong>{{path}}</strong> was not found.<br>The URL may have changed.',
-  'workbench.page_not_found.title': 'Page Not Found',
-  'workbench.page_not_found_developer_hint.message': 'You can create a custom "Not Found" page component and register it in the workbench configuration to personalize this page.',
-  'workbench.page_not_found_part.message': 'The requested page <strong>{{path}}</strong> was not found.<br>The URL may have changed. Try resetting the perspective.',
-  'workbench.page_not_found_view.message': 'The requested page <strong>{{path}}</strong> was not found.<br>The URL may have changed. Try opening the view again or resetting the perspective.',
-  'workbench.reset_perspective.action': 'Reset Perspective',
-  'workbench.show_open_tabs.tooltip': 'Show Open Tabs',
+  'scion.workbench.clear.tooltip': 'Clear',
+  'scion.workbench.close.action': 'Close',
+  'scion.workbench.close_all_tabs.action': 'Close All Tabs',
+  'scion.workbench.close_other_tabs.action': 'Close Other Tabs',
+  'scion.workbench.close_tab.action': 'Close',
+  'scion.workbench.close_tab.tooltip': 'Close. {{close_others_modifier}}+Click to Close Others.',
+  'scion.workbench.close_tabs_to_the_left.action': 'Close Tabs to the Left',
+  'scion.workbench.close_tabs_to_the_right.action': 'Close Tabs to the Right',
+  'scion.workbench.close.tooltip': 'Close',
+  'scion.workbench.dev_mode_only_hint.tooltip': 'This hint is only displayed in dev mode.',
+  'scion.workbench.minimize.tooltip': 'Minimize',
+  'scion.workbench.move_tab_down.action': 'Move Down',
+  'scion.workbench.move_tab_to_new_window.action': 'Move to New Window',
+  'scion.workbench.move_tab_to_the_left.action': 'Move Left',
+  'scion.workbench.move_tab_to_the_right.action': 'Move Right',
+  'scion.workbench.move_tab_up.action': 'Move Up',
+  'scion.workbench.no_views.message': 'No views found.',
+  'scion.workbench.null_content.message': 'Nothing to show.',
+  'scion.workbench.null_view_developer_hint.message': 'This view has not been navigated.<br>Navigate the view "{{view}}" to display content.',
+  'scion.workbench.ok.action': 'OK',
+  'scion.workbench.page_not_found.message': 'The requested page <strong>{{path}}</strong> was not found.<br>The URL may have changed.',
+  'scion.workbench.page_not_found.title': 'Page Not Found',
+  'scion.workbench.page_not_found_developer_hint.message': 'You can create a custom "Not Found" page component and register it in the workbench configuration to personalize this page.',
+  'scion.workbench.page_not_found_part.message': 'The requested page <strong>{{path}}</strong> was not found.<br>The URL may have changed. Try resetting the perspective.',
+  'scion.workbench.page_not_found_view.message': 'The requested page <strong>{{path}}</strong> was not found.<br>The URL may have changed. Try opening the view again or resetting the perspective.',
+  'scion.workbench.reset_perspective.action': 'Reset Perspective',
+  'scion.workbench.show_open_tabs.tooltip': 'Show Open Tabs',
 };
 
 /**
@@ -82,7 +83,7 @@ const workbenchTexts: Record<string, string> = {
  *
  * Register this provider as the last text provider, enabling change or translation of built-in workbench texts.
  */
-export const workbenchTextProvider: WorkbenchTextProviderFn = (key: string, params: {[name: string]: string}): string | undefined => {
+export const workbenchTextProvider: SciTextProviderFn = (key: string, params: {[name: string]: string}): string | undefined => {
   // Get the text.
   const text = workbenchTexts[key];
   if (text === undefined) {

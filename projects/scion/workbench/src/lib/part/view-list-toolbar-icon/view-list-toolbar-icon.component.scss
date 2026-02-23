@@ -1,0 +1,24 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 14px;
+  gap: .125em;
+
+  > sci-icon.menu-down {
+    flex: none;
+    line-height: .75;
+    --sci-icon-size: 1em;
+  }
+
+  > span.count {
+    flex: none;
+    font-size: var(--sci-workbench-part-hidden-tab-count-size);
+    line-height: .75;
+
+    // Display tab count only if font size is not 0 (style container query)
+    @container style(--sci-workbench-part-hidden-tab-count-size: 0) {
+      display: none;
+    }
+  }
+}

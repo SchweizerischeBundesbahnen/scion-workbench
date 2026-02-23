@@ -1,0 +1,345 @@
+$menu_padding_inline: .4em;
+$menu_padding_block: .3em;
+$menu_item_padding_inline: 5px;
+$menu_item_padding_block: 2px;
+$menu_item_gap: .25em;
+$menu_item_min_height: calc(var(--sci-icon-size) + (2 * $menu_item_padding_block + 4px)); // 2px for checked toolbar item plus 2px for toolbar item padding plus 18px icon size;
+$label_padding_left: 7.5px;
+$font-size: 13px;
+$font-size-smaller: $font-size - 1px;
+
+/**
+ * Displays ellipsis when text overflows.
+ */
+@mixin ellipsis-on-overflow {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+@mixin button {
+  all: unset;
+  text-wrap: nowrap;
+  padding: $menu_item_padding_block $menu_item_padding_inline;
+  border-radius: var(--sci-corner);
+  user-select: none;
+  overflow: hidden;
+  cursor: var(--sci-workbench-button-cursor);
+
+  // Do not hover menu items while scrolling.
+  @container not style(--ɵmenu-scrolling: true) {
+    &:hover:where(:not(:disabled)) {
+      background-color: var(--sci-workbench-menu-background-color-hover);
+    }
+  }
+
+  &:active:where(:not(:disabled)):focus { // guard with :focus to not style the menu button when clicking an action toolitem
+    background-color: var(--sci-workbench-button-background-color-active);
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: var(--sci-workbench-button-outline-width-focus) solid var(--sci-color-accent);
+  }
+
+  &:disabled {
+    color: var(--sci-color-gray-500);
+  }
+}
+
+:host {
+  --sci-icon-size: 18px;
+  --ɵsci-menu-padding-block: #{$menu_padding_block};
+
+  display: grid;
+  gap: $menu_item_gap .5em;
+  align-items: center;
+  font-size: $font-size;
+  box-sizing: border-box;
+  border: 1px solid var(--sci-color-border);
+  border-radius: 0.5rem;
+  color: var(--sci-color-text);
+  background-color: var(--sci-color-background-elevation);
+  padding: $menu_padding_block $menu_padding_inline;
+  margin: unset; // unset native popover styling
+  inset: unset; // unset native popover styling
+  outline: none;
+  width: max-content; // required for initial width
+  grid-template-columns:
+    // === Menu subgrid ===
+    auto // glyph area for icons and check marks
+    minmax(0, 1fr); // label area, not 1fr but minmax(0, 1fr) to display ellipsis for menu item labels
+
+  &.no-glyph-area {
+    grid-template-columns:
+      // === Menu subgrid ===
+      minmax(0, 1fr); // label area
+  }
+
+  &[popover]:not(:popover-open) {
+    display: none; // prevent flickering while closing, e.g., menu in workbench dialog toolbar
+  }
+
+  // Styles if a group (not top-level menu component)
+  &:not([popover]) {
+    grid-column: 1/-1; // consume all columns
+    grid-template-columns: subgrid;
+    border: unset;
+    border-radius: unset;
+    color: inherit;
+    padding: unset;
+    background-color: inherit;
+
+    &:not(.no-glyph-area) {
+      > header.group-header {
+        grid-column: 1/-1; // consume all columns
+        padding-left: $menu_item_padding_inline;
+      }
+    }
+
+    > header.group-header {
+      display: flex;
+      gap: .75em;
+      justify-content: space-between;
+      align-items: center;
+      padding-left: $menu_item_padding_inline + $label_padding_left;
+      padding-right: $menu_item_padding_inline;
+      user-select: none;
+      color: var(--sci-color-text);
+      box-sizing: border-box;
+      min-height: $menu_item_min_height;
+      // Do not set overflow: hidden to not crop outline of toolbar items.
+
+      > span.label {
+        flex: auto;
+        color: var(--sci-color-text-subtlest);
+        font-weight: 500;
+        font-size: .95em;
+      }
+
+      > sci-toolbar-group.actions {
+        flex: none;
+        align-self: stretch;
+        --sci-toolbar-toolbar-item-background-color-hover: color-mix(in srgb, var(--sci-workbench-button-background-color-hover) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+        --sci-toolbar-toolbar-item-border-radius: var(--sci-corner-small);
+
+        &:hover {
+          --sci-toolbar-toolbar-item-background-color-active: color-mix(in srgb, var(--sci-workbench-button-background-color-active) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+        }
+      }
+    }
+
+    > button.group-header {
+      @include button();
+      grid-column: 1/-1; // consume all columns
+      display: inline-grid;
+      grid-template-columns: subgrid;
+      align-items: center;
+      box-sizing: border-box;
+      min-height: $menu_item_min_height;
+
+      > div.content {
+        display: flex;
+        gap: .75em;
+        justify-content: space-between;
+        align-items: center;
+        // Do not set overflow: hidden to not crop outline of toolbar items.
+
+        > span.label {
+          flex: auto;
+        }
+
+        > sci-toolbar-group.actions {
+          flex: none;
+          align-self: stretch;
+          --sci-toolbar-toolbar-item-background-color-hover: color-mix(in srgb, var(--sci-workbench-button-background-color-hover) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+          --sci-toolbar-toolbar-item-border-radius: var(--sci-corner-small);
+
+          &:hover {
+            --sci-toolbar-toolbar-item-background-color-active: color-mix(in srgb, var(--sci-workbench-button-background-color-active) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+          }
+        }
+      }
+    }
+  }
+
+  &:has(> sci-viewport) {
+    padding: $menu_padding_block 0;
+
+    // TODO [menu] find better solution
+    > header.group-header, > button.group-header, > div.filter, > hr {
+      margin: 0 $menu_padding_inline;
+    }
+  }
+
+  > sci-viewport {
+    grid-column: 1/-1; // consume all columns
+    max-height: var(--ɵmenu-max-height);
+
+    &::part(content) {
+      grid-column: 1/-1; // consume all columns
+      display: grid;
+      gap: $menu_item_gap .5em;
+      grid-template-columns:
+      // === Menu subgrid ===
+        auto // glyph area for icons and check marks
+        minmax(0, 1fr); // label area
+      padding: 2px $menu_padding_inline; // 2px to not clip outline
+    }
+  }
+
+  &.no-glyph-area > sci-viewport::part(content) {
+    grid-template-columns:
+      // === Menu subgrid ===
+      minmax(0, 1fr); // label area
+  }
+
+  > div.filter {
+    grid-column: 1/-1; // consume all columns
+    display: inline-grid;
+    grid-template-columns: subgrid;
+    align-items: center;
+    padding: $menu_item_padding_block $menu_item_padding_inline;
+    user-select: none;
+    border-radius: var(--sci-corner-small);
+
+    &:focus-within {
+      outline: var(--sci-workbench-button-outline-width-focus) solid var(--sci-color-accent);
+    }
+  }
+
+  &.no-glyph-area > div.filter {
+    display: flex;
+    gap: .5em;
+
+    > sci-icon {
+      flex: none;
+    }
+
+    > sci-menu-filter {
+      flex: auto;
+    }
+  }
+
+  > hr {
+    all: unset;
+    grid-column: 1/-1; // consume all columns
+    height: 1px;
+    background-color: var(--sci-color-border);
+  }
+
+  div.message.no-items {
+    grid-column: 1/-1;
+    justify-self: center;
+    display: block;
+    color: var(--sci-color-text-subtlest);
+    font-size: $font-size-smaller;
+    padding: $menu_item_padding_block $menu_item_padding_inline;
+  }
+
+  // Add before separator
+  *:not(hr) + sci-menu-group:has(:not(:scope > sci-menu-group))::before {
+    content: '';
+    grid-column: 1/-1;
+    height: 1px;
+    background-color: var(--sci-color-border);
+  }
+
+  // Add after separator
+  sci-menu-group:not(:last-child):not(:has(+ sci-menu-group, + sci-menu))::after { // + sci-menu to exclude opened submenu, which is rendered as the last child
+    content: '';
+    grid-column: 1/-1;
+    height: 1px;
+    background-color: var(--sci-color-border);
+  }
+
+  button:is(.menu-item, .menu) {
+    @include button();
+
+    grid-column: 1/-1; // consume all columns
+    display: inline-grid;
+    grid-template-columns: subgrid;
+    align-items: center;
+    position: relative; // positioning context for active marker
+    box-sizing: border-box;
+    min-height: $menu_item_min_height;
+
+    &.menu-item.active::before {
+      position: absolute;
+      content: '';
+      box-sizing: border-box;
+      height: calc(100% - var(--sci-corner));
+      width: 4px;
+      border-radius: var(--sci-corner-small);
+      background-color: var(--sci-color-accent);
+    }
+
+    &.menu.open {
+      background-color: var(--sci-workbench-menu-background-color-hover);
+    }
+
+    // Make icon components to have the same size as icons.
+    > span.icon {
+      display: inline-grid;
+      place-content: center;
+      height: var(--sci-icon-size);
+      width: var(--sci-icon-size);
+    }
+
+    > div.content {
+      display: flex;
+      align-items: center;
+      gap: 2em;
+      // Do not set overflow: hidden to not crop outline of toolbar items.
+
+      // Add left padding if no glyph area.
+      &:first-child > span.label {
+        padding-left: $label_padding_left;
+      }
+
+      > span.label {
+        flex: auto;
+        padding-right: .5em;
+      }
+
+      > span.accelerator {
+        flex: none;
+        color: var(--sci-color-text-subtlest);
+        font-size: $font-size-smaller;
+      }
+
+      > sci-toolbar-group.actions {
+        flex: none;
+        align-self: stretch;
+        --sci-toolbar-toolbar-item-background-color-hover: color-mix(in srgb, var(--sci-workbench-button-background-color-hover) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+        --sci-toolbar-toolbar-item-border-radius: var(--sci-corner-small);
+
+        &:hover {
+          --sci-toolbar-toolbar-item-background-color-active: color-mix(in srgb, var(--sci-workbench-button-background-color-active) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+        }
+
+        // Hide actions toolbar while scrolling.
+        @container style(--ɵmenu-scrolling: true) {
+          visibility: hidden;
+        }
+      }
+    }
+
+    // TODO Why do we need that? Describe! Fix display of ellipsis when not hovering
+    // Add padding-right to label if no actions toolbar, or the actions toolbar is not visible because not hovered
+    //> div.content > span.label:last-child, &:not(:hover) > div.content > span.label:has(+ sci-toolbar-group.actions) {
+    //  padding-right: .5em;
+    //}
+
+    &:not(:hover):not(.checked):not(.active) > div.content > sci-toolbar-group.actions:not(.open) {
+      visibility: hidden;
+    }
+  }
+
+  span.label {
+    @include ellipsis-on-overflow();
+  }
+}

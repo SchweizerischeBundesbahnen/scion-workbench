@@ -9,7 +9,7 @@
  */
 
 import {ChangeDetectionStrategy, Component, computed, inject, isDevMode} from '@angular/core';
-import {TextPipe} from '../text/text.pipe';
+import {SciTextPipe} from '@scion/sci-components/text';
 import {WorkbenchService} from '../workbench.service';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
@@ -21,7 +21,7 @@ import {WorkbenchPopup} from '../popup/workbench-popup.model';
   templateUrl: './page-not-found.component.html',
   styleUrls: ['./page-not-found.component.scss'],
   imports: [
-    TextPipe,
+    SciTextPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

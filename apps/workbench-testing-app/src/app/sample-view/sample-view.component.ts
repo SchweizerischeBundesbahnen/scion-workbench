@@ -14,12 +14,13 @@ import {InputFieldSkeletonComponent} from '../skeletons/input-field-sekeleton/in
 import {TabbarSkeletonComponent} from '../skeletons/tabbar-sekeleton/tabbar-skeleton.component';
 import {ChartSkeletonComponent} from '../skeletons/chart-skeleton/chart-skeleton.component';
 import {Skeletons} from '../skeletons/skeletons.util';
-import {NavigationData, Translatable, WorkbenchRouter, WorkbenchView} from '@scion/workbench';
+import {NavigationData, WorkbenchRouter, WorkbenchView} from '@scion/workbench';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ListSkeletonComponent} from '../skeletons/list-sekeleton/list-skeleton.component';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {Objects} from '@scion/toolkit/util';
 import {ActivatedRoute} from '@angular/router';
+import {Translatable} from '@scion/sci-components/text';
 
 /**
  * Skeleton view for showcasing the SCION Workbench.

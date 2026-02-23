@@ -1,16 +1,20 @@
 @use '../common/workbench.mixin';
 
+$padding-block: .6em;
+$padding-left: var(--sci-workbench-notification-padding);
+$padding-right: calc(var(--sci-workbench-notification-padding) - var(--sci-workbench-notification-severity-indicator-size));
+
 :host {
   display: flex;
   flex-direction: column;
   gap: .75em;
   background-color: var(--sci-color-background-elevation);
   color: var(--sci-color-text);
-  font-size: .9em;
+  font-size: 1em;
   border: 1px solid var(--sci-color-border);
   border-radius: var(--sci-corner);
   box-shadow: var(--sci-elevation) var(--sci-static-color-black);
-  padding: 1em 0;
+  padding: $padding-block 0;
   overflow: hidden;
   outline: none;
   position: relative; // positioning context for close button and severity
@@ -39,28 +43,44 @@
 
   > header {
     flex: none;
-    font-weight: bold;
-    padding: 0 var(--sci-workbench-notification-padding);
-    word-break: break-word; // wrap unbreakable text at message box bounds
-    white-space: pre-line;
+    display: flex;
+    align-items: center;
+    gap: .5em;
+    justify-content: space-between;
+    padding-left: $padding-left;
+    padding-right: .5em; // because of toolbar
+    min-height: 22px; // to retain height if not visible, i.e., not hovering or focusing the notification
+
+    > span.title {
+      flex: auto;
+      font-weight: bold;
+      @include workbench.ellipsis-on-overflow();
+    }
+
+    > sci-toolbar[name="toolbar:workbench.notification.toolbar"] {
+      flex: none;
+    }
   }
 
   > div.slot {
     flex: auto;
     overflow: hidden;
     display: grid;
+    margin-top: .2em;
 
     &.text {
       word-break: break-word; // wrap unbreakable text at message box bounds
       white-space: pre-line;
-      padding: 0 var(--sci-workbench-notification-padding);
+      padding-left: $padding-left;
+      padding-right: $padding-right;
     }
 
     > sci-viewport {
       anchor-name: var(--ɵslot-anchor);
 
       &::part(content) {
-        padding-inline: var(--sci-workbench-notification-padding);
+        padding-left: $padding-left;
+        padding-right: $padding-right;
       }
     }
 
@@ -68,19 +88,33 @@
       position: absolute;
       position-anchor: var(--ɵslot-anchor);
       inset: anchor(top) anchor(right) anchor(bottom) anchor(left); // align with viewport bounds
-      margin-inline: var(--sci-workbench-notification-padding); // padding of viewport content
+      margin-left: $padding-left; // padding of viewport content
+      margin-right: $padding-right; // padding of viewport content
       visibility: hidden;
     }
   }
 
-  > button.close:is(button, #sci-reset) {
-    @include workbench.icon-button-element-states() {
-      position: absolute;
-      top: .275em;
-      right: .275em;
-      padding: .125em;
-      border-radius: var(--sci-corner-small);
-      font-size: 1rem;
-    }
+  // Use floating toolbar if located outside the header element.
+  > sci-toolbar[name="toolbar:workbench.notification.toolbar"] {
+    position: absolute;
+    top: $padding-block;
+    right: .5em;
+    background-color: var(--sci-color-background-elevation); // cover underlying text when floating
+  }
+
+  &:hover {
+    --ɵsci-workbench-notification-hover: true;
+  }
+
+  &[data-focus] {
+    --ɵsci-workbench-notification-focus: true;
+  }
+
+  sci-toolbar[name="toolbar:workbench.notification.toolbar"] {
+    --sci-toolbar-padding: 0;
+    --sci-toolbar-min-size: auto;
+
+    // Show/hide toolbar based on the `scion.workbench.appearance.toolbar.visibility` workbench setting.
+    @include workbench.toolbar-visibility(--ɵsci-workbench-notification-hover, --ɵsci-workbench-notification-focus);
   }
 }

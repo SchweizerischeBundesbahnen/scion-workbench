@@ -10,12 +10,13 @@
 
 import {Locator} from '@playwright/test';
 import {PartPO} from '../../part.po';
-import {NavigationData, NavigationState, Translatable} from '@scion/workbench';
+import {NavigationData, NavigationState} from '@scion/workbench';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {coerceArray} from '../../helper/testing.util';
 import {Params} from '@angular/router';
 import {ActivatedMicrofrontendPO} from './activated-microfrontend.po';
+import {Translatable} from '@scion/sci-components/text';
 
 /**
  * Page object to interact with {@link PartPageComponent}.

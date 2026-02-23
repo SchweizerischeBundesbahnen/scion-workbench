@@ -22,6 +22,7 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
+import {contributeMenu} from '@scion/sci-components/menu';
 
 @Component({
   selector: 'app-dialog-page',
@@ -72,6 +73,11 @@ export default class DialogPageComponent {
     this.form.controls.title.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(title => this.dialog.setTitle(title));
+
+    contributeMenu('menu:workbench.dialog.toolbar', menu => menu
+      .addMenuItem({label: 'Expand All', accelerator: {ctrl: true, key: '+', location: 'numpad'}, onSelect: () => console.log('>>> expand all')})
+      .addMenuItem({label: 'Collapse All', accelerator: {ctrl: true, key: '-', location: 'numpad'}, onSelect: () => console.log('>>> collapse all')}),
+    );
   }
 
   protected onClose(): void {

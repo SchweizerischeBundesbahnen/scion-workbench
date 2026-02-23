@@ -8,16 +8,28 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Observable} from 'rxjs';
 import {Capability, ParamDefinition} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
+import {MaybeObservable} from '../common/utility-types';
 
 /**
- * Signature of a function to provide texts to the SCION Workbench and micro apps.
+ * Symbol to inject {@link WorkbenchTextProviderFn} of @scion/workbench-client, if any.
+ *
+ * @see WorkbenchTextProviderFn
+ * @see ɵWorkbenchTextProvider
+ *
+ * @ignore
+ * @docs-private Not public API. For internal use only.
+ */
+export const ɵWORKBNCH_CLIENT_TEXT_PROVIDER = Symbol('WORKBNCH_CLIENT_TEXT_PROVIDER');
+
+/**
+ * Signature of a function to provide texts to the SCION Workbench and other micro apps.
  *
  * Texts starting with the percent symbol (`%`) are passed to the text provider for translation, with the percent symbol omitted.
  *
- * A text provider can be registered via {@link WorkbenchClient.registerTextProvider} in the Activator.
+ * A text provider can be registered via options object when connecting to the workbench using {@link WorkbenchClient.connect}.
+ * Angular applications using `@scion/workbench-client-angular` can register a text provider via `provideTextProvider` function.
  *
  * @param key - Translation key of the text.
  * @param params - Parameters used for text interpolation.
@@ -26,12 +38,12 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
  *
  * @category Localization
  */
-export type WorkbenchTextProviderFn = (key: string, params: {[name: string]: string}) => Observable<string | undefined> | string | undefined;
+export type WorkbenchTextProviderFn = (key: string, params: {[name: string]: string}) => MaybeObservable<string | undefined>;
 
 /**
  * Provides texts to the SCION Workbench and micro apps.
  *
- * @see WorkbenchClient.registerTextProvider
+ * @see WorkbenchClient.connect
  * @see WorkbenchTextService.text$
  *
  * @category Localization
@@ -55,8 +67,10 @@ export interface WorkbenchTextProviderCapability extends Capability {
  *
  * A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
  *
- * Key and parameters are passed to the registered text provider for translation. Applications can register a text provider
- * using {@link WorkbenchClient.registerTextProvider}.
+ * Key and parameters are passed to the registered text provider for translation.
+ *
+ * Applications can register a text provider when connecting to the workbench using {@link WorkbenchClient.connect}.
+ * Angular applications using `@scion/workbench-client-angular` can register a text provider via `provideTextProvider` function.
  *
  * Semicolons in interpolation parameters must be escaped with two backslashes (`\\;`).
  *

@@ -9,12 +9,12 @@
  */
 
 import {UrlSegment} from '@angular/router';
-import {CanCloseFn, CanCloseRef, WorkbenchMenuItem} from '../workbench.model';
+import {CanCloseFn, CanCloseRef} from '../workbench.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {NavigationData, NavigationState} from '../routing/routing.model';
 import {Signal} from '@angular/core';
 import {ViewId} from '../workbench.identifiers';
-import {Translatable} from '../text/workbench-text-provider.model';
+import {Translatable} from '@scion/sci-components/text';
 
 /**
  * A view is a visual workbench element for displaying content stacked or side-by-side in the workbench layout.
@@ -129,11 +129,6 @@ export abstract class WorkbenchView {
    * Indicates whether the tab of this view is scrolled into the tabbar.
    */
   public abstract readonly scrolledIntoView: Signal<boolean>;
-
-  /**
-   * Menu items associated with this view.
-   */
-  public abstract readonly menuItems: Signal<WorkbenchMenuItem[]>;
 
   /**
    * Gets the activation instant of this view.

@@ -13,14 +13,15 @@ import {animationFrameScheduler, catchError, concatWith, first, MonoTypeOperator
 import {APP_IDENTITY, Intent, IntentClient, ManifestService, mapToBody} from '@scion/microfrontend-platform';
 import {Beans, PreDestroy} from '@scion/toolkit/bean-manager';
 import {finalize} from 'rxjs/operators';
-import {Translatable} from './workbench-text-provider.model';
+import {Translatable, WorkbenchTextProviderFn, ɵWORKBNCH_CLIENT_TEXT_PROVIDER} from './workbench-text-provider.model';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
-import {Maps} from '@scion/toolkit/util';
+import {Maps, Observables} from '@scion/toolkit/util';
 
 /** @inheritDoc */
 export class ɵWorkbenchTextService implements WorkbenchTextService, PreDestroy {
 
   private readonly _cache = new Map<string, Observable<string | undefined>>();
+  private readonly _localTextProviderFn = Beans.opt<WorkbenchTextProviderFn>(ɵWORKBNCH_CLIENT_TEXT_PROVIDER);
 
   /** @inheritDoc */
   public text$(translatable: Translatable | undefined, options: {provider: string; params?: Record<string, unknown> | Map<string, unknown>; ttl?: number}): Observable<string | undefined> {
@@ -36,6 +37,11 @@ export class ɵWorkbenchTextService implements WorkbenchTextService, PreDestroy 
 
     // Append params from options.
     Maps.coerce(options.params).forEach((value, name) => params.set(name, `${value}`));
+
+    // Resolve text via local text provider if requesting local text.
+    if (Beans.get(APP_IDENTITY) === options.provider) {
+      return Observables.coerce(this._localTextProviderFn?.(key, Object.fromEntries(params)));
+    }
 
     // Compute cache key.
     const cacheKey = createCacheKey(key, params, options);

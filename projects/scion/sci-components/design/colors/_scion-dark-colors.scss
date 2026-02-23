@@ -1,0 +1,91 @@
+@use '../theming' as sci-theming;
+
+$-gray: (
+  --sci-color-gray-50: rgb(29, 29, 29),
+  --sci-color-gray-75: rgb(38, 38, 38),
+  --sci-color-gray-100: rgb(50, 50, 50),
+  --sci-color-gray-200: rgb(63, 63, 63),
+  --sci-color-gray-300: rgb(84, 84, 84),
+  --sci-color-gray-400: rgb(112, 112, 112),
+  --sci-color-gray-500: rgb(144, 144, 144),
+  --sci-color-gray-600: rgb(178, 178, 178),
+  --sci-color-gray-700: rgb(209, 209, 209),
+  --sci-color-gray-800: rgb(235, 235, 235),
+  --sci-color-gray-900: rgb(255, 255, 255),
+);
+
+$-blue: (
+  --sci-color-blue-100: rgb(0, 56, 119),
+  --sci-color-blue-200: rgb(0, 65, 138),
+  --sci-color-blue-300: rgb(0, 77, 163),
+  --sci-color-blue-400: rgb(0, 89, 194),
+  --sci-color-blue-500: rgb(3, 103, 224),
+  --sci-color-blue-600: rgb(19, 121, 243),
+  --sci-color-blue-700: rgb(52, 143, 244),
+  --sci-color-blue-800: rgb(84, 163, 246),
+  --sci-color-blue-900: rgb(114, 183, 249),
+  --sci-color-blue-1000: rgb(143, 202, 252),
+  --sci-color-blue-1100: rgb(174, 219, 254),
+  --sci-color-blue-1200: rgb(204, 233, 255),
+  --sci-color-blue-1300: rgb(232, 246, 255),
+  --sci-color-blue-1400: rgb(255, 255, 255),
+);
+
+$-red: (
+  --sci-color-red-100: rgb(123, 0, 0),
+  --sci-color-red-200: rgb(141, 0, 0),
+  --sci-color-red-300: rgb(165, 0, 0),
+  --sci-color-red-400: rgb(190, 4, 3),
+  --sci-color-red-500: rgb(215, 25, 19),
+  --sci-color-red-600: rgb(234, 56, 41),
+  --sci-color-red-700: rgb(246, 88, 67),
+  --sci-color-red-800: rgb(255, 117, 94),
+  --sci-color-red-900: rgb(255, 149, 129),
+  --sci-color-red-1000: rgb(255, 176, 161),
+  --sci-color-red-1100: rgb(255, 201, 189),
+  --sci-color-red-1200: rgb(255, 222, 216),
+  --sci-color-red-1300: rgb(255, 241, 238),
+  --sci-color-red-1400: rgb(255, 255, 255),
+);
+
+$-orange: (
+  --sci-color-orange-100: rgb(102, 37, 0),
+  --sci-color-orange-200: rgb(117, 45, 0),
+  --sci-color-orange-300: rgb(137, 55, 0),
+  --sci-color-orange-400: rgb(158, 66, 0),
+  --sci-color-orange-500: rgb(180, 78, 0),
+  --sci-color-orange-600: rgb(202, 93, 0),
+  --sci-color-orange-700: rgb(225, 109, 0),
+  --sci-color-orange-800: rgb(244, 129, 12),
+  --sci-color-orange-900: rgb(254, 154, 46),
+  --sci-color-orange-1000: rgb(255, 181, 88),
+  --sci-color-orange-1100: rgb(253, 206, 136),
+  --sci-color-orange-1200: rgb(255, 225, 179),
+  --sci-color-orange-1300: rgb(255, 242, 221),
+  --sci-color-orange-1400: rgb(255, 253, 249),
+);
+
+$-green: (
+  --sci-color-green-100: rgb(4, 67, 41),
+  --sci-color-green-200: rgb(0, 78, 47),
+  --sci-color-green-300: rgb(0, 92, 56),
+  --sci-color-green-400: rgb(0, 108, 67),
+  --sci-color-green-500: rgb(0, 125, 78),
+  --sci-color-green-600: rgb(0, 143, 93),
+  --sci-color-green-700: rgb(18, 162, 108),
+  --sci-color-green-800: rgb(43, 180, 125),
+  --sci-color-green-900: rgb(67, 199, 143),
+  --sci-color-green-1000: rgb(94, 217, 162),
+  --sci-color-green-1100: rgb(129, 233, 184),
+  --sci-color-green-1200: rgb(177, 244, 209),
+  --sci-color-green-1300: rgb(223, 250, 234),
+  --sci-color-green-1400: rgb(254, 255, 252),
+);
+
+$tokens: sci-theming.map-merge(
+    $-gray,
+    $-blue,
+    $-red,
+    $-orange,
+    $-green
+);

@@ -4,7 +4,6 @@ import {Arrays} from '@scion/toolkit/util';
 import {NotificationId} from '../workbench.identifiers';
 import {WorkbenchNotification, WorkbenchNotificationSize} from './workbench-notification.model';
 import {WorkbenchNotificationOptions} from './workbench-notification.options';
-import {Translatable} from '../text/workbench-text-provider.model';
 import {ɵNotification} from './ɵnotification';
 import {Notification} from './notification';
 import {WorkbenchNotificationRegistry} from './workbench-notification.registry';
@@ -17,6 +16,7 @@ import {boundingClientRect} from '@scion/components/dimension';
 import {WorkbenchNotificationComponent} from './workbench-notification.component';
 import {WbComponentPortal} from '../portal/wb-component-portal';
 import {WORKBENCH_NOTIFICATION_CONTEXT} from './workbench-notification-context.provider';
+import {Translatable} from '@scion/sci-components/text';
 
 /** @inheritDoc */
 export class ɵWorkbenchNotification implements WorkbenchNotification, Blockable {

@@ -13,10 +13,11 @@ A text provider is a function that returns the text for a translation key.
 
 ```ts
 import {provideWorkbench} from '@scion/workbench';
-import {inject, Signal} from '@angular/core';
+import {MaybeSignal} from '@scion/components/common';
+import {inject} from '@angular/core';
 
 provideWorkbench({
-  textProvider: (key: string, params: Record<string, string>): Signal<string> | string | undefined => {
+  textProvider: (key: string, params: Record<string, string>): MaybeSignal<string> | undefined => {
     // The `TranslateService` is illustrative and not part of the Workbench API.
     return inject(TranslateService).translate(key, params);
   },
@@ -53,44 +54,46 @@ provideWorkbench({
 
 The SCION Workbench uses the following translation keys for built-in texts. Using a text provider, they can be changed or localized.
 
-| Translation Key                                 | Default Text                                                                                                                  |
-|-------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| workbench.clear.tooltip                         | Clear                                                                                                                         |
-| workbench.close.action                          | Close                                                                                                                         |
-| workbench.close_all_tabs.action                 | Close All Tabs                                                                                                                |
-| workbench.close_other_tabs.action               | Close Other Tabs                                                                                                              |
-| workbench.close_tab.action                      | Close                                                                                                                         |
-| workbench.close_tab.tooltip                     | Close. {{close_others_modifier}}+Click to Close Others.                                                                       |                                                                    
-| workbench.close_tabs_to_the_left.action         | Close Tabs to the Left                                                                                                        |
-| workbench.close_tabs_to_the_right.action        | Close Tabs to the Right                                                                                                       |
-| workbench.close.tooltip                         | Close                                                                                                                         |
-| workbench.dev_mode_only_hint.tooltip            | This hint is only displayed in dev mode.                                                                                      |
-| workbench.minimize.tooltip                      | Minimize                                                                                                                      |
-| workbench.move_tab_down.action                  | Move Down                                                                                                                     |
-| workbench.move_tab_to_new_window.action         | Move to New Window                                                                                                            |
-| workbench.move_tab_to_the_left.action           | Move Left                                                                                                                     |
-| workbench.move_tab_to_the_right.action          | Move Right                                                                                                                    |
-| workbench.move_tab_up.action                    | Move Up                                                                                                                       |
-| workbench.null_content.message                  | Nothing to show.                                                                                                              |
-| workbench.null_view_developer_hint.message      | This view has not been navigated. Navigate the view "{{view}}" to display content.                                            |
-| workbench.ok.action                             | OK                                                                                                                            |
-| workbench.page_not_found.message                | The requested page {{path}} was not found. The URL may have changed.                                                          |
-| workbench.page_not_found.title                  | Page Not Found                                                                                                                |
-| workbench.page_not_found_developer_hint.message | You can create a custom "Not Found" page component and register it in the workbench configuration to personalize this page.   |
-| workbench.page_not_found_part.message           | The requested page {{path}} was not found. The URL may have changed. Try resetting the perspective.                           |
-| workbench.page_not_found_view.message           | The requested page {{path}} was not found. The URL may have changed. Try opening the view again or resetting the perspective. |
-| workbench.reset_perspective.action              | Reset Perspective                                                                                                             |
-| workbench.show_open_tabs.tooltip                | Show Open Tabs                                                                                                                |
+| Translation Key                                       | Default Text                                                                                                                  |
+|-------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| scion.workbench.clear.tooltip                         | Clear                                                                                                                         |
+| scion.workbench.close.action                          | Close                                                                                                                         |
+| scion.workbench.close_all_tabs.action                 | Close All Tabs                                                                                                                |
+| scion.workbench.close_other_tabs.action               | Close Other Tabs                                                                                                              |
+| scion.workbench.close_tab.action                      | Close                                                                                                                         |
+| scion.workbench.close_tab.tooltip                     | Close. {{close_others_modifier}}+Click to Close Others.                                                                       |
+| scion.workbench.close_tabs_to_the_left.action         | Close Tabs to the Left                                                                                                        |
+| scion.workbench.close_tabs_to_the_right.action        | Close Tabs to the Right                                                                                                       |
+| scion.workbench.close.tooltip                         | Close                                                                                                                         |
+| scion.workbench.dev_mode_only_hint.tooltip            | This hint is only displayed in dev mode.                                                                                      |
+| scion.workbench.minimize.tooltip                      | Minimize                                                                                                                      |
+| scion.workbench.move_tab_down.action                  | Move Down                                                                                                                     |
+| scion.workbench.move_tab_to_new_window.action         | Move to New Window                                                                                                            |
+| scion.workbench.move_tab_to_the_left.action           | Move Left                                                                                                                     |
+| scion.workbench.move_tab_to_the_right.action          | Move Right                                                                                                                    |
+| scion.workbench.move_tab_up.action                    | Move Up                                                                                                                       |
+| scion.workbench.no_views.message                      | No views found.                                                                                                               |
+| scion.workbench.null_content.message                  | Nothing to show.                                                                                                              |
+| scion.workbench.null_view_developer_hint.message      | This view has not been navigated. Navigate the view "{{view}}" to display content.                                            |
+| scion.workbench.ok.action                             | OK                                                                                                                            |
+| scion.workbench.page_not_found.message                | The requested page {{path}} was not found. The URL may have changed.                                                          |
+| scion.workbench.page_not_found.title                  | Page Not Found                                                                                                                |
+| scion.workbench.page_not_found_developer_hint.message | You can create a custom "Not Found" page component and register it in the workbench configuration to personalize this page.   |
+| scion.workbench.page_not_found_part.message           | The requested page {{path}} was not found. The URL may have changed. Try resetting the perspective.                           |
+| scion.workbench.page_not_found_view.message           | The requested page {{path}} was not found. The URL may have changed. Try opening the view again or resetting the perspective. |
+| scion.workbench.reset_perspective.action              | Reset Perspective                                                                                                             |
+| scion.workbench.show_open_tabs.tooltip                | Show Open Tabs                                                                                                                |
 
-The translation keys of texts used by the SCION Workbench start with the `workbench.` prefix. To not localize built-in workbench texts, the text provider can return `undefined` instead.
+The translation keys of texts used by the SCION Workbench start with the `scion.workbench.` prefix. To not localize built-in SCION texts, the text provider can return `undefined` instead.
 
 ```ts
 import {provideWorkbench} from '@scion/workbench';
-import {inject, Signal} from '@angular/core';
+import {MaybeSignal} from '@scion/components/common';
+import {inject} from '@angular/core';
 
 provideWorkbench({
-  textProvider: (key: string): Signal<string> | string | undefined => {
-    if (key.startsWith('workbench.')) {
+  textProvider: (key: string): MaybeSignal<string> | undefined => {
+    if (key.startsWith('scion.')) {
       return undefined;
     }
 

@@ -8,20 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, effect, inject, Injector, runInInjectionContext, signal, untracked, WritableSignal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
 import {PerspectiveData} from '../app.perspectives';
-import {MenuItem, MenuItemSeparator} from '../menu/menu-item';
 import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-params';
 import {Router} from '@angular/router';
-import {MenuService} from '../menu/menu.service';
 import {Logger, LogLevel, WorkbenchPerspective, WorkbenchRouter, WorkbenchService} from '@scion/workbench';
-import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
-import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {SciToggleButtonComponent} from '@scion/components.internal/toggle-button';
-import {SettingsService} from '../settings.service';
+import {Settings} from '../settings.service';
 import {Maps} from '@scion/toolkit/util';
 import {comparePerspectives} from './perspective-comparator.util';
+import {contributeMenu, SciMenuFactory, SciToolbarComponent, SciToolbarFactory, SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
+import {ThemeSwitcherComponent} from '../theme-switch-button/theme-switcher.component';
 
 @Component({
   selector: 'app-header',
@@ -29,132 +25,273 @@ import {comparePerspectives} from './perspective-comparator.util';
   styleUrls: ['./header.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    ReactiveFormsModule,
-    SciMaterialIconDirective,
-    SciToggleButtonComponent,
+    SciToolbarComponent,
   ],
 })
 export class HeaderComponent {
 
+  private readonly _workbenchRouter = inject(WorkbenchRouter);
+  private readonly _workbenchService = inject(WorkbenchService);
   private readonly _router = inject(Router);
-  private readonly _wbRouter = inject(WorkbenchRouter);
-  private readonly _menuService = inject(MenuService);
-  private readonly _settingsService = inject(SettingsService);
-  private readonly _injector = inject(Injector);
+  private readonly _settings = inject(Settings);
   private readonly _logger = inject(Logger);
 
-  protected readonly workbenchService = inject(WorkbenchService);
-  protected readonly PerspectiveData = PerspectiveData;
-  protected readonly lightThemeActiveFormControl = inject(NonNullableFormBuilder).control<boolean | undefined>(undefined);
-  protected readonly perspectiveSwitcherMenuState = signal<'open' | 'closed'>('closed');
-  protected readonly settingsMenuState = signal<'open' | 'closed'>('closed');
-
   constructor() {
-    this.installThemeSwitcher();
+    this.contributeMainToolbar();
+    this.contributeSettingsToolbar();
   }
 
-  protected onPerspectiveSwitcherMenuOpen(element: Element): void {
-    void runIfMenuClosed(async () => {
-      const menuItems = this.findPerspectiveSwitcherMenuItems();
-      await this._menuService.openMenu(element, menuItems);
-    }, this.perspectiveSwitcherMenuState);
-  };
-
-  protected onSettingsMenuOpen(element: Element): void {
-    void runIfMenuClosed(async () => {
-      await this._menuService.openMenu(element, [
-        ...this.contributePanelAnimation(),
-        new MenuItemSeparator('Panel Alignment'),
-        ...this.contributePanelAlignment(),
-        new MenuItemSeparator('Log Level'),
-        ...this.contributeLogLevelMenuItems(),
-        new MenuItemSeparator(),
-        ...this.contributeViewMenuItems(),
-        new MenuItemSeparator(),
-        ...this.contributeStartupMenuItems(),
-        new MenuItemSeparator(),
-        ...this.contributeNavigationMenuItems(),
-        new MenuItemSeparator(),
-        ...this.contributeSettingsMenuItems(),
-      ]);
-    }, this.settingsMenuState);
+  private contributeMainToolbar(): void {
+    contributeMenu('toolbar:main', toolbar => {
+      this.contributePerspectiveSwitcherMenu(toolbar);
+    });
   }
 
-  private contributeLogLevelMenuItems(): MenuItem[] {
-    return [
-      new MenuItem({
-        text: 'Debug',
-        checked: this._logger.logLevel === LogLevel.DEBUG,
-        onAction: () => this._router.navigate([], {queryParams: {loglevel: 'debug'}, queryParamsHandling: 'merge'}),
+  private contributeSettingsToolbar(): void {
+    contributeMenu('toolbar:settings', toolbar => toolbar
+      .addToolbarItem({control: ThemeSwitcherComponent})
+      .addMenu({icon: 'more_vert', visualMenuHint: false, filter: true, cssClass: 'e2e-settings-menu'}, menu => {
+        this.contributeWorkbenchSettingsGroup(menu);
+        this.contributeApplicationSettingsGroup(menu);
+        this.contributeOpenGroup(menu);
+        this.contributeNavigateGroup(menu);
+        this.contributeLoggingGroup(menu)
       }),
-      new MenuItem({
-        text: 'Info',
-        checked: this._logger.logLevel === LogLevel.INFO,
-        onAction: () => this._router.navigate([], {queryParams: {loglevel: 'info'}, queryParamsHandling: 'merge'}),
-      }),
-      new MenuItem({
-        text: 'Warn',
-        checked: this._logger.logLevel === LogLevel.WARN,
-        onAction: () => this._router.navigate([], {queryParams: {loglevel: 'warn'}, queryParamsHandling: 'merge'}),
-      }),
-      new MenuItem({
-        text: 'Error',
-        checked: this._logger.logLevel === LogLevel.ERROR,
-        onAction: () => this._router.navigate([], {queryParams: {loglevel: 'error'}, queryParamsHandling: 'merge'}),
-      }),
-    ];
+    );
   }
 
-  private contributeViewMenuItems(): MenuItem[] {
-    return [
-      new MenuItem({
-        text: 'Open Start Page',
-        cssClass: 'e2e-open-start-page',
-        onAction: () => this._wbRouter.navigate(['start-page'], {target: 'blank'}),
+  private contributeWorkbenchSettingsGroup(menu: SciMenuFactory): void {
+    menu.addGroup({label: 'Workbench Settings'}, group => group
+      .addMenu('Panel Alignment', menu => menu
+        .addMenuItem({
+          label: 'Left',
+          checked: computed(() => this._workbenchService.settings.panelAlignment() === 'left'),
+          cssClass: 'e2e-change-panel-alignment-left',
+          onSelect: () => this._workbenchService.settings.panelAlignment.set('left'),
+        })
+        .addMenuItem({
+          label: 'Right',
+          checked: computed(() => this._workbenchService.settings.panelAlignment() === 'right'),
+          cssClass: 'e2e-change-panel-alignment-right',
+          onSelect: () => this._workbenchService.settings.panelAlignment.set('right'),
+        })
+        .addMenuItem({
+          label: 'Center',
+          checked: computed(() => this._workbenchService.settings.panelAlignment() === 'center'),
+          cssClass: 'e2e-change-panel-alignment-center',
+          onSelect: () => this._workbenchService.settings.panelAlignment.set('center'),
+        })
+        .addMenuItem({
+          label: 'Justify',
+          checked: computed(() => this._workbenchService.settings.panelAlignment() === 'justify'),
+          cssClass: 'e2e-change-panel-alignment-justify',
+          onSelect: () => this._workbenchService.settings.panelAlignment.set('justify'),
+        }),
+      )
+      .addMenuItem({
+        label: 'Show Toolbars Only on Hover or Focus',
+        checked: computed(() => this._workbenchService.settings.toolbarVisibility() === 'on-hover-or-focus'),
+        onSelect: () => this._workbenchService.settings.toolbarVisibility.update(visibility => visibility === 'always' ? 'on-hover-or-focus' : 'always'),
+      })
+      .addMenuItem({
+        label: 'Enable Panel Animation',
+        checked: this._workbenchService.settings.panelAnimation,
+        onSelect: () => this._workbenchService.settings.panelAnimation.update(enabled => !enabled),
       }),
-      new MenuItem({
-        text: 'Open Sample View',
-        onAction: () => this._wbRouter.navigate(['sample-view'], {target: 'blank'}),
-      }),
-    ];
+    );
   }
 
-  private contributeStartupMenuItems(): MenuItem[] {
-    return [
-      new MenuItem({
-        text: 'Open in new Browser Tab',
-        onAction: () => this.openInNewWindow({standalone: false, launcher: 'LAZY'}),
+  private contributeApplicationSettingsGroup(menu: SciMenuFactory): void {
+    menu.addGroup({label: 'Application Settings'}, group => group
+      .addMenuItem({
+        label: 'Show Skeletons',
+        checked: this._settings.showSkeletons,
+        accelerator: {ctrl: true, shift: true, key: 'S'},
+        onSelect: () => {
+          this._settings.showSkeletons.update(enabled => !enabled);
+          // Perform navigation for Angular to evaluate `CanMatch` guards.
+          void this._router.navigate([{outlets: {}}], {skipLocationChange: true});
+        },
+      })
+      .addMenuItem({
+        label: 'Show Microfrontend Application Labels',
+        checked: this._settings.showMicrofrontendApplicationLabels,
+        onSelect: () => this._settings.showMicrofrontendApplicationLabels.update(enabled => !enabled),
+      })
+      .addMenuItem({
+        label: 'Show Test Perspectives',
+        checked: this._settings.showTestPerspectives,
+        onSelect: () => this._settings.showTestPerspectives.update(enabled => !enabled),
+      })
+      .addMenuItem({
+        label: 'Highlight Focus',
+        checked: this._settings.highlightFocus,
+        onSelect: () => this._settings.highlightFocus.update(enabled => !enabled),
+      })
+      .addMenuItem({
+        label: 'Highlight Glasspane',
+        checked: this._settings.highlightGlasspane,
+        onSelect: () => this._settings.highlightGlasspane.update(enabled => !enabled),
+      })
+      .addMenuItem({
+        label: 'Reset Forms on Submit',
+        checked: this._settings.resetFormsOnSubmit,
+        onSelect: () => this._settings.resetFormsOnSubmit.update(enabled => !enabled),
       }),
-      new MenuItem({
-        text: 'Open in new Browser Tab (No Micro Apps)',
-        onAction: () => this.openInNewWindow({standalone: true, launcher: 'LAZY'}),
-      }),
-      new MenuItem({
-        text: 'Open in new Browser Tab (App Initializer)',
-        onAction: () => this.openInNewWindow({standalone: false, launcher: 'APP_INITIALIZER'}),
-      }),
-      new MenuItem({
-        text: 'Open in new Browser Tab (App Initializer, No Micro Apps)',
-        onAction: () => this.openInNewWindow({standalone: true, launcher: 'APP_INITIALIZER'}),
-      }),
-    ];
+    );
   }
 
-  private contributeNavigationMenuItems(): MenuItem[] {
-    return [
-      new MenuItem({
-        text: 'Navigate to Workbench Page',
+  private contributeOpenGroup(menu: SciMenuFactory): void {
+    menu.addGroup(group => group
+      .addMenu('Open View', menu => menu
+        .addMenuItem({
+          label: 'Open Start Page',
+          cssClass: 'e2e-open-start-page',
+          onSelect: () => this._workbenchRouter.navigate(['start-page'], {target: 'blank'}),
+        })
+        .addMenuItem({
+          label: 'Open Sample View',
+          onSelect: () => this._workbenchRouter.navigate(['sample-view'], {target: 'blank'}),
+        }),
+      )
+      .addMenu('Open Application', menu => menu
+        .addGroup({label: 'Starting Workbench in App Component'}, group => group
+          .addMenuItem({
+            label: 'Open in new Browser Tab',
+            onSelect: () => this.openInNewWindow({standalone: false, launcher: 'LAZY'}),
+          })
+          .addMenuItem({
+            label: 'Open in new Browser Tab (Exclude Micro Apps)',
+            onSelect: () => this.openInNewWindow({standalone: true, launcher: 'LAZY'}),
+          }),
+        )
+        .addGroup({label: 'Starting Workbench in App Initializer'}, group => group
+          .addMenuItem({
+            label: 'Open in new Browser Tab',
+            onSelect: () => this.openInNewWindow({standalone: false, launcher: 'APP_INITIALIZER'}),
+          })
+          .addMenuItem({
+            label: 'Open in new Browser Tab (Exclude Micro Apps)',
+            onSelect: () => this.openInNewWindow({standalone: true, launcher: 'APP_INITIALIZER'}),
+          }),
+        ),
+      ),
+    );
+  }
+
+  private contributeNavigateGroup(menu: SciMenuFactory): void {
+    menu.addGroup(group => group.addMenu('Navigate Primary Router Outlet', menu => menu
+      .addMenuItem({
+        label: 'Navigate to Workbench Page',
         cssClass: 'e2e-navigate-to-workbench-page',
-        disabled: !this._router.isActive('test-pages/blank-test-page', {paths: 'subset', queryParams: 'ignored', fragment: 'ignored', matrixParams: 'ignored'}),
-        onAction: () => this._router.navigate(['redirect-to-root']), // Do not navigate to the root page so Angular does not remove the view outlets from the URL.
-      }),
-      new MenuItem({
-        text: 'Navigate to Blank Page',
+        disabled: computed(() => {
+          // TODO [Angular 22] Check if Angular provides active signal on router.
+          this._router.currentNavigation(); // Track navigation to invalidate reactive context.
+          return !this._router.isActive('test-pages/blank-test-page', {paths: 'subset', queryParams: 'ignored', fragment: 'ignored', matrixParams: 'ignored'});
+        }),
+        onSelect: () => this._router.navigate(['redirect-to-root']), // Do not navigate to the root page so Angular does not remove the view outlets from the URL.
+      })
+      .addMenuItem({
+        label: 'Navigate to Non-Workbench Page',
         cssClass: 'e2e-navigate-to-blank-page',
-        disabled: this._router.isActive('test-pages/blank-test-page', {paths: 'subset', queryParams: 'ignored', fragment: 'ignored', matrixParams: 'ignored'}),
-        onAction: () => this._router.navigate(['test-pages/blank-test-page']),
+        disabled: computed(() => {
+          // TODO [Angular 22] Check if Angular provides active signal on router.
+          this._router.currentNavigation(); // Track navigation to invalidate reactive context.
+          return this._router.isActive('test-pages/blank-test-page', {paths: 'subset', queryParams: 'ignored', fragment: 'ignored', matrixParams: 'ignored'});
+        }),
+        onSelect: () => this._router.navigate(['test-pages/blank-test-page']),
       }),
-    ];
+    ));
+  }
+
+  private contributeLoggingGroup(menu: SciMenuFactory): void {
+    menu.addGroup(group => group
+      .addMenu('Log Level', menu => menu
+        .addMenuItem({
+          label: 'Debug',
+          checked: this._logger.logLevel === LogLevel.DEBUG,
+          onSelect: () => this._router.navigate([], {queryParams: {loglevel: 'debug'}, queryParamsHandling: 'merge'}),
+        })
+        .addMenuItem({
+          label: 'Info',
+          checked: this._logger.logLevel === LogLevel.INFO,
+          onSelect: () => this._router.navigate([], {queryParams: {loglevel: 'info'}, queryParamsHandling: 'merge'}),
+        })
+        .addMenuItem({
+          label: 'Warn',
+          checked: this._logger.logLevel === LogLevel.WARN,
+          onSelect: () => this._router.navigate([], {queryParams: {loglevel: 'warn'}, queryParamsHandling: 'merge'}),
+        })
+        .addMenuItem({
+          label: 'Error',
+          checked: this._logger.logLevel === LogLevel.ERROR,
+          onSelect: () => this._router.navigate([], {queryParams: {loglevel: 'error'}, queryParamsHandling: 'merge'}),
+        }),
+      )
+      .addMenuItem({
+        label: 'Log Angular Change Detection Cycles',
+        checked: this._settings.logAngularChangeDetectionCycles,
+        cssClass: 'e2e-log-angular-change-detection-cycles',
+        onSelect: () => {
+          this._settings.logAngularChangeDetectionCycles.update(enabled => !enabled);
+          return true;
+        },
+      }),
+    );
+  }
+
+  private contributePerspectiveSwitcherMenu(toolbar: SciToolbarFactory): void {
+    const menuDescriptor: SciToolbarMenuDescriptor = {
+      label: computed(() => this._workbenchService.activePerspective()?.data?.[PerspectiveData.label] as string | undefined ?? this._workbenchService.activePerspective()?.id ?? 'unkown'),
+      tooltip: 'Switch Perspective',
+      cssClass: ['perspective-switcher', 'e2e-perspective-switcher-menu'],
+    };
+    toolbar.addMenu(menuDescriptor, menu => {
+      const groupLabels = new Map()
+        .set('docked-part-layout', 'Layout with Docked Parts')
+        .set('aligned-part-layout', 'Layout with Aligned Parts')
+        .set('test-perspectives', 'Test Perspectives');
+
+      this._workbenchService.perspectives()
+        // Filter perspectives based on the visible flag.
+        .filter(perspective => isPerspectiveVisible(perspective))
+        // Sort perspectives.
+        .sort(comparePerspectives)
+        // Group perspectives.
+        .reduce((grouped, perspective) => {
+          const group = (perspective.data[PerspectiveData.menuGroup] ?? 'default') as string;
+          return Maps.addListValue(grouped, group, perspective);
+        }, new Map<string, WorkbenchPerspective[]>())
+        // Add perspectives by group.
+        .forEach((perspectives, group) => {
+          menu.addGroup({label: groupLabels.get(group)}, group => {
+            contributePerspectiveMenuItems(group, perspectives);
+          });
+        });
+    });
+
+    function contributePerspectiveMenuItems(group: SciMenuFactory, perspectives: WorkbenchPerspective[]): void {
+      const workbenchService = inject(WorkbenchService);
+
+      for (const perspective of perspectives) {
+        group.addMenuItem({
+          label: perspective.data[PerspectiveData.menuItemLabel] as string | undefined ?? perspective.id,
+          active: perspective.active,
+          attributes: {'data-perspectiveid': perspective.id},
+          actions: actions => perspective.active() && actions.addToolbarItem({
+            icon: 'undo',
+            tooltip: 'Reset Perspective',
+            onSelect: () => workbenchService.resetPerspective(),
+          }),
+          onSelect: () => void workbenchService.switchPerspective(perspective.id),
+        });
+      }
+    }
+
+    function isPerspectiveVisible(perspective: WorkbenchPerspective): boolean {
+      const visible = perspective.data[PerspectiveData.visible] as boolean | (() => boolean) | undefined ?? true;
+      return typeof visible === 'function' ? visible() : visible;
+    }
   }
 
   /**
@@ -165,162 +302,5 @@ export class HeaderComponent {
     href.searchParams.append(WorkbenchStartupQueryParams.LAUNCHER_QUERY_PARAM, options.launcher);
     href.searchParams.append(WorkbenchStartupQueryParams.STANDALONE_QUERY_PARAM, `${options.standalone}`);
     window.open(href);
-  }
-
-  protected onActivateLightTheme(): void {
-    this.lightThemeActiveFormControl.setValue(true);
-  }
-
-  protected onActivateDarkTheme(): void {
-    this.lightThemeActiveFormControl.setValue(false);
-  }
-
-  private installThemeSwitcher(): void {
-    effect(() => {
-      const theme = this.workbenchService.settings.theme();
-      untracked(() => {
-        this.lightThemeActiveFormControl.setValue(theme === 'scion-light', {emitEvent: false});
-      });
-    });
-
-    this.lightThemeActiveFormControl.valueChanges
-      .pipe(takeUntilDestroyed())
-      .subscribe(lightTheme => {
-        this.workbenchService.settings.theme.set(lightTheme ? 'scion-light' : 'scion-dark');
-      });
-  }
-
-  private contributeSettingsMenuItems(): MenuItem[] {
-    return [
-      new MenuItem({
-        text: 'Reset Forms on Submit',
-        checked: this._settingsService.isEnabled('resetFormsOnSubmit'),
-        onAction: () => this._settingsService.toggle('resetFormsOnSubmit'),
-      }),
-      new MenuItem({
-        text: 'Highlight Focus',
-        checked: this._settingsService.isEnabled('highlightFocus'),
-        onAction: () => this._settingsService.toggle('highlightFocus'),
-      }),
-      new MenuItem({
-        text: 'Highlight Glasspane',
-        checked: this._settingsService.isEnabled('highlightGlasspane'),
-        onAction: () => this._settingsService.toggle('highlightGlasspane'),
-      }),
-      new MenuItem({
-        text: 'Show Microfrontend Application Labels',
-        checked: this._settingsService.isEnabled('showMicrofrontendApplicationLabels'),
-        onAction: () => this._settingsService.toggle('showMicrofrontendApplicationLabels'),
-      }),
-      new MenuItem({
-        text: 'Show Skeletons',
-        checked: this._settingsService.isEnabled('showSkeletons'),
-        onAction: () => {
-          this._settingsService.toggle('showSkeletons');
-          // Perform navigation for Angular to evaluate `CanMatch` guards.
-          void inject(Router).navigate([{outlets: {}}], {skipLocationChange: true});
-        },
-      }),
-      new MenuItem({
-        text: 'Show Test Perspectives',
-        checked: this._settingsService.isEnabled('showTestPerspectives'),
-        onAction: () => this._settingsService.toggle('showTestPerspectives'),
-      }),
-      new MenuItem({
-        text: 'Log Angular Change Detection Cycles',
-        cssClass: 'e2e-log-angular-change-detection-cycles',
-        checked: this._settingsService.isEnabled('logAngularChangeDetectionCycles'),
-        onAction: () => this._settingsService.toggle('logAngularChangeDetectionCycles'),
-      }),
-    ];
-  }
-
-  private contributePanelAnimation(): MenuItem[] {
-    return [
-      new MenuItem({
-        text: 'Enable Panel Animation',
-        checked: this.workbenchService.settings.panelAnimation(),
-        onAction: () => this.workbenchService.settings.panelAnimation.update(enabled => !enabled),
-      }),
-    ];
-  }
-
-  private contributePanelAlignment(): MenuItem[] {
-    return [
-      new MenuItem({
-        text: 'Left',
-        cssClass: 'e2e-change-panel-alignment-left',
-        checked: this.workbenchService.settings.panelAlignment() === 'left',
-        onAction: () => this.workbenchService.settings.panelAlignment.set('left'),
-      }),
-      new MenuItem({
-        text: 'Right',
-        cssClass: 'e2e-change-panel-alignment-right',
-        checked: this.workbenchService.settings.panelAlignment() === 'right',
-        onAction: () => this.workbenchService.settings.panelAlignment.set('right'),
-      }),
-      new MenuItem({
-        text: 'Center',
-        cssClass: 'e2e-change-panel-alignment-center',
-        checked: this.workbenchService.settings.panelAlignment() === 'center',
-        onAction: () => this.workbenchService.settings.panelAlignment.set('center'),
-      }),
-      new MenuItem({
-        text: 'Justify',
-        cssClass: 'e2e-change-panel-alignment-justify',
-        checked: this.workbenchService.settings.panelAlignment() === 'justify',
-        onAction: () => this.workbenchService.settings.panelAlignment.set('justify'),
-      }),
-    ];
-  }
-
-  private findPerspectiveSwitcherMenuItems(): Array<MenuItem | MenuItemSeparator> {
-    const groupLabels = new Map<string, string>()
-      .set('docked-part-layout', 'Layout with Docked Parts')
-      .set('aligned-part-layout', 'Layout with Aligned Parts')
-      .set('test-perspectives', 'Test Perspectives');
-    const menuItems = new Array<MenuItem | MenuItemSeparator>();
-
-    [...this.workbenchService.perspectives()]
-      // Filter perspectives based on the visible flag.
-      .filter(perspective => runInInjectionContext(this._injector, () => isPerspectiveVisible(perspective)))
-      // Sort perspectives.
-      .sort(comparePerspectives)
-      // Group perspectives.
-      .reduce((grouped, perspective) => {
-        const group = (perspective.data[PerspectiveData.menuGroup] ?? 'default') as string;
-        return Maps.addListValue(grouped, group, perspective);
-      }, new Map<string, WorkbenchPerspective[]>())
-      // Add perspectives by group.
-      .forEach((perspectives, group) => {
-        menuItems.push(new MenuItemSeparator(groupLabels.get(group)));
-        perspectives.forEach(perspective => menuItems.push(new MenuItem({
-          text: (perspective.data[PerspectiveData.menuItemLabel] ?? perspective.id) as string,
-          onAction: () => void this.workbenchService.switchPerspective(perspective.id),
-          checked: perspective.active(),
-          attributes: {'data-perspectiveid': perspective.id},
-          actions: perspective.active() ? [{icon: 'undo', tooltip: 'Reset Perspective', onAction: () => this.workbenchService.resetPerspective()}] : [],
-        })));
-      });
-    return menuItems;
-  }
-}
-
-function isPerspectiveVisible(perspective: WorkbenchPerspective): boolean {
-  const visible = perspective.data[PerspectiveData.visible] as boolean | (() => boolean) | undefined ?? true;
-  return typeof visible === 'function' ? visible() : visible;
-}
-
-async function runIfMenuClosed(openFn: () => Promise<void>, state: WritableSignal<'open' | 'closed'>): Promise<void> {
-  if (state() === 'open') {
-    return;
-  }
-
-  state.set('open');
-  try {
-    await openFn();
-  }
-  finally {
-    state.set('closed');
   }
 }

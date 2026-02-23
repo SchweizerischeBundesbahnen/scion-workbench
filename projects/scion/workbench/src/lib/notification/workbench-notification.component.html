@@ -1,24 +1,32 @@
-<!-- Title -->
-@if (notification.title(); as title) {
-  <header class="e2e-title">{{(title | wbText)()}}</header>
+@let hasTitle = notification.title()?.length;
+@let hasSlot = notification.slot.text?.length || notification.slot.component;
+@let toolbarFloating = !hasTitle && hasSlot;
+
+<!-- Use non-floatable toolbar if having a title, displaying ellipsis to not overlap the toolbar. -->
+@if (!toolbarFloating) {
+  <header>
+    <span class="title e2e-title">{{(notification.title() | sciText)()}}</span>
+    <sci-toolbar name="toolbar:workbench.notification.toolbar" (keydown.escape)="onToolbarEscape($event)" wbToolbarVisibility/>
+  </header>
 }
 
-<!-- Message -->
-<div class="slot e2e-slot" [class.text]="!!notification.slot.text?.length">
-  @if (notification.slot.text?.length) {
-    {{(notification.slot.text | wbText)()}}
-  } @else if (notification.slot.component) {
-    <sci-viewport class="e2e-notification-slot">
-      <ng-container *ngComponentOutlet="notification.slot.component; inputs: notification.inputs | wbRemoveLegacyInput;"/>
-    </sci-viewport>
+<!-- Content -->
+@if (hasSlot) {
+  <div class="slot e2e-slot" [class.text]="!!notification.slot.text?.length">
+    @if (notification.slot.text?.length) {
+      {{(notification.slot.text | sciText)()}}
+    } @else if (notification.slot.component) {
+      <sci-viewport class="e2e-notification-slot">
+        <ng-container *ngComponentOutlet="notification.slot.component; inputs: notification.inputs | wbRemoveLegacyInput;"/>
+      </sci-viewport>
 
-    <!-- Extra DIV to capture bounds available to slotted content, excluding viewport content padding. May differ from the actual content size if content overflows or does not fill the slot. -->
-    <div class="slot-bounds e2e-notification-slot-bounds" #slot_bounds></div>
-  }
-</div>
+      <!-- Extra DIV to capture bounds available to slotted content, excluding viewport content padding. May differ from the actual content size if content overflows or does not fill the slot. -->
+      <div class="slot-bounds e2e-notification-slot-bounds" #slot_bounds></div>
+    }
+  </div>
+}
 
-<button (click)="onClose()"
-        [title]="('%workbench.close.tooltip' | wbText)()"
-        class="close e2e-close">
-  <wb-icon icon="workbench.close"/>
-</button>
+<!-- Use floatable toolbar if having no title -->
+@if (toolbarFloating) {
+  <sci-toolbar name="toolbar:workbench.notification.toolbar" (keydown.escape)="onToolbarEscape($event)" wbToolbarVisibility/>
+}

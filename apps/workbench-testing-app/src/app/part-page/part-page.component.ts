@@ -9,7 +9,7 @@
  */
 
 import {Component, computed, inject, Signal} from '@angular/core';
-import {ActivatedMicrofrontend, Translatable, WorkbenchPart, WorkbenchPartActionDirective} from '@scion/workbench';
+import {ActivatedMicrofrontend, WorkbenchPart, WorkbenchPartActionDirective} from '@scion/workbench';
 import {AppendDataTypePipe, MultiValueInputComponent, NullIfEmptyPipe, parseTypedString} from 'workbench-testing-app-common';
 import {AsyncPipe} from '@angular/common';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
@@ -22,6 +22,7 @@ import {ActivatedRoute} from '@angular/router';
 import {Arrays} from '@scion/toolkit/util';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import ActivatedMicrofrontendComponent from '../activated-microfrontend/activated-microfrontend.component';
+import {Translatable} from '@scion/sci-components/text';
 
 @Component({
   selector: 'app-part-page',

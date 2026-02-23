@@ -12,6 +12,8 @@ import {Locator} from '@playwright/test';
 
 /**
  * Page object to interact with {@link ViewListComponent}.
+ *
+ * TODO [menu] migrate to toolbar item
  */
 export class ViewListMenuPO {
 

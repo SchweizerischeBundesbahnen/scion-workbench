@@ -21,16 +21,16 @@ import {ɵWorkbenchView} from './view/ɵworkbench-view.model';
 import {ɵWorkbenchPart} from './part/ɵworkbench-part.model';
 import {ɵWorkbenchPerspective} from './perspective/ɵworkbench-perspective.model';
 import {WorkbenchPerspectiveRegistry} from './perspective/workbench-perspective.registry';
-import {WorkbenchPartActionRegistry} from './part/workbench-part-action.registry';
 import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
 import {DialogId, PartId, PopupId, ViewId} from './workbench.identifiers';
 import {WorkbenchLayoutService} from './layout/workbench-layout.service';
-import {WorkbenchViewMenuItemRegistry} from './view/workbench-view-menu-item.registry';
 import {WorkbenchFocusMonitor} from './focus/workbench-focus-tracker.service';
 import {WorkbenchDialogRegistry} from './dialog/workbench-dialog.registry';
 import {WorkbenchPopupRegistry} from './popup/workbench-popup.registry';
 import {ɵWorkbenchPopup} from './popup/ɵworkbench-popup.model';
 import {ɵWorkbenchDialog} from './dialog/ɵworkbench-dialog.model';
+import {WorkbenchViewContextMenuService} from './part/view-context-menu/workbench-view-context-menu.service';
+import {WorkbenchPartActionRegistrationService} from './part/part-action/workbench-part-action-registration.service';
 
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchService implements WorkbenchService {
@@ -41,9 +41,9 @@ export class ɵWorkbenchService implements WorkbenchService {
   private readonly _viewRegistry = inject(WorkbenchViewRegistry);
   private readonly _dialogRegistry = inject(WorkbenchDialogRegistry);
   private readonly _popupRegistry = inject(WorkbenchPopupRegistry);
-  private readonly _partActionRegistry = inject(WorkbenchPartActionRegistry);
-  private readonly _viewMenuItemRegistry = inject(WorkbenchViewMenuItemRegistry);
   private readonly _perspectiveService = inject(WorkbenchPerspectiveService);
+  private readonly _viewContextMenuService = inject(WorkbenchViewContextMenuService);
+  private readonly _partActionRegistrationService = inject(WorkbenchPartActionRegistrationService);
 
   public readonly layout = inject(WorkbenchLayoutService).layout;
   public readonly perspectives = inject(WorkbenchPerspectiveRegistry).elements;
@@ -57,6 +57,7 @@ export class ɵWorkbenchService implements WorkbenchService {
     theme: inject(WorkbenchThemeSwitcher).theme,
     panelAlignment: inject(WorkbenchLayoutService).panelAlignment,
     panelAnimation: inject(WorkbenchLayoutService).panelAnimation,
+    toolbarVisibility: inject(WorkbenchLayoutService).toolbarVisibility,
   };
 
   /** @inheritDoc */
@@ -111,18 +112,12 @@ export class ɵWorkbenchService implements WorkbenchService {
   /** @inheritDoc */
   public registerPartAction(fn: WorkbenchPartActionFn): Disposable {
     assertNotInReactiveContext(this.registerPartAction, 'Call WorkbenchService.registerPartAction() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    this._partActionRegistry.register(fn, fn);
-    return {
-      dispose: () => this._partActionRegistry.unregister(fn),
-    };
+    return this._partActionRegistrationService.registerLegacyPartAction(fn);
   }
 
   /** @inheritDoc */
   public registerViewMenuItem(fn: WorkbenchViewMenuItemFn): Disposable {
     assertNotInReactiveContext(this.registerViewMenuItem, 'Call WorkbenchService.registerViewMenuItem() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    this._viewMenuItemRegistry.register(fn, fn);
-    return {
-      dispose: () => this._viewMenuItemRegistry.unregister(fn),
-    };
+    return this._viewContextMenuService.registerLegacyMenuContribution(fn);
   }
 }

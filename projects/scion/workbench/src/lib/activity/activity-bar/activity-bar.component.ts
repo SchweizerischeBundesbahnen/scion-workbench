@@ -11,6 +11,7 @@
 import {Component, inject, input} from '@angular/core';
 import {ActivityStackComponent} from './activity-stack/activity-stack.component';
 import {ɵWorkbenchService} from '../../ɵworkbench.service';
+import {SciToolbarComponent} from '@scion/sci-components/menu';
 
 /**
  * Renders the activity bar of a given workbench side.
@@ -21,6 +22,7 @@ import {ɵWorkbenchService} from '../../ɵworkbench.service';
   styleUrls: ['./activity-bar.component.scss'],
   imports: [
     ActivityStackComponent,
+    SciToolbarComponent,
   ],
   host: {
     '[attr.data-align]': 'align()',

@@ -13,8 +13,26 @@
   position: relative; // Positioning context for the bottom border pseudo element.
   padding-inline: var(--sci-workbench-part-bar-padding-inline);
 
-  // Subtract the "tab border radius" from the left padding if the first element is the tabbar.
-  &:has(wb-view-tab-bar:first-child) {
+  // Ensure unit (px) for use in calculations and style queries.
+  @container style(--sci-workbench-tab-border-radius: 0) {
+    --sci-workbench-tab-border-radius: 0px;
+  }
+
+  // Add margin to view tabbar if tabs have no border radius.
+  @container style(--sci-workbench-tab-border-radius: 0px) {
+    // Add left margin only if the tabbar is not the first visible child (part has title or titlebar).
+    &:has(> span.title, > sci-toolbar[name="toolbar:workbench.part.titlebar"]:not(.empty)) > wb-view-tab-bar {
+      margin-left: .25em;
+    }
+
+    // Add right margin.
+    > wb-view-tab-bar {
+      margin-right: .25em;
+    }
+  }
+
+  // Adjust left padding if tabbar is the first visible child (no title, no titlebar).
+  &:not(:has(> span.title)):has(> sci-toolbar[name="toolbar:workbench.part.titlebar"].empty) {
     padding-left: calc(var(--sci-workbench-part-bar-padding-inline) - var(--sci-workbench-tab-border-radius));
   }
 
@@ -22,8 +40,12 @@
     background-color: var(--sci-workbench-part-peripheral-bar-background-color);
   }
 
+  > sci-toolbar.empty {
+    visibility: collapse; // hidden, plus removing occupied space.
+  }
+
   > span.title {
-    flex: none;
+    flex: 0 1 auto; // enables display of elllipsis on overflow
     align-self: center;
     user-select: none;
     margin-right: .5em;
@@ -38,32 +60,19 @@
     flex: initial;
   }
 
-  > div.actions {
-    flex: initial; // allow to shrink
-    display: flex;
-    align-items: center;
-    gap: var(--sci-workbench-part-bar-actions-gap);
-    padding-inline: var(--sci-workbench-part-bar-actions-padding-inline);
+  > sci-toolbar {
+    flex: none;
+    --sci-toolbar-padding: .2em 0;
+    --sci-toolbar-min-size: auto;
+  }
 
-    > wb-part-action {
-      flex: initial; // allow to shrink
-    }
+  // Show/hide part 'workbench.part.toolbar' based on the `scion.workbench.appearance.toolbar.visibility` workbench setting.
+  wb-part[data-peripheral] & > sci-toolbar[name="toolbar:workbench.part.toolbar"] {
+    @include workbench.toolbar-visibility(--ɵsci-workbench-part-hover, --ɵsci-workbench-part-focus);
   }
 
   > div.filler {
     flex: auto;
-  }
-
-  > wb-view-list-button {
-    flex: none;
-    align-self: center;
-  }
-
-  > button.minimize:is(button, #sci-reset) {
-    @include workbench.icon-button-element-states() {
-      flex: none;
-      align-self: center;
-    }
   }
 
   // Pseudo element for rendering the bottom border of the tabbar.

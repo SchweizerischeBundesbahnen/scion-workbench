@@ -8,19 +8,18 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Injector, linkedSignal, Provider, signal, Signal, untracked, viewChild} from '@angular/core';
-import {firstValueFrom, MonoTypeOperatorFunction, switchMap, tap} from 'rxjs';
+import {afterNextRender, ChangeDetectorRef, Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Injector, linkedSignal, Provider, signal, Signal, untracked, viewChild} from '@angular/core';
+import {firstValueFrom, fromEvent, MonoTypeOperatorFunction, switchMap, tap} from 'rxjs';
 import {filter, first, map, take} from 'rxjs/operators';
 import {ManifestService, mapToBody, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {WorkbenchViewCapability, ɵVIEW_CAPABILITY_ID_PARAM_NAME, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
-import {Dictionaries, Maps, Objects} from '@scion/toolkit/util';
+import {Arrays, Dictionaries, Maps, Objects} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
 import {CanCloseRef} from '../../workbench.model';
 import {IFRAME_OVERLAY_HOST} from '../../workbench-element-references';
 import {serializeExecution} from '../../common/operators';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
-import {ViewMenuService} from '../../part/view-context-menu/view-menu.service';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {stringifyError} from '../../common/stringify-error.util';
 import {MICROFRONTEND_VIEW_NAVIGATION_HINT, MICROFRONTEND_VIEW_STATE_TRANSIENT_PARAMS, splitMicrofrontendViewParams} from './microfrontend-view-routes';
@@ -37,6 +36,8 @@ import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provid
 import {prune} from '../../common/prune.util';
 import {MicrofrontendViewNavigationData} from './microfrontend-view-navigation-data';
 import {Routing} from '../../routing/routing.util';
+import {ɵSciMenuService} from '@scion/sci-components/menu';
+import {workbenchKeyboardAccelerators} from '../workbench-keyboard-accelerators';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -67,17 +68,11 @@ export class MicrofrontendViewComponent {
   private readonly _changeDetectorRef = inject(ChangeDetectorRef);
 
   private readonly _routerOutletElement = viewChild.required<ElementRef<SciRouterOutletElement>>('router_outlet');
-  private readonly _universalKeystrokes = [
-    ['escape'], // keystroke to close notifications
-    ['ctrl', 'shift', 'F12'], // keystroke to minimize activities
-  ];
 
   protected readonly view = inject(ɵWorkbenchView);
   protected readonly workbenchLayoutService = inject(WorkbenchLayoutService);
   /** Splash to display until the microfrontend signals readiness. */
   protected readonly splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
-  /** Keystrokes which to bubble across iframe boundaries from embedded content. */
-  protected readonly keystrokesToBubble = this.computeKeyStrokesToBubble();
   protected readonly focusWithin = signal(false);
   /** Configures iframe projection. */
   protected readonly overlayConfig: ContentAsOverlayConfig = {
@@ -93,11 +88,13 @@ export class MicrofrontendViewComponent {
     this.installViewFocusedPublisher();
     this.installPartIdPublisher();
     this.installCanCloseGuard();
-    this.installMenuAccelerators();
-    this.propagateWorkbenchTheme();
-    this.propagateViewContext();
     this.installNavigator();
     this.installParamsUpdater();
+    this.installAcceleratorsToBubble();
+    this.propagateViewContext();
+    this.propagateWorkbenchTheme();
+    this.propagateKeyboardEvents();
+    this.propagateHoverState();
 
     inject(DestroyRef).onDestroy(() => this.unload());
   }
@@ -236,13 +233,6 @@ export class MicrofrontendViewComponent {
     });
   }
 
-  private installMenuAccelerators(): void {
-    // Since the iframe is added at a top-level location in the DOM, that is, not as a child element of this component,
-    // the workbench view misses keyboard events from embedded content. As a result, menu item accelerators of the context
-    // menu of this view do not work, so we install the accelerators on the router outlet as well.
-    inject(ViewMenuService).installMenuAccelerators(this._routerOutletElement, this.view);
-  }
-
   /**
    * Subscribes to requests from the currently loaded microfrontend to update its parameters.
    */
@@ -360,37 +350,65 @@ export class MicrofrontendViewComponent {
     }
   }
 
-  /**
-   * Computes keystrokes to bubble through the iframe boundary.
-   */
-  private computeKeyStrokesToBubble(): Signal<string[]> {
-    return computed(() => {
-      const accelerators = [
-        ...this._universalKeystrokes,
-        ...this.view.menuItems().map(menuItem => menuItem.accelerator ?? []),
-      ];
-
-      return accelerators
-        .filter(accelerator => accelerator.length)
-        .map(accelerator => accelerator.map(segment => {
-          // Normalize keystrokes according to `SciRouterOutletElement#keystrokes`
-          switch (segment) {
-            case 'ctrl':
-              return 'control';
-            case '.':
-              return 'dot';
-            case ' ':
-              return 'space';
-            default:
-              return segment;
-          }
-        }))
-        .map(accelerator => `keydown.${accelerator.join('.')}{preventDefault=true}`);
-    }, {equal: (a, b) => Objects.isEqual(a, b, {ignoreArrayOrder: true})});
-  }
-
   private propagateWorkbenchTheme(): void {
     Microfrontends.propagateTheme(this._routerOutletElement);
+  }
+
+  /**
+   * Propagates keyboard events from embedded content to the workbench view, necessary because the iframe
+   * is located at the top level of the DOM.
+   *
+   * Otherwise, accelerators of menu items in the part toolbar or view context menu would not work.
+   */
+  private propagateKeyboardEvents(): void {
+    const destroyRef = inject(DestroyRef);
+
+    afterNextRender(() => {
+      fromEvent<KeyboardEvent>(this._routerOutletElement().nativeElement, 'keydown')
+        .pipe(takeUntilDestroyed(destroyRef))
+        .subscribe(event => {
+          // Stop propagation so global accelerators (e.g., in the application header) are not handled twice.
+          event.stopPropagation();
+
+          // Dispatch keyboard event to workbench view.
+          this.view.slot.portal.element()!.dispatchEvent(new KeyboardEvent('keydown', {
+            key: event.key,
+            ctrlKey: event.ctrlKey,
+            shiftKey: event.shiftKey,
+            altKey: event.altKey,
+            metaKey: event.metaKey,
+            bubbles: event.bubbles,
+            location: event.location,
+          }));
+        });
+    });
+  }
+
+  /**
+   * Propagates the hover state from projected microfrontend content (sci-router-outlet) to the part.
+   *
+   * The microfrontend sits on top of the part but is not its child, preventing the part from receiving native hover events.
+   * This method manually sets `--ɵsci-workbench-part-hover` on the part when the microfrontend is hovered.
+   */
+  private propagateHoverState(): void {
+    const styleSheet = new CSSStyleSheet({});
+    styleSheet.insertRule(`
+      wb-workbench:has(sci-router-outlet[name="${this.view.id}"]:hover) wb-part[data-partid="${this.view.part().id}"] {
+        --ɵsci-workbench-part-hover: true;
+      }`,
+    );
+    document.adoptedStyleSheets.push(styleSheet);
+    inject(DestroyRef).onDestroy(() => Arrays.remove(document.adoptedStyleSheets, styleSheet));
+  }
+
+  /**
+   * Instructs router outlet to bubble menu accelerators across iframe boundaries.
+   */
+  private installAcceleratorsToBubble(): void {
+    const menuAccelerators = inject(ɵSciMenuService).accelerators();
+    const accelerators = computed(() => [...workbenchKeyboardAccelerators, ...menuAccelerators()]);
+
+    Microfrontends.installAcceleratorsToBubble(this._routerOutletElement, accelerators);
   }
 
   private unload(): void {

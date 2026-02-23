@@ -1,5 +1,5 @@
 <button (click)="onToggle()"
         [class.focus-within-activity]="focusWithinActivity()"
         [class.active]="active()">
-  <wb-icon [icon]="activity().icon"/>
+  <sci-icon>{{activity().icon}}</sci-icon>
 </button>

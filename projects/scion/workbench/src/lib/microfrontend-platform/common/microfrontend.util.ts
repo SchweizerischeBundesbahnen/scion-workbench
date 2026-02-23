@@ -9,7 +9,7 @@
  */
 
 import {APP_IDENTITY, Capability, SciRouterOutletElement} from '@scion/microfrontend-platform';
-import {DOCUMENT, ElementRef, inject, Injector, Signal, untracked} from '@angular/core';
+import {DOCUMENT, effect, ElementRef, inject, Injector, Signal, untracked} from '@angular/core';
 import {WorkbenchTheme, ɵTHEME_CONTEXT_KEY} from '@scion/workbench-client';
 import {WorkbenchService} from '../../workbench.service';
 import {Crypto} from '@scion/toolkit/crypto';
@@ -17,6 +17,7 @@ import {coerceElement} from '@angular/cdk/coercion';
 import {first} from 'rxjs/operators';
 import {rootEffect} from '../../common/rxjs-interop.util';
 import {Beans} from '@scion/toolkit/bean-manager';
+import {SciKeyboardAccelerator} from '@scion/sci-components/menu';
 
 /**
  * Provides functions related to workbench themes.
@@ -51,6 +52,36 @@ export const Microfrontends = {
         }
       });
     }, {injector});
+  },
+  /**
+   * Instructs given router outlet to bubble given accelerators across iframe boundaries.
+   */
+  installAcceleratorsToBubble: (routerOutletElement: Signal<SciRouterOutletElement | ElementRef<SciRouterOutletElement>>, accelerators: Signal<SciKeyboardAccelerator[]>): void => {
+    effect(() => {
+      const routerOutlet = coerceElement(routerOutletElement());
+      const routerOutletAccelerators = accelerators().map(toRouterOutletAccelerator);
+
+      untracked(() => {
+        routerOutlet.keystrokes = routerOutletAccelerators;
+      })
+    });
+
+    /**
+     * Converts passed keystrokes to the format of `SciRouterOutletElement#keystrokes`.
+     */
+    function toRouterOutletAccelerator(accelerator: SciKeyboardAccelerator): string {
+      const replacements = new Map()
+        .set('.', 'dot')
+        .set(' ', 'space');
+
+      return `keydown.${[
+        accelerator.ctrl && 'control',
+        accelerator.shift && 'shift',
+        accelerator.alt && 'alt',
+        accelerator.meta && 'meta',
+        replacements.get(accelerator.key) ?? accelerator.key,
+      ].filter(Boolean).join('.')}{preventDefault=true}`;
+    }
   },
   /**
    * Waits for contextual data to be available to embedded content.

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, input, signal, untracked, viewChild} from '@angular/core';
+import {Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, input, signal, untracked, viewChild} from '@angular/core';
 import {ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
 import {WorkbenchNotificationCapability, ɵNOTIFICATION_CONTEXT, ɵNotificationContext, ɵWorkbenchCommands} from '@scion/workbench-client';
@@ -18,6 +18,8 @@ import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfronten
 import {Microfrontends} from '../common/microfrontend.util';
 import {ɵWorkbenchNotification} from '../../notification/ɵworkbench-notification.model';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ɵSciMenuService} from '@scion/sci-components/menu';
+import {workbenchKeyboardAccelerators} from '../workbench-keyboard-accelerators';
 
 /**
  * Displays the microfrontend of a given {@link WorkbenchNotficationCapability}.
@@ -62,6 +64,7 @@ export class MicrofrontendNotificationComponent {
     this.setNotificationProperties();
     this.propagateNotificationContext();
     this.propagateWorkbenchTheme();
+    this.installAcceleratorsToBubble();
 
     inject(DestroyRef).onDestroy(() => {
       // Clear the outlet.
@@ -158,5 +161,15 @@ export class MicrofrontendNotificationComponent {
 
   private propagateWorkbenchTheme(): void {
     Microfrontends.propagateTheme(this._routerOutletElement);
+  }
+
+  /**
+   * Instructs router outlet to bubble menu accelerators across iframe boundaries.
+   */
+  private installAcceleratorsToBubble(): void {
+    const menuAccelerators = inject(ɵSciMenuService).accelerators();
+    const accelerators = computed(() => [...workbenchKeyboardAccelerators, ...menuAccelerators()]);
+
+    Microfrontends.installAcceleratorsToBubble(this._routerOutletElement, accelerators);
   }
 }

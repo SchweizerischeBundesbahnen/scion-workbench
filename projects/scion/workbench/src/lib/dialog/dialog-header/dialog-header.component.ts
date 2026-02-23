@@ -8,10 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {Component, ElementRef, inject, viewChild} from '@angular/core';
 import {ɵWorkbenchDialog} from '../ɵworkbench-dialog.model';
-import {TextPipe} from '../../text/text.pipe';
-import {IconComponent} from '../../icon/icon.component';
+import {SciTextPipe} from '@scion/sci-components/text';
+import {SciToolbarComponent} from '@scion/sci-components/menu';
+import {dimension} from '@scion/components/dimension';
 
 /**
  * Renders the dialog header with a close button and optional title.
@@ -21,19 +22,25 @@ import {IconComponent} from '../../icon/icon.component';
   templateUrl: './dialog-header.component.html',
   styleUrls: ['./dialog-header.component.scss'],
   imports: [
-    TextPipe,
-    IconComponent,
+    SciTextPipe,
+    SciToolbarComponent,
   ],
+  host: {
+    '[style.--ɵdialog-toolbar-width]': '`${toolbarSize().offsetWidth}px`',
+  },
 })
 export class DialogHeaderComponent {
 
-  protected readonly dialog = inject(ɵWorkbenchDialog);
+  private readonly _toolbar = viewChild.required(SciToolbarComponent, {read: ElementRef<HTMLElement>});
 
-  protected onCloseClick(): void {
-    this.dialog.close();
+  protected readonly dialog = inject(ɵWorkbenchDialog);
+  protected readonly toolbarSize = dimension(this._toolbar);
+
+  protected onToolbarMouseDown(event: Event): void {
+    event.stopPropagation(); // Prevent dragging the dialog when pressing toolbar item, e.g., the close button.
   }
 
-  protected onCloseMouseDown(event: Event): void {
-    event.stopPropagation(); // Prevent dragging the dialog with the close button.
+  protected onEscape(event: Event): void {
+    event.stopPropagation(); // Prevent dialog from closing.
   }
 }

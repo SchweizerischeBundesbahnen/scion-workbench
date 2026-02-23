@@ -8,13 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {WorkbenchPartAction} from '../workbench.model';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {Signal} from '@angular/core';
 import {NavigationData, NavigationState} from '../routing/routing.model';
 import {UrlSegment} from '@angular/router';
 import {PartId, ViewId} from '../workbench.identifiers';
-import {Translatable} from '../text/workbench-text-provider.model';
+import {Translatable} from '@scion/sci-components/text';
 
 /**
  * A part is a visual element of the workbench layout. Parts can be docked to the side or
@@ -104,11 +103,6 @@ export abstract class WorkbenchPart {
    * Gets views opened in this part.
    */
   public abstract readonly views: Signal<WorkbenchView[]>;
-
-  /**
-   * Actions associated with this part.
-   */
-  public abstract readonly actions: Signal<WorkbenchPartAction[]>;
 
   /**
    * Specifies CSS class(es) to add to the part, e.g., to locate the part in tests.

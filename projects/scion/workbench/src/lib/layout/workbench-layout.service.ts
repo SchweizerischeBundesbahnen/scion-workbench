@@ -49,21 +49,31 @@ export class WorkbenchLayoutService {
   /**
    * Controls the alignment of the bottom activity panel.
    *
-   * Defaults to the `--sci-workbench-layout-panel-align` design token, or `justify` if not set.
+   * Defaults to the `--sci-workbench-activity-panel-bottom-align` design token, or `justify` if not set.
    */
-  public readonly panelAlignment = renderingFlag(
-    'scion.workbench.layout.panel.align',
-    readCssVariable(inject(DOCUMENT).documentElement, '--sci-workbench-layout-panel-align', 'justify'),
+  public readonly panelAlignment = renderingFlag<'left' | 'right' | 'center' | 'justify'>(
+    'scion.workbench.appearance.activity.panel.bottom.align',
+    readCssVariable(inject(DOCUMENT).documentElement, '--sci-workbench-activity-panel-bottom-align', 'justify'),
   );
 
   /**
    * Controls animation of activity panels.
    *
-   * Defaults to the `--sci-workbench-layout-panel-animate` design token, or `true` if not set.
+   * Defaults to the `--sci-workbench-activity-panel-animate` design token, or `true` if not set.
    */
-  public readonly panelAnimation = renderingFlag(
-    'scion.workbench.layout.panel.animate',
-    readCssVariable(inject(DOCUMENT).documentElement, '--sci-workbench-layout-panel-animate', true),
+  public readonly panelAnimation = renderingFlag<boolean>(
+    'scion.workbench.appearance.activity.panel.animate',
+    readCssVariable(inject(DOCUMENT).documentElement, '--sci-workbench-activity-panel-animate', true),
+  );
+
+  /**
+   * Controls when to display toolbars of the SCION Workbench.
+   *
+   * Defaults to the `--sci-workbench-toolbar-visibility` design token, or `on-hover-or-focus` if not set.
+   */
+  public readonly toolbarVisibility = renderingFlag<'always' | 'on-hover-or-focus'>(
+    'scion.workbench.appearance.toolbar.visibility',
+    readCssVariable(inject(DOCUMENT).documentElement, '--sci-workbench-toolbar-visibility', 'on-hover-or-focus'),
   );
 
   /**

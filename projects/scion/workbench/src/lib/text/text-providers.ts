@@ -8,10 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {EnvironmentProviders, makeEnvironmentProviders, Signal} from '@angular/core';
+import {EnvironmentProviders, makeEnvironmentProviders} from '@angular/core';
+import {provideTextProvider, SciTextProviderFn} from '@scion/sci-components/text';
 import {WorkbenchConfig} from '../workbench-config';
-import {WORKBENCH_TEXT_PROVIDER, WorkbenchTextProviderFn} from './workbench-text-provider.model';
 import {workbenchTextProvider} from './workbench-text-provider';
+import {MaybeSignal} from '@scion/sci-components/common';
 
 /**
  * Provides a set of DI providers to register text providers.
@@ -19,17 +20,9 @@ import {workbenchTextProvider} from './workbench-text-provider';
 export function provideTextProviders(config: WorkbenchConfig): EnvironmentProviders {
   return makeEnvironmentProviders([
     // Provide app-specific texts.
-    {
-      provide: WORKBENCH_TEXT_PROVIDER,
-      useValue: applicationTextProvider(config),
-      multi: true,
-    },
-    // Provide built-in texts.
-    {
-      provide: WORKBENCH_TEXT_PROVIDER,
-      useValue: workbenchTextProvider,
-      multi: true,
-    },
+    provideTextProvider(applicationTextProvider(config)),
+    // Provide built-in texts of @scion/workbench.
+    provideTextProvider(workbenchTextProvider),
   ]);
 }
 
@@ -38,16 +31,16 @@ export function provideTextProviders(config: WorkbenchConfig): EnvironmentProvid
  *
  * Register this provider as the first text provider, enabling change or translation of built-in workbench texts.
  */
-function applicationTextProvider(config: WorkbenchConfig): WorkbenchTextProviderFn {
+function applicationTextProvider(config: WorkbenchConfig): SciTextProviderFn | undefined {
   const appTextProvider = config.textProvider;
   if (!appTextProvider) {
-    return () => undefined;
+    return undefined;
   }
 
-  return (key: string, params: {[name: string]: string}): Signal<string> | string | undefined => {
-    // Translation keys starting with the `workbench.external.` prefix are external and must not
+  return (key: string, params: {[name: string]: string}): MaybeSignal<string> | undefined => {
+    // Translation keys starting with the `scion.workbench.internal.` prefix are internal and must not
     // be localized by the workbench application, such as remote keys to resolve texts from micro apps.
-    if (key.startsWith('workbench.external.')) {
+    if (key.startsWith('scion.workbench.internal.')) {
       return undefined;
     }
     return appTextProvider(key, params);

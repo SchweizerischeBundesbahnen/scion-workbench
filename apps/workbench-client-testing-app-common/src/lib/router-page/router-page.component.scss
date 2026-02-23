@@ -2,6 +2,11 @@
   display: block;
   padding: 1em;
 
+  > div.toolbar {
+    display: flex;
+    flex-direction: column;
+  }
+
   > form {
     display: flex;
     flex-direction: column;

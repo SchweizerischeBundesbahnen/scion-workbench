@@ -32,6 +32,7 @@ import {dasherize} from '../common/dasherize.util';
     '[attr.data-peripheral]': `part.peripheral() ? '' : null`,
     '[attr.data-grid]': 'dasherize(part.gridName())',
     '[attr.data-active]': `part.active() ? '' : null`,
+    '[attr.data-focus]': `part.focused() || part.activeView()?.focused() ? '' : null`,
     '[attr.data-referencepart]': `part.referencePart() ? '' : null`,
     '[attr.tabindex]': '-1',
     '[class]': 'part.classList.asList()',

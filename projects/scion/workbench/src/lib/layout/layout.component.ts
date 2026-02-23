@@ -26,6 +26,7 @@ import {WorkbenchPerspectiveService} from '../perspective/workbench-perspective.
 import {MAIN_AREA} from './workbench-layout';
 import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';
 import {WorkbenchDesktop} from '../desktop/workbench-desktop.model';
+import {contributeMenu} from '@scion/sci-components/menu';
 
 @Component({
   selector: 'wb-layout',
@@ -83,6 +84,15 @@ export class LayoutComponent {
   protected readonly canDropInMainGrid = computed(() => {
     return !this.layout().hasActivities() || this.layout().parts({grid: 'main'}).some(part => part.id !== MAIN_AREA);
   });
+
+  constructor() {
+    contributeMenu({location: 'toolbar:workbench.activitybar.left', position: 'end'}, toolbar => {
+      toolbar.addMenu({name: 'menu:workbench.activitybar.left', icon: 'more_horiz', visualMenuHint: false}, menu => menu);
+    });
+    contributeMenu({location: 'toolbar:workbench.activitybar.right', position: 'end'}, toolbar => {
+      toolbar.addMenu({name: 'menu:workbench.activitybar.right', icon: 'more_horiz', visualMenuHint: false}, menu => menu);
+    });
+  }
 
   protected onSashStart(): void {
     this._workbenchLayoutService.signalResizing(true);

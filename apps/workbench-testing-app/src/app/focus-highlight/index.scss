@@ -32,15 +32,15 @@
         content: '';
       }
 
-      &[data-active]:not([data-focus])::after {
+      &[data-active]:not([data-highlight-focus])::after {
         border: $border-width solid var(--sci-color-border);
       }
 
-      &[data-focus]:not([data-active])::after {
+      &[data-highlight-focus]:not([data-active])::after {
         border: $border-width dashed var(--sci-color-accent); // invalid state
       }
 
-      &[data-active][data-focus]::after {
+      &[data-active][data-highlight-focus]::after {
         border: $border-width solid var(--sci-color-accent);
       }
     }
@@ -56,12 +56,12 @@
         margin-bottom: $border-width;
       }
 
-      &[data-focus]::after {
+      &[data-highlight-focus]::after {
         border: $border-width solid var(--sci-color-accent);
       }
     }
 
-    wb-dialog[data-focus] div.e2e-dialog {
+    wb-dialog[data-highlight-focus] div.e2e-dialog {
       position: relative; // Positioning context to visualize the active and focused state.
 
       &::after {
@@ -70,7 +70,7 @@
       }
     }
 
-    wb-popup[data-focus] {
+    wb-popup[data-highlight-focus] {
       position: relative; // Positioning context to visualize the active and focused state.
 
       &::after {
@@ -79,7 +79,7 @@
       }
     }
 
-    wb-notification[data-focus] {
+    wb-notification[data-highlight-focus] {
       position: relative; // Positioning context to visualize the active and focused state.
 
       &::after {

@@ -9,7 +9,7 @@
  */
 
 import {ActivityId} from '../workbench.identifiers';
-import {Translatable} from '../text/workbench-text-provider.model';
+import {Translatable} from '@scion/sci-components/text';
 
 /**
  * Defines the arrangement of docked parts (also referred to as activities) in the workbench.
@@ -91,14 +91,14 @@ export interface MActivity {
 /**
  * Specifies the default width of the left and right activity panels.
  *
- * Used as the default width if the design tokens '--sci-workbench-layout-panel-left-width' or '--sci-workbench-layout-panel-right-width' are not set.
+ * Used as the default width if the design tokens '--sci-workbench-activity-panel-left-width' or '--sci-workbench-activity-panel-right-width' are not set.
  */
 export const ACTIVITY_PANEL_WIDTH = 300;
 
 /**
  * Specifies the default height of the bottom activity panel.
  *
- * Used as the default height if the design token '--sci-workbench-layout-panel-bottom-height' is not set.
+ * Used as the default height if the design token '--sci-workbench-activity-panel-bottom-height' is not set.
  */
 export const ACTIVITY_PANEL_HEIGHT = 250;
 

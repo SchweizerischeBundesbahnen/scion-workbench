@@ -85,10 +85,10 @@ export class ContentAsOverlayComponent {
         this._overlay.set(overlayElement);
 
         // Destroy overlay when the location or template changes.
-        onCleanup(() => untracked(() => {
+        onCleanup(() => {
           overlayViewRef.destroy();
           this._overlay.set(undefined);
-        }));
+        });
       });
     }); // Do not run as root effect for component inputs to be available in the effect.
   }

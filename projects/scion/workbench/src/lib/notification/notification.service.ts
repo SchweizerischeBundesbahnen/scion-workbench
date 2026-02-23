@@ -10,10 +10,10 @@
 
 import {inject, Injectable} from '@angular/core';
 import {NotificationConfig} from './notification.config';
-import {Translatable} from '../text/workbench-text-provider.model';
 import {LEGACY_NOTIFICATION_INPUT} from './ɵnotification';
 import {ɵWorkbenchNotificationService} from './ɵworkbench-notification.service';
 import {prune} from '../common/prune.util';
+import {Translatable} from '@scion/sci-components/text';
 
 /**
  * Shows a notification.

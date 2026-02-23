@@ -10,8 +10,8 @@
 
 import {assertType} from '../common/asserts.util';
 import {NavigationData} from '../routing/routing.model';
-import {Translatable} from '../text/workbench-text-provider.model';
 import {ActivityId, PartId, ViewId} from '../workbench.identifiers';
+import {Translatable} from '@scion/sci-components/text';
 
 /**
  * Represents the arrangement of parts as grid.

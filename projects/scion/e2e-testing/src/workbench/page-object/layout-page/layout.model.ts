@@ -8,9 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ActivityId, Commands, DockedPartExtras, DockingArea, NavigationData, NavigationState, PartExtras, PartId, ReferencePart, Translatable, WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
+import {ActivityId, Commands, DockedPartExtras, DockingArea, NavigationData, NavigationState, PartExtras, PartId, ReferencePart, WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
 import {MAIN_AREA} from '../../../workbench.model';
 import {ActivatedRoute} from '@angular/router';
+import {Translatable} from '@scion/sci-components/text';
 
 /**
  * Implementation of {@link WorkbenchLayoutFactory} that can be used in page objects.

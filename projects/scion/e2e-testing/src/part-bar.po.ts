@@ -36,6 +36,8 @@ export class PartBarPO {
 
   /**
    * Opens the view list menu.
+   *
+   * TODO [menu] Rewrite to menu API
    */
   public async openViewListMenu(): Promise<ViewListMenuPO> {
     await this.viewListButton.click();

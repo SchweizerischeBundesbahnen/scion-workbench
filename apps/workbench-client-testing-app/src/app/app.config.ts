@@ -13,19 +13,21 @@ import {provideRouter, withComponentInputBinding, withHashLocation} from '@angul
 import {routes} from './app.routes';
 import {environment} from '../environments/environment';
 import {provideAnimations, provideNoopAnimations} from '@angular/platform-browser/animations';
-import {provideWorkbenchClient} from './workbench-client/workbench-client.provider';
-import {provideWorkbenchTheme} from './theme/workbench-theme-switcher';
+import {provideWorkbenchClientAngular} from '@scion/workbench-client-angular';
+import {provideValueFromStorage, storageTextProvider} from './text/storage-text-provider';
+import {provideTextProvider} from '@scion/sci-components/text';
 
 /**
  * Central place to configure the workbench-client-testing-app.
  */
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideWorkbenchClientAngular(determineAppSymbolicName()),
     provideRouter(routes, withHashLocation(), withComponentInputBinding()),
-    provideWorkbenchClient(),
-    provideWorkbenchTheme(),
     provideAnimationsIfEnabled(),
     provideZoneChangeDetection(),
+    provideTextProvider(storageTextProvider),
+    provideValueFromStorage(),
   ],
 };
 
@@ -38,4 +40,15 @@ function provideAnimationsIfEnabled(): EnvironmentProviders {
   return makeEnvironmentProviders([
     environment.animationEnabled ? provideAnimations() : provideNoopAnimations(),
   ]);
+}
+
+/**
+ * Identifies the currently running app based on the configured apps in the environment and the current URL.
+ */
+function determineAppSymbolicName(): string {
+  const application = Object.values(environment.apps).find(app => new URL(app.url).host === window.location.host);
+  if (!application) {
+    throw Error(`[AppError] Application served on wrong URL. Supported URLs are: ${Object.values(environment.apps).map(app => app.url)}`);
+  }
+  return application.symbolicName;
 }

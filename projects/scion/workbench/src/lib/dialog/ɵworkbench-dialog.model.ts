@@ -31,7 +31,7 @@ import {Disposable} from '../common/disposable';
 import {Blockable} from '../glass-pane/blockable';
 import {Blocking} from '../glass-pane/blocking';
 import {boundingClientRect} from '@scion/components/dimension';
-import {Translatable} from '../text/workbench-text-provider.model';
+import {Translatable} from '@scion/sci-components/text';
 import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
 import {DialogId} from '../workbench.identifiers';
 import {WorkbenchInvocationContext} from '../invocation-context/invocation-context';
@@ -67,6 +67,8 @@ export class ɵWorkbenchDialog implements WorkbenchDialog, Blockable, Blocking {
   public readonly bounds = boundingClientRect(computed(() => this._componentRef()?.instance.dialogSlotBounds()));
   public readonly modal: boolean;
   public readonly blinking$ = new BehaviorSubject(false);
+  // TODO [menu] Consider using a wbPortal like other workbench elements
+  public readonly element = computed(() => this._componentRef()?.location.nativeElement as HTMLElement | undefined);
 
   public header: WorkbenchDialogHeaderDirective | undefined;
   public footer: WorkbenchDialogFooterDirective | undefined;

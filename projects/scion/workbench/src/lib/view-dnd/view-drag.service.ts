@@ -17,13 +17,13 @@ import {observeIn, subscribeIn} from '@scion/toolkit/operators';
 import {WorkbenchViewNavigation} from '../view/workbench-view.model';
 import {ClassListMap} from '../common/class-list';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {Translatable} from '../text/workbench-text-provider.model';
 import {MActivity} from '../activity/workbench-activity.model';
 import {MPartGrid} from '../layout/workbench-grid.model';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {ActivityId, isActivityId, PartId, ViewId, WORKBENCH_ID} from '../workbench.identifiers';
+import {Translatable} from '@scion/sci-components/text';
 
 /**
  * Coordinates cross application drag and drop of views.

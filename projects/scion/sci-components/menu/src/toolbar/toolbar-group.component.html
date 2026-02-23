@@ -1,0 +1,76 @@
+@for (menuItem of menuItems(); track $index) {
+  @let disabled = this.disabled() || menuItem.disabled?.() || false;
+
+  @switch (menuItem.type) {
+    @case ('menu-item') {
+      @if (menuItem.control) {
+        <ng-container *sciComponentOutlet="menuItem.control | sciToolbarControl:menuItem"/>
+      } @else {
+        <button [attr.disabled]="disabled || null"
+                [attr.title]="menuItem.accelerator | sciFormatAccelerator:menuItem.tooltip?.()"
+                [class.checked]="menuItem.checked?.()"
+                [class]="menuItem.cssClass" class="menu-item"
+                [sciAttributes]="menuItem.attributes"
+                (click)="onSelect(menuItem)">
+          @if (menuItem.iconLigature) {
+            <sci-icon>{{menuItem.iconLigature()}}</sci-icon>
+          } @else if (menuItem.iconComponent) {
+            <span class="icon">
+              <ng-container *sciComponentOutlet="menuItem.iconComponent"/>
+            </span>
+          }
+
+          @if (menuItem.labelText) {
+            <span class="label">{{menuItem.labelText()}}</span>
+          } @else if (menuItem.labelComponent) {
+            <span class="label">
+              <ng-container *sciComponentOutlet="menuItem.labelComponent"/>
+            </span>
+          }
+        </button>
+      }
+    }
+    @case ('menu') {
+      @let hasLabel = menuItem.labelText || menuItem.labelComponent;
+      @let hasIcon = menuItem.iconLigature || menuItem.iconComponent;
+      <button [attr.disabled]="disabled || null"
+              [attr.title]="menuItem.tooltip?.()"
+              [class.active]="activeMenu()?.menu === menuItem"
+              [class.visual-menu-hint]="hasIcon && !hasLabel && menuItem.visualMenuHint"
+              [class]="menuItem.cssClass" class="menu-item submenu-item"
+              (click)="onMenuClick(menuItem, element)"
+              (mousedown)="onMenuMouseDown(menuItem)"
+              (mouseleave)="onMenuMouseLeave(menuItem)"
+              #element>
+        @if (menuItem.iconLigature) {
+          <sci-icon>{{menuItem.iconLigature()}}</sci-icon>
+        } @else if (menuItem.iconComponent) {
+          <span class="icon">
+            <ng-container *sciComponentOutlet="menuItem.iconComponent"/>
+          </span>
+        }
+
+        @if (menuItem.labelText) {
+          <span class="label">{{menuItem.labelText()}}</span>
+        } @else if (menuItem.labelComponent) {
+          <span class="label">
+            <ng-container *sciComponentOutlet="menuItem.labelComponent"/>
+          </span>
+        }
+
+        <!-- Add chevron for label menus -->
+        @if (hasLabel && menuItem.visualMenuHint) {
+          <span class="material-symbols-rounded" translate="no">keyboard_arrow_down</span>
+        }
+      </button>
+    }
+    @case ('group') {
+      <sci-toolbar-group [menuItems]="menuItem.children"
+                         [orientation]="orientation()"
+                         [disabled]="disabled"
+                         [popoverViewContainerRef]="popoverViewContainerRef()"
+                         (menuOpen)="onChildGroupMenuOpen($event)"
+                         [class]="menuItem.cssClass"/>
+    }
+  }
+}

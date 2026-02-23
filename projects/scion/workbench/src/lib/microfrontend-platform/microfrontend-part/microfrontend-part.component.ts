@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Injector, linkedSignal, Provider, signal, Signal, untracked, viewChild} from '@angular/core';
+import {afterNextRender, Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Injector, linkedSignal, Provider, signal, Signal, untracked, viewChild} from '@angular/core';
 import {ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {WorkbenchPartCapability, ɵWORKBENCH_PART_CONTEXT, ɵWorkbenchCommands, ɵWorkbenchPartContext} from '@scion/workbench-client';
-import {Maps} from '@scion/toolkit/util';
+import {Arrays, Maps} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
 import {IFRAME_OVERLAY_HOST} from '../../workbench-element-references';
 import {serializeExecution} from '../../common/operators';
@@ -28,6 +28,9 @@ import {MicrofrontendPartNavigationData} from './microfrontend-part-navigation-d
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../../glass-pane/glass-pane.directive';
 import {WorkbenchPart} from '../../part/workbench-part.model';
 import {Routing} from '../../routing/routing.util';
+import {ɵSciMenuService} from '@scion/sci-components/menu';
+import {workbenchKeyboardAccelerators} from '../workbench-keyboard-accelerators';
+import {fromEvent} from 'rxjs';
 
 /**
  * Embeds the microfrontend of a part capability.
@@ -41,6 +44,10 @@ import {Routing} from '../../routing/routing.util';
     NgComponentOutlet,
     GlassPaneDirective,
   ],
+  host: {
+    '[attr.data-partid]': 'part.id',
+    '[attr.data-peripheral]': `part.peripheral() ? '' : null`,
+  },
   viewProviders: [
     configureMicrofrontendGlassPane(),
   ],
@@ -75,6 +82,9 @@ export class MicrofrontendPartComponent {
     this.installPartFocusedPublisher();
     this.propagateWorkbenchTheme();
     this.propagatePartContext();
+    this.propagateKeyboardEvents();
+    this.propagateHoverState();
+    this.installAcceleratorsToBubble();
     this.installNavigator();
 
     inject(DestroyRef).onDestroy(() => this.unload());
@@ -191,6 +201,63 @@ export class MicrofrontendPartComponent {
 
   private propagateWorkbenchTheme(): void {
     Microfrontends.propagateTheme(this._routerOutletElement);
+  }
+
+  /**
+   * Propagates keyboard events from embedded content to the workbench part, necessary because the iframe
+   * is located at the top level of the DOM.
+   *
+   * Otherwise, accelerators of menu items in the part toolbar would not work.
+   */
+  private propagateKeyboardEvents(): void {
+    const destroyRef = inject(DestroyRef);
+
+    afterNextRender(() => {
+      fromEvent<KeyboardEvent>(this._routerOutletElement().nativeElement, 'keydown')
+        .pipe(takeUntilDestroyed(destroyRef))
+        .subscribe(event => {
+          // Stop propagation so global accelerators (e.g., in the application header) are not handled twice.
+          event.stopPropagation();
+
+          // Dispatch keyboard event to workbench part.
+          this.part.slot.portal.element()!.dispatchEvent(new KeyboardEvent('keydown', {
+            key: event.key,
+            ctrlKey: event.ctrlKey,
+            shiftKey: event.shiftKey,
+            altKey: event.altKey,
+            metaKey: event.metaKey,
+            bubbles: event.bubbles,
+            location: event.location,
+          }));
+        });
+    });
+  }
+
+  /**
+   * Propagates the hover state from projected microfrontend content (sci-router-outlet) to the part.
+   *
+   * The microfrontend sits on top of the part but is not its child, preventing the part from receiving native hover events.
+   * This method manually sets `--ɵsci-workbench-part-hover` on the part when the microfrontend is hovered.
+   */
+  private propagateHoverState(): void {
+    const styleSheet = new CSSStyleSheet({});
+    styleSheet.insertRule(`
+      wb-workbench:has(sci-router-outlet[name="${this.part.id}"]:hover) wb-part[data-partid="${this.part.id}"] {
+        --ɵsci-workbench-part-hover: true;
+      }`,
+    );
+    document.adoptedStyleSheets.push(styleSheet);
+    inject(DestroyRef).onDestroy(() => Arrays.remove(document.adoptedStyleSheets, styleSheet));
+  }
+
+  /**
+   * Instructs router outlet to bubble menu accelerators across iframe boundaries.
+   */
+  private installAcceleratorsToBubble(): void {
+    const menuAccelerators = inject(ɵSciMenuService).accelerators();
+    const accelerators = computed(() => [...workbenchKeyboardAccelerators, ...menuAccelerators()]);
+
+    Microfrontends.installAcceleratorsToBubble(this._routerOutletElement, accelerators);
   }
 
   private unload(): void {

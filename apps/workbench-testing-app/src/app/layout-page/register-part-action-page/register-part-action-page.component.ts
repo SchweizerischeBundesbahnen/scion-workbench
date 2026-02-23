@@ -13,7 +13,7 @@ import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/
 import {WorkbenchPart, WorkbenchService} from '@scion/workbench';
 import {MultiValueInputComponent, stringifyError, undefinedIfEmpty} from 'workbench-testing-app-common';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
-import {SettingsService} from '../../settings.service';
+import {Settings} from '../../settings.service';
 import {UUID} from '@scion/toolkit/uuid';
 import {Arrays} from '@scion/toolkit/util';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
@@ -31,7 +31,7 @@ import {SciMaterialIconDirective} from '@scion/components.internal/material-icon
 export default class RegisterPartActionPageComponent {
 
   private readonly _formBuilder = inject(NonNullableFormBuilder);
-  private readonly _settingsService = inject(SettingsService);
+  private readonly _settings = inject(Settings);
 
   protected readonly workbenchService = inject(WorkbenchService);
   protected readonly viewList = `view-list-${UUID.randomUUID()}`;
@@ -96,7 +96,7 @@ export default class RegisterPartActionPageComponent {
   }
 
   private resetForm(): void {
-    if (this._settingsService.isEnabled('resetFormsOnSubmit')) {
+    if (this._settings.resetFormsOnSubmit()) {
       this.form.reset();
     }
   }

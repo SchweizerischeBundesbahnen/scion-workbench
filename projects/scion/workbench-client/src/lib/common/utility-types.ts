@@ -8,9 +8,24 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
+import {Observable} from 'rxjs';
+
 /**
  * Excludes all keys from T, resulting in an empty object `{}`.
  */
 export type Empty<T> = {
   [Key in keyof T]: never;
 };
+
+// TODO [menu] Move to @scion/toolkit
+export type OneOf<T> = {
+  [K in keyof T]: { [P in K]: T[P] } & { [P in Exclude<keyof T, K>]?: never };
+}[keyof T];
+
+// TODO [menu] Move to @scion/toolkit
+export type MaybeObservable<T> = T | Observable<T>;
+
+// TODO [menu] Move to @scion/toolkit
+export type RequireOne<T> = {
+  [K in keyof T]: Required<Pick<T, K>> & Partial<Omit<T, K>>
+}[keyof T];
