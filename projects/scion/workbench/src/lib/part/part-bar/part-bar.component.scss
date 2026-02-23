@@ -50,6 +50,12 @@
     }
   }
 
+  > sci-toolbar {
+    flex: initial; // allow to shrink
+    height: 25px;
+    align-self: center;
+  }
+
   > div.filler {
     flex: auto;
   }

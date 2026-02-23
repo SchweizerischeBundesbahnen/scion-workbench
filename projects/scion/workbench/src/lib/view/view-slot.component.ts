@@ -11,7 +11,6 @@
 import {afterRenderEffect, Component, DestroyRef, DOCUMENT, ElementRef, inject, Provider, untracked, viewChild} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {ViewMenuService} from '../part/view-context-menu/view-menu.service';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
 import {Logger, LoggerNames} from '../logging';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
@@ -21,6 +20,7 @@ import {WorkbenchView} from './workbench-view.model';
 import {OnAttach, OnDetach} from '../portal/wb-component-portal';
 import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-context.directive';
 import {FocusTrackerRef, trackFocus} from '../focus/workbench-focus-tracker.service';
+import {installMenuAccelerators} from '@scion/sci-components/menu';
 
 /**
  * Acts as a placeholder for a view's content that Angular fills based on the current router state of the associated view outlet.
@@ -105,7 +105,8 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
   }
 
   private installMenuAccelerators(): void {
-    inject(ViewMenuService).installMenuAccelerators(inject(ElementRef), this.view);
+    installMenuAccelerators('menu:workbench.view.contextmenu');
+    // inject(ViewMenuService).installMenuAccelerators(inject(ElementRef), this.view);
   }
 
   /**

@@ -19,6 +19,7 @@ import {PartId} from '../workbench.identifiers';
 import {provideWorkbenchDialogService} from '../dialog/ɵworkbench-dialog.service';
 import {provideWorkbenchMessageBoxService} from '../message-box/ɵworkbench-message-box.service';
 import {provideWorkbenchPopupService} from '../popup/ɵworkbench-popup.service';
+import {provideSciMenuService} from '@scion/sci-components/menu';
 
 /**
  * Enables and configures the SCION Workbench in tests., returning a set of dependency-injection providers to be registered in Angular.
@@ -53,5 +54,6 @@ export function provideWorkbenchForTest(config?: WorkbenchConfig & {mainAreaInit
     provideWorkbenchDialogService(),
     provideWorkbenchMessageBoxService(),
     provideWorkbenchPopupService(),
+    provideSciMenuService(),
   ]);
 }

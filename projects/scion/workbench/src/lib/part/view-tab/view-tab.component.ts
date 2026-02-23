@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, ElementRef, inject, Injector, input, Signal} from '@angular/core';
+import {Component, computed, effect, ElementRef, inject, Injector, input, Signal, untracked} from '@angular/core';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {VIEW_DRAG_TRANSFER_TYPE, ViewDragService} from '../../view-dnd/view-drag.service';
 import {createElement} from '../../common/dom.util';
@@ -24,6 +24,7 @@ import {UUID} from '@scion/toolkit/uuid';
 import {TextPipe} from '../../text/text.pipe';
 import {IconComponent} from '../../icon/icon.component';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
+import {installMenuAccelerators, SciMenuService} from '@scion/sci-components/menu';
 
 /**
  * IMPORTANT: HTML and CSS also used by {@link ViewTabDragImageComponent}.
@@ -52,6 +53,7 @@ import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
     '(click)': 'onClick()',
     '(auxclick)': 'onAuxClick($event)',
     '(contextmenu)': 'onContextmenu($event)',
+    '(mousedown)': 'onMouseDown($event)',
     '(dragstart)': 'onDragStart($event)',
     '(dragend)': 'onDragEnd()',
   },
@@ -62,6 +64,7 @@ export class ViewTabComponent {
   private readonly _workbenchConfig = inject(WorkbenchConfig);
   private readonly _viewRegistry = inject(WorkbenchViewRegistry);
   private readonly _viewMenuService = inject(ViewMenuService);
+  private readonly _menuService = inject(SciMenuService);
   private readonly _layout = inject(WorkbenchLayoutService).layout;
   private readonly _injector = inject(Injector);
 
@@ -94,10 +97,15 @@ export class ViewTabComponent {
     }
   }
 
+  protected onMouseDown(event: MouseEvent): void {
+    if (event.button === 1) { // primary aux button
+      event.preventDefault(); // Prevent middle-click scrolling; necessary for aux click to work
+    }
+  }
+
   protected onContextmenu(event: MouseEvent): void {
-    void this._viewMenuService.showMenu({x: event.clientX, y: event.clientY}, this.view().id);
-    event.stopPropagation();
-    event.preventDefault();
+    // void this._viewMenuService.showMenu({x: event.clientX, y: event.clientY}, this.view().id);
+    this._menuService.open('menu:workbench.view.contextmenu', {anchor: event, context: new Map().set('viewId', this.view().id), size: {minWidth: '20em'}}); // TODO [menu] remove minWidth; width not working
   }
 
   protected onDragStart(event: DragEvent): void {
@@ -155,7 +163,22 @@ export class ViewTabComponent {
   }
 
   private installMenuAccelerators(): void {
-    this._viewMenuService.installMenuAccelerators(this.host, this.view);
+    const injector = inject(Injector);
+
+    effect(onCleanup => {
+      const view = this.view();
+
+      untracked(() => {
+        const ref = installMenuAccelerators('menu:workbench.view.contextmenu', {
+          target: this.host,
+          context: new Map().set('viewId', view.id),
+          injector,
+        });
+        onCleanup(() => ref.dispose());
+      });
+    });
+
+    // this._viewMenuService.installMenuAccelerators(this.host, this.view);
   }
 
   private createViewTabContentPortal(): Signal<ComponentPortal<unknown>> {

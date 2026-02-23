@@ -67,6 +67,8 @@ export class ɵWorkbenchDialog implements WorkbenchDialog, Blockable, Blocking {
   public readonly bounds = boundingClientRect(computed(() => this._componentRef()?.instance.dialogSlotBounds()));
   public readonly modal: boolean;
   public readonly blinking$ = new BehaviorSubject(false);
+  // TODO [menu] Consider using a wbPortal like other workbench elements
+  public readonly element = computed(() => this._componentRef()?.location.nativeElement as HTMLElement | undefined);
 
   public header: WorkbenchDialogHeaderDirective | undefined;
   public footer: WorkbenchDialogFooterDirective | undefined;

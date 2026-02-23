@@ -1,0 +1,104 @@
+$padding_menu_item: .125em .75em;
+$icon-size: 18px;
+
+:host {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+
+  // Add before separator
+  > sci-toolbar-group:not(:first-child)::before {
+    content: '';
+    width: 1px;
+    background-color: var(--sci-color-border);
+    margin: 2px;
+  }
+
+  // Add after separator
+  > sci-toolbar-group:not(:last-child):not(:has(+ sci-toolbar-group))::after {
+    content: '';
+    width: 1px;
+    background-color: var(--sci-color-border);
+    margin: 2px;
+  }
+
+  > button.menu-item {
+    all: unset;
+    display: inline-flex;
+    place-content: center;
+    align-items: center;
+    text-wrap: nowrap;
+    padding: $padding_menu_item;
+    border-radius: var(--sci-toolbar-toolitem-border-radius);
+    user-select: none;
+    overflow: hidden;
+    cursor: var(--sci-workbench-button-cursor);
+    gap: .3em;
+    border: 1px solid transparent; // unset to not flicker when toggling checkable menu item
+
+    // Maintain 1:1 aspect ratio if no label
+    &:not(:has(> span.label)) {
+      padding: 0;
+      aspect-ratio: 1 / 1;
+    }
+
+    > span.icon {
+      display: inline-grid;
+      place-content: center;
+      font-size: $icon-size;
+      height: 1em;
+      width: 1em;
+    }
+
+    // Display visual marker to indicate menu.
+    &.submenu-item.visual-menu-hint {
+      position: relative;
+
+      &::after {
+        $size: 3px;
+        box-sizing: border-box;
+        content: "";
+        position: absolute;
+        width: $size;
+        height: $size;
+        border: $size solid transparent;
+        border-right-color: var(--sci-color-text-subtle);
+        border-bottom-color: var(--sci-color-text-subtle);
+        bottom: calc(var(--sci-corner) / 2);
+        right: calc(var(--sci-corner) / 2);
+      }
+    }
+
+    &.checked:where(:not(:disabled)) {
+      background-color: var(--sci-toolbar-toolitem-background-color-checked);
+    }
+
+    &.checked {
+      border: 1px solid var(--sci-color-border);
+    }
+
+    &:hover:where(:not(:disabled)) {
+      background-color: var(--sci-toolbar-toolitem-background-color-hover);
+    }
+
+    &:active:where(:not(:disabled)) {
+      background-color: var(--sci-toolbar-toolitem-background-color-active);
+    }
+
+    &:focus:not(:focus-visible) {
+      outline: none;
+    }
+
+    &:focus-visible {
+      outline: var(--sci-workbench-button-outline-width-focus) solid var(--sci-color-accent);
+    }
+
+    &:disabled {
+      color: var(--sci-color-gray-500);
+    }
+
+    &.active {
+      background-color: var(--sci-toolbar-toolitem-background-color-hover);
+    }
+  }
+}
