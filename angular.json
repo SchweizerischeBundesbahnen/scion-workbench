@@ -696,6 +696,44 @@
           }
         }
       }
+    },
+    "@scion/workbench-client-angular": {
+      "projectType": "library",
+      "root": "projects/scion/workbench-client-angular",
+      "sourceRoot": "projects/scion/workbench-client-angular/src",
+      "prefix": "wb",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/scion/workbench-client-angular/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/scion/workbench-client-angular/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "tsConfig": "projects/scion/workbench-client-angular/tsconfig.spec.json",
+            "karmaConfig": "projects/scion/workbench-client-angular/karma.conf.js",
+            "inlineStyleLanguage": "scss"
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/scion/workbench-client-angular/**/*.ts",
+              "projects/scion/workbench-client-angular/**/*.html"
+            ],
+            "eslintConfig": "projects/scion/workbench-client-angular/eslint.config.js"
+          }
+        }
+      }
     }
   },
   "schematics": {

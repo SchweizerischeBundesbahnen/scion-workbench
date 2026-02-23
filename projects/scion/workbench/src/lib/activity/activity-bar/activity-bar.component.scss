@@ -29,6 +29,11 @@
     border-radius: var(--sci-corner);
   }
 
+  > sci-toolbar {
+    flex: auto;
+    align-self: center;
+  }
+
   > div.filler {
     flex: auto;
   }
