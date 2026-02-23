@@ -1,0 +1,78 @@
+@for (menuItem of menuItems(); track $index) {
+  @let disabled = this.disabled() || menuItem.disabled();
+
+  @switch (menuItem.type) {
+    @case ('menu-item') {
+      <button [attr.disabled]="disabled || null"
+              [class.checked]="menuItem.checked?.()"
+              [class]="menuItem.cssClass" class="menu-item"
+              (click)="menuItem.onSelect()"
+              sciMenuItemState [menuItem]="menuItem" #sciMenuItemState="sciMenuItemState">
+        @if (menuItem.icon?.()) {
+          <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon?.()}}</span>
+        }
+        @if (menuItem.label?.()) {
+          <span class="label">
+              @if (sciMenuItemState.labelText()) {
+                {{sciMenuItemState.labelText()}}
+              } @else if (sciMenuItemState.labelComponent()) {
+                <ng-container *ngComponentOutlet="sciMenuItemState.labelComponent()!"/>
+              }
+            </span>
+        }
+      </button>
+    }
+    @case ('menu') {
+      <button [attr.popovertarget]="popoverId"
+              [attr.popovertargetaction]="'show'"
+              [style.anchor-name]="activeSubMenuItem()?.subMenuItem === menuItem ? `--${popoverId}` : null"
+              [attr.disabled]="disabled || null"
+              [attr.data-menu-id]="menuItem.id"
+              [attr.data-menu-name]="menuItem.name"
+              [class.active]="activeSubMenuItem()?.subMenuItem === menuItem"
+              [class.visual-menu-hint]="menuItem.icon?.() && !menuItem.label?.() && menuItem.visualMenuHint"
+              [class]="menuItem.cssClass" class="menu-item submenu-item"
+              (click)="onSubMenuClick(menuItem, sciMenuItemState.bounds)"
+              sciMenuItemState [menuItem]="menuItem" #sciMenuItemState="sciMenuItemState">
+        @if (menuItem.icon?.()) {
+          <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon?.()}}</span>
+        }
+        @if (menuItem.label?.()) {
+          <span class="label">
+              @if (sciMenuItemState.labelText()) {
+                {{sciMenuItemState.labelText()}}
+              } @else if (sciMenuItemState.labelComponent()) {
+                <ng-container *ngComponentOutlet="sciMenuItemState.labelComponent()!"/>
+              }
+            </span>
+        }
+
+        <!-- Add chevron for label menus -->
+        @if (menuItem.label?.() && menuItem.visualMenuHint) {
+          <span class="material-symbols-rounded" translate="no">keyboard_arrow_down</span>
+        }
+      </button>
+    }
+    @case ('group') {
+      <sci-toolbar-group [contextElement]="menuItem"
+                         [disabled]="disabled"
+                         [attr.data-group-id]="menuItem.id"
+                         [attr.data-group-name]="menuItem.name"/>
+    }
+  }
+}
+
+<!-- Menu popover -->
+<!--Template to control where to add the popup, e.g., required for toolbar in menu button to not be child of the menu item (hover state) -->
+<ng-template #popover_template>
+  @if (activeSubMenuItem()) {
+    <sci-menu [contextElement]="activeSubMenuItem()!.subMenuItem"
+              [attr.id]="popoverId"
+              [style.position-anchor]="`--${popoverId}`"
+              [anchorWidth]="activeSubMenuItem()!.bounds().offsetWidth"
+              [disabled]="disabled() || activeSubMenuItem()!.subMenuItem.disabled()"
+              [class]="activeSubMenuItem()!.subMenuItem.cssClass"
+              (toggle)="onTogglePopover($event)"
+              popover #popover/>
+  }
+</ng-template>

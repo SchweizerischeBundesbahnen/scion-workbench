@@ -22,6 +22,7 @@ import {SciToggleButtonComponent} from '@scion/components.internal/toggle-button
 import {SettingsService} from '../settings.service';
 import {Maps} from '@scion/toolkit/util';
 import {comparePerspectives} from './perspective-comparator.util';
+import {SciToolbarComponent} from '@scion/sci-components/menu';
 
 @Component({
   selector: 'app-header',
@@ -32,6 +33,7 @@ import {comparePerspectives} from './perspective-comparator.util';
     ReactiveFormsModule,
     SciMaterialIconDirective,
     SciToggleButtonComponent,
+    SciToolbarComponent,
   ],
 })
 export class HeaderComponent {

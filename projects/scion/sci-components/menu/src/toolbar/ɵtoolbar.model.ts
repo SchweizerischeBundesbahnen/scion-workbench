@@ -1,0 +1,117 @@
+import {SciMenu} from '../menu/menu.model';
+import {signal} from '@angular/core';
+import {UUID} from '@scion/toolkit/uuid';
+import {Arrays} from '@scion/toolkit/util';
+import {SciToolbar, SciToolbarGroup, SciToolbarGroupDescriptor, SciToolbarItemDescriptor, SciToolbarMenuDescriptor} from './toolbar.model';
+import {coerceSignal} from '../common/common';
+import {SciMenuContribution, SciMenuGroupContribution, SciMenuItemContribution} from '../menu-contribution.model';
+
+export class ɵSciToolbar implements SciToolbar {
+
+  public readonly contributions = new Array<SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution>();
+  public readonly groupContributions = new Array<ToolbarGroupContributionDescriptor>();
+  public readonly menuContributions = new Array<ToolbarMenuContributionDescriptor>();
+
+  public addToolbarItem(descriptor: SciToolbarItemDescriptor, onSelect: () => void): this {
+    this.contributions.push({
+      type: 'menu-item',
+      id: `menuitem:${UUID.randomUUID()}`,
+      name: descriptor.name,
+      label: coerceSignal(descriptor.label),
+      icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
+      checked: 'checked' in descriptor ? coerceSignal(descriptor.checked) : undefined,
+      tooltip: coerceSignal(descriptor.tooltip),
+      accelerator: descriptor.accelerator,
+      disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
+      cssClass: Arrays.coerce(descriptor.cssClass),
+      onSelect,
+    } satisfies SciMenuItemContribution);
+
+    // TODO [menu] throw error if icon and checked
+    return this;
+  }
+
+  public addMenu(descriptor: SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenu) => SciMenu): this {
+    const menuItem: SciMenuContribution = {
+      type: 'menu',
+      id: `menu:${UUID.randomUUID()}`,
+      name: descriptor.name,
+      label: coerceSignal(descriptor.label),
+      icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
+      tooltip: coerceSignal(descriptor.tooltip),
+      disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
+      visualMenuHint: descriptor.visualMenuHint ?? true,
+      menu: {
+        width: descriptor.menu?.width,
+        minWidth: descriptor.menu?.minWidth,
+        maxWidth: descriptor.menu?.maxWidth,
+        filter: descriptor.menu?.filter,
+      },
+      cssClass: Arrays.coerce(descriptor.cssClass),
+    };
+    this.contributions.push(menuItem);
+
+    // children
+    this.menuContributions.push({
+      location: menuItem.id,
+      factoryFn: menuFactoryFn,
+    });
+
+    return this;
+  }
+
+  public addGroup(groupFactoryFn: (group: SciToolbarGroup) => SciToolbarGroup): this;
+  public addGroup(descriptor: SciToolbarGroupDescriptor, groupFactoryFn?: (group: SciToolbarGroup) => SciToolbarGroup): this;
+  public addGroup(argument1: unknown, argument2?: unknown): this {
+    const id = UUID.randomUUID();
+
+    if (typeof argument1 === 'function') {
+      const groupFactoryFn = argument1 as (group: SciToolbarGroup) => SciToolbarGroup;
+
+      this.contributions.push({
+        type: 'group',
+        id: `group:${id}`,
+        disabled: signal(false),
+      } satisfies SciMenuGroupContribution);
+
+      // children
+      this.groupContributions.push({
+        location: `group(toolbar):${id}`,
+        factoryFn: groupFactoryFn,
+      });
+
+      return this;
+    }
+    else {
+      const descriptor = argument1 as SciToolbarGroupDescriptor;
+      const groupFactoryFn = argument2 as ((group: SciToolbarGroup) => SciToolbarGroup) | undefined;
+
+      this.contributions.push({
+        type: 'group',
+        id: `group:${id}`,
+        name: descriptor.name,
+        disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
+      } satisfies SciMenuGroupContribution);
+
+      // children
+      if (groupFactoryFn) {
+        this.groupContributions.push({
+          location: `group(toolbar):${id}`,
+          factoryFn: groupFactoryFn,
+        });
+      }
+
+      return this;
+    }
+  }
+}
+
+export interface ToolbarMenuContributionDescriptor {
+  location: `menu:${string}`;
+  factoryFn: (group: SciMenu) => SciMenu;
+}
+
+export interface ToolbarGroupContributionDescriptor {
+  location: `group(toolbar):${string}`;
+  factoryFn: (group: SciToolbarGroup) => SciToolbarGroup;
+}

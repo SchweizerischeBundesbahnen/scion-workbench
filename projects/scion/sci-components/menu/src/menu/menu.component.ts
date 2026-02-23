@@ -1,0 +1,226 @@
+import {afterRenderEffect, ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, forwardRef, inject, input, linkedSignal, signal, Signal, untracked, viewChild, ViewContainerRef} from '@angular/core';
+import {SciMenuContributionRegistry} from '../menu-contribution.registry';
+import {UUID} from '@scion/toolkit/uuid';
+import {JoinPipe} from './join.pipe';
+import {MenuItemGroupComponent} from './menu-group.component';
+import {MenuFilterComponent} from './menu-filter.component';
+import {MenuFilter} from './menu-filter.service';
+import {SciToolbarComponent} from '../toolbar/toolbar.component';
+import {ToolbarStateDirective} from '../toolbar/toolbar-state.directive';
+import {MenuItemStateDirective} from './menu-item-state.directive';
+import {NgComponentOutlet} from '@angular/common';
+import {SciMenuContribution, SciMenuGroupContribution, SciMenuItemContribution} from '../menu-contribution.model';
+
+/**
+ * Represents a menu or a group of menu items.
+ */
+@Component({
+  selector: 'sci-menu',
+  templateUrl: './menu.component.html',
+  styleUrl: './menu.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    JoinPipe,
+    MenuItemGroupComponent,
+    MenuFilterComponent,
+    forwardRef(() => SciToolbarComponent),
+    ToolbarStateDirective,
+    MenuItemStateDirective,
+    NgComponentOutlet,
+  ],
+  providers: [
+    MenuFilter,
+  ],
+  host: {
+    '[class.no-glyph-area]': '!hasGlyphArea()',
+    '[class.is-group]': 'isGroup()',
+    '[style.width]': 'size()?.width',
+    '[style.min-width]': 'size()?.minWidth',
+    '[style.max-width]': 'size()?.maxWidth',
+  },
+})
+export class MenuComponent {
+
+  public readonly contextElement = input.required<SciMenuContribution | SciMenuGroupContribution>();
+  public readonly disabled = input<boolean>();
+  public readonly glyphArea = input<boolean>();
+  public readonly anchorWidth = input(undefined, {transform: (width: number | undefined): string | undefined => width ? `${width}px` : undefined});
+
+  private readonly _menuContributionRegistry = inject(SciMenuContributionRegistry);
+  private readonly _popover = viewChild('popover', {read: ElementRef<HTMLElement>});
+  private readonly _menuFilter = inject(MenuFilter);
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
+  private readonly _document = inject(DOCUMENT);
+  private readonly _actionToolbarMenuOpen = signal(false);
+
+  protected readonly popoverId = UUID.randomUUID();
+  protected readonly hasGlyphArea = computed(() => this.glyphArea() ?? this.requiresGlyphArea(this.contextElement())());
+  protected readonly menuItems = this.computeMenuItems();
+  protected readonly actionsPopoverAnchor = viewChild.required('actions_popover_anchor', {read: ViewContainerRef});
+  protected readonly activeSubMenuItem = linkedSignal<SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution, SciMenuContribution | null>({
+    source: this.contextElement,  // reset active sub menu item when this component is re-used
+    computation: () => null,
+  });
+
+  protected readonly isGroup = computed(() => this.contextElement().type === 'group');
+  protected readonly isGroupExpanded = linkedSignal(() => {
+    const contextElement = this.contextElement();
+    const group = contextElement.type == 'group' ? contextElement : null;
+    if (!group) {
+      return true;
+    }
+
+    return this._menuFilter.filterActive() || !group.collapsible || !group.collapsible.collapsed;
+  });
+
+  protected readonly size = linkedSignal<PreferredSize | undefined>(() => {
+    const subMenuItem = this.contextElement();
+    if (subMenuItem.type === 'group') {
+      return undefined;
+    }
+
+    const preferredMinWidth = subMenuItem.menu.minWidth ?? '12em';
+    return {
+      width: subMenuItem.menu.width,
+      minWidth: this.anchorWidth() ? `max(${preferredMinWidth}, ${this.anchorWidth()})` : preferredMinWidth,
+      maxWidth: subMenuItem.menu.maxWidth ?? '24em',
+    };
+  });
+
+  constructor() {
+    // Maintain stable width when expanding/collapsing groups or hovering menu item when displaying the actions toolbar.
+    afterRenderEffect(() => {
+      this.contextElement(); // re-evaluate when re-used
+      this.size.update(size => ({...size, width: `${this._host.getBoundingClientRect().width}px`}));
+    });
+
+    // Close action menu when this component is re-used.
+    effect(() => {
+      this.contextElement();
+
+      untracked(() => {
+        const popover = this._host.appendChild(this._document.createElement('div'));
+        popover.setAttribute('popover', '');
+        popover.style.setProperty('display', 'none');
+        popover.showPopover();
+        popover.remove();
+      });
+    })
+
+    // Open popover when hovering over a submenu item, or hide it otherwise.
+    effect(() => {
+      const popover = this._popover();
+      const activeSubMenuItem = this.activeSubMenuItem();
+
+      untracked(() => {
+        if (activeSubMenuItem) {
+          popover?.nativeElement.showPopover();
+        }
+        else {
+          popover?.nativeElement.hidePopover();
+        }
+      });
+    });
+  }
+
+  protected onSelect(menuItem: SciMenuItemContribution): void {
+    // Close the popup if the callback returns true. Defaults to closing non-checkable menu items.
+    if (menuItem.onSelect() ?? menuItem.checked?.() === undefined) {
+      this.close();
+    }
+  }
+
+  protected onGroupToggle(): void {
+    this.isGroupExpanded.update(expanded => !expanded);
+  }
+
+  protected onMenuItemMouseEnter(menuItem: SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution): void {
+    this.activeSubMenuItem.set(menuItem.type === 'menu' ? menuItem : null);
+
+    // Create and display "fake" popover to close popover of other groups or menus.
+    if (!this.activeSubMenuItem() && !this._actionToolbarMenuOpen()) {
+      const popover = this._host.appendChild(this._document.createElement('div'));
+      popover.setAttribute('popover', '');
+      popover.style.setProperty('display', 'none');
+      popover.showPopover();
+      popover.remove();
+    }
+  }
+
+  protected onTogglePopover(event: ToggleEvent): void {
+    if (event.newState === 'closed') {
+      this.activeSubMenuItem.set(null);
+    }
+  }
+
+  protected onFilterChange(filter: string): void {
+    this._menuFilter.setFilter(filter);
+  }
+
+  protected onActionToolbarMenuOpen(open: boolean): void {
+    this._actionToolbarMenuOpen.set(open);
+  }
+
+  private computeMenuItems(): Signal<Array<SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution>> {
+    return computed(() => {
+      const contextElement = this.contextElement();
+      switch (contextElement.type) {
+        case 'menu':
+          return this._menuContributionRegistry.menuContributions(contextElement.id, contextElement.name)().filter(menuItem => this.matchesFilter(menuItem)());
+        case 'group':
+          return this._menuContributionRegistry.menuContributions(contextElement.id, contextElement.name)().filter(menuItem => this.matchesFilter(menuItem)());
+      }
+    });
+  }
+
+  private matchesFilter(menuItem: SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution): Signal<boolean> {
+    return computed(() => {
+      switch (menuItem.type) {
+        case 'menu-item':
+          return this._menuFilter.matches(menuItem)();
+        case 'menu':
+          return this._menuContributionRegistry.menuContributions(menuItem.id, menuItem.name)().some(menuItem => this.matchesFilter(menuItem)());
+        case 'group':
+          return this._menuContributionRegistry.menuContributions(menuItem.id, menuItem.name)().some(menuItem => this.matchesFilter(menuItem)());
+      }
+    });
+  }
+
+  private close(): void {
+    const popover = this._document.documentElement.appendChild(this._document.createElement('div'));
+    popover.setAttribute('popover', '');
+    popover.style.setProperty('display', 'none');
+    popover.showPopover();
+    popover.remove();
+  }
+
+  /**
+   * Computes if a glyph area is needed for icons and checkmarks.
+   *
+   * A glyph area is required if any group needs one, even if the context does not.
+   */
+  private requiresGlyphArea(contextElement: SciMenuContribution | SciMenuGroupContribution): Signal<boolean> {
+    return computed(() => {
+      if (contextElement.type === 'menu' && contextElement.menu.filter) {
+        return true;
+      }
+
+      return this._menuContributionRegistry.menuContributions(contextElement.id, contextElement.name)().some(menuItem => {
+        switch (menuItem.type) {
+          case 'menu-item':
+            return menuItem.icon?.() || menuItem.checked !== undefined;
+          case 'menu':
+            return menuItem.icon?.();
+          case 'group':
+            return menuItem.collapsible || this.requiresGlyphArea(menuItem)();
+        }
+      });
+    });
+  }
+}
+
+interface PreferredSize {
+  width?: string;
+  minWidth?: string;
+  maxWidth?: string
+}
