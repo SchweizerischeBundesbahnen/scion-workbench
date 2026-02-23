@@ -1,0 +1,244 @@
+@use 'sass:map';
+
+/**
+ * Installs provided themes and selects a theme based on the user's OS color scheme preference.
+ *
+ * ```scss
+ * @use '@scion/components' with (
+ *   $themes: (
+ *     dark: (
+ *       color-scheme: dark,
+ *       --sci-color-gray-50: #1D1D1D,
+ *       --sci-color-gray-75: #262626,
+ *       --sci-color-gray-100: #323232,
+ *       --sci-color-gray-200: #3F3F3F,
+ *       --sci-color-gray-300: #545454,
+ *       --sci-color-gray-400: #707070,
+ *       --sci-color-gray-500: #909090,
+ *       --sci-color-gray-600: #B2B2B2,
+ *       --sci-color-gray-700: #D1D1D1,
+ *       --sci-color-gray-800: #EBEBEB,
+ *       --sci-color-gray-900: #FFFFFF,
+ *       --sci-color-accent: blueviolet,
+ *     ),
+ *     light: (
+ *       color-scheme: light,
+ *       --sci-color-gray-50: #FFFFFF,
+ *       --sci-color-gray-75: #FDFDFD,
+ *       --sci-color-gray-100: #F8F8F8,
+ *       --sci-color-gray-200: #E6E6E6,
+ *       --sci-color-gray-300: #D5D5D5,
+ *       --sci-color-gray-400: #B1B1B1,
+ *       --sci-color-gray-500: #909090,
+ *       --sci-color-gray-600: #6D6D6D,
+ *       --sci-color-gray-700: #464646,
+ *       --sci-color-gray-800: #222222,
+ *       --sci-color-gray-900: #000000,
+ *       --sci-color-accent: blueviolet,
+ *     ),
+ *   ),
+ * );
+ * ```
+ *
+ * @param {map} $themes - A map of themes with token mappings.
+ */
+@mixin install($themes) {
+  @if ($themes == null or $themes == ()) {
+    @error 'No themes provided to "@scion/components" SCSS module. Provide a map of themes with token mappings. Refer to the documentation for an example.';
+  }
+
+  $void: -warn-if-color-scheme-token-missing($themes);
+  $themes: -add-theme-name-token($themes);
+
+  @layer sci-theme {
+    @include -create-theme-selector($themes);
+    @include -auto-select-preferred-theme($themes);
+  }
+}
+
+/**
+ * Augments the provided themes with the provided built-in themes, matching the themes by name or, if there is no match, by light or dark color scheme.
+ * The color scheme of a theme is determined by evaluating the "color-scheme" token.
+ *
+ * @param {map} $themes - map of themes to be augmented with tokens of the built-in themes.
+ * @param {map} $built-in-themes - map of built-in themes.
+ * @return {map} Themes with augmented tokens.
+ */
+@function augment($themes, $built-in-themes) {
+  @each $theme, $tokens in $themes {
+    @if map.has-key($built-in-themes, $theme) {
+      $built-in-theme: map.get($built-in-themes, $theme);
+      $themes: map.set($themes, $theme, map.merge($built-in-theme, $tokens));
+    }
+    @else {
+      $void: -warn-if-color-scheme-token-missing(($theme: $tokens));
+
+      @if -is-dark-theme($tokens) {
+        $dark-theme: -get-dark-theme($built-in-themes);
+        $themes: map.set($themes, $theme, map.merge($dark-theme, $tokens));
+      }
+      @else {
+        $light-theme: -get-light-theme($built-in-themes);
+        $themes: map.set($themes, $theme, map.merge($light-theme, $tokens));
+      }
+    }
+  }
+  @return $themes;
+}
+
+/**
+ * Adds each theme the token 'sci-theme' with its name.
+ *
+ * @param {map} $themes - map of themes with token mappings.
+ * @return {map} Themes with the token 'sci-theme' added to each theme.
+ */
+@function -add-theme-name-token($themes) {
+  @each $theme, $tokens in $themes {
+    $themes: map.set($themes, $theme, map.merge((--sci-theme: $theme), $tokens));
+  }
+  @return $themes;
+}
+
+/**
+ * Creates a theme selector on the root HTML element for each provided theme and sets its tokens as CSS variables, as following:
+ *
+ * ```scss
+ * :root[sci-theme="dark"] {
+ *   // Tokens as CSS variables
+ * }
+ *
+ * :root[sci-theme="light"] {
+ *   // Tokens as CSS variables
+ * }
+ * ```
+ *
+ * @param {map} $themes - A map of themes with token mappings.
+ */
+@mixin -create-theme-selector($themes) {
+  @each $theme, $tokens in $themes {
+    :root[sci-theme="#{$theme}"] {
+      @include -set-css-variables($tokens);
+    }
+  }
+}
+
+/**
+ * Selects a theme based on the user's OS color scheme preference, but ony if no theme is set on the root HTML element.
+ *
+ * The color scheme of a theme is determined by evaluating the "color-scheme" token.
+ *
+ * @param {map} $themes - A map of themes with token mappings.
+ */
+@mixin -auto-select-preferred-theme($themes) {
+  #{-if-no-theme-active-selector($themes)} {
+    $dark-theme: -get-dark-theme($themes);
+    $light-theme: -get-light-theme($themes);
+
+    @if ($dark-theme and $light-theme) {
+      @media (prefers-color-scheme: dark) {
+        @include -set-css-variables($dark-theme);
+      }
+      @media (prefers-color-scheme: light) {
+        @include -set-css-variables($light-theme);
+     }
+    }
+    @else if ($dark-theme) {
+      @include -set-css-variables($dark-theme);
+    }
+    @else if ($light-theme) {
+      @include -set-css-variables($light-theme);
+    }
+  }
+}
+
+/**
+ * Sets passed tokens as CSS variables.
+ *
+ * @param {map} $themes - A map of themes with token mappings.
+ */
+@mixin -set-css-variables($tokens) {
+  @each $token-name, $token-value in $tokens {
+    #{$token-name}: #{$token-value};
+  }
+}
+
+/**
+ * Creates a selector that matches if none of given themes is selected on the root HTML element.
+ *
+ * @param {map} $themes - A map of themes with token mappings.
+ * @return {string} selector
+ */
+@function -if-no-theme-active-selector($themes) {
+  $selector: ':root';
+  @each $theme in map.keys($themes) {
+    $selector: $selector + ':not([sci-theme="#{$theme}"])';
+  }
+  @return $selector;
+}
+
+/**
+ * Returns `true` for a theme with a color-scheme token 'dark'.
+ *
+ * @param {map} $tokens - Token mappings of a theme.
+ * @return {boolean} `true` if dark theme, otherwise `false`.
+ */
+@function -is-dark-theme($tokens) {
+  $color-scheme: map.get($tokens, 'color-scheme');
+  @return ($color-scheme == 'dark');
+}
+
+/**
+ * Returns the token mappings of the first dark theme found, or `null` if not found.
+ *
+ * @param {map} $themes - A map of themes with token mappings.
+ * @return {map|null} Token mappings of the first dark theme found, or `null` if not found.
+ */
+@function -get-dark-theme($themes) {
+  @each $tokens in map.values($themes) {
+    @if (-is-dark-theme($tokens)) {
+      @return $tokens;
+    }
+  }
+  @return null;
+}
+
+/**
+ * Returns the token mappings of the first light theme found, or `null` if not found.
+ *
+ * @param {map} $themes - A map of themes with token mappings.
+ * @return {map|null} Token mappings of the first light theme found, or `null` if not found.
+ */
+@function -get-light-theme($themes) {
+  @each $tokens in map.values($themes) {
+    @if (not -is-dark-theme($tokens)) {
+      @return $tokens;
+    }
+  }
+  @return null;
+}
+
+/**
+ * Logs a warning if the 'color-scheme' design token is missing.
+ */
+@function -warn-if-color-scheme-token-missing($themes) {
+  @each $theme, $tokens in $themes {
+    @if (not map.has-key($tokens, 'color-scheme')) {
+      @warn 'Missing required token "color-scheme" in theme "#{$theme}". Add the token "color-scheme" to the theme "#{$theme}". For a dark theme, add the token "color-scheme: dark". For a light theme, add the token "color-scheme: light".';
+    }
+  }
+  @return null;
+}
+
+/**
+ * Merges given maps into a single map.
+ *
+ * @param {...map} $maps - Maps to be merged into a single map.
+ * @return {map} Merged map.
+ */
+@function map-merge($maps...) {
+  $merged: ();
+  @each $map in $maps {
+    $merged: map.merge($merged, $map);
+  }
+  @return $merged;
+}

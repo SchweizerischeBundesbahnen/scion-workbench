@@ -1,6 +1,0 @@
-@use '../../../common/workbench.mixin';
-
-:host {
-  display: block;
-  @include workbench.ellipsis-on-overflow();
-}

@@ -1,0 +1,106 @@
+<!-- Group header -->
+@if (group(); as group) {
+  @if (group.collapsible) {
+    <button class="group-header" (click)="onGroupToggle()" (mouseenter)="onMenuItemMouseEnter(null)">
+      <span class="icon material-symbols-rounded" translate="no">{{isGroupExpanded() ? 'keyboard_arrow_down' : 'chevron_right'}}</span>
+      <span class="label">{{group.label}}</span>
+    </button>
+  } @else if (group.label) {
+    <header class="group-header">{{group.label}}</header>
+  }
+}
+
+@let filter = this.filter();
+@if (isGroupExpanded()) {
+  <!-- Filter field -->
+  @if (filter) {
+    <div class="filter">
+      <span class="icon material-symbols-rounded filter" translate="no">search</span>
+      <sci-menu-filter (textChange)="onFilterChange($event)" [placeholder]="(typeof filter === 'object' && filter.placeholder) || 'Type to filter'"/>
+    </div>
+    <hr>
+  }
+
+  <!-- Menu items -->
+  @for (menuItem of menuItemsFiltered(); track $index) {
+    @let disabled = this.disabled() || menuItem.disabled();
+
+    @switch (menuItem.type) {
+      @case ('menu-item') {
+        <button (mouseenter)="onMenuItemMouseEnter(null)"
+                [attr.disabled]="disabled || null"
+                [class.checked]="menuItem.checked?.()"
+                [class]="menuItem.cssClass" class="menu-item"
+                (click)="onSelect(menuItem)"
+                sciMenuItemState [menuItem]="menuItem" #sciMenuItemState="sciMenuItemState">
+          @if (hasGlyphArea()) {
+            @if (menuItem.checked !== undefined) {
+              <span class="icon material-symbols-rounded checkmark" translate="no">{{menuItem.checked() ? 'check' : ''}}</span>
+            } @else {
+              <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon?.()}}</span>
+            }
+          }
+
+          <div class="content">
+            <span class="label">
+              @if (sciMenuItemState.labelText()) {
+                {{sciMenuItemState.labelText()}}
+              } @else if (sciMenuItemState.labelComponent()) {
+                <ng-container *ngComponentOutlet="sciMenuItemState.labelComponent()!"/>
+              }
+            </span>
+
+            @if (menuItem.accelerator?.length) {
+              <span class="accelerator">{{menuItem.accelerator | sciFormatAccelerator}}</span>
+            }
+
+            @let actions = menuItem.actions;
+            @if (!disabled && actions.length) {
+              <sci-toolbar-group [menuItems]="actions"
+                                 [viewContainerRef]="popoverAnchor()"
+                                 (menuOpen)="onActionToolbarMenuOpen($event)"
+                                 (click)="$event.stopPropagation()"
+                                 sciToolbarState
+                                 class="actions"/>
+            }
+          </div>
+        </button>
+      }
+      @case ('menu') {
+        <button [attr.disabled]="disabled || null"
+                [class.active]="activeSubMenuItem()?.menu === menuItem"
+                [class]="menuItem.cssClass" class="menu-item"
+                (mouseenter)="onMenuItemMouseEnter({menu: menuItem, element: element})"
+                sciMenuItemState [menuItem]="menuItem" #sciMenuItemState="sciMenuItemState"
+                #element>
+          @if (hasGlyphArea()) {
+            <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon?.()}}</span>
+          }
+          <div class="content">
+            <span class="label">
+              @if (sciMenuItemState.labelText()) {
+                {{sciMenuItemState.labelText()}}
+              } @else if (sciMenuItemState.labelComponent()) {
+                <ng-container *ngComponentOutlet="sciMenuItemState.labelComponent()!"/>
+              }
+            </span>
+            <span class="icon material-symbols-rounded sub-menu-chevron" translate="no">arrow_right</span>
+          </div>
+        </button>
+      }
+      @case ('group') {
+        <sci-menu-group [group]="menuItem"
+                        [glyphArea]="hasGlyphArea()"
+                        [disabled]="disabled"
+                        [class]="menuItem.cssClass"/>
+      }
+    }
+  } @empty {
+    @if (filter) {
+      <div class="filter no-items-message">{{(typeof filter === 'object' && filter.notFoundText) || 'No items found.'}}</div>
+    }
+  }
+
+  <!-- Anchor where to insert popover -->
+  <ng-container #popover_anchor/>
+}

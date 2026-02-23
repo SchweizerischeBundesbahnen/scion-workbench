@@ -13,7 +13,7 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {FieldValidationDirective, SciKeyValueFieldComponent} from 'workbench-testing-app-common';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SettingsService} from '../../settings.service';
-import {Field, form, hidden, required} from '@angular/forms/signals';
+import {form, Field, hidden, required} from '@angular/forms/signals';
 import {Qualifier} from '@scion/microfrontend-platform';
 import {RouteRegistrationService} from '../../route-registration.service';
 

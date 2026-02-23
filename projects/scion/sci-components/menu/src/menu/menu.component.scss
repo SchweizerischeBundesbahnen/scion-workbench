@@ -1,0 +1,217 @@
+$padding_menu: .3em;
+$padding_menu_item: 4px;
+$menu_item_gap: .25em;
+$font-size: 13px;
+$font-size-smaller: $font-size - 1px;
+$icon-size: 18px;
+
+/**
+ * Displays ellipsis when text overflows.
+ */
+@mixin ellipsis-on-overflow {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+@mixin button {
+  all: unset;
+  text-wrap: nowrap;
+  padding: $padding_menu_item;
+  border-radius: var(--sci-corner);
+  user-select: none;
+  overflow: hidden;
+  cursor: var(--sci-workbench-button-cursor);
+
+  &:hover:where(:not(:disabled)) {
+    background-color: var(--sci-workbench-menu-background-color-hover);
+  }
+
+  &:active:where(:not(:disabled)) {
+    background-color: var(--sci-workbench-button-background-color-active);
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: var(--sci-workbench-button-outline-width-focus) solid var(--sci-color-accent);
+  }
+
+  &:disabled {
+    color: var(--sci-color-gray-500);
+  }
+
+  &.active {
+    background-color: var(--sci-workbench-menu-background-color-hover);
+  }
+}
+
+:host {
+  --ɵsci-menu-padding: #{$padding_menu};
+
+  display: grid;
+  gap: $menu_item_gap .5em;
+  overflow: hidden;
+  align-items: center;
+  font-size: $font-size;
+  box-sizing: border-box;
+  border: 1px solid var(--sci-color-border);
+  border-radius: 0.5rem;
+  color: var(--sci-color-text);
+  background-color: var(--sci-color-background-elevation);
+  padding: $padding_menu;
+  margin: unset; // unset native popover styling
+  inset: unset; // unset native popover styling
+  grid-template-columns:
+    // === Menu subgrid ===
+    auto // glyph area for icons and check marks
+    1fr; // label area
+
+  &.no-glyph-area {
+    grid-template-columns:
+      // === Menu subgrid ===
+      1fr; // label area
+  }
+
+  &.is-group {
+    grid-column: 1/-1; // consume all columns
+    grid-template-columns: subgrid;
+    border: unset;
+    border-radius: unset;
+    color: inherit;
+    padding: unset;
+    background-color: inherit;
+
+    > header.group-header {
+      grid-column: 1/-1; // consume all columns
+      user-select: none;
+      color: var(--sci-color-text-subtle);
+      padding: $padding_menu_item $padding_menu_item 0 $padding_menu_item;
+      @include ellipsis-on-overflow();
+    }
+
+    > button.group-header {
+      @include button();
+      grid-column: 1/-1; // consume all columns
+      display: inline-grid;
+      grid-template-columns: subgrid;
+      align-items: center;
+    }
+  }
+
+  > div.filter {
+    grid-column: 1/-1; // consume all columns
+    display: inline-grid;
+    grid-template-columns: subgrid;
+    align-items: center;
+    padding: $padding_menu_item;
+  }
+
+  > hr {
+    all: unset;
+    grid-column: 1/-1; // consume all columns
+    height: 1px;
+    background-color: var(--sci-color-border);
+    margin-bottom: .5em;
+  }
+
+  > div.filter.no-items-message {
+    grid-column: 1/-1;
+    justify-self: center;
+    display: block;
+    color: var(--sci-color-text-subtlest);
+    font-size: $font-size-smaller;
+    padding: $padding_menu_item;
+  }
+
+  // Add before separator
+  > *:not(hr) + sci-menu-group::before {
+    content: '';
+    grid-column: 1/-1;
+    height: 1px;
+    background-color: var(--sci-color-border);
+  }
+
+  // Add after separator
+  > sci-menu-group:not(:last-child):not(:has(+ sci-menu-group))::after {
+    content: '';
+    grid-column: 1/-1;
+    height: 1px;
+    background-color: var(--sci-color-border);
+  }
+
+  > button.menu-item {
+    @include button();
+    grid-column: 1/-1; // consume all columns
+    display: inline-grid;
+    grid-template-columns: subgrid;
+    align-items: center;
+    position: relative; // positioning context for actions toolbar
+    box-sizing: border-box;
+    min-height: calc($icon-size + 2 * $padding_menu_item + 2px); // 2px for checked toolbar item
+
+    > div.content {
+      display: flex;
+      align-items: center;
+      gap: 1em;
+      overflow: hidden; // to support ellipsis on label
+
+      &:first-child > span.label {
+        padding-left: .5em;
+      }
+
+      > span.label {
+        flex: auto;
+      }
+
+      > span.accelerator {
+        flex: none;
+        color: var(--sci-color-text-subtlest);
+        font-size: $font-size-smaller;
+      }
+
+      // Display accelerator only if no toolbar
+      > span.accelerator:has(+ sci-toolbar-group.actions) {
+        display: none;
+      }
+
+      > sci-toolbar-group.actions {
+        flex: none;
+        padding-left: .25em;
+        border-left: 1px solid var(--sci-color-border);
+        align-self: stretch;
+        --sci-toolbar-toolitem-background-color-hover: color-mix(in srgb, var(--sci-workbench-button-background-color-hover) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+        --sci-toolbar-toolitem-background-color-checked: color-mix(in srgb, var(--sci-workbench-button-background-color-checked) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+        --sci-toolbar-toolitem-border-radius: var(--sci-corner-small);
+
+        &:hover {
+          --sci-toolbar-toolitem-background-color-active: color-mix(in srgb, var(--sci-workbench-button-background-color-active) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+        }
+      }
+    }
+
+    // TODO Why do we need that? Describe! Fix display of ellipsis when not hovering
+    // Add padding-right to label if no actions toolbar, or the actions toolbar is not visible because not hovered
+    > div.content > span.label:last-child, &:not(:hover) > div.content > span.label:has(+ sci-toolbar-group.actions) {
+      padding-right: 2em;
+    }
+
+    &:not(:hover):not(.checked) > div.content > sci-toolbar-group.actions:not(.open) {
+      display: none;
+    }
+  }
+
+  span.label {
+    @include ellipsis-on-overflow();
+  }
+
+  span.icon {
+    display: inline-grid;
+    place-content: center;
+    font-size: $icon-size;
+    height: 1em;
+    width: 1em;
+  }
+}

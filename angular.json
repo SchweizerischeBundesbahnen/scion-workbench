@@ -660,6 +660,95 @@
           }
         }
       }
+    },
+    "@scion/sci-components": {
+      "projectType": "library",
+      "root": "projects/scion/sci-components",
+      "sourceRoot": "projects/scion/sci-components",
+      "prefix": "sci",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/scion/sci-components/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/scion/sci-components/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "tsConfig": "projects/scion/sci-components/tsconfig.spec.json",
+            "karmaConfig": "projects/scion/sci-components/karma.conf.js",
+            "inlineStyleLanguage": "scss",
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "projects/scion/sci-components"
+              ]
+            },
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/scion/sci-components/**/*.ts",
+              "projects/scion/sci-components/**/*.html"
+            ],
+            "eslintConfig": "projects/scion/sci-components/eslint.config.js"
+          }
+        }
+      }
+    },
+    "@scion/workbench-client-angular": {
+      "projectType": "library",
+      "root": "projects/scion/workbench-client-angular",
+      "sourceRoot": "projects/scion/workbench-client-angular/src",
+      "prefix": "wb",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/scion/workbench-client-angular/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/scion/workbench-client-angular/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "tsConfig": "projects/scion/workbench-client-angular/tsconfig.spec.json",
+            "karmaConfig": "projects/scion/workbench-client-angular/karma.conf.js",
+            "inlineStyleLanguage": "scss",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/scion/workbench-client-angular/**/*.ts",
+              "projects/scion/workbench-client-angular/**/*.html"
+            ],
+            "eslintConfig": "projects/scion/workbench-client-angular/eslint.config.js"
+          }
+        }
+      }
     }
   },
   "schematics": {

@@ -11,15 +11,15 @@
 import {Component, computed, effect, ElementRef, inject, InjectionToken, NgZone, Signal, untracked, viewChild} from '@angular/core';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
-import {PartActionComponent} from '../part-action/part-action.component';
 import {ViewListButtonComponent} from '../view-list-button/view-list-button.component';
 import {ViewTabBarComponent} from '../view-tab-bar/view-tab-bar.component';
 import {dimension} from '@scion/components/dimension';
-import {NgClass} from '@angular/common';
 import {EMPTY, fromEvent, mergeMap, of, pairwise, withLatestFrom} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {TextPipe} from '../../text/text.pipe';
 import {IconComponent} from '../../icon/icon.component';
+import {contributeMenu, SciToolbarComponent, SciToolbarFactory} from '@scion/sci-components/menu';
+import {text} from '../../text/text';
 
 /**
  * DI token to inject the HTML element of the {@link PartBarComponent}.
@@ -32,11 +32,10 @@ export const PART_BAR_ELEMENT = new InjectionToken<HTMLElement>('PART_BAR_ELEMEN
   styleUrls: ['./part-bar.component.scss'],
   imports: [
     ViewTabBarComponent,
-    PartActionComponent,
     ViewListButtonComponent,
-    NgClass,
     TextPipe,
     IconComponent,
+    SciToolbarComponent,
   ],
   providers: [
     {provide: PART_BAR_ELEMENT, useFactory: () => inject(ElementRef).nativeElement as HTMLElement},
@@ -56,6 +55,11 @@ export class PartBarComponent {
   constructor() {
     this.maxViewTabBarWidth = this.calculateMaxViewTabBarWidth();
     this.installActivityMinimizer();
+
+    contributeMenu('toolbar:workbench.part.internal', toolbar => {
+      this.contributeViewListMenu(toolbar);
+      this.contributeAdditionsMenu(toolbar);
+    });
   }
 
   protected onPartBarMouseDown(event: Event): void {
@@ -107,6 +111,47 @@ export class PartBarComponent {
     });
   }
 
+  private contributeAdditionsMenu(toolbar: SciToolbarFactory): void {
+    toolbar.addMenu({icon: 'more_vert', visualMenuHint: false, name: 'menu:workbench.part.additions'}, menu => menu);
+  }
+
+  private contributeViewListMenu(toolbar: SciToolbarFactory): void {
+    const viewsInsideTabbar = this.part.views().filter(view => view.scrolledIntoView());
+    const viewsOutsideTabbar = this.part.views().filter(view => !view.scrolledIntoView());
+
+    toolbar.addMenu({icon: 'arrow_downward', tooltip: untracked(() => text('%workbench.show_open_tabs.tooltip')), menu: {filter: true}}, menu => {
+      // Add group for views that are scrolled out the tab bar.
+      menu.addGroup(group => {
+        for (const view of viewsOutsideTabbar) {
+          const title = untracked(() => text(view.title));
+          const heading = untracked(() => text(view.heading));
+
+          group.addMenuItem({
+            label: computed(() => title() || ''),
+            tooltip: computed(() => join([title(), heading()], {delimiter: '\n'})),
+            actions: actions => actions.addToolbarItem('close', () => void view.close()),
+            onSelect: () => void view.activate(),
+          });
+        }
+      });
+
+      // Add group for views that are scrolled into the tab bar.
+      menu.addGroup(group => {
+        for (const view of viewsInsideTabbar) {
+          const title = untracked(() => text(view.title));
+          const heading = untracked(() => text(view.heading));
+
+          group.addMenuItem({
+            label: computed(() => title() || ''),
+            tooltip: computed(() => join([title(), heading()], {delimiter: '\n'})),
+            actions: actions => actions.addToolbarItem('close', () => void view.close()),
+            onSelect: () => void view.activate(),
+          });
+        }
+      });
+    });
+  }
+
   /**
    * Calculates the maximum available width for the view tab bar.
    */
@@ -115,4 +160,8 @@ export class PartBarComponent {
     const viewTabBarDimension = dimension(this._viewTabBar);
     return computed(() => (viewTabBarDimension()?.offsetWidth ?? 0) + fillerDimension().offsetWidth);
   }
+}
+
+function join(tokens: unknown[], options: {delimiter: string}): string {
+  return tokens.filter(token => token !== null && token !== undefined).join(options.delimiter);
 }

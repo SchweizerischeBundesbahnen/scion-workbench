@@ -118,6 +118,7 @@ export class ɵWorkbenchPart implements WorkbenchPart, Blockable {
         {provide: ɵWorkbenchPart, useValue: this},
         {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
         {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchPart},
+        inject(WORKBENCH_PART_CONTEXT, {optional: true}) ?? [],
       ],
     });
   }

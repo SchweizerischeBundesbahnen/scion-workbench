@@ -12,10 +12,7 @@ import {booleanAttribute, Component, effect, inject, OnDestroy, Signal, untracke
 import {ActivatedRoute} from '@angular/router';
 import {map} from 'rxjs/operators';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {WorkbenchComponent as ScionWorkbenchComponent, WorkbenchDesktopDirective, WorkbenchDialogService, WorkbenchPart, WorkbenchPartActionDirective, WorkbenchRouter, WorkbenchRouterLinkDirective, WorkbenchService, WorkbenchView, WorkbenchViewMenuItemDirective} from '@scion/workbench';
-import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
-import {ViewMoveDialogTestPageComponent} from '../test-pages/view-move-dialog-test-page/view-move-dialog-test-page.component';
-import {ViewInfoDialogComponent} from '../view-info-dialog/view-info-dialog.component';
+import {WorkbenchComponent as ScionWorkbenchComponent, WorkbenchDesktopDirective, WorkbenchRouter, WorkbenchService} from '@scion/workbench';
 import StartPageComponent from '../start-page/start-page.component';
 import {WorkbenchStartupQueryParams} from './workbench-startup-query-params';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
@@ -27,11 +24,7 @@ import LayoutPageComponent from '../layout-page/layout-page.component';
   styleUrls: ['./workbench.component.scss'],
   templateUrl: './workbench.component.html',
   imports: [
-    SciMaterialIconDirective,
     ScionWorkbenchComponent,
-    WorkbenchPartActionDirective,
-    WorkbenchRouterLinkDirective,
-    WorkbenchViewMenuItemDirective,
     WorkbenchDesktopDirective,
     StartPageComponent,
     FocusTestPageComponent,
@@ -49,28 +42,6 @@ export class WorkbenchComponent implements OnDestroy {
   constructor() {
     console.debug('[WorkbenchComponent#construct]');
     this.installStickyViewTab();
-  }
-
-  /**
-   * Tests if given part is not a peripheral part.
-   */
-  protected isNotPeripheralPart = (part: WorkbenchPart): boolean => {
-    return !part.peripheral();
-  };
-
-  protected onMoveView(view: WorkbenchView): void {
-    void inject(WorkbenchDialogService).open(ViewMoveDialogTestPageComponent, {
-      inputs: {view},
-      cssClass: 'e2e-move-view',
-    });
-  }
-
-  protected onShowViewInfo(view: WorkbenchView): void {
-    void inject(WorkbenchDialogService).open(ViewInfoDialogComponent, {
-      inputs: {view},
-      modality: 'application', // to open view info of inactive views
-      cssClass: 'e2e-view-info',
-    });
   }
 
   /**

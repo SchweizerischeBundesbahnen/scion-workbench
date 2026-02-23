@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ElementRef, inject, Injectable, Injector, isSignal, NgZone, runInInjectionContext, Signal, untracked} from '@angular/core';
+import {computed, ElementRef, inject, Injectable, Injector, isSignal, NgZone, runInInjectionContext, Signal, untracked} from '@angular/core';
 import {ConnectedPosition, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {ViewMenuComponent} from './view-menu.component';
@@ -17,16 +17,16 @@ import {WORKBENCH_ELEMENT} from '../../workbench-element-references';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {fromEvent, Subscription} from 'rxjs';
 import {MenuItemConfig, WorkbenchConfig} from '../../workbench-config';
-import {WorkbenchService} from '../../workbench.service';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {ViewId} from '../../workbench.identifiers';
 import {WorkbenchView} from '../../view/workbench-view.model';
-import {TextComponent} from './text/text.component';
 import {coerceElement} from '@angular/cdk/coercion';
 import {rootEffect} from '../../common/rxjs-interop.util';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {WORKBENCH_VIEW_CONTEXT} from '../../view/workbench-view-context.provider';
 import {Objects} from '@scion/toolkit/util';
+import {contributeMenu, SciMenuGroupFactory} from '@scion/sci-components/menu';
+import {text} from '../../text/text';
 
 /**
  * Shows menu items of a {@link WorkbenchView} in a menu.
@@ -42,7 +42,6 @@ export class ViewMenuService {
   private readonly _overlay = inject(Overlay);
   private readonly _injector = inject(Injector);
   private readonly _viewRegistry = inject(WorkbenchViewRegistry);
-  private readonly _workbenchService = inject(WorkbenchService);
   private readonly _workbenchConfig = inject(WorkbenchConfig);
 
   constructor() {
@@ -58,16 +57,29 @@ export class ViewMenuService {
       return;
     }
 
-    this.registerCloseMenuItem(config.close ?? {});
-    this.registerCloseOtherTabsMenuItem(config.closeOthers ?? {});
-    this.registerCloseAllTabsMenuItem(config.closeAll ?? {});
-    this.registerCloseRightTabsMenuItem(config.closeToTheRight ?? {});
-    this.registerCloseLeftTabsMenuItem(config.closeToTheLeft ?? {});
-    this.registerMoveRightMenuItem(config.moveRight ?? {});
-    this.registerMoveLeftMenuItem(config.moveLeft ?? {});
-    this.registerMoveUpMenuItem(config.moveUp ?? {});
-    this.registerMoveDownMenuItem(config.moveDown ?? {});
-    this.registerMoveToNewWindowMenuItem(config.moveToNewWindow ?? {});
+    contributeMenu({location: 'menu:workbench.view.contextmenu'}, (menu, context) => {
+      const view = inject(WorkbenchViewRegistry).get(context.get('viewId') as ViewId);
+      menu.addGroup({name: 'group:workbench.view.contextmenu.close'}, group => {
+        this.registerCloseMenuItem(config.close ?? {}, group, view);
+        this.registerCloseOtherTabsMenuItem(config.closeOthers ?? {}, group, view);
+        this.registerCloseAllTabsMenuItem(config.closeAll ?? {}, group, view);
+        this.registerCloseRightTabsMenuItem(config.closeToTheRight ?? {}, group, view);
+        this.registerCloseLeftTabsMenuItem(config.closeToTheLeft ?? {}, group, view);
+      });
+
+      menu.addGroup({name: 'group:workbench.view.contextmenu.move'}, group => {
+        this.registerMoveRightMenuItem(config.moveRight ?? {}, group, view);
+        this.registerMoveLeftMenuItem(config.moveLeft ?? {}, group, view);
+        this.registerMoveUpMenuItem(config.moveUp ?? {}, group, view);
+        this.registerMoveDownMenuItem(config.moveDown ?? {}, group, view);
+      });
+
+      menu.addGroup(group => {
+        this.registerMoveToNewWindowMenuItem(config.moveToNewWindow ?? {}, group, view);
+      });
+
+      menu.addGroup({name: 'group:workbench.view.contextmenu.additions'});
+    });
   }
 
   /**
@@ -172,142 +184,118 @@ export class ViewMenuService {
     }
   }
 
-  private registerCloseMenuItem(config: MenuItemConfig | false): void {
+  private registerCloseMenuItem(config: MenuItemConfig | false, group: SciMenuGroupFactory, view: WorkbenchView): void {
     if (config) {
-      this._workbenchService.registerViewMenuItem(view => ({
-        content: TextComponent,
-        inputs: {text: '%workbench.close_tab.action'},
+      group.addMenuItem({
+        label: untracked(() => untracked(() => text('%workbench.close_tab.action'))),
         accelerator: config.accelerator ?? ['ctrl', 'k'],
-        group: config.group ?? 'close',
         cssClass: config.cssClass ?? 'e2e-close',
-        disabled: !view.isClosable(),
-        onAction: () => void view.close(),
-      }));
-    }
-  }
-
-  private registerCloseOtherTabsMenuItem(config: MenuItemConfig | false): void {
-    if (config) {
-      this._workbenchService.registerViewMenuItem(view => ({
-        content: TextComponent,
-        inputs: {text: '%workbench.close_other_tabs.action'},
-        accelerator: config.accelerator ?? ['ctrl', 'shift', 'k'],
-        group: config.group ?? 'close',
-        cssClass: config.cssClass ?? 'e2e-close-other-tabs',
-        disabled: view.first() && view.last(),
-        onAction: () => void view.close('other-views'),
-      }));
-    }
-  }
-
-  private registerCloseAllTabsMenuItem(config: MenuItemConfig | false): void {
-    if (config) {
-      this._workbenchService.registerViewMenuItem(view => ({
-        content: TextComponent,
-        inputs: {text: '%workbench.close_all_tabs.action'},
-        accelerator: config.accelerator ?? ['ctrl', 'shift', 'alt', 'k'],
-        group: config.group ?? 'close',
-        cssClass: config.cssClass ?? 'e2e-close-all-tabs',
-        onAction: () => void view.close('all-views'),
-      }));
-    }
-  }
-
-  private registerCloseRightTabsMenuItem(config: MenuItemConfig | false): void {
-    if (config) {
-      this._workbenchService.registerViewMenuItem(view => ({
-        content: TextComponent,
-        inputs: {text: '%workbench.close_tabs_to_the_right.action'},
-        group: config.group ?? 'close',
-        cssClass: config.cssClass ?? 'e2e-close-right-tabs',
-        disabled: view.last(),
-        onAction: () => void view.close('views-to-the-right'),
-      }));
-    }
-  }
-
-  private registerCloseLeftTabsMenuItem(config: MenuItemConfig | false): void {
-    if (config) {
-      this._workbenchService.registerViewMenuItem(view => ({
-        content: TextComponent,
-        inputs: {text: '%workbench.close_tabs_to_the_left.action'},
-        group: config.group ?? 'close',
-        cssClass: config.cssClass ?? 'e2e-close-left-tabs',
-        disabled: view.first(),
-        onAction: () => void view.close('views-to-the-left'),
-      }));
-    }
-  }
-
-  private registerMoveRightMenuItem(config: MenuItemConfig | false): void {
-    if (config) {
-      this._workbenchService.registerViewMenuItem(view => ({
-        content: TextComponent,
-        inputs: {text: '%workbench.move_tab_to_the_right.action'},
-        accelerator: ['ctrl', 'alt', 'end'],
-        group: config.group ?? 'move',
-        cssClass: config.cssClass ?? 'e2e-move-right',
-        disabled: view.first() && view.last(),
-        onAction: () => view.move(view.part().id, {region: 'east'}),
-      }));
-    }
-  }
-
-  private registerMoveLeftMenuItem(config: MenuItemConfig | false): void {
-    if (config) {
-      this._workbenchService.registerViewMenuItem(view => ({
-        content: TextComponent,
-        inputs: {text: '%workbench.move_tab_to_the_left.action'},
-        group: config.group ?? 'move',
-        cssClass: config.cssClass ?? 'e2e-move-left',
-        disabled: view.first() && view.last(),
-        onAction: () => view.move(view.part().id, {region: 'west'}),
-      }));
-    }
-  }
-
-  private registerMoveUpMenuItem(config: MenuItemConfig | false): void {
-    if (config) {
-      this._workbenchService.registerViewMenuItem(view => ({
-        content: TextComponent,
-        inputs: {text: '%workbench.move_tab_up.action'},
-        group: config.group ?? 'move',
-        cssClass: config.cssClass ?? 'e2e-move-up',
-        disabled: view.first() && view.last(),
-        onAction: () => view.move(view.part().id, {region: 'north'}),
-      }));
-    }
-  }
-
-  private registerMoveDownMenuItem(config: MenuItemConfig | false): void {
-    if (config) {
-      this._workbenchService.registerViewMenuItem(view => ({
-        content: TextComponent,
-        inputs: {text: '%workbench.move_tab_down.action'},
-        group: config.group ?? 'move',
-        cssClass: config.cssClass ?? 'e2e-move-down',
-        disabled: view.first() && view.last(),
-        onAction: () => view.move(view.part().id, {region: 'south'}),
-      }));
-    }
-  }
-
-  private registerMoveToNewWindowMenuItem(config: MenuItemConfig | false): void {
-    if (config) {
-      this._workbenchService.registerViewMenuItem(view => {
-        if (view.part().peripheral()) {
-          return null;
-        }
-
-        return {
-          content: TextComponent,
-          inputs: {text: '%workbench.move_tab_to_new_window.action'},
-          group: config.group ?? 'open',
-          cssClass: config.cssClass ?? 'e2e-move-to-new-window',
-          onAction: () => view.move('new-window'),
-        };
+        disabled: computed(() => !view.isClosable()),
+        onSelect: () => void view.close(),
       });
     }
+  }
+
+  private registerCloseOtherTabsMenuItem(config: MenuItemConfig | false, group: SciMenuGroupFactory, view: WorkbenchView): void {
+    if (config) {
+      group.addMenuItem({
+        label: untracked(() => text('%workbench.close_other_tabs.action')),
+        accelerator: config.accelerator ?? ['ctrl', 'shift', 'k'],
+        cssClass: config.cssClass ?? 'e2e-close-other-tabs',
+        disabled: computed(() => view.first() && view.last()),
+        onSelect: () => void view.close('other-views'),
+      });
+    }
+  }
+
+  private registerCloseAllTabsMenuItem(config: MenuItemConfig | false, group: SciMenuGroupFactory, view: WorkbenchView): void {
+    if (config) {
+      group.addMenuItem({
+        label: untracked(() => text('%workbench.close_all_tabs.action')),
+        accelerator: config.accelerator ?? ['ctrl', 'shift', 'alt', 'k'],
+        cssClass: config.cssClass ?? 'e2e-close-all-tabs',
+        onSelect: () => void view.close('all-views'),
+      });
+    }
+  }
+
+  private registerCloseRightTabsMenuItem(config: MenuItemConfig | false, group: SciMenuGroupFactory, view: WorkbenchView): void {
+    if (config) {
+      group.addMenuItem({
+        label: untracked(() => text('%workbench.close_tabs_to_the_right.action')),
+        cssClass: config.cssClass ?? 'e2e-close-right-tabs',
+        disabled: view.last,
+        onSelect: () => void view.close('views-to-the-right'),
+      });
+    }
+  }
+
+  private registerCloseLeftTabsMenuItem(config: MenuItemConfig | false, group: SciMenuGroupFactory, view: WorkbenchView): void {
+    if (config) {
+      group.addMenuItem({
+        label: untracked(() => text('%workbench.close_tabs_to_the_left.action')),
+        cssClass: config.cssClass ?? 'e2e-close-left-tabs',
+        disabled: view.first,
+        onSelect: () => void view.close('views-to-the-left'),
+      });
+    }
+  }
+
+  private registerMoveRightMenuItem(config: MenuItemConfig | false, group: SciMenuGroupFactory, view: WorkbenchView): void {
+    if (config) {
+      group.addMenuItem({
+        label: untracked(() => text('%workbench.move_tab_to_the_right.action')),
+        accelerator: ['ctrl', 'alt', 'end'],
+        cssClass: config.cssClass ?? 'e2e-move-right',
+        disabled: computed(() => view.first() && view.last()),
+        onSelect: () => view.move(view.part().id, {region: 'east'}),
+      });
+    }
+  }
+
+  private registerMoveLeftMenuItem(config: MenuItemConfig | false, group: SciMenuGroupFactory, view: WorkbenchView): void {
+    if (config) {
+      group.addMenuItem({
+        label: untracked(() => text('%workbench.move_tab_to_the_left.action')),
+        cssClass: config.cssClass ?? 'e2e-move-left',
+        disabled: computed(() => view.first() && view.last()),
+        onSelect: () => view.move(view.part().id, {region: 'west'}),
+      });
+    }
+  }
+
+  private registerMoveUpMenuItem(config: MenuItemConfig | false, group: SciMenuGroupFactory, view: WorkbenchView): void {
+    if (config) {
+      group.addMenuItem({
+        label: untracked(() => text('%workbench.move_tab_up.action')),
+        cssClass: config.cssClass ?? 'e2e-move-up',
+        disabled: computed(() => view.first() && view.last()),
+        onSelect: () => view.move(view.part().id, {region: 'north'}),
+      });
+    }
+  }
+
+  private registerMoveDownMenuItem(config: MenuItemConfig | false, group: SciMenuGroupFactory, view: WorkbenchView): void {
+    if (config) {
+      group.addMenuItem({
+        label: untracked(() => text('%workbench.move_tab_down.action')),
+        cssClass: config.cssClass ?? 'e2e-move-down',
+        disabled: computed(() => view.first() && view.last()),
+        onSelect: () => view.move(view.part().id, {region: 'south'}),
+      });
+    }
+  }
+
+  private registerMoveToNewWindowMenuItem(config: MenuItemConfig | false, group: SciMenuGroupFactory, view: WorkbenchView): void {
+    if (!config || view.part().peripheral()) {
+      return;
+    }
+
+    group.addMenuItem({
+      label: untracked(() => text('%workbench.move_tab_to_new_window.action')),
+      cssClass: config.cssClass ?? 'e2e-move-to-new-window',
+      onSelect: () => view.move('new-window'),
+    });
   }
 }
 

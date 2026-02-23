@@ -30,9 +30,13 @@ export class ɵDestroyRef implements DestroyRef {
   }
 
   public destroy(): void {
+    if (this._destroyed) {
+      return;
+    }
+
+    this._destroyed = true;
     this._callbacks.forEach(callback => callback());
     this._callbacks.clear();
-    this._destroyed = true;
   }
 
   public get destroyed(): boolean {
