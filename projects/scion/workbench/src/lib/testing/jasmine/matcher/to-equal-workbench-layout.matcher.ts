@@ -186,6 +186,12 @@ function assertActivityToolbarsDOM(expectedActivityLayout: Partial<MActivityLayo
   if (expectedActivityLayout.toolbars?.rightBottom) {
     assertActivityStackDOM(expectedActivityLayout.toolbars.rightBottom, actualElement.querySelector('wb-layout > wb-activity-bar[data-align="right"] > wb-activity-stack[data-docking-area="right-bottom"]'), 'right-bottom');
   }
+  if (expectedActivityLayout.toolbars?.topLeft) {
+    assertActivityStackDOM(expectedActivityLayout.toolbars.topLeft, actualElement.querySelector('wb-layout > wb-activity-bar[data-align="left"] > wb-activity-stack[data-docking-area="top-left"]'), 'top-left');
+  }
+  if (expectedActivityLayout.toolbars?.topRight) {
+    assertActivityStackDOM(expectedActivityLayout.toolbars.topRight, actualElement.querySelector('wb-layout > wb-activity-bar[data-align="right"] > wb-activity-stack[data-docking-area="top-right"]'), 'top-right');
+  }
   if (expectedActivityLayout.toolbars?.bottomLeft) {
     assertActivityStackDOM(expectedActivityLayout.toolbars.bottomLeft, actualElement.querySelector('wb-layout > wb-activity-bar[data-align="left"] > wb-activity-stack[data-docking-area="bottom-left"]'), 'bottom-left');
   }
@@ -194,7 +200,7 @@ function assertActivityToolbarsDOM(expectedActivityLayout: Partial<MActivityLayo
   }
 }
 
-function assertActivityStackDOM(expectedStack: MActivityStack, actualElement: Element | null, dockingArea: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'bottom-left' | 'bottom-right'): void {
+function assertActivityStackDOM(expectedStack: MActivityStack, actualElement: Element | null, dockingArea: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'): void {
   if (expectedStack.activities.length === 0) {
     actualElement && throwError(`[DOMAssertError] Expected activity stack to not have activities, but it has. [dockingArea=${dockingArea}]`);
     return;
@@ -230,6 +236,9 @@ function assertActivityPanelsDOM(expectedActivityLayout: Partial<MActivityLayout
   }
   if (expectedActivityLayout.panels?.right) {
     assertRightActivityPanelDOM(expectedActivityLayout.panels.right, actualElement.querySelector('wb-layout wb-activity-panel[data-panel="right"]'));
+  }
+  if (expectedActivityLayout.panels?.top) {
+    assertTopActivityPanelDOM(expectedActivityLayout.panels.top, actualElement.querySelector('wb-layout wb-activity-panel[data-panel="top"]'));
   }
   if (expectedActivityLayout.panels?.bottom) {
     assertBottomActivityPanelDOM(expectedActivityLayout.panels.bottom, actualElement.querySelector('wb-layout wb-activity-panel[data-panel="bottom"]'));
@@ -298,6 +307,39 @@ function assertRightActivityPanelDOM(expectedPanel: Required<MActivityLayout['pa
     const expectedBottomGroupHeight = (panelBoundingBox.height - SASHBOX_SPLITTER_SIZE) * (1 - expectedPanel.ratio);
     if (bottomGridBoundingbox.height != expectedBottomGroupHeight) {
       throw Error(`[DOMAssertError] Expected height of bottom group of right activity panel to be ${expectedBottomGroupHeight} but was ${panelBoundingBox.height}.`);
+    }
+  }
+}
+
+function assertTopActivityPanelDOM(expectedPanel: Required<MActivityLayout['panels']>['top'], actualElement: Element | null): void {
+  if (expectedPanel === 'closed') {
+    actualElement && throwError(`[DOMAssertError] Expected top activity panel not to be present, but it is.`);
+    return;
+  }
+
+  if (!actualElement) {
+    throw Error(`[DOMAssertError] Expected top activity panel to be in the DOM, but is not.`);
+  }
+
+  // Assert top activity panel height.
+  const panelBoundingBox = actualElement.getBoundingClientRect();
+  if (panelBoundingBox.height !== expectedPanel.height) {
+    throw Error(`[DOMAssertError] Expected height of top activity panel to be ${expectedPanel.height} but was ${panelBoundingBox.height}.`);
+  }
+
+  if (expectedPanel.ratio) {
+    // Assert ratio (left group width).
+    const leftGridBoundingbox = actualElement.querySelectorAll('wb-grid').item(0).getBoundingClientRect();
+    const expectedLeftGroupWidth = (panelBoundingBox.width - SASHBOX_SPLITTER_SIZE) * expectedPanel.ratio;
+    if (leftGridBoundingbox.width != expectedLeftGroupWidth) {
+      throw Error(`[DOMAssertError] Expected width of left group of top activity panel to be ${expectedLeftGroupWidth} but was ${leftGridBoundingbox.width}.`);
+    }
+
+    // Assert ratio (right group width).
+    const rightGridBoundingbox = actualElement.querySelectorAll('wb-grid').item(1).getBoundingClientRect();
+    const expectedRightGroupWidth = (panelBoundingBox.width - SASHBOX_SPLITTER_SIZE) * (1 - expectedPanel.ratio);
+    if (rightGridBoundingbox.width != expectedRightGroupWidth) {
+      throw Error(`[DOMAssertError] Expected width of right group of top activity panel to be ${expectedRightGroupWidth} but was ${rightGridBoundingbox.width}.`);
     }
   }
 }

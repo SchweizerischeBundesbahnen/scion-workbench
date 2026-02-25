@@ -4751,7 +4751,7 @@ describe('WorkbenchLayout', () => {
       // Find without criteria.
       expect(workbenchLayout.activityStacks()).toEqual(jasmine.arrayWithExactContents([leftTopStack, leftBottomStack, rightTopStack, rightBottomStack, topLeftStack, topRightStack, bottomLeftStack, bottomRightStack]));
 
-      // Find by activityId id.
+      // Find by activity id.
       expect(workbenchLayout.activityStacks({activityId: undefined})).toEqual(jasmine.arrayWithExactContents([leftTopStack, leftBottomStack, rightTopStack, rightBottomStack, topLeftStack, topRightStack, bottomLeftStack, bottomRightStack]));
       expect(workbenchLayout.activityStacks({activityId: 'activity.1'})).toEqual([leftTopStack]);
       expect(workbenchLayout.activityStacks({activityId: 'activity.2'})).toEqual([leftBottomStack]);
@@ -4808,7 +4808,7 @@ describe('WorkbenchLayout', () => {
       const bottomLeftStack = workbenchLayout.activityLayout.toolbars.bottomLeft;
       const bottomRightStack = workbenchLayout.activityLayout.toolbars.bottomRight;
 
-      // Find by activityId id.
+      // Find by activity id.
       expect(workbenchLayout.activityStack({activityId: 'activity.1'})).toEqual(leftTopStack);
       expect(workbenchLayout.activityStack({activityId: 'activity.2'})).toEqual(leftBottomStack);
       expect(workbenchLayout.activityStack({activityId: 'activity.3'})).toEqual(rightTopStack);

@@ -26,7 +26,7 @@ Define the workbench layout via a layout function passed to `provideWorkbench()`
 Start by adding parts to the layout. Parts can be docked to a specific area (`left-top`, `left-bottom`, `right-top`, `right-bottom`, `bottom-left`, `bottom-right`) or aligned relative to each other. Views can be added to any part except the main area part. To display content, navigate parts and views to registered routes.
 
 > [!NOTE]
-> - A part can be docked to the left, right, or bottom side of the workbench. Each side has two docking areas: `left-top` and `left-bottom`, `right-top` and `right-bottom`, and `bottom-left` and `bottom-right`. Parts added to the same area are stacked, with only one part active per stack. If there is an active part in both stacks of a side, the two parts are split vertically or horizontally, depending on the side.
+> - A part can be docked to the left, right, top, or bottom side of the workbench. Each side has two docking areas: `left-top` and `left-bottom`, `right-top` and `right-bottom`, `top-left` and `top-right`, and `bottom-left` and `bottom-right`. Parts added to the same area are stacked, with only one part active per stack. If there is an active part in both stacks of a side, the two parts are split vertically or horizontally, depending on the side.
 > - Docked parts can be minimized to create more space for the main content.
 > - A docked part may be navigated to display content, have views, or define a layout with multiple parts aligned relative to each other.
 > - Users cannot drag views into or out of docked parts.

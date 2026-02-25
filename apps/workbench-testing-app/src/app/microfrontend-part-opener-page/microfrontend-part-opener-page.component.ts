@@ -49,7 +49,7 @@ export default class MicrofrontendPartOpenerPageComponent {
       }),
     ], Validators.required),
     params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
-    dockTo: this._formBuilder.control<'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'bottom-left' | 'bottom-right'>('left-top'),
+    dockTo: this._formBuilder.control<'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'>('left-top'),
     icon: this._formBuilder.control(''),
     label: this._formBuilder.control(''),
   });

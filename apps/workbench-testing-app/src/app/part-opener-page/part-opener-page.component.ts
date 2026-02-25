@@ -30,7 +30,7 @@ export default class PartOpenerPageComponent {
 
   protected readonly form = this._formBuilder.group({
     path: this._formBuilder.control('test-part', Validators.required),
-    dockTo: this._formBuilder.control<'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'bottom-left' | 'bottom-right'>('left-top'),
+    dockTo: this._formBuilder.control<'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'>('left-top'),
     icon: this._formBuilder.control('folder'),
     label: this._formBuilder.control('Workbench Part'),
   });
