@@ -15,6 +15,7 @@ import {environment} from '../environments/environment';
 import {provideAnimations, provideNoopAnimations} from '@angular/platform-browser/animations';
 import {provideWorkbenchClient} from './workbench-client/workbench-client.provider';
 import {provideWorkbenchTheme} from './theme/workbench-theme-switcher';
+import {provideWorkbenchClientMenuAdapter} from '@scion/workbench-client-angular';
 
 /**
  * Central place to configure the workbench-client-testing-app.
@@ -26,6 +27,7 @@ export const appConfig: ApplicationConfig = {
     provideWorkbenchTheme(),
     provideAnimationsIfEnabled(),
     provideZoneChangeDetection(),
+    provideWorkbenchClientMenuAdapter(),
   ],
 };
 

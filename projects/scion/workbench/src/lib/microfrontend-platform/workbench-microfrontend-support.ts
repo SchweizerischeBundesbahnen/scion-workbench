@@ -26,6 +26,7 @@ import {provideMicrofrontendText} from './microfrontend-text/microfrontend-text.
 import {provideMicrofrontendPopup} from './microfrontend-popup/microfrontend-popup.provider';
 import {Routing} from '../routing/routing.util';
 import {provideWorkbenchInitializer, WorkbenchStartupPhase} from '../startup/workbench-initializer';
+import {provideWorkbenchMenu} from './microfrontend-menu/microfrontend-menu.provider';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -49,6 +50,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     provideMicrofrontendPlatformBeans(),
     provideWorkbenchClientBeans(),
     runCanMatchGuardsAfterStartup(),
+    provideWorkbenchMenu(),
   ]);
 }
 

@@ -28,6 +28,7 @@ export type SciToolbarGroup = SciToolbar;
 
 export interface SciToolbarItemDescriptor {
   name?: `menuitem:${string}` | `menuitem:${string}`[];
+  id?: `menuitem:${string}`;
   label?: string | Signal<string> | ComponentType<unknown>;
   icon?: string | Signal<string>;
   checked?: boolean | Signal<boolean>;
@@ -41,6 +42,7 @@ export interface SciToolbarItemDescriptor {
 
 export interface SciToolbarMenuDescriptor {
   name?: `menu:${string}` | `menu:${string}`[];
+  id?: `menu:${string}`;
   label?: Signal<string> | string | ComponentType<unknown>;
   icon?: string | Signal<string>;
   tooltip?: string | Signal<string>;
@@ -62,6 +64,7 @@ export interface SciToolbarMenuDescriptor {
 
 export interface SciToolbarGroupDescriptor {
   name?: `group:${string}` | `group:${string}`[];
+  id?: `group:${string}`;
   disabled?: boolean | Signal<boolean>;
   cssClass?: string | string[];
   /** Arbitrary metadata associated with the menu. */

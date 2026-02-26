@@ -80,6 +80,20 @@ export default class ViewPageComponent {
     this.installCssClassUpdater();
     this.installCanCloseGuard();
 
+    const menuRef = contributeMenu('toolbar:workbench.part.tools.start', menu => menu
+      .addMenu({label: 'File', name: 'menu:blubber2'}, menu => menu
+        .addMenuItem({label: 'Outside Microfrontend 2', icon: 'article', accelerator: ['Ctrl', 'N'], disabled: true}, () => {
+        }),
+      ));
+
+    setTimeout(() => {
+      menuRef.dispose();
+    }, 3000);
+
+    if (1 + 1) {
+      return;
+    }
+
     contributeMenu('toolbar:workbench.part.tools.end', toolbar => toolbar
       .addMenu({icon: 'more_vert', visualMenuHint: false}, menu => menu
         .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+']}, () => onAction())

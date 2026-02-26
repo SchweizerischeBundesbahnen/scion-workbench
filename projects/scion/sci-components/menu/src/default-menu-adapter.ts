@@ -27,18 +27,19 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
 
   /** @inheritDoc */
   public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`, contributions: SciMenuContributions, context: Map<string, unknown>): Disposable {
-    const normalizedGroupLocation = normalizeGroupLocation(location);
-    if (!this._contributions.has(normalizedGroupLocation)) {
-      this._contributions.set(normalizedGroupLocation, signal([]));
+    const normalizedLocation = normalizeGroupLocation(location);
+
+    if (!this._contributions.has(normalizedLocation)) {
+      this._contributions.set(normalizedLocation, signal([]));
     }
 
     const currentContribution: Contribution = {contributions: contributions, context};
-    this._contributions.get(normalizedGroupLocation)!.update(contributions => contributions.concat(currentContribution));
+    this._contributions.get(normalizedLocation)!.update(contributions => contributions.concat(currentContribution));
 
     return {
       dispose: () => {
         // Do not remove signal for listener to never have a "stale" signal.
-        this._contributions.get(normalizedGroupLocation)!.update(contributions => contributions.filter(contribution => contribution !== currentContribution));
+        this._contributions.get(normalizedLocation)!.update(contributions => contributions.filter(contribution => contribution !== currentContribution));
       },
     }
   }

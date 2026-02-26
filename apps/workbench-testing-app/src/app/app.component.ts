@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, DoCheck, DOCUMENT, inject, NgZone, signal, Signal, WritableSignal} from '@angular/core';
+import {Component, computed, DoCheck, DOCUMENT, inject, Injector, NgZone, runInInjectionContext, signal, Signal, WritableSignal} from '@angular/core';
 import {filter, map, scan} from 'rxjs/operators';
 import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} from '@angular/router';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
@@ -40,6 +40,7 @@ import {UserMenuItemComponent} from './user-menu-item/user-menu-item.component';
 export class AppComponent implements DoCheck {
 
   private readonly _zone = inject(NgZone);
+  private readonly _injector = inject(Injector);
   private readonly _logAngularChangeDetectionCycles = toSignal(inject(SettingsService).observe$('logAngularChangeDetectionCycles'));
 
   protected readonly workbenchStartup = inject(WorkbenchStartup);
@@ -67,15 +68,38 @@ export class AppComponent implements DoCheck {
       }),
     );
 
-    contributeMenu({location: 'menu:additions', context: new Map()}, menu => menu
-      .addMenuItem({icon: 'home', label: 'Home'}, () => {
-
-      }),
-    );
-
     if (1 + 1) {
       return;
     }
+
+    // const label = signal(UUID.randomUUID());
+    //
+    // setInterval(() => {
+    //   label.set(UUID.randomUUID());
+    // }, 2000);
+    //
+    // contributeMenu('toolbar:workbench.part.tools.start', menu => menu
+    //   .addMenu({label: label, name: 'menu:abc'}, menu => menu
+    //     .addMenuItem({label: 'blubber', icon: 'article', accelerator: ['Ctrl', 'N']}, () => this.onAction())));
+    // contributeMenu('menu:abc', menu => menu
+    //   .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N']}, () => this.onAction())
+    //   .addMenuItem({label: 'Open', icon: 'folder'}, () => this.onAction())
+    //   .addMenuItem({label: 'Make a Copy', icon: 'file_copy'}, () => this.onAction()),
+    // );
+
+    contributeMenu('toolbar:workbench.part.tools.start', menu => menu
+      .addMenu({label: 'File', name: 'menu:blubber2'}, menu => menu
+        .addMenuItem({label: 'Outside Microfrontend 2', icon: 'article', accelerator: ['Ctrl', 'N'], disabled: true}, () => this.onAction()),
+      ));
+
+    if (1 + 1 === 2) {
+      return;
+    }
+
+    contributeMenu('toolbar:workbench.part.tools.end', toolbar => toolbar
+      .addToolbarItem({icon: 'expand_all', tooltip: 'Expand Selected'}, () => this.onAction())
+      .addToolbarItem({icon: 'collapse_all', tooltip: 'Collapse All'}, () => this.onAction()),
+    );
 
     const flags = signal(new Set<string>()
       .add('always_select_opened_element')
@@ -241,7 +265,7 @@ export class AppComponent implements DoCheck {
               .addMenuItem({label: 'Decrease font size'}, () => this.onAction()),
             ),
           )
-          .addMenu({label: 'Paragraph styles', icon: 'format_align_justify', name: 'menu:paragraph'}, menu => {
+          .addMenu({label: 'Paragraph styles', tooltip: 'host tooltip', icon: 'format_align_justify', name: 'menu:paragraph'}, menu => {
               return menu
                 .addMenuItem({label: 'Normal text', checked: computed(() => paragraphStyle() === 'normal')}, () => paragraphStyle.set('normal'))
                 .addMenuItem({label: 'Heading 1', checked: computed(() => paragraphStyle() === 'heading1')}, () => paragraphStyle.set('heading1'))

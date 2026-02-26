@@ -155,4 +155,25 @@ export const ɵWorkbenchCommands = {
    * Computes the topic via which a notification can be closed.
    */
   notificationCloseTopic: (notificationId: NotificationId) => `ɵworkbench/notifications/${notificationId}/close`,
+
+  /**
+   * Computes the topic via which a menu can be contributed.
+   */
+  menuContributionRegisterTopic: (menuContributionId: string) => `ɵworkbench/menucontributions/${menuContributionId}/register`,
+  menuContributionUnregisterTopic: (menuContributionId: string) => `ɵworkbench/menucontributions/${menuContributionId}/unregister`,
+
+  menuContributionTopic: `ɵworkbench/menucontribution`,
+
+  menuSelectTopic: (menuId: string) => `ɵworkbench/menus/${menuId.replace(':', '-')}/select`,
+
+  menuLabelTopic: (menuId: string) => `ɵworkbench/menus/${menuId.replace(':', '-')}/label`,
+
+  menuTooltipTopic: (menuId: string) => `ɵworkbench/menus/${menuId.replace(':', '-')}/tooltip`,
+
+  menuIconTopic: (menuId: string) => `ɵworkbench/menus/${menuId.replace(':', '-')}/icon`,
+
+  menuCheckedTopic: (menuId: string) => `ɵworkbench/menus/${menuId.replace(':', '-')}/checked`,
+
+  menuDisabledTopic: (menuId: string) => `ɵworkbench/menus/${menuId.replace(':', '-')}/disabled`,
+
 } as const;
