@@ -35,6 +35,8 @@ import {ɵWorkbenchRouter} from './routing/ɵworkbench-router.service';
 import {ɵWorkbenchNotificationService} from './notification/ɵworkbench-notification.service';
 import {WORKBENCH_ELEMENT, WorkbenchElement} from './workbench.model';
 import {WorkbenchNotificationInitializer} from './notification/workbench-notification-initializer';
+import {WorkbenchMenuService} from './menu/workbench-menu.service';
+import { ɵWorkbenchMenuService } from './menu/ɵworkbench-menu.service';
 
 /**
  * **SCION Workbench Client provides core API for a web app to interact with SCION Workbench and other microfrontends.**
@@ -137,6 +139,7 @@ export class WorkbenchClient {
     Beans.register(WorkbenchNotificationService, {useClass: ɵWorkbenchNotificationService});
     Beans.register(WorkbenchThemeMonitor, {useClass: ɵWorkbenchThemeMonitor});
     Beans.register(WorkbenchTextService, {useClass: ɵWorkbenchTextService});
+    Beans.register(WorkbenchMenuService, {useClass: ɵWorkbenchMenuService});
     Beans.register(StyleSheetInstaller, {eager: true});
     Beans.registerInitializer({useClass: WorkbenchPartInitializer});
     Beans.registerInitializer({useClass: WorkbenchViewInitializer});
