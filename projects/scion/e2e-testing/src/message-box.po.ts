@@ -51,9 +51,20 @@ export class MessageBoxPO {
   }
 
   /**
-   * Gets the bounding box of the content of this message box.
+   * Gets the bounding box of the messagebox or a specific area in the messagebox. Defaults to the bounding box of the messagebox.
+   *
+   * Options:
+   * - `messagebox`: messagebox bounds.
+   * - `slot`: bounds for slotted content; may differ from the actual content size if content overflows or does not fill the slot.
    */
-  public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.locator('> div.e2e-message').boundingBox());
+  public async getBoundingBox(selector: 'messagebox' | 'slot' = 'messagebox'): Promise<DomRect> {
+    switch (selector) {
+      case 'messagebox': {
+        return fromRect(await this.locator.boundingBox());
+      }
+      case 'slot': {
+        return fromRect(await this.locator.locator('> div.e2e-slot').boundingBox());
+      }
+    }
   }
 }

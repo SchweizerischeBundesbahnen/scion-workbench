@@ -70,7 +70,7 @@ test.describe('Workbench Message Box Built-in Capability', () => {
 
       await expectMessageBox(textMessagePage).toBeVisible();
 
-      const singleLineBounds = await messageBox.getBoundingBox();
+      const singleLineBounds = await messageBox.getBoundingBox('slot');
 
       // Close the message box.
       await messageBox.clickActionButton('ok');
@@ -80,8 +80,8 @@ test.describe('Workbench Message Box Built-in Capability', () => {
 
       // Expect the message box to break words.
       await expect.poll(() => messageBox.dialog.hasVerticalOverflow()).toBe(false);
-      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.width)).toEqual(400);
-      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
+      await expect.poll(() => messageBox.dialog.getBoundingBox('dialog').then(bounds => bounds.width)).toEqual(400);
+      await expect.poll(() => messageBox.dialog.getBoundingBox('dialog').then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
     });
 
     test('should wrap "unbreakable" text', async ({appPO, microfrontendNavigator}) => {
@@ -98,7 +98,7 @@ test.describe('Workbench Message Box Built-in Capability', () => {
 
       await expectMessageBox(textMessagePage).toBeVisible();
 
-      const singleLineBounds = await messageBox.getBoundingBox();
+      const singleLineBounds = await messageBox.getBoundingBox('slot');
 
       // Close the message box.
       await messageBox.clickActionButton('ok');
@@ -108,8 +108,8 @@ test.describe('Workbench Message Box Built-in Capability', () => {
 
       // Expect the message box to break words.
       await expect.poll(() => messageBox.dialog.hasVerticalOverflow()).toBe(false);
-      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.width)).toEqual(400);
-      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
+      await expect.poll(() => messageBox.dialog.getBoundingBox('dialog').then(bounds => bounds.width)).toEqual(400);
+      await expect.poll(() => messageBox.dialog.getBoundingBox('dialog').then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
     });
 
     test('should wrap title', async ({appPO, microfrontendNavigator}) => {
@@ -126,7 +126,7 @@ test.describe('Workbench Message Box Built-in Capability', () => {
 
       await expectMessageBox(textMessagePage).toBeAttached();
 
-      const singleLineBounds = await messageBox.dialog.getDialogBoundingBox();
+      const singleLineBounds = await messageBox.dialog.getBoundingBox('dialog');
 
       // Close the message box.
       await messageBox.clickActionButton('ok');
@@ -136,8 +136,8 @@ test.describe('Workbench Message Box Built-in Capability', () => {
 
       // Expect the message box to break words.
       await expect.poll(() => messageBox.dialog.hasVerticalOverflow()).toBe(false);
-      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.width)).toEqual(400);
-      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
+      await expect.poll(() => messageBox.dialog.getBoundingBox('dialog').then(bounds => bounds.width)).toEqual(400);
+      await expect.poll(() => messageBox.dialog.getBoundingBox('dialog').then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
     });
 
     test('should wrap "unbreakable" title', async ({appPO, microfrontendNavigator}) => {
@@ -154,7 +154,7 @@ test.describe('Workbench Message Box Built-in Capability', () => {
 
       await expectMessageBox(textMessagePage).toBeAttached();
 
-      const singleLineBounds = await messageBox.dialog.getDialogBoundingBox();
+      const singleLineBounds = await messageBox.dialog.getBoundingBox('dialog');
 
       // Close the message box.
       await messageBox.clickActionButton('ok');
@@ -164,8 +164,8 @@ test.describe('Workbench Message Box Built-in Capability', () => {
 
       // Expect the message box to break words.
       await expect.poll(() => messageBox.dialog.hasVerticalOverflow()).toBe(false);
-      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.width)).toEqual(400);
-      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
+      await expect.poll(() => messageBox.dialog.getBoundingBox('dialog').then(bounds => bounds.width)).toEqual(400);
+      await expect.poll(() => messageBox.dialog.getBoundingBox('dialog').then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
     });
 
     test('should allow selecting text', async ({appPO, microfrontendNavigator}) => {

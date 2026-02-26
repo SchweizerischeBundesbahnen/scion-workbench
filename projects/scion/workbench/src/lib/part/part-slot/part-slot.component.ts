@@ -114,7 +114,7 @@ function configurePartGlassPane(): Provider[] {
     },
     {
       provide: GLASS_PANE_OPTIONS,
-      useFactory: () => ({attributes: {'data-partid': inject(WorkbenchPart).id}}) satisfies GlassPaneOptions,
+      useFactory: (): GlassPaneOptions => ({attributes: {'data-partid': inject(WorkbenchPart).id}}),
     },
   ];
 }

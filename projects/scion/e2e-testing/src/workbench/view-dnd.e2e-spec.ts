@@ -809,7 +809,7 @@ test.describe('View Drag & Drop', () => {
       );
       const tab = appPO.view({viewId: 'view.100'}).tab;
       const part = appPO.part({partId: 'part.right'});
-      const {top, right, bottom, left, vcenter, hcenter} = await part.getBoundingBox('content');
+      const {top, right, bottom, left, vcenter, hcenter} = await part.getBoundingBox('slot');
 
       const dragHandle = await tab.startDrag();
 
@@ -899,7 +899,7 @@ test.describe('View Drag & Drop', () => {
       );
       const tab = appPO.view({viewId: 'view.100'}).tab;
       const mainAreaPart = appPO.part({partId: MAIN_AREA});
-      const {top, right, bottom, left, vcenter, hcenter} = await mainAreaPart.getBoundingBox('content');
+      const {top, right, bottom, left, vcenter, hcenter} = await mainAreaPart.getBoundingBox('slot');
 
       const dragHandle = await tab.startDrag();
 
@@ -937,7 +937,7 @@ test.describe('View Drag & Drop', () => {
 
       const tab = appPO.view({viewId: 'view.100'}).tab;
       const mainAreaPart = appPO.part({partId: MAIN_AREA});
-      const {top, right, bottom, left, vcenter, hcenter} = await mainAreaPart.getBoundingBox('content');
+      const {top, right, bottom, left, vcenter, hcenter} = await mainAreaPart.getBoundingBox('slot');
 
       const dragHandle = await tab.startDrag();
       await dragHandle.dragTo({x: hcenter, y: vcenter});
@@ -1026,7 +1026,7 @@ test.describe('View Drag & Drop', () => {
       const tab = appPO.view({viewId: 'view.100'}).tab;
       const mainGrid = appPO.grid({grid: 'main'});
       const mainAreaPart = appPO.part({partId: MAIN_AREA});
-      const {top, right, bottom, left, vcenter, hcenter} = await mainAreaPart.getBoundingBox('content');
+      const {top, right, bottom, left, vcenter, hcenter} = await mainAreaPart.getBoundingBox('slot');
 
       const dragHandle = await tab.startDrag();
 
@@ -1113,8 +1113,8 @@ test.describe('View Drag & Drop', () => {
       const rightPart = appPO.part({partId: 'part.right'});
       const mainGrid = appPO.grid({grid: 'main'});
 
-      const leftPartBoundingBox = await leftPart.getBoundingBox('content');
-      const rightPartBoundingBox = await rightPart.getBoundingBox('content');
+      const leftPartBoundingBox = await leftPart.getBoundingBox('slot');
+      const rightPartBoundingBox = await rightPart.getBoundingBox('slot');
       const mainGridBoundingBox = await mainGrid.getBoundingBox();
 
       const dragHandle = await tab.startDrag();
@@ -1180,8 +1180,8 @@ test.describe('View Drag & Drop', () => {
       const bottomPart = appPO.part({partId: 'part.bottom'});
       const mainGrid = appPO.grid({grid: 'main'});
 
-      const topPartBoundingBox = await topPart.getBoundingBox('content');
-      const bottomPartBoundingBox = await bottomPart.getBoundingBox('content');
+      const topPartBoundingBox = await topPart.getBoundingBox('slot');
+      const bottomPartBoundingBox = await bottomPart.getBoundingBox('slot');
       const mainGridBoundingBox = await mainGrid.getBoundingBox();
 
       const dragHandle = await tab.startDrag();
@@ -1247,7 +1247,7 @@ test.describe('View Drag & Drop', () => {
       const tab = appPO.view({viewId: 'view.100'}).tab;
       const mainGrid = appPO.grid({grid: 'main'});
       const mainAreaPart = appPO.part({partId: MAIN_AREA});
-      const {top, right, bottom, left, vcenter, hcenter} = await mainAreaPart.getBoundingBox('content');
+      const {top, right, bottom, left, vcenter, hcenter} = await mainAreaPart.getBoundingBox('slot');
 
       const dragHandle = await tab.startDrag();
 
@@ -1310,9 +1310,9 @@ test.describe('View Drag & Drop', () => {
       const mainGrid = appPO.grid({grid: 'main'});
       const mainAreaPart = appPO.part({partId: MAIN_AREA});
       const leftTopPart = appPO.part({partId: 'part.left-top'});
-      const leftTopPartBounds = await appPO.part({partId: 'part.left-top'}).getBoundingBox('content');
+      const leftTopPartBounds = await appPO.part({partId: 'part.left-top'}).getBoundingBox('slot');
       const midTopPart = appPO.part({partId: 'part.mid-top'});
-      const midTopPartBounds = await appPO.part({partId: 'part.mid-top'}).getBoundingBox('content');
+      const midTopPartBounds = await appPO.part({partId: 'part.mid-top'}).getBoundingBox('slot');
 
       const dragHandle = await tab.startDrag();
 

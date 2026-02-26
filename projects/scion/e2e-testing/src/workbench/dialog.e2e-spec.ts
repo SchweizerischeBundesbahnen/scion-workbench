@@ -26,6 +26,7 @@ import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 import {expectPopup} from '../matcher/popup-matcher';
 import {LargeTestPagePO} from './page-object/test-pages/large-test-page.po';
 import {WorkbenchHandleBoundsTestPagePO} from './page-object/test-pages/workbench-handle-bounds-test-page.po';
+import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
 
 test.describe('Workbench Dialog', () => {
 
@@ -249,7 +250,7 @@ test.describe('Workbench Dialog', () => {
 
       // Expect dialog to be positioned in the center of the workbench.
       const workbenchBounds = fromRect(await appPO.workbenchRoot.boundingBox());
-      const dialogBounds = await dialog.getDialogBoundingBox();
+      const dialogBounds = await dialog.getBoundingBox('dialog');
 
       const left = workbenchBounds.hcenter - (dialogBounds.width / 2);
       expect(left).toEqual(expect.closeTo(dialogBounds.left, 0));
@@ -297,7 +298,7 @@ test.describe('Workbench Dialog', () => {
 
       // Expect dialog to be positioned in the center of the view.
       const viewBounds = await appPO.view({viewId: 'view.left'}).getBoundingBox();
-      const dialogBounds = await dialog.getDialogBoundingBox();
+      const dialogBounds = await dialog.getBoundingBox('dialog');
 
       const left = viewBounds.hcenter - (dialogBounds.width / 2);
       expect(left).toEqual(expect.closeTo(dialogBounds.left, 0));
@@ -328,7 +329,7 @@ test.describe('Workbench Dialog', () => {
       await expectDialog(dialogPage).toBeVisible();
       await expect.poll(() => appPO.isPartBlocked('part.testee')).toBe(true);
       await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
-      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.part.getBoundingBox('content')]));
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.part.getBoundingBox('slot')]));
     });
 
     test('should reject the promise when attaching the dialog to a non-existent part', async ({appPO, workbenchNavigator, consoleLogs}) => {
@@ -388,8 +389,8 @@ test.describe('Workbench Dialog', () => {
 
       await workbenchNavigator.createPerspective(factory => factory
         .addPart(MAIN_AREA)
-        .addPart('part.testee-1', {dockTo: 'left-top'}, {label: 'Activity', icon: 'folder', activate: true, ɵactivityId: 'activity.1'})
-        .addPart('part.testee-2', {dockTo: 'left-top'}, {label: 'Activity', icon: 'folder', ɵactivityId: 'activity.2'})
+        .addPart('part.testee-1', {dockTo: 'left-top'}, {label: 'Activity 1', icon: 'folder', activate: true, ɵactivityId: 'activity.1'})
+        .addPart('part.testee-2', {dockTo: 'left-top'}, {label: 'Activity 2', icon: 'folder', ɵactivityId: 'activity.2'})
         .navigatePart('part.testee-1', ['test-dialog-opener']),
       );
 
@@ -465,9 +466,9 @@ test.describe('Workbench Dialog', () => {
 
       await workbenchNavigator.createPerspective(factory => factory
         .addPart(MAIN_AREA)
-        .addPart('part.testee-1', {dockTo: 'left-top'}, {label: 'Activity', icon: 'folder', ɵactivityId: 'activity.1'})
-        .addPart('part.testee-2', {dockTo: 'left-top'}, {label: 'Activity', icon: 'folder', ɵactivityId: 'activity.2'})
-        .addPart('part.testee-3', {dockTo: 'left-top'}, {label: 'Activity', icon: 'folder', ɵactivityId: 'activity.3'}),
+        .addPart('part.testee-1', {dockTo: 'left-top'}, {label: 'Activity 1', icon: 'folder', ɵactivityId: 'activity.1'})
+        .addPart('part.testee-2', {dockTo: 'left-top'}, {label: 'Activity 2', icon: 'folder', ɵactivityId: 'activity.2'})
+        .addPart('part.testee-3', {dockTo: 'left-top'}, {label: 'Activity 3', icon: 'folder', ɵactivityId: 'activity.3'}),
       );
 
       // Open the dialog in part 2.
@@ -515,11 +516,11 @@ test.describe('Workbench Dialog', () => {
       await expectDialog(dialogPage).toBeVisible();
       await expect.poll(() => appPO.isPartBlocked('part.peripheral')).toBe(true);
       await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
-      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.part.getBoundingBox('content')]));
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.part.getBoundingBox('slot')]));
 
       // Expect dialog to be positioned in the center of the workbench.
       const workbenchBounds = fromRect(await appPO.workbenchRoot.boundingBox());
-      const dialogBounds = await dialog.getDialogBoundingBox();
+      const dialogBounds = await dialog.getBoundingBox('dialog');
 
       const left = workbenchBounds.hcenter - (dialogBounds.width / 2);
       expect(left).toEqual(expect.closeTo(dialogBounds.left, 0));
@@ -562,11 +563,11 @@ test.describe('Workbench Dialog', () => {
       await expectDialog(dialogPage).toBeVisible();
       await expect.poll(() => appPO.isPartBlocked('part.left')).toBe(true);
       await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
-      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.part.getBoundingBox('content')]));
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.part.getBoundingBox('slot')]));
 
       // Expect dialog to be positioned in the center of the part.
       const partBounds = await appPO.part({partId: 'part.left'}).getBoundingBox();
-      const dialogBounds = await dialog.getDialogBoundingBox();
+      const dialogBounds = await dialog.getBoundingBox('dialog');
 
       const left = partBounds.hcenter - (dialogBounds.width / 2);
       expect(left).toEqual(expect.closeTo(dialogBounds.left, 0));
@@ -595,7 +596,7 @@ test.describe('Workbench Dialog', () => {
       await expect.poll(() => appPO.isDialogBlocked(dialogPage1.dialog.getDialogId())).toBe(true);
       await expect.poll(() => appPO.isDialogBlocked(dialogPage2.dialog.getDialogId())).toBe(false);
       await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
-      await expect.poll(() => dialogPage2.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogPage1.dialog.getDialogBoundingBox()]));
+      await expect.poll(() => dialogPage2.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogPage1.dialog.getBoundingBox('dialog')]));
     });
 
     test('should reject the promise when attaching the dialog to a non-existent dialog', async ({appPO, workbenchNavigator, consoleLogs}) => {
@@ -685,8 +686,8 @@ test.describe('Workbench Dialog', () => {
 
       await workbenchNavigator.createPerspective(factory => factory
         .addPart(MAIN_AREA)
-        .addPart('part.testee-1', {dockTo: 'left-top'}, {label: 'Activity', icon: 'folder', ɵactivityId: 'activity.1'})
-        .addPart('part.testee-2', {dockTo: 'left-top'}, {label: 'Activity', icon: 'folder', ɵactivityId: 'activity.2'})
+        .addPart('part.testee-1', {dockTo: 'left-top'}, {label: 'Activity 1', icon: 'folder', ɵactivityId: 'activity.1'})
+        .addPart('part.testee-2', {dockTo: 'left-top'}, {label: 'Activity 2', icon: 'folder', ɵactivityId: 'activity.2'})
         .navigatePart('part.testee-1', ['test-dialog-opener'])
         .activatePart('part.testee-1'),
       );
@@ -735,11 +736,11 @@ test.describe('Workbench Dialog', () => {
       await expectDialog(dialogPage2).toBeVisible();
       await expect.poll(() => appPO.isDialogBlocked(dialogPage1.dialog.getDialogId())).toBe(true);
       await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
-      await expect.poll(() => dialogPage2.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogPage1.dialog.getDialogBoundingBox()]));
+      await expect.poll(() => dialogPage2.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogPage1.dialog.getBoundingBox('dialog')]));
 
       // Expect dialog to be positioned in the center of dialog 1.
-      const contextualDialogBounds = await dialogPage1.dialog.getDialogBoundingBox();
-      const dialogBounds = await dialogPage2.dialog.getDialogBoundingBox();
+      const contextualDialogBounds = await dialogPage1.dialog.getBoundingBox('dialog');
+      const dialogBounds = await dialogPage2.dialog.getBoundingBox('dialog');
 
       const left = contextualDialogBounds.hcenter - (dialogBounds.width / 2);
       expect(left).toBeCloseTo(dialogBounds.left, 0);
@@ -790,7 +791,7 @@ test.describe('Workbench Dialog', () => {
       await expect.poll(() => appPO.isPopupBlocked(popupPage.popup.getPopupId())).toBe(true);
       await expect.poll(() => appPO.isDialogBlocked(dialogPage.dialog.getDialogId())).toBe(false);
       await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
-      await expect.poll(() => dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popupPage.popup.getBoundingBox('content')]));
+      await expect.poll(() => dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popupPage.popup.getBoundingBox('slot')]));
     });
 
     test('should reject the promise when attaching the dialog to a non-existent popup', async ({appPO, workbenchNavigator, consoleLogs}) => {
@@ -894,8 +895,8 @@ test.describe('Workbench Dialog', () => {
 
       await workbenchNavigator.createPerspective(factory => factory
         .addPart(MAIN_AREA)
-        .addPart('part.testee-1', {dockTo: 'left-top'}, {label: 'Activity', icon: 'folder', ɵactivityId: 'activity.1'})
-        .addPart('part.testee-2', {dockTo: 'left-top'}, {label: 'Activity', icon: 'folder', ɵactivityId: 'activity.2'})
+        .addPart('part.testee-1', {dockTo: 'left-top'}, {label: 'Activity 1', icon: 'folder', ɵactivityId: 'activity.1'})
+        .addPart('part.testee-2', {dockTo: 'left-top'}, {label: 'Activity 2', icon: 'folder', ɵactivityId: 'activity.2'})
         .navigatePart('part.testee-1', ['test-popup-opener'])
         .activatePart('part.testee-1'),
       );
@@ -953,11 +954,11 @@ test.describe('Workbench Dialog', () => {
       await expectDialog(dialogPage).toBeVisible();
       await expect.poll(() => appPO.isPopupBlocked(popupPage.popup.getPopupId())).toBe(true);
       await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
-      await expect.poll(() => dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popupPage.popup.getBoundingBox('content')]));
+      await expect.poll(() => dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popupPage.popup.getBoundingBox('slot')]));
 
       // Expect dialog to be positioned in the center of the popup.
       const popupBounds = await popupPage.popup.getBoundingBox();
-      const dialogBounds = await dialogPage.dialog.getDialogBoundingBox();
+      const dialogBounds = await dialogPage.dialog.getBoundingBox('dialog');
 
       const left = popupBounds.hcenter - (dialogBounds.width / 2);
       expect(left).toBeCloseTo(dialogBounds.left, 0);
@@ -1005,6 +1006,117 @@ test.describe('Workbench Dialog', () => {
 
       // Expect popup not to be closed.
       await expectPopup(popupPage).toBeVisible();
+    });
+  });
+
+  test.describe('Notification Context', () => {
+
+    test('should bind dialog to contextual notification', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open notification.
+      const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+      await notificationOpenerPage.show('component:dialog-opener-page', {cssClass: 'notification'});
+      const notificationPage = new DialogOpenerPagePO(appPO.notification({cssClass: 'notification'}));
+
+      // Open dialog from notification.
+      await notificationPage.open('dialog-page', {cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(appPO.dialog({cssClass: 'testee'}));
+
+      await expectDialog(dialogPage).toBeVisible();
+      await expect(async () => expect(await dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await notificationPage.notification.getBoundingBox('notification-inset'),
+      ]))).toPass();
+      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
+      await expect.poll(() => appPO.isNotificationBlocked(notificationPage.notification.getNotificationId())).toBe(true);
+      await expect.poll(() => appPO.isViewBlocked(notificationOpenerPage.view.getViewId())).toBe(false);
+      await expect.poll(() => appPO.isDialogBlocked(dialogPage.dialog.getDialogId())).toBe(false);
+    });
+
+    test('should not bind dialog to contextual notification if context null', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open notification.
+      const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+      await notificationOpenerPage.show('component:dialog-opener-page', {cssClass: 'notification'});
+      const notificationPage = new DialogOpenerPagePO(appPO.notification({cssClass: 'notification'}));
+
+      // Open dialog from notification.
+      await notificationPage.open('dialog-page', {cssClass: 'testee', context: null});
+      const dialogPage = new DialogPagePO(appPO.dialog({cssClass: 'testee'}));
+
+      await expectDialog(dialogPage).toBeVisible();
+      await expect(async () => expect(await dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await appPO.workbenchBoundingBox(), // workbench
+        await notificationOpenerPage.view.getBoundingBox(), // workbench view
+        await notificationPage.notification.getBoundingBox('notification-inset'),
+      ]))).toPass();
+      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(true);
+      await expect.poll(() => appPO.isNotificationBlocked(notificationPage.notification.getNotificationId())).toBe(true);
+      await expect.poll(() => appPO.isViewBlocked(notificationOpenerPage.view.getViewId())).toBe(true);
+      await expect.poll(() => appPO.isDialogBlocked(dialogPage.dialog.getDialogId())).toBe(false);
+    });
+
+    test('should reject the promise when attaching the dialog to a non-existent notification', async ({appPO, workbenchNavigator, consoleLogs}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+
+      // Expect to error when opening the dialog.
+      await expect(dialogOpenerPage.open('dialog-page', {context: 'notification.does-not-exist'})).rejects.toThrow('[NullNotificationError] Notification \'notification.does-not-exist\' not found.');
+
+      // Expect no error to be logged to the console.
+      await expect.poll(() => consoleLogs.get({severity: 'error'})).toEqual([]);
+    });
+
+    test('should bind dialog to any notification', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open notification.
+      const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+      await notificationOpenerPage.show('component:notification-page', {cssClass: 'notification'});
+      const notification = appPO.notification({cssClass: 'notification'});
+
+      // Open dialog in notification.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('dialog-opener-page', {context: await notification.getNotificationId(), cssClass: 'testee'});
+      const dialogPage = new DialogOpenerPagePO(appPO.dialog({cssClass: 'testee'}));
+
+      // Expect dialog to display and notification to be blocked.
+      await expectDialog(dialogPage).toBeVisible();
+      await expect.poll(() => appPO.isNotificationBlocked(notification.getNotificationId())).toBe(true);
+      await expect.poll(() => appPO.isViewBlocked(dialogOpenerPage.view.getViewId())).toBe(false);
+      await expect(async () => expect(await dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await notification.getBoundingBox('notification-inset'),
+      ]))).toPass();
+    });
+
+    test('should position dialog in workbench center', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open notification.
+      const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+      await notificationOpenerPage.show('component:dialog-opener-page', {cssClass: 'notification'});
+      const notificationPage = new DialogOpenerPagePO(appPO.notification({cssClass: 'notification'}));
+
+      // Open dialog from notification.
+      await notificationPage.open('dialog-page', {cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(appPO.dialog({cssClass: 'testee'}));
+
+      // Expect dialog to be visible.
+      await expectDialog(dialogPage).toBeVisible();
+      await expect.poll(() => appPO.isNotificationBlocked(notificationPage.notification.getNotificationId())).toBe(true);
+
+      // Expect dialog to be positioned in the center of the workbench.
+      const workbenchBounds = fromRect(await appPO.workbenchRoot.boundingBox());
+      const dialogBounds = await dialogPage.getBoundingBox();
+
+      const left = workbenchBounds.hcenter - (dialogBounds.width / 2);
+      expect(left).toEqual(expect.closeTo(dialogBounds.left, 0));
+
+      const right = workbenchBounds.hcenter + (dialogBounds.width / 2);
+      expect(right).toEqual(expect.closeTo(dialogBounds.right, 0));
     });
   });
 
@@ -1466,11 +1578,11 @@ test.describe('Workbench Dialog', () => {
 
       const dialog = appPO.dialog({cssClass: 'testee'});
       const dialogPage = new DialogPagePO(dialog);
-      const dialogPaneBoundingBox = await dialog.getDialogBoundingBox();
+      const dialogPaneBoundingBox = await dialog.getBoundingBox('dialog');
       await dialogPage.enterTitle('Very Long Title'.repeat(100));
 
       // Expect title not to change dialog width.
-      await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(dialogPaneBoundingBox);
+      await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(dialogPaneBoundingBox);
     });
   });
 
@@ -1600,15 +1712,15 @@ test.describe('Workbench Dialog', () => {
 
       const dialog1 = appPO.dialog({cssClass: 'testee'}, {nth: 0});
       const dialogPage1 = new DialogPagePO(dialog1);
-      const dialogBounds1 = await dialog1.getDialogBoundingBox();
+      const dialogBounds1 = await dialog1.getBoundingBox('dialog');
 
       const dialog2 = appPO.dialog({cssClass: 'testee'}, {nth: 1});
       const dialogPage2 = new DialogPagePO(dialog2);
-      const dialogBounds2 = await dialog2.getDialogBoundingBox();
+      const dialogBounds2 = await dialog2.getBoundingBox('dialog');
 
       const dialog3 = appPO.dialog({cssClass: 'testee'}, {nth: 2});
       const dialogPage3 = new DialogPagePO(dialog3);
-      const dialogBounds3 = await dialog3.getDialogBoundingBox();
+      const dialogBounds3 = await dialog3.getBoundingBox('dialog');
 
       await expectDialog(dialogPage1).toBeVisible();
       await expectDialog(dialogPage2).toBeVisible();
@@ -1701,11 +1813,11 @@ test.describe('Workbench Dialog', () => {
       await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
-      const dialogBounds = await dialog.getDialogBoundingBox();
+      const dialogBounds = await dialog.getBoundingBox('dialog');
 
       await test.step('moving dialog 50px to the right and 100px to the bottom', async () => {
         await dialog.moveDialog({x: 50, y: 100});
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           x: dialogBounds.x + 50,
           y: dialogBounds.y + 100,
           height: dialogBounds.height,
@@ -1715,7 +1827,7 @@ test.describe('Workbench Dialog', () => {
 
       await test.step('moving dialog 100px to the left', async () => {
         await dialog.moveDialog({x: -100, y: 0});
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           x: dialogBounds.x - 50,
           y: dialogBounds.y + 100,
           height: dialogBounds.height,
@@ -1725,7 +1837,7 @@ test.describe('Workbench Dialog', () => {
 
       await test.step('moving dialog 100px to the top', async () => {
         await dialog.moveDialog({x: 0, y: -100});
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           x: dialogBounds.x - 50,
           y: dialogBounds.y,
           height: dialogBounds.height,
@@ -1735,7 +1847,7 @@ test.describe('Workbench Dialog', () => {
 
       await test.step('moving dialog 50px to the right', async () => {
         await dialog.moveDialog({x: 50, y: 0});
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           x: dialogBounds.x,
           y: dialogBounds.y,
           height: dialogBounds.height,
@@ -1762,8 +1874,8 @@ test.describe('Workbench Dialog', () => {
 
       // Capture border, header and footer height.
       const dialogBorder = 2 * await dialog.getDialogBorderWidth();
-      const dialogHeaderHeight = (await dialog.getHeaderBoundingBox()).height;
-      const dialogFooterHeight = (await dialog.getFooterBoundingBox()).height;
+      const dialogHeaderHeight = (await dialog.getBoundingBox('header')).height;
+      const dialogFooterHeight = (await dialog.getBoundingBox('footer')).height;
 
       // Change the size of the content.
       await dialogPage.enterContentSize({
@@ -1772,7 +1884,7 @@ test.describe('Workbench Dialog', () => {
       });
 
       // Expect the dialog to adapt to the content size.
-      await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+      await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
         height: 500 + dialogBorder + dialogHeaderHeight + dialogFooterHeight,
         width: 500 + dialogBorder,
       }));
@@ -1784,7 +1896,7 @@ test.describe('Workbench Dialog', () => {
       });
 
       // Expect the dialog to adapt to the content size.
-      await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+      await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
         height: 400 + dialogBorder + dialogHeaderHeight + dialogFooterHeight,
         width: 400 + dialogBorder,
       }));
@@ -1796,7 +1908,7 @@ test.describe('Workbench Dialog', () => {
       });
 
       // Expect the dialog to adapt to the content size.
-      await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+      await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
         height: 500 + dialogBorder + dialogHeaderHeight + dialogFooterHeight,
         width: 500 + dialogBorder,
       }));
@@ -1805,7 +1917,7 @@ test.describe('Workbench Dialog', () => {
         await dialogPage.enterDialogSize({maxHeight: '300px'});
 
         // Expect the dialog height to be max height.
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           height: 300,
           width: 500 + dialogBorder,
         }));
@@ -1819,7 +1931,7 @@ test.describe('Workbench Dialog', () => {
         await dialogPage.enterDialogSize({minHeight: '600px'});
 
         // Expect the dialog height to be min height.
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           height: 600,
           width: 500 + dialogBorder,
         }));
@@ -1833,7 +1945,7 @@ test.describe('Workbench Dialog', () => {
         await dialogPage.enterDialogSize({maxWidth: '300px'});
 
         // Expect the dialog width to be max-width.
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           height: 500 + dialogBorder + dialogHeaderHeight + dialogFooterHeight,
           width: 300,
         }));
@@ -1847,7 +1959,7 @@ test.describe('Workbench Dialog', () => {
         await dialogPage.enterDialogSize({minWidth: '600px'});
 
         // Expect the dialog width to be min-width.
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           height: 500 + dialogBorder + dialogHeaderHeight + dialogFooterHeight,
           width: 600,
         }));
@@ -1859,7 +1971,7 @@ test.describe('Workbench Dialog', () => {
     });
 
     test('should grow beyong context bounds', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false, designTokens: {'--sci-workbench-dialog-padding': '0'}});
+      await appPO.navigateTo({microfrontendSupport: false});
 
       // Add layout with a small main area.
       await workbenchNavigator.createPerspective(factory => factory
@@ -1886,11 +1998,11 @@ test.describe('Workbench Dialog', () => {
       await expectDialog(dialogPage).toBeVisible();
 
       // Expect dialog to have a size of 1000x1000 pixels.
-      const dialogBounds = await dialogPage.dialog.getDialogBoundingBox();
+      const dialogBounds = await dialogPage.dialog.getBoundingBox('dialog');
       expect(dialogBounds.width).toBeGreaterThan(1000);
       expect(dialogBounds.height).toBeGreaterThan(1000);
 
-      const dialogSlotBounds = await dialogPage.dialog.getDialogSlotBoundingBox();
+      const dialogSlotBounds = await dialogPage.dialog.getBoundingBox('slot');
       expect(dialogSlotBounds).toMatchObject({height: 1000, width: 1000});
 
       // Expect dialog to be positioned in the center of the context.
@@ -1910,7 +2022,28 @@ test.describe('Workbench Dialog', () => {
       const testPage = new WorkbenchHandleBoundsTestPagePO(dialog);
 
       await expect(async () => {
-        const expectedBounds = await dialog.getDialogSlotBoundingBox();
+        const expectedBounds = await dialog.getBoundingBox('slot');
+        const handleBounds = await testPage.getBounds();
+        expect(handleBounds).toEqual(expectedBounds);
+      }).toPass();
+    });
+
+    test('should provide dialog bounds (content overflow)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('workbench-handle-bounds-test-page', {cssClass: 'testee'});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const testPage = new WorkbenchHandleBoundsTestPagePO(dialog);
+
+      // Overflow viewport.
+      await testPage.enterContentSize({height: '800px', width: '800px'});
+      await testPage.enterDialogSize({height: '500px', width: '500px'});
+
+      await expect(async () => {
+        const expectedBounds = await dialog.getBoundingBox('slot');
         const handleBounds = await testPage.getBounds();
         expect(handleBounds).toEqual(expectedBounds);
       }).toPass();
@@ -1954,7 +2087,7 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerViewPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerViewPage.open('dialog-opener-page', {cssClass: 'testee'});
       const dialog = appPO.dialog({cssClass: 'testee'});
-      const dialogBoundingBox = await dialog.getDialogBoundingBox();
+      const dialogBoundingBox = await dialog.getBoundingBox('dialog');
 
       // Block the dialog by opening another dialog.
       const dialogOpenerDialogPage = new DialogOpenerPagePO(dialog);
@@ -1973,7 +2106,7 @@ test.describe('Workbench Dialog', () => {
       await dialog.resizeBottomLeft({x: 10, y: 10});
 
       // Expect the dialog not to be resized.
-      await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(dialogBoundingBox);
+      await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(dialogBoundingBox);
     });
 
     test('should prefer minimal size over maximal size ', async ({appPO, workbenchNavigator}) => {
@@ -1993,9 +2126,9 @@ test.describe('Workbench Dialog', () => {
         maxHeight: '400px',
       });
 
-      const dialogBounds = await dialog.getDialogBoundingBox();
+      const dialogBounds = await dialog.getBoundingBox('dialog');
 
-      await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+      await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
         x: dialogBounds.x,
         y: dialogBounds.y,
         height: 500,
@@ -2005,7 +2138,7 @@ test.describe('Workbench Dialog', () => {
       // Trying to resize the dialog ...
       await test.step('resizing dialog via top handle', async () => {
         await dialog.resizeTop(-10);
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           x: dialogBounds.x,
           y: dialogBounds.y,
           height: 500,
@@ -2013,7 +2146,7 @@ test.describe('Workbench Dialog', () => {
         }));
 
         await dialog.resizeTop(10);
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           x: dialogBounds.x,
           y: dialogBounds.y,
           height: 500,
@@ -2023,7 +2156,7 @@ test.describe('Workbench Dialog', () => {
 
       await test.step('resizing dialog via right handle', async () => {
         await dialog.resizeRight(-10);
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           x: dialogBounds.x,
           y: dialogBounds.y,
           height: 500,
@@ -2031,7 +2164,7 @@ test.describe('Workbench Dialog', () => {
         }));
 
         await dialog.resizeRight(10);
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           x: dialogBounds.x,
           y: dialogBounds.y,
           height: 500,
@@ -2041,7 +2174,7 @@ test.describe('Workbench Dialog', () => {
 
       await test.step('resizing dialog via bottom handle', async () => {
         await dialog.resizeBottom(-10);
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           x: dialogBounds.x,
           y: dialogBounds.y,
           height: 500,
@@ -2049,7 +2182,7 @@ test.describe('Workbench Dialog', () => {
         }));
 
         await dialog.resizeBottom(10);
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           x: dialogBounds.x,
           y: dialogBounds.y,
           height: 500,
@@ -2059,7 +2192,7 @@ test.describe('Workbench Dialog', () => {
 
       await test.step('resizing dialog via left handle', async () => {
         await dialog.resizeLeft(-10);
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           x: dialogBounds.x,
           y: dialogBounds.y,
           height: 500,
@@ -2067,7 +2200,7 @@ test.describe('Workbench Dialog', () => {
         }));
 
         await dialog.resizeLeft(10);
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           x: dialogBounds.x,
           y: dialogBounds.y,
           height: 500,
@@ -2077,7 +2210,7 @@ test.describe('Workbench Dialog', () => {
 
       await test.step('resizing dialog via top-right handle', async () => {
         await dialog.resizeTopRight({x: -10, y: -10});
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           x: dialogBounds.x,
           y: dialogBounds.y,
           height: 500,
@@ -2085,7 +2218,7 @@ test.describe('Workbench Dialog', () => {
         }));
 
         await dialog.resizeTopRight({x: 10, y: 10});
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           x: dialogBounds.x,
           y: dialogBounds.y,
           height: 500,
@@ -2095,7 +2228,7 @@ test.describe('Workbench Dialog', () => {
 
       await test.step('resizing dialog via bottom-right handle', async () => {
         await dialog.resizeBottomRight({x: -10, y: -10});
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           x: dialogBounds.x,
           y: dialogBounds.y,
           height: 500,
@@ -2103,7 +2236,7 @@ test.describe('Workbench Dialog', () => {
         }));
 
         await dialog.resizeBottomRight({x: 10, y: 10});
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           x: dialogBounds.x,
           y: dialogBounds.y,
           height: 500,
@@ -2113,7 +2246,7 @@ test.describe('Workbench Dialog', () => {
 
       await test.step('resizing dialog via bottom-left handle', async () => {
         await dialog.resizeBottomLeft({x: -10, y: -10});
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           x: dialogBounds.x,
           y: dialogBounds.y,
           height: 500,
@@ -2121,7 +2254,7 @@ test.describe('Workbench Dialog', () => {
         }));
 
         await dialog.resizeBottomLeft({x: 10, y: 10});
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           x: dialogBounds.x,
           y: dialogBounds.y,
           height: 500,
@@ -2131,7 +2264,7 @@ test.describe('Workbench Dialog', () => {
 
       await test.step('resizing dialog via top-left handle', async () => {
         await dialog.resizeTopLeft({x: -10, y: -10});
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           x: dialogBounds.x,
           y: dialogBounds.y,
           height: 500,
@@ -2139,7 +2272,7 @@ test.describe('Workbench Dialog', () => {
         }));
 
         await dialog.resizeTopLeft({x: 10, y: 10});
-        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
           x: dialogBounds.x,
           y: dialogBounds.y,
           height: 500,
@@ -2161,12 +2294,12 @@ test.describe('Workbench Dialog', () => {
         const dialogPage = new DialogPagePO(dialog);
 
         await dialogPage.enterDialogSize({height: '500px', width: '500px'});
-        const dialogBounds = await dialog.getDialogBoundingBox();
+        const dialogBounds = await dialog.getBoundingBox('dialog');
 
         // Resize the dialog.
         await test.step('dragging handle 10px to the top', async () => {
           await dialog.resizeTop(-10);
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y - 10,
             height: dialogBounds.height + 10,
@@ -2176,7 +2309,7 @@ test.describe('Workbench Dialog', () => {
 
         await test.step('dragging handle 10px to the bottom', async () => {
           await dialog.resizeTop(10);
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2201,12 +2334,12 @@ test.describe('Workbench Dialog', () => {
           minHeight: '300px',
           maxHeight: '500px',
         });
-        const dialogBounds = await dialog.getDialogBoundingBox();
+        const dialogBounds = await dialog.getBoundingBox('dialog');
 
         // Resize the dialog.
         await test.step('dragging handle past max-height to the top', async () => {
           await dialog.resizeTop(-200, {mouseup: false});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y - 100,
             height: dialogBounds.height + 100,
@@ -2218,7 +2351,7 @@ test.describe('Workbench Dialog', () => {
           const mouse = appPO.page.mouse;
           await mouse.move(dialogBounds.hcenter, dialogBounds.top, {steps: 10});
           await mouse.up();
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2228,7 +2361,7 @@ test.describe('Workbench Dialog', () => {
 
         await test.step('dragging handle past min-height to the bottom', async () => {
           await dialog.resizeTop(200, {mouseup: false});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y + 100,
             height: dialogBounds.height - 100,
@@ -2240,7 +2373,7 @@ test.describe('Workbench Dialog', () => {
           const mouse = appPO.page.mouse;
           await mouse.move(dialogBounds.hcenter, dialogBounds.top, {steps: 10});
           await mouse.up();
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2263,12 +2396,12 @@ test.describe('Workbench Dialog', () => {
         const dialogPage = new DialogPagePO(dialog);
 
         await dialogPage.enterDialogSize({height: '500px', width: '500px'});
-        const dialogBounds = await dialog.getDialogBoundingBox();
+        const dialogBounds = await dialog.getBoundingBox('dialog');
 
         // Resize the dialog.
         await test.step('dragging handle 10px to the bottom', async () => {
           await dialog.resizeBottom(10);
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height + 10,
@@ -2278,7 +2411,7 @@ test.describe('Workbench Dialog', () => {
 
         await test.step('dragging handle 10px to the top', async () => {
           await dialog.resizeBottom(-10);
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2303,12 +2436,12 @@ test.describe('Workbench Dialog', () => {
           minHeight: '300px',
           maxHeight: '500px',
         });
-        const dialogBounds = await dialog.getDialogBoundingBox();
+        const dialogBounds = await dialog.getBoundingBox('dialog');
 
         // Resize the dialog.
         await test.step('dragging handle past max-height to the bottom', async () => {
           await dialog.resizeBottom(200, {mouseup: false});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height + 100,
@@ -2320,7 +2453,7 @@ test.describe('Workbench Dialog', () => {
           const mouse = appPO.page.mouse;
           await mouse.move(dialogBounds.hcenter, dialogBounds.bottom, {steps: 10});
           await mouse.up();
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2330,7 +2463,7 @@ test.describe('Workbench Dialog', () => {
 
         await test.step('dragging handle past min-height to the top', async () => {
           await dialog.resizeBottom(-200, {mouseup: false});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height - 100,
@@ -2342,7 +2475,7 @@ test.describe('Workbench Dialog', () => {
           const mouse = appPO.page.mouse;
           await mouse.move(dialogBounds.hcenter, dialogBounds.bottom, {steps: 10});
           await mouse.up();
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2365,12 +2498,12 @@ test.describe('Workbench Dialog', () => {
         const dialogPage = new DialogPagePO(dialog);
 
         await dialogPage.enterDialogSize({height: '500px', width: '500px'});
-        const dialogBounds = await dialog.getDialogBoundingBox();
+        const dialogBounds = await dialog.getBoundingBox('dialog');
 
         // Resize the dialog.
         await test.step('dragging handle 10px to the left', async () => {
           await dialog.resizeLeft(-10);
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x - 10,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2380,7 +2513,7 @@ test.describe('Workbench Dialog', () => {
 
         await test.step('dragging handle 10px to the right', async () => {
           await dialog.resizeLeft(10);
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2405,12 +2538,12 @@ test.describe('Workbench Dialog', () => {
           minWidth: '300px',
           maxWidth: '500px',
         });
-        const dialogBounds = await dialog.getDialogBoundingBox();
+        const dialogBounds = await dialog.getBoundingBox('dialog');
 
         // Resize the dialog.
         await test.step('dragging handle past max-width to the left', async () => {
           await dialog.resizeLeft(-200, {mouseup: false});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x - 100,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2422,7 +2555,7 @@ test.describe('Workbench Dialog', () => {
           const mouse = appPO.page.mouse;
           await mouse.move(dialogBounds.left, dialogBounds.vcenter, {steps: 10});
           await mouse.up();
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2432,7 +2565,7 @@ test.describe('Workbench Dialog', () => {
 
         await test.step('dragging handle past min-width to the right', async () => {
           await dialog.resizeLeft(200, {mouseup: false});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x + 100,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2444,7 +2577,7 @@ test.describe('Workbench Dialog', () => {
           const mouse = appPO.page.mouse;
           await mouse.move(dialogBounds.left, dialogBounds.vcenter, {steps: 10});
           await mouse.up();
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2467,12 +2600,12 @@ test.describe('Workbench Dialog', () => {
         const dialogPage = new DialogPagePO(dialog);
 
         await dialogPage.enterDialogSize({height: '500px', width: '500px'});
-        const dialogBounds = await dialog.getDialogBoundingBox();
+        const dialogBounds = await dialog.getBoundingBox('dialog');
 
         // Resize the dialog.
         await test.step('dragging handle 10px to the right', async () => {
           await dialog.resizeRight(10);
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2482,7 +2615,7 @@ test.describe('Workbench Dialog', () => {
 
         await test.step('dragging handle 10px to the left', async () => {
           await dialog.resizeRight(-10);
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2507,12 +2640,12 @@ test.describe('Workbench Dialog', () => {
           minWidth: '300px',
           maxWidth: '500px',
         });
-        const dialogBounds = await dialog.getDialogBoundingBox();
+        const dialogBounds = await dialog.getBoundingBox('dialog');
 
         // Resize the dialog.
         await test.step('dragging handle past max-width to the right', async () => {
           await dialog.resizeRight(200, {mouseup: false});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2524,7 +2657,7 @@ test.describe('Workbench Dialog', () => {
           const mouse = appPO.page.mouse;
           await mouse.move(dialogBounds.right, dialogBounds.vcenter, {steps: 10});
           await mouse.up();
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2534,7 +2667,7 @@ test.describe('Workbench Dialog', () => {
 
         await test.step('dragging handle past min-width to the left', async () => {
           await dialog.resizeRight(-200, {mouseup: false});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2546,7 +2679,7 @@ test.describe('Workbench Dialog', () => {
           const mouse = appPO.page.mouse;
           await mouse.move(dialogBounds.right, dialogBounds.vcenter, {steps: 10});
           await mouse.up();
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2569,12 +2702,12 @@ test.describe('Workbench Dialog', () => {
         const dialogPage = new DialogPagePO(dialog);
 
         await dialogPage.enterDialogSize({height: '500px', width: '500px'});
-        const dialogBounds = await dialog.getDialogBoundingBox();
+        const dialogBounds = await dialog.getBoundingBox('dialog');
 
         // Resize the dialog.
         await test.step('dragging handle 10px to the left and 20px to the top', async () => {
           await dialog.resizeTopLeft({x: -10, y: -20});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x - 10,
             y: dialogBounds.y - 20,
             height: dialogBounds.height + 20,
@@ -2584,7 +2717,7 @@ test.describe('Workbench Dialog', () => {
 
         await test.step('dragging handle 10px to the right and 20px to the bottom', async () => {
           await dialog.resizeTopLeft({x: 10, y: 20});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2611,12 +2744,12 @@ test.describe('Workbench Dialog', () => {
           minHeight: '300px',
           maxHeight: '500px',
         });
-        const dialogBounds = await dialog.getDialogBoundingBox();
+        const dialogBounds = await dialog.getBoundingBox('dialog');
 
         // Resize the dialog.
         await test.step('dragging handle past max-size', async () => {
           await dialog.resizeTopLeft({x: -200, y: -200}, {mouseup: false});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x - 100,
             y: dialogBounds.y - 100,
             height: dialogBounds.height + 100,
@@ -2628,7 +2761,7 @@ test.describe('Workbench Dialog', () => {
           const mouse = appPO.page.mouse;
           await mouse.move(dialogBounds.left, dialogBounds.top, {steps: 10});
           await mouse.up();
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2638,7 +2771,7 @@ test.describe('Workbench Dialog', () => {
 
         await test.step('dragging handle past min-size', async () => {
           await dialog.resizeTopLeft({x: 200, y: 200}, {mouseup: false});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x + 100,
             y: dialogBounds.y + 100,
             height: dialogBounds.height - 100,
@@ -2650,7 +2783,7 @@ test.describe('Workbench Dialog', () => {
           const mouse = appPO.page.mouse;
           await mouse.move(dialogBounds.left, dialogBounds.top, {steps: 10});
           await mouse.up();
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2673,12 +2806,12 @@ test.describe('Workbench Dialog', () => {
         const dialogPage = new DialogPagePO(dialog);
 
         await dialogPage.enterDialogSize({height: '500px', width: '500px'});
-        const dialogBounds = await dialog.getDialogBoundingBox();
+        const dialogBounds = await dialog.getBoundingBox('dialog');
 
         // Resize the dialog.
         await test.step('dragging handle 10px to the right and 20px to the top', async () => {
           await dialog.resizeTopRight({x: 10, y: -20});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y - 20,
             height: dialogBounds.height + 20,
@@ -2688,7 +2821,7 @@ test.describe('Workbench Dialog', () => {
 
         await test.step('dragging handle 10px to the left and 20px to the bottom', async () => {
           await dialog.resizeTopRight({x: -10, y: 20});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2715,12 +2848,12 @@ test.describe('Workbench Dialog', () => {
           minHeight: '300px',
           maxHeight: '500px',
         });
-        const dialogBounds = await dialog.getDialogBoundingBox();
+        const dialogBounds = await dialog.getBoundingBox('dialog');
 
         // Resize the dialog.
         await test.step('dragging handle past max-size', async () => {
           await dialog.resizeTopRight({x: 200, y: -200}, {mouseup: false});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y - 100,
             height: dialogBounds.height + 100,
@@ -2732,7 +2865,7 @@ test.describe('Workbench Dialog', () => {
           const mouse = appPO.page.mouse;
           await mouse.move(dialogBounds.right, dialogBounds.top, {steps: 10});
           await mouse.up();
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2742,7 +2875,7 @@ test.describe('Workbench Dialog', () => {
 
         await test.step('dragging handle past min-size', async () => {
           await dialog.resizeTopRight({x: -200, y: 200}, {mouseup: false});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y + 100,
             height: dialogBounds.height - 100,
@@ -2754,7 +2887,7 @@ test.describe('Workbench Dialog', () => {
           const mouse = appPO.page.mouse;
           await mouse.move(dialogBounds.right, dialogBounds.top, {steps: 10});
           await mouse.up();
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2777,12 +2910,12 @@ test.describe('Workbench Dialog', () => {
         const dialogPage = new DialogPagePO(dialog);
 
         await dialogPage.enterDialogSize({height: '500px', width: '500px'});
-        const dialogBounds = await dialog.getDialogBoundingBox();
+        const dialogBounds = await dialog.getBoundingBox('dialog');
 
         // Resize the dialog.
         await test.step('dragging handle 10px to the right and 20px to the bottom', async () => {
           await dialog.resizeBottomRight({x: 10, y: 20});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height + 20,
@@ -2792,7 +2925,7 @@ test.describe('Workbench Dialog', () => {
 
         await test.step('dragging handle 10px to the left and 20px to the top', async () => {
           await dialog.resizeBottomRight({x: -10, y: -20});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2819,12 +2952,12 @@ test.describe('Workbench Dialog', () => {
           minHeight: '300px',
           maxHeight: '500px',
         });
-        const dialogBounds = await dialog.getDialogBoundingBox();
+        const dialogBounds = await dialog.getBoundingBox('dialog');
 
         // Resize the dialog.
         await test.step('dragging handle past max-size', async () => {
           await dialog.resizeBottomRight({x: 200, y: 200}, {mouseup: false});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height + 100,
@@ -2836,7 +2969,7 @@ test.describe('Workbench Dialog', () => {
           const mouse = appPO.page.mouse;
           await mouse.move(dialogBounds.right, dialogBounds.bottom, {steps: 10});
           await mouse.up();
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2846,7 +2979,7 @@ test.describe('Workbench Dialog', () => {
 
         await test.step('dragging handle past min-size', async () => {
           await dialog.resizeBottomRight({x: -200, y: -200}, {mouseup: false});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height - 100,
@@ -2858,7 +2991,7 @@ test.describe('Workbench Dialog', () => {
           const mouse = appPO.page.mouse;
           await mouse.move(dialogBounds.right, dialogBounds.bottom, {steps: 10});
           await mouse.up();
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2881,12 +3014,12 @@ test.describe('Workbench Dialog', () => {
         const dialogPage = new DialogPagePO(dialog);
 
         await dialogPage.enterDialogSize({height: '500px', width: '500px'});
-        const dialogBounds = await dialog.getDialogBoundingBox();
+        const dialogBounds = await dialog.getBoundingBox('dialog');
 
         // Resize the dialog.
         await test.step('dragging handle 10px to the left and 20px to the bottom', async () => {
           await dialog.resizeBottomLeft({x: -10, y: 20});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x - 10,
             y: dialogBounds.y,
             height: dialogBounds.height + 20,
@@ -2896,7 +3029,7 @@ test.describe('Workbench Dialog', () => {
 
         await test.step('dragging handle 10px to the right and 20px to the top', async () => {
           await dialog.resizeBottomLeft({x: 10, y: -20});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2923,12 +3056,12 @@ test.describe('Workbench Dialog', () => {
           minHeight: '300px',
           maxHeight: '500px',
         });
-        const dialogBounds = await dialog.getDialogBoundingBox();
+        const dialogBounds = await dialog.getBoundingBox('dialog');
 
         // Resize the dialog.
         await test.step('dragging handle past max-size', async () => {
           await dialog.resizeBottomLeft({x: -200, y: 200}, {mouseup: false});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x - 100,
             y: dialogBounds.y,
             height: dialogBounds.height + 100,
@@ -2940,7 +3073,7 @@ test.describe('Workbench Dialog', () => {
           const mouse = appPO.page.mouse;
           await mouse.move(dialogBounds.left, dialogBounds.bottom, {steps: 10});
           await mouse.up();
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -2950,7 +3083,7 @@ test.describe('Workbench Dialog', () => {
 
         await test.step('dragging handle past min-size', async () => {
           await dialog.resizeBottomLeft({x: 200, y: -200}, {mouseup: false});
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x + 100,
             y: dialogBounds.y,
             height: dialogBounds.height - 100,
@@ -2962,7 +3095,7 @@ test.describe('Workbench Dialog', () => {
           const mouse = appPO.page.mouse;
           await mouse.move(dialogBounds.left, dialogBounds.bottom, {steps: 10});
           await mouse.up();
-          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          await expect.poll(() => dialog.getBoundingBox('dialog')).toEqual(expect.objectContaining({
             x: dialogBounds.x,
             y: dialogBounds.y,
             height: dialogBounds.height,
@@ -3026,7 +3159,7 @@ test.describe('Workbench Dialog', () => {
 
       // Expect glass pane.
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
-        await dialogOpenerPage.part.getBoundingBox('content'),
+        await dialogOpenerPage.part.getBoundingBox('slot'),
       ]));
     });
 
@@ -3062,7 +3195,7 @@ test.describe('Workbench Dialog', () => {
 
       // Expect glass panes.
       await expect.poll(() => dialog1.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerViewPage.view.getBoundingBox()]));
-      await expect.poll(() => dialog2.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialog1.getDialogBoundingBox()]));
+      await expect.poll(() => dialog2.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialog1.getBoundingBox('dialog')]));
       await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
       await expect.poll(() => appPO.isViewBlocked(dialogOpenerViewPage.view.getViewId())).toBe(true);
       await expect.poll(() => appPO.isDialogBlocked(dialog1.getDialogId())).toBe(true);
@@ -3105,7 +3238,7 @@ test.describe('Workbench Dialog', () => {
       await expect(focusTestPage.middleField).toBeFocused();
 
       // Expect glass panes.
-      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('content')]));
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('slot')]));
       await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
       await expect.poll(() => appPO.isViewBlocked(popupOpenerViewPage.view.getViewId())).toBe(false);
       await expect.poll(() => appPO.isPopupBlocked(popup.getPopupId())).toBe(true);

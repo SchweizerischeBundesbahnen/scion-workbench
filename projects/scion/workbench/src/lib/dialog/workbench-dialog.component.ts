@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -63,6 +63,7 @@ import {trackFocus} from '../focus/workbench-focus-tracker.service';
     '[style.--ɵdialog-min-width]': 'dialog.size.minWidth() ?? \'100px\'',
     '[style.--ɵdialog-width]': 'dialog.size.width()',
     '[style.--ɵdialog-max-width]': 'dialog.size.maxWidth()',
+    '[style.--ɵslot-anchor]': '`--${slotAnchorName}`',
     '[class]': 'dialog.cssClass()',
   },
 })
@@ -78,11 +79,12 @@ export class WorkbenchDialogComponent {
 
   protected readonly dialog = inject(ɵWorkbenchDialog);
 
-  protected headerHeight = signal<string | undefined>(undefined);
-  protected transformTranslateX = signal(0);
-  protected transformTranslateY = signal(0);
+  protected readonly headerHeight = signal<string | undefined>(undefined);
+  protected readonly transformTranslateX = signal(0);
+  protected readonly transformTranslateY = signal(0);
+  protected readonly slotAnchorName = this.dialog.id.replace('.', '_'); // Anchor must not contain a dot.
 
-  public readonly dialogContent = viewChild.required(SciViewportComponent, {read: ElementRef<HTMLElement>});
+  public readonly dialogSlotBounds = viewChild.required('slot_bounds', {read: ElementRef<HTMLElement>});
 
   constructor() {
     this.setDialogOffset();
@@ -229,7 +231,7 @@ function configureDialogGlassPane(): Provider[] {
     },
     {
       provide: GLASS_PANE_OPTIONS,
-      useFactory: () => ({attributes: {'data-dialogid': inject(ɵWorkbenchDialog).id}}) satisfies GlassPaneOptions,
+      useFactory: (): GlassPaneOptions => ({attributes: {'data-dialogid': inject(ɵWorkbenchDialog).id}}),
     },
   ];
 }

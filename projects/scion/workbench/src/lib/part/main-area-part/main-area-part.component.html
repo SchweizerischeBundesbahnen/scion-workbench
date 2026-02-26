@@ -9,7 +9,7 @@
              }
            }"
            [attr.data-grid]="'main-area'"
-           class="e2e-content"/>
+           class="e2e-slot"/>
 } @else {
   <div wbViewDropZone
        [wbViewDropZoneRegions]="canDrop() && {center: true, north: false, south: false, west: false, east: false}"
@@ -18,7 +18,7 @@
          'data-partid': part.id,
        }"
        (wbViewDropZoneDrop)="onDesktopViewDrop($event)"
-       class="desktop e2e-part-content e2e-content">
+       class="desktop e2e-part-slot e2e-slot">
     @if (part.navigation()) {
       <ng-container *wbPortalOutlet="part.slot.portal; destroyOnDetach: false"/>
     } @else {

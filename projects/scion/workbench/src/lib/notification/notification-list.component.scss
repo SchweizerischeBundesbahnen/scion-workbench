@@ -8,7 +8,7 @@
   pointer-events: none; // prevent interaction with notification list since overlaying the entire workbench
   margin: .5em;
 
-  > wb-notification {
+  > div.notification {
     pointer-events: auto; // enable interaction with notification
     width: var(--sci-workbench-notification-width);
     max-width: 100%; // fit notification to available space

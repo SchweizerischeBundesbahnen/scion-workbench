@@ -59,10 +59,19 @@
 
       > sci-viewport {
         flex: auto;
+        anchor-name: var(--ɵslot-anchor);
 
         &::part(content) {
           padding-inline: var(--ɵdialog-padding);
         }
+      }
+
+      > div.slot-bounds {
+        position: absolute;
+        position-anchor: var(--ɵslot-anchor);
+        inset: anchor(top) anchor(right) anchor(bottom) anchor(left); // align with viewport bounds
+        margin-inline: var(--ɵdialog-padding); // padding of viewport content
+        visibility: hidden;
       }
 
       > footer {

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
+import {EnvironmentProviders, inject, makeEnvironmentProviders, Provider} from '@angular/core';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {CapabilityInterceptor, HostManifestInterceptor, IntentInterceptor} from '@scion/microfrontend-platform';
 import {MicrofrontendTextNotificationCapabilityProvider} from './microfrontend-text-notification-capability-provider.interceptor';
@@ -16,6 +16,9 @@ import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializ
 import {MicrofrontendNotificationIntentHandler} from './microfrontend-notification-intent-handler.interceptor';
 import {provideMicrofrontendTextNotificationRoute} from './microfrontend-notification-routes';
 import {MicrofrontendNotificationCapabilityValidator} from './microfrontend-notification-capability-validator.interceptor';
+import {WORKBENCH_NOTIFICATION_CONTEXT} from '../../notification/workbench-notification-context.provider';
+import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchPopupService, ɵWorkbenchDialogService, ɵWorkbenchMessageBoxService, ɵWorkbenchPopupService} from '@scion/workbench-client';
+import {WorkbenchNotification} from '../../notification/workbench-notification.model';
 
 /**
  * Provides a set of DI providers enabling microfrontend notification support.
@@ -27,6 +30,7 @@ export function provideMicrofrontendNotification(): EnvironmentProviders {
     MicrofrontendNotificationCapabilityValidator,
     MicrofrontendTextNotificationCapabilityProvider,
     MicrofrontendNotificationIntentHandler,
+    provideWorkbenchNotificationContext(),
     provideMicrofrontendTextNotificationRoute(),
     provideMicrofrontendPlatformInitializer(onPreStartup, {phase: MicrofrontendPlatformStartupPhase.PreStartup}),
   ]);
@@ -38,5 +42,20 @@ export function provideMicrofrontendNotification(): EnvironmentProviders {
     Beans.register(CapabilityInterceptor, {useValue: inject(MicrofrontendNotificationCapabilityValidator), multi: true});
     // Register notification intent handler.
     Beans.register(IntentInterceptor, {useValue: inject(MicrofrontendNotificationIntentHandler), multi: true});
+  }
+
+  /**
+   * Provides beans of @scion/workbench-client available for DI if in the context of a workbench notification.
+   */
+  function provideWorkbenchNotificationContext(): Provider {
+    return {
+      provide: WORKBENCH_NOTIFICATION_CONTEXT,
+      useFactory: (): Provider[] => [
+        {provide: WorkbenchDialogService, useFactory: () => new ɵWorkbenchDialogService(inject(WorkbenchNotification).id)},
+        {provide: WorkbenchMessageBoxService, useFactory: () => new ɵWorkbenchMessageBoxService(inject(WorkbenchNotification).id)},
+        {provide: WorkbenchPopupService, useFactory: () => new ɵWorkbenchPopupService(inject(WorkbenchNotification).id)},
+      ],
+      multi: true,
+    };
   }
 }

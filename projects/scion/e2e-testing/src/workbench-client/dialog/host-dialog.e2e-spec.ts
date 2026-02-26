@@ -14,10 +14,11 @@ import {DialogOpenerPagePO} from '../page-object/dialog-opener-page.po';
 import {expectDialog} from '../../matcher/dialog-matcher';
 import {DialogPagePO} from '../../workbench/page-object/dialog-page.po';
 import {FocusTestPagePO} from '../../workbench/page-object/test-pages/focus-test-page.po';
-import {canMatchWorkbenchDialogCapability, canMatchWorkbenchPartCapability, canMatchWorkbenchPopupCapability} from '../../workbench/page-object/layout-page/register-route-page.po';
+import {canMatchWorkbenchDialogCapability, canMatchWorkbenchNotificationCapability, canMatchWorkbenchPartCapability, canMatchWorkbenchPopupCapability} from '../../workbench/page-object/layout-page/register-route-page.po';
 import {WorkbenchDialogCapability, WorkbenchPartCapability} from '../page-object/register-workbench-capability-page.po';
 import {MAIN_AREA} from '../../workbench.model';
 import {PopupOpenerPagePO} from '../page-object/popup-opener-page.po';
+import {NotificationOpenerPagePO} from '../page-object/notification-opener-page.po';
 
 test.describe('Workbench Host Dialog', () => {
 
@@ -109,7 +110,7 @@ test.describe('Workbench Host Dialog', () => {
     await expect(async () => {
       const dialogBorder = 2 * await dialog.getDialogBorderWidth();
       const pageSize = await dialogPage.getBoundingBox();
-      const dialogSize = await dialog.getDialogBoundingBox();
+      const dialogSize = await dialog.getBoundingBox('dialog');
       expect(pageSize.width).toBeLessThan(dialogSize.width - dialogBorder);
     }).toPass();
   });
@@ -169,7 +170,7 @@ test.describe('Workbench Host Dialog', () => {
     await expect(async () => {
       const dialogBorder = 2 * await dialog.getDialogBorderWidth();
       const pageSize = await dialogPage.getBoundingBox();
-      const dialogSize = await dialog.getDialogBoundingBox();
+      const dialogSize = await dialog.getBoundingBox('dialog');
       expect(pageSize.width).toEqual(dialogSize.width - dialogBorder);
     }).toPass();
   });
@@ -364,7 +365,7 @@ test.describe('Workbench Host Dialog', () => {
       const componentInstanceId = await dialogPage.getComponentInstanceId();
 
       // Expect glass pane of the dialog.
-      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.part.getBoundingBox('content')]));
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.part.getBoundingBox('slot')]));
 
       // Detach dialog.
       await appPO.activityItem({cssClass: 'testee'}).click();
@@ -437,7 +438,7 @@ test.describe('Workbench Host Dialog', () => {
 
       // Expect glass pane of the dialog.
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
-        await dialogOpenerPage.part.getBoundingBox('content'), // workbench part
+        await dialogOpenerPage.part.getBoundingBox('slot'), // workbench part
         await dialogOpenerPage.outlet.locator.boundingBox(), // router outlet
       ]));
 
@@ -509,7 +510,7 @@ test.describe('Workbench Host Dialog', () => {
       const componentInstanceId = await dialogPage.getComponentInstanceId();
 
       // Expect glass pane of the dialog.
-      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('content')]));
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('slot')]));
 
       // Detach dialog.
       await appPO.openNewViewTab();
@@ -575,7 +576,7 @@ test.describe('Workbench Host Dialog', () => {
       const componentInstanceId = await dialogPage.getComponentInstanceId();
 
       // Expect glass pane of the dialog.
-      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('content')]));
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('slot')]));
 
       // Detach dialog.
       await appPO.openNewViewTab();
@@ -639,7 +640,7 @@ test.describe('Workbench Host Dialog', () => {
       const componentInstanceId = await dialogPage.getComponentInstanceId();
 
       // Expect glass pane of the dialog.
-      await expect.poll(() => dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage2.dialog.getDialogBoundingBox()]));
+      await expect.poll(() => dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage2.dialog.getBoundingBox('dialog')]));
 
       // Detach dialog.
       await appPO.openNewViewTab();
@@ -699,7 +700,7 @@ test.describe('Workbench Host Dialog', () => {
       const componentInstanceId = await dialogPage.getComponentInstanceId();
 
       // Expect glass pane of the dialog.
-      await expect.poll(() => dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage2.dialog.getDialogBoundingBox()]));
+      await expect.poll(() => dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage2.dialog.getBoundingBox('dialog')]));
 
       // Detach dialog.
       await appPO.openNewViewTab();
@@ -711,6 +712,106 @@ test.describe('Workbench Host Dialog', () => {
 
       // Expect dialog not to be constructed anew.
       await expect.poll(() => dialogPage.getComponentInstanceId()).toEqual(componentInstanceId);
+    });
+  });
+
+  test.describe('Notification Context', () => {
+
+    test('should open host dialog from host notification', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('host', {
+        type: 'dialog',
+        qualifier: {component: 'testee', app: 'host'},
+        properties: {
+          path: '',
+          size: {height: '100px', width: '100px'},
+        },
+      });
+
+      // Register host dialog route.
+      await workbenchNavigator.registerRoute({
+        path: '', component: 'dialog-page', canMatch: [canMatchWorkbenchDialogCapability({component: 'testee', app: 'host'})],
+      });
+
+      await microfrontendNavigator.registerCapability('host', {
+        type: 'notification',
+        qualifier: {component: 'dialog-opener', app: 'host'},
+        properties: {
+          path: '',
+          size: {height: '500px', width: '300px'},
+        },
+      });
+
+      // Register host notification route.
+      await workbenchNavigator.registerRoute({
+        path: '', component: 'microfrontend-dialog-opener-page', canMatch: [canMatchWorkbenchNotificationCapability({component: 'dialog-opener', app: 'host'})],
+      });
+
+      // Open host notification.
+      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'host');
+      await notificationOpenerPage.show({component: 'dialog-opener', app: 'host'}, {cssClass: 'dialog-opener'});
+
+      const dialogOpenerPage = new DialogOpenerPagePO(appPO.notification({cssClass: 'dialog-opener'}), {host: true});
+
+      // Open host dialog from host notification.
+      await dialogOpenerPage.open({component: 'testee', app: 'host'}, {cssClass: 'testee'});
+
+      const dialogPage = new DialogPagePO(appPO.dialog({cssClass: 'testee'}));
+
+      // Expect dialog to display.
+      await expectDialog(dialogPage).toBeVisible();
+
+      // Expect glass pane of the dialog.
+      await expect.poll(() => dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.notification.getBoundingBox('notification-inset')]));
+    });
+
+    test('should open host dialog from non-host notification', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register intention.
+      await microfrontendNavigator.registerIntention('app1', {type: 'dialog', qualifier: {component: 'testee', app: 'host'}});
+
+      await microfrontendNavigator.registerCapability('host', {
+        type: 'dialog',
+        qualifier: {component: 'testee', app: 'host'},
+        private: false,
+        properties: {
+          path: '',
+          size: {height: '100px', width: '100px'},
+        },
+      });
+
+      // Register host dialog route.
+      await workbenchNavigator.registerRoute({
+        path: '', component: 'dialog-page', canMatch: [canMatchWorkbenchDialogCapability({component: 'testee', app: 'host'})],
+      });
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'notification',
+        qualifier: {component: 'dialog-opener', app: 'app1'},
+        properties: {
+          path: 'test-dialog-opener',
+          size: {height: '500px', width: '300px'},
+        },
+      });
+
+      // Open notification.
+      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+      await notificationOpenerPage.show({component: 'dialog-opener', app: 'app1'}, {cssClass: 'dialog-opener'});
+
+      const dialogOpenerPage = new DialogOpenerPagePO(appPO.notification({cssClass: 'dialog-opener'}));
+
+      // Open host dialog from non-host notification.
+      await dialogOpenerPage.open({component: 'testee', app: 'host'}, {cssClass: 'testee'});
+
+      const dialogPage = new DialogPagePO(appPO.dialog({cssClass: 'testee'}));
+
+      // Expect dialog to display.
+      await expectDialog(dialogPage).toBeVisible();
+
+      // Expect glass pane of the dialog.
+      await expect.poll(() => dialogPage.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.notification.getBoundingBox('notification-inset')]));
     });
   });
 });

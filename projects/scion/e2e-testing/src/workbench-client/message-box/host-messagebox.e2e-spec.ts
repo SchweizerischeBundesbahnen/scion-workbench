@@ -11,13 +11,14 @@
 import {test} from '../../fixtures';
 import {expect} from '@playwright/test';
 import {DialogOpenerPagePO} from '../page-object/dialog-opener-page.po';
-import {canMatchWorkbenchDialogCapability, canMatchWorkbenchMessageBoxCapability, canMatchWorkbenchPartCapability, canMatchWorkbenchPopupCapability} from '../../workbench/page-object/layout-page/register-route-page.po';
+import {canMatchWorkbenchDialogCapability, canMatchWorkbenchMessageBoxCapability, canMatchWorkbenchNotificationCapability, canMatchWorkbenchPartCapability, canMatchWorkbenchPopupCapability} from '../../workbench/page-object/layout-page/register-route-page.po';
 import {WorkbenchMessageBoxCapability, WorkbenchPartCapability} from '../page-object/register-workbench-capability-page.po';
 import {MAIN_AREA} from '../../workbench.model';
 import {PopupOpenerPagePO} from '../page-object/popup-opener-page.po';
 import {MessageBoxOpenerPagePO} from '../page-object/message-box-opener-page.po';
 import {expectMessageBox} from '../../matcher/message-box-matcher';
 import {MessageBoxPagePO} from '../../workbench/page-object/message-box-page.po';
+import {NotificationOpenerPagePO} from '../page-object/notification-opener-page.po';
 
 test.describe('Workbench Host Message Box', () => {
 
@@ -180,7 +181,7 @@ test.describe('Workbench Host Message Box', () => {
     const messageBoxPage = new MessageBoxPagePO(messageBox);
 
     // Expect the message box page to display with the defined size.
-    await expect.poll(() => messageBoxPage.messageBox.dialog.getDialogBoundingBox()).toMatchObject({
+    await expect.poll(() => messageBoxPage.messageBox.dialog.getBoundingBox('dialog')).toMatchObject({
       height: 500,
       width: 350,
     });
@@ -201,13 +202,13 @@ test.describe('Workbench Host Message Box', () => {
     });
 
     // Expect the message box to adapt to the content size.
-    await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+    await expect.poll(() => messageBox.getBoundingBox('slot')).toMatchObject({
       height: 800,
       width: 800,
     });
 
     // Expect the dialog to adapt to the content size.
-    await expect.poll(() => messageBoxPage.messageBox.dialog.getDialogBoundingBox()).toMatchObject({
+    await expect.poll(() => messageBoxPage.messageBox.dialog.getBoundingBox('dialog')).toMatchObject({
       height: 500,
       width: 350,
     });
@@ -244,24 +245,24 @@ test.describe('Workbench Host Message Box', () => {
     await expectMessageBox(messageBoxPage).toBeVisible();
 
     // Capture current size.
-    const dialogBounds = await messageBox.dialog.getDialogSlotBoundingBox();
-    const messageBoxPageBounds = await messageBox.getBoundingBox();
-    const verticalPadding = dialogBounds.height - messageBoxPageBounds.height;
-    const horizontalPadding = dialogBounds.width - messageBoxPageBounds.width;
+    const dialogSlotBounds = await messageBox.dialog.getBoundingBox('slot');
+    const messageBoxSlotBounds = await messageBox.getBoundingBox('slot');
+    const verticalSlotPadding = dialogSlotBounds.height - messageBoxSlotBounds.height;
+    const horizontalSlotPadding = dialogSlotBounds.width - messageBoxSlotBounds.width;
 
     // Change the size of the content.
     await messageBoxPage.enterContentSize({width: '800px', height: '800px'});
 
     // Expect the message box to adapt to the content size.
-    await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+    await expect.poll(() => messageBox.getBoundingBox('slot')).toMatchObject({
       height: 800,
       width: 800,
     });
 
     // Expect the dialog to adapt to the content size.
-    await expect.poll(() => messageBox.dialog.getDialogSlotBoundingBox()).toMatchObject({
-      height: 800 + verticalPadding,
-      width: 800 + horizontalPadding,
+    await expect.poll(() => messageBox.dialog.getBoundingBox('slot')).toMatchObject({
+      height: 800 + verticalSlotPadding,
+      width: 800 + horizontalSlotPadding,
     });
 
     // Expect content not to overflow.
@@ -275,15 +276,15 @@ test.describe('Workbench Host Message Box', () => {
     });
 
     // Expect the message box to adapt to the content size.
-    await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+    await expect.poll(() => messageBox.getBoundingBox('slot')).toMatchObject({
       height: 400,
       width: 400,
     });
 
     // Expect the dialog to adapt to the content size.
-    await expect.poll(() => messageBox.dialog.getDialogSlotBoundingBox()).toMatchObject({
-      height: 400 + verticalPadding,
-      width: 400 + horizontalPadding,
+    await expect.poll(() => messageBox.dialog.getBoundingBox('slot')).toMatchObject({
+      height: 400 + verticalSlotPadding,
+      width: 400 + horizontalSlotPadding,
     });
 
     // Expect content not to overflow.
@@ -297,15 +298,15 @@ test.describe('Workbench Host Message Box', () => {
     });
 
     // Expect the message box to adapt to the content size.
-    await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+    await expect.poll(() => messageBox.getBoundingBox('slot')).toMatchObject({
       height: 800,
       width: 800,
     });
 
     // Expect the dialog to adapt to the content size.
-    await expect.poll(() => messageBox.dialog.getDialogSlotBoundingBox()).toMatchObject({
-      height: 800 + verticalPadding,
-      width: 800 + horizontalPadding,
+    await expect.poll(() => messageBox.dialog.getBoundingBox('slot')).toMatchObject({
+      height: 800 + verticalSlotPadding,
+      width: 800 + horizontalSlotPadding,
     });
 
     // Expect content not to overflow.
@@ -442,7 +443,7 @@ test.describe('Workbench Host Message Box', () => {
       const componentInstanceId = await messageboxPage.getComponentInstanceId();
 
       // Expect glass pane of the messagebox.
-      await expect.poll(() => messagebox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await messageboxOpenerPage.part.getBoundingBox('content')]));
+      await expect.poll(() => messagebox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await messageboxOpenerPage.part.getBoundingBox('slot')]));
 
       // Detach messagebox.
       await appPO.activityItem({cssClass: 'testee'}).click();
@@ -515,7 +516,7 @@ test.describe('Workbench Host Message Box', () => {
 
       // Expect glass pane of the messagebox.
       await expect.poll(() => messagebox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
-        await messageboxOpenerPage.part.getBoundingBox('content'), // workbench part
+        await messageboxOpenerPage.part.getBoundingBox('slot'), // workbench part
         await messageboxOpenerPage.outlet.locator.boundingBox(), // router outlet
       ]));
 
@@ -587,7 +588,7 @@ test.describe('Workbench Host Message Box', () => {
       const componentInstanceId = await messageboxPage.getComponentInstanceId();
 
       // Expect glass pane of the messagebox.
-      await expect.poll(() => messagebox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('content')]));
+      await expect.poll(() => messagebox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('slot')]));
 
       // Detach messagebox.
       await appPO.openNewViewTab();
@@ -653,7 +654,7 @@ test.describe('Workbench Host Message Box', () => {
       const componentInstanceId = await messageboxPage.getComponentInstanceId();
 
       // Expect glass pane of the messagebox.
-      await expect.poll(() => messagebox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('content')]));
+      await expect.poll(() => messagebox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await popup.getBoundingBox('slot')]));
 
       // Detach messagebox.
       await appPO.openNewViewTab();
@@ -717,7 +718,7 @@ test.describe('Workbench Host Message Box', () => {
       const componentInstanceId = await messageboxPage.getComponentInstanceId();
 
       // Expect glass pane of the messagebox.
-      await expect.poll(() => messageboxPage.messageBox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await messageboxOpenerPage.dialog.getDialogBoundingBox()]));
+      await expect.poll(() => messageboxPage.messageBox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await messageboxOpenerPage.dialog.getBoundingBox('dialog')]));
 
       // Detach dialog.
       await appPO.openNewViewTab();
@@ -777,7 +778,7 @@ test.describe('Workbench Host Message Box', () => {
       const componentInstanceId = await messageboxPage.getComponentInstanceId();
 
       // Expect glass pane of the messagebox.
-      await expect.poll(() => messageboxPage.messageBox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await messageboxOpenerPage.dialog.getDialogBoundingBox()]));
+      await expect.poll(() => messageboxPage.messageBox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await messageboxOpenerPage.dialog.getBoundingBox('dialog')]));
 
       // Detach dialog.
       await appPO.openNewViewTab();
@@ -789,6 +790,104 @@ test.describe('Workbench Host Message Box', () => {
 
       // Expect dialog not to be constructed anew.
       await expect.poll(() => messageboxPage.getComponentInstanceId()).toEqual(componentInstanceId);
+    });
+  });
+
+  test.describe('Notification Context', () => {
+
+    test('should open host messagebox from host notification', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('host', {
+        type: 'messagebox',
+        qualifier: {component: 'testee', app: 'host'},
+        properties: {
+          path: '',
+          size: {height: '100px', width: '100px'},
+        },
+      });
+
+      // Register host messagebox route.
+      await workbenchNavigator.registerRoute({
+        path: '', component: 'messagebox-page', canMatch: [canMatchWorkbenchMessageBoxCapability({component: 'testee', app: 'host'})],
+      });
+
+      await microfrontendNavigator.registerCapability('host', {
+        type: 'notification',
+        qualifier: {component: 'messagebox-opener', app: 'host'},
+        properties: {
+          path: '',
+          size: {height: '500px', width: '300px'},
+        },
+      });
+
+      // Register host notification route.
+      await workbenchNavigator.registerRoute({
+        path: '', component: 'microfrontend-messagebox-opener-page', canMatch: [canMatchWorkbenchNotificationCapability({component: 'messagebox-opener', app: 'host'})],
+      });
+
+      // Open host notification.
+      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'host');
+      await notificationOpenerPage.show({component: 'messagebox-opener', app: 'host'}, {cssClass: 'messagebox-opener'});
+
+      const messageboxOpenerPage = new MessageBoxOpenerPagePO(appPO.notification({cssClass: 'messagebox-opener'}), {host: true});
+
+      // Open host messagebox from host notification.
+      await messageboxOpenerPage.open({component: 'testee', app: 'host'}, {cssClass: 'testee'});
+
+      const messageboxPage = new MessageBoxPagePO(appPO.messagebox({cssClass: 'testee'}));
+
+      // Expect messagebox to display.
+      await expectMessageBox(messageboxPage).toBeVisible();
+      // Expect glass pane of the messagebox.
+      await expect.poll(() => messageboxPage.messageBox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await messageboxOpenerPage.notification.getBoundingBox('notification-inset')]));
+    });
+
+    test('should open host messagebox from non-host notification', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register intention.
+      await microfrontendNavigator.registerIntention('app1', {type: 'messagebox', qualifier: {component: 'testee', app: 'host'}});
+
+      await microfrontendNavigator.registerCapability('host', {
+        type: 'messagebox',
+        qualifier: {component: 'testee', app: 'host'},
+        private: false,
+        properties: {
+          path: '',
+          size: {height: '500px', width: '500px'},
+        },
+      });
+
+      // Register host messagebox route.
+      await workbenchNavigator.registerRoute({
+        path: '', component: 'messagebox-page', canMatch: [canMatchWorkbenchMessageBoxCapability({component: 'testee', app: 'host'})],
+      });
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'notification',
+        qualifier: {component: 'messagebox-opener', app: 'app1'},
+        properties: {
+          path: 'test-message-box-opener',
+          size: {height: '500px', width: '300px'},
+        },
+      });
+
+      // Open non-host notification.
+      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+      await notificationOpenerPage.show({component: 'messagebox-opener', app: 'app1'}, {cssClass: 'messagebox-opener'});
+
+      const messageboxOpenerPage = new MessageBoxOpenerPagePO(appPO.notification({cssClass: 'messagebox-opener'}));
+
+      // Open host messagebox from non-host notification.
+      await messageboxOpenerPage.open({component: 'testee', app: 'host'}, {cssClass: 'testee'});
+
+      const messageboxPage = new MessageBoxPagePO(appPO.messagebox({cssClass: 'testee'}));
+
+      // Expect messagebox to display.
+      await expectMessageBox(messageboxPage).toBeVisible();
+      // Expect glass pane of the messagebox.
+      await expect.poll(() => messageboxPage.messageBox.dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await messageboxOpenerPage.notification.getBoundingBox('notification-inset')]));
     });
   });
 });

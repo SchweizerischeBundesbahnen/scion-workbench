@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,7 @@
 
 import {Component, ElementRef, inject, Type, viewChild} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {DialogId, PartId, PopupId, PopupOrigin, PopupService, ViewId, WorkbenchPopupService} from '@scion/workbench';
+import {DialogId, PartId, PopupId, NotificationId, PopupOrigin, PopupService, ViewId, WorkbenchPopupService} from '@scion/workbench';
 import PopupPageComponent from '../popup-page/popup-page.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import {map, startWith, switchMap} from 'rxjs/operators';
@@ -67,7 +67,7 @@ export default class PopupOpenerPageComponent {
       align: this._formBuilder.control<'east' | 'west' | 'north' | 'south' | ''>(''),
       inputs: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
       inputLegacy: this._formBuilder.control(''),
-      context: this._formBuilder.control<ViewId | PartId | DialogId | PopupId | '<null>' | ''>(''),
+      context: this._formBuilder.control<ViewId | PartId | DialogId | PopupId | NotificationId | '<null>' | ''>(''),
       cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
       closeStrategy: this._formBuilder.group({
         onFocusLost: this._formBuilder.control(true),

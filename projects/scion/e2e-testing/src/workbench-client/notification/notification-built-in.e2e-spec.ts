@@ -300,6 +300,7 @@ test.describe('Workbench Notification', () => {
 
     // Close the notification.
     await notification.close();
+    await expectNotification(notificationPage).not.toBeAttached();
 
     // Display notification with multiple lines.
     await notificationOpenerPage.show('Multiple Lines '.repeat(100), {cssClass: 'testee'});
@@ -328,6 +329,7 @@ test.describe('Workbench Notification', () => {
 
     // Close the notification.
     await notification.close();
+    await expectNotification(notificationPage).not.toBeAttached();
 
     // Display notification with multiple lines.
     await notificationOpenerPage.show('MultipleLines'.repeat(100), {cssClass: 'testee'});
@@ -356,6 +358,7 @@ test.describe('Workbench Notification', () => {
 
     // Close the notification.
     await notification.close();
+    await expectNotification(notificationPage).not.toBeAttached();
 
     // Display notification with multiple lines.
     await notificationOpenerPage.show(null, {title: 'Multiple Lines '.repeat(100), cssClass: 'testee'});
@@ -384,6 +387,7 @@ test.describe('Workbench Notification', () => {
 
     // Close the notification.
     await notification.close();
+    await expectNotification(notificationPage).not.toBeAttached();
 
     // Display notification with multiple lines.
     await notificationOpenerPage.show(null, {title: 'MultipleLines'.repeat(100), cssClass: 'testee'});

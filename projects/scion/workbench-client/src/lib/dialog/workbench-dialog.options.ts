@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
+import {DialogId, NotificationId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 
 /**
  * Controls the appearance and behavior of a dialog.
@@ -40,7 +40,7 @@ export interface WorkbenchDialogOptions {
    *
    * Set to `null` to open the dialog outside a context.
    */
-  context?: ViewId | PartId | DialogId | PopupId | Context | null;
+  context?: ViewId | PartId | DialogId | PopupId | NotificationId | Context | null;
   /**
    * Controls whether to animate the opening of the dialog. Defaults is `false`.
    */

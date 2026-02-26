@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,7 @@
 
 import {Component, inject, Type} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {DialogId, PartId, PopupId, Translatable, ViewId, WorkbenchMessageBoxOptions, WorkbenchMessageBoxService} from '@scion/workbench';
+import {DialogId, PartId, PopupId, Translatable, ViewId, NotificationId, WorkbenchMessageBoxOptions, WorkbenchMessageBoxService} from '@scion/workbench';
 import {MultiValueInputComponent, parseTypedString, prune, stringifyError} from 'workbench-testing-app-common';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
@@ -45,7 +45,7 @@ export default class MessageBoxOpenerPageComponent {
       actions: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
       severity: this._formBuilder.control<'info' | 'warn' | 'error' | ''>(''),
       modality: this._formBuilder.control<'' | 'none' | 'context' | 'application' | 'view'>(''),
-      context: this._formBuilder.control<ViewId | PartId | DialogId | PopupId | '<null>' | ''>(''),
+      context: this._formBuilder.control<ViewId | PartId | DialogId | PopupId | NotificationId | '<null>' | ''>(''),
       contentSelectable: this._formBuilder.control(false),
       inputs: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
       cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),

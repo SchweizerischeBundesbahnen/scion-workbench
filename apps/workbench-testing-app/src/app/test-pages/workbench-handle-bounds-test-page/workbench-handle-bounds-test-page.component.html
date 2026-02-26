@@ -1,1 +1,25 @@
 <sci-key-value [object]="bounds()" class="e2e-bounds"/>
+
+<sci-form-field label="Content Height">
+  <input [(ngModel)]="contentSize.height" class="e2e-height">
+</sci-form-field>
+
+<sci-form-field label="Content Width">
+  <input [(ngModel)]="contentSize.width" class="e2e-width">
+</sci-form-field>
+
+@if (dialog; as dialog) {
+  <sci-form-field label="Dialog Height">
+    <input [ngModel]="dialog.size.height()" (ngModelChange)="dialog.size.height = $event || undefined" class="e2e-dialog-height">
+  </sci-form-field>
+
+  <sci-form-field label="Dialog Width">
+    <input [ngModel]="dialog.size.width()" (ngModelChange)="dialog.size.width = $event || undefined" class="e2e-dialog-width">
+  </sci-form-field>
+}
+
+@if (notification; as notification) {
+  <sci-form-field label="Notification Height">
+    <input [ngModel]="notification.size.height()" (ngModelChange)="notification.size.height = $event || undefined" class="e2e-notification-height">
+  </sci-form-field>
+}

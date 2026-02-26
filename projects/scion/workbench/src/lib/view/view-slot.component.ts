@@ -139,7 +139,7 @@ function configureViewGlassPane(): Provider[] {
     },
     {
       provide: GLASS_PANE_OPTIONS,
-      useFactory: () => ({attributes: {'data-viewid': inject(WorkbenchView).id}}) satisfies GlassPaneOptions,
+      useFactory: (): GlassPaneOptions => ({attributes: {'data-viewid': inject(WorkbenchView).id}}),
     },
   ];
 }

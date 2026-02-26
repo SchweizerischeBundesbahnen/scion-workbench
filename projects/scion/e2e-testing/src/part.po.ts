@@ -116,10 +116,14 @@ export class PartPO {
   }
 
   /**
-   * Gets the bounding box of this part (inclusive partbar) or its content (exclusive partbar). Defaults to the bounding box of the part.
+   * Gets the bounding box of the part or a specific area in the part. Defaults to the bounding box of the part.
+   *
+   * Options:
+   * - `part`: part bounds, including part bar.
+   * - `slot`: bounds for slotted content; may differ from the actual content size if content overflows or does not fill the slot.
    */
-  public async getBoundingBox(selector: 'part' | 'content' = 'part'): Promise<DomRect> {
-    return fromRect(await this.locator.locator(selector === 'part' ? ':scope' : ':scope > .e2e-content').boundingBox());
+  public async getBoundingBox(selector: 'part' | 'slot' = 'part'): Promise<DomRect> {
+    return fromRect(await this.locator.locator(selector === 'part' ? ':scope' : ':scope > .e2e-slot').boundingBox());
   }
 
   /**

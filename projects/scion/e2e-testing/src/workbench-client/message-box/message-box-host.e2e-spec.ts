@@ -103,7 +103,7 @@ test.describe('Workbench Message Box Host', () => {
     const messageBoxPage = new MessageBoxPagePO(messageBox);
 
     // Expect the message box page to display with the defined size.
-    await expect.poll(() => messageBoxPage.messageBox.dialog.getDialogBoundingBox()).toMatchObject({
+    await expect.poll(() => messageBoxPage.messageBox.dialog.getBoundingBox('dialog')).toMatchObject({
       height: 500,
       width: 350,
     });

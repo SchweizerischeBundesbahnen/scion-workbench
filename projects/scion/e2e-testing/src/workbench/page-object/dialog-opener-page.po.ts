@@ -21,11 +21,13 @@ import {WorkbenchViewPagePO} from './workbench-view-page.po';
 import {PartPO} from '../../part.po';
 import {WorkbenchDialogPagePO} from './workbench-dialog-page.po';
 import {WorkbenchPopupPagePO} from './workbench-popup-page.po';
+import {NotificationPO} from '../../notification.po';
+import {WorkbenchNotificationPagePO} from './workbench-notification-page.po';
 
 /**
  * Page object to interact with {@link DialogOpenerPageComponent}.
  */
-export class DialogOpenerPagePO implements WorkbenchViewPagePO, WorkbenchDialogPagePO, WorkbenchPopupPagePO {
+export class DialogOpenerPagePO implements WorkbenchViewPagePO, WorkbenchDialogPagePO, WorkbenchPopupPagePO, WorkbenchNotificationPagePO {
 
   public readonly locator: Locator;
   public readonly returnValue: Locator;
@@ -34,7 +36,7 @@ export class DialogOpenerPagePO implements WorkbenchViewPagePO, WorkbenchDialogP
 
   private readonly _appPO: AppPO;
 
-  constructor(private _locateBy: ViewPO | PartPO | PopupPO | DialogPO) {
+  constructor(private _locateBy: ViewPO | PartPO | PopupPO | DialogPO | NotificationPO) {
     this.locator = this._locateBy.locator.locator('app-dialog-opener-page');
     this.returnValue = this.locator.locator('output.e2e-return-value');
     this.error = this.locator.locator('output.e2e-dialog-error');
@@ -130,6 +132,15 @@ export class DialogOpenerPagePO implements WorkbenchViewPagePO, WorkbenchDialogP
     }
     else {
       throw Error('[PageObjectError] Test page not opened in a dialog.');
+    }
+  }
+
+  public get notification(): NotificationPO {
+    if (this._locateBy instanceof NotificationPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a notification.');
     }
   }
 }

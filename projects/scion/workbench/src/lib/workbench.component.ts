@@ -172,7 +172,7 @@ function configureWorkbenchGlassPane(): Provider[] {
     },
     {
       provide: GLASS_PANE_OPTIONS,
-      useValue: {cssClass: 'e2e-workbench'} satisfies GlassPaneOptions,
+      useFactory: (): GlassPaneOptions => ({cssClass: 'e2e-workbench'}),
     },
   ];
 }

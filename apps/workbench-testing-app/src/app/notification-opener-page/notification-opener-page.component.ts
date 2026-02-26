@@ -20,6 +20,9 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {LegacyNotificationPageComponent} from '../legacy-notification-page/legacy-notification-page.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import {firstValueFrom, timer} from 'rxjs';
+import DialogOpenerPageComponent from '../dialog-opener-page/dialog-opener-page.component';
+import PopupOpenerPageComponent from '../popup-opener-page/popup-opener-page.component';
+import WorkbenchHandleBoundsTestPageComponent from '../test-pages/workbench-handle-bounds-test-page/workbench-handle-bounds-test-page.component';
 
 @Component({
   selector: 'app-notification-opener-page',
@@ -115,8 +118,14 @@ export default class NotificationOpenerPageComponent {
         return NotificationPageComponent;
       case 'focus-test-page':
         return FocusTestPageComponent;
+      case 'dialog-opener-page':
+        return DialogOpenerPageComponent;
+      case 'popup-opener-page':
+        return PopupOpenerPageComponent;
       case 'legacy-notification-page':
         return LegacyNotificationPageComponent;
+      case 'workbench-handle-bounds-test-page':
+        return WorkbenchHandleBoundsTestPageComponent;
       default:
         throw Error(`[IllegalNotificationComponent] Notification component not supported: ${this.form.controls.component.value}`);
     }

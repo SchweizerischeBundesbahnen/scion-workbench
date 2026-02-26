@@ -13,11 +13,12 @@ import {test} from '../fixtures';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {expectPopup} from '../matcher/popup-matcher';
 import {PopupPagePO} from '../workbench/page-object/popup-page.po';
-import {canMatchWorkbenchDialogCapability, canMatchWorkbenchPartCapability, canMatchWorkbenchPopupCapability} from '../workbench/page-object/layout-page/register-route-page.po';
+import {canMatchWorkbenchDialogCapability, canMatchWorkbenchNotificationCapability, canMatchWorkbenchPartCapability, canMatchWorkbenchPopupCapability} from '../workbench/page-object/layout-page/register-route-page.po';
 import {WorkbenchPartCapability, WorkbenchPopupCapability} from './page-object/register-workbench-capability-page.po';
 import {MAIN_AREA} from '../workbench.model';
 import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
 import {SizeTestPagePO} from '../workbench/page-object/test-pages/size-test-page.po';
+import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
 
 test.describe('Workbench Host Popup', () => {
 
@@ -944,6 +945,110 @@ test.describe('Workbench Host Popup', () => {
 
       // Expect popup not to be constructed anew.
       await expect.poll(() => popupPage.getComponentInstanceId()).toEqual(componentInstanceId);
+    });
+  });
+
+  test.describe('Notification Context', () => {
+
+    test('should open host popup from host notification', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('host', {
+        type: 'popup',
+        qualifier: {component: 'testee', app: 'host'},
+        properties: {
+          path: '',
+          size: {height: '100px', width: '100px'},
+        },
+      });
+
+      // Register host popup route.
+      await workbenchNavigator.registerRoute({
+        path: '', component: 'popup-page', canMatch: [canMatchWorkbenchPopupCapability({component: 'testee', app: 'host'})],
+      });
+
+      await microfrontendNavigator.registerCapability('host', {
+        type: 'notification',
+        qualifier: {component: 'popup-opener', app: 'host'},
+        properties: {
+          path: '',
+          size: {height: '500px', width: '300px'},
+        },
+      });
+
+      // Register host notification route.
+      await workbenchNavigator.registerRoute({
+        path: '', component: 'microfrontend-popup-opener-page', canMatch: [canMatchWorkbenchNotificationCapability({component: 'popup-opener', app: 'host'})],
+      });
+
+      // Open host notification.
+      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'host');
+      await notificationOpenerPage.show({component: 'popup-opener', app: 'host'}, {cssClass: 'popup-opener'});
+
+      const popupOpenerPage = new PopupOpenerPagePO(appPO.notification({cssClass: 'popup-opener'}), {host: true});
+
+      // Open host popup from host notification.
+      await popupOpenerPage.open({component: 'testee', app: 'host'}, {
+        anchor: {top: 100, left: 100},
+        align: 'south',
+        cssClass: 'testee',
+      });
+
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+
+      // Expect popup to display.
+      await expectPopup(popupPage).toBeVisible();
+      await expectPopup(popupPage).toHavePosition('south', popupOpenerPage.notification.slot, {top: 100, left: 100});
+    });
+
+    test('should open host popup from non-host notification', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Register intention.
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'testee', app: 'host'}});
+
+      await microfrontendNavigator.registerCapability('host', {
+        type: 'popup',
+        qualifier: {component: 'testee', app: 'host'},
+        private: false,
+        properties: {
+          path: '',
+          size: {height: '100px', width: '100px'},
+        },
+      });
+
+      // Register host popup route.
+      await workbenchNavigator.registerRoute({
+        path: '', component: 'popup-page', canMatch: [canMatchWorkbenchPopupCapability({component: 'testee', app: 'host'})],
+      });
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'notification',
+        qualifier: {component: 'popup-opener', app: 'app1'},
+        properties: {
+          path: 'test-popup-opener',
+          size: {height: '500px', width: '300px'},
+        },
+      });
+
+      // Open non-host notification.
+      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+      await notificationOpenerPage.show({component: 'popup-opener', app: 'app1'}, {cssClass: 'popup-opener'});
+
+      const popupOpenerPage = new PopupOpenerPagePO(appPO.notification({cssClass: 'popup-opener'}));
+
+      // Open host popup from non-host notification.
+      await popupOpenerPage.open({component: 'testee', app: 'host'}, {
+        anchor: {top: 100, left: 100},
+        align: 'south',
+        cssClass: 'testee',
+      });
+
+      const popupPage = new PopupPagePO(appPO.popup({cssClass: 'testee'}));
+
+      // Expect popup to display.
+      await expectPopup(popupPage).toBeVisible();
+      await expectPopup(popupPage).toHavePosition('south', popupOpenerPage.notification.slot, {top: 100, left: 100});
     });
   });
 

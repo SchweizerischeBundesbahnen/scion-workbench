@@ -23,6 +23,7 @@ import {PopupPO} from '../../popup.po';
 import {MicrofrontendDialogPagePO, WorkbenchDialogPagePO} from '../../workbench/page-object/workbench-dialog-page.po';
 import {MicrofrontendPopupPagePO, WorkbenchPopupPagePO} from '../../workbench/page-object/workbench-popup-page.po';
 import {AppPO} from '../../app.po';
+import {NotificationPO} from '../../notification.po';
 
 /**
  * Page object to interact with {@link MessageBoxOpenerPageComponent}.
@@ -34,13 +35,14 @@ export class MessageBoxOpenerPagePO implements MicrofrontendViewPagePO, Microfro
   public readonly view: ViewPO;
   public readonly dialog: DialogPO;
   public readonly popup: PopupPO;
+  public readonly notification: NotificationPO;
   public readonly outlet: SciRouterOutletPO;
   public readonly closeAction: Locator;
   public readonly openButton: Locator;
 
   private readonly _appPO: AppPO;
 
-  constructor(locateBy: PartPO | ViewPO | DialogPO | PopupPO, options?: {host?: boolean}) {
+  constructor(locateBy: PartPO | ViewPO | DialogPO | PopupPO | NotificationPO, options?: {host?: boolean}) {
     this.outlet = new SciRouterOutletPO(locateBy.locator.page(), {name: locateBy.locateBy?.id, cssClass: locateBy.locateBy?.cssClass});
     this.locator = (options?.host ? locateBy.locator : this.outlet.frameLocator).locator('app-message-box-opener-page');
 
@@ -48,6 +50,7 @@ export class MessageBoxOpenerPagePO implements MicrofrontendViewPagePO, Microfro
     this.view = locateBy instanceof ViewPO ? locateBy : undefined!;
     this.dialog = locateBy instanceof DialogPO ? locateBy : undefined!;
     this.popup = locateBy instanceof PopupPO ? locateBy : undefined!;
+    this.notification = locateBy instanceof NotificationPO ? locateBy : undefined!;
 
     this.closeAction = this.locator.locator('output.e2e-close-action');
     this.openButton = this.locator.locator('button.e2e-open');

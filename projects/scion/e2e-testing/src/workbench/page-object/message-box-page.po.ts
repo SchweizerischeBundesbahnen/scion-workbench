@@ -44,5 +44,4 @@ export class MessageBoxPagePO implements WorkbenchMessageBoxPagePO {
       await accordion.collapse();
     }
   }
-
 }

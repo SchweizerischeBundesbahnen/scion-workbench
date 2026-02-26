@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,7 @@
 
 import {assertNotInReactiveContext, computed, Injectable, Signal} from '@angular/core';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog.model';
-import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
+import {DialogId, NotificationId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 import {WorkbenchElementRegistry} from '../registry/workbench-element-registry';
 
 /**
@@ -42,7 +42,7 @@ export class WorkbenchDialogRegistry extends WorkbenchElementRegistry<DialogId, 
    *
    * Method must not be called in a reactive context.
    */
-  public top(context?: ViewId | PartId | DialogId | PopupId): Signal<ɵWorkbenchDialog | null> {
+  public top(context?: ViewId | PartId | DialogId | PopupId | NotificationId): Signal<ɵWorkbenchDialog | null> {
     assertNotInReactiveContext(this.top, 'Call WorkbenchDialogRegistry.top() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
     return computed(() => {

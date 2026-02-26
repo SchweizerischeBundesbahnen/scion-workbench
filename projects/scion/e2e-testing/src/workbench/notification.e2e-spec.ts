@@ -15,6 +15,10 @@ import {TextNotificationPO} from '../text-notification.po';
 import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
 import {expectNotification} from '../matcher/notification-matcher';
 import {MAIN_AREA} from '../workbench.model';
+import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
+import {expectDialog} from '../matcher/dialog-matcher';
+import {DialogPagePO} from './page-object/dialog-page.po';
+import {WorkbenchHandleBoundsTestPagePO} from './page-object/test-pages/workbench-handle-bounds-test-page.po';
 
 test.describe('Workbench Notification', () => {
 
@@ -653,6 +657,37 @@ test.describe('Workbench Notification', () => {
     // Expect the notification not to display after 2.5s.
     await page.waitForTimeout(1000);
     expect(await notification.locator.isVisible()).toBe(false);
+  });
+
+  test('should not close notification after the auto-close, if blocked by dialog', async ({appPO, workbenchNavigator, page}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open notification.
+    const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPage.show('component:dialog-opener-page', {duration: 2000, cssClass: 'testee'});
+    const notification = appPO.notification({cssClass: 'testee'});
+    const dialogOpenerNotification = new DialogOpenerPagePO(notification);
+    await expectNotification(dialogOpenerNotification).toBeVisible();
+
+    // Open dialog from notification.
+    await dialogOpenerNotification.open('dialog-page', {cssClass: 'blockedby'});
+    const dialog = appPO.dialog({cssClass: 'blockedby'});
+    const dialogPage = new DialogPagePO(dialog);
+    await expectDialog(dialogPage).toBeVisible();
+
+    // Expect the notification to still display after 2.5s.
+    await page.waitForTimeout(2500);
+    expect(await notification.locator.isVisible()).toBe(true);
+
+    // Close dialog.
+    await dialog.close();
+
+    // Unfocus notification.
+    await notificationOpenerPage.view.tab.click();
+
+    // Expect the notification not to display after 2.5s.
+    await page.waitForTimeout(2500);
+    await expectNotification(dialogOpenerNotification).not.toBeAttached();
   });
 
   test('should not close notification on hover', async ({appPO, workbenchNavigator, page}) => {
@@ -1347,6 +1382,50 @@ test.describe('Workbench Notification', () => {
     await expect(appPO.notifications).toHaveCount(1);
 
     await expect(notificationPage.input).toHaveText('value, value, value, value, value');
+  });
+
+  test('should provide notification bounds', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open notification.
+    const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPage.show('component:workbench-handle-bounds-test-page', {cssClass: 'testee'});
+
+    const notification = appPO.notification({cssClass: 'testee'});
+    const testPage = new WorkbenchHandleBoundsTestPagePO(notification);
+
+    await expect(async () => {
+      const expectedBounds = await notification.getBoundingBox('slot');
+      const handleBounds = await testPage.getBounds();
+      expect(handleBounds.x).toEqual(expect.closeTo(expectedBounds.x, 0));
+      expect(handleBounds.y).toEqual(expect.closeTo(expectedBounds.y, 0));
+      expect(handleBounds.width).toEqual(expect.closeTo(expectedBounds.width, 0));
+      expect(handleBounds.height).toEqual(expect.closeTo(expectedBounds.height, 0));
+    }).toPass();
+  });
+
+  test('should provide notification bounds (content overflow)', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open notification.
+    const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPage.show('component:workbench-handle-bounds-test-page', {cssClass: 'testee'});
+
+    const notification = appPO.notification({cssClass: 'testee'});
+    const testPage = new WorkbenchHandleBoundsTestPagePO(notification);
+
+    // Overflow viewport.
+    await testPage.enterContentSize({height: '800px', width: '800px'});
+    await testPage.enterNotificationSize({height: '500px'});
+
+    await expect(async () => {
+      const expectedBounds = await notification.getBoundingBox('slot');
+      const handleBounds = await testPage.getBounds();
+      expect(handleBounds.x).toEqual(expect.closeTo(expectedBounds.x, 0));
+      expect(handleBounds.y).toEqual(expect.closeTo(expectedBounds.y, 0));
+      expect(handleBounds.width).toEqual(expect.closeTo(expectedBounds.width, 0));
+      expect(handleBounds.height).toEqual(expect.closeTo(expectedBounds.height, 0));
+    }).toPass();
   });
 
   test.describe('Notification Component', () => {

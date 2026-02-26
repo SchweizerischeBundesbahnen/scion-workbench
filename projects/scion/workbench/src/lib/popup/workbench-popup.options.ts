@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2025 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,7 +11,7 @@
 import {ElementRef, Injector, Provider} from '@angular/core';
 import {Observable} from 'rxjs';
 import {PopupOrigin} from './popup.origin';
-import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
+import {DialogId, NotificationId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 
 /**
  * Controls the appearance and behavior of a popup.
@@ -80,7 +80,7 @@ export interface WorkbenchPopupOptions {
    *
    * Set to `null` to open the popup outside a context.
    */
-  context?: ViewId | PartId | DialogId | PopupId | Context | null;
+  context?: ViewId | PartId | DialogId | PopupId | NotificationId | Context | null;
 
   /**
    * Specifies the injector for the instantiation of the popup, giving control over the objects available

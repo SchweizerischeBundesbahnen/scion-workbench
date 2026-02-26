@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,7 +19,7 @@ import {ɵWorkbenchPopupCommand} from './workbench-popup-command';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {WorkbenchPopupOptions} from './workbench-popup.options';
 import {PopupOrigin} from './popup.origin';
-import {computePopupId, DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
+import {computePopupId, DialogId, PartId, PopupId, ViewId, NotificationId} from '../workbench.identifiers';
 import {WorkbenchPopupService} from './workbench-popup.service';
 
 /**
@@ -28,7 +28,7 @@ import {WorkbenchPopupService} from './workbench-popup.service';
  */
 export class ɵWorkbenchPopupService implements WorkbenchPopupService {
 
-  constructor(private _context?: ViewId | PartId | DialogId | PopupId | undefined) {
+  constructor(private _context?: ViewId | PartId | DialogId | PopupId | NotificationId | undefined) {
   }
 
   /** @inheritDoc */

@@ -37,7 +37,7 @@ export abstract class WorkbenchFocusMonitor {
 export function trackFocus(target: HTMLElement, workbenchElement: WorkbenchElement | null): FocusTrackerRef {
   const focusMonitor = inject(ɵWorkbenchFocusMonitor);
 
-  const subscription = toObservable(focusMonitor.activeElement)
+  toObservable(focusMonitor.activeElement)
     .pipe(
       startWith(focusMonitor.activeElement()), // Immediately subscribe to `focusin` events, required when the DOM element is focused right after invocation.
       switchMap(activeWorkbenchElement => activeWorkbenchElement === workbenchElement ? EMPTY : merge(fromEvent<FocusEvent>(target, 'focusin', {once: true}), fromEvent(target, 'sci-microfrontend-focusin', {once: true}))),
@@ -50,7 +50,6 @@ export function trackFocus(target: HTMLElement, workbenchElement: WorkbenchEleme
 
   return {
     unsetActiveElement: () => focusMonitor.unsetActiveElement(workbenchElement),
-    destroy: () => subscription.unsubscribe(),
   };
 }
 
@@ -63,11 +62,6 @@ export interface FocusTrackerRef {
    * Unsets the active workbench element if the tracked element was the focus owner.
    */
   unsetActiveElement(): void;
-
-  /**
-   * Stops focus tracking, unsetting the active workbench element if it was the focus owner.
-   */
-  destroy(): void;
 }
 
 @Injectable({providedIn: 'root'})
