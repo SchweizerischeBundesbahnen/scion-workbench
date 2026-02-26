@@ -22,7 +22,7 @@ export class TextMessageBoxPO implements WorkbenchMessageBoxPagePO {
   public readonly text: Locator;
 
   constructor(public messageBox: MessageBoxPO) {
-    this.locator = this.messageBox.locator.locator('div.e2e-message');
+    this.locator = this.messageBox.locator.locator('div.e2e-slot');
     this.text = this.locator;
   }
 

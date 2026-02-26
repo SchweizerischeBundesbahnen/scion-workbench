@@ -9,7 +9,7 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {coerceArray, selectBy, DomRect, fromRect, hasCssClass} from './helper/testing.util';
+import {coerceArray, DomRect, fromRect, hasCssClass, selectBy} from './helper/testing.util';
 import {AppPO} from './app.po';
 import {DialogId} from '@scion/workbench';
 import {RequireOne} from './helper/utility-types';
@@ -25,6 +25,7 @@ export class DialogPO {
   public readonly title: Locator;
   public readonly closeButton: Locator;
   public readonly resizeHandles: Locator;
+  public readonly viewport: Locator;
   public readonly slot: Locator;
   public readonly footer: Locator;
   public readonly contentScrollbars: {vertical: Locator; horizontal: Locator};
@@ -38,12 +39,13 @@ export class DialogPO {
     this.header = this.dialog.locator('header.e2e-dialog-header');
     this.title = this.header.locator('div.e2e-title > span');
     this.closeButton = this.header.locator('button.e2e-close');
-    this.slot = this.locator.locator('sci-viewport.e2e-dialog-content');
+    this.viewport = this.locator.locator('sci-viewport.e2e-dialog-slot');
+    this.slot = this.locator.locator('div.e2e-dialog-slot-bounds');
     this.footer = this.dialog.locator('footer.e2e-dialog-footer');
     this.resizeHandles = this.dialog.locator('div.e2e-resize-handle');
     this.contentScrollbars = {
-      vertical: this.dialog.locator('sci-viewport.e2e-dialog-content sci-scrollbar.e2e-vertical'),
-      horizontal: this.dialog.locator('sci-viewport.e2e-dialog-content sci-scrollbar.e2e-horizontal'),
+      vertical: this.viewport.locator('sci-scrollbar.e2e-vertical'),
+      horizontal: this.viewport.locator('sci-scrollbar.e2e-horizontal'),
     };
   }
 
@@ -51,20 +53,46 @@ export class DialogPO {
     return (await this.locator.getAttribute('data-dialogid')) as DialogId;
   }
 
-  public async getDialogBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.dialog.boundingBox());
-  }
-
-  public async getDialogSlotBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.slot.boundingBox());
+  /**
+   * Gets the bounding box of the dialog or a specific area in the dialog. Defaults to the bounding box of the dialog.
+   *
+   * Options:
+   * - `dialog`: dialog bounds.
+   * - `slot`: bounds for slotted content; may differ from the actual content size if content overflows or does not fill the slot.
+   * - `header`: header bounds.
+   * - `footer`: footer bounds.
+   */
+  public async getBoundingBox(selector: 'dialog' | 'slot' | 'header' | 'footer' = 'dialog'): Promise<DomRect> {
+    switch (selector) {
+      case 'dialog': {
+        return fromRect(await this.dialog.boundingBox());
+      }
+      case 'slot': {
+        // Do not read bounds from 'div.e2e-dialog-slot-bounds' to test actual slot bounds.
+        const {paddingTop, paddingRight, paddingBottom, paddingLeft} = await this.viewport.locator('div.viewport-client[part="content"]').evaluate((slot: HTMLElement) => getComputedStyle(slot));
+        const viewportBounds = (await this.viewport.boundingBox())!;
+        return fromRect({
+          x: viewportBounds.x + parseFloat(paddingLeft),
+          y: viewportBounds.y + parseFloat(paddingTop),
+          width: viewportBounds.width - parseFloat(paddingLeft) - parseFloat(paddingRight),
+          height: viewportBounds.height - parseFloat(paddingTop) - parseFloat(paddingBottom),
+        });
+      }
+      case 'header': {
+        return fromRect(await this.header.boundingBox());
+      }
+      case 'footer': {
+        return fromRect(await this.footer.boundingBox());
+      }
+    }
   }
 
   public hasVerticalOverflow(): Promise<boolean> {
-    return hasCssClass(this.locator.locator('sci-viewport.e2e-dialog-content > sci-scrollbar.vertical'), 'overflow');
+    return hasCssClass(this.locator.locator('sci-viewport.e2e-dialog-slot > sci-scrollbar.vertical'), 'overflow');
   }
 
   public hasHorizontalOverflow(): Promise<boolean> {
-    return hasCssClass(this.locator.locator('sci-viewport.e2e-dialog-content > sci-scrollbar.horizontal'), 'overflow');
+    return hasCssClass(this.locator.locator('sci-viewport.e2e-dialog-slot > sci-scrollbar.horizontal'), 'overflow');
   }
 
   public getComputedStyle(): Promise<CSSStyleDeclaration> {
@@ -81,14 +109,6 @@ export class DialogPO {
     return boundingBoxes;
   }
 
-  public async getHeaderBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.header.boundingBox());
-  }
-
-  public async getFooterBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.footer.boundingBox());
-  }
-
   public async getDialogBorderWidth(): Promise<number> {
     return this.dialog.locator('div.e2e-dialog-box').evaluate((element: HTMLElement) => parseInt(getComputedStyle(element).borderWidth, 10));
   }
@@ -102,7 +122,7 @@ export class DialogPO {
   }
 
   public async moveDialog(distance: {x: number; y: number} | 'top-left-corner' | 'top-right-corner' | 'bottom-right-corner' | 'bottom-left-corner'): Promise<void> {
-    const dialogBoundingBox = await this.getDialogBoundingBox();
+    const dialogBoundingBox = await this.getBoundingBox('dialog');
     const viewportBoundingBox = new AppPO(this.locator.page()).viewportBoundingBox();
 
     switch (distance) {
@@ -135,7 +155,7 @@ export class DialogPO {
   }
 
   public async resizeTop(distance: number, options?: {mouseup?: boolean}): Promise<void> {
-    const dialogBounds = await this.getDialogBoundingBox();
+    const dialogBounds = await this.getBoundingBox('dialog');
 
     await this.resize(
       {x: dialogBounds.hcenter, y: dialogBounds.top},
@@ -145,7 +165,7 @@ export class DialogPO {
   }
 
   public async resizeBottom(distance: number, options?: {mouseup?: boolean}): Promise<void> {
-    const dialogBounds = await this.getDialogBoundingBox();
+    const dialogBounds = await this.getBoundingBox('dialog');
 
     await this.resize(
       {x: dialogBounds.hcenter, y: dialogBounds.bottom},
@@ -155,7 +175,7 @@ export class DialogPO {
   }
 
   public async resizeLeft(distance: number, options?: {mouseup?: boolean}): Promise<void> {
-    const dialogBounds = await this.getDialogBoundingBox();
+    const dialogBounds = await this.getBoundingBox('dialog');
 
     await this.resize(
       {x: dialogBounds.left, y: dialogBounds.vcenter},
@@ -165,7 +185,7 @@ export class DialogPO {
   }
 
   public async resizeRight(distance: number, options?: {mouseup?: boolean}): Promise<void> {
-    const dialogBounds = await this.getDialogBoundingBox();
+    const dialogBounds = await this.getBoundingBox('dialog');
 
     await this.resize(
       {x: dialogBounds.right, y: dialogBounds.vcenter},
@@ -175,7 +195,7 @@ export class DialogPO {
   }
 
   public async resizeTopLeft(distance: {x: number; y: number}, options?: {mouseup?: boolean}): Promise<void> {
-    const dialogBounds = await this.getDialogBoundingBox();
+    const dialogBounds = await this.getBoundingBox('dialog');
     await this.resize(
       {x: dialogBounds.left, y: dialogBounds.top},
       {x: dialogBounds.left + distance.x, y: dialogBounds.top + distance.y},
@@ -184,7 +204,7 @@ export class DialogPO {
   }
 
   public async resizeTopRight(distance: {x: number; y: number}, options?: {mouseup?: boolean}): Promise<void> {
-    const dialogBounds = await this.getDialogBoundingBox();
+    const dialogBounds = await this.getBoundingBox('dialog');
     await this.resize(
       {x: dialogBounds.right, y: dialogBounds.top},
       {x: dialogBounds.right + distance.x, y: dialogBounds.top + distance.y},
@@ -193,7 +213,7 @@ export class DialogPO {
   }
 
   public async resizeBottomLeft(distance: {x: number; y: number}, options?: {mouseup?: boolean}): Promise<void> {
-    const dialogBounds = await this.getDialogBoundingBox();
+    const dialogBounds = await this.getBoundingBox('dialog');
     await this.resize(
       {x: dialogBounds.left, y: dialogBounds.bottom},
       {x: dialogBounds.left + distance.x, y: dialogBounds.bottom + distance.y},
@@ -202,7 +222,7 @@ export class DialogPO {
   }
 
   public async resizeBottomRight(distance: {x: number; y: number}, options?: {mouseup?: boolean}): Promise<void> {
-    const dialogBounds = await this.getDialogBoundingBox();
+    const dialogBounds = await this.getBoundingBox('dialog');
     await this.resize(
       {x: dialogBounds.right, y: dialogBounds.bottom},
       {x: dialogBounds.right + distance.x, y: dialogBounds.bottom + distance.y},

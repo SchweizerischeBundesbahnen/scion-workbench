@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,7 +17,7 @@ import {catchError, firstValueFrom, throwError} from 'rxjs';
 import {eMESSAGE_BOX_MESSAGE_PARAM, ɵWorkbenchMessageBoxCommand} from './workbench-message-box-command';
 import {WorkbenchMessageBoxService} from './workbench-message-box.service';
 import {Translatable} from '../text/workbench-text-provider.model';
-import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
+import {DialogId, NotificationId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 
 /**
  * @ignore
@@ -25,7 +25,7 @@ import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
  */
 export class ɵWorkbenchMessageBoxService implements WorkbenchMessageBoxService {
 
-  constructor(private _context?: ViewId | PartId | DialogId | PopupId | undefined) {
+  constructor(private _context?: ViewId | PartId | DialogId | PopupId | NotificationId | undefined) {
   }
 
   /** @inheritDoc */

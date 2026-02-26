@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2025 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 
 import {Translatable} from '../text/workbench-text-provider.model';
-import {DialogId, PartId, PopupId, ViewId} from '../workbench.identifiers';
+import {DialogId, NotificationId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 
 /**
  * Command to open a message box.
@@ -24,7 +24,7 @@ export interface ɵWorkbenchMessageBoxCommand {
   modality?: 'none' | 'context' | 'application' | ViewModality;
   contentSelectable?: boolean;
   cssClass?: string | string[];
-  context?: ViewId | PartId | DialogId | PopupId | Context | null;
+  context?: ViewId | PartId | DialogId | PopupId | NotificationId | Context | null;
 }
 
 /**

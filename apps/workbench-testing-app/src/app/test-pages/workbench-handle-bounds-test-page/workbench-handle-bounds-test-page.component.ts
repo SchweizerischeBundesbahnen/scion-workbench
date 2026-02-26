@@ -8,9 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject, Signal} from '@angular/core';
-import {WorkbenchDialog, WorkbenchPart, WorkbenchPopup, WorkbenchView} from '@scion/workbench';
+import {Component, computed, inject, signal, Signal} from '@angular/core';
+import {WorkbenchDialog, WorkbenchNotification, WorkbenchPart, WorkbenchPopup, WorkbenchView} from '@scion/workbench';
 import {SciKeyValueComponent} from '@scion/components.internal/key-value';
+import {FormsModule} from '@angular/forms';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 
 @Component({
   selector: 'app-workbench-handle-bounds-test-page',
@@ -18,17 +20,30 @@ import {SciKeyValueComponent} from '@scion/components.internal/key-value';
   styleUrl: './workbench-handle-bounds-test-page.component.scss',
   imports: [
     SciKeyValueComponent,
+    FormsModule,
+    SciFormFieldComponent,
   ],
+  host: {
+    '[style.height]': 'contentSize.height()',
+    '[style.width]': 'contentSize.width()',
+  },
 })
 export default class WorkbenchHandleBoundsTestPageComponent {
 
   protected readonly bounds = computeHandleBounds();
+  protected readonly dialog = inject(WorkbenchDialog, {optional: true});
+  protected readonly notification = inject(WorkbenchNotification, {optional: true});
+
+  protected readonly contentSize = {
+    width: signal(''),
+    height: signal(''),
+  };
 }
 
 /**
  * Gets the bounds from the handle.
  */
 function computeHandleBounds(): Signal<Record<string, string> | undefined> {
-  const handle = inject(WorkbenchPart, {optional: true}) ?? inject(WorkbenchView, {optional: true}) ?? inject(WorkbenchDialog, {optional: true}) ?? inject(WorkbenchPopup, {optional: true});
+  const handle = inject(WorkbenchPart, {optional: true}) ?? inject(WorkbenchView, {optional: true}) ?? inject(WorkbenchDialog, {optional: true}) ?? inject(WorkbenchPopup, {optional: true}) ?? inject(WorkbenchNotification, {optional: true});
   return computed(() => handle?.bounds()?.toJSON() as Record<string, string> | undefined);
 }

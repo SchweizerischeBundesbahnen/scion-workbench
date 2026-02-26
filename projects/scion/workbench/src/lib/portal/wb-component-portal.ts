@@ -94,7 +94,7 @@ export class WbComponentPortal<T = unknown> {
     }
 
     this._viewContainerRef.set(viewContainerRef);
-    this._componentRef.update(componentRef => componentRef ?? createPortalComponent(this._componentType, {providers: this._options?.providers, injector: viewContainerRef.injector}));
+    this._componentRef.update(componentRef => componentRef ?? createPortalComponent(this._componentType, {providers: this._options?.providers, injector: this._options?.injector ?? viewContainerRef.injector}));
     this._logger.debug(() => 'Attaching portal', LoggerNames.LIFECYCLE, this._options?.debugName ?? this._componentType.name);
     this._componentRef()!.changeDetectorRef.reattach();
     this._viewContainerRef()!.insert(this._componentRef()!.hostView);
@@ -149,9 +149,14 @@ export class WbComponentPortal<T = unknown> {
  */
 export interface PortalOptions {
   /**
-   * Providers registered with the injector for the instantiation of the component.
+   * Specifies providers available for injection in the component.
    */
   providers?: Provider[];
+  /**
+   * Specifies the injector for the instantiation of the component, giving control over the objects available
+   * for injection in the component. Defaults to the element injector.
+   */
+  injector?: Injector;
   /**
    * Optional name used in portal lifecycle logs.
    */

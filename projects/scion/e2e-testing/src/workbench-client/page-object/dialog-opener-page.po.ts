@@ -23,17 +23,20 @@ import {DialogPO} from '../../dialog.po';
 import {MicrofrontendDialogPagePO} from '../../workbench/page-object/workbench-dialog-page.po';
 import {MicrofrontendPopupPagePO} from '../../workbench/page-object/workbench-popup-page.po';
 import {AppPO} from '../../app.po';
+import {MicrofrontendNotificationPagePO} from '../../workbench/page-object/workbench-notification-page.po';
+import {NotificationPO} from '../../notification.po';
 
 /**
  * Page object to interact with {@link DialogOpenerPageComponent}.
  */
-export class DialogOpenerPagePO implements MicrofrontendViewPagePO, MicrofrontendDialogPagePO, MicrofrontendPopupPagePO {
+export class DialogOpenerPagePO implements MicrofrontendViewPagePO, MicrofrontendDialogPagePO, MicrofrontendPopupPagePO, MicrofrontendNotificationPagePO {
 
   public readonly locator: Locator;
   public readonly view: ViewPO;
   public readonly part: PartPO;
   public readonly dialog: DialogPO;
   public readonly popup: PopupPO;
+  public readonly notification: NotificationPO;
   public readonly outlet: SciRouterOutletPO;
   public readonly returnValue: Locator;
   public readonly error: Locator;
@@ -41,7 +44,7 @@ export class DialogOpenerPagePO implements MicrofrontendViewPagePO, Microfronten
 
   private readonly _appPO: AppPO;
 
-  constructor(locateBy: PartPO | ViewPO | DialogPO | PopupPO, options?: {host?: boolean}) {
+  constructor(locateBy: PartPO | ViewPO | DialogPO | PopupPO | NotificationPO, options?: {host?: boolean}) {
     this.outlet = new SciRouterOutletPO(locateBy.locator.page(), {name: locateBy.locateBy?.id, cssClass: locateBy.locateBy?.cssClass});
     this.locator = (options?.host ? locateBy.locator : this.outlet.frameLocator).locator('app-dialog-opener-page');
 
@@ -49,6 +52,7 @@ export class DialogOpenerPagePO implements MicrofrontendViewPagePO, Microfronten
     this.view = locateBy instanceof ViewPO ? locateBy : undefined!;
     this.dialog = locateBy instanceof DialogPO ? locateBy : undefined!;
     this.popup = locateBy instanceof PopupPO ? locateBy : undefined!;
+    this.notification = locateBy instanceof NotificationPO ? locateBy : undefined!;
 
     this.returnValue = this.locator.locator('output.e2e-return-value');
     this.error = this.locator.locator('output.e2e-dialog-error');

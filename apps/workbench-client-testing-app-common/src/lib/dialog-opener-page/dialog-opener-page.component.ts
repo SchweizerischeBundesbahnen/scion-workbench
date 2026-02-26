@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,7 @@
 
 import {Component, inject} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {DialogId, PartId, PopupId, ViewId, WORKBENCH_ELEMENT, WorkbenchDialogOptions, WorkbenchDialogService, WorkbenchElement} from '@scion/workbench-client';
+import {DialogId, PartId, PopupId, ViewId, NotificationId, WORKBENCH_ELEMENT, WorkbenchDialogOptions, WorkbenchDialogService, WorkbenchElement} from '@scion/workbench-client';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
@@ -49,7 +49,7 @@ export class DialogOpenerPageComponent {
     options: this._formBuilder.group({
       params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
       modality: this._formBuilder.control<'' | 'none' | 'context' | 'application' | 'view'>(''),
-      context: this._formBuilder.control<ViewId | PartId | DialogId | PopupId | '<null>' | ''>(''),
+      context: this._formBuilder.control<ViewId | PartId | DialogId | PopupId | NotificationId | '<null>' | ''>(''),
       animate: this._formBuilder.control(undefined),
       cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
     }),

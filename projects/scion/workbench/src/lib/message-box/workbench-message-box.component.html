@@ -4,7 +4,7 @@
 </ng-template>
 
 @let message = this.message();
-<div class="message e2e-message" [class.text]="message | wbTypeof:'string'" sciDimension (sciDimensionChange)="onContentDimensionChange($event)">
+<div class="slot e2e-slot" [class.text]="message | wbTypeof:'string'" sciDimension (sciDimensionChange)="onContentDimensionChange($event)">
   @if (message | wbTypeof:'string') {
     {{($any(message) | wbText)()}}
   } @else {

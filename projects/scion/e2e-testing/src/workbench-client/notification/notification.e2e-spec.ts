@@ -755,8 +755,8 @@ test.describe('Workbench Notification Microfrontend', () => {
 
       // Capture current size.
       const notificationBounds = await notification.getBoundingBox();
-      const notificationPageBounds = await notification.getBoundingBox('content');
-      const padding = notificationBounds.height - notificationPageBounds.height;
+      const notificationSlotBounds = await notification.getBoundingBox('slot');
+      const padding = notificationBounds.height - notificationSlotBounds.height;
 
       // Change the size of the content.
       await notificationPage.reportContentSize(true);

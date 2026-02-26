@@ -18,12 +18,13 @@ import {WorkbenchPopupPagePO} from '../workbench-popup-page.po';
 import {PartPO} from '../../../part.po';
 import {SciKeyValuePO} from '../../../@scion/components.internal/key-value.po';
 import {DomRect, fromRect} from '../../../helper/testing.util';
+import {NotificationPO} from '../../../notification.po';
 
 export class WorkbenchHandleBoundsTestPagePO implements WorkbenchViewPagePO, WorkbenchDialogPagePO, WorkbenchPopupPagePO {
 
   public readonly locator: Locator;
 
-  constructor(private _locateBy: PartPO | ViewPO | DialogPO | PopupPO) {
+  constructor(private _locateBy: PartPO | ViewPO | DialogPO | PopupPO | NotificationPO) {
     this.locator = this._locateBy.locator.locator('app-workbench-handle-bounds-test-page');
   }
 
@@ -35,6 +36,20 @@ export class WorkbenchHandleBoundsTestPagePO implements WorkbenchViewPagePO, Wor
       width: +bounds['width']!,
       height: +bounds['height']!,
     });
+  }
+
+  public async enterContentSize(size: {width?: string; height?: string}): Promise<void> {
+    await this.locator.locator('input.e2e-width').fill(size.width ?? '');
+    await this.locator.locator('input.e2e-height').fill(size.height ?? '');
+  }
+
+  public async enterDialogSize(size: {width?: string; height?: string}): Promise<void> {
+    await this.locator.locator('input.e2e-dialog-width').fill(size.width ?? '');
+    await this.locator.locator('input.e2e-dialog-height').fill(size.height ?? '');
+  }
+
+  public async enterNotificationSize(size: {height?: string}): Promise<void> {
+    await this.locator.locator('input.e2e-notification-height').fill(size.height ?? '');
   }
 
   public get view(): ViewPO {

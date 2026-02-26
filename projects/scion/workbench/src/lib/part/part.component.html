@@ -11,7 +11,7 @@
        [wbViewDropZoneAttributes]="{'data-partid': part.id}"
        [wbViewDropZoneRegions]="canDrop() && {center: true, north: canSplit, south: canSplit, west: canSplit, east: canSplit}"
        (wbViewDropZoneDrop)="onViewDrop($event)"
-       class="content e2e-content e2e-view-content">
+       class="slot e2e-slot e2e-view-slot">
     <ng-container *wbPortalOutlet="part.activeView()?.slot!.portal; destroyOnDetach: false"/>
   </div>
 } @else {
@@ -19,7 +19,7 @@
        [wbViewDropZoneRegions]="canDrop() && {center: false, north: true, south: true, west: true, east: true}"
        [wbViewDropZoneAttributes]="{'data-partid': part.id}"
        (wbViewDropZoneDrop)="onViewDrop($event)"
-       class="content e2e-content e2e-part-content">
+       class="slot e2e-slot e2e-part-slot">
     <ng-container *wbPortalOutlet="part.slot.portal; destroyOnDetach: false"/>
   </div>
 }

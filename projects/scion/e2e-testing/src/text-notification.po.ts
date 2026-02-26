@@ -22,7 +22,7 @@ export class TextNotificationPO implements WorkbenchNotificationPagePO {
   public readonly text: Locator;
 
   constructor(public notification: NotificationPO) {
-    this.locator = this.notification.locator.locator('div.e2e-message');
+    this.locator = this.notification.locator.locator('div.e2e-slot');
     this.text = this.locator;
   }
 

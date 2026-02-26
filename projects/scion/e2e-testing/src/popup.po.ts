@@ -34,9 +34,13 @@ export class PopupPO {
   }
 
   /**
-   * Gets the bounding box of this popup (inclusive borders) or its content (exclusive borders). Defaults to the bounding box of the popup inclusive borders.
+   * Gets the bounding box of the popup or a specific area in the popup. Defaults to the bounding box of the popup.
+   *
+   * Options:
+   * - `part`: popup bounds.
+   * - `slot`: bounds for slotted content; may differ from the actual content size if content overflows or does not fill the slot.
    */
-  public async getBoundingBox(selector: 'popup' | 'content' = 'popup'): Promise<DomRect> {
+  public async getBoundingBox(selector: 'popup' | 'slot' = 'popup'): Promise<DomRect> {
     const locator = selector === 'popup' ? this.overlay : this.locator;
     return fromRect(await locator.boundingBox());
   }

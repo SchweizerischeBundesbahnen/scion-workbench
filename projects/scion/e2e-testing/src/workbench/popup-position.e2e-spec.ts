@@ -574,7 +574,7 @@ test.describe('Workbench Popup Position', () => {
       );
 
       const middlePart = appPO.part({partId: 'part.middle'});
-      const middlePartBounds = await middlePart.getBoundingBox('content');
+      const middlePartBounds = await middlePart.getBoundingBox('slot');
 
       await test.step('anchor relative to viewport with coordinate inside context bounds', async () => {
         const popupOpenerPage = new PopupOpenerPagePO(middlePart);

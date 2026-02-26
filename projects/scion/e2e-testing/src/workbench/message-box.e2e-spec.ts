@@ -385,7 +385,7 @@ test.describe('Workbench Message Box', () => {
       });
       const messageBox = appPO.messagebox({cssClass: 'testee'});
 
-      await expect.poll(() => messageBox.dialog.getDialogBoundingBox()).toMatchObject({
+      await expect.poll(() => messageBox.dialog.getBoundingBox('dialog')).toMatchObject({
         width: 400,
       });
     });
@@ -412,7 +412,7 @@ test.describe('Workbench Message Box', () => {
       const messageBoxPage = new TextMessageBoxPO(messageBox);
 
       // Expect message box to exceed maximal width.
-      await expect.poll(() => messageBox.dialog.getDialogBoundingBox()).toMatchObject({
+      await expect.poll(() => messageBox.dialog.getBoundingBox('dialog')).toMatchObject({
         width: 1007, // visual regression test
       });
       // Expect message to be aligned with message box bounds.
@@ -434,24 +434,24 @@ test.describe('Workbench Message Box', () => {
       await expectMessageBox(messageBoxPage).toBeVisible();
 
       // Capture current size.
-      const dialogBounds = await messageBox.dialog.getDialogSlotBoundingBox();
-      const messageBoxPageBounds = await messageBox.getBoundingBox();
-      const verticalPadding = dialogBounds.height - messageBoxPageBounds.height;
-      const horizontalPadding = dialogBounds.width - messageBoxPageBounds.width;
+      const dialogSlotBounds = await messageBox.dialog.getBoundingBox('slot');
+      const messageBoxSlotBounds = await messageBox.getBoundingBox('slot');
+      const verticalSlotPadding = dialogSlotBounds.height - messageBoxSlotBounds.height;
+      const horizontalSlotPadding = dialogSlotBounds.width - messageBoxSlotBounds.width;
 
       // Change the size of the content.
       await messageBoxPage.enterContentSize({width: '800px', height: '800px'});
 
       // Expect the message box to adapt to the content size.
-      await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+      await expect.poll(() => messageBox.getBoundingBox('slot')).toMatchObject({
         height: 800,
         width: 800,
       });
 
       // Expect the dialog to adapt to the content size.
-      await expect.poll(() => messageBox.dialog.getDialogSlotBoundingBox()).toMatchObject({
-        height: 800 + verticalPadding,
-        width: 800 + horizontalPadding,
+      await expect.poll(() => messageBox.dialog.getBoundingBox('slot')).toMatchObject({
+        height: 800 + verticalSlotPadding,
+        width: 800 + horizontalSlotPadding,
       });
 
       // Expect content not to overflow.
@@ -465,15 +465,15 @@ test.describe('Workbench Message Box', () => {
       });
 
       // Expect the message box to adapt to the content size.
-      await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+      await expect.poll(() => messageBox.getBoundingBox('slot')).toMatchObject({
         height: 400,
         width: 400,
       });
 
       // Expect the dialog to adapt to the content size.
-      await expect.poll(() => messageBox.dialog.getDialogSlotBoundingBox()).toMatchObject({
-        height: 400 + verticalPadding,
-        width: 400 + horizontalPadding,
+      await expect.poll(() => messageBox.dialog.getBoundingBox('slot')).toMatchObject({
+        height: 400 + verticalSlotPadding,
+        width: 400 + horizontalSlotPadding,
       });
 
       // Expect content not to overflow.
@@ -487,15 +487,15 @@ test.describe('Workbench Message Box', () => {
       });
 
       // Expect the message box to adapt to the content size.
-      await expect.poll(() => messageBox.getBoundingBox()).toMatchObject({
+      await expect.poll(() => messageBox.getBoundingBox('slot')).toMatchObject({
         height: 800,
         width: 800,
       });
 
       // Expect the dialog to adapt to the content size.
-      await expect.poll(() => messageBox.dialog.getDialogSlotBoundingBox()).toMatchObject({
-        height: 800 + verticalPadding,
-        width: 800 + horizontalPadding,
+      await expect.poll(() => messageBox.dialog.getBoundingBox('slot')).toMatchObject({
+        height: 800 + verticalSlotPadding,
+        width: 800 + horizontalSlotPadding,
       });
 
       // Expect content not to overflow.
@@ -515,7 +515,7 @@ test.describe('Workbench Message Box', () => {
 
       await expectMessageBox(textMessagePage).toBeVisible();
 
-      const singleLineBounds = await messageBox.getBoundingBox();
+      const singleLineBounds = await messageBox.getBoundingBox('slot');
 
       // Close the message box.
       await messageBox.clickActionButton('ok');
@@ -525,8 +525,8 @@ test.describe('Workbench Message Box', () => {
 
       // Expect the message box to break words.
       await expect.poll(() => messageBox.dialog.hasVerticalOverflow()).toBe(false);
-      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.width)).toEqual(400);
-      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
+      await expect.poll(() => messageBox.dialog.getBoundingBox('dialog').then(bounds => bounds.width)).toEqual(400);
+      await expect.poll(() => messageBox.dialog.getBoundingBox('dialog').then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
     });
 
     test('should wrap "unbreakable" text', async ({appPO, workbenchNavigator}) => {
@@ -541,7 +541,7 @@ test.describe('Workbench Message Box', () => {
 
       await expectMessageBox(textMessagePage).toBeVisible();
 
-      const singleLineBounds = await messageBox.getBoundingBox();
+      const singleLineBounds = await messageBox.getBoundingBox('slot');
 
       // Close the message box.
       await messageBox.clickActionButton('ok');
@@ -551,8 +551,8 @@ test.describe('Workbench Message Box', () => {
 
       // Expect the message box to break words.
       await expect.poll(() => messageBox.dialog.hasVerticalOverflow()).toBe(false);
-      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.width)).toEqual(400);
-      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
+      await expect.poll(() => messageBox.dialog.getBoundingBox('dialog').then(bounds => bounds.width)).toEqual(400);
+      await expect.poll(() => messageBox.dialog.getBoundingBox('dialog').then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
     });
 
     test('should wrap title', async ({appPO, workbenchNavigator}) => {
@@ -567,7 +567,7 @@ test.describe('Workbench Message Box', () => {
 
       await expectMessageBox(textMessagePage).toBeAttached();
 
-      const singleLineBounds = await messageBox.dialog.getDialogBoundingBox();
+      const singleLineBounds = await messageBox.dialog.getBoundingBox('dialog');
 
       // Close the message box.
       await messageBox.clickActionButton('ok');
@@ -577,8 +577,8 @@ test.describe('Workbench Message Box', () => {
 
       // Expect the message box to break words.
       await expect.poll(() => messageBox.dialog.hasVerticalOverflow()).toBe(false);
-      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.width)).toEqual(400);
-      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
+      await expect.poll(() => messageBox.dialog.getBoundingBox('dialog').then(bounds => bounds.width)).toEqual(400);
+      await expect.poll(() => messageBox.dialog.getBoundingBox('dialog').then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
     });
 
     test('should wrap "unbreakable" title', async ({appPO, workbenchNavigator}) => {
@@ -593,7 +593,7 @@ test.describe('Workbench Message Box', () => {
 
       await expectMessageBox(textMessagePage).toBeAttached();
 
-      const singleLineBounds = await messageBox.dialog.getDialogBoundingBox();
+      const singleLineBounds = await messageBox.dialog.getBoundingBox('dialog');
 
       // Close the message box.
       await messageBox.clickActionButton('ok');
@@ -603,8 +603,8 @@ test.describe('Workbench Message Box', () => {
 
       // Expect the message box to break words.
       await expect.poll(() => messageBox.dialog.hasVerticalOverflow()).toBe(false);
-      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.width)).toEqual(400);
-      await expect.poll(() => messageBox.dialog.getDialogBoundingBox().then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
+      await expect.poll(() => messageBox.dialog.getBoundingBox('dialog').then(bounds => bounds.width)).toEqual(400);
+      await expect.poll(() => messageBox.dialog.getBoundingBox('dialog').then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
     });
   });
 });

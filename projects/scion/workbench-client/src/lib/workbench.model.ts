@@ -12,11 +12,12 @@ import {WorkbenchPart} from './part/workbench-part.model';
 import {WorkbenchView} from './view/workbench-view.model';
 import {WorkbenchDialog} from './dialog/workbench-dialog.model';
 import {WorkbenchPopup} from './popup/workbench-popup.model';
+import {WorkbenchNotification} from './notification/workbench-notification.model';
 
 /**
  * Union of workbench elements.
  */
-export type WorkbenchElement = WorkbenchPart | WorkbenchView | WorkbenchDialog | WorkbenchPopup;
+export type WorkbenchElement = WorkbenchPart | WorkbenchView | WorkbenchDialog | WorkbenchPopup | WorkbenchNotification;
 
 /**
  * Symbol to inject the workbench element available in the current context.

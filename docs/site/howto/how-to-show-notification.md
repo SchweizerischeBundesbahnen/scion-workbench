@@ -130,6 +130,7 @@ export class ErrorNotificationComponent {
 The following CSS variables can be set to customize the default look of a notification.
 
 - `--sci-workbench-notification-width`
+- `--sci-workbench-notification-padding`
 - `--sci-workbench-notification-severity-indicator-size`
 
 [menu-how-to]: /docs/site/howto/how-to.md
