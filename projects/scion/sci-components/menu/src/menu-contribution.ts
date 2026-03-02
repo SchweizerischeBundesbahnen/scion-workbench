@@ -1,10 +1,10 @@
 import {SciMenu, SciMenuGroup} from './menu/menu.model';
 import {ɵSciMenu} from './menu/ɵmenu.model';
-import {inject, Injector, runInInjectionContext} from '@angular/core';
-import {SciMenuContributionRegistry} from './menu-contribution.registry';
+import {DestroyRef, inject, Injector, runInInjectionContext} from '@angular/core';
 import {SciToolbar, SciToolbarGroup} from './toolbar/toolbar.model';
 import {ɵSciToolbar} from './toolbar/ɵtoolbar.model';
 import {Disposable} from './common/disposable';
+import {ɵSciMenuService} from './ɵmenu.service';
 
 export function contributeMenu(location: `menu:${string}` | SciMenuContributionLocation, menuFactoryFn: (menu: SciMenu) => SciMenu, options?: SciMenuContributionOptions): Disposable;
 export function contributeMenu(location: `toolbar:${string}` | SciToolbarContributionLocation, menuFactoryFn: (toolbar: SciToolbar) => SciToolbar, options?: SciMenuContributionOptions): Disposable;
@@ -17,7 +17,7 @@ export function contributeMenu(locationArg: string | SciContributionLocation, fa
 
   const {location, before, after} = typeof locationArg === 'string' ? {location: locationArg} : locationArg;
   return runInInjectionContext(injector, () => {
-    const menuContributionRegistry = inject(SciMenuContributionRegistry);
+    const menuService = inject(ɵSciMenuService);
 
     const {contributions, menuContributions, groupContributions} = constructMenu(location, factoryFn);
 
@@ -25,13 +25,14 @@ export function contributeMenu(locationArg: string | SciContributionLocation, fa
     contributions.forEach(contribution => contribution.position = {before, after});
 
     const registrations = new Array<Disposable>();
-    registrations.push(menuContributionRegistry.registerMenuContributions(normalizeGroupLocation(location), contributions));
+    registrations.push(menuService.contributeMenu(normalizeGroupLocation(location), contributions));
     registrations.push(...menuContributions.map(menuContribution => contributeMenu(menuContribution.location, menuContribution.factoryFn, options)));
     registrations.push(...groupContributions.map(groupContribution => contributeMenu(groupContribution.location, groupContribution.factoryFn, options)));
 
-    return {
-      dispose: () => registrations.forEach(registration => registration.dispose()),
-    };
+    const disposeFn = () => registrations.forEach(registration => registration.dispose());
+    injector.get(DestroyRef).onDestroy(disposeFn);
+
+    return {dispose: disposeFn};
   });
 }
 
@@ -46,12 +47,14 @@ function normalizeGroupLocation(location: string): `menu:${string}` | `toolbar:$
 
 function constructMenu(location: string, factoryFn: Function): ɵSciMenu | ɵSciToolbar {
   if (location.startsWith('menu:') || location.startsWith('group(menu):')) {
-    const fn = factoryFn as (menu: SciMenu) => SciMenu;
-    return fn(new ɵSciMenu()) as ɵSciMenu;
+    const menu = new ɵSciMenu();
+    void factoryFn(menu);
+    return menu;
   }
   else if (location.startsWith('toolbar:') || location.startsWith('group(toolbar):')) {
-    const fn = factoryFn as (toolbar: SciToolbar) => SciToolbar;
-    return fn(new ɵSciToolbar()) as ɵSciToolbar;
+    const toolbar = new ɵSciToolbar();
+    void factoryFn(toolbar);
+    return toolbar;
   }
   else {
     throw Error('Illegal contribution point');

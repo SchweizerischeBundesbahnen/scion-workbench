@@ -1,5 +1,5 @@
 import {computed, inject, Injectable, Signal, signal} from '@angular/core';
-import {SciMenuItemContribution} from '@scion/sci-components/menu';
+import {SciMenuItemContribution} from '../menu-contribution.model';
 
 @Injectable()
 export class MenuFilter {

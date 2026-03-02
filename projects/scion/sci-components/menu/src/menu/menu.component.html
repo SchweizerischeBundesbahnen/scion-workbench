@@ -1,19 +1,16 @@
-@let contextElement = this.contextElement();
-
 <!-- Group header -->
-@if (contextElement.type === 'group') {
-  @let group = contextElement;
+@if (group(); as group) {
   @if (group.collapsible) {
-    <button class="group-header" (click)="onGroupToggle()" (mouseenter)="onMenuItemMouseEnter(group)">
+    <button class="group-header" (click)="onGroupToggle()" (mouseenter)="onMenuItemMouseEnter(null)">
       <span class="icon material-symbols-rounded" translate="no">{{isGroupExpanded() ? 'keyboard_arrow_down' : 'chevron_right'}}</span>
-      <span class="label">{{contextElement.label?.()}}</span>
+      <span class="label">{{group.label}}</span>
     </button>
-  } @else if (group.label?.()) {
-    <header class="group-header">{{contextElement.label!()}}</header>
+  } @else if (group.label) {
+    <header class="group-header">{{group.label}}</header>
   }
 }
 
-@let filter = (contextElement.type !== 'group' ? contextElement.menu.filter : undefined);
+@let filter = this.filter();
 @if (isGroupExpanded()) {
   <!-- Filter field -->
   @if (filter) {
@@ -30,7 +27,7 @@
 
     @switch (menuItem.type) {
       @case ('menu-item') {
-        <button (mouseenter)="onMenuItemMouseEnter(menuItem)"
+        <button (mouseenter)="onMenuItemMouseEnter(null)"
                 [attr.disabled]="disabled || null"
                 [class.checked]="menuItem.checked?.()"
                 [class]="menuItem.cssClass" class="menu-item"
@@ -60,7 +57,7 @@
             @let actionToolbarName = menuItem.actionToolbarName?.();
             @if (!disabled && actionToolbarName) {
               <sci-toolbar [name]="actionToolbarName"
-                           [viewContainerRef]="actionsPopoverAnchor()"
+                           [viewContainerRef]="popoverAnchor()"
                            (toolbarMenuOpen)="onActionToolbarMenuOpen($event)"
                            (click)="$event.stopPropagation()"
                            sciToolbarState
@@ -70,16 +67,14 @@
         </button>
       }
       @case ('menu') {
-        <button [attr.popovertarget]="popoverId"
-                [attr.popovertargetaction]="'show'"
-                [style.anchor-name]="activeSubMenuItem() === menuItem ? `--${popoverId}` : null"
-                [attr.disabled]="disabled || null"
+        <button [attr.disabled]="disabled || null"
                 [attr.data-menu-id]="menuItem.id"
                 [attr.data-menu-name]="menuItem.name"
-                [class.active]="activeSubMenuItem() === menuItem"
+                [class.active]="activeSubMenuItem()?.menu === menuItem"
                 [class]="menuItem.cssClass" class="menu-item"
-                (mouseenter)="onMenuItemMouseEnter(menuItem)"
-                sciMenuItemState [menuItem]="menuItem" #sciMenuItemState="sciMenuItemState">
+                (mouseenter)="onMenuItemMouseEnter({menu: menuItem, element: element})"
+                sciMenuItemState [menuItem]="menuItem" #sciMenuItemState="sciMenuItemState"
+                #element>
           @if (hasGlyphArea()) {
             <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon?.()}}</span>
           }
@@ -100,7 +95,8 @@
                         [glyphArea]="hasGlyphArea()"
                         [disabled]="disabled"
                         [attr.data-group-id]="menuItem.id"
-                        [attr.data-group-name]="menuItem.name"/>
+                        [attr.data-group-name]="menuItem.name"
+                        [class]="menuItem.cssClass"/>
       }
     }
   } @empty {
@@ -109,17 +105,6 @@
     }
   }
 
-  <!-- Anchor where to insert the menu popover -->
-  <ng-container #actions_popover_anchor/>
-
-  <!-- Menu popover -->
-  @if (activeSubMenuItem()) {
-    <sci-menu [contextElement]="activeSubMenuItem()!"
-              [attr.id]="popoverId"
-              [style.position-anchor]="`--${popoverId}`"
-              [disabled]="disabled() || activeSubMenuItem()!.disabled()"
-              [class]="activeSubMenuItem()!.cssClass"
-              (toggle)="onTogglePopover($event)"
-              popover #popover/>
-  }
+  <!-- Anchor where to insert popover -->
+  <ng-container #popover_anchor/>
 }

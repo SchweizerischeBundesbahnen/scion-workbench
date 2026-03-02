@@ -4,6 +4,7 @@ import {UUID} from '@scion/toolkit/uuid';
 import {Arrays} from '@scion/toolkit/util';
 import {SciMenuContribution, SciMenuGroupContribution, SciMenuItemContribution} from '../menu-contribution.model';
 import {coerceSignal} from '../common/common';
+import {coerceArray} from '@angular/cdk/coercion';
 
 export class ɵSciMenu implements SciMenu {
 
@@ -15,7 +16,7 @@ export class ɵSciMenu implements SciMenu {
     this.contributions.push({
       type: 'menu-item',
       id: `menuitem:${UUID.randomUUID()}`,
-      name: descriptor.name,
+      name: coerceArray(descriptor.name ?? []),
       label: coerceSignal(descriptor.label),
       icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
       checked: 'checked' in descriptor ? coerceSignal(descriptor.checked) : undefined,
@@ -33,10 +34,11 @@ export class ɵSciMenu implements SciMenu {
   }
 
   public addMenu(descriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenu) => SciMenu): this {
+    const id = UUID.randomUUID();
     const menuItem: SciMenuContribution = {
       type: 'menu',
-      id: `menu:${UUID.randomUUID()}`,
-      name: descriptor.name,
+      id: `menu:${id}`,
+      name: coerceArray(descriptor.name ?? []).concat(`menu:${id}`),
       label: coerceSignal(descriptor.label),
       icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
       tooltip: coerceSignal(descriptor.tooltip),
@@ -54,7 +56,7 @@ export class ɵSciMenu implements SciMenu {
 
     // children
     this.menuContributions.push({
-      location: menuItem.id,
+      location: `menu:${id}`,
       factoryFn: menuFactoryFn,
     });
 
@@ -72,6 +74,7 @@ export class ɵSciMenu implements SciMenu {
       this.contributions.push({
         type: 'group',
         id: `group:${id}`,
+        name: [`group:${id}`],
         collapsible: false,
         disabled: signal(false),
       });
@@ -91,10 +94,11 @@ export class ɵSciMenu implements SciMenu {
       this.contributions.push({
         type: 'group',
         id: `group:${id}`,
-        name: descriptor.name,
+        name: coerceArray(descriptor.name ?? []).concat(`group:${id}`),
         label: coerceSignal(descriptor.label),
         collapsible: computeCollapsible(descriptor),
         disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
+        cssClass: Arrays.coerce(descriptor.cssClass),
       });
 
       // children

@@ -1,9 +1,16 @@
-import {ElementRef, Signal, ViewContainerRef} from '@angular/core';
-import {SciMenuRef} from './menu-adapter';
+import {ElementRef, Injectable, Signal, ViewContainerRef} from '@angular/core';
+import {ɵSciMenuService} from './ɵmenu.service';
+import {SciMenu} from './menu/menu.model';
+import {SciMenuContributions} from './menu-contribution.model';
 
+@Injectable({providedIn: 'root', useExisting: ɵSciMenuService})
 export abstract class SciMenuService {
 
-  public abstract open(menuName: `menu:${string}`, options: SciMenuOptions): SciMenuRef;
+  public abstract open(location: `menu:${string}` | `menu:${string}`[], options: SciMenuOptions): SciMenuRef;
+
+  public abstract open(factory: (menu: SciMenu) => SciMenu, options: SciMenuOptions): SciMenuRef;
+
+  public abstract menuContributions(locations: Array<`menu:${string}` | `toolbar:${string}` | `group:${string}`>): Signal<SciMenuContributions>;
 }
 
 export interface SciMenuOptions {
@@ -19,19 +26,24 @@ export interface SciMenuOptions {
    * - bottom/left: Relative to the bottom/left corner of the page viewport.
    * - bottom/right: Relative to the bottom/right corner of the page viewport.
    */
-  anchor: MaybeSignal<HTMLElement | ElementRef<HTMLElement> | SciMenuOrigin>;
+  anchor: HTMLElement | ElementRef<HTMLElement> | SciMenuOrigin | MouseEvent;
   /**
    * Controls where to align the menu relative to the menu anchor, unless there is not enough space available in that area. Defaults to `south`.
    */
-  align?: 'east' | 'west' | 'north' | 'south';
+  align?: 'vertical' | 'horizontal';
   /**
    * Controls where the menu will be added to the DOM. If not specified, adds the menu after the anchor element.
    */
   viewContainerRef?: ViewContainerRef;
-}
 
-// Consider moving to @scion/toolkit
-export type MaybeSignal<T> = T | Signal<T>;
+  size?: {
+    width?: string
+    minWidth?: string;
+    maxWidth?: string;
+  };
+  filter?: boolean | {placeholder?: string; notFoundText?: string};
+  cssClass?: string[];
+}
 
 /**
  * Represents a point on the page, optionally with a dimension, where a menu should be attached.
@@ -42,3 +54,14 @@ export type SciMenuOrigin = {
   width?: number;
   height?: number;
 };
+
+export interface SciMenuRef {
+  close(): void;
+
+  /**
+   * Registers a close callback.  Returns a cleanup function that can be invoked to unregister the callback.
+   *
+   * The callback is immediately called if registering a callback and the menu is already closed.
+   */
+  onClose: (fn: () => void) => void;
+}

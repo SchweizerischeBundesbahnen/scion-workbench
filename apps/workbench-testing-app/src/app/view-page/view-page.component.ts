@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject, Signal} from '@angular/core';
+import {Component, computed, inject, signal, Signal, WritableSignal} from '@angular/core';
 import {ActivatedMicrofrontend, CanCloseRef, WorkbenchMessageBoxService, WorkbenchPartActionDirective, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
 import {startWith} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
@@ -25,6 +25,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {rootEffect} from '../common/root-effect';
 import ActivatedMicrofrontendComponent from '../activated-microfrontend/activated-microfrontend.component';
+import {contributeMenu, SciMenuService} from '@scion/sci-components/menu';
 
 @Component({
   selector: 'app-view-page',
@@ -50,6 +51,7 @@ import ActivatedMicrofrontendComponent from '../activated-microfrontend/activate
 export default class ViewPageComponent {
 
   private readonly _formBuilder = inject(NonNullableFormBuilder);
+  private readonly _menuService = inject(SciMenuService);
 
   protected readonly view = inject(WorkbenchView);
   protected readonly activatedMicrofrontend = inject(ActivatedMicrofrontend, {optional: true});
@@ -72,6 +74,43 @@ export default class ViewPageComponent {
     this.installViewActiveStateLogger();
     this.installCssClassUpdater();
     this.installCanCloseGuard();
+
+    contributeMenu(`menu:contextmenu.${this.view.id}`, menu => menu
+      .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+']}, onAction)
+      .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-']}, onAction)
+      .addGroup(group => group
+        .addMenuItem({label: 'Navigate with Single Click', checked: computed(() => flags().has('navigate_with_single_click'))}, () => toggleMultiFlag(flags, 'navigate_with_single_click'))
+        .addMenuItem({label: 'Always Select Opened Element', checked: computed(() => flags().has('always_select_opened_element'))}, () => toggleMultiFlag(flags, 'always_select_opened_element')),
+      )
+      .addGroup(group => group
+        .addMenuItem({label: 'Speed Search', icon: 'search', accelerator: ['Ctrl', 'F']}, onAction),
+      )
+      .addGroup(group => group
+        .addMenu({label: 'View Mode'}, menu => menu
+          .addMenuItem({label: 'Dock Pinned', checked: computed(() => viewMode() === 'dock_pinned')}, () => viewMode.set('dock_pinned'))
+          .addMenuItem({label: 'Dock Unpinned', checked: computed(() => viewMode() === 'dock_unpinned')}, () => viewMode.set('dock_unpinned'))
+          .addMenuItem({label: 'Undock', checked: computed(() => viewMode() === 'unddock')}, () => viewMode.set('unddock'))
+          .addMenuItem({label: 'Float', checked: computed(() => viewMode() === 'float')}, () => viewMode.set('float'))
+          .addMenuItem({label: 'Window', checked: computed(() => viewMode() === 'window')}, () => viewMode.set('window')),
+        )
+        .addMenu({label: 'Move To'}, menu => menu
+          .addMenuItem({label: 'Left Top', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_top')}, () => moveTo.set('left_top'))
+          .addMenuItem({label: 'Left Bottom', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_bottom')}, () => moveTo.set('left_bottom'))
+          .addMenuItem({label: 'Bottom Left', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_left')}, () => moveTo.set('bottom_left'))
+          .addMenuItem({label: 'Bottom Right', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_right')}, () => moveTo.set('bottom_right'))
+          .addMenuItem({label: 'Right Bottom', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_bottom')}, () => moveTo.set('right_bottom'))
+          .addMenuItem({label: 'Right Top', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_top')}, () => moveTo.set('right_top')),
+        )
+        .addMenu({label: 'Resize'}, menu => menu
+          .addMenuItem({label: 'Stretch to Left'}, onAction)
+          .addMenuItem({label: 'Stretch to Right'}, onAction)
+          .addMenuItem({label: 'Stretch to Top'}, onAction)
+          .addMenuItem({label: 'Stretch to Bottom'}, onAction)
+          .addMenuItem({label: 'Maximize Tool Window'}, onAction),
+        ),
+      )
+      .addMenuItem({label: 'Remove from Sidebar'}, onAction),
+    );
   }
 
   private async confirmClosing(): Promise<boolean> {
@@ -134,6 +173,54 @@ export default class ViewPageComponent {
         }
       });
   }
+
+  protected onContextMenuOpen(event: MouseEvent): void {
+    this._menuService.open(`menu:contextmenu.${this.view.id}`, {
+      anchor: event,
+    });
+  }
+
+  protected onContextMenuOpenInline(event: MouseEvent): void {
+    const ref = this._menuService.open(menu => menu
+        .addMenuItem({label: 'Close'}, () => {
+          ref.close();
+        })
+        .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+']}, onAction)
+        .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-']}, onAction)
+        .addGroup(group => group
+          .addMenuItem({label: 'Navigate with Single Click', checked: computed(() => flags().has('navigate_with_single_click'))}, () => toggleMultiFlag(flags, 'navigate_with_single_click'))
+          .addMenuItem({label: 'Always Select Opened Element', checked: computed(() => flags().has('always_select_opened_element'))}, () => toggleMultiFlag(flags, 'always_select_opened_element')),
+        )
+        .addGroup(group => group
+          .addMenuItem({label: 'Speed Search', icon: 'search', accelerator: ['Ctrl', 'F']}, onAction),
+        )
+        .addGroup(group => group
+          .addMenu({label: 'View Mode'}, menu => menu
+            .addMenuItem({label: 'Dock Pinned', checked: computed(() => viewMode() === 'dock_pinned')}, () => viewMode.set('dock_pinned'))
+            .addMenuItem({label: 'Dock Unpinned', checked: computed(() => viewMode() === 'dock_unpinned')}, () => viewMode.set('dock_unpinned'))
+            .addMenuItem({label: 'Undock', checked: computed(() => viewMode() === 'unddock')}, () => viewMode.set('unddock'))
+            .addMenuItem({label: 'Float', checked: computed(() => viewMode() === 'float')}, () => viewMode.set('float'))
+            .addMenuItem({label: 'Window', checked: computed(() => viewMode() === 'window')}, () => viewMode.set('window')),
+          )
+          .addMenu({label: 'Move To'}, menu => menu
+            .addMenuItem({label: 'Left Top', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_top')}, () => moveTo.set('left_top'))
+            .addMenuItem({label: 'Left Bottom', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_bottom')}, () => moveTo.set('left_bottom'))
+            .addMenuItem({label: 'Bottom Left', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_left')}, () => moveTo.set('bottom_left'))
+            .addMenuItem({label: 'Bottom Right', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_right')}, () => moveTo.set('bottom_right'))
+            .addMenuItem({label: 'Right Bottom', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_bottom')}, () => moveTo.set('right_bottom'))
+            .addMenuItem({label: 'Right Top', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_top')}, () => moveTo.set('right_top')),
+          )
+          .addMenu({label: 'Resize'}, menu => menu
+            .addMenuItem({label: 'Stretch to Left'}, onAction)
+            .addMenuItem({label: 'Stretch to Right'}, onAction)
+            .addMenuItem({label: 'Stretch to Top'}, onAction)
+            .addMenuItem({label: 'Stretch to Bottom'}, onAction)
+            .addMenuItem({label: 'Maximize Tool Window'}, onAction),
+          ),
+        )
+        .addMenuItem({label: 'Remove from Sidebar'}, onAction),
+      {anchor: event});
+  }
 }
 
 interface WorkbenchPartActionDescriptor {
@@ -141,3 +228,36 @@ interface WorkbenchPartActionDescriptor {
   align: 'start' | 'end';
   cssClass: string;
 }
+
+function onAction(): void {
+
+}
+
+function toggleMultiFlag(flags: WritableSignal<Set<string>>, flag: string): void {
+  flags.update(flags => {
+    const newFlags = new Set(flags);
+    if (flags.has(flag)) {
+      newFlags.delete(flag);
+    }
+    else {
+      newFlags.add(flag);
+    }
+    return newFlags;
+  });
+}
+
+const flags = signal(new Set<string>()
+  .add('always_select_opened_element')
+  .add('server_and_database_objects')
+  .add('schema_objects')
+  .add('object_elements')
+  .add('use_natural_order_when_sorting')
+  .add('single_object_levels')
+  .add('generate_objects')
+  .add('virtual_objects')
+  .add('query_files')
+  .add('format_italic')
+  .add('single_object_levels'),
+);
+const viewMode = signal('dock_pinned');
+const moveTo = signal('left_top');

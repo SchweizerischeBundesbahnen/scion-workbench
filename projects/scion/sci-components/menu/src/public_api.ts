@@ -13,11 +13,11 @@
  *
  * @see https://github.com/ng-packagr/ng-packagr/blob/master/docs/secondary-entrypoints.md
  */
-export {type SciMenuService, type SciMenuOptions, type SciMenuOrigin, type  MaybeSignal} from './menu.service';
+export {SciMenuService, type SciMenuRef, type SciMenuOptions, type SciMenuOrigin} from './menu.service';
 export {type SciMenu, type SciMenuItemDescriptor, type SciMenuDescriptor, type  SciMenuGroupDescriptor, type SciMenuGroup} from './menu/menu.model';
 export {type SciToolbar, type SciToolbarItemDescriptor, type SciToolbarMenuDescriptor, type  SciToolbarGroupDescriptor, type SciToolbarGroup} from './toolbar/toolbar.model';
-export {type SciMenuAdapter, type SciMenuRef, SCI_MENU_ADAPTER} from './menu-adapter';
+export {SciMenuAdapter} from './menu-adapter';
 export {contributeMenu} from './menu-contribution';
 export {type Disposable} from './common/disposable';
 export {SciToolbarComponent} from './toolbar/toolbar.component';
-export {type SciMenuItemContribution, type SciMenuContribution, type SciMenuGroupContribution, type SciMenuContributionUnion} from './menu-contribution.model';
+export {type SciMenuItemContribution, type SciMenuContribution, type SciMenuGroupContribution, type SciMenuContributions} from './menu-contribution.model';

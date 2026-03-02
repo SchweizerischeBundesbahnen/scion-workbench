@@ -1,11 +1,9 @@
-import {ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, Injector, input, linkedSignal, output, signal, Signal, TemplateRef, untracked, viewChild, ViewContainerRef} from '@angular/core';
-import {SciMenuContributionRegistry} from '../menu-contribution.registry';
-import {MenuComponent} from '../menu/menu.component';
-import {UUID} from '@scion/toolkit/uuid';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, Injector, input, linkedSignal, output, signal, Signal, untracked, ViewContainerRef} from '@angular/core';
 import {NgComponentOutlet} from '@angular/common';
 import {MenuItemStateDirective} from '../menu/menu-item-state.directive';
-import {SciDimension} from '@scion/components/dimension';
 import {SciMenuContribution, SciMenuGroupContribution, SciMenuItemContribution} from '../menu-contribution.model';
+import {SciMenuService} from '../menu.service';
+import {coerceArray} from '@angular/cdk/coercion';
 
 @Component({
   selector: 'sci-toolbar-group',
@@ -13,42 +11,55 @@ import {SciMenuContribution, SciMenuGroupContribution, SciMenuItemContribution} 
   styleUrl: './toolbar-group.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    MenuComponent,
     NgComponentOutlet,
     MenuItemStateDirective,
   ],
 })
 export class SciToolGroupComponent {
 
-  public readonly contextElement = input.required<`toolbar:${string}` | SciMenuGroupContribution>();
+  public readonly location = input.required({transform: coerceLocation});
   public readonly disabled = input<boolean>();
   public readonly viewContainerRef = input<ViewContainerRef | undefined>();
   public readonly groupEmpty = output<boolean>();
   public readonly groupMenuOpen = output<boolean>();
 
-  private readonly _menuContributionRegistry = inject(SciMenuContributionRegistry);
-  private readonly _popover = viewChild('popover', {read: ElementRef<HTMLElement>});
-  private readonly _popoverTemplate = viewChild.required('popover_template', {read: TemplateRef<void>});
+  private readonly _menuService = inject(SciMenuService);
 
-  protected readonly popoverId = UUID.randomUUID();
   protected readonly menuItems = this.computeToolbarItems();
-  protected readonly activeSubMenuItem = linkedSignal<string | SciMenuGroupContribution, {subMenuItem: SciMenuContribution, bounds: Signal<SciDimension>} | null>({
-    source: this.contextElement,  // reset active sub menu item when this component is re-used
+  protected readonly activeSubMenuItem = linkedSignal<Array<`toolbar:${string}` | `group:${string}`>, {menu: SciMenuContribution, element: HTMLElement} | null>({
+    source: this.location,  // reset active sub menu item when this component is re-used
     computation: () => null,
   });
 
   constructor() {
+    const injector = inject(Injector);
+
     // Open popover when hovering over a submenu item, or hide it otherwise.
-    effect(() => {
-      const popover = this._popover();
+    effect((onCleanup) => {
       const activeSubMenuItem = this.activeSubMenuItem();
+      // Attach popover to configured view ref. Defaults to this component's view ref.
+      // Controls where to add the popup, e.g., required for toolbar in menu button to not be child of the menu item (hover state)
+      const viewContainerRef = this.viewContainerRef() ?? injector.get(ViewContainerRef);
 
       untracked(() => {
         if (activeSubMenuItem) {
-          popover?.nativeElement.showPopover();
-        }
-        else {
-          popover?.nativeElement.hidePopover();
+          const ref = this._menuService.open(activeSubMenuItem.menu.name, {
+            anchor: activeSubMenuItem.element,
+            viewContainerRef,
+            cssClass: activeSubMenuItem.menu.cssClass,
+            filter: activeSubMenuItem.menu.menu.filter,
+            size: {
+              minWidth: activeSubMenuItem.menu.menu.minWidth,
+              maxWidth: activeSubMenuItem.menu.menu.maxWidth,
+              width: activeSubMenuItem.menu.menu.width,
+            },
+            align: 'vertical',
+          });
+          ref.onClose(() => {
+            // do not close other menu
+            this.activeSubMenuItem.update(it => it === activeSubMenuItem ? null : it);
+          });
+          onCleanup(() => ref.close());
         }
       });
     });
@@ -61,40 +72,14 @@ export class SciToolGroupComponent {
     effect(() => {
       this.groupEmpty.emit(this.menuItems().every(menuItem => this.isEmtpy(menuItem)()));
     });
-
-    // Attach popover to configured view ref. Defaults to this component's view ref.
-    const injector = inject(Injector);
-    effect(onCleanup => {
-      const popoverTemplate = this._popoverTemplate();
-      const viewContainerRef = this.viewContainerRef() ?? injector.get(ViewContainerRef);
-
-      untracked(() => {
-        const popoverViewRef = viewContainerRef.createEmbeddedView(popoverTemplate, undefined, {injector});
-        popoverViewRef.detectChanges(); // required?
-        onCleanup(() => () => popoverViewRef.destroy());
-      });
-    });
   }
 
   private computeToolbarItems(): Signal<Array<SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution>> {
-    return computed(() => {
-      const contextElement = this.contextElement();
-      if (typeof contextElement === 'string') {
-        return this._menuContributionRegistry.menuContributions(contextElement)();
-      }
-
-      return this._menuContributionRegistry.menuContributions(contextElement.id, contextElement.name)();
-    });
+    return computed(() => this._menuService.menuContributions(this.location())());
   }
 
-  protected onSubMenuClick(subMenuItem: SciMenuContribution, bounds: Signal<SciDimension>): void {
-    this.activeSubMenuItem.update(activeSubMenuItem => activeSubMenuItem?.subMenuItem === subMenuItem ? null : {subMenuItem, bounds});
-  }
-
-  protected onTogglePopover(event: ToggleEvent): void {
-    if (event.newState === 'closed') {
-      this.activeSubMenuItem.set(null);
-    }
+  protected onSubMenuClick(menuItem: {menu: SciMenuContribution, element: HTMLElement} | null): void {
+    this.activeSubMenuItem.set(menuItem);
   }
 
   private isEmtpy(menuItem: SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution): Signal<boolean> {
@@ -103,7 +88,11 @@ export class SciToolGroupComponent {
         return signal(false);
       case 'menu':
       case 'group':
-        return computed(() => this._menuContributionRegistry.menuContributions(menuItem.id, menuItem.name)().every(menuItem => this.isEmtpy(menuItem)()));
+        return computed(() => this._menuService.menuContributions(menuItem.name)().every(menuItem => this.isEmtpy(menuItem)()));
     }
   }
+}
+
+function coerceLocation(location: `toolbar:${string}` | `group:${string}` | Array<`toolbar:${string}` | `group:${string}`>): Array<`toolbar:${string}` | `group:${string}`> {
+  return coerceArray(location);
 }

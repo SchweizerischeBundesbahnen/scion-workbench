@@ -1,6 +1,6 @@
-import {ApplicationRef, ChangeDetectionStrategy, Component, createComponent, effect, ElementRef, EnvironmentInjector, inject, Injector, input, inputBinding, untracked} from '@angular/core';
+import {ApplicationRef, ChangeDetectionStrategy, Component, computed, createComponent, effect, ElementRef, EnvironmentInjector, inject, Injector, input, inputBinding, untracked} from '@angular/core';
 import {MenuComponent} from './menu.component';
-import {SciMenuGroupContribution} from '@scion/sci-components/menu';
+import {SciMenuGroupContribution} from '../menu-contribution.model';
 
 /**
  * Alias for {@link MenuComponent} with the name `sci-menu-group` instead of `sci-menu`.
@@ -24,14 +24,22 @@ export class MenuItemGroupComponent {
 
     // Run as effect (single-shot) to read input properties.
     effect(onCleanup => untracked(() => {
+      const collapsible = this.group().collapsible;
+      const collapsed = collapsible ? collapsible.collapsed : false;
       const componentRef = createComponent(MenuComponent, {
         elementInjector,
         environmentInjector,
         hostElement,
         bindings: [
-          inputBinding('contextElement', this.group),
-          inputBinding('glyphArea', this.glyphArea),
+          inputBinding('location', computed(() => this.group().name)),
           inputBinding('disabled', this.disabled),
+          inputBinding('group', computed(() => ({
+              label: this.group().label?.(),
+              collapsible: !!collapsible,
+              collapsed,
+            })),
+          ),
+          inputBinding('glyphArea', this.glyphArea),
         ],
       });
 

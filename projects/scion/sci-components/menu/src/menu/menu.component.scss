@@ -49,6 +49,8 @@ $icon-size: 18px;
 }
 
 :host {
+  --ɵsci-menu-padding: #{$padding_menu};
+
   display: grid;
   gap: $menu_item_gap .5em;
   overflow: hidden;
@@ -60,6 +62,8 @@ $icon-size: 18px;
   color: var(--sci-color-text);
   background-color: var(--sci-color-background-elevation);
   padding: $padding_menu;
+  margin: unset; // unset native popover styling
+  inset: unset; // unset native popover styling
   grid-template-columns:
     // === Menu subgrid ===
     auto // glyph area for icons and check marks
@@ -192,7 +196,8 @@ $icon-size: 18px;
       }
     }
 
-    // Add padding-right to label if no actions toolbar, or the actions toolsbar is not visible because not hovered
+    // TODO Why do we need that? Describe! Fix display of ellipsis when not hovering
+    // Add padding-right to label if no actions toolbar, or the actions toolbar is not visible because not hovered
     > div.content > span.label:last-child, &:not(:hover) > div.content > span.label:has(+ sci-toolbar.actions:not(.empty)) {
       padding-right: 2em;
     }
@@ -213,15 +218,4 @@ $icon-size: 18px;
     height: 1em;
     width: 1em;
   }
-}
-
-:where(sci-menu[popover]) { // allow setting host styles in menu component
-  @layer unset-browser-defaults {
-    margin: unset; // unset native popover styling
-    padding: unset; // unset native popover styling
-    inset: unset; // unset native popover styling
-  }
-  position-try-fallbacks: flip-inline, flip-block;
-  top: calc(anchor(top) - $padding_menu);
-  left: calc(anchor(right) + 1px);
 }

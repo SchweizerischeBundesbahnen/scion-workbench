@@ -8,22 +8,21 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {InjectionToken, Signal} from '@angular/core';
-import {SciMenuOptions} from './menu.service';
-import {SciMenuContributionUnion} from './menu-contribution.model';
+import {Injectable, Signal} from '@angular/core';
+import {SciMenuOptions, SciMenuRef} from './menu.service';
 import {Disposable} from './common/disposable';
+import {SciMenuContributions} from './menu-contribution.model';
+import {SciDefaultMenuAdapter} from './default-menu-adapter';
 
-export const SCI_MENU_ADAPTER = new InjectionToken<SciMenuAdapter>('SCI_MENU_ADAPTER');
+@Injectable({providedIn: 'root', useExisting: SciDefaultMenuAdapter})
+export abstract class SciMenuAdapter {
 
-export interface SciMenuAdapter {
+  public abstract contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contributions: SciMenuContributions): Disposable;
 
-  openMenu(menuName: `menu:${string}`, options: SciMenuOptions): SciMenuRef;
+  public abstract menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`): Signal<SciMenuContributions>;
 
-  contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contributions: SciMenuContributionUnion[]): Disposable;
-
-  menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`): Signal<SciMenuContributionUnion[]>;
-}
-
-export interface SciMenuRef {
-  close(): void;
+  /**
+   * TODO Optional or required?
+   */
+  public abstract openMenu?(locations: `menu:${string}`[], options: SciMenuOptions): SciMenuRef;
 }

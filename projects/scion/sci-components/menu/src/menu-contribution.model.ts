@@ -4,7 +4,7 @@ import {ComponentType} from '@angular/cdk/portal';
 export interface SciMenuItemContribution {
   type: 'menu-item'
   id: `menuitem:${string}`;
-  name?: `menuitem:${string}`;
+  name: `menuitem:${string}`[];
   label?: Signal<string | ComponentType<unknown>>;
   icon?: Signal<string>;
   tooltip?: Signal<string>;
@@ -24,7 +24,7 @@ export interface SciMenuItemContribution {
 export interface SciMenuContribution {
   type: 'menu'
   id: `menu:${string}`;
-  name?: `menu:${string}`;
+  name: `menu:${string}`[];
   label?: Signal<string | ComponentType<unknown>>;
   icon?: Signal<string>;
   tooltip?: Signal<string>;
@@ -46,7 +46,7 @@ export interface SciMenuContribution {
 export interface SciMenuGroupContribution {
   type: 'group'
   id: `group:${string}`;
-  name?: `group:${string}`;
+  name: `group:${string}`[];
   label?: Signal<string>;
   collapsible?: {collapsed: boolean} | false;
   position?: {
@@ -54,14 +54,7 @@ export interface SciMenuGroupContribution {
     after?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
   };
   disabled: Signal<boolean>;
+  cssClass?: string[];
 }
 
-export interface Element {
-  name?: string;
-  position?: {
-    before?: string;
-    after?: string;
-  };
-}
-
-export type SciMenuContributionUnion = SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution;
+export type SciMenuContributions = Array<SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution>;

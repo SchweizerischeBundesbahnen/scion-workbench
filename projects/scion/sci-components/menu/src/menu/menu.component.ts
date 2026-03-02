@@ -1,6 +1,4 @@
 import {afterRenderEffect, ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, forwardRef, inject, input, linkedSignal, signal, Signal, untracked, viewChild, ViewContainerRef} from '@angular/core';
-import {SciMenuContributionRegistry} from '../menu-contribution.registry';
-import {UUID} from '@scion/toolkit/uuid';
 import {JoinPipe} from './join.pipe';
 import {MenuItemGroupComponent} from './menu-group.component';
 import {MenuFilterComponent} from './menu-filter.component';
@@ -10,6 +8,7 @@ import {ToolbarStateDirective} from '../toolbar/toolbar-state.directive';
 import {MenuItemStateDirective} from './menu-item-state.directive';
 import {NgComponentOutlet} from '@angular/common';
 import {SciMenuContribution, SciMenuGroupContribution, SciMenuItemContribution} from '../menu-contribution.model';
+import {SciMenuService} from '../menu.service';
 
 /**
  * Represents a menu or a group of menu items.
@@ -33,70 +32,71 @@ import {SciMenuContribution, SciMenuGroupContribution, SciMenuItemContribution} 
   ],
   host: {
     '[class.no-glyph-area]': '!hasGlyphArea()',
-    '[class.is-group]': 'isGroup()',
+    '[class.is-group]': '!!group()',
     '[style.width]': 'size()?.width',
     '[style.min-width]': 'size()?.minWidth',
     '[style.max-width]': 'size()?.maxWidth',
+    '[class]': 'cssClass()',
   },
 })
 export class MenuComponent {
 
-  public readonly contextElement = input.required<SciMenuContribution | SciMenuGroupContribution>();
+  public readonly location = input.required<Array<`menu:${string}` | `group:${string}`>>();
   public readonly disabled = input<boolean>();
+  public readonly filter = input<boolean | {placeholder?: string; notFoundText?: string}>(false);
+  public readonly group = input<{label?: string, collapsible: boolean, collapsed: boolean}>();
+  public readonly sizeInput = input<{width?: string; minWidth?: string; maxWidth?: string}>();
   public readonly glyphArea = input<boolean>();
   public readonly anchorWidth = input(undefined, {transform: (width: number | undefined): string | undefined => width ? `${width}px` : undefined});
+  public readonly cssClass = input<string[]>();
 
-  private readonly _menuContributionRegistry = inject(SciMenuContributionRegistry);
-  private readonly _popover = viewChild('popover', {read: ElementRef<HTMLElement>});
+  private readonly _menuService = inject(SciMenuService);
   private readonly _menuFilter = inject(MenuFilter);
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _document = inject(DOCUMENT);
   private readonly _actionToolbarMenuOpen = signal(false);
 
-  protected readonly popoverId = UUID.randomUUID();
-  protected readonly hasGlyphArea = computed(() => this.glyphArea() ?? this.requiresGlyphArea(this.contextElement())());
+  protected readonly hasGlyphArea = computed(() => this.glyphArea() ?? this.requiresGlyphArea());
   protected readonly menuItems = this.computeMenuItems();
-  protected readonly actionsPopoverAnchor = viewChild.required('actions_popover_anchor', {read: ViewContainerRef});
-  protected readonly activeSubMenuItem = linkedSignal<SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution, SciMenuContribution | null>({
-    source: this.contextElement,  // reset active sub menu item when this component is re-used
+  protected readonly popoverAnchor = viewChild.required('popover_anchor', {read: ViewContainerRef});
+  protected readonly activeSubMenuItem = linkedSignal<Array<`menu:${string}` | `group:${string}`>, {menu: SciMenuContribution, element: HTMLElement} | null>({
+    source: this.location,  // reset active sub menu item when this component is re-used
     computation: () => null,
   });
 
-  protected readonly isGroup = computed(() => this.contextElement().type === 'group');
   protected readonly isGroupExpanded = linkedSignal(() => {
-    const contextElement = this.contextElement();
-    const group = contextElement.type == 'group' ? contextElement : null;
+    const group = this.group();
+
     if (!group) {
       return true;
     }
 
-    return this._menuFilter.filterActive() || !group.collapsible || !group.collapsible.collapsed;
+    return this._menuFilter.filterActive() || !group.collapsible || !group.collapsed;
   });
 
   protected readonly size = linkedSignal<PreferredSize | undefined>(() => {
-    const subMenuItem = this.contextElement();
-    if (subMenuItem.type === 'group') {
+    if (this.group()) {
       return undefined;
     }
 
-    const preferredMinWidth = subMenuItem.menu.minWidth ?? '12em';
+    const preferredMinWidth = this.sizeInput()?.minWidth ?? '12em';
     return {
-      width: subMenuItem.menu.width,
+      width: this.sizeInput()?.width,
       minWidth: this.anchorWidth() ? `max(${preferredMinWidth}, ${this.anchorWidth()})` : preferredMinWidth,
-      maxWidth: subMenuItem.menu.maxWidth ?? '24em',
+      maxWidth: this.sizeInput()?.maxWidth ?? '24em',
     };
   });
 
   constructor() {
     // Maintain stable width when expanding/collapsing groups or hovering menu item when displaying the actions toolbar.
     afterRenderEffect(() => {
-      this.contextElement(); // re-evaluate when re-used
+      this.location(); // re-evaluate when re-used
       this.size.update(size => ({...size, width: `${this._host.getBoundingClientRect().width}px`}));
     });
 
     // Close action menu when this component is re-used.
     effect(() => {
-      this.contextElement();
+      this.location();
 
       untracked(() => {
         const popover = this._host.appendChild(this._document.createElement('div'));
@@ -108,16 +108,22 @@ export class MenuComponent {
     })
 
     // Open popover when hovering over a submenu item, or hide it otherwise.
-    effect(() => {
-      const popover = this._popover();
+    effect((onCleanup) => {
       const activeSubMenuItem = this.activeSubMenuItem();
-
       untracked(() => {
         if (activeSubMenuItem) {
-          popover?.nativeElement.showPopover();
-        }
-        else {
-          popover?.nativeElement.hidePopover();
+          const ref = this._menuService.open(activeSubMenuItem.menu.name, {
+            anchor: activeSubMenuItem.element,
+            viewContainerRef: this.popoverAnchor(),
+            cssClass: activeSubMenuItem.menu.cssClass,
+            filter: activeSubMenuItem.menu.menu.filter,
+            align: 'horizontal',
+          });
+          ref.onClose(() => {
+            // do not close other menu
+            this.activeSubMenuItem.update(it => it === activeSubMenuItem ? null : it);
+          });
+          onCleanup(() => ref.close());
         }
       });
     });
@@ -134,22 +140,16 @@ export class MenuComponent {
     this.isGroupExpanded.update(expanded => !expanded);
   }
 
-  protected onMenuItemMouseEnter(menuItem: SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution): void {
-    this.activeSubMenuItem.set(menuItem.type === 'menu' ? menuItem : null);
+  protected onMenuItemMouseEnter(menuItem: {menu: SciMenuContribution, element: HTMLElement} | null): void {
+    this.activeSubMenuItem.set(menuItem);
 
-    // Create and display "fake" popover to close popover of other groups or menus.
+    // Create and display "fake" popover to close popover when hovering menu items of other groups.
     if (!this.activeSubMenuItem() && !this._actionToolbarMenuOpen()) {
       const popover = this._host.appendChild(this._document.createElement('div'));
       popover.setAttribute('popover', '');
       popover.style.setProperty('display', 'none');
       popover.showPopover();
       popover.remove();
-    }
-  }
-
-  protected onTogglePopover(event: ToggleEvent): void {
-    if (event.newState === 'closed') {
-      this.activeSubMenuItem.set(null);
     }
   }
 
@@ -162,15 +162,7 @@ export class MenuComponent {
   }
 
   private computeMenuItems(): Signal<Array<SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution>> {
-    return computed(() => {
-      const contextElement = this.contextElement();
-      switch (contextElement.type) {
-        case 'menu':
-          return this._menuContributionRegistry.menuContributions(contextElement.id, contextElement.name)().filter(menuItem => this.matchesFilter(menuItem)());
-        case 'group':
-          return this._menuContributionRegistry.menuContributions(contextElement.id, contextElement.name)().filter(menuItem => this.matchesFilter(menuItem)());
-      }
-    });
+    return computed(() => this._menuService.menuContributions(this.location())().filter(menuItem => this.matchesFilter(menuItem)()));
   }
 
   private matchesFilter(menuItem: SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution): Signal<boolean> {
@@ -179,9 +171,9 @@ export class MenuComponent {
         case 'menu-item':
           return this._menuFilter.matches(menuItem)();
         case 'menu':
-          return this._menuContributionRegistry.menuContributions(menuItem.id, menuItem.name)().some(menuItem => this.matchesFilter(menuItem)());
+          return this._menuService.menuContributions(menuItem.name)().some(menuItem => this.matchesFilter(menuItem)());
         case 'group':
-          return this._menuContributionRegistry.menuContributions(menuItem.id, menuItem.name)().some(menuItem => this.matchesFilter(menuItem)());
+          return this._menuService.menuContributions(menuItem.name)().some(menuItem => this.matchesFilter(menuItem)());
       }
     });
   }
@@ -199,23 +191,36 @@ export class MenuComponent {
    *
    * A glyph area is required if any group needs one, even if the context does not.
    */
-  private requiresGlyphArea(contextElement: SciMenuContribution | SciMenuGroupContribution): Signal<boolean> {
-    return computed(() => {
-      if (contextElement.type === 'menu' && contextElement.menu.filter) {
-        return true;
-      }
+  private requiresGlyphArea(): boolean {
+    const menuService = this._menuService;
 
-      return this._menuContributionRegistry.menuContributions(contextElement.id, contextElement.name)().some(menuItem => {
+    if (this.filter()) {
+      return true;
+    }
+
+    return menuService.menuContributions(this.location())().some(menuItem => {
+      switch (menuItem.type) {
+        case 'menu-item':
+          return menuItem.icon?.() || menuItem.checked !== undefined;
+        case 'menu':
+          return menuItem.icon?.();
+        case 'group':
+          return menuItem.collapsible || requiresGlyphAreaRec(menuItem);
+      }
+    });
+
+    function requiresGlyphAreaRec(contextElement: SciMenuGroupContribution): boolean {
+      return menuService.menuContributions(contextElement.name)().some(menuItem => {
         switch (menuItem.type) {
           case 'menu-item':
             return menuItem.icon?.() || menuItem.checked !== undefined;
           case 'menu':
             return menuItem.icon?.();
           case 'group':
-            return menuItem.collapsible || this.requiresGlyphArea(menuItem)();
+            return menuItem.collapsible || requiresGlyphAreaRec(menuItem);
         }
       });
-    });
+    }
   }
 }
 

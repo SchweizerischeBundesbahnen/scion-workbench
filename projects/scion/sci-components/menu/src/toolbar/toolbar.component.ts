@@ -12,7 +12,7 @@ import {SciToolGroupComponent} from './toolbar-group.component';
 })
 export class SciToolbarComponent {
 
-  public readonly name = input.required<`toolbar:${string}`>();
+  public readonly name = input.required<`toolbar:${string}` | `toolbar:${string}`[]>();
   public readonly viewContainerRef = input<ViewContainerRef | undefined>();
   public readonly toolbarMenuOpen = output<boolean>();
   public readonly toolbarEmpty = output<boolean>();

@@ -1,6 +1,5 @@
-import {computed, Directive, ElementRef, inject, input, Signal} from '@angular/core';
+import {computed, Directive, ElementRef, inject, input} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
-import {dimension, SciDimension} from '@scion/components/dimension';
 import {SciMenuContribution, SciMenuGroupContribution, SciMenuItemContribution} from '../menu-contribution.model';
 
 @Directive({
@@ -27,6 +26,4 @@ export class MenuItemStateDirective {
     }
     return undefined;
   });
-
-  public readonly bounds: Signal<SciDimension> = dimension(inject(ElementRef));
 }

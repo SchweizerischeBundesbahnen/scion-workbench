@@ -20,8 +20,8 @@ import {SettingsService} from './settings.service';
 import {installFocusHighlighter} from './focus-highlight/focus-highlighter';
 import {installGlasspaneHighlighter} from './glasspane-highlight/glasspane-highlighter';
 import {installMicrofrontendApplicationLabels} from './microfrontend-application-labels/microfrontend-application-labels';
-import {UserMenuItemComponent} from './user-menu-item/user-menu-item.component';
 import {contributeMenu} from '@scion/sci-components/menu';
+import {UserMenuItemComponent} from './user-menu-item/user-menu-item.component';
 
 @Component({
   selector: 'app-root',
@@ -74,8 +74,6 @@ export class AppComponent implements DoCheck {
     );
     const paragraphStyle = signal<string>('');
 
-    const workbenchService = inject(WorkbenchService);
-
     // contributeMenu('toolbar:main', toolbar => toolbar
     //   .addMenu({id: 'menu:additions', label: 'submenu'}, menu => menu
     //     .filterable(true)
@@ -105,6 +103,56 @@ export class AppComponent implements DoCheck {
     // contributeMenu('toolbar-group:additions', menuGroup => toolbar
     // contributeMenu('menu-group:additions', menuGroup => menu
 
+    if (1 + 1 === 3) {
+      contributeMenu('toolbar:workbench.part.tools.start', toolbar => toolbar
+        .addMenu({label: 'File', menu: {filter: {placeholder: 'hello', notFoundText: 'nüd found'}}}, menu => menu
+          .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N']}, () => this.onAction())
+          .addMenuItem({label: 'Open', icon: 'folder'}, () => this.onAction())
+          .addMenuItem({label: 'Make a Copy', icon: 'file_copy'}, () => this.onAction())
+          .addMenu({label: 'Share', name: 'menu:share', icon: 'person_add'}, menu => menu
+            .addMenuItem({label: 'Share with others', icon: 'person_add', name: 'menuitem:share-with-others'}, () => this.onAction())
+            .addMenuItem({label: 'Publish to web', icon: 'public'}, () => this.onAction())
+            .addMenu({label: 'Text', icon: 'format_bold'}, menu => menu
+              .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B']}, () => this.onAction())
+              .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I']}, () => this.onAction())
+              .addMenuItem({label: 'Underline', icon: 'format_underlined'}, () => this.onAction())
+              .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s'}, () => this.onAction())
+              .addMenu({label: 'Size', icon: 'format_bold'}, menu => menu
+                .addMenuItem({label: 'Increase font size'}, () => this.onAction())
+                .addMenuItem({label: 'Decrease font size'}, () => this.onAction()),
+              ),
+            ),
+          )
+          .addMenu({label: 'Share1', name: 'menu:share', icon: 'person_add'}, menu => menu
+            .addMenuItem({label: 'Share with others1', icon: 'person_add', name: 'menuitem:share-with-others'}, () => this.onAction())
+            .addMenuItem({label: 'Publish to web1', icon: 'public'}, () => this.onAction())
+            .addMenu({label: 'Text', icon: 'format_bold'}, menu => menu
+              .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B']}, () => this.onAction())
+              .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I']}, () => this.onAction())
+              .addMenuItem({label: 'Underline', icon: 'format_underlined'}, () => this.onAction())
+              .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s'}, () => this.onAction())
+              .addGroup(group => group
+                .addMenuItem({label: 'Increase font size'}, () => this.onAction())
+                .addMenuItem({label: 'Decrease font size'}, () => this.onAction()),
+              )
+              .addMenu({label: 'Size', icon: 'format_bold'}, menu => menu
+                .addMenuItem({label: 'Increase font size'}, () => this.onAction())
+                .addMenuItem({label: 'Decrease font size'}, () => this.onAction()),
+              )
+              .addMenu({label: 'Size', icon: 'format_bold'}, menu => menu
+                .addMenuItem({label: 'Increase font size'}, () => this.onAction())
+                .addMenuItem({label: 'Decrease font size'}, () => this.onAction()),
+              ),
+            ),
+          )
+          .addMenuItem({label: 'Download', icon: 'download'}, () => this.onAction())
+          .addMenuItem({label: 'Print', icon: 'print'}, () => this.onAction()),
+        ),
+      );
+      return;
+    }
+
+    const workbenchService = inject(WorkbenchService);
     contributeMenu('toolbar:main', toolbar => toolbar
       .addToolbarItem({icon: computed(() => workbenchService.settings.theme() === 'scion-light' ? 'light_mode' : 'dark_mode')}, () => {
         workbenchService.settings.theme.update(theme => theme === 'scion-light' ? 'scion-dark' : 'scion-light');
