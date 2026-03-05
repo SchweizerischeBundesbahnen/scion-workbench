@@ -6,7 +6,6 @@ import {ComponentType} from '@angular/cdk/portal';
  */
 export interface SciMenuItemContribution {
   type: 'menu-item'
-  id: `menuitem:${string}`;
   name: `menuitem:${string}`[];
   label?: Signal<string | ComponentType<unknown>>;
   icon?: Signal<string>;
@@ -23,11 +22,12 @@ export interface SciMenuItemContribution {
     after?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
   };
   onSelect: (context: Map<string, unknown>) => boolean;
+  /** Arbitrary metadata associated with the menu. */
+  data?: {[key: string]: string};
 }
 
 export interface SciMenuContribution {
   type: 'menu'
-  id: `menu:${string}`;
   name: `menu:${string}`[];
   label?: Signal<string | ComponentType<unknown>>;
   icon?: Signal<string>;
@@ -46,11 +46,12 @@ export interface SciMenuContribution {
     filter?: boolean | {placeholder?: string; notFoundText?: string};
   };
   cssClass?: string[];
+  /** Arbitrary metadata associated with the menu. */
+  data?: {[key: string]: string};
 }
 
 export interface SciMenuGroupContribution {
   type: 'group'
-  id: `group:${string}`;
   name: `group:${string}`[];
   label?: Signal<string>;
   collapsible?: {collapsed: boolean} | false;
@@ -61,6 +62,8 @@ export interface SciMenuGroupContribution {
   disabled: Signal<boolean>; // Consider renaming to enabled; https://www.electronjs.org/docs/latest/api/menu-item
   // visible: Signal<boolean>; // Consider providing visible
   cssClass?: string[];
+  /** Arbitrary metadata associated with the menu. */
+  data?: {[key: string]: string};
 }
 
 export type SciMenuContributions = Array<SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution>;

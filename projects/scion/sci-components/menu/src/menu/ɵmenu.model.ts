@@ -15,7 +15,6 @@ export class ɵSciMenu implements SciMenu {
   public addMenuItem(descriptor: SciMenuItemDescriptor, onSelect: (context: Map<string, unknown>) => boolean | void): this {
     this.contributions.push({
       type: 'menu-item',
-      id: `menuitem:${UUID.randomUUID()}`,
       name: coerceArray(descriptor.name ?? []),
       label: coerceSignal(descriptor.label),
       icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
@@ -27,6 +26,7 @@ export class ɵSciMenu implements SciMenu {
       matchesFilter: descriptor.onFilter,
       cssClass: Arrays.coerce(descriptor.cssClass),
       onSelect: (context) => onSelect(context) ?? descriptor.checked === undefined, // Close if the callback returns true. Defaults to closing non-checkable menu items.
+      data: descriptor.data,
     } satisfies SciMenuItemContribution);
 
     // TODO [menu] throw error if icon and checked
@@ -37,7 +37,6 @@ export class ɵSciMenu implements SciMenu {
     const id = UUID.randomUUID();
     const menuItem: SciMenuContribution = {
       type: 'menu',
-      id: `menu:${id}`,
       name: coerceArray(descriptor.name ?? []).concat(`menu:${id}`),
       label: coerceSignal(descriptor.label),
       icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
@@ -50,6 +49,7 @@ export class ɵSciMenu implements SciMenu {
         filter: descriptor.menu?.filter,
       },
       cssClass: Arrays.coerce(descriptor.cssClass),
+      data: descriptor.data,
     };
 
     this.contributions.push(menuItem);
@@ -73,7 +73,6 @@ export class ɵSciMenu implements SciMenu {
 
       this.contributions.push({
         type: 'group',
-        id: `group:${id}`,
         name: [`group:${id}`],
         collapsible: false,
         disabled: signal(false),
@@ -93,12 +92,12 @@ export class ɵSciMenu implements SciMenu {
 
       this.contributions.push({
         type: 'group',
-        id: `group:${id}`,
         name: coerceArray(descriptor.name ?? []).concat(`group:${id}`),
         label: coerceSignal(descriptor.label),
         collapsible: computeCollapsible(descriptor),
         disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
         cssClass: Arrays.coerce(descriptor.cssClass),
+        data: descriptor.data,
       });
 
       // children

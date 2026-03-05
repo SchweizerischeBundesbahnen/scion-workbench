@@ -35,6 +35,8 @@ export interface SciToolbarItemDescriptor {
   accelerator?: string[];
   disabled?: boolean | Signal<boolean>;
   cssClass?: string | string[];
+  /** Arbitrary metadata associated with the menu. */
+  data?: {[key: string]: string};
 }
 
 export interface SciToolbarMenuDescriptor {
@@ -54,10 +56,14 @@ export interface SciToolbarMenuDescriptor {
     filter?: boolean | {placeholder?: string; notFoundText?: string};
   };
   cssClass?: string | string[];
+  /** Arbitrary metadata associated with the menu. */
+  data?: {[key: string]: string};
 }
 
 export interface SciToolbarGroupDescriptor {
   name?: `group:${string}` | `group:${string}`[];
   disabled?: boolean | Signal<boolean>;
   cssClass?: string | string[];
+  /** Arbitrary metadata associated with the menu. */
+  data?: {[key: string]: string};
 }

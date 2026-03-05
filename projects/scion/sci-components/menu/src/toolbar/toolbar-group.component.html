@@ -24,8 +24,6 @@
     }
     @case ('menu') {
       <button [attr.disabled]="disabled || null"
-              [attr.data-menu-id]="menuItem.id"
-              [attr.data-menu-name]="menuItem.name"
               [class.active]="activeSubMenuItem()?.menu === menuItem"
               [class.visual-menu-hint]="menuItem.icon?.() && !menuItem.label?.() && menuItem.visualMenuHint"
               [class]="menuItem.cssClass" class="menu-item submenu-item"
@@ -55,8 +53,6 @@
       <sci-toolbar-group [name]="menuItem.name"
                          [context]="this.context()"
                          [disabled]="disabled"
-                         [attr.data-group-id]="menuItem.id"
-                         [attr.data-group-name]="menuItem.name"
                          [class]="menuItem.cssClass"/>
     }
   }

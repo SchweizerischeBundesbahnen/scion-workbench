@@ -22,22 +22,23 @@ import {Objects} from '@scion/toolkit/util';
 @Injectable({providedIn: 'root'})
 export class SciDefaultMenuAdapter implements SciMenuAdapter {
 
-  private readonly _contributions = new Map<string, WritableSignal<Contribution[]>>;
+  private readonly _contributions = new Map<`menu:${string}` | `toolbar:${string}` | `group:${string}`, WritableSignal<Contribution[]>>;
   private readonly _injector = inject(Injector);
 
   /** @inheritDoc */
-  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contributions: SciMenuContributions, context: Map<string, unknown>): Disposable {
-    if (!this._contributions.has(location)) {
-      this._contributions.set(location, signal([]));
+  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`, contributions: SciMenuContributions, context: Map<string, unknown>): Disposable {
+    const normalizedGroupLocation = normalizeGroupLocation(location);
+    if (!this._contributions.has(normalizedGroupLocation)) {
+      this._contributions.set(normalizedGroupLocation, signal([]));
     }
 
     const currentContribution: Contribution = {contributions: contributions, context};
-    this._contributions.get(location)!.update(contributions => contributions.concat(currentContribution));
+    this._contributions.get(normalizedGroupLocation)!.update(contributions => contributions.concat(currentContribution));
 
     return {
       dispose: () => {
         // Do not remove signal for listener to never have a "stale" signal.
-        this._contributions.get(location)!.update(contributions => contributions.filter(contribution => contribution !== currentContribution));
+        this._contributions.get(normalizedGroupLocation)!.update(contributions => contributions.filter(contribution => contribution !== currentContribution));
       },
     }
   }
@@ -245,6 +246,15 @@ function setStyles(element: HTMLElement, styles: {[style: string]: string | null
       element.style.setProperty(name, value);
     }
   });
+}
+
+function normalizeGroupLocation(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`): `menu:${string}` | `toolbar:${string}` | `group:${string}` {
+  const regex = /^group\((menu|toolbar)\):(?<name>.+)/;
+  const match = regex.exec(location);
+  if (match) {
+    return `group:${match.groups!['name']}`;
+  }
+  return location as `menu:${string}` | `toolbar:${string}`;
 }
 
 interface Contribution {

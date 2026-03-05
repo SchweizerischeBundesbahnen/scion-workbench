@@ -17,7 +17,7 @@ export function contributeMenu(location: string | SciContributionLocation, facto
 export function contributeMenu(locationArg: string | SciContributionLocation, factoryFn: Function, options?: SciMenuContributionOptions): Disposable {
   const injector = Injector.create({parent: options?.injector ?? inject(Injector), providers: []});
 
-  const {location, before, after, context} = typeof locationArg === 'string' ? {location: locationArg} : locationArg;
+  const {location, before, after, context} = typeof locationArg === 'string' ? {location: locationArg} as SciContributionLocation : locationArg;
   return runInInjectionContext(injector, () => {
     const menuService = inject(ɵSciMenuService);
 
@@ -32,7 +32,7 @@ export function contributeMenu(locationArg: string | SciContributionLocation, fa
 
       untracked(() => {
         const registrations = new Array<Disposable>();
-        registrations.push(menuService.contributeMenu(normalizeGroupLocation(location), contributions, mergedContext));
+        registrations.push(menuService.contributeMenu(location, contributions, mergedContext));
         registrations.push(...menuContributions.map(menuContribution => contributeMenu(menuContribution.location, menuContribution.factoryFn, {...options, injector})));
         registrations.push(...groupContributions.map(groupContribution => contributeMenu(groupContribution.location, groupContribution.factoryFn, {...options, injector})));
 
@@ -47,15 +47,6 @@ export function contributeMenu(locationArg: string | SciContributionLocation, fa
       dispose: () => injector.destroy(),
     };
   });
-}
-
-function normalizeGroupLocation(location: string): `menu:${string}` | `toolbar:${string}` | `group:${string}` {
-  const regex = /^group\((menu|toolbar)\):(?<name>.+)/;
-  const match = regex.exec(location);
-  if (match) {
-    return `group:${match.groups!['name']}`;
-  }
-  return location as `menu:${string}` | `toolbar:${string}` | `group:${string}`;
 }
 
 function constructMenu(location: string, factoryFn: Function): ɵSciMenu | ɵSciToolbar {
@@ -109,9 +100,4 @@ export interface SciToolbarGroupContributionLocation {
   after?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
 }
 
-export interface SciContributionLocation {
-  location: string;
-  context?: Map<string, unknown>;
-  before?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
-  after?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
-}
+export type SciContributionLocation = SciMenuContributionLocation | SciToolbarContributionLocation | SciMenuGroupContributionLocation | SciToolbarGroupContributionLocation;

@@ -36,6 +36,8 @@ export interface SciMenuItemDescriptor {
   // actions?: (toolbar: SciToolbar) => SciMenu;
   onFilter?: (filter: string) => boolean;
   cssClass?: string | string[];
+  /** Arbitrary metadata associated with the menu. */
+  data?: {[key: string]: string};
 }
 
 export interface SciMenuDescriptor {
@@ -51,6 +53,8 @@ export interface SciMenuDescriptor {
     filter?: boolean | {placeholder?: string; notFoundText?: string};
   };
   cssClass?: string | string[];
+  /** Arbitrary metadata associated with the menu. */
+  data?: {[key: string]: string};
 }
 
 export interface SciMenuGroupDescriptor {
@@ -59,4 +63,6 @@ export interface SciMenuGroupDescriptor {
   collapsible?: boolean | {collapsed: boolean};
   disabled?: boolean | Signal<boolean>;
   cssClass?: string | string[];
+  /** Arbitrary metadata associated with the menu. */
+  data?: {[key: string]: string};
 }

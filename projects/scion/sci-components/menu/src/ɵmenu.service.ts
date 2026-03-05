@@ -48,7 +48,7 @@ export class ɵSciMenuService implements SciMenuService {
     return computed(() => sortMenuContributions(location.reduce((contributions, location) => contributions.concat(this._menuAdapter.menuContributions(location, context)()), [] as SciMenuContributions)));
   }
 
-  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contributions: SciMenuContributions, context: Map<string, unknown>): Disposable {
+  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`, contributions: SciMenuContributions, context: Map<string, unknown>): Disposable {
     return this._menuAdapter.contributeMenu(location, contributions, context);
   }
 }

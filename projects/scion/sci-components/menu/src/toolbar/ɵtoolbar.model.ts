@@ -16,7 +16,6 @@ export class ɵSciToolbar implements SciToolbar {
   public addToolbarItem(descriptor: SciToolbarItemDescriptor, onSelect: (context: Map<string, unknown>) => void): this {
     this.contributions.push({
       type: 'menu-item',
-      id: `menuitem:${UUID.randomUUID()}`,
       name: coerceArray(descriptor.name ?? []),
       label: coerceSignal(descriptor.label),
       icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
@@ -29,6 +28,7 @@ export class ɵSciToolbar implements SciToolbar {
         onSelect(context);
         return false;
       },
+      data: descriptor.data,
     } satisfies SciMenuItemContribution);
 
     // TODO [menu] throw error if icon and checked
@@ -39,7 +39,6 @@ export class ɵSciToolbar implements SciToolbar {
     const id = UUID.randomUUID();
     const menuItem: SciMenuContribution = {
       type: 'menu',
-      id: `menu:${id}`,
       name: coerceArray(descriptor.name ?? []).concat(`menu:${id}`),
       label: coerceSignal(descriptor.label),
       icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
@@ -53,6 +52,7 @@ export class ɵSciToolbar implements SciToolbar {
         filter: descriptor.menu?.filter,
       },
       cssClass: Arrays.coerce(descriptor.cssClass),
+      data: descriptor.data,
     };
     this.contributions.push(menuItem);
 
@@ -75,7 +75,6 @@ export class ɵSciToolbar implements SciToolbar {
 
       this.contributions.push({
         type: 'group',
-        id: `group:${id}`,
         name: [`group:${id}`],
         disabled: signal(false),
       } satisfies SciMenuGroupContribution);
@@ -94,10 +93,10 @@ export class ɵSciToolbar implements SciToolbar {
 
       this.contributions.push({
         type: 'group',
-        id: `group:${id}`,
         name: coerceArray(descriptor.name ?? []).concat(`group:${id}`),
         disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
         cssClass: Arrays.coerce(descriptor.cssClass),
+        data: descriptor.data,
       } satisfies SciMenuGroupContribution);
 
       // children
