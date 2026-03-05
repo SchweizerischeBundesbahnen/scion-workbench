@@ -17,9 +17,9 @@ import {SciDefaultMenuAdapter} from './default-menu-adapter';
 @Injectable({providedIn: 'root', useExisting: SciDefaultMenuAdapter})
 export abstract class SciMenuAdapter {
 
-  public abstract contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`, contributions: SciMenuContributions, context: Map<string, unknown>): Disposable;
+  public abstract contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`, contributions: SciMenuContributions, context: Map<string, unknown>, next: SciMenuAdapter): Disposable;
 
-  public abstract menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>): Signal<SciMenuContributions>;
+  public abstract menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>, next: SciMenuAdapter): Signal<SciMenuContributions>;
 
   /**
    * TODO Optional or required?

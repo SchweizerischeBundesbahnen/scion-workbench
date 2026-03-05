@@ -11,13 +11,13 @@
 import {SciMenuOptions, SciMenuRef, SciMenuService} from './menu.service';
 import {computed, inject, Injectable, Provider, Signal} from '@angular/core';
 import {coerceArray} from '@angular/cdk/coercion';
-import {SciMenuAdapter} from './menu-adapter';
 import {SciMenuContributions} from './menu-contribution.model';
 import {Disposable} from './common/disposable';
 import {sortMenuContributions} from './menu-contribution-sorter';
-import {SciDefaultMenuAdapter} from './default-menu-adapter';
 import {SciMenuContextProvider} from './menu-context-provider';
 import {coerceSignal} from './common/common';
+import {SciMenuAdapter} from './menu-adapter';
+import {SciDefaultMenuAdapter} from './default-menu-adapter';
 
 @Injectable({providedIn: 'root'})
 export class ɵSciMenuService implements SciMenuService {
@@ -45,11 +45,11 @@ export class ɵSciMenuService implements SciMenuService {
 
   /** @inheritDoc */
   public menuContributions(location: Array<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Map<string, unknown>): Signal<SciMenuContributions> {
-    return computed(() => sortMenuContributions(location.reduce((contributions, location) => contributions.concat(this._menuAdapter.menuContributions(location, context)()), [] as SciMenuContributions)));
+    return computed(() => sortMenuContributions(location.reduce((contributions, location) => contributions.concat(this._menuAdapter.menuContributions(location, context, this._defaultMenuAdapter)()), [] as SciMenuContributions)));
   }
 
   public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`, contributions: SciMenuContributions, context: Map<string, unknown>): Disposable {
-    return this._menuAdapter.contributeMenu(location, contributions, context);
+    return this._menuAdapter.contributeMenu(location, contributions, context, this._defaultMenuAdapter);
   }
 }
 
