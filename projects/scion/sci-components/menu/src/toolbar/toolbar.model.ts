@@ -14,6 +14,7 @@ import {SciMenu} from '../menu/menu.model';
 
 export interface SciToolbar {
 
+  // Describe that onSelect can call `inject` to get any required dependencies.
   addToolbarItem(descriptor: SciToolbarItemDescriptor, onSelect: (context: Map<string, unknown>) => void): this;
 
   addMenu(descriptor: SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenu) => SciMenu): this;

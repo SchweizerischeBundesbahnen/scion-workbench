@@ -25,7 +25,10 @@ export class ɵSciToolbar implements SciToolbar {
       accelerator: descriptor.accelerator,
       disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
       cssClass: Arrays.coerce(descriptor.cssClass),
-      onSelect,
+      onSelect: context => {
+        onSelect(context);
+        return false;
+      },
     } satisfies SciMenuItemContribution);
 
     // TODO [menu] throw error if icon and checked

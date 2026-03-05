@@ -13,5 +13,7 @@ import {Injectable, Signal} from '@angular/core';
 @Injectable()
 export abstract class SciMenuContextProvider {
 
-  public abstract provideContext(): Map<string, unknown> | Signal<Map<string, unknown>>;
+  public abstract provideContext?(): Map<string, unknown> | Signal<Map<string, unknown>>;
+
+  public abstract provideAcceleratorTarget(): Element | undefined | Signal<Element | undefined>;
 }

@@ -26,7 +26,7 @@ export class ɵSciMenu implements SciMenu {
       actionToolbarName: coerceSignal(descriptor.actionToolbarName),
       matchesFilter: descriptor.onFilter,
       cssClass: Arrays.coerce(descriptor.cssClass),
-      onSelect,
+      onSelect: (context) => onSelect(context) ?? descriptor.checked === undefined, // Close if the callback returns true. Defaults to closing non-checkable menu items.
     } satisfies SciMenuItemContribution);
 
     // TODO [menu] throw error if icon and checked

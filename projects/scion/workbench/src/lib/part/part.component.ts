@@ -17,6 +17,7 @@ import {PartBarComponent} from './part-bar/part-bar.component';
 import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';
 import {WORKBENCH_ID} from '../workbench.identifiers';
 import {dasherize} from '../common/dasherize.util';
+import {installMenuAccelerators} from '@scion/sci-components/menu';
 
 @Component({
   selector: 'wb-part',
@@ -51,6 +52,10 @@ export class PartComponent implements OnInit {
   constructor() {
     this.installComponentLifecycleLogger();
     this.constructInactiveViewComponents();
+
+    installMenuAccelerators('toolbar:workbench.part.tools.start');
+    installMenuAccelerators('toolbar:workbench.part.tools.end');
+
   }
 
   public ngOnInit(): void {

@@ -25,7 +25,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {rootEffect} from '../common/root-effect';
 import ActivatedMicrofrontendComponent from '../activated-microfrontend/activated-microfrontend.component';
-import {contributeMenu, SciMenuService, SciToolbarComponent} from '@scion/sci-components/menu';
+import {contributeMenu, installMenuAccelerators, SciMenuService, SciToolbarComponent} from '@scion/sci-components/menu';
 import {Notification1Component} from '../notification-1/notification-1.component';
 
 @Component({
@@ -128,7 +128,9 @@ export default class ViewPageComponent {
         .addMenuItem({label: 'Always Select Opened Element', checked: computed(() => flags().has('always_select_opened_element'))}, () => toggleMultiFlag(flags, 'always_select_opened_element')),
       )
       .addGroup(group => group
-        .addMenuItem({label: 'Speed Search', icon: 'search', accelerator: ['Ctrl', 'F']}, onAction),
+        .addMenuItem({label: 'Speed Search', icon: 'search', accelerator: ['Ctrl', 'F']}, (context) => {
+          console.log('>>> speed search (Ctrl + F)', context);
+        }),
       )
       .addGroup(group => group
         .addMenu({label: 'View Mode'}, menu => menu
@@ -157,6 +159,8 @@ export default class ViewPageComponent {
       .addMenuItem({label: 'Remove from Sidebar'}, onAction),
     );
 
+    installMenuAccelerators(`menu:contextmenu`);
+
     contributeMenu({location: 'toolbar:hello', context: new Map().set('marc', 'dani')}, toolbar => toolbar
       .addGroup(group => group
         .addToolbarItem({icon: 'lens_blur'}, () => onAction())
@@ -166,7 +170,9 @@ export default class ViewPageComponent {
       .addMenu({icon: 'content_cut'}, menu => menu
         .addMenuItem({label: 'Undo', icon: 'undo', accelerator: ['Ctrl', 'Z']}, () => onAction())
         .addMenuItem({label: 'Redo', icon: 'redo'}, () => onAction())
-        .addMenuItem({label: 'Cut', icon: 'content_cut', accelerator: ['Ctrl', 'X']}, () => onAction())
+        .addMenuItem({label: 'Cut', icon: 'content_cut', accelerator: ['Ctrl', 'X']}, () => {
+          console.log('>>> ctrl x');
+        })
         .addMenuItem({label: 'Copy', icon: 'content_copy', accelerator: ['Ctrl', 'C']}, () => onAction())
         .addMenuItem({label: 'Paste', icon: 'content_paste', accelerator: ['Ctrl', 'V']}, () => onAction())
         .addMenuItem({label: 'Find and replace', icon: 'find_replace', accelerator: ['Ctrl', 'F']}, () => onAction()),

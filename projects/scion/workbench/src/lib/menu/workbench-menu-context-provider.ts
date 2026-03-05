@@ -14,9 +14,14 @@ import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {WorkbenchDialog} from '../dialog/workbench-dialog.model';
 import {WorkbenchNotification} from '../notification/workbench-notification.model';
+import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
+import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
+import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog.model';
+import {ɵWorkbenchNotification} from '../notification/ɵworkbench-notification.model';
 
 class WorkbenchMenuContextProvider implements SciMenuContextProvider {
 
+  /** @inheritDoc */
   public provideContext(): Map<string, unknown> | Signal<Map<string, unknown>> {
     const view = inject(WorkbenchView, {optional: true});
     if (view) {
@@ -47,6 +52,31 @@ class WorkbenchMenuContextProvider implements SciMenuContextProvider {
     }
 
     return new Map();
+  }
+
+  /** @inheritDoc */
+  public provideAcceleratorTarget(): Signal<Element | undefined> | undefined {
+    const view = inject(ɵWorkbenchView, {optional: true});
+    if (view) {
+      return view.slot.portal.element;
+    }
+
+    const part = inject(ɵWorkbenchPart, {optional: true});
+    if (part) {
+      return part.slot.portal.element;
+    }
+
+    const dialog = inject(ɵWorkbenchDialog, {optional: true});
+    if (dialog) {
+      return dialog.element;
+    }
+
+    const notification = inject(ɵWorkbenchNotification, {optional: true});
+    if (notification) {
+      return notification.portal.element;
+    }
+
+    return undefined;
   }
 }
 

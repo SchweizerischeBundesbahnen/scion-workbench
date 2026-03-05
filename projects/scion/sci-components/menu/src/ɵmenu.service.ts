@@ -24,7 +24,7 @@ export class ɵSciMenuService implements SciMenuService {
 
   private readonly _menuAdapter = inject(SciMenuAdapter);
   private readonly _defaultMenuAdapter = inject(SciDefaultMenuAdapter);
-  private readonly _environmentMenuContext = coerceSignal(inject(SciMenuContextProvider, {optional: true})?.provideContext());
+  private readonly _environmentMenuContext = coerceSignal(inject(SciMenuContextProvider, {optional: true})?.provideContext?.());
 
   /** @inheritDoc */
   public open(name: `menu:${string}` | `menu:${string}`[], options: SciMenuOptions): SciMenuRef {
@@ -44,8 +44,8 @@ export class ɵSciMenuService implements SciMenuService {
   }
 
   /** @inheritDoc */
-  public menuContributions(locations: Array<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Map<string, unknown>): Signal<SciMenuContributions> {
-    return computed(() => sortMenuContributions(locations.reduce((contributions, location) => contributions.concat(this._menuAdapter.menuContributions(location, context)()), [] as SciMenuContributions)));
+  public menuContributions(location: Array<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Map<string, unknown>): Signal<SciMenuContributions> {
+    return computed(() => sortMenuContributions(location.reduce((contributions, location) => contributions.concat(this._menuAdapter.menuContributions(location, context)()), [] as SciMenuContributions)));
   }
 
   public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contributions: SciMenuContributions, context: Map<string, unknown>): Disposable {

@@ -1,8 +1,9 @@
-import {ChangeDetectionStrategy, Component, computed, inject, input, output, Signal, ViewContainerRef} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, Injector, input, output, Signal, untracked, ViewContainerRef} from '@angular/core';
 import {SciToolGroupComponent} from './toolbar-group.component';
 import {SciMenuContextProvider} from '../menu-context-provider';
 import {coerceSignal} from '../common/common';
-import {coerceArray} from '@angular/cdk/coercion';
+import {coerceArray, coerceElement} from '@angular/cdk/coercion';
+import {installMenuAccelerators} from '../menu-accelerators';
 
 @Component({
   selector: 'sci-toolbar',
@@ -17,11 +18,16 @@ export class SciToolbarComponent {
 
   public readonly name = input.required({transform: coerceNameArray});
   public readonly context = input<Map<string, unknown>>();
+  public readonly acceleratorTarget = input<Element | ElementRef<Element>>();
   public readonly viewContainerRef = input<ViewContainerRef | undefined>();
   public readonly toolbarMenuOpen = output<boolean>();
   public readonly toolbarEmpty = output<boolean>();
 
   protected readonly mergedContext = this.computeContext();
+
+  constructor() {
+    this.installAccelerators();
+  }
 
   protected onToolbarEmptyChange(empty: boolean): void {
     this.toolbarEmpty.emit(empty);
@@ -32,8 +38,23 @@ export class SciToolbarComponent {
   }
 
   protected computeContext(): Signal<Map<string, unknown>> {
-    const environmentMenuContext = coerceSignal(inject(SciMenuContextProvider, {optional: true})?.provideContext());
+    const environmentMenuContext = coerceSignal(inject(SciMenuContextProvider, {optional: true})?.provideContext?.());
     return computed(() => new Map([...environmentMenuContext?.() ?? new Map(), ...this.context() ?? new Map()]));
+  }
+
+  private installAccelerators(): void {
+    const injector = inject(Injector);
+
+    effect(onCleanup => {
+      const name = this.name();
+      const target = coerceElement(this.acceleratorTarget());
+      const context = this.mergedContext();
+
+      untracked(() => {
+        const ref = installMenuAccelerators(name, {target, context, injector});
+        onCleanup(() => ref.dispose());
+      });
+    });
   }
 }
 

@@ -15,15 +15,14 @@ export function contributeMenu(location: `group(toolbar):${string}` | SciMenuGro
 /** @internal */
 export function contributeMenu(location: string | SciContributionLocation, factoryFn: Function, options?: SciMenuContributionOptions): Disposable;
 export function contributeMenu(locationArg: string | SciContributionLocation, factoryFn: Function, options?: SciMenuContributionOptions): Disposable {
-  const parent = options?.injector ?? inject(Injector);
-  const injector = Injector.create({parent: parent, providers: []});
+  const injector = Injector.create({parent: options?.injector ?? inject(Injector), providers: []});
 
   const {location, before, after, context} = typeof locationArg === 'string' ? {location: locationArg} : locationArg;
   return runInInjectionContext(injector, () => {
     const menuService = inject(ɵSciMenuService);
 
     const {contributions, menuContributions, groupContributions} = constructMenu(location, factoryFn);
-    const environmentMenuContext = coerceSignal(inject(SciMenuContextProvider, {optional: true})?.provideContext());
+    const environmentMenuContext = coerceSignal(inject(SciMenuContextProvider, {optional: true})?.provideContext?.());
 
     // Sort relative to other contributions.
     contributions.forEach(contribution => contribution.position = {before, after});

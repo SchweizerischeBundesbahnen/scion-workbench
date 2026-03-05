@@ -51,7 +51,7 @@
             </span>
 
             @if (menuItem.accelerator?.length) {
-              <span class="accelerator">{{menuItem.accelerator | wbJoin:'+'}}</span>
+              <span class="accelerator">{{menuItem.accelerator | sciFormatAccelerator}}</span>
             }
 
             @let actionToolbarName = menuItem.actionToolbarName?.();

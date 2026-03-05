@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, computed, effect, inject, Injector, input, linkedSignal, output, signal, Signal, untracked, ViewContainerRef} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, Injector, input, linkedSignal, output, runInInjectionContext, signal, Signal, untracked, ViewContainerRef} from '@angular/core';
 import {NgComponentOutlet} from '@angular/common';
 import {MenuItemStateDirective} from '../menu/menu-item-state.directive';
 import {SciMenuContribution, SciMenuGroupContribution, SciMenuItemContribution} from '../menu-contribution.model';
@@ -24,6 +24,7 @@ export class SciToolGroupComponent {
   public readonly groupMenuOpen = output<boolean>();
 
   private readonly _menuService = inject(SciMenuService);
+  private readonly _injector = inject(Injector);
 
   protected readonly menuItems = this.computeToolbarItems();
   protected readonly activeSubMenuItem = linkedSignal<{location: Array<`toolbar:${string}` | `group:${string}`>; context: Map<string, unknown> | undefined}, {menu: SciMenuContribution, element: HTMLElement} | null>({
@@ -73,6 +74,10 @@ export class SciToolGroupComponent {
     effect(() => {
       this.groupEmpty.emit(this.menuItems().every(menuItem => this.isEmtpy(menuItem)()));
     });
+  }
+
+  protected onSelect(menuItem: SciMenuItemContribution): void {
+    runInInjectionContext(this._injector, () => void menuItem.onSelect(this.context()));
   }
 
   private computeToolbarItems(): Signal<Array<SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution>> {

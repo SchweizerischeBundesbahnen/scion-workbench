@@ -6,7 +6,7 @@
       <button [attr.disabled]="disabled || null"
               [class.checked]="menuItem.checked?.()"
               [class]="menuItem.cssClass" class="menu-item"
-              (click)="menuItem.onSelect(this.context())"
+              (click)="onSelect(menuItem)"
               sciMenuItemState [menuItem]="menuItem" #sciMenuItemState="sciMenuItemState">
         @if (menuItem.icon?.()) {
           <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon?.()}}</span>

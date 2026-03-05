@@ -12,6 +12,7 @@ import {Signal} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
 
 export interface SciMenu {
+  // Describe that onSelect can call `inject` to get any required dependencies.
   addMenuItem(descriptor: SciMenuItemDescriptor, onSelect: (context: Map<string, unknown>) => boolean | void): this;
 
   addMenu(descriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenu) => SciMenu): this;

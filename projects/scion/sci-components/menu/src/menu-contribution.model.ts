@@ -1,6 +1,9 @@
 import {Signal} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
 
+/**
+ * INPUTS FOR DESCRIPTION: https://www.electronjs.org/docs/latest/api/menu-item
+ */
 export interface SciMenuItemContribution {
   type: 'menu-item'
   id: `menuitem:${string}`;
@@ -9,7 +12,8 @@ export interface SciMenuItemContribution {
   icon?: Signal<string>;
   tooltip?: Signal<string>;
   accelerator?: string[];
-  disabled: Signal<boolean>;
+  disabled: Signal<boolean>; // Consider renaming to enabled; https://www.electronjs.org/docs/latest/api/menu-item
+  // visible: Signal<boolean>; // Consider providing visible
   checked?: Signal<boolean>;
   actionToolbarName?: Signal<`toolbar:${string}` | undefined>;
   matchesFilter?: (filter: string) => boolean;
@@ -18,7 +22,7 @@ export interface SciMenuItemContribution {
     before?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
     after?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
   };
-  onSelect: (context: Map<string, unknown>) => boolean | void;
+  onSelect: (context: Map<string, unknown>) => boolean;
 }
 
 export interface SciMenuContribution {
@@ -28,7 +32,8 @@ export interface SciMenuContribution {
   label?: Signal<string | ComponentType<unknown>>;
   icon?: Signal<string>;
   tooltip?: Signal<string>;
-  disabled: Signal<boolean>;
+  disabled: Signal<boolean>; // Consider renaming to enabled; https://www.electronjs.org/docs/latest/api/menu-item
+  // visible: Signal<boolean>; // Consider providing visible
   visualMenuHint?: boolean;
   position?: {
     before?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
@@ -53,7 +58,8 @@ export interface SciMenuGroupContribution {
     before?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
     after?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
   };
-  disabled: Signal<boolean>;
+  disabled: Signal<boolean>; // Consider renaming to enabled; https://www.electronjs.org/docs/latest/api/menu-item
+  // visible: Signal<boolean>; // Consider providing visible
   cssClass?: string[];
 }
 

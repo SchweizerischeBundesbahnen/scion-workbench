@@ -1,5 +1,5 @@
-import {afterRenderEffect, ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, forwardRef, inject, input, linkedSignal, signal, Signal, untracked, viewChild, ViewContainerRef} from '@angular/core';
-import {JoinPipe} from './join.pipe';
+import {afterRenderEffect, ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, forwardRef, inject, Injector, input, linkedSignal, runInInjectionContext, signal, Signal, untracked, viewChild, ViewContainerRef} from '@angular/core';
+import {FormatAcceleratorPipe} from './accelerator-format.pipe';
 import {MenuItemGroupComponent} from './menu-group.component';
 import {MenuFilterComponent} from './menu-filter.component';
 import {MenuFilter} from './menu-filter.service';
@@ -19,7 +19,7 @@ import {SciMenuService} from '../menu.service';
   styleUrl: './menu.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    JoinPipe,
+    FormatAcceleratorPipe,
     MenuItemGroupComponent,
     MenuFilterComponent,
     forwardRef(() => SciToolbarComponent),
@@ -55,6 +55,7 @@ export class MenuComponent {
   private readonly _menuFilter = inject(MenuFilter);
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _document = inject(DOCUMENT);
+  private readonly _injector = inject(Injector);
   private readonly _actionToolbarMenuOpen = signal(false);
 
   protected readonly hasGlyphArea = computed(() => this.glyphArea() ?? this.requiresGlyphArea());
@@ -134,10 +135,11 @@ export class MenuComponent {
   }
 
   protected onSelect(menuItem: SciMenuItemContribution): void {
-    // Close the popup if the callback returns true. Defaults to closing non-checkable menu items.
-    if (menuItem.onSelect(this.context()) ?? menuItem.checked?.() === undefined) {
-      this.close();
-    }
+    runInInjectionContext(this._injector, () => {
+      if (menuItem.onSelect(this.context())) {
+        this.close();
+      }
+    });
   }
 
   protected onGroupToggle(): void {
