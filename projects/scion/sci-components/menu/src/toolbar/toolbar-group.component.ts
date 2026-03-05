@@ -3,7 +3,6 @@ import {NgComponentOutlet} from '@angular/common';
 import {MenuItemStateDirective} from '../menu/menu-item-state.directive';
 import {SciMenuContribution, SciMenuGroupContribution, SciMenuItemContribution} from '../menu-contribution.model';
 import {SciMenuService} from '../menu.service';
-import {coerceArray} from '@angular/cdk/coercion';
 
 @Component({
   selector: 'sci-toolbar-group',
@@ -17,7 +16,8 @@ import {coerceArray} from '@angular/cdk/coercion';
 })
 export class SciToolGroupComponent {
 
-  public readonly location = input.required({transform: coerceLocation});
+  public readonly name = input.required<Array<`toolbar:${string}` | `group:${string}`>>();
+  public readonly context = input.required<Map<string, unknown>>();
   public readonly disabled = input<boolean>();
   public readonly viewContainerRef = input<ViewContainerRef | undefined>();
   public readonly groupEmpty = output<boolean>();
@@ -26,8 +26,8 @@ export class SciToolGroupComponent {
   private readonly _menuService = inject(SciMenuService);
 
   protected readonly menuItems = this.computeToolbarItems();
-  protected readonly activeSubMenuItem = linkedSignal<Array<`toolbar:${string}` | `group:${string}`>, {menu: SciMenuContribution, element: HTMLElement} | null>({
-    source: this.location,  // reset active sub menu item when this component is re-used
+  protected readonly activeSubMenuItem = linkedSignal<{location: Array<`toolbar:${string}` | `group:${string}`>; context: Map<string, unknown> | undefined}, {menu: SciMenuContribution, element: HTMLElement} | null>({
+    source: computed(() => ({location: this.name(), context: this.context()})),  // reset active sub menu item when this component is re-used
     computation: () => null,
   });
 
@@ -45,6 +45,7 @@ export class SciToolGroupComponent {
         if (activeSubMenuItem) {
           const ref = this._menuService.open(activeSubMenuItem.menu.name, {
             anchor: activeSubMenuItem.element,
+            context: this.context(),
             viewContainerRef,
             cssClass: activeSubMenuItem.menu.cssClass,
             filter: activeSubMenuItem.menu.menu.filter,
@@ -75,7 +76,7 @@ export class SciToolGroupComponent {
   }
 
   private computeToolbarItems(): Signal<Array<SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution>> {
-    return computed(() => this._menuService.menuContributions(this.location())());
+    return computed(() => this._menuService.menuContributions(this.name(), this.context())());
   }
 
   protected onSubMenuClick(menuItem: {menu: SciMenuContribution, element: HTMLElement} | null): void {
@@ -88,11 +89,7 @@ export class SciToolGroupComponent {
         return signal(false);
       case 'menu':
       case 'group':
-        return computed(() => this._menuService.menuContributions(menuItem.name)().every(menuItem => this.isEmtpy(menuItem)()));
+        return computed(() => this._menuService.menuContributions(menuItem.name, this.context())().every(menuItem => this.isEmtpy(menuItem)()));
     }
   }
-}
-
-function coerceLocation(location: `toolbar:${string}` | `group:${string}` | Array<`toolbar:${string}` | `group:${string}`>): Array<`toolbar:${string}` | `group:${string}`> {
-  return coerceArray(location);
 }

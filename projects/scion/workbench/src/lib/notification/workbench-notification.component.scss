@@ -73,14 +73,19 @@
     }
   }
 
-  > button.close:is(button, #sci-reset) {
-    @include workbench.icon-button-element-states() {
-      position: absolute;
-      top: .275em;
-      right: .275em;
-      padding: .125em;
-      border-radius: var(--sci-corner-small);
-      font-size: 1rem;
+  > div.top-right {
+    display: flex;
+    gap: .25em;
+    position: absolute;
+    top: .275em;
+    right: .275em;
+
+    > button.close:is(button, #sci-reset) {
+      @include workbench.icon-button-element-states() {
+        padding: .125em;
+        border-radius: var(--sci-corner-small);
+        font-size: 1rem;
+      }
     }
   }
 }

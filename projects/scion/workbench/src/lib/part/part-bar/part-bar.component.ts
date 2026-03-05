@@ -51,6 +51,10 @@ export class PartBarComponent {
   protected readonly endActions = computed(() => this.part.actions().filter(action => action.align !== 'start'));
   protected readonly maxViewTabBarWidth: Signal<number>;
 
+  protected readonly toolbarContext = computed(() => {
+    return new Map<string, unknown>().set('viewId', this.part.activeView()?.id)
+  });
+
   constructor() {
     this.maxViewTabBarWidth = this.calculateMaxViewTabBarWidth();
     this.installActivityMinimizer();

@@ -6,7 +6,7 @@
       <button [attr.disabled]="disabled || null"
               [class.checked]="menuItem.checked?.()"
               [class]="menuItem.cssClass" class="menu-item"
-              (click)="menuItem.onSelect()"
+              (click)="menuItem.onSelect(this.context())"
               sciMenuItemState [menuItem]="menuItem" #sciMenuItemState="sciMenuItemState">
         @if (menuItem.icon?.()) {
           <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon?.()}}</span>
@@ -52,7 +52,8 @@
       </button>
     }
     @case ('group') {
-      <sci-toolbar-group [location]="menuItem.name"
+      <sci-toolbar-group [name]="menuItem.name"
+                         [context]="this.context()"
                          [disabled]="disabled"
                          [attr.data-group-id]="menuItem.id"
                          [attr.data-group-name]="menuItem.name"

@@ -12,7 +12,7 @@ import {Signal} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
 
 export interface SciMenu {
-  addMenuItem(descriptor: SciMenuItemDescriptor, onSelect: () => boolean | void): this;
+  addMenuItem(descriptor: SciMenuItemDescriptor, onSelect: (context: Map<string, unknown>) => boolean | void): this;
 
   addMenu(descriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenu) => SciMenu): this;
 
@@ -25,7 +25,7 @@ export type SciMenuGroup = SciMenu;
 
 export interface SciMenuItemDescriptor {
   name?: `menuitem:${string}` | `menuitem:${string}`[];
-  label?: string | Signal<string> | ComponentType<unknown>;
+  label: string | Signal<string> | ComponentType<unknown>;
   icon?: string | Signal<string>;
   checked?: boolean | Signal<boolean>;
   tooltip?: string | Signal<string>;

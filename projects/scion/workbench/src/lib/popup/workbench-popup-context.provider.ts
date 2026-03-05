@@ -12,6 +12,7 @@ import {InjectionToken, Provider} from '@angular/core';
 import {provideWorkbenchDialogService} from '../dialog/ɵworkbench-dialog.service';
 import {provideWorkbenchMessageBoxService} from '../message-box/ɵworkbench-message-box.service';
 import {provideWorkbenchPopupService} from './ɵworkbench-popup.service';
+import {provideSciMenuService} from '@scion/sci-components/menu';
 
 /**
  * DI token to register providers available for DI if in the context of a workbench popup.
@@ -28,6 +29,7 @@ export function provideWorkbenchPopupContext(): Provider {
       provideWorkbenchDialogService(),
       provideWorkbenchMessageBoxService(),
       provideWorkbenchPopupService(),
+      provideSciMenuService(),
     ],
     multi: true,
   };

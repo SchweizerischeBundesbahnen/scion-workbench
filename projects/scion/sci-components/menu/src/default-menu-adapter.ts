@@ -17,41 +17,55 @@ import {coerceElement} from '@angular/cdk/coercion';
 import {MenuComponent} from './menu/menu.component';
 import {dimension} from '@scion/components/dimension';
 import {UUID} from '@scion/toolkit/uuid';
+import {Objects} from '@scion/toolkit/util';
 
 @Injectable({providedIn: 'root'})
 export class SciDefaultMenuAdapter implements SciMenuAdapter {
 
-  private readonly _contributions = new Map<string, WritableSignal<SciMenuContributions>>;
+  private readonly _contributions = new Map<string, WritableSignal<Contribution[]>>;
   private readonly _injector = inject(Injector);
 
   /** @inheritDoc */
-  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contributions: SciMenuContributions): Disposable {
+  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contributions: SciMenuContributions, context: Map<string, unknown>): Disposable {
     if (!this._contributions.has(location)) {
       this._contributions.set(location, signal([]));
     }
 
-    this._contributions.get(location)!.update(currentContributions => currentContributions.concat(contributions));
+    const currentContribution: Contribution = {contributions: contributions, context};
+    this._contributions.get(location)!.update(contributions => contributions.concat(currentContribution));
 
     return {
       dispose: () => {
         // Do not remove signal for listener to never have a "stale" signal.
-        this._contributions.get(location)!.update(currentContributions => currentContributions.filter(candidate => !contributions.includes(candidate)));
+        this._contributions.get(location)!.update(contributions => contributions.filter(contribution => contribution !== currentContribution));
       },
     }
   }
 
   /** @inheritDoc */
-  public menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`): Signal<SciMenuContributions> {
+  public menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>): Signal<SciMenuContributions> {
     // If no contributions are registered yet, register signal for the signal to "emit" when contributions are registered later.
     if (!this._contributions.has(location)) {
       this._contributions.set(location, signal([]));
     }
 
-    return this._contributions.get(location)!;
+    const contributions = this._contributions.get(location)!;
+    return computed(() => contributions()
+      .filter(contribution => {
+        const contributionContext = contribution.context;
+        for (const [name, value] of contributionContext.entries()) {
+          if (!Objects.isEqual(context.get(name), value, {ignoreArrayOrder: true})) {
+            return false;
+          }
+        }
+        return true;
+      })
+      .flatMap(contribution => contribution.contributions),
+    );
   }
 
   /** @inheritDoc */
-  public openMenu(locations: `menu:${string}`[], options: SciMenuOptions): SciMenuRef {
+  public openMenu(name: `menu:${string}`[], options: SciMenuOptions): SciMenuRef {
     // Create injection context to dispose resources when closing the menu.
     const injector = Injector.create({parent: this._injector, providers: []});
 
@@ -61,7 +75,7 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
 
       // Create menu popover.
       try {
-        const componentRef = this.createMenuPopover(locations, anchorElement, options);
+        const componentRef = this.createMenuPopover(name, anchorElement, options);
         componentRef.onDestroy(() => injector.destroy());
 
         return {
@@ -76,10 +90,11 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
     });
   }
 
-  private createMenuPopover(location: `menu:${string}`[], anchorElement: HTMLElement, options: SciMenuOptions): ComponentRef<MenuComponent> {
+  private createMenuPopover(name: `menu:${string}`[], anchorElement: HTMLElement, options: SciMenuOptions): ComponentRef<MenuComponent> {
     const anchorSize = dimension(anchorElement);
     const bindings: Binding[] = [
-      inputBinding('location', signal(location)),
+      inputBinding('name', signal(name)),
+      inputBinding('context', signal(options.context ?? new Map<string, unknown>())),
       inputBinding('filter', signal(options.filter)),
       inputBinding('sizeInput', signal(options.size)),
       inputBinding('anchorWidth', computed(() => anchorSize().offsetWidth)),
@@ -230,4 +245,9 @@ function setStyles(element: HTMLElement, styles: {[style: string]: string | null
       element.style.setProperty(name, value);
     }
   });
+}
+
+interface Contribution {
+  context: Map<string, unknown>;
+  contributions: SciMenuContributions;
 }

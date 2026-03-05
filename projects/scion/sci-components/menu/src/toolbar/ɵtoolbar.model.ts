@@ -13,7 +13,7 @@ export class ɵSciToolbar implements SciToolbar {
   public readonly groupContributions = new Array<ToolbarGroupContributionDescriptor>();
   public readonly menuContributions = new Array<ToolbarMenuContributionDescriptor>();
 
-  public addToolbarItem(descriptor: SciToolbarItemDescriptor, onSelect: () => void): this {
+  public addToolbarItem(descriptor: SciToolbarItemDescriptor, onSelect: (context: Map<string, unknown>) => void): this {
     this.contributions.push({
       type: 'menu-item',
       id: `menuitem:${UUID.randomUUID()}`,

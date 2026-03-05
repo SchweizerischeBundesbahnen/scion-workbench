@@ -1,4 +1,5 @@
-<sci-toolbar-group [location]="name()"
+<sci-toolbar-group [name]="name()"
+                   [context]="mergedContext()"
                    [viewContainerRef]="viewContainerRef()"
                    (groupMenuOpen)="onMenuOpen($event)"
                    (groupEmpty)="onToolbarEmptyChange($event)"/>

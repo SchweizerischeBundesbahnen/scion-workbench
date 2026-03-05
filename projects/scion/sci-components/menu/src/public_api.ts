@@ -21,3 +21,5 @@ export {contributeMenu} from './menu-contribution';
 export {type Disposable} from './common/disposable';
 export {SciToolbarComponent} from './toolbar/toolbar.component';
 export {type SciMenuItemContribution, type SciMenuContribution, type SciMenuGroupContribution, type SciMenuContributions} from './menu-contribution.model';
+export {SciMenuContextProvider} from './menu-context-provider';
+export {provideSciMenuService} from './ɵmenu.service';

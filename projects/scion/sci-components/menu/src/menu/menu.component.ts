@@ -41,7 +41,8 @@ import {SciMenuService} from '../menu.service';
 })
 export class MenuComponent {
 
-  public readonly location = input.required<Array<`menu:${string}` | `group:${string}`>>();
+  public readonly name = input.required<Array<`menu:${string}` | `group:${string}`>>();
+  public readonly context = input.required<Map<string, unknown>>();
   public readonly disabled = input<boolean>();
   public readonly filter = input<boolean | {placeholder?: string; notFoundText?: string}>(false);
   public readonly group = input<{label?: string, collapsible: boolean, collapsed: boolean}>();
@@ -59,8 +60,8 @@ export class MenuComponent {
   protected readonly hasGlyphArea = computed(() => this.glyphArea() ?? this.requiresGlyphArea());
   protected readonly menuItems = this.computeMenuItems();
   protected readonly popoverAnchor = viewChild.required('popover_anchor', {read: ViewContainerRef});
-  protected readonly activeSubMenuItem = linkedSignal<Array<`menu:${string}` | `group:${string}`>, {menu: SciMenuContribution, element: HTMLElement} | null>({
-    source: this.location,  // reset active sub menu item when this component is re-used
+  protected readonly activeSubMenuItem = linkedSignal<{name: Array<`menu:${string}` | `group:${string}`>; context: Map<string, unknown> | undefined}, {menu: SciMenuContribution, element: HTMLElement} | null>({
+    source: computed(() => ({name: this.name(), context: this.context()})),  // reset active sub menu item when this component is re-used
     computation: () => null,
   });
 
@@ -90,13 +91,15 @@ export class MenuComponent {
   constructor() {
     // Maintain stable width when expanding/collapsing groups or hovering menu item when displaying the actions toolbar.
     afterRenderEffect(() => {
-      this.location(); // re-evaluate when re-used
+      this.name(); // re-evaluate when re-used
+      this.context();
       this.size.update(size => ({...size, width: `${this._host.getBoundingClientRect().width}px`}));
     });
 
     // Close action menu when this component is re-used.
     effect(() => {
-      this.location();
+      this.name();
+      this.context();
 
       untracked(() => {
         const popover = this._host.appendChild(this._document.createElement('div'));
@@ -114,6 +117,7 @@ export class MenuComponent {
         if (activeSubMenuItem) {
           const ref = this._menuService.open(activeSubMenuItem.menu.name, {
             anchor: activeSubMenuItem.element,
+            context: this.context(),
             viewContainerRef: this.popoverAnchor(),
             cssClass: activeSubMenuItem.menu.cssClass,
             filter: activeSubMenuItem.menu.menu.filter,
@@ -131,7 +135,7 @@ export class MenuComponent {
 
   protected onSelect(menuItem: SciMenuItemContribution): void {
     // Close the popup if the callback returns true. Defaults to closing non-checkable menu items.
-    if (menuItem.onSelect() ?? menuItem.checked?.() === undefined) {
+    if (menuItem.onSelect(this.context()) ?? menuItem.checked?.() === undefined) {
       this.close();
     }
   }
@@ -162,7 +166,7 @@ export class MenuComponent {
   }
 
   private computeMenuItems(): Signal<Array<SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution>> {
-    return computed(() => this._menuService.menuContributions(this.location())().filter(menuItem => this.matchesFilter(menuItem)()));
+    return computed(() => this._menuService.menuContributions(this.name(), this.context())().filter(menuItem => this.matchesFilter(menuItem)()));
   }
 
   private matchesFilter(menuItem: SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution): Signal<boolean> {
@@ -171,9 +175,9 @@ export class MenuComponent {
         case 'menu-item':
           return this._menuFilter.matches(menuItem)();
         case 'menu':
-          return this._menuService.menuContributions(menuItem.name)().some(menuItem => this.matchesFilter(menuItem)());
+          return this._menuService.menuContributions(menuItem.name, this.context())().some(menuItem => this.matchesFilter(menuItem)());
         case 'group':
-          return this._menuService.menuContributions(menuItem.name)().some(menuItem => this.matchesFilter(menuItem)());
+          return this._menuService.menuContributions(menuItem.name, this.context())().some(menuItem => this.matchesFilter(menuItem)());
       }
     });
   }
@@ -198,26 +202,26 @@ export class MenuComponent {
       return true;
     }
 
-    return menuService.menuContributions(this.location())().some(menuItem => {
+    return menuService.menuContributions(this.name(), this.context())().some(menuItem => {
       switch (menuItem.type) {
         case 'menu-item':
           return menuItem.icon?.() || menuItem.checked !== undefined;
         case 'menu':
           return menuItem.icon?.();
         case 'group':
-          return menuItem.collapsible || requiresGlyphAreaRec(menuItem);
+          return menuItem.collapsible || requiresGlyphAreaRec(menuItem, this.context());
       }
     });
 
-    function requiresGlyphAreaRec(contextElement: SciMenuGroupContribution): boolean {
-      return menuService.menuContributions(contextElement.name)().some(menuItem => {
+    function requiresGlyphAreaRec(contextElement: SciMenuGroupContribution, context: Map<string, unknown>): boolean {
+      return menuService.menuContributions(contextElement.name, context)().some(menuItem => {
         switch (menuItem.type) {
           case 'menu-item':
             return menuItem.icon?.() || menuItem.checked !== undefined;
           case 'menu':
             return menuItem.icon?.();
           case 'group':
-            return menuItem.collapsible || requiresGlyphAreaRec(menuItem);
+            return menuItem.collapsible || requiresGlyphAreaRec(menuItem, context);
         }
       });
     }

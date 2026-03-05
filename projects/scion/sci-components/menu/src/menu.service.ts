@@ -1,16 +1,13 @@
 import {ElementRef, Injectable, Signal, ViewContainerRef} from '@angular/core';
 import {ɵSciMenuService} from './ɵmenu.service';
-import {SciMenu} from './menu/menu.model';
 import {SciMenuContributions} from './menu-contribution.model';
 
 @Injectable({providedIn: 'root', useExisting: ɵSciMenuService})
 export abstract class SciMenuService {
 
-  public abstract open(location: `menu:${string}` | `menu:${string}`[], options: SciMenuOptions): SciMenuRef;
+  public abstract open(name: `menu:${string}` | `menu:${string}`[], options: SciMenuOptions): SciMenuRef;
 
-  public abstract open(factory: (menu: SciMenu) => SciMenu, options: SciMenuOptions): SciMenuRef;
-
-  public abstract menuContributions(locations: Array<`menu:${string}` | `toolbar:${string}` | `group:${string}`>): Signal<SciMenuContributions>;
+  public abstract menuContributions(locations: Array<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Map<string, unknown>): Signal<SciMenuContributions>;
 }
 
 export interface SciMenuOptions {
@@ -27,6 +24,7 @@ export interface SciMenuOptions {
    * - bottom/right: Relative to the bottom/right corner of the page viewport.
    */
   anchor: HTMLElement | ElementRef<HTMLElement> | SciMenuOrigin | MouseEvent;
+  context?: Map<string, unknown>;
   /**
    * Controls where to align the menu relative to the menu anchor, unless there is not enough space available in that area. Defaults to `south`.
    */

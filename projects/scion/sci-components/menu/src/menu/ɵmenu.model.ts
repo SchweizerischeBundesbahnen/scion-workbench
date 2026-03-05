@@ -12,7 +12,7 @@ export class ɵSciMenu implements SciMenu {
   public readonly groupContributions = new Array<MenuGroupContributionDescriptor>();
   public readonly menuContributions = new Array<MenuContributionDescriptor>();
 
-  public addMenuItem(descriptor: SciMenuItemDescriptor, onSelect: () => boolean | void): this {
+  public addMenuItem(descriptor: SciMenuItemDescriptor, onSelect: (context: Map<string, unknown>) => boolean | void): this {
     this.contributions.push({
       type: 'menu-item',
       id: `menuitem:${UUID.randomUUID()}`,

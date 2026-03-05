@@ -17,12 +17,12 @@ import {SciDefaultMenuAdapter} from './default-menu-adapter';
 @Injectable({providedIn: 'root', useExisting: SciDefaultMenuAdapter})
 export abstract class SciMenuAdapter {
 
-  public abstract contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contributions: SciMenuContributions): Disposable;
+  public abstract contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contributions: SciMenuContributions, context: Map<string, unknown>): Disposable;
 
-  public abstract menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`): Signal<SciMenuContributions>;
+  public abstract menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>): Signal<SciMenuContributions>;
 
   /**
    * TODO Optional or required?
    */
-  public abstract openMenu?(locations: `menu:${string}`[], options: SciMenuOptions): SciMenuRef;
+  public abstract openMenu?(name: `menu:${string}`[], options: SciMenuOptions): SciMenuRef;
 }

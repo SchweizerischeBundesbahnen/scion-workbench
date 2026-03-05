@@ -14,7 +14,7 @@ import {SciMenu} from '../menu/menu.model';
 
 export interface SciToolbar {
 
-  addToolbarItem(descriptor: SciToolbarItemDescriptor, onSelect: () => void): this;
+  addToolbarItem(descriptor: SciToolbarItemDescriptor, onSelect: (context: Map<string, unknown>) => void): this;
 
   addMenu(descriptor: SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenu) => SciMenu): this;
 

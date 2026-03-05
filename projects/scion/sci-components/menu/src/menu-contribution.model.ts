@@ -18,7 +18,7 @@ export interface SciMenuItemContribution {
     before?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
     after?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
   };
-  onSelect: () => boolean | void;
+  onSelect: (context: Map<string, unknown>) => boolean | void;
 }
 
 export interface SciMenuContribution {

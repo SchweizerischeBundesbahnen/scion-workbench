@@ -14,7 +14,7 @@
     "importHelpers": true,
     "target": "ES2022",
     "module": "preserve",
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "noUncheckedIndexedAccess": true,
 //    "paths": {
 //      "@scion/workbench": [

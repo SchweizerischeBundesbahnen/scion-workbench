@@ -92,6 +92,7 @@
       }
       @case ('group') {
         <sci-menu-group [group]="menuItem"
+                        [context]="context()"
                         [glyphArea]="hasGlyphArea()"
                         [disabled]="disabled"
                         [attr.data-group-id]="menuItem.id"

@@ -12,7 +12,7 @@ import {Component, computed, DoCheck, DOCUMENT, inject, NgZone, signal, Signal, 
 import {filter, map, scan} from 'rxjs/operators';
 import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} from '@angular/router';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
-import {WORKBENCH_ID, WorkbenchService, WorkbenchStartup} from '@scion/workbench';
+import {PartId, WORKBENCH_ID, WorkbenchRouter, WorkbenchService, WorkbenchStartup} from '@scion/workbench';
 import {HeaderComponent} from './header/header.component';
 import {fromEvent} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
@@ -45,6 +45,7 @@ export class AppComponent implements DoCheck {
   protected readonly workbenchStartup = inject(WorkbenchStartup);
   protected readonly activePerspective = inject(WorkbenchService).activePerspective;
   protected readonly workbenchId = inject(WORKBENCH_ID);
+  protected readonly workbenchRouter = inject(WorkbenchRouter);
   /**
    * Unique id that is set after a navigation has been performed.
    *
@@ -58,6 +59,23 @@ export class AppComponent implements DoCheck {
     installFocusHighlighter();
     installGlasspaneHighlighter();
     installMicrofrontendApplicationLabels();
+
+    contributeMenu({location: 'toolbar:workbench.part.tools.start', context: new Map().set('peripheral', false)}, toolbar => toolbar
+      .addToolbarItem({icon: 'add'}, (context) => {
+        console.log('>>> context', context);
+        this.workbenchRouter.navigate(['/start-page'], {target: 'blank', partId: context.get('partId') as PartId, position: 'end'})
+      }),
+    );
+
+    contributeMenu({location: 'menu:additions', context: new Map()}, menu => menu
+      .addMenuItem({icon: 'home', label: 'Home'}, () => {
+
+      }),
+    );
+
+    if (1 + 1) {
+      return;
+    }
 
     const flags = signal(new Set<string>()
       .add('always_select_opened_element')

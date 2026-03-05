@@ -13,6 +13,7 @@ import {SciMenuGroupContribution} from '../menu-contribution.model';
 export class MenuItemGroupComponent {
 
   public readonly group = input.required<SciMenuGroupContribution>();
+  public readonly context = input.required<Map<string, unknown>>();
   public readonly glyphArea = input.required<boolean>();
   public readonly disabled = input<boolean>();
 
@@ -31,7 +32,8 @@ export class MenuItemGroupComponent {
         environmentInjector,
         hostElement,
         bindings: [
-          inputBinding('location', computed(() => this.group().name)),
+          inputBinding('name', computed(() => this.group().name)),
+          inputBinding('context', computed(() => this.context())),
           inputBinding('disabled', this.disabled),
           inputBinding('group', computed(() => ({
               label: this.group().label?.(),

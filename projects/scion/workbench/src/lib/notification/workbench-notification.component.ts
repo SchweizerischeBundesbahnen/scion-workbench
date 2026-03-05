@@ -20,6 +20,7 @@ import {SciViewportComponent} from '@scion/components/viewport';
 import {observeIn, subscribeIn} from '@scion/toolkit/operators';
 import {filter} from 'rxjs/operators';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
+import {contributeMenu, SciToolbarComponent} from '@scion/sci-components/menu';
 
 /**
  * Renders the content of a workbench notification.
@@ -34,6 +35,7 @@ import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneO
     NgComponentOutlet,
     RemoveLegacyInputPipe,
     SciViewportComponent,
+    SciToolbarComponent,
   ],
   hostDirectives: [
     GlassPaneDirective,
@@ -69,6 +71,11 @@ export class WorkbenchNotificationComponent {
     this.closeOnEscapeIfOnTop();
 
     trackFocus(inject(ElementRef).nativeElement as HTMLElement, this.notification);
+
+    contributeMenu('toolbar:workbench.notification', toolbar => toolbar
+      .addMenu({icon: 'more_vert', visualMenuHint: false, name: 'menu:additions'}, menu => menu),
+    )
+
   }
 
   protected onClose(): void {
