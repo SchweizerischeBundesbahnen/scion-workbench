@@ -1,4 +1,4 @@
-import {effect, EnvironmentInjector, inject, Injector, Provider, signal, Signal, untracked} from '@angular/core';
+import {effect, EnvironmentInjector, inject, Injector, Provider, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
 import {Disposable, SciMenuAdapter, SciMenuContribution, SciMenuContributions, SciMenuGroupContribution, SciMenuItemContribution} from '@scion/sci-components/menu';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {WorkbenchMenuContribution, WorkbenchMenuGroupContribution, WorkbenchMenuItemContribution, WorkbenchMenuService, WorkbenchSelectCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
@@ -19,103 +19,106 @@ export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
   /** @inheritDoc */
   public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`, contributions: SciMenuContributions, context: Map<string, unknown>): Disposable {
     const injector = Injector.create({parent: this._injector, providers: []});
-    return this._workbenchMenuService.contributeMenu(location, contributions.map(contribution => {
-      switch (contribution.type) {
-        case 'menu': {
-          const menu = new WorkbenchMenuContribution({
-            name: contribution.name,
-            label: (() => {
-              if (!contribution.label) {
-                return undefined;
-              }
-              const label = contribution.label();
-              if (typeof label !== 'string') {
-                throw Error('ComponentType not supported');
-              }
-              return label;
-            })(),
-            icon: contribution.icon?.(),
-            tooltip: contribution.tooltip?.(),
-            disabled: contribution.disabled ? contribution.disabled() : false,
-            visualMenuHint: contribution.visualMenuHint,
-            position: contribution.position,
-            menu: contribution.menu,
-            cssClass: contribution.cssClass,
-          });
-          effect(() => {
-            const label = contribution.label?.();
-            if (!label) {
-              return;
-            }
-            if (typeof label !== 'string') {
-              return;
-            }
-            menu.label = label;
-          }, {injector: injector});
-          effect(() => menu.icon = contribution.icon?.(), {injector: injector});
-          effect(() => menu.disabled = contribution.disabled(), {injector: injector});
-          return menu;
-        }
-        case 'menu-item': {
-          const menuItem = new WorkbenchMenuItemContribution({
-            name: contribution.name,
-            label: (() => {
-              if (!contribution.label) {
-                return undefined;
-              }
-              const label = contribution.label();
-              if (typeof label !== 'string') {
-                return undefined;
-              }
-              return label;
-            })(),
-            icon: contribution.icon?.(),
-            tooltip: contribution.tooltip?.(),
-            accelerator: contribution.accelerator,
-            disabled: contribution.disabled ? contribution.disabled() : false,
-            checked: contribution.checked?.(),
-            actionToolbarName: contribution.actionToolbarName?.(),
-            matchesFilter: contribution.matchesFilter,
-            position: contribution.position,
-            cssClass: contribution.cssClass,
-            onSelect: contribution.onSelect,
-          });
-          effect(() => {
-            const label = contribution.label?.();
-            if (!label) {
-              return;
-            }
-            if (typeof label !== 'string') {
-              return;
-            }
-            menuItem.label = label;
-          }, {injector: injector});
-          effect(() => menuItem.icon = contribution.icon?.(), {injector: injector});
-          effect(() => menuItem.checked = contribution.checked?.(), {injector: injector});
-          effect(() => menuItem.disabled = contribution.disabled(), {injector: injector});
-          return menuItem;
-        }
-        case 'group': {
-          const group = new WorkbenchMenuGroupContribution({
-            name: contribution.name,
-            label: contribution.label?.(),
-            collapsible: contribution.collapsible,
-            position: contribution.position,
-            disabled: contribution.disabled ? contribution.disabled() : false,
-          });
-          effect(() => group.label = contribution.label?.(), {injector: injector});
-          effect(() => group.disabled = contribution.disabled(), {injector: injector});
-          return group;
-        }
-      }
-    }), context);
 
-    // return {
-    //   dispose: () => {
-    //     console.log('>>> dispose menu menu-adapter');
-    //     environmentInjector.destroy();
-    //   },
-    // }
+    return runInInjectionContext(injector, () => {
+      const contributionRef = this._workbenchMenuService.contributeMenu(location, contributions.map(contribution => {
+        switch (contribution.type) {
+          case 'menu': {
+            const menu = new WorkbenchMenuContribution({
+              name: contribution.name,
+              label: (() => {
+                if (!contribution.label) {
+                  return undefined;
+                }
+                const label = contribution.label();
+                if (typeof label !== 'string') {
+                  throw Error('ComponentType not supported');
+                }
+                return label;
+              })(),
+              icon: contribution.icon?.(),
+              tooltip: contribution.tooltip?.(),
+              disabled: contribution.disabled ? contribution.disabled() : false,
+              visualMenuHint: contribution.visualMenuHint,
+              position: contribution.position,
+              menu: contribution.menu,
+              cssClass: contribution.cssClass,
+            });
+            effect(() => {
+              const label = contribution.label?.();
+              if (!label) {
+                return;
+              }
+              if (typeof label !== 'string') {
+                return;
+              }
+              menu.label = label;
+            }, {injector: injector});
+            effect(() => menu.icon = contribution.icon?.(), {injector: injector});
+            effect(() => menu.disabled = contribution.disabled(), {injector: injector});
+            return menu;
+          }
+          case 'menu-item': {
+            const menuItem = new WorkbenchMenuItemContribution({
+              name: contribution.name,
+              label: (() => {
+                if (!contribution.label) {
+                  return undefined;
+                }
+                const label = contribution.label();
+                if (typeof label !== 'string') {
+                  return undefined;
+                }
+                return label;
+              })(),
+              icon: contribution.icon?.(),
+              tooltip: contribution.tooltip?.(),
+              accelerator: contribution.accelerator,
+              disabled: contribution.disabled ? contribution.disabled() : false,
+              checked: contribution.checked?.(),
+              actionToolbarName: contribution.actionToolbarName?.(),
+              matchesFilter: contribution.matchesFilter,
+              position: contribution.position,
+              cssClass: contribution.cssClass,
+              onSelect: contribution.onSelect,
+            });
+            effect(() => {
+              const label = contribution.label?.();
+              if (!label) {
+                return;
+              }
+              if (typeof label !== 'string') {
+                return;
+              }
+              menuItem.label = label;
+            }, {injector: injector});
+            effect(() => menuItem.icon = contribution.icon?.(), {injector: injector});
+            effect(() => menuItem.checked = contribution.checked?.(), {injector: injector});
+            effect(() => menuItem.disabled = contribution.disabled(), {injector: injector});
+            return menuItem;
+          }
+          case 'group': {
+            const group = new WorkbenchMenuGroupContribution({
+              name: contribution.name,
+              label: contribution.label?.(),
+              collapsible: contribution.collapsible,
+              position: contribution.position,
+              disabled: contribution.disabled ? contribution.disabled() : false,
+            });
+            effect(() => group.label = contribution.label?.(), {injector: injector});
+            effect(() => group.disabled = contribution.disabled(), {injector: injector});
+            return group;
+          }
+        }
+      }), context);
+
+      return {
+        dispose: () => {
+          contributionRef.dispose();
+          injector.destroy();
+        },
+      }
+    });
   }
 
   /** @inheritDoc */
