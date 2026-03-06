@@ -33,7 +33,7 @@ export class ɵSciMenu implements SciMenu {
     return this;
   }
 
-  public addMenu(descriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenu) => SciMenu): this {
+  public addMenu(descriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenu) => void): this {
     const id = UUID.randomUUID();
     const menuItem: SciMenuContribution = {
       type: 'menu',
@@ -63,8 +63,8 @@ export class ɵSciMenu implements SciMenu {
     return this;
   }
 
-  public addGroup(groupFactoryFn: (group: SciMenuGroup) => SciMenuGroup): this;
-  public addGroup(groupDescriptor: SciMenuGroupDescriptor, menuFactoryFn?: (group: SciMenuGroup) => SciMenuGroup): this;
+  public addGroup(groupFactoryFn: (group: SciMenuGroup) => void): this;
+  public addGroup(groupDescriptor: SciMenuGroupDescriptor, menuFactoryFn?: (group: SciMenuGroup) => void): this;
   public addGroup(argument1: unknown, argument2?: unknown): this {
     const id = UUID.randomUUID();
 
@@ -128,10 +128,10 @@ function computeCollapsible(groupDescriptor: SciMenuGroupDescriptor): {collapsed
 
 export interface MenuContributionDescriptor {
   location: `menu:${string}`;
-  factoryFn: (group: SciMenu) => SciMenu;
+  factoryFn: (group: SciMenu) => void;
 }
 
 export interface MenuGroupContributionDescriptor {
   location: `group(menu):${string}`;
-  factoryFn: (group: SciMenuGroup) => SciMenuGroup;
+  factoryFn: (group: SciMenuGroup) => void;
 }

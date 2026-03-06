@@ -17,11 +17,11 @@ export interface SciToolbar {
   // Describe that onSelect can call `inject` to get any required dependencies.
   addToolbarItem(descriptor: SciToolbarItemDescriptor, onSelect: (context: Map<string, unknown>) => void): this;
 
-  addMenu(descriptor: SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenu) => SciMenu): this;
+  addMenu(descriptor: SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenu) => void): this;
 
-  addGroup(groupFactoryFn: (group: SciToolbarGroup) => SciToolbarGroup): this;
+  addGroup(groupFactoryFn: (group: SciToolbarGroup) => void): this;
 
-  addGroup(descriptor: SciToolbarGroupDescriptor, groupFactoryFn?: (group: SciToolbarGroup) => SciToolbarGroup): this;
+  addGroup(descriptor: SciToolbarGroupDescriptor, groupFactoryFn?: (group: SciToolbarGroup) => void): this;
 }
 
 export type SciToolbarGroup = SciToolbar;

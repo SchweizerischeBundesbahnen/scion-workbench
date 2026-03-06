@@ -15,11 +15,11 @@ export interface SciMenu {
   // Describe that onSelect can call `inject` to get any required dependencies.
   addMenuItem(descriptor: SciMenuItemDescriptor, onSelect: (context: Map<string, unknown>) => boolean | void): this;
 
-  addMenu(descriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenu) => SciMenu): this;
+  addMenu(descriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenu) => void): this;
 
-  addGroup(groupFactoryFn: (group: SciMenuGroup) => SciMenuGroup): this;
+  addGroup(groupFactoryFn: (group: SciMenuGroup) => void): this;
 
-  addGroup(descriptor: SciMenuGroupDescriptor, groupFactoryFn?: (group: SciMenuGroup) => SciMenuGroup): this;
+  addGroup(descriptor: SciMenuGroupDescriptor, groupFactoryFn?: (group: SciMenuGroup) => void): this;
 }
 
 export type SciMenuGroup = SciMenu;

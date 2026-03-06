@@ -35,7 +35,7 @@ export class ɵSciToolbar implements SciToolbar {
     return this;
   }
 
-  public addMenu(descriptor: SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenu) => SciMenu): this {
+  public addMenu(descriptor: SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenu) => void): this {
     const id = UUID.randomUUID();
     const menuItem: SciMenuContribution = {
       type: 'menu',
@@ -65,8 +65,8 @@ export class ɵSciToolbar implements SciToolbar {
     return this;
   }
 
-  public addGroup(groupFactoryFn: (group: SciToolbarGroup) => SciToolbarGroup): this;
-  public addGroup(descriptor: SciToolbarGroupDescriptor, groupFactoryFn?: (group: SciToolbarGroup) => SciToolbarGroup): this;
+  public addGroup(groupFactoryFn: (group: SciToolbarGroup) => void): this;
+  public addGroup(descriptor: SciToolbarGroupDescriptor, groupFactoryFn?: (group: SciToolbarGroup) => void): this;
   public addGroup(argument1: unknown, argument2?: unknown): this {
     const id = UUID.randomUUID();
 
@@ -114,10 +114,10 @@ export class ɵSciToolbar implements SciToolbar {
 
 export interface ToolbarMenuContributionDescriptor {
   location: `menu:${string}`;
-  factoryFn: (group: SciMenu) => SciMenu;
+  factoryFn: (group: SciMenu) => void;
 }
 
 export interface ToolbarGroupContributionDescriptor {
   location: `group(toolbar):${string}`;
-  factoryFn: (group: SciToolbarGroup) => SciToolbarGroup;
+  factoryFn: (group: SciToolbarGroup) => void;
 }
