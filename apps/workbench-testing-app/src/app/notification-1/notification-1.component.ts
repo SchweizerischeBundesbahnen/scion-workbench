@@ -10,21 +10,12 @@ import {contributeMenu} from '@scion/sci-components/menu';
 export class Notification1Component {
 
   constructor() {
-    // contributeMenu('toolbar:workbench.notification', menu => menu
-    //   .addMenu({icon: 'more_vert'}, menu => menu
-    //     .addMenuItem({label: 'Settings...'}, () => this.onAction())
-    //     .addGroup(group => group
-    //       .addMenuItem({label: 'Don\'t Show Again For This Project'}, () => this.onAction())
-    //       .addMenuItem({label: 'Don\'t Show Again'}, () => this.onAction()),
-    //     ),
-    //   ),
-    // )
     contributeMenu('menu:additions', menu => menu
       .addGroup(group => group
-        .addMenuItem({label: 'Settings...'}, () => this.onAction()),
+        .addMenuItem({label: 'Settings...', onSelect: () => this.onAction()}),
       )
       .addGroup(group => group
-        .addMenuItem({label: 'Don\'t Show Again'}, () => this.onAction()),
+        .addMenuItem({label: 'Don\'t Show Again', onSelect: () => this.onAction()}),
       ),
     )
   }

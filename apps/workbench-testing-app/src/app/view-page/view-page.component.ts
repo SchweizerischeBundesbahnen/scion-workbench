@@ -68,8 +68,6 @@ export default class ViewPageComponent {
     confirmClosing: this._formBuilder.control(false),
   });
 
-  protected context = new Map().set('marc', 'dani');
-
   constructor() {
     if (!inject(WorkbenchStartup).done()) {
       throw Error('[LifecycleError] Component constructed before the workbench startup completed!'); // Do not remove as required by `startup.e2e-spec.ts` in [#1]
@@ -82,102 +80,97 @@ export default class ViewPageComponent {
 
     contributeMenu('toolbar:workbench.part.tools.end', toolbar => toolbar
       .addMenu({icon: 'more_vert', visualMenuHint: false}, menu => menu
-        .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+']}, () => onAction())
-        .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-']}, () => onAction())
+        .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+'], onSelect: () => onAction()})
+        .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-'], onSelect: () => onAction()})
         .addMenu({label: 'Additions', name: 'menu:additions'}, menu => menu)
         .addGroup(group => group
-          .addMenuItem({label: 'Navigate with Single Click', checked: computed(() => flags().has('navigate_with_single_click'))}, () => toggleMultiFlag(flags, 'navigate_with_single_click'))
-          .addMenuItem({label: 'Always Select Opened Element', checked: computed(() => flags().has('always_select_opened_element'))}, () => toggleMultiFlag(flags, 'always_select_opened_element')),
+          .addMenuItem({label: 'Navigate with Single Click', checked: computed(() => flags().has('navigate_with_single_click')), onSelect: () => toggleMultiFlag(flags, 'navigate_with_single_click')})
+          .addMenuItem({label: 'Always Select Opened Element', checked: computed(() => flags().has('always_select_opened_element')), onSelect: () => toggleMultiFlag(flags, 'always_select_opened_element')}),
         )
         .addGroup(group => group
-          .addMenuItem({label: 'Speed Search', icon: 'search', accelerator: ['Ctrl', 'F']}, () => onAction()),
+          .addMenuItem({label: 'Speed Search', icon: 'search', accelerator: ['Ctrl', 'F'], onSelect: () => onAction()}),
         )
         .addGroup(group => group
           .addMenu({label: 'View Mode'}, menu => menu
-            .addMenuItem({label: 'Dock Pinned', checked: computed(() => viewMode() === 'dock_pinned')}, () => viewMode.set('dock_pinned'))
-            .addMenuItem({label: 'Dock Unpinned', checked: computed(() => viewMode() === 'dock_unpinned')}, () => viewMode.set('dock_unpinned'))
-            .addMenuItem({label: 'Undock', checked: computed(() => viewMode() === 'unddock')}, () => viewMode.set('unddock'))
-            .addMenuItem({label: 'Float', checked: computed(() => viewMode() === 'float')}, () => viewMode.set('float'))
-            .addMenuItem({label: 'Window', checked: computed(() => viewMode() === 'window')}, () => viewMode.set('window')),
+            .addMenuItem({label: 'Dock Pinned', checked: computed(() => viewMode() === 'dock_pinned'), onSelect: () => viewMode.set('dock_pinned')})
+            .addMenuItem({label: 'Dock Unpinned', checked: computed(() => viewMode() === 'dock_unpinned'), onSelect: () => viewMode.set('dock_unpinned')})
+            .addMenuItem({label: 'Undock', checked: computed(() => viewMode() === 'unddock'), onSelect: () => viewMode.set('unddock')})
+            .addMenuItem({label: 'Float', checked: computed(() => viewMode() === 'float'), onSelect: () => viewMode.set('float')})
+            .addMenuItem({label: 'Window', checked: computed(() => viewMode() === 'window'), onSelect: () => viewMode.set('window')}),
           )
           .addMenu({label: 'Move To'}, menu => menu
-            .addMenuItem({label: 'Left Top', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_top')}, () => moveTo.set('left_top'))
-            .addMenuItem({label: 'Left Bottom', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_bottom')}, () => moveTo.set('left_bottom'))
-            .addMenuItem({label: 'Bottom Left', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_left')}, () => moveTo.set('bottom_left'))
-            .addMenuItem({label: 'Bottom Right', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_right')}, () => moveTo.set('bottom_right'))
-            .addMenuItem({label: 'Right Bottom', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_bottom')}, () => moveTo.set('right_bottom'))
-            .addMenuItem({label: 'Right Top', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_top')}, () => moveTo.set('right_top')),
+            .addMenuItem({label: 'Left Top', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_top'), onSelect: () => moveTo.set('left_top')})
+            .addMenuItem({label: 'Left Bottom', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_bottom'), onSelect: () => moveTo.set('left_bottom')})
+            .addMenuItem({label: 'Bottom Left', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_left'), onSelect: () => moveTo.set('bottom_left')})
+            .addMenuItem({label: 'Bottom Right', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_right'), onSelect: () => moveTo.set('bottom_right')})
+            .addMenuItem({label: 'Right Bottom', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_bottom'), onSelect: () => moveTo.set('right_bottom')})
+            .addMenuItem({label: 'Right Top', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_top'), onSelect: () => moveTo.set('right_top')}),
           )
           .addMenu({label: 'Resize'}, menu => menu
-            .addMenuItem({label: 'Stretch to Left'}, () => onAction())
-            .addMenuItem({label: 'Stretch to Right'}, () => onAction())
-            .addMenuItem({label: 'Stretch to Top'}, () => onAction())
-            .addMenuItem({label: 'Stretch to Bottom'}, () => onAction())
-            .addMenuItem({label: 'Maximize Tool Window'}, () => onAction()),
+            .addMenuItem({label: 'Stretch to Left', onSelect: () => onAction()})
+            .addMenuItem({label: 'Stretch to Right', onSelect: () => onAction()})
+            .addMenuItem({label: 'Stretch to Top', onSelect: () => onAction()})
+            .addMenuItem({label: 'Stretch to Bottom', onSelect: () => onAction()})
+            .addMenuItem({label: 'Maximize Tool Window', onSelect: () => onAction()}),
           ),
         )
-        .addMenuItem({label: 'Remove from Sidebar'}, () => onAction()),
-      ),
-    )
+        .addMenuItem({label: 'Remove from Sidebar', onSelect: () => onAction()}),
+      ));
 
     contributeMenu(`menu:contextmenu`, menu => menu
-      .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+']}, onAction)
-      .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-']}, onAction)
+      .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+'], onSelect: onAction})
+      .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-'], onSelect: onAction})
       .addGroup(group => group
-        .addMenuItem({label: 'Navigate with Single Click', checked: computed(() => flags().has('navigate_with_single_click'))}, () => toggleMultiFlag(flags, 'navigate_with_single_click'))
-        .addMenuItem({label: 'Always Select Opened Element', checked: computed(() => flags().has('always_select_opened_element'))}, () => toggleMultiFlag(flags, 'always_select_opened_element')),
-      )
-      .addGroup(group => group
-        .addMenuItem({label: 'Speed Search', icon: 'search', accelerator: ['Ctrl', 'F']}, (context) => {
-          console.log('>>> speed search (Ctrl + F)', context);
-        }),
-      )
-      .addGroup(group => group
-        .addMenu({label: 'View Mode'}, menu => menu
-          .addMenuItem({label: 'Dock Pinned', checked: computed(() => viewMode() === 'dock_pinned')}, () => viewMode.set('dock_pinned'))
-          .addMenuItem({label: 'Dock Unpinned', checked: computed(() => viewMode() === 'dock_unpinned')}, () => viewMode.set('dock_unpinned'))
-          .addMenuItem({label: 'Undock', checked: computed(() => viewMode() === 'unddock')}, () => viewMode.set('unddock'))
-          .addMenuItem({label: 'Float', checked: computed(() => viewMode() === 'float')}, () => viewMode.set('float'))
-          .addMenuItem({label: 'Window', checked: computed(() => viewMode() === 'window')}, () => viewMode.set('window')),
+        .addMenuItem({label: 'Navigate with Single Click', checked: computed(() => flags().has('navigate_with_single_click')), onSelect: () => toggleMultiFlag(flags, 'navigate_with_single_click')})
+        .addMenuItem({label: 'Always Select Opened Element', checked: computed(() => flags().has('always_select_opened_element')), onSelect: () => toggleMultiFlag(flags, 'always_select_opened_element')},
         )
-        .addMenu({label: 'Move To'}, menu => menu
-          .addMenuItem({label: 'Left Top', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_top')}, () => moveTo.set('left_top'))
-          .addMenuItem({label: 'Left Bottom', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_bottom')}, () => moveTo.set('left_bottom'))
-          .addMenuItem({label: 'Bottom Left', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_left')}, () => moveTo.set('bottom_left'))
-          .addMenuItem({label: 'Bottom Right', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_right')}, () => moveTo.set('bottom_right'))
-          .addMenuItem({label: 'Right Bottom', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_bottom')}, () => moveTo.set('right_bottom'))
-          .addMenuItem({label: 'Right Top', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_top')}, () => moveTo.set('right_top')),
+        .addGroup(group => group
+          .addMenuItem({label: 'Speed Search', icon: 'search', accelerator: ['Ctrl', 'F'], onSelect: context => console.log('>>> speed search (Ctrl + F)', context)}),
         )
-        .addMenu({label: 'Resize'}, menu => menu
-          .addMenuItem({label: 'Stretch to Left'}, onAction)
-          .addMenuItem({label: 'Stretch to Right'}, onAction)
-          .addMenuItem({label: 'Stretch to Top'}, onAction)
-          .addMenuItem({label: 'Stretch to Bottom'}, onAction)
-          .addMenuItem({label: 'Maximize Tool Window'}, onAction),
-        ),
-      )
-      .addMenuItem({label: 'Remove from Sidebar'}, onAction),
+        .addGroup(group => group
+          .addMenu({label: 'View Mode'}, menu => menu
+            .addMenuItem({label: 'Dock Pinned', checked: computed(() => viewMode() === 'dock_pinned'), onSelect: () => viewMode.set('dock_pinned')})
+            .addMenuItem({label: 'Dock Unpinned', checked: computed(() => viewMode() === 'dock_unpinned'), onSelect: () => viewMode.set('dock_unpinned')})
+            .addMenuItem({label: 'Undock', checked: computed(() => viewMode() === 'unddock'), onSelect: () => viewMode.set('unddock')})
+            .addMenuItem({label: 'Float', checked: computed(() => viewMode() === 'float'), onSelect: () => viewMode.set('float')})
+            .addMenuItem({label: 'Window', checked: computed(() => viewMode() === 'window'), onSelect: () => viewMode.set('window')}))
+          .addMenu({label: 'Move To'}, menu => menu
+            .addMenuItem({label: 'Left Top', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_top'), onSelect: () => moveTo.set('left_top')})
+            .addMenuItem({label: 'Left Bottom', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_bottom'), onSelect: () => moveTo.set('left_bottom')})
+            .addMenuItem({label: 'Bottom Left', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_left'), onSelect: () => moveTo.set('bottom_left')})
+            .addMenuItem({label: 'Bottom Right', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_right'), onSelect: () => moveTo.set('bottom_right')})
+            .addMenuItem({label: 'Right Bottom', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_bottom'), onSelect: () => moveTo.set('right_bottom')})
+            .addMenuItem({label: 'Right Top', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_top'), onSelect: () => moveTo.set('right_top')}),
+          )
+          .addMenu({label: 'Resize'}, menu => menu
+            .addMenuItem({label: 'Stretch to Left', onSelect: onAction})
+            .addMenuItem({label: 'Stretch to Right', onSelect: onAction})
+            .addMenuItem({label: 'Stretch to Top', onSelect: onAction})
+            .addMenuItem({label: 'Stretch to Bottom', onSelect: onAction})
+            .addMenuItem({label: 'Maximize Tool Window', onSelect: onAction}),
+          ),
+        )
+        .addMenuItem({label: 'Remove from Sidebar', onSelect: onAction}),
+      ),
     );
 
     installMenuAccelerators(`menu:contextmenu`);
 
     contributeMenu({location: 'toolbar:hello', context: new Map().set('marc', 'dani')}, toolbar => toolbar
       .addGroup(group => group
-        .addToolbarItem({icon: 'lens_blur'}, () => onAction())
-        .addToolbarItem({icon: 'lens_blur'}, () => onAction())
-        .addToolbarItem({icon: 'lens_blur'}, () => onAction()),
+        .addToolbarItem({icon: 'lens_blur', onSelect: () => onAction()})
+        .addToolbarItem({icon: 'lens_blur', onSelect: () => onAction()})
+        .addToolbarItem({icon: 'lens_blur', onSelect: () => onAction()}),
       )
       .addMenu({icon: 'content_cut'}, menu => menu
-        .addMenuItem({label: 'Undo', icon: 'undo', accelerator: ['Ctrl', 'Z']}, () => onAction())
-        .addMenuItem({label: 'Redo', icon: 'redo'}, () => onAction())
-        .addMenuItem({label: 'Cut', icon: 'content_cut', accelerator: ['Ctrl', 'X']}, () => {
-          console.log('>>> ctrl x');
-        })
-        .addMenuItem({label: 'Copy', icon: 'content_copy', accelerator: ['Ctrl', 'C']}, () => onAction())
-        .addMenuItem({label: 'Paste', icon: 'content_paste', accelerator: ['Ctrl', 'V']}, () => onAction())
-        .addMenuItem({label: 'Find and replace', icon: 'find_replace', accelerator: ['Ctrl', 'F']}, () => onAction()),
+        .addMenuItem({label: 'Undo', icon: 'undo', accelerator: ['Ctrl', 'Z'], onSelect: () => onAction()})
+        .addMenuItem({label: 'Redo', icon: 'redo', onSelect: () => onAction()})
+        .addMenuItem({label: 'Cut', icon: 'content_cut', accelerator: ['Ctrl', 'X'], onSelect: () => console.log('>>> ctrl x')})
+        .addMenuItem({label: 'Copy', icon: 'content_copy', accelerator: ['Ctrl', 'C'], onSelect: () => onAction()})
+        .addMenuItem({label: 'Paste', icon: 'content_paste', accelerator: ['Ctrl', 'V'], onSelect: () => onAction()})
+        .addMenuItem({label: 'Find and replace', icon: 'find_replace', accelerator: ['Ctrl', 'F'], onSelect: () => onAction()}),
       ),
-    )
+    );
   }
 
   private async confirmClosing(): Promise<boolean> {

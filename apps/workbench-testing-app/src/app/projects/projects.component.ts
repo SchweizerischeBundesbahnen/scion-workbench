@@ -12,15 +12,15 @@ export class ProjectsComponent {
   constructor() {
     contributeMenu('toolbar:workbench.part.tools.end', menu => menu
       .addMenu({label: 'File'}, menu => menu
-        .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N']}, () => this.onAction())
-        .addMenuItem({label: 'Open', icon: 'folder'}, () => this.onAction())
-        .addMenuItem({label: 'Make a Copy', icon: 'file_copy'}, () => this.onAction())
+        .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N'], onSelect: () => this.onAction()})
+        .addMenuItem({label: 'Open', icon: 'folder', onSelect: () => this.onAction()})
+        .addMenuItem({label: 'Make a Copy', icon: 'file_copy', onSelect: () => this.onAction()})
         .addMenu({label: 'Share', name: 'menu:share', icon: 'person_add'}, menu => menu
-          .addMenuItem({label: 'Share with others', icon: 'person_add', name: 'menuitem:share-with-others'}, () => this.onAction())
-          .addMenuItem({label: 'Publish to web', icon: 'public'}, () => this.onAction()),
+          .addMenuItem({label: 'Share with others', icon: 'person_add', name: 'menuitem:share-with-others', onSelect: () => this.onAction()})
+          .addMenuItem({label: 'Publish to web', icon: 'public', onSelect: () => this.onAction()}),
         )
-        .addMenuItem({label: 'Download', icon: 'download'}, () => this.onAction())
-        .addMenuItem({label: 'Print', icon: 'print'}, () => this.onAction()),
+        .addMenuItem({label: 'Download', icon: 'download', onSelect: () => this.onAction()})
+        .addMenuItem({label: 'Print', icon: 'print', onSelect: () => this.onAction()}),
       ),
     )
   }

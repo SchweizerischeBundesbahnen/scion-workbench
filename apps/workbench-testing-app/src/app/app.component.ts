@@ -61,16 +61,16 @@ export class AppComponent implements DoCheck {
     installMicrofrontendApplicationLabels();
 
     contributeMenu({location: 'toolbar:workbench.part.tools.start', context: new Map().set('peripheral', false)}, toolbar => toolbar
-      .addToolbarItem({icon: 'add'}, (context) => {
-        console.log('>>> context', context);
-        this.workbenchRouter.navigate(['/start-page'], {target: 'blank', partId: context.get('partId') as PartId, position: 'end'})
+      .addToolbarItem({
+        icon: 'add', onSelect: context => {
+          console.log('>>> context', context);
+          this.workbenchRouter.navigate(['/start-page'], {target: 'blank', partId: context.get('partId') as PartId, position: 'end'})
+        },
       }),
     );
 
     contributeMenu({location: 'menu:additions', context: new Map()}, menu => menu
-      .addMenuItem({icon: 'home', label: 'Home'}, () => {
-
-      }),
+      .addMenuItem({icon: 'home', label: 'Home', onSelect: () => this.onAction()}),
     );
 
     if (1 + 1) {
@@ -92,79 +92,50 @@ export class AppComponent implements DoCheck {
     );
     const paragraphStyle = signal<string>('');
 
-    // contributeMenu('toolbar:main', toolbar => toolbar
-    //   .addMenu({id: 'menu:additions', label: 'submenu'}, menu => menu
-    //     .filterable(true)
-    //     .addMenuItem({label: 'click me 1'}, () => this.onAction())
-    //     .addMenuItem({label: 'click me 2'}, () => this.onAction()),
-    //   ),
-    // );
-    //
-    // contributeMenu('menu:additions', toolbar => toolbar
-    //   .addMenu({label: 'submenu'}, menu => menu
-    //     .filterable(true)
-    //     .addMenuItem({label: 'click me 1'}, () => this.onAction())
-    //     .addMenuItem({label: 'click me 2'}, () => this.onAction()),
-    //   ));
-    //
-    // contributeMenu('menu:hello', menu => menu
-    //   .addMenuItem({label: 'click me'}, () => this.onAction()),
-    // );
-    //
-    // contributeMenu('toolbar_group:main', menubar => menubar
-    // contributeMenu('menu_group:main', menubar => menubar
-    //
-    // contributeMenu('menu:hello', menu => menu
-    //
-    // contributeMenu('toolbar:group:additions', menuGroup => toolbar
-    //
-    // contributeMenu('toolbar-group:additions', menuGroup => toolbar
-    // contributeMenu('menu-group:additions', menuGroup => menu
-
     if (1 + 1 === 3) {
       contributeMenu('toolbar:workbench.part.tools.start', toolbar => toolbar
         .addMenu({label: 'File', menu: {filter: {placeholder: 'hello', notFoundText: 'nüd found'}}}, menu => menu
-          .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N']}, () => this.onAction())
-          .addMenuItem({label: 'Open', icon: 'folder'}, () => this.onAction())
-          .addMenuItem({label: 'Make a Copy', icon: 'file_copy'}, () => this.onAction())
+          .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N'], onSelect: () => this.onAction()})
+          .addMenuItem({label: 'Open', icon: 'folder', onSelect: () => this.onAction()})
+          .addMenuItem({label: 'Make a Copy', icon: 'file_copy', onSelect: () => this.onAction()})
           .addMenu({label: 'Share', name: 'menu:share', icon: 'person_add'}, menu => menu
-            .addMenuItem({label: 'Share with others', icon: 'person_add', name: 'menuitem:share-with-others'}, () => this.onAction())
-            .addMenuItem({label: 'Publish to web', icon: 'public'}, () => this.onAction())
+            .addMenuItem({label: 'Share with others', icon: 'person_add', name: 'menuitem:share-with-others', onSelect: () => this.onAction()})
+            .addMenuItem({label: 'Publish to web', icon: 'public', onSelect: () => this.onAction()})
             .addMenu({label: 'Text', icon: 'format_bold'}, menu => menu
-              .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B']}, () => this.onAction())
-              .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I']}, () => this.onAction())
-              .addMenuItem({label: 'Underline', icon: 'format_underlined'}, () => this.onAction())
-              .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s'}, () => this.onAction())
+              .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], onSelect: () => this.onAction()})
+              .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], onSelect: () => this.onAction()})
+              .addMenuItem({label: 'Underline', icon: 'format_underlined', onSelect: () => this.onAction()})
+              .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s', onSelect: () => this.onAction()})
               .addMenu({label: 'Size', icon: 'format_bold'}, menu => menu
-                .addMenuItem({label: 'Increase font size'}, () => this.onAction())
-                .addMenuItem({label: 'Decrease font size'}, () => this.onAction()),
+                .addMenuItem({label: 'Increase font size', onSelect: () => this.onAction()})
+                .addMenuItem({label: 'Decrease font size', onSelect: () => this.onAction()}),
               ),
             ),
           )
           .addMenu({label: 'Share1', name: 'menu:share', icon: 'person_add'}, menu => menu
-            .addMenuItem({label: 'Share with others1', icon: 'person_add', name: 'menuitem:share-with-others'}, () => this.onAction())
-            .addMenuItem({label: 'Publish to web1', icon: 'public'}, () => this.onAction())
+            .addMenuItem({label: 'Share with others1', icon: 'person_add', name: 'menuitem:share-with-others', onSelect: () => this.onAction()})
+            .addMenuItem({label: 'Publish to web1', icon: 'public', onSelect: () => this.onAction()})
             .addMenu({label: 'Text', icon: 'format_bold'}, menu => menu
-              .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B']}, () => this.onAction())
-              .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I']}, () => this.onAction())
-              .addMenuItem({label: 'Underline', icon: 'format_underlined'}, () => this.onAction())
-              .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s'}, () => this.onAction())
+              .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], onSelect: () => this.onAction()})
+              .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], onSelect: () => this.onAction()})
+              .addMenuItem({label: 'Underline', icon: 'format_underlined', onSelect: () => this.onAction()})
+              .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s', onSelect: () => this.onAction()})
               .addGroup(group => group
-                .addMenuItem({label: 'Increase font size'}, () => this.onAction())
-                .addMenuItem({label: 'Decrease font size'}, () => this.onAction()),
+                .addMenuItem({label: 'Increase font size', onSelect: () => this.onAction()})
+                .addMenuItem({label: 'Decrease font size', onSelect: () => this.onAction()}),
               )
               .addMenu({label: 'Size', icon: 'format_bold'}, menu => menu
-                .addMenuItem({label: 'Increase font size'}, () => this.onAction())
-                .addMenuItem({label: 'Decrease font size'}, () => this.onAction()),
+                .addMenuItem({label: 'Increase font size', onSelect: () => this.onAction()})
+                .addMenuItem({label: 'Decrease font size', onSelect: () => this.onAction()}),
               )
               .addMenu({label: 'Size', icon: 'format_bold'}, menu => menu
-                .addMenuItem({label: 'Increase font size'}, () => this.onAction())
-                .addMenuItem({label: 'Decrease font size'}, () => this.onAction()),
+                .addMenuItem({label: 'Increase font size', onSelect: () => this.onAction()})
+                .addMenuItem({label: 'Decrease font size', onSelect: () => this.onAction()}),
               ),
             ),
           )
-          .addMenuItem({label: 'Download', icon: 'download'}, () => this.onAction())
-          .addMenuItem({label: 'Print', icon: 'print'}, () => this.onAction()),
+          .addMenuItem({label: 'Download', icon: 'download', onSelect: () => this.onAction()})
+          .addMenuItem({label: 'Print', icon: 'print', onSelect: () => this.onAction()}),
         ),
       );
       return;
@@ -172,130 +143,127 @@ export class AppComponent implements DoCheck {
 
     const workbenchService = inject(WorkbenchService);
     contributeMenu('toolbar:main', toolbar => toolbar
-      .addToolbarItem({icon: computed(() => workbenchService.settings.theme() === 'scion-light' ? 'light_mode' : 'dark_mode')}, () => {
-        workbenchService.settings.theme.update(theme => theme === 'scion-light' ? 'scion-dark' : 'scion-light');
+      .addToolbarItem({
+        icon: computed(() => workbenchService.settings.theme() === 'scion-light' ? 'light_mode' : 'dark_mode'), onSelect: () => {
+          workbenchService.settings.theme.update(theme => theme === 'scion-light' ? 'scion-dark' : 'scion-light');
+        },
       })
       .addMenu({icon: 'account_circle', label: UserMenuItemComponent, menu: {filter: true}}, menu => menu
         .addGroup({label: 'Gruppe', collapsible: {collapsed: true}}, group => group
-          .addMenuItem({label: 'Kapazitätsplaner'}, () => this.onAction())
-          .addMenuItem({label: 'Administrator'}, () => this.onAction()),
+          .addMenuItem({label: 'Kapazitätsplaner', onSelect: () => this.onAction()})
+          .addMenuItem({label: 'Administrator', onSelect: () => this.onAction()}),
         ),
       ),
     );
 
     contributeMenu('toolbar:workbench.part.tools.end', toolbar => toolbar
-      .addToolbarItem({icon: 'expand_all', tooltip: 'Expand Selected'}, () => this.onAction())
-      .addToolbarItem({icon: 'collapse_all', tooltip: 'Collapse All'}, () => this.onAction()),
+      .addToolbarItem({icon: 'expand_all', tooltip: 'Expand Selected', onSelect: () => this.onAction()})
+      .addToolbarItem({icon: 'collapse_all', tooltip: 'Collapse All', onSelect: () => this.onAction()}),
     );
 
     contributeMenu({location: 'menu:share', after: 'menuitem:share-with-others'}, menu => menu
-      .addMenuItem({label: 'Teams', icon: 'groups'}, () => {
-      }),
+      .addMenuItem({label: 'Teams', icon: 'groups', onSelect: () => this.onAction()}),
     );
 
     contributeMenu('toolbar:workbench.part.tools.start', menu => menu
       .addGroup(group => group
-        .addToolbarItem({icon: 'lens_blur'}, () => this.onAction()),
+        .addToolbarItem({icon: 'lens_blur', onSelect: () => this.onAction()}),
       )
       .addMenu({label: 'File'}, menu => menu
-        .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N']}, () => this.onAction())
-        .addMenuItem({label: 'Open', icon: 'folder'}, () => this.onAction())
-        .addMenuItem({label: 'Make a Copy', icon: 'file_copy'}, () => this.onAction())
+        .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N'], onSelect: () => this.onAction()})
+        .addMenuItem({label: 'Open', icon: 'folder', onSelect: () => this.onAction()})
+        .addMenuItem({label: 'Make a Copy', icon: 'file_copy', onSelect: () => this.onAction()})
         .addMenu({label: 'Share', name: 'menu:share', icon: 'person_add'}, menu => menu
-          .addMenuItem({label: 'Share with others', icon: 'person_add', name: 'menuitem:share-with-others'}, () => this.onAction())
-          .addMenuItem({label: 'Publish to web', icon: 'public'}, () => this.onAction()),
+          .addMenuItem({label: 'Share with others', icon: 'person_add', name: 'menuitem:share-with-others', onSelect: () => this.onAction()})
+          .addMenuItem({label: 'Publish to web', icon: 'public', onSelect: () => this.onAction()}),
         )
-        .addMenuItem({label: 'Download', icon: 'download'}, () => this.onAction())
-        .addMenuItem({label: 'Print', icon: 'print'}, () => this.onAction()),
+        .addMenuItem({label: 'Download', icon: 'download', onSelect: () => this.onAction()})
+        .addMenuItem({label: 'Print', icon: 'print', onSelect: () => this.onAction()}),
       )
       .addMenu({label: 'Edit', menu: {filter: {placeholder: 'Sueche...', notFoundText: 'Nüd gfunde.'}}}, menu => menu
-        .addMenuItem({label: 'Undo', icon: 'undo', accelerator: ['Ctrl', 'Z']}, () => this.onAction())
-        .addMenuItem({label: 'Redo', icon: 'redo'}, () => this.onAction())
-        .addMenuItem({label: 'Cut', icon: 'content_cut', accelerator: ['Ctrl', 'X']}, () => this.onAction())
-        .addMenuItem({label: 'Copy', icon: 'content_copy', accelerator: ['Ctrl', 'C']}, () => this.onAction())
-        .addMenuItem({label: 'Paste', icon: 'content_paste', accelerator: ['Ctrl', 'V']}, () => this.onAction())
-        .addMenuItem({label: 'Find and replace', icon: 'find_replace', accelerator: ['Ctrl', 'F']}, () => this.onAction()),
+        .addMenuItem({label: 'Undo', icon: 'undo', accelerator: ['Ctrl', 'Z'], onSelect: () => this.onAction()})
+        .addMenuItem({label: 'Redo', icon: 'redo', onSelect: () => this.onAction()})
+        .addMenuItem({label: 'Cut', icon: 'content_cut', accelerator: ['Ctrl', 'X'], onSelect: () => this.onAction()})
+        .addMenuItem({label: 'Copy', icon: 'content_copy', accelerator: ['Ctrl', 'C'], onSelect: () => this.onAction()})
+        .addMenuItem({label: 'Paste', icon: 'content_paste', accelerator: ['Ctrl', 'V'], onSelect: () => this.onAction()})
+        .addMenuItem({label: 'Find and replace', icon: 'find_replace', accelerator: ['Ctrl', 'F'], onSelect: () => this.onAction()}),
       )
       .addGroup(group => group
         .addGroup(group => group
-          .addToolbarItem({icon: 'lens_blur'}, () => this.onAction())
-          .addToolbarItem({icon: 'lens_blur'}, () => this.onAction())
-          .addToolbarItem({icon: 'lens_blur'}, () => this.onAction()),
+          .addToolbarItem({icon: 'lens_blur', onSelect: () => this.onAction()})
+          .addToolbarItem({icon: 'lens_blur', onSelect: () => this.onAction()})
+          .addToolbarItem({icon: 'lens_blur', onSelect: () => this.onAction()}),
         ),
       )
       .addGroup(group => group
-        .addToolbarItem({icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], checked: computed(() => flags().has('format_bold'))}, () => toggleMultiFlag(flags, 'format_bold'))
-        .addToolbarItem({icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], checked: computed(() => flags().has('format_italic'))}, () => toggleMultiFlag(flags, 'format_italic'))
-        .addToolbarItem({icon: 'format_underlined', checked: computed(() => flags().has('format_underlined'))}, () => toggleMultiFlag(flags, 'format_underlined'))
-        .addToolbarItem({icon: 'strikethrough_s', checked: computed(() => flags().has('strikethrough_s'))}, () => toggleMultiFlag(flags, 'strikethrough_s')),
+        .addToolbarItem({icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], checked: computed(() => flags().has('format_bold')), onSelect: () => toggleMultiFlag(flags, 'format_bold')})
+        .addToolbarItem({icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], checked: computed(() => flags().has('format_italic')), onSelect: () => toggleMultiFlag(flags, 'format_italic')})
+        .addToolbarItem({icon: 'format_underlined', checked: computed(() => flags().has('format_underlined')), onSelect: () => toggleMultiFlag(flags, 'format_underlined')})
+        .addToolbarItem({icon: 'strikethrough_s', checked: computed(() => flags().has('strikethrough_s')), onSelect: () => toggleMultiFlag(flags, 'strikethrough_s')}),
       )
       .addGroup(group => group
         .addMenu({label: 'Menu 1', menu: {filter: true}}, menu => menu
           .addMenu({label: 'Text', icon: 'format_bold'}, menu => menu
-            .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B']}, () => this.onAction())
-            .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I']}, () => this.onAction())
-            .addMenuItem({label: 'Underline', icon: 'format_underlined'}, () => this.onAction())
-            .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s'}, () => this.onAction())
+            .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], onSelect: () => this.onAction()})
+            .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], onSelect: () => this.onAction()})
+            .addMenuItem({label: 'Underline', icon: 'format_underlined', onSelect: () => this.onAction()})
+            .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s', onSelect: () => this.onAction()})
             .addMenu({label: 'Size', icon: 'format_bold'}, menu => menu
-              .addMenuItem({label: 'Increase font size'}, () => this.onAction())
-              .addMenuItem({label: 'Decrease font size'}, () => this.onAction()),
+              .addMenuItem({label: 'Increase font size', onSelect: () => this.onAction()})
+              .addMenuItem({label: 'Decrease font size', onSelect: () => this.onAction()}),
             ),
           )
-          .addMenu({label: 'Paragraph styles', icon: 'format_align_justify', name: 'menu:paragraph'}, menu => {
-              return menu
-                .addMenuItem({label: 'Normal text', checked: computed(() => paragraphStyle() === 'normal')}, () => paragraphStyle.set('normal'))
-                .addMenuItem({label: 'Heading 1', checked: computed(() => paragraphStyle() === 'heading1')}, () => paragraphStyle.set('heading1'))
-                .addMenuItem({label: 'Heading 2', checked: computed(() => paragraphStyle() === 'heading2')}, () => paragraphStyle.set('heading2'))
-            },
+          .addMenu({label: 'Paragraph styles', icon: 'format_align_justify', name: 'menu:paragraph'}, menu => menu
+            .addMenuItem({label: 'Normal text', checked: computed(() => paragraphStyle() === 'normal'), onSelect: () => paragraphStyle.set('normal')})
+            .addMenuItem({label: 'Heading 1', checked: computed(() => paragraphStyle() === 'heading1'), onSelect: () => paragraphStyle.set('heading1')})
+            .addMenuItem({label: 'Heading 2', checked: computed(() => paragraphStyle() === 'heading2'), onSelect: () => paragraphStyle.set('heading2')}),
           )
           .addMenu({icon: 'format_bold', label: 'Align & indent', menu: {filter: true}}, menu => menu
-            .addMenuItem({label: 'Align left', icon: 'format_align_left'}, () => this.onAction())
-            .addMenuItem({label: 'Align center', icon: 'format_align_center'}, () => this.onAction())
-            .addMenuItem({label: 'Align right', icon: 'format_align_right'}, () => this.onAction())
-            .addMenuItem({label: 'Justify', icon: 'format_align_justify'}, () => this.onAction()),
+            .addMenuItem({label: 'Align left', icon: 'format_align_left', onSelect: () => this.onAction()})
+            .addMenuItem({label: 'Align center', icon: 'format_align_center', onSelect: () => this.onAction()})
+            .addMenuItem({label: 'Align right', icon: 'format_align_right', onSelect: () => this.onAction()})
+            .addMenuItem({label: 'Justify', icon: 'format_align_justify', onSelect: () => this.onAction()}),
           ),
         )
         .addMenu({label: 'Menu 2'}, menu => menu
           // .addGroup({label: 'Group 1'}, group => group
-          //   .addMenuItem({text: 'Nested Menu Item'}, () => this.onAction())
+          //   .addMenuItem({text: 'Nested Menu Item', onSelect: () => this.onAction()})
           //   .addGroup({label: 'Group 2'}, group => group
           //     .addGroup({label: 'Group 3'}, group => group
-          //       .addMenuItem({text: 'Nested Menu Item'}, () => this.onAction()),
+          //       .addMenuItem({text: 'Nested Menu Item', onSelect: () => this.onAction()}),
           //     ),
           //   )
           .addGroup({label: 'Formatting', collapsible: true}, group => group
               .addMenu({label: 'Text', icon: 'format_bold'}, menu => menu
-                .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B']}, () => this.onAction())
-                .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I']}, () => this.onAction())
-                .addMenuItem({label: 'Underline', icon: 'format_underlined'}, () => this.onAction())
-                .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s'}, () => this.onAction())
+                .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], onSelect: () => this.onAction()})
+                .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], onSelect: () => this.onAction()})
+                .addMenuItem({label: 'Underline', icon: 'format_underlined', onSelect: () => this.onAction()})
+                .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s', onSelect: () => this.onAction()})
                 .addGroup({label: 'Size'}, menu => menu
-                  .addMenuItem({label: 'Increase font size'}, () => this.onAction())
-                  .addMenuItem({label: 'Decrease font size'}, () => this.onAction()),
+                  .addMenuItem({label: 'Increase font size', onSelect: () => this.onAction()})
+                  .addMenuItem({label: 'Decrease font size', onSelect: () => this.onAction()}),
                 ),
               )
               // .addGroup(group => group
               .addMenu({label: 'Size', icon: 'format_size'}, menu => menu
-                .addMenuItem({label: 'Increase font size'}, () => this.onAction())
-                .addMenuItem({label: 'Decrease font size'}, () => this.onAction()),
+                .addMenuItem({label: 'Increase font size', onSelect: () => this.onAction()})
+                .addMenuItem({label: 'Decrease font size', onSelect: () => this.onAction()}),
               ),
             // ),
           )
           .addGroup(group => group
-            .addMenu({label: 'Paragraph styles', icon: 'format_align_justify', name: 'menu:paragraph'}, menu => {
-                return menu
-                  .addMenuItem({label: 'Normal text', checked: computed(() => paragraphStyle() === 'normal')}, () => paragraphStyle.set('normal'))
-                  .addMenuItem({label: 'Heading 1', checked: computed(() => paragraphStyle() === 'heading1')}, () => paragraphStyle.set('heading1'))
-                  .addMenuItem({label: 'Heading 2', checked: computed(() => paragraphStyle() === 'heading2')}, () => paragraphStyle.set('heading2'))
-              },
+            .addMenu({label: 'Paragraph styles', icon: 'format_align_justify', name: 'menu:paragraph'}, menu => menu
+              .addMenuItem({label: 'Normal text', checked: computed(() => paragraphStyle() === 'normal'), onSelect: () => paragraphStyle.set('normal')})
+              .addMenuItem({label: 'Heading 1', checked: computed(() => paragraphStyle() === 'heading1'), onSelect: () => paragraphStyle.set('heading1')})
+              .addMenuItem({label: 'Heading 2', checked: computed(() => paragraphStyle() === 'heading2'), onSelect: () => paragraphStyle.set('heading2')}),
             ),
           )
           .addGroup(group => group
             .addMenu({label: 'Align & indent', icon: 'format_bold'}, menu => menu
-              .addMenuItem({label: 'Align left', icon: 'format_align_left'}, () => this.onAction())
-              .addMenuItem({label: 'Align center', icon: 'format_align_center'}, () => this.onAction())
-              .addMenuItem({label: 'Align right', icon: 'format_align_right'}, () => this.onAction())
-              .addMenuItem({label: 'Justify', icon: 'format_align_justify'}, () => this.onAction()),
+              .addMenuItem({label: 'Align left', icon: 'format_align_left', onSelect: () => this.onAction()})
+              .addMenuItem({label: 'Align center', icon: 'format_align_center', onSelect: () => this.onAction()})
+              .addMenuItem({label: 'Align right', icon: 'format_align_right', onSelect: () => this.onAction()})
+              .addMenuItem({label: 'Justify', icon: 'format_align_justify', onSelect: () => this.onAction()}),
             ),
           ),
         ),
@@ -303,45 +271,45 @@ export class AppComponent implements DoCheck {
     );
 
     contributeMenu('menu:paragraph', menu => menu
-      .addMenuItem({label: 'Heading 3', checked: computed(() => paragraphStyle() === 'heading3')}, () => paragraphStyle.set('heading3')),
+      .addMenuItem({label: 'Heading 3', checked: computed(() => paragraphStyle() === 'heading3'), onSelect: () => paragraphStyle.set('heading3')}),
     );
 
     contributeMenu('menu:paragraph', menu => menu
       .addMenu({label: 'SCION Developers'}, menu => menu
-        .addMenuItem({label: 'Etienne'}, () => this.onAction())
-        .addMenuItem({label: 'Marc'}, () => this.onAction())
-        .addMenuItem({label: 'Konstantin'}, () => this.onAction())
-        .addMenuItem({label: 'Dani'}, () => this.onAction()),
+        .addMenuItem({label: 'Etienne', onSelect: () => this.onAction()})
+        .addMenuItem({label: 'Marc', onSelect: () => this.onAction()})
+        .addMenuItem({label: 'Konstantin', onSelect: () => this.onAction()})
+        .addMenuItem({label: 'Dani', onSelect: () => this.onAction()}),
       ),
     );
 
     contributeMenu('toolbar:workbench.part.tools.start', menu => menu
       .addMenu({label: 'Database', icon: 'database', menu: {filter: {placeholder: 'Type to filter'}}}, menu => menu
-        // .addMenuItem({icon: 'filter_alt', text: 'Filter'}, () => this.onAction())
+        // .addMenuItem({icon: 'filter_alt', text: 'Filter', onSelect: () => this.onAction()})
         .addGroup({label: 'View in Groups', collapsible: true}, group => group
-          .addMenuItem({label: 'Databases and Schemas', checked: computed(() => flags().has('databases_and_schmemas'))}, () => toggleMultiFlag(flags, 'databases_and_schmemas'))
-          .addMenuItem({label: 'Server and Database Objects', checked: computed(() => flags().has('server_and_database_objects'))}, () => toggleMultiFlag(flags, 'server_and_database_objects'))
-          .addMenuItem({label: 'Schema Objects', checked: computed(() => flags().has('schema_objects'))}, () => toggleMultiFlag(flags, 'schema_objects'))
-          .addMenuItem({label: 'Object Elements', checked: computed(() => flags().has('object_elements'))}, () => toggleMultiFlag(flags, 'object_elements'))
+          .addMenuItem({label: 'Databases and Schemas', checked: computed(() => flags().has('databases_and_schmemas')), onSelect: () => toggleMultiFlag(flags, 'databases_and_schmemas')})
+          .addMenuItem({label: 'Server and Database Objects', checked: computed(() => flags().has('server_and_database_objects')), onSelect: () => toggleMultiFlag(flags, 'server_and_database_objects')})
+          .addMenuItem({label: 'Schema Objects', checked: computed(() => flags().has('schema_objects')), onSelect: () => toggleMultiFlag(flags, 'schema_objects')})
+          .addMenuItem({label: 'Object Elements', checked: computed(() => flags().has('object_elements')), onSelect: () => toggleMultiFlag(flags, 'object_elements')})
           .addGroup(group => group
-            .addMenuItem({label: 'Separate Procedures and Functions', checked: computed(() => flags().has('separate_procedures_and_functions'))}, () => toggleMultiFlag(flags, 'separate_procedures_and_functions'))
-            .addMenuItem({label: 'Place Table Elements Under Schema', checked: computed(() => flags().has('place_schema_elements_under_schema'))}, () => toggleMultiFlag(flags, 'place_schema_elements_under_schema'))
-            .addMenuItem({label: 'Use Natural Order When Sorting', checked: computed(() => flags().has('use_natural_order_when_sorting'))}, () => toggleMultiFlag(flags, 'use_natural_order_when_sorting'))
-            .addMenuItem({label: 'Sort folders and Data Sources', checked: computed(() => flags().has('sort_folders_and_data_sources'))}, () => toggleMultiFlag(flags, 'sort_folders_and_data_sources')),
+            .addMenuItem({label: 'Separate Procedures and Functions', checked: computed(() => flags().has('separate_procedures_and_functions')), onSelect: () => toggleMultiFlag(flags, 'separate_procedures_and_functions')})
+            .addMenuItem({label: 'Place Table Elements Under Schema', checked: computed(() => flags().has('place_schema_elements_under_schema')), onSelect: () => toggleMultiFlag(flags, 'place_schema_elements_under_schema')})
+            .addMenuItem({label: 'Use Natural Order When Sorting', checked: computed(() => flags().has('use_natural_order_when_sorting')), onSelect: () => toggleMultiFlag(flags, 'use_natural_order_when_sorting')})
+            .addMenuItem({label: 'Sort folders and Data Sources', checked: computed(() => flags().has('sort_folders_and_data_sources')), onSelect: () => toggleMultiFlag(flags, 'sort_folders_and_data_sources')}),
           ),
         )
         .addGroup({label: 'Show Elements', collapsible: {collapsed: true}}, group => group
-          .addMenuItem({label: 'All Namespaces', checked: computed(() => flags().has('all_namespaces'))}, () => toggleMultiFlag(flags, 'all_namespaces'))
-          .addMenuItem({label: 'Empty Groups', checked: computed(() => flags().has('empty_groups'))}, () => toggleMultiFlag(flags, 'empty_groups'))
-          .addMenuItem({label: 'Single-Object Levels', checked: computed(() => flags().has('single_object_levels'))}, () => toggleMultiFlag(flags, 'single_object_levels'))
-          .addMenuItem({label: 'Generate Objects', checked: computed(() => flags().has('generate_objects'))}, () => toggleMultiFlag(flags, 'generate_objects'))
-          .addMenuItem({label: 'Virtual Objects', checked: computed(() => flags().has('virtual_objects'))}, () => toggleMultiFlag(flags, 'virtual_objects'))
-          .addMenuItem({label: 'Query Files', checked: computed(() => flags().has('query_files'))}, () => toggleMultiFlag(flags, 'query_files')),
+          .addMenuItem({label: 'All Namespaces', checked: computed(() => flags().has('all_namespaces')), onSelect: () => toggleMultiFlag(flags, 'all_namespaces')})
+          .addMenuItem({label: 'Empty Groups', checked: computed(() => flags().has('empty_groups')), onSelect: () => toggleMultiFlag(flags, 'empty_groups')})
+          .addMenuItem({label: 'Single-Object Levels', checked: computed(() => flags().has('single_object_levels')), onSelect: () => toggleMultiFlag(flags, 'single_object_levels')})
+          .addMenuItem({label: 'Generate Objects', checked: computed(() => flags().has('generate_objects')), onSelect: () => toggleMultiFlag(flags, 'generate_objects')})
+          .addMenuItem({label: 'Virtual Objects', checked: computed(() => flags().has('virtual_objects')), onSelect: () => toggleMultiFlag(flags, 'virtual_objects')})
+          .addMenuItem({label: 'Query Files', checked: computed(() => flags().has('query_files')), onSelect: () => toggleMultiFlag(flags, 'query_files')}),
         )
         .addGroup({label: 'Node Details'}, group => group
-          .addMenuItem({label: 'Comments Instead of Details', checked: computed(() => flags().has('comments_instead_of_details'))}, () => toggleMultiFlag(flags, 'comments_instead_of_details'))
-          .addMenuItem({label: 'Schema Refresh Time', checked: computed(() => flags().has('schema_refresh_time'))}, () => toggleMultiFlag(flags, 'schema_refresh_time'))
-          .addMenuItem({label: 'Bold Folders and Data Sources', checked: computed(() => flags().has('bold_folders_and_data_sources'))}, () => toggleMultiFlag(flags, 'bold_folders_and_data_sources')),
+          .addMenuItem({label: 'Comments Instead of Details', checked: computed(() => flags().has('comments_instead_of_details')), onSelect: () => toggleMultiFlag(flags, 'comments_instead_of_details')})
+          .addMenuItem({label: 'Schema Refresh Time', checked: computed(() => flags().has('schema_refresh_time')), onSelect: () => toggleMultiFlag(flags, 'schema_refresh_time')})
+          .addMenuItem({label: 'Bold Folders and Data Sources', checked: computed(() => flags().has('bold_folders_and_data_sources')), onSelect: () => toggleMultiFlag(flags, 'bold_folders_and_data_sources')}),
         ),
       ),
     );
@@ -352,55 +320,55 @@ export class AppComponent implements DoCheck {
     contributeMenu('toolbar:workbench.part.tools.end', menu => menu
       .addMenu({icon: 'visibility'}, menu => menu
         .addGroup({label: 'Sort'}, group => group
-          .addMenuItem({label: 'Alphabetically', checked: computed(() => flags().has('alphabetically'))}, () => toggleMultiFlag(flags, 'alphabetically')),
+          .addMenuItem({label: 'Alphabetically', checked: computed(() => flags().has('alphabetically')), onSelect: () => toggleMultiFlag(flags, 'alphabetically')}),
         )
         .addGroup({label: 'Show'}, group => group
-          .addMenuItem({label: 'Fields', checked: computed(() => flags().has('fields'))}, () => toggleMultiFlag(flags, 'fields'))
-          .addMenuItem({label: 'Inherited', checked: computed(() => flags().has('inherited'))}, () => toggleMultiFlag(flags, 'inherited'))
-          .addMenuItem({label: 'Inherited from Object', checked: computed(() => flags().has('inherited_from_object'))}, () => toggleMultiFlag(flags, 'inherited_from_object')),
+          .addMenuItem({label: 'Fields', checked: computed(() => flags().has('fields')), onSelect: () => toggleMultiFlag(flags, 'fields')})
+          .addMenuItem({label: 'Inherited', checked: computed(() => flags().has('inherited')), onSelect: () => toggleMultiFlag(flags, 'inherited')})
+          .addMenuItem({label: 'Inherited from Object', checked: computed(() => flags().has('inherited_from_object')), onSelect: () => toggleMultiFlag(flags, 'inherited_from_object')}),
         )
         .addGroup({label: 'Group'}, group => group
-          .addMenuItem({label: 'Members by Defining Type', checked: computed(() => flags().has('member_by_defining_type'))}, () => toggleMultiFlag(flags, 'member_by_defining_type')),
+          .addMenuItem({label: 'Members by Defining Type', checked: computed(() => flags().has('member_by_defining_type')), onSelect: () => toggleMultiFlag(flags, 'member_by_defining_type')}),
         ),
       ),
     );
 
     contributeMenu('toolbar:workbench.part.tools.end', menu => menu
       .addMenu({icon: 'more_vert', visualMenuHint: false}, menu => menu
-        .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+']}, () => this.onAction())
-        .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-']}, () => this.onAction())
+        .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+'], onSelect: () => this.onAction()})
+        .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-'], onSelect: () => this.onAction()})
         .addGroup(group => group
-          .addMenuItem({label: 'Navigate with Single Click', checked: computed(() => flags().has('navigate_with_single_click'))}, () => toggleMultiFlag(flags, 'navigate_with_single_click'))
-          .addMenuItem({label: 'Always Select Opened Element', checked: computed(() => flags().has('always_select_opened_element'))}, () => toggleMultiFlag(flags, 'always_select_opened_element')),
+          .addMenuItem({label: 'Navigate with Single Click', checked: computed(() => flags().has('navigate_with_single_click')), onSelect: () => toggleMultiFlag(flags, 'navigate_with_single_click')})
+          .addMenuItem({label: 'Always Select Opened Element', checked: computed(() => flags().has('always_select_opened_element')), onSelect: () => toggleMultiFlag(flags, 'always_select_opened_element')}),
         )
         .addGroup(group => group
-          .addMenuItem({label: 'Speed Search', icon: 'search', accelerator: ['Ctrl', 'F']}, () => this.onAction()),
+          .addMenuItem({label: 'Speed Search', icon: 'search', accelerator: ['Ctrl', 'F'], onSelect: () => this.onAction()}),
         )
         .addGroup(group => group
           .addMenu({label: 'View Mode'}, menu => menu
-            .addMenuItem({label: 'Dock Pinned', checked: computed(() => viewMode() === 'dock_pinned')}, () => viewMode.set('dock_pinned'))
-            .addMenuItem({label: 'Dock Unpinned', checked: computed(() => viewMode() === 'dock_unpinned')}, () => viewMode.set('dock_unpinned'))
-            .addMenuItem({label: 'Undock', checked: computed(() => viewMode() === 'unddock')}, () => viewMode.set('unddock'))
-            .addMenuItem({label: 'Float', checked: computed(() => viewMode() === 'float')}, () => viewMode.set('float'))
-            .addMenuItem({label: 'Window', checked: computed(() => viewMode() === 'window')}, () => viewMode.set('window')),
+            .addMenuItem({label: 'Dock Pinned', checked: computed(() => viewMode() === 'dock_pinned'), onSelect: () => viewMode.set('dock_pinned')})
+            .addMenuItem({label: 'Dock Unpinned', checked: computed(() => viewMode() === 'dock_unpinned'), onSelect: () => viewMode.set('dock_unpinned')})
+            .addMenuItem({label: 'Undock', checked: computed(() => viewMode() === 'unddock'), onSelect: () => viewMode.set('unddock')})
+            .addMenuItem({label: 'Float', checked: computed(() => viewMode() === 'float'), onSelect: () => viewMode.set('float')})
+            .addMenuItem({label: 'Window', checked: computed(() => viewMode() === 'window'), onSelect: () => viewMode.set('window')}),
           )
           .addMenu({label: 'Move To'}, menu => menu
-            .addMenuItem({label: 'Left Top', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_top')}, () => moveTo.set('left_top'))
-            .addMenuItem({label: 'Left Bottom', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_bottom')}, () => moveTo.set('left_bottom'))
-            .addMenuItem({label: 'Bottom Left', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_left')}, () => moveTo.set('bottom_left'))
-            .addMenuItem({label: 'Bottom Right', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_right')}, () => moveTo.set('bottom_right'))
-            .addMenuItem({label: 'Right Bottom', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_bottom')}, () => moveTo.set('right_bottom'))
-            .addMenuItem({label: 'Right Top', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_top')}, () => moveTo.set('right_top')),
+            .addMenuItem({label: 'Left Top', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_top'), onSelect: () => moveTo.set('left_top')})
+            .addMenuItem({label: 'Left Bottom', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_bottom'), onSelect: () => moveTo.set('left_bottom')})
+            .addMenuItem({label: 'Bottom Left', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_left'), onSelect: () => moveTo.set('bottom_left')})
+            .addMenuItem({label: 'Bottom Right', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_right'), onSelect: () => moveTo.set('bottom_right')})
+            .addMenuItem({label: 'Right Bottom', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_bottom'), onSelect: () => moveTo.set('right_bottom')})
+            .addMenuItem({label: 'Right Top', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_top'), onSelect: () => moveTo.set('right_top')}),
           )
           .addMenu({label: 'Resize'}, menu => menu
-            .addMenuItem({label: 'Stretch to Left'}, () => this.onAction())
-            .addMenuItem({label: 'Stretch to Right'}, () => this.onAction())
-            .addMenuItem({label: 'Stretch to Top'}, () => this.onAction())
-            .addMenuItem({label: 'Stretch to Bottom'}, () => this.onAction())
-            .addMenuItem({label: 'Maximize Tool Window'}, () => this.onAction()),
+            .addMenuItem({label: 'Stretch to Left', onSelect: () => this.onAction()})
+            .addMenuItem({label: 'Stretch to Right', onSelect: () => this.onAction()})
+            .addMenuItem({label: 'Stretch to Top', onSelect: () => this.onAction()})
+            .addMenuItem({label: 'Stretch to Bottom', onSelect: () => this.onAction()})
+            .addMenuItem({label: 'Maximize Tool Window', onSelect: () => this.onAction()}),
           ),
         )
-        .addMenuItem({label: 'Remove from Sidebar'}, () => this.onAction()),
+        .addMenuItem({label: 'Remove from Sidebar', onSelect: () => this.onAction()}),
       ),
     );
 
@@ -418,110 +386,160 @@ export class AppComponent implements DoCheck {
       .set('focus_test_perspective', 'Focus Test Perspective');
 
     contributeMenu('toolbar:perspective.menu', menu => menu
-      .addToolbarItem({icon: 'undo', tooltip: 'Reset Perspective'}, () => console.log('>>> Reset default perspective'))
+      .addToolbarItem({icon: 'undo', tooltip: 'Reset Perspective', onSelect: () => console.log('>>> Reset default perspective')})
       .addMenu({icon: 'more_vert', visualMenuHint: false}, menu => menu
-        .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+']}, () => this.onAction())
-        .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-']}, () => this.onAction())
+        .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+'], onSelect: () => this.onAction()})
+        .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-'], onSelect: () => this.onAction()})
         .addGroup(group => group
-          .addMenuItem({label: 'Navigate with Single Click', checked: computed(() => flags().has('navigate_with_single_click'))}, () => toggleMultiFlag(flags, 'navigate_with_single_click'))
-          .addMenuItem({label: 'Always Select Opened Element', checked: computed(() => flags().has('always_select_opened_element'))}, () => toggleMultiFlag(flags, 'always_select_opened_element')),
+          .addMenuItem({label: 'Navigate with Single Click', checked: computed(() => flags().has('navigate_with_single_click')), onSelect: () => toggleMultiFlag(flags, 'navigate_with_single_click')})
+          .addMenuItem({label: 'Always Select Opened Element', checked: computed(() => flags().has('always_select_opened_element')), onSelect: () => toggleMultiFlag(flags, 'always_select_opened_element')}),
         )
         .addGroup(group => group
-          .addMenuItem({label: 'Speed Search', icon: 'search', accelerator: ['Ctrl', 'F']}, () => this.onAction()),
+          .addMenuItem({label: 'Speed Search', icon: 'search', accelerator: ['Ctrl', 'F'], onSelect: () => this.onAction()}),
         )
         .addGroup(group => group
           .addMenu({label: 'View Mode'}, menu => menu
-            .addMenuItem({label: 'Dock Pinned', checked: computed(() => viewMode() === 'dock_pinned')}, () => viewMode.set('dock_pinned'))
-            .addMenuItem({label: 'Dock Unpinned', checked: computed(() => viewMode() === 'dock_unpinned')}, () => viewMode.set('dock_unpinned'))
-            .addMenuItem({label: 'Undock', checked: computed(() => viewMode() === 'unddock')}, () => viewMode.set('unddock'))
-            .addMenuItem({label: 'Float', checked: computed(() => viewMode() === 'float')}, () => viewMode.set('float'))
-            .addMenuItem({label: 'Window', checked: computed(() => viewMode() === 'window')}, () => viewMode.set('window')),
+            .addMenuItem({label: 'Dock Pinned', checked: computed(() => viewMode() === 'dock_pinned'), onSelect: () => viewMode.set('dock_pinned')})
+            .addMenuItem({label: 'Dock Unpinned', checked: computed(() => viewMode() === 'dock_unpinned'), onSelect: () => viewMode.set('dock_unpinned')})
+            .addMenuItem({label: 'Undock', checked: computed(() => viewMode() === 'unddock'), onSelect: () => viewMode.set('unddock')})
+            .addMenuItem({label: 'Float', checked: computed(() => viewMode() === 'float'), onSelect: () => viewMode.set('float')})
+            .addMenuItem({label: 'Window', checked: computed(() => viewMode() === 'window'), onSelect: () => viewMode.set('window')}),
           )
           .addMenu({label: 'Move To'}, menu => menu
-            .addMenuItem({label: 'Left Top', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_top')}, () => moveTo.set('left_top'))
-            .addMenuItem({label: 'Left Bottom', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_bottom')}, () => moveTo.set('left_bottom'))
-            .addMenuItem({label: 'Bottom Left', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_left')}, () => moveTo.set('bottom_left'))
-            .addMenuItem({label: 'Bottom Right', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_right')}, () => moveTo.set('bottom_right'))
-            .addMenuItem({label: 'Right Bottom', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_bottom')}, () => moveTo.set('right_bottom'))
-            .addMenuItem({label: 'Right Top', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_top')}, () => moveTo.set('right_top')),
+            .addMenuItem({label: 'Left Top', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_top'), onSelect: () => moveTo.set('left_top')})
+            .addMenuItem({label: 'Left Bottom', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_bottom'), onSelect: () => moveTo.set('left_bottom')})
+            .addMenuItem({label: 'Bottom Left', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_left'), onSelect: () => moveTo.set('bottom_left')})
+            .addMenuItem({label: 'Bottom Right', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_right'), onSelect: () => moveTo.set('bottom_right')})
+            .addMenuItem({label: 'Right Bottom', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_bottom'), onSelect: () => moveTo.set('right_bottom')})
+            .addMenuItem({label: 'Right Top', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_top'), onSelect: () => moveTo.set('right_top')}),
           )
           .addMenu({label: 'Resize'}, menu => menu
-            .addMenuItem({label: 'Stretch to Left'}, () => this.onAction())
-            .addMenuItem({label: 'Stretch to Right'}, () => this.onAction())
-            .addMenuItem({label: 'Stretch to Top'}, () => this.onAction())
-            .addMenuItem({label: 'Stretch to Bottom'}, () => this.onAction())
-            .addMenuItem({label: 'Maximize Tool Window'}, () => this.onAction()),
+            .addMenuItem({label: 'Stretch to Left', onSelect: () => this.onAction()})
+            .addMenuItem({label: 'Stretch to Right', onSelect: () => this.onAction()})
+            .addMenuItem({label: 'Stretch to Top', onSelect: () => this.onAction()})
+            .addMenuItem({label: 'Stretch to Bottom', onSelect: () => this.onAction()})
+            .addMenuItem({label: 'Maximize Tool Window', onSelect: () => this.onAction()}),
           ),
         )
-        .addMenuItem({label: 'Remove from Sidebar'}, () => this.onAction()),
+        .addMenuItem({label: 'Remove from Sidebar', onSelect: () => this.onAction()}),
       ),
     )
 
     contributeMenu('toolbar:workbench.part.tools.start', menu => menu
       .addMenu({label: computed(() => perspectiveLabels.get(perspective()) ?? perspective()), visualMenuHint: true}, menu => menu
-        .addMenuItem({label: 'A', checked: true, actionToolbarName: 'toolbar:toolbar:perspective.menu'}, () => this.onAction())
-        .addMenuItem({label: 'B', actionToolbarName: 'toolbar:perspective.menu'}, () => this.onAction())
-        .addMenuItem({label: 'C', actionToolbarName: 'toolbar:perspective.menu'}, () => this.onAction())
-        .addMenuItem({label: 'D', actionToolbarName: 'toolbar:perspective.menu'}, () => this.onAction())
-        .addMenuItem({label: 'E', actionToolbarName: 'toolbar:perspective.menu'}, () => this.onAction())
-        .addMenuItem({label: 'F', actionToolbarName: 'toolbar:perspective.menu'}, () => this.onAction())
-        .addMenuItem({label: 'G', actionToolbarName: 'toolbar:perspective.menu'}, () => this.onAction()),
+        .addMenuItem({label: 'A', checked: true, actionToolbarName: 'toolbar:toolbar:perspective.menu', onSelect: () => this.onAction()})
+        .addMenuItem({label: 'B', actionToolbarName: 'toolbar:perspective.menu', onSelect: () => this.onAction()})
+        .addMenuItem({label: 'C', actionToolbarName: 'toolbar:perspective.menu', onSelect: () => this.onAction()})
+        .addMenuItem({label: 'D', actionToolbarName: 'toolbar:perspective.menu', onSelect: () => this.onAction()})
+        .addMenuItem({label: 'E', actionToolbarName: 'toolbar:perspective.menu', onSelect: () => this.onAction()})
+        .addMenuItem({label: 'F', actionToolbarName: 'toolbar:perspective.menu', onSelect: () => this.onAction()})
+        .addMenuItem({label: 'G', actionToolbarName: 'toolbar:perspective.menu', onSelect: () => this.onAction()}),
       ),
     );
     contributeMenu('toolbar:workbench.part.tools.start', menu => menu
       .addMenu({label: computed(() => perspectiveLabels.get(perspective()) ?? perspective())}, menu => menu
-        .addMenuItem({label: 'Default Layout', actionToolbarName: 'toolbar:perspective.menu', checked: computed(() => perspective() === 'default_layout')}, () => {
-          perspective.set('default_layout');
-          return true;
+        .addMenuItem({
+          label: 'Default Layout',
+          actionToolbarName: 'toolbar:perspective.menu',
+          checked: computed(() => perspective() === 'default_layout'),
+          onSelect: () => {
+            perspective.set('default_layout');
+            return true;
+          },
         })
         .addGroup({label: 'Workbench Perspectives'}, group => group
           .addMenu({label: 'Layout with Docked Parts'}, menu => menu
-            .addMenuItem({label: 'Sample Layout 1', actionToolbarName: 'toolbar:perspective.menu', checked: computed(() => perspective() === 'sample_layout_docked_parts_1')}, () => {
-              perspective.set('sample_layout_docked_parts_1');
-              return true;
+            .addMenuItem({
+              label: 'Sample Layout 1',
+              actionToolbarName: 'toolbar:perspective.menu',
+              checked: computed(() => perspective() === 'sample_layout_docked_parts_1'),
+              onSelect: () => {
+                perspective.set('sample_layout_docked_parts_1');
+                return true;
+              },
             })
-            .addMenuItem({label: 'Sample Layout 2', actionToolbarName: 'toolbar:perspective.menu', checked: computed(() => perspective() === 'sample_layout_docked_parts_2')}, () => {
-              perspective.set('sample_layout_docked_parts_2');
-              return true;
+            .addMenuItem({
+              label: 'Sample Layout 2',
+              actionToolbarName: 'toolbar:perspective.menu',
+              checked: computed(() => perspective() === 'sample_layout_docked_parts_2'),
+              onSelect: () => {
+                perspective.set('sample_layout_docked_parts_2');
+                return true;
+              },
             }),
           )
           .addMenu({label: 'Layout with Aligned Parts'}, menu => menu
-            .addMenuItem({label: 'Sample Layout 1', actionToolbarName: 'toolbar:perspective.menu', checked: computed(() => perspective() === 'sample_layout_aligned_parts_1')}, () => {
-              perspective.set('sample_layout_aligned_parts_1');
-              return true;
+            .addMenuItem({
+              label: 'Sample Layout 1',
+              actionToolbarName: 'toolbar:perspective.menu',
+              checked: computed(() => perspective() === 'sample_layout_aligned_parts_1'),
+              onSelect: () => {
+                perspective.set('sample_layout_aligned_parts_1');
+                return true;
+              },
             })
-            .addMenuItem({label: 'Sample Layout 2', actionToolbarName: 'toolbar:perspective.menu', checked: computed(() => perspective() === 'sample_layout_aligned_parts_2')}, () => {
-              perspective.set('sample_layout_aligned_parts_2');
-              return true;
+            .addMenuItem({
+              label: 'Sample Layout 2',
+              actionToolbarName: 'toolbar:perspective.menu',
+              checked: computed(() => perspective() === 'sample_layout_aligned_parts_2'),
+              onSelect: () => {
+                perspective.set('sample_layout_aligned_parts_2');
+                return true;
+              },
             }),
           ),
         )
         .addGroup({label: 'Microfrontend Perspectives'}, group => group
           .addMenu({label: 'Layout with Docked Parts'}, menu => menu
-            .addMenuItem({label: 'Sample Layout App 1', actionToolbarName: 'toolbar:perspective.menu', checked: computed(() => perspective() === 'sample_layout_docked_parts_app_1')}, () => {
-              perspective.set('sample_layout_docked_parts_app_1');
-              return true;
+            .addMenuItem({
+              label: 'Sample Layout App 1',
+              actionToolbarName: 'toolbar:perspective.menu',
+              checked: computed(() => perspective() === 'sample_layout_docked_parts_app_1'),
+              onSelect: () => {
+                perspective.set('sample_layout_docked_parts_app_1');
+                return true;
+              },
             })
-            .addMenuItem({label: 'Sample Layout App 2', actionToolbarName: 'toolbar:perspective.menu', checked: computed(() => perspective() === 'sample_layout_docked_parts_app_2')}, () => {
-              perspective.set('sample_layout_docked_parts_app_2');
-              return true;
+            .addMenuItem({
+              label: 'Sample Layout App 2',
+              actionToolbarName: 'toolbar:perspective.menu',
+              checked: computed(() => perspective() === 'sample_layout_docked_parts_app_2'),
+              onSelect: () => {
+                perspective.set('sample_layout_docked_parts_app_2');
+                return true;
+              },
             }),
           )
           .addMenu({label: 'Layout with Aligned Parts'}, menu => menu
-            .addMenuItem({label: 'Sample Layout App 1', actionToolbarName: 'toolbar:perspective.menu', checked: computed(() => perspective() === 'sample_layout_aligned_parts_app_1')}, () => {
-              perspective.set('sample_layout_aligned_parts_app_1');
-              return true;
+            .addMenuItem({
+              label: 'Sample Layout App 1',
+              actionToolbarName: 'toolbar:perspective.menu',
+              checked: computed(() => perspective() === 'sample_layout_aligned_parts_app_1'),
+              onSelect: () => {
+                perspective.set('sample_layout_aligned_parts_app_1');
+                return true;
+              },
             })
-            .addMenuItem({label: 'Sample Layout App 2', actionToolbarName: 'toolbar:perspective.menu', checked: computed(() => perspective() === 'sample_layout_aligned_parts_app_2')}, () => {
-              perspective.set('sample_layout_aligned_parts_app_2');
-              return true;
+            .addMenuItem({
+              label: 'Sample Layout App 2',
+              actionToolbarName: 'toolbar:perspective.menu',
+              checked: computed(() => perspective() === 'sample_layout_aligned_parts_app_2'),
+              onSelect: () => {
+                perspective.set('sample_layout_aligned_parts_app_2');
+                return true;
+              },
             }),
           ),
         )
         .addGroup({label: 'Test Perspectives', collapsible: {collapsed: true}}, group => group
-          .addMenuItem({label: 'Focus Test Perspective', actionToolbarName: 'toolbar:perspective.menu', checked: computed(() => perspective() === 'focus_test_perspective')}, () => {
-            perspective.set('focus_test_perspective');
-            return true;
+          .addMenuItem({
+            label: 'Focus Test Perspective',
+            actionToolbarName: 'toolbar:perspective.menu',
+            checked: computed(() => perspective() === 'focus_test_perspective'),
+            onSelect: () => {
+              perspective.set('focus_test_perspective');
+              return true;
+            },
           }),
         ),
       ),

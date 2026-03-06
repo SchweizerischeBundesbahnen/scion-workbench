@@ -13,7 +13,7 @@ export class ɵSciToolbar implements SciToolbar {
   public readonly groupContributions = new Array<ToolbarGroupContributionDescriptor>();
   public readonly menuContributions = new Array<ToolbarMenuContributionDescriptor>();
 
-  public addToolbarItem(descriptor: SciToolbarItemDescriptor, onSelect: (context: Map<string, unknown>) => void): this {
+  public addToolbarItem(descriptor: SciToolbarItemDescriptor): this {
     this.contributions.push({
       type: 'menu-item',
       name: coerceArray(descriptor.name ?? []),
@@ -25,7 +25,7 @@ export class ɵSciToolbar implements SciToolbar {
       disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
       cssClass: Arrays.coerce(descriptor.cssClass),
       onSelect: context => {
-        onSelect(context);
+        descriptor.onSelect(context);
         return false;
       },
       data: descriptor.data,

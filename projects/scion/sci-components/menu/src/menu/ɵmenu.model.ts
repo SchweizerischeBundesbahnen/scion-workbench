@@ -12,7 +12,7 @@ export class ɵSciMenu implements SciMenu {
   public readonly groupContributions = new Array<MenuGroupContributionDescriptor>();
   public readonly menuContributions = new Array<MenuContributionDescriptor>();
 
-  public addMenuItem(descriptor: SciMenuItemDescriptor, onSelect: (context: Map<string, unknown>) => boolean | void): this {
+  public addMenuItem(descriptor: SciMenuItemDescriptor): this {
     this.contributions.push({
       type: 'menu-item',
       name: coerceArray(descriptor.name ?? []),
@@ -25,7 +25,7 @@ export class ɵSciMenu implements SciMenu {
       actionToolbarName: coerceSignal(descriptor.actionToolbarName),
       matchesFilter: descriptor.onFilter,
       cssClass: Arrays.coerce(descriptor.cssClass),
-      onSelect: (context) => onSelect(context) ?? descriptor.checked === undefined, // Close if the callback returns true. Defaults to closing non-checkable menu items.
+      onSelect: (context) => descriptor.onSelect(context) ?? descriptor.checked === undefined, // Close if the callback returns true. Defaults to closing non-checkable menu items.
       data: descriptor.data,
     } satisfies SciMenuItemContribution);
 
