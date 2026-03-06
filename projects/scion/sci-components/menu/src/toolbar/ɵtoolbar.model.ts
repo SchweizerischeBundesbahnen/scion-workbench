@@ -1,5 +1,5 @@
 import {SciMenu} from '../menu/menu.model';
-import {signal} from '@angular/core';
+import {isSignal, Signal, signal} from '@angular/core';
 import {UUID} from '@scion/toolkit/uuid';
 import {Arrays} from '@scion/toolkit/util';
 import {SciToolbar, SciToolbarGroup, SciToolbarGroupDescriptor, SciToolbarItemDescriptor, SciToolbarMenuDescriptor} from './toolbar.model';
@@ -13,7 +13,19 @@ export class ɵSciToolbar implements SciToolbar {
   public readonly groupContributions = new Array<ToolbarGroupContributionDescriptor>();
   public readonly menuContributions = new Array<ToolbarMenuContributionDescriptor>();
 
-  public addToolbarItem(descriptor: SciToolbarItemDescriptor): this {
+  /** @inheritDoc */
+  public addToolbarItem(icon: string | Signal<string>, onSelect: (context: Map<string, unknown>) => void): this;
+  public addToolbarItem(descriptor: SciToolbarItemDescriptor): this;
+  public addToolbarItem(argument1: string | Signal<string> | SciToolbarItemDescriptor, argument2?: (context: Map<string, unknown>) => void): this {
+    if (typeof argument1 === 'string' || isSignal(argument1)) {
+      return this.addToolbarItemFromDescriptor({icon: argument1, onSelect: argument2!});
+    }
+    else {
+      return this.addToolbarItemFromDescriptor(argument1);
+    }
+  }
+
+  private addToolbarItemFromDescriptor(descriptor: SciToolbarItemDescriptor): this {
     this.contributions.push({
       type: 'menu-item',
       name: coerceArray(descriptor.name ?? []),
@@ -35,6 +47,7 @@ export class ɵSciToolbar implements SciToolbar {
     return this;
   }
 
+  /** @inheritDoc */
   public addMenu(descriptor: SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenu) => void): this {
     const id = UUID.randomUUID();
     const menuItem: SciMenuContribution = {
@@ -65,6 +78,7 @@ export class ɵSciToolbar implements SciToolbar {
     return this;
   }
 
+  /** @inheritDoc */
   public addGroup(groupFactoryFn: (group: SciToolbarGroup) => void): this;
   public addGroup(descriptor: SciToolbarGroupDescriptor, groupFactoryFn?: (group: SciToolbarGroup) => void): this;
   public addGroup(argument1: unknown, argument2?: unknown): this {

@@ -107,8 +107,8 @@ export class AppComponent implements DoCheck {
               .addMenuItem({label: 'Underline', icon: 'format_underlined', onSelect: () => this.onAction()})
               .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s', onSelect: () => this.onAction()})
               .addMenu({label: 'Size', icon: 'format_bold'}, menu => menu
-                .addMenuItem({label: 'Increase font size', onSelect: () => this.onAction()})
-                .addMenuItem({label: 'Decrease font size', onSelect: () => this.onAction()}),
+                .addMenuItem('Increase font size', () => this.onAction())
+                .addMenuItem('Decrease font size', () => this.onAction()),
               ),
             ),
           )
@@ -121,16 +121,16 @@ export class AppComponent implements DoCheck {
               .addMenuItem({label: 'Underline', icon: 'format_underlined', onSelect: () => this.onAction()})
               .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s', onSelect: () => this.onAction()})
               .addGroup(group => group
-                .addMenuItem({label: 'Increase font size', onSelect: () => this.onAction()})
-                .addMenuItem({label: 'Decrease font size', onSelect: () => this.onAction()}),
+                .addMenuItem('Increase font size', () => this.onAction())
+                .addMenuItem('Decrease font size', () => this.onAction()),
               )
               .addMenu({label: 'Size', icon: 'format_bold'}, menu => menu
-                .addMenuItem({label: 'Increase font size', onSelect: () => this.onAction()})
-                .addMenuItem({label: 'Decrease font size', onSelect: () => this.onAction()}),
+                .addMenuItem('Increase font size', () => this.onAction())
+                .addMenuItem('Decrease font size', () => this.onAction()),
               )
               .addMenu({label: 'Size', icon: 'format_bold'}, menu => menu
-                .addMenuItem({label: 'Increase font size', onSelect: () => this.onAction()})
-                .addMenuItem({label: 'Decrease font size', onSelect: () => this.onAction()}),
+                .addMenuItem('Increase font size', () => this.onAction())
+                .addMenuItem('Decrease font size', () => this.onAction()),
               ),
             ),
           )
@@ -150,8 +150,8 @@ export class AppComponent implements DoCheck {
       })
       .addMenu({icon: 'account_circle', label: UserMenuItemComponent, menu: {filter: true}}, menu => menu
         .addGroup({label: 'Gruppe', collapsible: {collapsed: true}}, group => group
-          .addMenuItem({label: 'Kapazitätsplaner', onSelect: () => this.onAction()})
-          .addMenuItem({label: 'Administrator', onSelect: () => this.onAction()}),
+          .addMenuItem('Kapazitätsplaner', () => this.onAction())
+          .addMenuItem('Administrator', () => this.onAction()),
         ),
       ),
     );
@@ -167,7 +167,7 @@ export class AppComponent implements DoCheck {
 
     contributeMenu('toolbar:workbench.part.tools.start', menu => menu
       .addGroup(group => group
-        .addToolbarItem({icon: 'lens_blur', onSelect: () => this.onAction()}),
+        .addToolbarItem('lens_blur', () => this.onAction()),
       )
       .addMenu({label: 'File'}, menu => menu
         .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N'], onSelect: () => this.onAction()})
@@ -190,9 +190,9 @@ export class AppComponent implements DoCheck {
       )
       .addGroup(group => group
         .addGroup(group => group
-          .addToolbarItem({icon: 'lens_blur', onSelect: () => this.onAction()})
-          .addToolbarItem({icon: 'lens_blur', onSelect: () => this.onAction()})
-          .addToolbarItem({icon: 'lens_blur', onSelect: () => this.onAction()}),
+          .addToolbarItem('lens_blur', () => this.onAction())
+          .addToolbarItem('lens_blur', () => this.onAction())
+          .addToolbarItem('lens_blur', () => this.onAction()),
         ),
       )
       .addGroup(group => group
@@ -209,8 +209,8 @@ export class AppComponent implements DoCheck {
             .addMenuItem({label: 'Underline', icon: 'format_underlined', onSelect: () => this.onAction()})
             .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s', onSelect: () => this.onAction()})
             .addMenu({label: 'Size', icon: 'format_bold'}, menu => menu
-              .addMenuItem({label: 'Increase font size', onSelect: () => this.onAction()})
-              .addMenuItem({label: 'Decrease font size', onSelect: () => this.onAction()}),
+              .addMenuItem('Increase font size', () => this.onAction())
+              .addMenuItem('Decrease font size', () => this.onAction()),
             ),
           )
           .addMenu({label: 'Paragraph styles', icon: 'format_align_justify', name: 'menu:paragraph'}, menu => menu
@@ -240,14 +240,14 @@ export class AppComponent implements DoCheck {
                 .addMenuItem({label: 'Underline', icon: 'format_underlined', onSelect: () => this.onAction()})
                 .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s', onSelect: () => this.onAction()})
                 .addGroup({label: 'Size'}, menu => menu
-                  .addMenuItem({label: 'Increase font size', onSelect: () => this.onAction()})
-                  .addMenuItem({label: 'Decrease font size', onSelect: () => this.onAction()}),
+                  .addMenuItem('Increase font size', () => this.onAction())
+                  .addMenuItem('Decrease font size', () => this.onAction()),
                 ),
               )
               // .addGroup(group => group
               .addMenu({label: 'Size', icon: 'format_size'}, menu => menu
-                .addMenuItem({label: 'Increase font size', onSelect: () => this.onAction()})
-                .addMenuItem({label: 'Decrease font size', onSelect: () => this.onAction()}),
+                .addMenuItem('Increase font size', () => this.onAction())
+                .addMenuItem('Decrease font size', () => this.onAction()),
               ),
             // ),
           )
@@ -276,10 +276,10 @@ export class AppComponent implements DoCheck {
 
     contributeMenu('menu:paragraph', menu => menu
       .addMenu({label: 'SCION Developers'}, menu => menu
-        .addMenuItem({label: 'Etienne', onSelect: () => this.onAction()})
-        .addMenuItem({label: 'Marc', onSelect: () => this.onAction()})
-        .addMenuItem({label: 'Konstantin', onSelect: () => this.onAction()})
-        .addMenuItem({label: 'Dani', onSelect: () => this.onAction()}),
+        .addMenuItem('Etienne', () => this.onAction())
+        .addMenuItem('Marc', () => this.onAction())
+        .addMenuItem('Konstantin', () => this.onAction())
+        .addMenuItem('Dani', () => this.onAction()),
       ),
     );
 
@@ -361,14 +361,14 @@ export class AppComponent implements DoCheck {
             .addMenuItem({label: 'Right Top', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_top'), onSelect: () => moveTo.set('right_top')}),
           )
           .addMenu({label: 'Resize'}, menu => menu
-            .addMenuItem({label: 'Stretch to Left', onSelect: () => this.onAction()})
-            .addMenuItem({label: 'Stretch to Right', onSelect: () => this.onAction()})
-            .addMenuItem({label: 'Stretch to Top', onSelect: () => this.onAction()})
-            .addMenuItem({label: 'Stretch to Bottom', onSelect: () => this.onAction()})
-            .addMenuItem({label: 'Maximize Tool Window', onSelect: () => this.onAction()}),
+            .addMenuItem('Stretch to Left', () => this.onAction())
+            .addMenuItem('Stretch to Right', () => this.onAction())
+            .addMenuItem('Stretch to Top', () => this.onAction())
+            .addMenuItem('Stretch to Bottom', () => this.onAction())
+            .addMenuItem('Maximize Tool Window', () => this.onAction()),
           ),
         )
-        .addMenuItem({label: 'Remove from Sidebar', onSelect: () => this.onAction()}),
+        .addMenuItem('Remove from Sidebar', () => this.onAction()),
       ),
     );
 
@@ -414,14 +414,14 @@ export class AppComponent implements DoCheck {
             .addMenuItem({label: 'Right Top', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_top'), onSelect: () => moveTo.set('right_top')}),
           )
           .addMenu({label: 'Resize'}, menu => menu
-            .addMenuItem({label: 'Stretch to Left', onSelect: () => this.onAction()})
-            .addMenuItem({label: 'Stretch to Right', onSelect: () => this.onAction()})
-            .addMenuItem({label: 'Stretch to Top', onSelect: () => this.onAction()})
-            .addMenuItem({label: 'Stretch to Bottom', onSelect: () => this.onAction()})
-            .addMenuItem({label: 'Maximize Tool Window', onSelect: () => this.onAction()}),
+            .addMenuItem('Stretch to Left', () => this.onAction())
+            .addMenuItem('Stretch to Right', () => this.onAction())
+            .addMenuItem('Stretch to Top', () => this.onAction())
+            .addMenuItem('Stretch to Bottom', () => this.onAction())
+            .addMenuItem('Maximize Tool Window', () => this.onAction()),
           ),
         )
-        .addMenuItem({label: 'Remove from Sidebar', onSelect: () => this.onAction()}),
+        .addMenuItem('Remove from Sidebar', () => this.onAction()),
       ),
     )
 

@@ -107,14 +107,14 @@ export default class ViewPageComponent {
             .addMenuItem({label: 'Right Top', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_top'), onSelect: () => moveTo.set('right_top')}),
           )
           .addMenu({label: 'Resize'}, menu => menu
-            .addMenuItem({label: 'Stretch to Left', onSelect: () => onAction()})
-            .addMenuItem({label: 'Stretch to Right', onSelect: () => onAction()})
-            .addMenuItem({label: 'Stretch to Top', onSelect: () => onAction()})
-            .addMenuItem({label: 'Stretch to Bottom', onSelect: () => onAction()})
-            .addMenuItem({label: 'Maximize Tool Window', onSelect: () => onAction()}),
+            .addMenuItem('Stretch to Left', () => onAction())
+            .addMenuItem('Stretch to Right', () => onAction())
+            .addMenuItem('Stretch to Top', () => onAction())
+            .addMenuItem('Stretch to Bottom', () => onAction())
+            .addMenuItem('Maximize Tool Window', () => onAction()),
           ),
         )
-        .addMenuItem({label: 'Remove from Sidebar', onSelect: () => onAction()}),
+        .addMenuItem('Remove from Sidebar', () => onAction()),
       ));
 
     contributeMenu(`menu:contextmenu`, menu => menu
@@ -143,14 +143,14 @@ export default class ViewPageComponent {
             .addMenuItem({label: 'Right Top', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_top'), onSelect: () => moveTo.set('right_top')}),
           )
           .addMenu({label: 'Resize'}, menu => menu
-            .addMenuItem({label: 'Stretch to Left', onSelect: onAction})
-            .addMenuItem({label: 'Stretch to Right', onSelect: onAction})
-            .addMenuItem({label: 'Stretch to Top', onSelect: onAction})
-            .addMenuItem({label: 'Stretch to Bottom', onSelect: onAction})
-            .addMenuItem({label: 'Maximize Tool Window', onSelect: onAction}),
+            .addMenuItem('Stretch to Left', onAction)
+            .addMenuItem('Stretch to Right', onAction)
+            .addMenuItem('Stretch to Top', onAction)
+            .addMenuItem('Stretch to Bottom', onAction)
+            .addMenuItem('Maximize Tool Window', onAction),
           ),
         )
-        .addMenuItem({label: 'Remove from Sidebar', onSelect: onAction}),
+        .addMenuItem('Remove from Sidebar', onAction),
       ),
     );
 
@@ -158,9 +158,9 @@ export default class ViewPageComponent {
 
     contributeMenu({location: 'toolbar:hello', context: new Map().set('marc', 'dani')}, toolbar => toolbar
       .addGroup(group => group
-        .addToolbarItem({icon: 'lens_blur', onSelect: () => onAction()})
-        .addToolbarItem({icon: 'lens_blur', onSelect: () => onAction()})
-        .addToolbarItem({icon: 'lens_blur', onSelect: () => onAction()}),
+        .addToolbarItem('lens_blur', () => onAction())
+        .addToolbarItem('lens_blur', () => onAction())
+        .addToolbarItem('lens_blur', () => onAction()),
       )
       .addMenu({icon: 'content_cut'}, menu => menu
         .addMenuItem({label: 'Undo', icon: 'undo', accelerator: ['Ctrl', 'Z'], onSelect: () => onAction()})

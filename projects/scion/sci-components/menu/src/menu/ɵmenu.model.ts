@@ -1,5 +1,5 @@
 import {SciMenu, SciMenuDescriptor, SciMenuGroup, SciMenuGroupDescriptor, SciMenuItemDescriptor} from './menu.model';
-import {signal} from '@angular/core';
+import {isSignal, Signal, signal} from '@angular/core';
 import {UUID} from '@scion/toolkit/uuid';
 import {Arrays} from '@scion/toolkit/util';
 import {SciMenuContribution, SciMenuGroupContribution, SciMenuItemContribution} from '../menu-contribution.model';
@@ -12,7 +12,19 @@ export class ɵSciMenu implements SciMenu {
   public readonly groupContributions = new Array<MenuGroupContributionDescriptor>();
   public readonly menuContributions = new Array<MenuContributionDescriptor>();
 
-  public addMenuItem(descriptor: SciMenuItemDescriptor): this {
+  /** @inheritDoc */
+  public addMenuItem(label: string | Signal<string>, onSelect: (context: Map<string, unknown>) => boolean | void): this;
+  public addMenuItem(descriptor: SciMenuItemDescriptor): this;
+  public addMenuItem(argument1: string | Signal<string> | SciMenuItemDescriptor, argument2?: (context: Map<string, unknown>) => boolean | void): this {
+    if (typeof argument1 === 'string' || isSignal(argument1)) {
+      return this.addMenuItemFromDescriptor({label: argument1, onSelect: argument2!});
+    }
+    else {
+      return this.addMenuItemFromDescriptor(argument1);
+    }
+  }
+
+  private addMenuItemFromDescriptor(descriptor: SciMenuItemDescriptor): this {
     this.contributions.push({
       type: 'menu-item',
       name: coerceArray(descriptor.name ?? []),
@@ -33,6 +45,7 @@ export class ɵSciMenu implements SciMenu {
     return this;
   }
 
+  /** @inheritDoc */
   public addMenu(descriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenu) => void): this {
     const id = UUID.randomUUID();
     const menuItem: SciMenuContribution = {
@@ -63,6 +76,7 @@ export class ɵSciMenu implements SciMenu {
     return this;
   }
 
+  /** @inheritDoc */
   public addGroup(groupFactoryFn: (group: SciMenuGroup) => void): this;
   public addGroup(groupDescriptor: SciMenuGroupDescriptor, menuFactoryFn?: (group: SciMenuGroup) => void): this;
   public addGroup(argument1: unknown, argument2?: unknown): this {
