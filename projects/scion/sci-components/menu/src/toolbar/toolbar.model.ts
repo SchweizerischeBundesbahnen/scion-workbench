@@ -19,6 +19,8 @@ export interface SciToolbar {
 
   addToolbarItem(descriptor: SciToolbarItemDescriptor): this;
 
+  addMenu(icon: string | Signal<string>, menuFactoryFn: (menu: SciMenu) => void): this;
+
   addMenu(descriptor: SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenu) => void): this;
 
   addGroup(groupFactoryFn: (group: SciToolbarGroup) => void): this;

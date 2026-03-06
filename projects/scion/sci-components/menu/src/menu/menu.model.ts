@@ -17,6 +17,8 @@ export interface SciMenu {
 
   addMenuItem(descriptor: SciMenuItemDescriptor): this;
 
+  addMenu(label: string | Signal<string>, menuFactoryFn: (menu: SciMenu) => void): this;
+
   addMenu(descriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenu) => void): this;
 
   addGroup(groupFactoryFn: (group: SciMenuGroup) => void): this;

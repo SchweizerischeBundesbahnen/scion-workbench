@@ -15,16 +15,9 @@ export class ɵSciMenu implements SciMenu {
   /** @inheritDoc */
   public addMenuItem(label: string | Signal<string>, onSelect: (context: Map<string, unknown>) => boolean | void): this;
   public addMenuItem(descriptor: SciMenuItemDescriptor): this;
-  public addMenuItem(argument1: string | Signal<string> | SciMenuItemDescriptor, argument2?: (context: Map<string, unknown>) => boolean | void): this {
-    if (typeof argument1 === 'string' || isSignal(argument1)) {
-      return this.addMenuItemFromDescriptor({label: argument1, onSelect: argument2!});
-    }
-    else {
-      return this.addMenuItemFromDescriptor(argument1);
-    }
-  }
+  public addMenuItem(labelOrDescriptor: string | Signal<string> | SciMenuItemDescriptor, onSelect?: (context: Map<string, unknown>) => boolean | void): this {
+    const descriptor = coerceMenuItemDescriptor(labelOrDescriptor, onSelect);
 
-  private addMenuItemFromDescriptor(descriptor: SciMenuItemDescriptor): this {
     this.contributions.push({
       type: 'menu-item',
       name: coerceArray(descriptor.name ?? []),
@@ -46,7 +39,11 @@ export class ɵSciMenu implements SciMenu {
   }
 
   /** @inheritDoc */
-  public addMenu(descriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenu) => void): this {
+  public addMenu(label: string | Signal<string>, menuFactoryFn: (menu: SciMenu) => void): this ;
+  public addMenu(descriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenu) => void): this ;
+  public addMenu(labelOrDescriptor: string | Signal<string> | SciMenuDescriptor, menuFactoryFn: (menu: SciMenu) => void): this {
+    const descriptor = coerceMenuDescriptor(labelOrDescriptor);
+
     const id = UUID.randomUUID();
     const menuItem: SciMenuContribution = {
       type: 'menu',
@@ -78,12 +75,12 @@ export class ɵSciMenu implements SciMenu {
 
   /** @inheritDoc */
   public addGroup(groupFactoryFn: (group: SciMenuGroup) => void): this;
-  public addGroup(groupDescriptor: SciMenuGroupDescriptor, menuFactoryFn?: (group: SciMenuGroup) => void): this;
+  public addGroup(descriptor: SciMenuGroupDescriptor, groupFactoryFn?: (group: SciMenuGroup) => void): this;
   public addGroup(argument1: unknown, argument2?: unknown): this {
     const id = UUID.randomUUID();
 
     if (typeof argument1 === 'function') {
-      const groupFactoryFn = argument1 as (group: SciMenuGroup) => SciMenuGroup;
+      const groupFactoryFn = argument1 as (group: SciMenuGroup) => void;
 
       this.contributions.push({
         type: 'group',
@@ -102,7 +99,7 @@ export class ɵSciMenu implements SciMenu {
     }
     else {
       const descriptor = argument1 as SciMenuGroupDescriptor;
-      const groupFactoryFn = argument2 as ((group: SciMenuGroup) => SciMenuGroup) | undefined;
+      const groupFactoryFn = argument2 as ((group: SciMenuGroup) => void) | undefined;
 
       this.contributions.push({
         type: 'group',
@@ -148,4 +145,18 @@ export interface MenuContributionDescriptor {
 export interface MenuGroupContributionDescriptor {
   location: `group(menu):${string}`;
   factoryFn: (group: SciMenuGroup) => void;
+}
+
+function coerceMenuItemDescriptor(labelOrDescriptor: string | Signal<string> | SciMenuItemDescriptor, onSelect?: (context: Map<string, unknown>) => boolean | void): SciMenuItemDescriptor {
+  if (typeof labelOrDescriptor === 'string' || isSignal(labelOrDescriptor)) {
+    return {label: labelOrDescriptor, onSelect: onSelect!};
+  }
+  return labelOrDescriptor;
+}
+
+function coerceMenuDescriptor(labelOrDescriptor: string | Signal<string> | SciMenuDescriptor): SciMenuDescriptor {
+  if (typeof labelOrDescriptor === 'string' || isSignal(labelOrDescriptor)) {
+    return {label: labelOrDescriptor};
+  }
+  return labelOrDescriptor;
 }

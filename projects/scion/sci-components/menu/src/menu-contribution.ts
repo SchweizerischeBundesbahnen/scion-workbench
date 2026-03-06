@@ -8,16 +8,16 @@ import {ɵSciMenuService} from './ɵmenu.service';
 import {SciMenuContextProvider} from './menu-context-provider';
 import {coerceSignal} from './common/common';
 
-export function contributeMenu(location: `menu:${string}` | SciMenuContributionLocation, menuFactoryFn: (menu: SciMenu) => void | SciMenu, options?: SciMenuContributionOptions): Disposable;
-export function contributeMenu(location: `toolbar:${string}` | SciToolbarContributionLocation, menuFactoryFn: (toolbar: SciToolbar) => void | SciToolbar, options?: SciMenuContributionOptions): Disposable;
-export function contributeMenu(location: `group(menu):${string}` | SciMenuGroupContributionLocation, menuFactoryFn: (group: SciMenuGroup) => void | SciMenuGroup, options?: SciMenuContributionOptions): Disposable;
-export function contributeMenu(location: `group(toolbar):${string}` | SciToolbarGroupContributionLocation, menuFactoryFn: (group: SciToolbarGroup) => void | SciToolbarGroup, options?: SciMenuContributionOptions): Disposable;
+export function contributeMenu(location: `menu:${string}` | SciMenuContributionLocation, menuFactoryFn: (menu: SciMenu) => void, options?: SciMenuContributionOptions): Disposable;
+export function contributeMenu(location: `toolbar:${string}` | SciToolbarContributionLocation, menuFactoryFn: (toolbar: SciToolbar) => void, options?: SciMenuContributionOptions): Disposable;
+export function contributeMenu(location: `group(menu):${string}` | SciMenuGroupContributionLocation, groupFactoryFn: (group: SciMenuGroup) => void, options?: SciMenuContributionOptions): Disposable;
+export function contributeMenu(location: `group(toolbar):${string}` | SciToolbarGroupContributionLocation, groupFactoryFn: (group: SciToolbarGroup) => void, options?: SciMenuContributionOptions): Disposable;
 /** @internal */
-export function contributeMenu(location: string | SciContributionLocation, factoryFn: Function, options?: SciMenuContributionOptions): Disposable;
-export function contributeMenu(locationArg: string | SciContributionLocation, factoryFn: Function, options?: SciMenuContributionOptions): Disposable {
+export function contributeMenu(locationLike: string | SciContributionLocation, factoryFn: Function, options?: SciMenuContributionOptions): Disposable;
+export function contributeMenu(locationLike: string | SciContributionLocation, factoryFn: Function, options?: SciMenuContributionOptions): Disposable {
   const injector = Injector.create({parent: options?.injector ?? inject(Injector), providers: []});
 
-  const {location, before, after, context} = typeof locationArg === 'string' ? {location: locationArg} as SciContributionLocation : locationArg;
+  const {location, before, after, context} = typeof locationLike === 'string' ? {location: locationLike} as SciContributionLocation : locationLike;
   return runInInjectionContext(injector, () => {
     const menuService = inject(ɵSciMenuService);
 
@@ -52,12 +52,12 @@ export function contributeMenu(locationArg: string | SciContributionLocation, fa
 function constructMenu(location: string, factoryFn: Function): ɵSciMenu | ɵSciToolbar {
   if (location.startsWith('menu:') || location.startsWith('group(menu):')) {
     const menu = new ɵSciMenu();
-    void factoryFn(menu);
+    factoryFn(menu);
     return menu;
   }
   else if (location.startsWith('toolbar:') || location.startsWith('group(toolbar):')) {
     const toolbar = new ɵSciToolbar();
-    void factoryFn(toolbar);
+    factoryFn(toolbar);
     return toolbar;
   }
   else {

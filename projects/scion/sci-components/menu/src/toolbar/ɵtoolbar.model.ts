@@ -16,16 +16,9 @@ export class ɵSciToolbar implements SciToolbar {
   /** @inheritDoc */
   public addToolbarItem(icon: string | Signal<string>, onSelect: (context: Map<string, unknown>) => void): this;
   public addToolbarItem(descriptor: SciToolbarItemDescriptor): this;
-  public addToolbarItem(argument1: string | Signal<string> | SciToolbarItemDescriptor, argument2?: (context: Map<string, unknown>) => void): this {
-    if (typeof argument1 === 'string' || isSignal(argument1)) {
-      return this.addToolbarItemFromDescriptor({icon: argument1, onSelect: argument2!});
-    }
-    else {
-      return this.addToolbarItemFromDescriptor(argument1);
-    }
-  }
+  public addToolbarItem(iconOrDescriptor: string | Signal<string> | SciToolbarItemDescriptor, onSelect?: (context: Map<string, unknown>) => void): this {
+    const descriptor = coerceToolbarItemDescriptor(iconOrDescriptor, onSelect);
 
-  private addToolbarItemFromDescriptor(descriptor: SciToolbarItemDescriptor): this {
     this.contributions.push({
       type: 'menu-item',
       name: coerceArray(descriptor.name ?? []),
@@ -48,7 +41,11 @@ export class ɵSciToolbar implements SciToolbar {
   }
 
   /** @inheritDoc */
-  public addMenu(descriptor: SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenu) => void): this {
+  public addMenu(icon: string | Signal<string>, menuFactoryFn: (menu: SciMenu) => void): this;
+  public addMenu(descriptor: SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenu) => void): this;
+  public addMenu(iconOrDescriptor: string | Signal<string> | SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenu) => void): this {
+    const descriptor = coerceMenuDescriptor(iconOrDescriptor);
+
     const id = UUID.randomUUID();
     const menuItem: SciMenuContribution = {
       type: 'menu',
@@ -85,7 +82,7 @@ export class ɵSciToolbar implements SciToolbar {
     const id = UUID.randomUUID();
 
     if (typeof argument1 === 'function') {
-      const groupFactoryFn = argument1 as (group: SciToolbarGroup) => SciToolbarGroup;
+      const groupFactoryFn = argument1 as (group: SciToolbarGroup) => void;
 
       this.contributions.push({
         type: 'group',
@@ -103,7 +100,7 @@ export class ɵSciToolbar implements SciToolbar {
     }
     else {
       const descriptor = argument1 as SciToolbarGroupDescriptor;
-      const groupFactoryFn = argument2 as ((group: SciToolbarGroup) => SciToolbarGroup) | undefined;
+      const groupFactoryFn = argument2 as ((group: SciToolbarGroup) => void) | undefined;
 
       this.contributions.push({
         type: 'group',
@@ -134,4 +131,18 @@ export interface ToolbarMenuContributionDescriptor {
 export interface ToolbarGroupContributionDescriptor {
   location: `group(toolbar):${string}`;
   factoryFn: (group: SciToolbarGroup) => void;
+}
+
+function coerceToolbarItemDescriptor(iconOrDescriptor: string | Signal<string> | SciToolbarItemDescriptor, onSelect?: (context: Map<string, unknown>) => void): SciToolbarItemDescriptor {
+  if (typeof iconOrDescriptor === 'string' || isSignal(iconOrDescriptor)) {
+    return {icon: iconOrDescriptor, onSelect: onSelect!};
+  }
+  return iconOrDescriptor;
+}
+
+function coerceMenuDescriptor(iconOrDescriptor: string | Signal<string> | SciToolbarMenuDescriptor): SciToolbarMenuDescriptor {
+  if (typeof iconOrDescriptor === 'string' || isSignal(iconOrDescriptor)) {
+    return {icon: iconOrDescriptor};
+  }
+  return iconOrDescriptor;
 }
