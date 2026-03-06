@@ -8,10 +8,10 @@ import {ɵSciMenuService} from './ɵmenu.service';
 import {SciMenuContextProvider} from './menu-context-provider';
 import {coerceSignal} from './common/common';
 
-export function contributeMenu(location: `menu:${string}` | SciMenuContributionLocation, menuFactoryFn: (menu: SciMenu) => SciMenu, options?: SciMenuContributionOptions): Disposable;
-export function contributeMenu(location: `toolbar:${string}` | SciToolbarContributionLocation, menuFactoryFn: (toolbar: SciToolbar) => SciToolbar, options?: SciMenuContributionOptions): Disposable;
-export function contributeMenu(location: `group(menu):${string}` | SciToolbarGroupContributionLocation, menuFactoryFn: (group: SciMenuGroup) => SciMenuGroup, options?: SciMenuContributionOptions): Disposable;
-export function contributeMenu(location: `group(toolbar):${string}` | SciMenuGroupContributionLocation, menuFactoryFn: (group: SciToolbarGroup) => SciToolbarGroup, options?: SciMenuContributionOptions): Disposable;
+export function contributeMenu(location: `menu:${string}` | SciMenuContributionLocation, menuFactoryFn: (menu: SciMenu) => void | SciMenu, options?: SciMenuContributionOptions): Disposable;
+export function contributeMenu(location: `toolbar:${string}` | SciToolbarContributionLocation, menuFactoryFn: (toolbar: SciToolbar) => void | SciToolbar, options?: SciMenuContributionOptions): Disposable;
+export function contributeMenu(location: `group(menu):${string}` | SciMenuGroupContributionLocation, menuFactoryFn: (group: SciMenuGroup) => void | SciMenuGroup, options?: SciMenuContributionOptions): Disposable;
+export function contributeMenu(location: `group(toolbar):${string}` | SciToolbarGroupContributionLocation, menuFactoryFn: (group: SciToolbarGroup) => void | SciToolbarGroup, options?: SciMenuContributionOptions): Disposable;
 /** @internal */
 export function contributeMenu(location: string | SciContributionLocation, factoryFn: Function, options?: SciMenuContributionOptions): Disposable;
 export function contributeMenu(locationArg: string | SciContributionLocation, factoryFn: Function, options?: SciMenuContributionOptions): Disposable {
@@ -33,8 +33,8 @@ export function contributeMenu(locationArg: string | SciContributionLocation, fa
       untracked(() => {
         const registrations = new Array<Disposable>();
         registrations.push(menuService.contributeMenu(location, contributions, mergedContext));
-        registrations.push(...menuContributions.map(menuContribution => contributeMenu(menuContribution.location, menuContribution.factoryFn, {...options, injector})));
-        registrations.push(...groupContributions.map(groupContribution => contributeMenu(groupContribution.location, groupContribution.factoryFn, {...options, injector})));
+        registrations.push(...menuContributions.map(menuContribution => contributeMenu({location: menuContribution.location, context}, menuContribution.factoryFn, {...options, injector})));
+        registrations.push(...groupContributions.map(groupContribution => contributeMenu({location: groupContribution.location, context}, groupContribution.factoryFn, {...options, injector})));
 
         onCleanup(() => {
           registrations.forEach(registration => registration.dispose());

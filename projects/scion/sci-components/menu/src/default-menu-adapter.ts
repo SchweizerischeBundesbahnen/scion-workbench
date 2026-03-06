@@ -32,13 +32,13 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
       this._contributions.set(normalizedGroupLocation, signal([]));
     }
 
-    const currentContribution: Contribution = {contributions: contributions, context};
-    this._contributions.get(normalizedGroupLocation)!.update(contributions => contributions.concat(currentContribution));
+    const newContribution: Contribution = {contributions: contributions, context};
+    this._contributions.get(normalizedGroupLocation)!.update(contributions => contributions.concat(newContribution));
 
     return {
       dispose: () => {
         // Do not remove signal for listener to never have a "stale" signal.
-        this._contributions.get(normalizedGroupLocation)!.update(contributions => contributions.filter(contribution => contribution !== currentContribution));
+        this._contributions.get(normalizedGroupLocation)!.update(contributions => contributions.filter(contribution => contribution !== newContribution));
       },
     }
   }
