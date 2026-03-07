@@ -8,7 +8,7 @@ import {SciToolbar, SciToolbarGroup} from './toolbar/toolbar.model';
  */
 export interface SciMenuItemContribution {
   type: 'menu-item'
-  name: `menuitem:${string}`[];
+  name?: `menuitem:${string}`;
   label?: Signal<string | ComponentType<unknown>>;
   icon?: Signal<string>;
   tooltip?: Signal<string>;
@@ -30,7 +30,7 @@ export interface SciMenuItemContribution {
 
 export interface SciMenuContribution {
   type: 'menu'
-  name: `menu:${string}`[];
+  name?: `menu:${string}`;
   label?: Signal<string | ComponentType<unknown>>;
   icon?: Signal<string>;
   tooltip?: Signal<string>;
@@ -55,7 +55,7 @@ export interface SciMenuContribution {
 
 export interface SciMenuGroupContribution {
   type: 'group'
-  name: `group:${string}`[];
+  name?: `group:${string}`;
   label?: Signal<string>;
   collapsible?: {collapsed: boolean} | false;
   position?: {

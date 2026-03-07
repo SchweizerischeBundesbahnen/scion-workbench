@@ -17,13 +17,13 @@ export function sortMenuContributions(contributions: SciMenuContributions): SciM
     }
 
     // Add contribution if declaring a "non-existent"  insertion point.
-    if (contribution.position?.before && !contributions.some(it => it.name.some(name => name === contribution.position!.before))) {
+    if (contribution.position?.before && !contributions.some(it => it.name === contribution.position!.before)) {
       sorted.push(contribution);
       queue.delete(contribution);
     }
 
     // Add contribution if declaring a "non-existent" insertion point.
-    if (contribution.position?.after && !contributions.some(it => it.name.some(name => name === contribution.position!.after))) {
+    if (contribution.position?.after && !contributions.some(it => it.name === contribution.position!.after)) {
       sorted.push(contribution);
       queue.delete(contribution);
     }
@@ -36,7 +36,7 @@ export function sortMenuContributions(contributions: SciMenuContributions): SciM
     for (const contribution of queue) {
       // Add contributions declaring a before "insertion point".
       if (contribution.position?.before) {
-        const index = sorted.findIndex(candidate => candidate.name.some(name => name === contribution.position!.before));
+        const index = sorted.findIndex(candidate => candidate.name === contribution.position!.before);
         if (index !== -1) {
           sorted.splice(index, 0, contribution);
           queue.delete(contribution);
@@ -44,7 +44,7 @@ export function sortMenuContributions(contributions: SciMenuContributions): SciM
       }
       // Add contributions declaring an after "insertion point".
       else if (contribution.position?.after) {
-        const index = sorted.findIndex(candidate => candidate.name.some(name => name === contribution.position!.after));
+        const index = sorted.findIndex(candidate => candidate.name === contribution.position!.after);
         if (index !== -1) {
           sorted.splice(index + 1, 0, contribution);
           queue.delete(contribution);

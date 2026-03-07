@@ -35,7 +35,7 @@ export class ɵSciMenuService implements SciMenuService {
       options.anchor.preventDefault();
     }
 
-    const menuContributions = Array.isArray(nameOrMenuItems) ? nameOrMenuItems : this.menuContributions([nameOrMenuItems], mergedContext)();
+    const menuContributions = typeof nameOrMenuItems === 'string' ? this.menuContributions(nameOrMenuItems, mergedContext)() : nameOrMenuItems;
     if (this._menuAdapter.openMenu) {
       return this._menuAdapter.openMenu(menuContributions, options);
     }
@@ -45,7 +45,7 @@ export class ɵSciMenuService implements SciMenuService {
   }
 
   /** @inheritDoc */
-  public menuContributions(location: `menu:${string}`[] | `toolbar:${string}`[] | `group:${string}`[], context: Map<string, unknown>): Signal<SciMenuContributions> {
+  public menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>): Signal<SciMenuContributions> {
     return computed(() => this._menuAdapter.menuContributions(location, context, this._defaultMenuAdapter)());
   }
 

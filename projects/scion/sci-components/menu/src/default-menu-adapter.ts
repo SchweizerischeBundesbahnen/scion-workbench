@@ -52,11 +52,9 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
   }
 
   /** @inheritDoc */
-  public menuContributions(location: `menu:${string}`[] | `toolbar:${string}`[] | `group:${string}`[], context: Map<string, unknown>): Signal<SciMenuContributions> {
-    console.log('>>> menuContributions for', location);
-
+  public menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>): Signal<SciMenuContributions> {
     return computed(() => {
-      const contributions = location.reduce((contributions, location) => contributions.concat(this._contributions().get(location) ?? []), [] as Array<SciMenuContribution2 | SciGroupContribution2>);
+      const contributions = this._contributions().get(location) ?? [];
 
       return untracked(() => sortMenuContributions(contributions
         // Check if context matches
@@ -100,7 +98,7 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
     return {
       ...contribution,
       children: sortMenuContributions(contribution.children
-        .concat(contribution.name.length ? this.menuContributions(contribution.name, context)() : []) // TODO change to !contribution.name when removing names array
+        .concat(contribution.name ? this.menuContributions(contribution.name, context)() : [])
         .map(child => this.augmentChildContributions(child, context))),
     };
   }

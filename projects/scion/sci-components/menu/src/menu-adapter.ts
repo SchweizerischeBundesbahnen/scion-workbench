@@ -19,7 +19,7 @@ export abstract class SciMenuAdapter {
 
   public abstract contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`, contribution: SciMenuContribution2 | SciGroupContribution2, next: SciMenuAdapter): Disposable;
 
-  public abstract menuContributions(location: `menu:${string}`[] | `toolbar:${string}`[] | `group:${string}`[], context: Map<string, unknown>, next: SciMenuAdapter): Signal<SciMenuContributions>;
+  public abstract menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>, next: SciMenuAdapter): Signal<SciMenuContributions>;
 
   /**
    * TODO Optional or required?

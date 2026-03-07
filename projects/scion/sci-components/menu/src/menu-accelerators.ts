@@ -17,7 +17,6 @@ import {Objects} from '@scion/toolkit/util';
 import {coerceSignal} from './common/common';
 import {SciMenuContextProvider} from './menu-context-provider';
 import {SciMenuService} from './menu.service';
-import {coerceArray} from '@angular/cdk/coercion';
 
 /**
  * INPUTS FOR DOCUMENTING THIS FUNCTION:
@@ -30,7 +29,7 @@ import {coerceArray} from '@angular/cdk/coercion';
  *
  * An accelerator key can be a single key, such as F1 - F12 and Esc, or a combination of keys (Ctrl + Shift + B, or Ctrl C) that invoke a command. They differ from access keys (mnemonics), which are typically modified with the Alt key and simply activate a command or control.
  */
-export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${string}` | `menu:${string}`[] | `toolbar:${string}`[], options?: SciMenuAcceleratorOptions): Disposable {
+export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${string}`, options?: SciMenuAcceleratorOptions): Disposable {
   const injector = Injector.create({parent: options?.injector ?? inject(Injector), providers: []});
   return runInInjectionContext(injector, () => {
     const menuService = inject(SciMenuService);
@@ -42,7 +41,7 @@ export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${
     const mergedContext = computed(() => new Map<string, unknown>([...environmentMenuContext?.() ?? new Map(), ...options?.context ?? new Map()]));
 
     const menuItemContributions = computed(() => {
-      const menuItems = menuService.menuContributions(coerceArray(location) as `menu:${string}`[] | `toolbar:${string}`[], mergedContext())();
+      const menuItems = menuService.menuContributions(location, mergedContext())();
       return untracked(() => collectMenuItemsWithAccelerator(menuItems));
     });
 

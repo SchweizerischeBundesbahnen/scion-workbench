@@ -7,7 +7,7 @@ export abstract class SciMenuService {
 
   public abstract open(name: `menu:${string}`, options: SciMenuOptions): SciMenuRef;
 
-  public abstract menuContributions(location: `menu:${string}`[] | `toolbar:${string}`[] | `group:${string}`[], context: Map<string, unknown>): Signal<SciMenuContributions>;
+  public abstract menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>): Signal<SciMenuContributions>;
 }
 
 export interface SciMenuOptions {

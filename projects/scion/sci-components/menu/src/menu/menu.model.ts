@@ -29,7 +29,7 @@ export interface SciMenu {
 export type SciMenuGroup = SciMenu;
 
 export interface SciMenuItemDescriptor {
-  name?: `menuitem:${string}` | `menuitem:${string}`[];
+  name?: `menuitem:${string}`;
   label: string | Signal<string> | ComponentType<unknown>;
   icon?: string | Signal<string>;
   checked?: boolean | Signal<boolean>;
@@ -46,7 +46,7 @@ export interface SciMenuItemDescriptor {
 }
 
 export interface SciMenuDescriptor {
-  name?: `menu:${string}` | `menu:${string}`[];
+  name?: `menu:${string}`;
   label: string | Signal<string> | ComponentType<unknown>;
   icon?: string | Signal<string>;
   tooltip?: string | Signal<string>;
@@ -63,7 +63,7 @@ export interface SciMenuDescriptor {
 }
 
 export interface SciMenuGroupDescriptor {
-  name?: `group:${string}` | `group:${string}`[];
+  name?: `group:${string}`;
   label?: string | Signal<string>;
   collapsible?: boolean | {collapsed: boolean};
   disabled?: boolean | Signal<boolean>;

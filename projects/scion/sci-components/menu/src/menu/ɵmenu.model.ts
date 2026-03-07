@@ -3,7 +3,6 @@ import {isSignal, Signal} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {SciMenuContribution, SciMenuContributions, SciMenuGroupContribution, SciMenuItemContribution} from '../menu-contribution.model';
 import {coerceSignal} from '../common/common';
-import {coerceArray} from '@angular/cdk/coercion';
 
 export class ɵSciMenu implements SciMenu {
 
@@ -17,7 +16,7 @@ export class ɵSciMenu implements SciMenu {
 
     this.contributions.push({
       type: 'menu-item',
-      name: coerceArray(descriptor.name ?? []),
+      name: descriptor.name,
       label: coerceSignal(descriptor.label),
       icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
       checked: 'checked' in descriptor ? coerceSignal(descriptor.checked) : undefined,
@@ -48,7 +47,7 @@ export class ɵSciMenu implements SciMenu {
     // Add menu.
     this.contributions.push({
       type: 'menu',
-      name: coerceArray(descriptor.name ?? []),
+      name: descriptor.name,
       label: coerceSignal(descriptor.label),
       icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
       tooltip: coerceSignal(descriptor.tooltip),
@@ -80,7 +79,7 @@ export class ɵSciMenu implements SciMenu {
     // Add group.
     this.contributions.push({
       type: 'group',
-      name: coerceArray(descriptor.name ?? []),
+      name: descriptor.name,
       label: coerceSignal(descriptor.label),
       collapsible: computeCollapsible(descriptor),
       disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),

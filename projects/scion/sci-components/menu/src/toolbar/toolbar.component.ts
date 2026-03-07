@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject
 import {SciToolGroupComponent} from './toolbar-group.component';
 import {SciMenuContextProvider} from '../menu-context-provider';
 import {coerceSignal} from '../common/common';
-import {coerceArray, coerceElement} from '@angular/cdk/coercion';
+import {coerceElement} from '@angular/cdk/coercion';
 import {installMenuAccelerators} from '../menu-accelerators';
 import {SciMenuService} from '../menu.service';
 
@@ -17,7 +17,7 @@ import {SciMenuService} from '../menu.service';
 })
 export class SciToolbarComponent {
 
-  public readonly name = input.required({transform: coerceNameArray});
+  public readonly name = input.required<`toolbar:${string}`>();
   public readonly context = input<Map<string, unknown>>();
   public readonly acceleratorTarget = input<Element | ElementRef<Element>>();
   public readonly viewContainerRef = input<ViewContainerRef | undefined>();
@@ -60,8 +60,4 @@ export class SciToolbarComponent {
       });
     });
   }
-}
-
-function coerceNameArray(name: `toolbar:${string}` | `toolbar:${string}`[]): `toolbar:${string}`[] {
-  return coerceArray(name);
 }

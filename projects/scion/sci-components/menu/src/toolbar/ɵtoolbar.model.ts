@@ -4,7 +4,6 @@ import {Arrays} from '@scion/toolkit/util';
 import {SciToolbar, SciToolbarGroup, SciToolbarGroupDescriptor, SciToolbarItemDescriptor, SciToolbarMenuDescriptor} from './toolbar.model';
 import {coerceSignal} from '../common/common';
 import {SciMenuContribution, SciMenuContributions, SciMenuGroupContribution, SciMenuItemContribution} from '../menu-contribution.model';
-import {coerceArray} from '@angular/cdk/coercion';
 import {ɵSciMenu} from '../menu/ɵmenu.model';
 
 export class ɵSciToolbar implements SciToolbar {
@@ -19,7 +18,7 @@ export class ɵSciToolbar implements SciToolbar {
 
     this.contributions.push({
       type: 'menu-item',
-      name: coerceArray(descriptor.name ?? []),
+      name: descriptor.name,
       label: coerceSignal(descriptor.label),
       icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
       checked: 'checked' in descriptor ? coerceSignal(descriptor.checked) : undefined,
@@ -50,7 +49,7 @@ export class ɵSciToolbar implements SciToolbar {
     // Add menu.
     this.contributions.push({
       type: 'menu',
-      name: coerceArray(descriptor.name ?? []),
+      name: descriptor.name,
       label: coerceSignal(descriptor.label),
       icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
       tooltip: coerceSignal(descriptor.tooltip),
@@ -83,7 +82,7 @@ export class ɵSciToolbar implements SciToolbar {
     // Add group.
     this.contributions.push({
       type: 'group',
-      name: coerceArray(descriptor.name ?? []),
+      name: descriptor.name,
       disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
       children: group.contributions,
       cssClass: Arrays.coerce(descriptor.cssClass),
