@@ -31,12 +31,10 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
   private readonly _injector = inject(Injector);
 
   /** @inheritDoc */
-  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`, contribution: SciMenuContribution2 | SciGroupContribution2): Disposable {
-    const normalizedLocation = normalizeLocation(location);
-
+  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution2 | SciGroupContribution2): Disposable {
     this._contributions.update(contributions => {
       const copy = new Map(contributions);
-      Maps.addListValue(copy, normalizedLocation, contribution);
+      Maps.addListValue(copy, location, contribution);
       return copy;
     });
 
@@ -44,7 +42,7 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
       dispose: () => {
         this._contributions.update(contributions => {
           const copy = new Map(contributions);
-          Maps.removeListValue(copy, normalizedLocation, contribution);
+          Maps.removeListValue(copy, location, contribution);
           return copy;
         });
       },
@@ -283,14 +281,5 @@ function setStyles(element: HTMLElement, styles: {[style: string]: string | null
       element.style.setProperty(name, value);
     }
   });
-}
-
-function normalizeLocation(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`): `menu:${string}` | `toolbar:${string}` | `group:${string}` {
-  const regex = /^group\((menu|toolbar)\):(?<name>.+)/;
-  const match = regex.exec(location);
-  if (match) {
-    return `group:${match.groups!['name']}`;
-  }
-  return location as `menu:${string}` | `toolbar:${string}`;
 }
 

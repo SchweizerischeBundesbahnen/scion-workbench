@@ -29,7 +29,7 @@ export function contributeMenu(locationLike: string | SciContributionLocation, f
     const mergedContext = new Map([...environmentMenuContext?.() ?? new Map(), ...context ?? new Map()]);
 
     untracked(() => {
-      const contributionRef = menuService.contributeMenu(location, {
+      const contributionRef = menuService.contributeMenu(normalizeLocation(location), {
         scope: location.startsWith('menu:') || location.startsWith('group(menu):') ? 'menu' : 'toolbar',
         factory: factoryFn as ((menu: SciMenu | SciToolbar, context: Map<string, unknown>) => void) | ((group: SciMenuGroup | SciToolbarGroup, context: Map<string, unknown>) => void),
         context: mergedContext,
@@ -93,6 +93,15 @@ function constructMenu(location: string, factoryFn: Function): ɵSciMenu | ɵSci
   else {
     throw Error('Illegal contribution point');
   }
+}
+
+function normalizeLocation(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`): `menu:${string}` | `toolbar:${string}` | `group:${string}` {
+  const regex = /^group\((menu|toolbar)\):(?<name>.+)/;
+  const match = regex.exec(location);
+  if (match) {
+    return `group:${match.groups!['name']}`;
+  }
+  return location as `menu:${string}` | `toolbar:${string}`;
 }
 
 export interface SciMenuContributionOptions {

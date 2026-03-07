@@ -17,7 +17,7 @@ import {SciDefaultMenuAdapter} from './default-menu-adapter';
 @Injectable({providedIn: 'root', useExisting: SciDefaultMenuAdapter})
 export abstract class SciMenuAdapter {
 
-  public abstract contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`, contribution: SciMenuContribution2 | SciGroupContribution2, next: SciMenuAdapter): Disposable;
+  public abstract contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution2 | SciGroupContribution2, next: SciMenuAdapter): Disposable;
 
   public abstract menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>, next: SciMenuAdapter): Signal<SciMenuContributions>;
 

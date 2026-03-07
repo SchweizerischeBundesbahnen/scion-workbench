@@ -49,7 +49,7 @@ export class ɵSciMenuService implements SciMenuService {
     return computed(() => this._menuAdapter.menuContributions(location, context, this._defaultMenuAdapter)());
   }
 
-  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`, contribution: SciMenuContribution2 | SciGroupContribution2): Disposable {
+  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution2 | SciGroupContribution2): Disposable {
     return this._menuAdapter.contributeMenu(location, contribution, this._defaultMenuAdapter);
   }
 }
