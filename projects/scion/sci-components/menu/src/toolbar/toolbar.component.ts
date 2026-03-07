@@ -25,8 +25,8 @@ export class SciToolbarComponent {
   public readonly toolbarEmpty = output<boolean>();
 
   private readonly menuService = inject(SciMenuService);
+  private readonly mergedContext = this.computeContext();
 
-  protected readonly mergedContext = this.computeContext();
   protected readonly menuItems = computed(() => this.menuService.menuContributions(this.name(), this.mergedContext())());
 
   constructor() {

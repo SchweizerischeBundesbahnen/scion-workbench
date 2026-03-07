@@ -10,7 +10,7 @@
 
 import {SciMenuOptions, SciMenuRef, SciMenuService} from './menu.service';
 import {computed, inject, Injectable, Provider, Signal} from '@angular/core';
-import {SciGroupContribution2, SciMenuContribution2, SciMenuContributions, SciMenuItemContribution} from './menu-contribution.model';
+import {SciGroupContribution2, SciMenuContribution2, SciMenuContributions} from './menu-contribution.model';
 import {Disposable} from './common/disposable';
 import {SciMenuContextProvider} from './menu-context-provider';
 import {coerceSignal} from './common/common';
@@ -26,7 +26,7 @@ export class ɵSciMenuService implements SciMenuService {
 
   /** @inheritDoc */
   public open(name: `menu:${string}`, options: SciMenuOptions): SciMenuRef;
-  public open(menuItems: SciMenuContributions, options: SciMenuOptions): SciMenuRef;
+  public open(menuItems: SciMenuContributions, options: Omit<SciMenuOptions, 'context'>): SciMenuRef;
   public open(nameOrMenuItems: `menu:${string}` | SciMenuContributions, options: SciMenuOptions): SciMenuRef {
     const mergedContext = new Map([...this._environmentMenuContext?.() ?? new Map(), ...options.context ?? new Map()]);
 
@@ -35,11 +35,12 @@ export class ɵSciMenuService implements SciMenuService {
       options.anchor.preventDefault();
     }
 
+    const menuContributions = Array.isArray(nameOrMenuItems) ? nameOrMenuItems : this.menuContributions([nameOrMenuItems], mergedContext)();
     if (this._menuAdapter.openMenu) {
-      return this._menuAdapter.openMenu(nameOrMenuItems, {...options, context: mergedContext});
+      return this._menuAdapter.openMenu(menuContributions, options);
     }
     else {
-      return this._defaultMenuAdapter.openMenu(nameOrMenuItems, {...options, context: mergedContext});
+      return this._defaultMenuAdapter.openMenu(menuContributions, options);
     }
   }
 

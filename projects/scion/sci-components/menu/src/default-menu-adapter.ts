@@ -106,14 +106,9 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
   }
 
   /** @inheritDoc */
-  public openMenu(name: `menu:${string}`, options: SciMenuOptions): SciMenuRef;
-  public openMenu(menuItems: SciMenuContributions, options: SciMenuOptions): SciMenuRef;
-  public openMenu(nameOrMenuItems: `menu:${string}` | SciMenuContributions, options: SciMenuOptions): SciMenuRef;
-  public openMenu(nameOrMenuItems: `menu:${string}` | SciMenuContributions, options: SciMenuOptions): SciMenuRef {
+  public openMenu(menuItems: SciMenuContributions, options: Omit<SciMenuOptions, 'context'>): SciMenuRef {
     // Create injection context to dispose resources when closing the menu.
     const injector = Injector.create({parent: this._injector, providers: []});
-
-    const menuItems = Array.isArray(nameOrMenuItems) ? nameOrMenuItems : this.menuContributions([nameOrMenuItems], options.context ?? new Map())();
 
     return runInInjectionContext(injector, () => {
       // Get or create anchor at specified origin.
@@ -136,11 +131,10 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
     });
   }
 
-  private createMenuPopover(menuItems: SciMenuContributions, anchorElement: HTMLElement, options: SciMenuOptions): ComponentRef<MenuComponent> {
+  private createMenuPopover(menuItems: SciMenuContributions, anchorElement: HTMLElement, options: Omit<SciMenuOptions, 'context'>): ComponentRef<MenuComponent> {
     const anchorSize = dimension(anchorElement);
     const bindings: Binding[] = [
       inputBinding('menuItems', signal(menuItems)),
-      inputBinding('context', signal(options.context ?? new Map<string, unknown>())),
       inputBinding('filter', signal(options.filter)),
       inputBinding('sizeInput', signal(options.size)),
       inputBinding('anchorWidth', computed(() => anchorSize().offsetWidth)),

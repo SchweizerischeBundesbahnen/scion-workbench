@@ -24,7 +24,5 @@ export abstract class SciMenuAdapter {
   /**
    * TODO Optional or required?
    */
-  public openMenu?(name: `menu:${string}`, options: SciMenuOptions): SciMenuRef;
-  public openMenu?(menuItems: SciMenuContributions, options: SciMenuOptions): SciMenuRef;
-  public openMenu?(nameOrMenuItems: `menu:${string}` | SciMenuContributions, options: SciMenuOptions): SciMenuRef;
+  public openMenu?(menuItems: SciMenuContributions, options: Omit<SciMenuOptions, 'context'>): SciMenuRef;
 }

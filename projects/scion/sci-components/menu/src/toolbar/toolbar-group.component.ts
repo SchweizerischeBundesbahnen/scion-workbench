@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, computed, effect, inject, Injector, input, linkedSignal, output, runInInjectionContext, untracked, ViewContainerRef} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject, Injector, input, linkedSignal, output, runInInjectionContext, untracked, ViewContainerRef} from '@angular/core';
 import {NgComponentOutlet} from '@angular/common';
 import {MenuItemStateDirective} from '../menu/menu-item-state.directive';
 import {SciMenuContribution, SciMenuContributions, SciMenuGroupContribution, SciMenuItemContribution} from '../menu-contribution.model';
@@ -17,7 +17,6 @@ import {ɵSciMenuService} from '../ɵmenu.service';
 export class SciToolGroupComponent {
 
   public readonly menuItems = input.required<SciMenuContributions>();
-  public readonly context = input.required<Map<string, unknown>>();
   public readonly disabled = input<boolean>();
   public readonly viewContainerRef = input<ViewContainerRef | undefined>();
   public readonly groupEmpty = output<boolean>();
@@ -26,8 +25,8 @@ export class SciToolGroupComponent {
   private readonly _menuService = inject(ɵSciMenuService);
   private readonly _injector = inject(Injector);
 
-  protected readonly activeSubMenuItem = linkedSignal<{menuItems: SciMenuContributions; context: Map<string, unknown> | undefined}, {menu: SciMenuContribution, element: HTMLElement} | null>({
-    source: computed(() => ({menuItems: this.menuItems(), context: this.context()})),  // reset active sub menu item when this component is re-used
+  protected readonly activeSubMenuItem = linkedSignal<SciMenuContributions, {menu: SciMenuContribution, element: HTMLElement} | null>({
+    source: this.menuItems,  // reset active sub menu item when this component is re-used
     computation: () => null,
   });
 
@@ -45,7 +44,6 @@ export class SciToolGroupComponent {
         if (activeSubMenuItem) {
           const ref = this._menuService.open(activeSubMenuItem.menu.children, {
             anchor: activeSubMenuItem.element,
-            context: this.context(),
             viewContainerRef,
             cssClass: activeSubMenuItem.menu.cssClass,
             filter: activeSubMenuItem.menu.menu.filter,

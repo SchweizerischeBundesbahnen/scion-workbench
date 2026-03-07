@@ -42,7 +42,6 @@ import {ɵSciMenuService} from '../ɵmenu.service';
 export class MenuComponent {
 
   public readonly menuItems = input.required<SciMenuContributions>();
-  public readonly context = input.required<Map<string, unknown>>();
   public readonly disabled = input<boolean>();
   public readonly filter = input<boolean | {placeholder?: string; notFoundText?: string}>(false);
   public readonly group = input<{label?: string, collapsible: boolean, collapsed: boolean}>();
@@ -61,8 +60,8 @@ export class MenuComponent {
   protected readonly hasGlyphArea = computed(() => this.glyphArea() ?? (!!this.filter() || requiresGlyphArea(this.menuItems())));
   protected readonly menuItemsFiltered = computed(() => this.menuItems().filter(menuItem => this.matchesFilter(menuItem)()));
   protected readonly popoverAnchor = viewChild.required('popover_anchor', {read: ViewContainerRef});
-  protected readonly activeSubMenuItem = linkedSignal<{menuItems: SciMenuContributions; context: Map<string, unknown>}, {menu: SciMenuContribution, element: HTMLElement} | null>({
-    source: computed(() => ({menuItems: this.menuItems(), context: this.context()})),  // reset active sub menu item when this component is re-used
+  protected readonly activeSubMenuItem = linkedSignal<SciMenuContributions, {menu: SciMenuContribution, element: HTMLElement} | null>({
+    source: this.menuItems,  // reset active sub menu item when this component is re-used
     computation: () => null,
   });
 
@@ -93,14 +92,12 @@ export class MenuComponent {
     // Maintain stable width when expanding/collapsing groups or hovering menu item when displaying the actions toolbar.
     afterRenderEffect(() => {
       this.menuItems(); // re-evaluate when re-used
-      this.context();
       this.size.update(size => ({...size, width: `${this._host.getBoundingClientRect().width}px`}));
     });
 
     // Close action menu when this component is re-used.
     effect(() => {
       this.menuItems();
-      this.context();
 
       untracked(() => {
         const popover = this._host.appendChild(this._document.createElement('div'));
@@ -118,7 +115,6 @@ export class MenuComponent {
         if (activeSubMenuItem) {
           const ref = this._menuService.open(activeSubMenuItem.menu.children, {
             anchor: activeSubMenuItem.element,
-            context: this.context(),
             viewContainerRef: this.popoverAnchor(),
             cssClass: activeSubMenuItem.menu.cssClass,
             filter: activeSubMenuItem.menu.menu.filter,
