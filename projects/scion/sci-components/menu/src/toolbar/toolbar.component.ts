@@ -4,6 +4,7 @@ import {SciMenuContextProvider} from '../menu-context-provider';
 import {coerceSignal} from '../common/common';
 import {coerceArray, coerceElement} from '@angular/cdk/coercion';
 import {installMenuAccelerators} from '../menu-accelerators';
+import {SciMenuService} from '../menu.service';
 
 @Component({
   selector: 'sci-toolbar',
@@ -23,7 +24,10 @@ export class SciToolbarComponent {
   public readonly toolbarMenuOpen = output<boolean>();
   public readonly toolbarEmpty = output<boolean>();
 
+  private readonly menuService = inject(SciMenuService);
+
   protected readonly mergedContext = this.computeContext();
+  protected readonly menuItems = computed(() => this.menuService.menuContributions(this.name(), this.mergedContext())());
 
   constructor() {
     this.installAccelerators();

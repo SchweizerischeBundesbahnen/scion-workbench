@@ -50,7 +50,7 @@
       </button>
     }
     @case ('group') {
-      <sci-toolbar-group [name]="menuItem.name"
+      <sci-toolbar-group [menuItems]="menuItem.children"
                          [context]="this.context()"
                          [disabled]="disabled"
                          [class]="menuItem.cssClass"/>

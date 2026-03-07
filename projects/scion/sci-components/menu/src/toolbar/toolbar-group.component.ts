@@ -1,8 +1,8 @@
-import {ChangeDetectionStrategy, Component, computed, effect, inject, Injector, input, linkedSignal, output, runInInjectionContext, signal, Signal, untracked, ViewContainerRef} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, Injector, input, linkedSignal, output, runInInjectionContext, untracked, ViewContainerRef} from '@angular/core';
 import {NgComponentOutlet} from '@angular/common';
 import {MenuItemStateDirective} from '../menu/menu-item-state.directive';
-import {SciMenuContribution, SciMenuGroupContribution, SciMenuItemContribution} from '../menu-contribution.model';
-import {SciMenuService} from '../menu.service';
+import {SciMenuContribution, SciMenuContributions, SciMenuGroupContribution, SciMenuItemContribution} from '../menu-contribution.model';
+import {ɵSciMenuService} from '../ɵmenu.service';
 
 @Component({
   selector: 'sci-toolbar-group',
@@ -16,19 +16,18 @@ import {SciMenuService} from '../menu.service';
 })
 export class SciToolGroupComponent {
 
-  public readonly name = input.required<Array<`toolbar:${string}` | `group:${string}`>>();
+  public readonly menuItems = input.required<SciMenuContributions>();
   public readonly context = input.required<Map<string, unknown>>();
   public readonly disabled = input<boolean>();
   public readonly viewContainerRef = input<ViewContainerRef | undefined>();
   public readonly groupEmpty = output<boolean>();
   public readonly groupMenuOpen = output<boolean>();
 
-  private readonly _menuService = inject(SciMenuService);
+  private readonly _menuService = inject(ɵSciMenuService);
   private readonly _injector = inject(Injector);
 
-  protected readonly menuItems = this.computeToolbarItems();
-  protected readonly activeSubMenuItem = linkedSignal<{location: Array<`toolbar:${string}` | `group:${string}`>; context: Map<string, unknown> | undefined}, {menu: SciMenuContribution, element: HTMLElement} | null>({
-    source: computed(() => ({location: this.name(), context: this.context()})),  // reset active sub menu item when this component is re-used
+  protected readonly activeSubMenuItem = linkedSignal<{menuItems: SciMenuContributions; context: Map<string, unknown> | undefined}, {menu: SciMenuContribution, element: HTMLElement} | null>({
+    source: computed(() => ({menuItems: this.menuItems(), context: this.context()})),  // reset active sub menu item when this component is re-used
     computation: () => null,
   });
 
@@ -44,7 +43,7 @@ export class SciToolGroupComponent {
 
       untracked(() => {
         if (activeSubMenuItem) {
-          const ref = this._menuService.open(activeSubMenuItem.menu.name, {
+          const ref = this._menuService.open(activeSubMenuItem.menu.children, {
             anchor: activeSubMenuItem.element,
             context: this.context(),
             viewContainerRef,
@@ -72,29 +71,25 @@ export class SciToolGroupComponent {
     });
 
     effect(() => {
-      this.groupEmpty.emit(this.menuItems().every(menuItem => this.isEmtpy(menuItem)()));
+      this.groupEmpty.emit(this.menuItems().every(isEmtpy));
     });
   }
 
   protected onSelect(menuItem: SciMenuItemContribution): void {
-    runInInjectionContext(this._injector, () => void menuItem.onSelect(this.context()));
-  }
-
-  private computeToolbarItems(): Signal<Array<SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution>> {
-    return computed(() => this._menuService.menuContributions(this.name(), this.context())());
+    runInInjectionContext(this._injector, () => void menuItem.onSelect());
   }
 
   protected onSubMenuClick(menuItem: {menu: SciMenuContribution, element: HTMLElement} | null): void {
     this.activeSubMenuItem.set(menuItem);
   }
+}
 
-  private isEmtpy(menuItem: SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution): Signal<boolean> {
-    switch (menuItem.type) {
-      case 'menu-item':
-        return signal(false);
-      case 'menu':
-      case 'group':
-        return computed(() => this._menuService.menuContributions(menuItem.name, this.context())().every(menuItem => this.isEmtpy(menuItem)()));
-    }
+function isEmtpy(menuItem: SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution): boolean {
+  switch (menuItem.type) {
+    case 'menu-item':
+      return false;
+    case 'menu':
+    case 'group':
+      return menuItem.children.every(isEmtpy);
   }
 }

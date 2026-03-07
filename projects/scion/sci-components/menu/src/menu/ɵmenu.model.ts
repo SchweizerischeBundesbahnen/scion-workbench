@@ -1,21 +1,18 @@
 import {SciMenu, SciMenuDescriptor, SciMenuGroup, SciMenuGroupDescriptor, SciMenuItemDescriptor} from './menu.model';
-import {isSignal, Signal, signal} from '@angular/core';
-import {UUID} from '@scion/toolkit/uuid';
+import {isSignal, Signal} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
-import {SciMenuContribution, SciMenuGroupContribution, SciMenuItemContribution} from '../menu-contribution.model';
+import {SciMenuContribution, SciMenuContributions, SciMenuGroupContribution, SciMenuItemContribution} from '../menu-contribution.model';
 import {coerceSignal} from '../common/common';
 import {coerceArray} from '@angular/cdk/coercion';
 
 export class ɵSciMenu implements SciMenu {
 
-  public readonly contributions = new Array<SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution>();
-  public readonly groupContributions = new Array<MenuGroupContributionDescriptor>();
-  public readonly menuContributions = new Array<MenuContributionDescriptor>();
+  public readonly contributions = [] as SciMenuContributions;
 
   /** @inheritDoc */
-  public addMenuItem(label: string | Signal<string>, onSelect: (context: Map<string, unknown>) => boolean | void): this;
+  public addMenuItem(label: string | Signal<string>, onSelect: () => boolean | void): this;
   public addMenuItem(descriptor: SciMenuItemDescriptor): this;
-  public addMenuItem(labelOrDescriptor: string | Signal<string> | SciMenuItemDescriptor, onSelect?: (context: Map<string, unknown>) => boolean | void): this {
+  public addMenuItem(labelOrDescriptor: string | Signal<string> | SciMenuItemDescriptor, onSelect?: () => boolean | void): this {
     const descriptor = coerceMenuItemDescriptor(labelOrDescriptor, onSelect);
 
     this.contributions.push({
@@ -30,7 +27,7 @@ export class ɵSciMenu implements SciMenu {
       actionToolbarName: coerceSignal(descriptor.actionToolbarName),
       matchesFilter: descriptor.onFilter,
       cssClass: Arrays.coerce(descriptor.cssClass),
-      onSelect: (context) => descriptor.onSelect(context) ?? descriptor.checked === undefined, // Close if the callback returns true. Defaults to closing non-checkable menu items.
+      onSelect: () => descriptor.onSelect() ?? descriptor.checked === undefined, // Close if the callback returns true. Defaults to closing non-checkable menu items.
       data: descriptor.data,
     } satisfies SciMenuItemContribution);
 
@@ -44,10 +41,14 @@ export class ɵSciMenu implements SciMenu {
   public addMenu(labelOrDescriptor: string | Signal<string> | SciMenuDescriptor, menuFactoryFn: (menu: SciMenu) => void): this {
     const descriptor = coerceMenuDescriptor(labelOrDescriptor);
 
-    const id = UUID.randomUUID();
-    const menuItem: SciMenuContribution = {
+    // Construct menu.
+    const menu = new ɵSciMenu();
+    menuFactoryFn(menu);
+
+    // Add menu.
+    this.contributions.push({
       type: 'menu',
-      name: coerceArray(descriptor.name ?? []).concat(`menu:${id}`),
+      name: coerceArray(descriptor.name ?? []),
       label: coerceSignal(descriptor.label),
       icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
       tooltip: coerceSignal(descriptor.tooltip),
@@ -58,17 +59,10 @@ export class ɵSciMenu implements SciMenu {
         maxWidth: descriptor.menu?.maxWidth,
         filter: descriptor.menu?.filter,
       },
+      children: menu.contributions,
       cssClass: Arrays.coerce(descriptor.cssClass),
       data: descriptor.data,
-    };
-
-    this.contributions.push(menuItem);
-
-    // children
-    this.menuContributions.push({
-      location: `menu:${id}`,
-      factoryFn: menuFactoryFn,
-    });
+    } satisfies SciMenuContribution);
 
     return this;
   }
@@ -76,51 +70,26 @@ export class ɵSciMenu implements SciMenu {
   /** @inheritDoc */
   public addGroup(groupFactoryFn: (group: SciMenuGroup) => void): this;
   public addGroup(descriptor: SciMenuGroupDescriptor, groupFactoryFn?: (group: SciMenuGroup) => void): this;
-  public addGroup(argument1: unknown, argument2?: unknown): this {
-    const id = UUID.randomUUID();
+  public addGroup(factoryOrDescriptor: ((group: SciMenuGroup) => void) | SciMenuGroupDescriptor, factoryIfDescriptor?: (group: SciMenuGroup) => void): this {
+    const [descriptor, groupFactoryFn] = coerceGroupDescriptor(factoryOrDescriptor, factoryIfDescriptor);
 
-    if (typeof argument1 === 'function') {
-      const groupFactoryFn = argument1 as (group: SciMenuGroup) => void;
+    // Construct group.
+    const group = new ɵSciMenu();
+    groupFactoryFn?.(group);
 
-      this.contributions.push({
-        type: 'group',
-        name: [`group:${id}`],
-        collapsible: false,
-        disabled: signal(false),
-      });
+    // Add group.
+    this.contributions.push({
+      type: 'group',
+      name: coerceArray(descriptor.name ?? []),
+      label: coerceSignal(descriptor.label),
+      collapsible: computeCollapsible(descriptor),
+      disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
+      children: group.contributions,
+      cssClass: Arrays.coerce(descriptor.cssClass),
+      data: descriptor.data,
+    } satisfies SciMenuGroupContribution);
 
-      // children
-      this.groupContributions.push({
-        location: `group(menu):${id}`,
-        factoryFn: groupFactoryFn,
-      });
-
-      return this;
-    }
-    else {
-      const descriptor = argument1 as SciMenuGroupDescriptor;
-      const groupFactoryFn = argument2 as ((group: SciMenuGroup) => void) | undefined;
-
-      this.contributions.push({
-        type: 'group',
-        name: coerceArray(descriptor.name ?? []).concat(`group:${id}`),
-        label: coerceSignal(descriptor.label),
-        collapsible: computeCollapsible(descriptor),
-        disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
-        cssClass: Arrays.coerce(descriptor.cssClass),
-        data: descriptor.data,
-      });
-
-      // children
-      if (groupFactoryFn) {
-        this.groupContributions.push({
-          location: `group(menu):${id}`,
-          factoryFn: groupFactoryFn,
-        });
-      }
-
-      return this;
-    }
+    return this;
   }
 }
 
@@ -137,17 +106,7 @@ function computeCollapsible(groupDescriptor: SciMenuGroupDescriptor): {collapsed
   return {collapsed: false};
 }
 
-export interface MenuContributionDescriptor {
-  location: `menu:${string}`;
-  factoryFn: (group: SciMenu) => void;
-}
-
-export interface MenuGroupContributionDescriptor {
-  location: `group(menu):${string}`;
-  factoryFn: (group: SciMenuGroup) => void;
-}
-
-function coerceMenuItemDescriptor(labelOrDescriptor: string | Signal<string> | SciMenuItemDescriptor, onSelect?: (context: Map<string, unknown>) => boolean | void): SciMenuItemDescriptor {
+function coerceMenuItemDescriptor(labelOrDescriptor: string | Signal<string> | SciMenuItemDescriptor, onSelect?: () => boolean | void): SciMenuItemDescriptor {
   if (typeof labelOrDescriptor === 'string' || isSignal(labelOrDescriptor)) {
     return {label: labelOrDescriptor, onSelect: onSelect!};
   }
@@ -159,4 +118,11 @@ function coerceMenuDescriptor(labelOrDescriptor: string | Signal<string> | SciMe
     return {label: labelOrDescriptor};
   }
   return labelOrDescriptor;
+}
+
+function coerceGroupDescriptor(factoryOrDescriptor: ((group: SciMenuGroup) => void) | SciMenuGroupDescriptor, factoryIfDescriptor?: (group: SciMenuGroup) => void): [SciMenuGroupDescriptor, ((group: SciMenuGroup) => void) | undefined] {
+  if (typeof factoryOrDescriptor === 'function') {
+    return [{}, factoryOrDescriptor];
+  }
+  return [factoryOrDescriptor, factoryIfDescriptor];
 }

@@ -117,15 +117,15 @@ export default class ViewPageComponent {
         .addMenuItem('Remove from Sidebar', () => onAction()),
       ));
 
-    contributeMenu(`menu:contextmenu`, menu => menu
-      .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+'], onSelect: onAction})
+    contributeMenu(`menu:contextmenu`, (menu, context) => menu
+      .addMenuItem({label: 'Expand All', disabled: context.get('partId') === 'part.d7b1190a', accelerator: ['Ctrl', 'NumPad', '+'], onSelect: onAction})
       .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-'], onSelect: onAction})
       .addGroup(group => group
         .addMenuItem({label: 'Navigate with Single Click', checked: computed(() => flags().has('navigate_with_single_click')), onSelect: () => toggleMultiFlag(flags, 'navigate_with_single_click')})
         .addMenuItem({label: 'Always Select Opened Element', checked: computed(() => flags().has('always_select_opened_element')), onSelect: () => toggleMultiFlag(flags, 'always_select_opened_element')},
         )
         .addGroup(group => group
-          .addMenuItem({label: 'Speed Search', icon: 'search', accelerator: ['Ctrl', 'F'], onSelect: context => console.log('>>> speed search (Ctrl + F)', context)}),
+          .addMenuItem({label: 'Speed Search', icon: 'search', accelerator: ['Ctrl', 'F'], onSelect: () => console.log('>>> speed search (Ctrl + F)', context)}),
         )
         .addGroup(group => group
           .addMenu({label: 'View Mode'}, menu => menu

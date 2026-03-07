@@ -10,10 +10,8 @@
 
 import {SciMenuOptions, SciMenuRef, SciMenuService} from './menu.service';
 import {computed, inject, Injectable, Provider, Signal} from '@angular/core';
-import {coerceArray} from '@angular/cdk/coercion';
-import {SciMenuContributions} from './menu-contribution.model';
+import {SciGroupContribution2, SciMenuContribution2, SciMenuContributions, SciMenuItemContribution} from './menu-contribution.model';
 import {Disposable} from './common/disposable';
-import {sortMenuContributions} from './menu-contribution-sorter';
 import {SciMenuContextProvider} from './menu-context-provider';
 import {coerceSignal} from './common/common';
 import {SciMenuAdapter} from './menu-adapter';
@@ -27,7 +25,9 @@ export class ɵSciMenuService implements SciMenuService {
   private readonly _environmentMenuContext = coerceSignal(inject(SciMenuContextProvider, {optional: true})?.provideContext?.());
 
   /** @inheritDoc */
-  public open(name: `menu:${string}` | `menu:${string}`[], options: SciMenuOptions): SciMenuRef {
+  public open(name: `menu:${string}`, options: SciMenuOptions): SciMenuRef;
+  public open(menuItems: SciMenuContributions, options: SciMenuOptions): SciMenuRef;
+  public open(nameOrMenuItems: `menu:${string}` | SciMenuContributions, options: SciMenuOptions): SciMenuRef {
     const mergedContext = new Map([...this._environmentMenuContext?.() ?? new Map(), ...options.context ?? new Map()]);
 
     // Prevent default if opening context menu.
@@ -36,20 +36,20 @@ export class ɵSciMenuService implements SciMenuService {
     }
 
     if (this._menuAdapter.openMenu) {
-      return this._menuAdapter.openMenu(coerceArray(name), {...options, context: mergedContext});
+      return this._menuAdapter.openMenu(nameOrMenuItems, {...options, context: mergedContext});
     }
     else {
-      return this._defaultMenuAdapter.openMenu(coerceArray(name), {...options, context: mergedContext});
+      return this._defaultMenuAdapter.openMenu(nameOrMenuItems, {...options, context: mergedContext});
     }
   }
 
   /** @inheritDoc */
-  public menuContributions(location: Array<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Map<string, unknown>): Signal<SciMenuContributions> {
-    return computed(() => sortMenuContributions(location.reduce((contributions, location) => contributions.concat(this._menuAdapter.menuContributions(location, context, this._defaultMenuAdapter)()), [] as SciMenuContributions)));
+  public menuContributions(location: `menu:${string}`[] | `toolbar:${string}`[] | `group:${string}`[], context: Map<string, unknown>): Signal<SciMenuContributions> {
+    return computed(() => this._menuAdapter.menuContributions(location, context, this._defaultMenuAdapter)());
   }
 
-  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`, contributions: SciMenuContributions, context: Map<string, unknown>): Disposable {
-    return this._menuAdapter.contributeMenu(location, contributions, context, this._defaultMenuAdapter);
+  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`, contribution: SciMenuContribution2 | SciGroupContribution2): Disposable {
+    return this._menuAdapter.contributeMenu(location, contribution, this._defaultMenuAdapter);
   }
 }
 
@@ -62,3 +62,4 @@ export function provideSciMenuService(): Provider[] {
     {provide: SciMenuService, useExisting: ɵSciMenuService},
   ];
 }
+

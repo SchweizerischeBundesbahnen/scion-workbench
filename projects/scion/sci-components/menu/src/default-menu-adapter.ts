@@ -8,67 +8,112 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationRef, Binding, ComponentRef, computed, createComponent, DestroyRef, DOCUMENT, ElementRef, EnvironmentInjector, inject, Injectable, Injector, inputBinding, runInInjectionContext, signal, Signal, ViewContainerRef, WritableSignal} from '@angular/core';
+import {ApplicationRef, Binding, ComponentRef, computed, createComponent, DestroyRef, DOCUMENT, ElementRef, EnvironmentInjector, inject, Injectable, Injector, inputBinding, runInInjectionContext, signal, Signal, untracked, ViewContainerRef} from '@angular/core';
 import {Disposable} from './common/disposable';
-import {SciMenuContributions} from './menu-contribution.model';
+import {SciGroupContribution2, SciMenuContribution, SciMenuContribution2, SciMenuContributions, SciMenuGroupContribution, SciMenuItemContribution} from './menu-contribution.model';
 import {SciMenuAdapter} from './menu-adapter';
 import {SciMenuOptions, SciMenuOrigin, SciMenuRef} from './menu.service';
 import {coerceElement} from '@angular/cdk/coercion';
 import {MenuComponent} from './menu/menu.component';
 import {dimension} from '@scion/components/dimension';
 import {UUID} from '@scion/toolkit/uuid';
-import {Objects} from '@scion/toolkit/util';
+import {Maps, Objects} from '@scion/toolkit/util';
+import {SciMenu} from './menu/menu.model';
+import {ɵSciMenu} from './menu/ɵmenu.model';
+import {ɵSciToolbar} from './toolbar/ɵtoolbar.model';
+import {sortMenuContributions} from './menu-contribution-sorter';
+import {SciToolbar} from './toolbar/toolbar.model';
 
 @Injectable({providedIn: 'root'})
 export class SciDefaultMenuAdapter implements SciMenuAdapter {
 
-  private readonly _contributions = new Map<`menu:${string}` | `toolbar:${string}` | `group:${string}`, WritableSignal<Contribution[]>>;
+  private readonly _contributions = signal(new Map<`menu:${string}` | `toolbar:${string}` | `group:${string}`, Array<SciMenuContribution2 | SciGroupContribution2>>());
   private readonly _injector = inject(Injector);
 
   /** @inheritDoc */
-  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`, contributions: SciMenuContributions, context: Map<string, unknown>): Disposable {
-    const normalizedGroupLocation = normalizeGroupLocation(location);
-    if (!this._contributions.has(normalizedGroupLocation)) {
-      this._contributions.set(normalizedGroupLocation, signal([]));
-    }
+  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`, contribution: SciMenuContribution2 | SciGroupContribution2): Disposable {
+    const normalizedLocation = normalizeLocation(location);
 
-    const newContribution: Contribution = {contributions: contributions, context};
-    this._contributions.get(normalizedGroupLocation)!.update(contributions => contributions.concat(newContribution));
+    this._contributions.update(contributions => {
+      const copy = new Map(contributions);
+      Maps.addListValue(copy, normalizedLocation, contribution);
+      return copy;
+    });
 
     return {
       dispose: () => {
-        // Do not remove signal for listener to never have a "stale" signal.
-        this._contributions.get(normalizedGroupLocation)!.update(contributions => contributions.filter(contribution => contribution !== newContribution));
+        this._contributions.update(contributions => {
+          const copy = new Map(contributions);
+          Maps.removeListValue(copy, normalizedLocation, contribution);
+          return copy;
+        });
       },
     }
   }
 
   /** @inheritDoc */
-  public menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>): Signal<SciMenuContributions> {
-    // If no contributions are registered yet, register signal for the signal to "emit" when contributions are registered later.
-    if (!this._contributions.has(location)) {
-      this._contributions.set(location, signal([]));
+  public menuContributions(location: `menu:${string}`[] | `toolbar:${string}`[] | `group:${string}`[], context: Map<string, unknown>): Signal<SciMenuContributions> {
+    console.log('>>> menuContributions for', location);
+
+    return computed(() => {
+      const contributions = location.reduce((contributions, location) => contributions.concat(this._contributions().get(location) ?? []), [] as Array<SciMenuContribution2 | SciGroupContribution2>);
+
+      return untracked(() => sortMenuContributions(contributions
+        // Check if context matches
+        .filter(contribution => {
+          const contributionContext = contribution.context;
+          for (const [name, value] of contributionContext?.entries() ?? []) {
+            if (!Objects.isEqual(context.get(name), value, {ignoreArrayOrder: true})) {
+              return false;
+            }
+          }
+          return true;
+        })
+        // Construct contribution, recursively.
+        .flatMap((contribution: SciMenuContribution2 | SciGroupContribution2): SciMenuContributions => {
+          const {before, after} = contribution;
+          if (contribution.scope === 'menu') {
+            const factoryFn: ((menu: SciMenu, context: Map<string, unknown>) => void) = contribution.factory;
+            const menu = new ɵSciMenu();
+            factoryFn(menu, context);
+            return menu.contributions.map(contribution => ({...contribution, position: {before, after}}));
+          }
+          if (contribution.scope === 'toolbar') {
+            const factoryFn: (toolbar: SciToolbar, context: Map<string, unknown>) => void = contribution.factory;
+            const toolbar = new ɵSciToolbar();
+            factoryFn(toolbar, context);
+            return toolbar.contributions.map(contribution => ({...contribution, position: {before, after}}));
+          }
+
+          throw Error(`Unsupported location '${location}'. Location must start with 'menu:', 'toolbar:', or 'group(menu|toolbar):'.`);
+        })
+        // Add other contributions recursively.
+        .map(contribution => this.augmentChildContributions(contribution, context))));
+    }, {equal: Objects.isEqual});
+  }
+
+  private augmentChildContributions(contribution: SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution, context: Map<string, unknown>): SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution {
+    if (contribution.type === 'menu-item') {
+      return contribution;
     }
 
-    const contributions = this._contributions.get(location)!;
-    return computed(() => contributions()
-      .filter(contribution => {
-        const contributionContext = contribution.context;
-        for (const [name, value] of contributionContext.entries()) {
-          if (!Objects.isEqual(context.get(name), value, {ignoreArrayOrder: true})) {
-            return false;
-          }
-        }
-        return true;
-      })
-      .flatMap(contribution => contribution.contributions),
-    );
+    return {
+      ...contribution,
+      children: sortMenuContributions(contribution.children
+        .concat(contribution.name.length ? this.menuContributions(contribution.name, context)() : []) // TODO change to !contribution.name when removing names array
+        .map(child => this.augmentChildContributions(child, context))),
+    };
   }
 
   /** @inheritDoc */
-  public openMenu(name: `menu:${string}`[], options: SciMenuOptions): SciMenuRef {
+  public openMenu(name: `menu:${string}`, options: SciMenuOptions): SciMenuRef;
+  public openMenu(menuItems: SciMenuContributions, options: SciMenuOptions): SciMenuRef;
+  public openMenu(nameOrMenuItems: `menu:${string}` | SciMenuContributions, options: SciMenuOptions): SciMenuRef;
+  public openMenu(nameOrMenuItems: `menu:${string}` | SciMenuContributions, options: SciMenuOptions): SciMenuRef {
     // Create injection context to dispose resources when closing the menu.
     const injector = Injector.create({parent: this._injector, providers: []});
+
+    const menuItems = Array.isArray(nameOrMenuItems) ? nameOrMenuItems : this.menuContributions([nameOrMenuItems], options.context ?? new Map())();
 
     return runInInjectionContext(injector, () => {
       // Get or create anchor at specified origin.
@@ -76,7 +121,7 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
 
       // Create menu popover.
       try {
-        const componentRef = this.createMenuPopover(name, anchorElement, options);
+        const componentRef = this.createMenuPopover(menuItems, anchorElement, options);
         componentRef.onDestroy(() => injector.destroy());
 
         return {
@@ -91,10 +136,10 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
     });
   }
 
-  private createMenuPopover(name: `menu:${string}`[], anchorElement: HTMLElement, options: SciMenuOptions): ComponentRef<MenuComponent> {
+  private createMenuPopover(menuItems: SciMenuContributions, anchorElement: HTMLElement, options: SciMenuOptions): ComponentRef<MenuComponent> {
     const anchorSize = dimension(anchorElement);
     const bindings: Binding[] = [
-      inputBinding('name', signal(name)),
+      inputBinding('menuItems', signal(menuItems)),
       inputBinding('context', signal(options.context ?? new Map<string, unknown>())),
       inputBinding('filter', signal(options.filter)),
       inputBinding('sizeInput', signal(options.size)),
@@ -248,7 +293,7 @@ function setStyles(element: HTMLElement, styles: {[style: string]: string | null
   });
 }
 
-function normalizeGroupLocation(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`): `menu:${string}` | `toolbar:${string}` | `group:${string}` {
+function normalizeLocation(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`): `menu:${string}` | `toolbar:${string}` | `group:${string}` {
   const regex = /^group\((menu|toolbar)\):(?<name>.+)/;
   const match = regex.exec(location);
   if (match) {
@@ -257,7 +302,3 @@ function normalizeGroupLocation(location: `menu:${string}` | `toolbar:${string}`
   return location as `menu:${string}` | `toolbar:${string}`;
 }
 
-interface Contribution {
-  context: Map<string, unknown>;
-  contributions: SciMenuContributions;
-}

@@ -11,18 +11,20 @@
 import {Injectable, Signal} from '@angular/core';
 import {SciMenuOptions, SciMenuRef} from './menu.service';
 import {Disposable} from './common/disposable';
-import {SciMenuContributions} from './menu-contribution.model';
+import {SciGroupContribution2, SciMenuContribution2, SciMenuContributions} from './menu-contribution.model';
 import {SciDefaultMenuAdapter} from './default-menu-adapter';
 
 @Injectable({providedIn: 'root', useExisting: SciDefaultMenuAdapter})
 export abstract class SciMenuAdapter {
 
-  public abstract contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`, contributions: SciMenuContributions, context: Map<string, unknown>, next: SciMenuAdapter): Disposable;
+  public abstract contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`, contribution: SciMenuContribution2 | SciGroupContribution2, next: SciMenuAdapter): Disposable;
 
-  public abstract menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>, next: SciMenuAdapter): Signal<SciMenuContributions>;
+  public abstract menuContributions(location: `menu:${string}`[] | `toolbar:${string}`[] | `group:${string}`[], context: Map<string, unknown>, next: SciMenuAdapter): Signal<SciMenuContributions>;
 
   /**
    * TODO Optional or required?
    */
-  public abstract openMenu?(name: `menu:${string}`[], options: SciMenuOptions): SciMenuRef;
+  public openMenu?(name: `menu:${string}`, options: SciMenuOptions): SciMenuRef;
+  public openMenu?(menuItems: SciMenuContributions, options: SciMenuOptions): SciMenuRef;
+  public openMenu?(nameOrMenuItems: `menu:${string}` | SciMenuContributions, options: SciMenuOptions): SciMenuRef;
 }

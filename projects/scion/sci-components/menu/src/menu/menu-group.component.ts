@@ -32,8 +32,8 @@ export class MenuItemGroupComponent {
         environmentInjector,
         hostElement,
         bindings: [
-          inputBinding('name', computed(() => this.group().name)),
-          inputBinding('context', computed(() => this.context())),
+          inputBinding('menuItems', computed(() => this.group().children)),
+          inputBinding('context', this.context),
           inputBinding('disabled', this.disabled),
           inputBinding('group', computed(() => ({
               label: this.group().label?.(),

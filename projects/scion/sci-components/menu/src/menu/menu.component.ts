@@ -7,8 +7,8 @@ import {SciToolbarComponent} from '../toolbar/toolbar.component';
 import {ToolbarStateDirective} from '../toolbar/toolbar-state.directive';
 import {MenuItemStateDirective} from './menu-item-state.directive';
 import {NgComponentOutlet} from '@angular/common';
-import {SciMenuContribution, SciMenuGroupContribution, SciMenuItemContribution} from '../menu-contribution.model';
-import {SciMenuService} from '../menu.service';
+import {SciMenuContribution, SciMenuContributions, SciMenuGroupContribution, SciMenuItemContribution} from '../menu-contribution.model';
+import {ɵSciMenuService} from '../ɵmenu.service';
 
 /**
  * Represents a menu or a group of menu items.
@@ -41,7 +41,7 @@ import {SciMenuService} from '../menu.service';
 })
 export class MenuComponent {
 
-  public readonly name = input.required<Array<`menu:${string}` | `group:${string}`>>();
+  public readonly menuItems = input.required<SciMenuContributions>();
   public readonly context = input.required<Map<string, unknown>>();
   public readonly disabled = input<boolean>();
   public readonly filter = input<boolean | {placeholder?: string; notFoundText?: string}>(false);
@@ -51,18 +51,18 @@ export class MenuComponent {
   public readonly anchorWidth = input(undefined, {transform: (width: number | undefined): string | undefined => width ? `${width}px` : undefined});
   public readonly cssClass = input<string[]>();
 
-  private readonly _menuService = inject(SciMenuService);
+  private readonly _menuService = inject(ɵSciMenuService);
   private readonly _menuFilter = inject(MenuFilter);
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _document = inject(DOCUMENT);
   private readonly _injector = inject(Injector);
   private readonly _actionToolbarMenuOpen = signal(false);
 
-  protected readonly hasGlyphArea = computed(() => this.glyphArea() ?? this.requiresGlyphArea());
-  protected readonly menuItems = this.computeMenuItems();
+  protected readonly hasGlyphArea = computed(() => this.glyphArea() ?? (!!this.filter() || requiresGlyphArea(this.menuItems())));
+  protected readonly menuItemsFiltered = computed(() => this.menuItems().filter(menuItem => this.matchesFilter(menuItem)()));
   protected readonly popoverAnchor = viewChild.required('popover_anchor', {read: ViewContainerRef});
-  protected readonly activeSubMenuItem = linkedSignal<{name: Array<`menu:${string}` | `group:${string}`>; context: Map<string, unknown> | undefined}, {menu: SciMenuContribution, element: HTMLElement} | null>({
-    source: computed(() => ({name: this.name(), context: this.context()})),  // reset active sub menu item when this component is re-used
+  protected readonly activeSubMenuItem = linkedSignal<{menuItems: SciMenuContributions; context: Map<string, unknown>}, {menu: SciMenuContribution, element: HTMLElement} | null>({
+    source: computed(() => ({menuItems: this.menuItems(), context: this.context()})),  // reset active sub menu item when this component is re-used
     computation: () => null,
   });
 
@@ -92,14 +92,14 @@ export class MenuComponent {
   constructor() {
     // Maintain stable width when expanding/collapsing groups or hovering menu item when displaying the actions toolbar.
     afterRenderEffect(() => {
-      this.name(); // re-evaluate when re-used
+      this.menuItems(); // re-evaluate when re-used
       this.context();
       this.size.update(size => ({...size, width: `${this._host.getBoundingClientRect().width}px`}));
     });
 
     // Close action menu when this component is re-used.
     effect(() => {
-      this.name();
+      this.menuItems();
       this.context();
 
       untracked(() => {
@@ -116,7 +116,7 @@ export class MenuComponent {
       const activeSubMenuItem = this.activeSubMenuItem();
       untracked(() => {
         if (activeSubMenuItem) {
-          const ref = this._menuService.open(activeSubMenuItem.menu.name, {
+          const ref = this._menuService.open(activeSubMenuItem.menu.children, {
             anchor: activeSubMenuItem.element,
             context: this.context(),
             viewContainerRef: this.popoverAnchor(),
@@ -136,7 +136,7 @@ export class MenuComponent {
 
   protected onSelect(menuItem: SciMenuItemContribution): void {
     runInInjectionContext(this._injector, () => {
-      if (menuItem.onSelect(this.context())) {
+      if (menuItem.onSelect()) {
         this.close();
       }
     });
@@ -167,19 +167,15 @@ export class MenuComponent {
     this._actionToolbarMenuOpen.set(open);
   }
 
-  private computeMenuItems(): Signal<Array<SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution>> {
-    return computed(() => this._menuService.menuContributions(this.name(), this.context())().filter(menuItem => this.matchesFilter(menuItem)()));
-  }
-
   private matchesFilter(menuItem: SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution): Signal<boolean> {
     return computed(() => {
       switch (menuItem.type) {
         case 'menu-item':
           return this._menuFilter.matches(menuItem)();
         case 'menu':
-          return this._menuService.menuContributions(menuItem.name, this.context())().some(menuItem => this.matchesFilter(menuItem)());
+          return menuItem.children.some(menuItem => this.matchesFilter(menuItem)());
         case 'group':
-          return this._menuService.menuContributions(menuItem.name, this.context())().some(menuItem => this.matchesFilter(menuItem)());
+          return menuItem.children.some(menuItem => this.matchesFilter(menuItem)());
       }
     });
   }
@@ -191,43 +187,24 @@ export class MenuComponent {
     popover.showPopover();
     popover.remove();
   }
+}
 
-  /**
-   * Computes if a glyph area is needed for icons and checkmarks.
-   *
-   * A glyph area is required if any group needs one, even if the context does not.
-   */
-  private requiresGlyphArea(): boolean {
-    const menuService = this._menuService;
-
-    if (this.filter()) {
-      return true;
+/**
+ * Computes if a glyph area is needed for icons and checkmarks.
+ *
+ * A glyph area is required if any group needs one, even if the context does not.
+ */
+function requiresGlyphArea(menuItems: SciMenuContributions): boolean {
+  return menuItems.some(menuItem => {
+    switch (menuItem.type) {
+      case 'menu-item':
+        return menuItem.icon?.() || menuItem.checked !== undefined;
+      case 'menu':
+        return menuItem.icon?.();
+      case 'group':
+        return menuItem.collapsible || requiresGlyphArea(menuItem.children);
     }
-
-    return menuService.menuContributions(this.name(), this.context())().some(menuItem => {
-      switch (menuItem.type) {
-        case 'menu-item':
-          return menuItem.icon?.() || menuItem.checked !== undefined;
-        case 'menu':
-          return menuItem.icon?.();
-        case 'group':
-          return menuItem.collapsible || requiresGlyphAreaRec(menuItem, this.context());
-      }
-    });
-
-    function requiresGlyphAreaRec(contextElement: SciMenuGroupContribution, context: Map<string, unknown>): boolean {
-      return menuService.menuContributions(contextElement.name, context)().some(menuItem => {
-        switch (menuItem.type) {
-          case 'menu-item':
-            return menuItem.icon?.() || menuItem.checked !== undefined;
-          case 'menu':
-            return menuItem.icon?.();
-          case 'group':
-            return menuItem.collapsible || requiresGlyphAreaRec(menuItem, context);
-        }
-      });
-    }
-  }
+  });
 }
 
 interface PreferredSize {

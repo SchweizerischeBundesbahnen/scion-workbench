@@ -8,16 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {SciMenuService} from './menu.service';
 import {computed, DOCUMENT, effect, inject, Injector, NgZone, runInInjectionContext, untracked} from '@angular/core';
-import {SciMenuItemContribution} from './menu-contribution.model';
+import {SciMenuContributions, SciMenuItemContribution} from './menu-contribution.model';
 import {Disposable} from './common/disposable';
 import {fromEvent} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {Objects} from '@scion/toolkit/util';
-import {coerceArray} from '@angular/cdk/coercion';
 import {coerceSignal} from './common/common';
 import {SciMenuContextProvider} from './menu-context-provider';
+import {SciMenuService} from './menu.service';
+import {coerceArray} from '@angular/cdk/coercion';
 
 /**
  * INPUTS FOR DOCUMENTING THIS FUNCTION:
@@ -30,15 +30,22 @@ import {SciMenuContextProvider} from './menu-context-provider';
  *
  * An accelerator key can be a single key, such as F1 - F12 and Esc, or a combination of keys (Ctrl + Shift + B, or Ctrl C) that invoke a command. They differ from access keys (mnemonics), which are typically modified with the Alt key and simply activate a command or control.
  */
-export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${string}` | Array<`menu:${string}` | `toolbar:${string}`>, options?: SciMenuAcceleratorOptions): Disposable {
+export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${string}` | `menu:${string}`[] | `toolbar:${string}`[], options?: SciMenuAcceleratorOptions): Disposable {
   const injector = Injector.create({parent: options?.injector ?? inject(Injector), providers: []});
   return runInInjectionContext(injector, () => {
+    const menuService = inject(SciMenuService);
     const menuContextProvider = inject(SciMenuContextProvider, {optional: true});
     const zone = inject(NgZone);
     const document = inject(DOCUMENT);
+
     const environmentMenuContext = coerceSignal(menuContextProvider?.provideContext?.());
-    const context = computed(() => new Map<string, unknown>([...environmentMenuContext?.() ?? new Map(), ...options?.context ?? new Map()]));
-    const menuItemContributions = computed(() => collectMenuItemContributionsWithAccelerator(location, context(), {injector}), {equal: Objects.isEqual});
+    const mergedContext = computed(() => new Map<string, unknown>([...environmentMenuContext?.() ?? new Map(), ...options?.context ?? new Map()]));
+
+    const menuItemContributions = computed(() => {
+      const menuItems = menuService.menuContributions(coerceArray(location) as `menu:${string}`[] | `toolbar:${string}`[], mergedContext())();
+      return untracked(() => collectMenuItemsWithAccelerator(menuItems));
+    });
+
     const contextualAcceleratorTarget = coerceSignal(menuContextProvider?.provideAcceleratorTarget?.());
 
     effect(onCleanup => {
@@ -65,7 +72,7 @@ export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${
 
             // Execute action.
             runInInjectionContext(injector, () => zone.run(() => {
-              matchingMenuItems.forEach(menuItem => menuItem.onSelect(context()));
+              matchingMenuItems.forEach(menuItem => menuItem.onSelect());
             }));
           });
 
@@ -79,26 +86,18 @@ export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${
   });
 }
 
-function collectMenuItemContributionsWithAccelerator(location: `menu:${string}` | `toolbar:${string}` | `group:${string}` | Array<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Map<string, unknown>, options?: {injector?: Injector}): SciMenuItemContribution[] {
-  const injector = options?.injector ?? inject(Injector);
-  const menuItems = new Array<SciMenuItemContribution>();
-
-  for (const menuContribution of injector.get(SciMenuService).menuContributions(coerceArray(location), context)()) {
+function collectMenuItemsWithAccelerator(menuContributions: SciMenuContributions): SciMenuItemContribution[] {
+  return menuContributions.reduce((menuItems, menuContribution) => {
     switch (menuContribution.type) {
       case 'menu-item': {
-        if (menuContribution.accelerator?.length) {
-          menuItems.push(menuContribution);
-        }
-        break;
+        return menuItems.concat(menuContribution.accelerator?.length ? menuContribution : []);
       }
       case 'menu':
       case 'group': {
-        menuItems.push(...collectMenuItemContributionsWithAccelerator(menuContribution.name, context, options));
-        break;
+        return menuItems.concat(collectMenuItemsWithAccelerator(menuContribution.children));
       }
     }
-  }
-  return menuItems;
+  }, new Array<SciMenuItemContribution>());
 }
 
 /**

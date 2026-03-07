@@ -15,7 +15,7 @@ import {SciMenu} from '../menu/menu.model';
 export interface SciToolbar {
 
   // Describe that onSelect can call `inject` to get any required dependencies.
-  addToolbarItem(icon: string | Signal<string>, onSelect: (context: Map<string, unknown>) => void): this;
+  addToolbarItem(icon: string | Signal<string>, onSelect: () => void): this;
 
   addToolbarItem(descriptor: SciToolbarItemDescriptor): this;
 
@@ -39,7 +39,7 @@ export interface SciToolbarItemDescriptor {
   accelerator?: string[];
   disabled?: boolean | Signal<boolean>;
   cssClass?: string | string[];
-  onSelect: (context: Map<string, unknown>) => void;
+  onSelect: () => void;
   /** Arbitrary metadata associated with the menu. */
   data?: {[key: string]: string};
 }

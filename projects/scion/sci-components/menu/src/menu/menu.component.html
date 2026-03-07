@@ -22,7 +22,7 @@
   }
 
   <!-- Menu items -->
-  @for (menuItem of menuItems(); track $index) {
+  @for (menuItem of menuItemsFiltered(); track $index) {
     @let disabled = this.disabled() || menuItem.disabled();
 
     @switch (menuItem.type) {

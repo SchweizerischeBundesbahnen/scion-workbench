@@ -1,5 +1,7 @@
 import {Signal} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
+import {SciMenu, SciMenuGroup} from './menu/menu.model';
+import {SciToolbar, SciToolbarGroup} from './toolbar/toolbar.model';
 
 /**
  * INPUTS FOR DESCRIPTION: https://www.electronjs.org/docs/latest/api/menu-item
@@ -21,7 +23,7 @@ export interface SciMenuItemContribution {
     before?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
     after?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
   };
-  onSelect: (context: Map<string, unknown>) => boolean;
+  onSelect: () => boolean;
   /** Arbitrary metadata associated with the menu. */
   data?: {[key: string]: string};
 }
@@ -46,6 +48,7 @@ export interface SciMenuContribution {
     filter?: boolean | {placeholder?: string; notFoundText?: string};
   };
   cssClass?: string[];
+  children: SciMenuContributions;
   /** Arbitrary metadata associated with the menu. */
   data?: {[key: string]: string};
 }
@@ -61,9 +64,56 @@ export interface SciMenuGroupContribution {
   };
   disabled: Signal<boolean>; // Consider renaming to enabled; https://www.electronjs.org/docs/latest/api/menu-item
   // visible: Signal<boolean>; // Consider providing visible
+  children: SciMenuContributions;
   cssClass?: string[];
   /** Arbitrary metadata associated with the menu. */
   data?: {[key: string]: string};
 }
 
-export type SciMenuContributions = Array<SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution>;
+export interface SciMenuContribution2 {
+  scope: 'menu' | 'toolbar',
+  factory: (menu: SciMenu | SciToolbar, context: Map<string, unknown>) => void;
+  context?: Map<string, unknown>;
+  before?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
+  after?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
+}
+
+export interface SciGroupContribution2 {
+  scope: 'menu' | 'toolbar',
+  factory: (group: SciMenuGroup | SciToolbarGroup, context: Map<string, unknown>) => void;
+  context?: Map<string, unknown>;
+  before?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
+  after?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
+}
+
+export interface SciMenuContributionLocation {
+  location: `menu:${string}`;
+  context?: Map<string, unknown>;
+  before?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
+  after?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
+}
+
+export interface SciToolbarContributionLocation {
+  location: `toolbar:${string}`;
+  context?: Map<string, unknown>;
+  before?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
+  after?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
+}
+
+export interface SciMenuGroupContributionLocation {
+  location: `group(menu):${string}`;
+  context?: Map<string, unknown>;
+  before?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
+  after?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
+}
+
+export interface SciToolbarGroupContributionLocation {
+  location: `group(toolbar):${string}`;
+  context?: Map<string, unknown>;
+  before?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
+  after?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
+}
+
+export type SciMenuContributions = Array<SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution>
+
+// export type SciMenuContributionLocations = SciMenuContributionLocation | SciToolbarContributionLocation | SciMenuGroupContributionLocation | SciToolbarGroupContributionLocation;

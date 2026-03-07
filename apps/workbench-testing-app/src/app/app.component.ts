@@ -60,13 +60,11 @@ export class AppComponent implements DoCheck {
     installGlasspaneHighlighter();
     installMicrofrontendApplicationLabels();
 
-    contributeMenu({location: 'toolbar:workbench.part.tools.start', context: new Map().set('peripheral', false)}, toolbar => toolbar
-      .addToolbarItem({
-        icon: 'add', onSelect: context => {
-          console.log('>>> context', context);
+    contributeMenu({location: 'toolbar:workbench.part.tools.start', context: new Map().set('peripheral', false)}, (toolbar, context) => {
+        toolbar.addToolbarItem('add', () => {
           this.workbenchRouter.navigate(['/start-page'], {target: 'blank', partId: context.get('partId') as PartId, position: 'end'})
-        },
-      }),
+        });
+      },
     );
 
     contributeMenu({location: 'menu:additions', context: new Map()}, menu => menu

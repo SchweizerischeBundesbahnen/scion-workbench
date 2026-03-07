@@ -55,7 +55,6 @@ export class PartComponent implements OnInit {
 
     installMenuAccelerators('toolbar:workbench.part.tools.start');
     installMenuAccelerators('toolbar:workbench.part.tools.end');
-
   }
 
   public ngOnInit(): void {

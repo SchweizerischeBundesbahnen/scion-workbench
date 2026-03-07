@@ -1,22 +1,20 @@
 import {SciMenu} from '../menu/menu.model';
-import {isSignal, Signal, signal} from '@angular/core';
-import {UUID} from '@scion/toolkit/uuid';
+import {isSignal, Signal} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {SciToolbar, SciToolbarGroup, SciToolbarGroupDescriptor, SciToolbarItemDescriptor, SciToolbarMenuDescriptor} from './toolbar.model';
 import {coerceSignal} from '../common/common';
-import {SciMenuContribution, SciMenuGroupContribution, SciMenuItemContribution} from '../menu-contribution.model';
+import {SciMenuContribution, SciMenuContributions, SciMenuGroupContribution, SciMenuItemContribution} from '../menu-contribution.model';
 import {coerceArray} from '@angular/cdk/coercion';
+import {ɵSciMenu} from '../menu/ɵmenu.model';
 
 export class ɵSciToolbar implements SciToolbar {
 
-  public readonly contributions = new Array<SciMenuItemContribution | SciMenuContribution | SciMenuGroupContribution>();
-  public readonly groupContributions = new Array<ToolbarGroupContributionDescriptor>();
-  public readonly menuContributions = new Array<ToolbarMenuContributionDescriptor>();
+  public readonly contributions = [] as SciMenuContributions;
 
   /** @inheritDoc */
-  public addToolbarItem(icon: string | Signal<string>, onSelect: (context: Map<string, unknown>) => void): this;
+  public addToolbarItem(icon: string | Signal<string>, onSelect: () => void): this;
   public addToolbarItem(descriptor: SciToolbarItemDescriptor): this;
-  public addToolbarItem(iconOrDescriptor: string | Signal<string> | SciToolbarItemDescriptor, onSelect?: (context: Map<string, unknown>) => void): this {
+  public addToolbarItem(iconOrDescriptor: string | Signal<string> | SciToolbarItemDescriptor, onSelect?: () => void): this {
     const descriptor = coerceToolbarItemDescriptor(iconOrDescriptor, onSelect);
 
     this.contributions.push({
@@ -29,14 +27,13 @@ export class ɵSciToolbar implements SciToolbar {
       accelerator: descriptor.accelerator,
       disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
       cssClass: Arrays.coerce(descriptor.cssClass),
-      onSelect: context => {
-        descriptor.onSelect(context);
+      onSelect: () => {
+        descriptor.onSelect();
         return false;
       },
       data: descriptor.data,
     } satisfies SciMenuItemContribution);
 
-    // TODO [menu] throw error if icon and checked
     return this;
   }
 
@@ -46,10 +43,14 @@ export class ɵSciToolbar implements SciToolbar {
   public addMenu(iconOrDescriptor: string | Signal<string> | SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenu) => void): this {
     const descriptor = coerceMenuDescriptor(iconOrDescriptor);
 
-    const id = UUID.randomUUID();
-    const menuItem: SciMenuContribution = {
+    // Construct menu.
+    const menu = new ɵSciMenu();
+    menuFactoryFn(menu);
+
+    // Add menu.
+    this.contributions.push({
       type: 'menu',
-      name: coerceArray(descriptor.name ?? []).concat(`menu:${id}`),
+      name: coerceArray(descriptor.name ?? []),
       label: coerceSignal(descriptor.label),
       icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
       tooltip: coerceSignal(descriptor.tooltip),
@@ -61,16 +62,10 @@ export class ɵSciToolbar implements SciToolbar {
         maxWidth: descriptor.menu?.maxWidth,
         filter: descriptor.menu?.filter,
       },
+      children: menu.contributions,
       cssClass: Arrays.coerce(descriptor.cssClass),
       data: descriptor.data,
-    };
-    this.contributions.push(menuItem);
-
-    // children
-    this.menuContributions.push({
-      location: `menu:${id}`,
-      factoryFn: menuFactoryFn,
-    });
+    } satisfies SciMenuContribution);
 
     return this;
   }
@@ -78,62 +73,28 @@ export class ɵSciToolbar implements SciToolbar {
   /** @inheritDoc */
   public addGroup(groupFactoryFn: (group: SciToolbarGroup) => void): this;
   public addGroup(descriptor: SciToolbarGroupDescriptor, groupFactoryFn?: (group: SciToolbarGroup) => void): this;
-  public addGroup(argument1: unknown, argument2?: unknown): this {
-    const id = UUID.randomUUID();
+  public addGroup(factoryOrDescriptor: ((group: SciToolbarGroup) => void) | SciToolbarGroupDescriptor, factoryIfDescriptor?: (group: SciToolbarGroup) => void): this {
+    const [descriptor, groupFactoryFn] = coerceGroupDescriptor(factoryOrDescriptor, factoryIfDescriptor);
 
-    if (typeof argument1 === 'function') {
-      const groupFactoryFn = argument1 as (group: SciToolbarGroup) => void;
+    // Construct group.
+    const group = new ɵSciToolbar();
+    groupFactoryFn?.(group);
 
-      this.contributions.push({
-        type: 'group',
-        name: [`group:${id}`],
-        disabled: signal(false),
-      } satisfies SciMenuGroupContribution);
+    // Add group.
+    this.contributions.push({
+      type: 'group',
+      name: coerceArray(descriptor.name ?? []),
+      disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
+      children: group.contributions,
+      cssClass: Arrays.coerce(descriptor.cssClass),
+      data: descriptor.data,
+    } satisfies SciMenuGroupContribution);
 
-      // children
-      this.groupContributions.push({
-        location: `group(toolbar):${id}`,
-        factoryFn: groupFactoryFn,
-      });
-
-      return this;
-    }
-    else {
-      const descriptor = argument1 as SciToolbarGroupDescriptor;
-      const groupFactoryFn = argument2 as ((group: SciToolbarGroup) => void) | undefined;
-
-      this.contributions.push({
-        type: 'group',
-        name: coerceArray(descriptor.name ?? []).concat(`group:${id}`),
-        disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
-        cssClass: Arrays.coerce(descriptor.cssClass),
-        data: descriptor.data,
-      } satisfies SciMenuGroupContribution);
-
-      // children
-      if (groupFactoryFn) {
-        this.groupContributions.push({
-          location: `group(toolbar):${id}`,
-          factoryFn: groupFactoryFn,
-        });
-      }
-
-      return this;
-    }
+    return this;
   }
 }
 
-export interface ToolbarMenuContributionDescriptor {
-  location: `menu:${string}`;
-  factoryFn: (group: SciMenu) => void;
-}
-
-export interface ToolbarGroupContributionDescriptor {
-  location: `group(toolbar):${string}`;
-  factoryFn: (group: SciToolbarGroup) => void;
-}
-
-function coerceToolbarItemDescriptor(iconOrDescriptor: string | Signal<string> | SciToolbarItemDescriptor, onSelect?: (context: Map<string, unknown>) => void): SciToolbarItemDescriptor {
+function coerceToolbarItemDescriptor(iconOrDescriptor: string | Signal<string> | SciToolbarItemDescriptor, onSelect?: () => void): SciToolbarItemDescriptor {
   if (typeof iconOrDescriptor === 'string' || isSignal(iconOrDescriptor)) {
     return {icon: iconOrDescriptor, onSelect: onSelect!};
   }
@@ -145,4 +106,11 @@ function coerceMenuDescriptor(iconOrDescriptor: string | Signal<string> | SciToo
     return {icon: iconOrDescriptor};
   }
   return iconOrDescriptor;
+}
+
+function coerceGroupDescriptor(factoryOrDescriptor: ((group: SciToolbarGroup) => void) | SciToolbarGroupDescriptor, factoryIfDescriptor?: (group: SciToolbarGroup) => void): [SciToolbarGroupDescriptor, ((group: SciToolbarGroup) => void) | undefined] {
+  if (typeof factoryOrDescriptor === 'function') {
+    return [{}, factoryOrDescriptor];
+  }
+  return [factoryOrDescriptor, factoryIfDescriptor];
 }
