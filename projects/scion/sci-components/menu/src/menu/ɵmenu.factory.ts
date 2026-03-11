@@ -4,7 +4,8 @@ import {Arrays} from '@scion/toolkit/util';
 import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model';
 import {coerceSignal} from '../common/common';
 import {ɵSciToolbarFactory} from '../toolbar/ɵtoolbar.factory';
-import {SciToolbarFactory} from '@scion/sci-components/menu';
+import {ComponentType} from '@angular/cdk/portal';
+import {OneOf} from '../common/utility-types';
 
 export class ɵSciMenuFactory implements SciMenuFactory {
 
@@ -24,7 +25,7 @@ export class ɵSciMenuFactory implements SciMenuFactory {
     this.menuItems.push({
       type: 'menu-item',
       name: descriptor.name,
-      label: coerceSignal(descriptor.label),
+      label: coerceLabel(descriptor.label),
       icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
       checked: 'checked' in descriptor ? coerceSignal(descriptor.checked) : undefined,
       tooltip: coerceSignal(descriptor.tooltip),
@@ -55,7 +56,7 @@ export class ɵSciMenuFactory implements SciMenuFactory {
     this.menuItems.push({
       type: 'menu',
       name: descriptor.name,
-      label: coerceSignal(descriptor.label),
+      label: coerceLabel(descriptor.label),
       icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
       tooltip: coerceSignal(descriptor.tooltip),
       disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
@@ -131,6 +132,13 @@ function coerceGroupDescriptor(factoryOrDescriptor: ((group: SciMenuGroupFactory
     return [{}, factoryOrDescriptor];
   }
   return [factoryOrDescriptor, factoryIfDescriptor];
+}
+
+function coerceLabel(label: string | Signal<string> | ComponentType<unknown>): OneOf<{text?: Signal<string>; component?: ComponentType<unknown>}> {
+  if (typeof label === 'string' || isSignal(label)) {
+    return {text: coerceSignal(label)};
+  }
+  return {component: label};
 }
 
 export function ɵcreateSciMenu(menuFactoryFn: (menu: SciMenuFactory | SciMenuGroupFactory, context: Map<string, unknown>) => void, context: Map<string, unknown>, options?: {injector?: Injector}): SciMenuItemLike[] {

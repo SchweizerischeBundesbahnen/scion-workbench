@@ -6,45 +6,39 @@
       <button [attr.disabled]="disabled || null"
               [class.checked]="menuItem.checked?.()"
               [class]="menuItem.cssClass" class="menu-item"
-              (click)="onSelect(menuItem)"
-              sciMenuItemState [menuItem]="menuItem" #sciMenuItemState="sciMenuItemState">
+              (click)="onSelect(menuItem)">
         @if (menuItem.icon?.()) {
           <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon?.()}}</span>
         }
-        @if (menuItem.label?.()) {
+        @if (menuItem.label?.text?.(); as label) {
+          <span class="label">{{label}}</span>
+        } @else if (menuItem.label?.component; as component) {
           <span class="label">
-              @if (sciMenuItemState.labelText()) {
-                {{sciMenuItemState.labelText()}}
-              } @else if (sciMenuItemState.labelComponent()) {
-                <ng-container *ngComponentOutlet="sciMenuItemState.labelComponent()!"/>
-              }
-            </span>
+            <ng-container *ngComponentOutlet="component"/>
+          </span>
         }
       </button>
     }
     @case ('menu') {
       <button [attr.disabled]="disabled || null"
               [class.active]="activeSubMenuItem()?.menu === menuItem"
-              [class.visual-menu-hint]="menuItem.icon?.() && !menuItem.label?.() && menuItem.visualMenuHint"
+              [class.visual-menu-hint]="menuItem.icon?.() && !menuItem.label && menuItem.visualMenuHint"
               [class]="menuItem.cssClass" class="menu-item submenu-item"
               (click)="onSubMenuClick({menu: menuItem, element: element})"
-              sciMenuItemState [menuItem]="menuItem" #sciMenuItemState="sciMenuItemState"
               #element>
         @if (menuItem.icon?.()) {
           <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon?.()}}</span>
         }
-        @if (menuItem.label?.()) {
+        @if (menuItem.label?.text?.(); as label) {
+          <span class="label">{{label}}</span>
+        } @else if (menuItem.label?.component; as component) {
           <span class="label">
-              @if (sciMenuItemState.labelText()) {
-                {{sciMenuItemState.labelText()}}
-              } @else if (sciMenuItemState.labelComponent()) {
-                <ng-container *ngComponentOutlet="sciMenuItemState.labelComponent()!"/>
-              }
-            </span>
+            <ng-container *ngComponentOutlet="component"/>
+          </span>
         }
 
         <!-- Add chevron for label menus -->
-        @if (menuItem.label?.() && menuItem.visualMenuHint) {
+        @if (menuItem.label && menuItem.visualMenuHint) {
           <span class="material-symbols-rounded" translate="no">keyboard_arrow_down</span>
         }
       </button>

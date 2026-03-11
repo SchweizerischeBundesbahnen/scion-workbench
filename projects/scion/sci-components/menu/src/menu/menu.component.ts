@@ -4,7 +4,6 @@ import {MenuItemGroupComponent} from './menu-group.component';
 import {MenuFilterComponent} from './menu-filter.component';
 import {MenuFilter} from './menu-filter.service';
 import {ToolbarStateDirective} from '../toolbar/toolbar-state.directive';
-import {MenuItemStateDirective} from './menu-item-state.directive';
 import {NgComponentOutlet} from '@angular/common';
 import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model';
 import {ɵSciMenuService} from '../ɵmenu.service';
@@ -24,7 +23,6 @@ import {SciToolGroupComponent} from '../toolbar/toolbar-group.component';
     MenuFilterComponent,
     SciToolGroupComponent,
     ToolbarStateDirective,
-    MenuItemStateDirective,
     NgComponentOutlet,
   ],
   providers: [

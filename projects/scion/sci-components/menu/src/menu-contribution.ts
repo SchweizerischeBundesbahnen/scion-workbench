@@ -1,5 +1,5 @@
 import {SciMenuFactory, SciMenuGroupFactory} from './menu/menu.factory';
-import {assertNotInReactiveContext, effect, inject, Injector, runInInjectionContext, untracked} from '@angular/core';
+import {assertNotInReactiveContext, effect, Injector, runInInjectionContext, untracked} from '@angular/core';
 import {SciToolbarFactory, SciToolbarGroupFactory} from './toolbar/toolbar.factory';
 import {Disposable} from './common/disposable';
 import {ɵSciMenuService} from './ɵmenu.service';
@@ -7,6 +7,7 @@ import {SciMenuContextProvider} from './menu-context-provider';
 import {coerceSignal} from './common/common';
 import {SciMenuContributionLocation, SciMenuContributionPosition, SciMenuGroupContributionLocation, SciToolbarContributionLocation, SciToolbarGroupContributionLocation} from './menu-contribution.model';
 import {prune} from './common/prune.util';
+import {createDestroyableInjector} from './common/injector.util';
 
 /**
  * By default, the contribution will be unregistered when the current injection context is destroyed.
@@ -20,7 +21,7 @@ export function contributeMenu(locationLike: string | SciContributionLocation, f
 export function contributeMenu(locationLike: string | SciContributionLocation, factoryFn: Function, options?: SciMenuContributionOptions): Disposable {
   assertNotInReactiveContext(contributeMenu, 'Call contributeMenu in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
-  const injector = Injector.create({parent: options?.injector ?? inject(Injector), providers: []});
+  const injector = createDestroyableInjector({parent: options?.injector});
   const {location, before, after, position} = typeof locationLike === 'string' ? {location: locationLike} as SciContributionLocation : locationLike;
 
   const menuService = injector.get(ɵSciMenuService);

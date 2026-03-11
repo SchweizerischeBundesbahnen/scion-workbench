@@ -10,7 +10,7 @@ export function fromRemoteSignal<T>(name: string, remoteSignal: Signal<T> | unde
   }
 
   const injector = options?.injector ?? inject(Injector);
-  const messageClient = inject(MessageClient);
+  const messageClient = injector.get(MessageClient);
 
   effect(() => {
     const value = remoteSignal();
@@ -28,7 +28,7 @@ export function toRemoteSignal<T>(name: string, value: T | undefined, options?: 
   }
 
   const injector = options?.injector ?? inject(Injector);
-  const messageClient = inject(MessageClient);
+  const messageClient = injector.get(MessageClient);
   const remoteSignal = signal(value);
 
   messageClient.observe$<T>(`workbench/menu/property/${name}`)

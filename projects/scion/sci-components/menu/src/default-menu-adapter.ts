@@ -24,6 +24,7 @@ import {ɵSciToolbarFactory} from './toolbar/ɵtoolbar.factory';
 import {sortMenuItems} from './menu-item-sorter';
 import {SciToolbarFactory} from './toolbar/toolbar.factory';
 import {SciMenuContribution, SciToolbarContribution} from './menu-contribution.model';
+import {createDestroyableInjector} from './common/injector.util';
 
 @Injectable({providedIn: 'root'})
 export class SciDefaultMenuAdapter implements SciMenuAdapter {
@@ -112,7 +113,7 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
   /** @inheritDoc */
   public openMenu(menuItems: SciMenuItemLike[], options: Omit<SciMenuOptions, 'context'>): SciMenuRef {
     // Create injection context to dispose resources when closing the menu.
-    const injector = Injector.create({parent: this._injector, providers: []});
+    const injector = createDestroyableInjector({parent: this._injector});
 
     return runInInjectionContext(injector, () => {
       // Get or create anchor at specified origin.

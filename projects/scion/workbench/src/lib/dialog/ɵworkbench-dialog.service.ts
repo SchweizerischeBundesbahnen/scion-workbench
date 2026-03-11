@@ -21,6 +21,7 @@ import {createInvocationContext, WorkbenchInvocationContext} from '../invocation
 import {WORKBENCH_ELEMENT} from '../workbench-element-references';
 import {Logger, LoggerNames} from '../logging';
 import {toObservable} from '@angular/core/rxjs-interop';
+import {createDestroyableInjector} from '../common/injector.util';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})
@@ -90,7 +91,7 @@ export class ɵWorkbenchDialogService implements WorkbenchDialogService {
    */
   private async waitUntilApplicationModalDialogsClosed(): Promise<void> {
     // Use root injector to be independent of service construction context.
-    const injector = Injector.create({parent: this._rootInjector, providers: []});
+    const injector = createDestroyableInjector({parent: this._rootInjector});
     await firstValueFrom(toObservable(this._dialogRegistry.top(), {injector}).pipe(filter(top => !top)));
     injector.destroy();
   }

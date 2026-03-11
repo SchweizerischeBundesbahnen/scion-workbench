@@ -5,6 +5,8 @@ import {SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarGroupFactory, Sc
 import {coerceSignal} from '../common/common';
 import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model';
 import {ɵSciMenuFactory} from '../menu/ɵmenu.factory';
+import {OneOf} from '../common/utility-types';
+import {ComponentType} from '@angular/cdk/portal';
 
 export class ɵSciToolbarFactory implements SciToolbarFactory {
 
@@ -19,7 +21,7 @@ export class ɵSciToolbarFactory implements SciToolbarFactory {
     this.menuItems.push({
       type: 'menu-item',
       name: descriptor.name,
-      label: coerceSignal(descriptor.label),
+      label: coerceLabel(descriptor.label),
       icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
       checked: 'checked' in descriptor ? coerceSignal(descriptor.checked) : undefined,
       tooltip: coerceSignal(descriptor.tooltip),
@@ -51,7 +53,7 @@ export class ɵSciToolbarFactory implements SciToolbarFactory {
     this.menuItems.push({
       type: 'menu',
       name: descriptor.name,
-      label: coerceSignal(descriptor.label),
+      label: coerceLabel(descriptor.label),
       icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
       tooltip: coerceSignal(descriptor.tooltip),
       disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
@@ -113,6 +115,16 @@ function coerceGroupDescriptor(factoryOrDescriptor: ((group: SciToolbarGroupFact
     return [{}, factoryOrDescriptor];
   }
   return [factoryOrDescriptor, factoryIfDescriptor];
+}
+
+function coerceLabel(label: string | Signal<string> | ComponentType<unknown> | undefined): OneOf<{text?: Signal<string>; component?: ComponentType<unknown>}> | undefined {
+  if (!label) {
+    return undefined;
+  }
+  if (typeof label === 'string' || isSignal(label)) {
+    return {text: coerceSignal(label)};
+  }
+  return {component: label};
 }
 
 export function ɵcreateSciToolbar(toolbarFactoryFn: (menu: SciToolbarFactory | SciToolbarGroupFactory, context: Map<string, unknown>) => void, context: Map<string, unknown>, options?: {injector?: Injector}): SciMenuItemLike[] {

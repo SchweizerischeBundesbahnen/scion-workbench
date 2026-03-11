@@ -16,7 +16,7 @@ import {SciMenuContextProvider} from './menu-context-provider';
 import {coerceSignal} from './common/common';
 import {SciMenuAdapter} from './menu-adapter';
 import {SciDefaultMenuAdapter} from './default-menu-adapter';
-import {SciToolbarContribution, SciMenuContribution} from './menu-contribution.model';
+import {SciMenuContribution, SciToolbarContribution} from './menu-contribution.model';
 
 @Injectable({providedIn: 'root'})
 export class ɵSciMenuService implements SciMenuService {

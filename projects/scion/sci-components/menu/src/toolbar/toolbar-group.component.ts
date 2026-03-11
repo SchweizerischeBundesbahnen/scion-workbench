@@ -1,6 +1,5 @@
 import {ChangeDetectionStrategy, Component, effect, inject, Injector, input, linkedSignal, output, runInInjectionContext, signal, untracked, ViewContainerRef} from '@angular/core';
 import {NgComponentOutlet} from '@angular/common';
-import {MenuItemStateDirective} from '../menu/menu-item-state.directive';
 import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model';
 import {ɵSciMenuService} from '../ɵmenu.service';
 
@@ -11,7 +10,6 @@ import {ɵSciMenuService} from '../ɵmenu.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     NgComponentOutlet,
-    MenuItemStateDirective,
   ],
 })
 export class SciToolGroupComponent {

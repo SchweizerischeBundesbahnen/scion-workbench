@@ -9,7 +9,7 @@
  */
 
 import {computed, DOCUMENT, effect, inject, Injector, NgZone, runInInjectionContext, untracked} from '@angular/core';
-import {SciMenuItemLike, SciMenuItem} from './menu.model';
+import {SciMenuItem, SciMenuItemLike} from './menu.model';
 import {Disposable} from './common/disposable';
 import {fromEvent} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
@@ -17,6 +17,7 @@ import {Objects} from '@scion/toolkit/util';
 import {coerceSignal} from './common/common';
 import {SciMenuContextProvider} from './menu-context-provider';
 import {SciMenuService} from './menu.service';
+import {createDestroyableInjector} from './common/injector.util';
 
 /**
  * INPUTS FOR DOCUMENTING THIS FUNCTION:
@@ -30,7 +31,7 @@ import {SciMenuService} from './menu.service';
  * An accelerator key can be a single key, such as F1 - F12 and Esc, or a combination of keys (Ctrl + Shift + B, or Ctrl C) that invoke a command. They differ from access keys (mnemonics), which are typically modified with the Alt key and simply activate a command or control.
  */
 export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${string}`, options?: SciMenuAcceleratorOptions): Disposable {
-  const injector = Injector.create({parent: options?.injector ?? inject(Injector), providers: []});
+  const injector = createDestroyableInjector({parent: options?.injector});
   return runInInjectionContext(injector, () => {
     const menuService = inject(SciMenuService);
     const menuContextProvider = inject(SciMenuContextProvider, {optional: true});

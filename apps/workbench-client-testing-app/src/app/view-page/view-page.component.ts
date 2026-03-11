@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {Component, computed, inject, signal, WritableSignal} from '@angular/core';
 import {FormGroup, FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {CanCloseRef, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {ActivatedRoute} from '@angular/router';
@@ -25,6 +25,7 @@ import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {contributeMenu, SciToolbarComponent} from '@scion/sci-components/menu';
 
 @Component({
   selector: 'app-view-page',
@@ -44,6 +45,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
     SciKeyValueFieldComponent,
     SciViewportComponent,
     FormsModule,
+    SciToolbarComponent,
   ],
 })
 export default class ViewPageComponent {
@@ -96,6 +98,73 @@ export default class ViewPageComponent {
       .subscribe(capability => {
         console.debug(`[ViewCapability$::first] [component=ViewPageComponent@${this.uuid}, capabilityId=${capability.metadata!.id}]`);
       });
+
+    this.contributeToolbar();
+  }
+
+  private contributeToolbar(): void {
+    contributeMenu('menu:workbench.part.additions', menu => menu
+      .addMenuItem({label: 'Home', icon: 'home', onSelect})
+      .addMenuItem({label: 'Train', icon: 'train', onSelect}),
+    );
+    contributeMenu('toolbar:workbench.part', toolbar => toolbar
+        .addToolbarItem('home', onSelect),
+      // .addToolbarItem('train', onSelect),
+    );
+
+    const flags = signal(new Set<string>()
+      .add('always_select_opened_element')
+      .add('server_and_database_objects')
+      .add('schema_objects')
+      .add('object_elements')
+      .add('use_natural_order_when_sorting')
+      .add('single_object_levels')
+      .add('generate_objects')
+      .add('virtual_objects')
+      .add('query_files')
+      .add('format_italic')
+      .add('single_object_levels'),
+    );
+    const viewMode = signal('dock_pinned');
+    const moveTo = signal('left_top');
+
+    contributeMenu('menu:workbench.part.additions', menu => menu
+      .addMenu({label: 'File', menu: {filter: {placeholder: 'hello', notFoundText: 'nüd found'}}}, menu => menu
+        .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N'], onSelect: () => onSelect()})
+        .addMenuItem({label: 'Open', icon: 'folder', onSelect: () => onSelect()})
+        .addMenuItem({label: 'Make a Copy', icon: 'file_copy', onSelect: () => onSelect()})
+        .addMenu({label: 'Share', name: 'menu:share', icon: 'person_add'}, menu => menu
+          .addMenuItem({label: 'Share with others', icon: 'person_add', name: 'menuitem:share-with-others', onSelect: () => onSelect()})
+          .addMenuItem({label: 'Publish to web', icon: 'public', onSelect: () => onSelect()})
+          .addMenu({label: 'Text', icon: 'format_bold'}, menu => menu
+            .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], onSelect: () => onSelect()})
+            .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], onSelect: () => onSelect()})
+            .addMenuItem({label: 'Underline', icon: 'format_underlined', onSelect: () => onSelect()})
+            .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s', onSelect: () => onSelect()})
+            .addMenu({label: 'Size', icon: 'format_bold'}, menu => menu
+              .addMenuItem('Increase font size', () => onSelect())
+              .addMenuItem('Decrease font size', () => onSelect()),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    contributeMenu('toolbar:testee', toolbar => toolbar
+      .addGroup(group => group
+        .addGroup(group => group
+          .addToolbarItem('lens_blur', () => onSelect())
+          .addToolbarItem('lens_blur', () => onSelect())
+          .addToolbarItem('lens_blur', () => onSelect()),
+        ),
+      )
+      .addGroup(group => group
+        .addToolbarItem({icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], checked: computed(() => flags().has('format_bold')), onSelect: () => toggleMultiFlag(flags, 'format_bold')})
+        .addToolbarItem({icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], checked: computed(() => flags().has('format_italic')), onSelect: () => toggleMultiFlag(flags, 'format_italic')})
+        .addToolbarItem({icon: 'format_underlined', checked: computed(() => flags().has('format_underlined')), onSelect: () => toggleMultiFlag(flags, 'format_underlined')})
+        .addToolbarItem({icon: 'strikethrough_s', checked: computed(() => flags().has('strikethrough_s')), onSelect: () => toggleMultiFlag(flags, 'strikethrough_s')}),
+      )
+    );
   }
 
   private async confirmClosing(): Promise<boolean> {
@@ -187,4 +256,21 @@ export default class ViewPageComponent {
       console.debug(`[${logPrefix}] [component=ViewPageComponent@${this.uuid}]`);
     });
   }
+}
+
+function onSelect(): void {
+
+}
+
+function toggleMultiFlag(flags: WritableSignal<Set<string>>, flag: string): void {
+  flags.update(flags => {
+    const newFlags = new Set(flags);
+    if (flags.has(flag)) {
+      newFlags.delete(flag);
+    }
+    else {
+      newFlags.add(flag);
+    }
+    return newFlags;
+  });
 }

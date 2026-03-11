@@ -1,11 +1,12 @@
 import {Disposable, SciMenuAdapter, SciMenuContribution, SciMenuItemLike, SciToolbarContribution, ɵcreateSciMenu, ɵcreateSciToolbar} from '@scion/sci-components/menu';
-import {assertInInjectionContext, DestroyRef, inject, Injector, runInInjectionContext, Signal, untracked} from '@angular/core';
+import {assertInInjectionContext, DestroyRef, inject, Injector, Signal, untracked} from '@angular/core';
 import {UUID} from '@scion/toolkit/uuid';
-import {mapToBody, MessageClient} from '@scion/microfrontend-platform';
+import {mapToBody, MessageClient, MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
 import {WorkbenchClientMenuContributionFactoryCommand, WorkbenchClientMenuContributionRegisterCommand, WorkbenchClientMenuItemLike, WorkbenchClientMenuItemListCommand} from '@scion/workbench-client';
 import {fromRemoteSignal, toRemoteSignal} from './remote-signal';
 import {map} from 'rxjs';
 import {toSignal} from '@angular/core/rxjs-interop';
+import {createDestroyableInjector} from '../common/injector.util';
 
 export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
 
@@ -16,8 +17,7 @@ export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
     assertInInjectionContext(this.contributeMenu);
 
     const contributionId = UUID.randomUUID();
-    // Create injector to bind resources which should be destroyed when unregistering the contribution.
-    const injector = Injector.create({parent: inject(Injector), providers: []});
+    const injector = createDestroyableInjector({parent: this._injector});
 
     void this._messageClient.publish<WorkbenchClientMenuContributionRegisterCommand>(`workbench/menu/contribution/${contributionId}/register`, {
       location,
@@ -29,13 +29,15 @@ export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
     const subscription = this._messageClient.onMessage<WorkbenchClientMenuContributionFactoryCommand, WorkbenchClientMenuItemLike[]>(`workbench/menu/contribution/${contributionId}/create`, request => {
       const {context} = request.body!;
 
+      console.log('>>> WorkbenchClentMenuAdapter.menuFactoryFn');
+
       if (contribution.scope === 'menu') {
-        const menuItems = ɵcreateSciMenu(contribution.factory, context);
-        return runInInjectionContext(injector, () => transformToWorkbenchClientModel(menuItems));
+        const menuItems = ɵcreateSciMenu(contribution.factory, context, {injector});
+        return transformToWorkbenchClientModel(menuItems, {injector});
       }
       if (contribution.scope === 'toolbar') {
-        const menuItems = ɵcreateSciToolbar(contribution.factory, context);
-        return runInInjectionContext(injector, () => transformToWorkbenchClientModel(menuItems));
+        const menuItems = ɵcreateSciToolbar(contribution.factory, context, {injector});
+        return transformToWorkbenchClientModel(menuItems, {injector});
       }
       return [];
     });
@@ -45,6 +47,9 @@ export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
       void this._messageClient.publish(`workbench/menu/contribution/${contributionId}/unregister`);
     });
 
+    // Unregister menu contributions when stopping the platform, e.g., when closing the view, part, ..., or during hot code replacement.
+    void MicrofrontendPlatform.whenState(PlatformState.Stopping).then(() => injector.destroy());
+
     return {
       dispose: () => injector.destroy(),
     }
@@ -52,7 +57,6 @@ export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
 
   public menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>, next: SciMenuAdapter): Signal<SciMenuItemLike[]> {
     return untracked(() => { // untracked because invoked in a reactive context.
-
       const command: WorkbenchClientMenuItemListCommand = {location, context};
       return toSignal(this._messageClient.request$<WorkbenchClientMenuItemLike[]>('workbench/menu/items', command)
         .pipe(
@@ -71,15 +75,11 @@ function transformToWorkbenchClientModel(menuItems: SciMenuItemLike[], options?:
 
     switch (menuItem.type) {
       case 'menu-item': {
-        if (typeof menuItem.label === 'function') {
-          throw Error('[MenuDefinitionError] Component not supported for label');
-        }
-
         return {
           id: menuItemId,
           type: menuItem.type,
           name: menuItem.name,
-          label: fromRemoteSignal(`label-${menuItemId}`, menuItem.label, {injector}),
+          label: fromRemoteSignal(`label-${menuItemId}`, menuItem.label?.text, {injector}),
           icon: fromRemoteSignal(`icon-${menuItemId}`, menuItem.icon, {injector}),
           tooltip: fromRemoteSignal(`tooltip-${menuItemId}`, menuItem.tooltip, {injector}),
           accelerator: menuItem.accelerator,
@@ -92,15 +92,11 @@ function transformToWorkbenchClientModel(menuItems: SciMenuItemLike[], options?:
         };
       }
       case 'menu': {
-        if (typeof menuItem.label === 'function') {
-          throw Error('[MenuDefinitionError] Component not supported for label');
-        }
-
         return {
           id: menuItemId,
           type: menuItem.type,
           name: menuItem.name,
-          label: fromRemoteSignal(`label-${menuItemId}`, menuItem.label, {injector}),
+          label: fromRemoteSignal(`label-${menuItemId}`, menuItem.label?.text, {injector}),
           icon: fromRemoteSignal(`icon-${menuItemId}`, menuItem.icon, {injector}),
           tooltip: fromRemoteSignal(`tooltip-${menuItemId}`, menuItem.tooltip, {injector}),
           disabled: fromRemoteSignal(`disabled-${menuItemId}`, menuItem.disabled, {injector}),
@@ -144,7 +140,7 @@ function transformToSignalMenuModel(menuItems: WorkbenchClientMenuItemLike[], op
         return {
           type: menuItem.type,
           name: menuItem.name,
-          label: toRemoteSignal(`label-${menuItem.id}`, menuItem.label, {injector}),
+          label: menuItem.label ? {text: toRemoteSignal(`label-${menuItem.id}`, menuItem.label, {injector})} : undefined,
           icon: toRemoteSignal(`icon-${menuItem.id}`, menuItem.icon, {injector}),
           tooltip: toRemoteSignal(`tooltip-${menuItem.id}`, menuItem.tooltip, {injector}),
           accelerator: menuItem.accelerator,
@@ -162,7 +158,7 @@ function transformToSignalMenuModel(menuItems: WorkbenchClientMenuItemLike[], op
         return {
           type: menuItem.type,
           name: menuItem.name,
-          label: toRemoteSignal(`label-${menuItem.id}`, menuItem.label, {injector}),
+          label: menuItem.label ? {text: toRemoteSignal(`label-${menuItem.id}`, menuItem.label, {injector})} : undefined,
           icon: toRemoteSignal(`icon-${menuItem.id}`, menuItem.icon, {injector}),
           tooltip: toRemoteSignal(`tooltip-${menuItem.id}`, menuItem.tooltip, {injector}),
           disabled: toRemoteSignal(`disabled-${menuItem.id}`, menuItem.disabled, {injector}),
