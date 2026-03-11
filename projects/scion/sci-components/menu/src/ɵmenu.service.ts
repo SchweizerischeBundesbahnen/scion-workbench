@@ -16,7 +16,7 @@ import {SciMenuContextProvider} from './menu-context-provider';
 import {coerceSignal} from './common/common';
 import {SciMenuAdapter} from './menu-adapter';
 import {SciDefaultMenuAdapter} from './default-menu-adapter';
-import {SciGroupContribution, SciMenuContribution} from './menu-contribution.model';
+import {SciToolbarContribution, SciMenuContribution} from './menu-contribution.model';
 
 @Injectable({providedIn: 'root'})
 export class ɵSciMenuService implements SciMenuService {
@@ -51,7 +51,7 @@ export class ɵSciMenuService implements SciMenuService {
     return computed(() => this._menuAdapter.menuContributions(location, context, this._defaultMenuAdapter)());
   }
 
-  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution | SciGroupContribution): Disposable {
+  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution | SciToolbarContribution): Disposable {
     return this._menuAdapter.contributeMenu(location, contribution, this._defaultMenuAdapter);
   }
 }

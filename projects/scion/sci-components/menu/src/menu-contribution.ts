@@ -1,5 +1,5 @@
 import {SciMenuFactory, SciMenuGroupFactory} from './menu/menu.factory';
-import {assertNotInReactiveContext, effect, inject, Injector, untracked} from '@angular/core';
+import {assertNotInReactiveContext, effect, inject, Injector, runInInjectionContext, untracked} from '@angular/core';
 import {SciToolbarFactory, SciToolbarGroupFactory} from './toolbar/toolbar.factory';
 import {Disposable} from './common/disposable';
 import {ɵSciMenuService} from './ɵmenu.service';
@@ -8,6 +8,9 @@ import {coerceSignal} from './common/common';
 import {SciMenuContributionLocation, SciMenuContributionPosition, SciMenuGroupContributionLocation, SciToolbarContributionLocation, SciToolbarGroupContributionLocation} from './menu-contribution.model';
 import {prune} from './common/prune.util';
 
+/**
+ * By default, the contribution will be unregistered when the current injection context is destroyed.
+ */
 export function contributeMenu(location: `menu:${string}` | SciMenuContributionLocation, menuFactoryFn: (menu: SciMenuFactory, context: Map<string, unknown>) => void, options?: SciMenuContributionOptions): Disposable;
 export function contributeMenu(location: `toolbar:${string}` | SciToolbarContributionLocation, menuFactoryFn: (toolbar: SciToolbarFactory, context: Map<string, unknown>) => void, options?: SciMenuContributionOptions): Disposable;
 export function contributeMenu(location: `group(menu):${string}` | SciMenuGroupContributionLocation, groupFactoryFn: (group: SciMenuGroupFactory, context: Map<string, unknown>) => void, options?: SciMenuContributionOptions): Disposable;
@@ -27,15 +30,26 @@ export function contributeMenu(locationLike: string | SciContributionLocation, f
   effect((onCleanup) => {
     const requiredContext = environmentContext?.() ?? new Map();
 
-    untracked(() => {
-      const contributionRef = menuService.contributeMenu(normalizeLocation(location), {
-        scope: location.startsWith('menu:') || location.startsWith('group(menu):') ? 'menu' : 'toolbar',
-        factory: factoryFn as ((menu: SciMenuFactory | SciToolbarFactory, context: Map<string, unknown>) => void) | ((group: SciMenuGroupFactory | SciToolbarGroupFactory, context: Map<string, unknown>) => void),
-        requiredContext,
-        position: prune({before, after, position} as SciMenuContributionPosition, {pruneIfEmpty: true}),
-      });
-      onCleanup(() => contributionRef.dispose());
-    });
+    untracked(() => runInInjectionContext(injector, () => {
+      if (location.startsWith('menu:') || location.startsWith('group(menu):')) {
+        const contributionRef = menuService.contributeMenu(normalizeLocation(location), {
+          scope: 'menu',
+          factory: factoryFn as unknown as (menu: SciMenuFactory | SciMenuGroupFactory, context: Map<string, unknown>) => void,
+          requiredContext,
+          position: prune({before, after, position} as SciMenuContributionPosition, {pruneIfEmpty: true}),
+        });
+        onCleanup(() => contributionRef.dispose());
+      }
+      else {
+        const contributionRef = menuService.contributeMenu(normalizeLocation(location), {
+          scope: 'toolbar',
+          factory: factoryFn as unknown as (toolbar: SciToolbarFactory | SciToolbarGroupFactory, context: Map<string, unknown>) => void,
+          requiredContext,
+          position: prune({before, after, position} as SciMenuContributionPosition, {pruneIfEmpty: true}),
+        });
+        onCleanup(() => contributionRef.dispose());
+      }
+    }));
   }, {injector});
 
   return {

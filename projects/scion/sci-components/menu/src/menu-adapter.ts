@@ -13,12 +13,12 @@ import {SciMenuOptions, SciMenuRef} from './menu.service';
 import {Disposable} from './common/disposable';
 import {SciMenuItemLike} from './menu.model';
 import {SciDefaultMenuAdapter} from './default-menu-adapter';
-import {SciGroupContribution, SciMenuContribution} from './menu-contribution.model';
+import {SciToolbarContribution, SciMenuContribution} from './menu-contribution.model';
 
 @Injectable({providedIn: 'root', useExisting: SciDefaultMenuAdapter})
 export abstract class SciMenuAdapter {
 
-  public abstract contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution | SciGroupContribution, next: SciMenuAdapter): Disposable;
+  public abstract contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution | SciToolbarContribution, next: SciMenuAdapter): Disposable;
 
   public abstract menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>, next: SciMenuAdapter): Signal<SciMenuItemLike[]>;
 

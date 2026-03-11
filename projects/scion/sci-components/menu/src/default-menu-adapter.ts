@@ -23,17 +23,17 @@ import {ɵSciMenuFactory} from './menu/ɵmenu.factory';
 import {ɵSciToolbarFactory} from './toolbar/ɵtoolbar.factory';
 import {sortMenuItems} from './menu-item-sorter';
 import {SciToolbarFactory} from './toolbar/toolbar.factory';
-import {SciGroupContribution, SciMenuContribution} from './menu-contribution.model';
+import {SciMenuContribution, SciToolbarContribution} from './menu-contribution.model';
 
 @Injectable({providedIn: 'root'})
 export class SciDefaultMenuAdapter implements SciMenuAdapter {
 
-  private readonly _contributions = new Map<`menu:${string}` | `toolbar:${string}` | `group:${string}`, WritableSignal<Array<SciMenuContribution | SciGroupContribution>>>;
+  private readonly _contributions = new Map<`menu:${string}` | `toolbar:${string}` | `group:${string}`, WritableSignal<Array<SciMenuContribution | SciToolbarContribution>>>;
 
   private readonly _injector = inject(Injector);
 
   /** @inheritDoc */
-  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution | SciGroupContribution): Disposable {
+  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution | SciToolbarContribution): Disposable {
     if (!this._contributions.has(location)) {
       this._contributions.set(location, signal([]));
     }
@@ -68,7 +68,7 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
         return true;
       })
       // Construct contribution, recursively.
-      .flatMap((contribution: SciMenuContribution | SciGroupContribution): SciMenuItemLike[] => {
+      .flatMap((contribution: SciMenuContribution | SciToolbarContribution): SciMenuItemLike[] => {
         if (contribution.scope === 'menu') {
           const factoryFn: ((menu: SciMenuFactory, context: Map<string, unknown>) => void) = contribution.factory;
           const menuFactory = new ɵSciMenuFactory();

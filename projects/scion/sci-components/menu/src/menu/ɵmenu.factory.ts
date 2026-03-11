@@ -1,9 +1,10 @@
 import {SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuGroupFactory, SciMenuItemDescriptor} from './menu.factory';
-import {isSignal, Signal} from '@angular/core';
+import {inject, Injector, isSignal, runInInjectionContext, Signal} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model';
 import {coerceSignal} from '../common/common';
 import {ɵSciToolbarFactory} from '../toolbar/ɵtoolbar.factory';
+import {SciToolbarFactory} from '@scion/sci-components/menu';
 
 export class ɵSciMenuFactory implements SciMenuFactory {
 
@@ -130,4 +131,11 @@ function coerceGroupDescriptor(factoryOrDescriptor: ((group: SciMenuGroupFactory
     return [{}, factoryOrDescriptor];
   }
   return [factoryOrDescriptor, factoryIfDescriptor];
+}
+
+export function ɵcreateSciMenu(menuFactoryFn: (menu: SciMenuFactory | SciMenuGroupFactory, context: Map<string, unknown>) => void, context: Map<string, unknown>, options?: {injector?: Injector}): SciMenuItemLike[] {
+  const injector = options?.injector ?? inject(Injector);
+  const menuFactory = new ɵSciMenuFactory();
+  runInInjectionContext(injector, () => menuFactoryFn(menuFactory, context));
+  return menuFactory.menuItems;
 }
