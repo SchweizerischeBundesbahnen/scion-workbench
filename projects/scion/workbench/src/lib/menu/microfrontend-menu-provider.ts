@@ -65,8 +65,7 @@ function installMenuItemsReplier(): void {
   messageClient.onMessage<WorkbenchClientMenuItemListCommand>('workbench/menu/items', request => {
     const {location, context} = request.body!;
     const injector = createDestroyableInjector({parent: environmentInjector});
-
-    const menuItems = menuService.menuContributions(location, context);
+    const menuItems = menuService.menuContributions(location, context, {injector});
 
     return toObservable(menuItems, {injector})
       .pipe(

@@ -99,6 +99,14 @@ export class AppComponent implements DoCheck {
       .addMenuItem('Remove from Sidebar', () => this.onAction()),
     );
 
+    contributeMenu({location: 'toolbar:testee'}, menu => menu
+      .addToolbarItem({label: 'Teams From Host', icon: 'groups', onSelect: () => this.onAction()}),
+    );
+
+    contributeMenu({location: 'menu:share'}, menu => menu
+      .addMenuItem({label: 'Teams from Host', icon: 'groups', onSelect: () => this.onAction()}),
+    );
+
     if (1 + 1) {
       return;
     }

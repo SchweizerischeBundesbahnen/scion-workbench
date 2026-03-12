@@ -25,7 +25,7 @@ export class SciToolbarComponent {
   private readonly _menuService = inject(SciMenuService);
   private readonly _context = this.computeContext();
 
-  protected readonly menuItems = computed(() => this._menuService.menuContributions(this.name(), this._context())());
+  protected readonly menuItems = this._menuService.menuContributions(this.name, this._context);
 
   constructor() {
     this.installAccelerators();

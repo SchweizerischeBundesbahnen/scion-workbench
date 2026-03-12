@@ -1,13 +1,19 @@
-import {ElementRef, Injectable, Signal, ViewContainerRef} from '@angular/core';
+import {ElementRef, Injectable, Injector, Signal, ViewContainerRef} from '@angular/core';
 import {ɵSciMenuService} from './ɵmenu.service';
 import {SciMenuItemLike} from './menu.model';
+import {MaybeSignal} from './common/utility-types';
 
 @Injectable({providedIn: 'root', useExisting: ɵSciMenuService})
 export abstract class SciMenuService {
 
   public abstract open(name: `menu:${string}`, options: SciMenuOptions): SciMenuRef;
 
-  public abstract menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>): Signal<SciMenuItemLike[]>;
+  /**
+   * The function:
+   * - Must be called within an injection context, or an explicit {@link Injector} passed.
+   * - Must be called in a non-reactive (non-tracking) context.
+   */
+  public abstract menuContributions(location: MaybeSignal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: MaybeSignal<Map<string, unknown>>, options?: {injector?: Injector}): Signal<SciMenuItemLike[]>;
 }
 
 export interface SciMenuOptions {

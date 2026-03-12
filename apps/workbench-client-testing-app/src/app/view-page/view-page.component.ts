@@ -107,6 +107,7 @@ export default class ViewPageComponent {
       .addMenuItem({label: 'Home', icon: 'home', onSelect})
       .addMenuItem({label: 'Train', icon: 'train', onSelect}),
     );
+
     contributeMenu('toolbar:workbench.part', toolbar => toolbar
         .addToolbarItem('home', onSelect),
       // .addToolbarItem('train', onSelect),
@@ -163,6 +164,25 @@ export default class ViewPageComponent {
         .addToolbarItem({icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], checked: computed(() => flags().has('format_italic')), onSelect: () => toggleMultiFlag(flags, 'format_italic')})
         .addToolbarItem({icon: 'format_underlined', checked: computed(() => flags().has('format_underlined')), onSelect: () => toggleMultiFlag(flags, 'format_underlined')})
         .addToolbarItem({icon: 'strikethrough_s', checked: computed(() => flags().has('strikethrough_s')), onSelect: () => toggleMultiFlag(flags, 'strikethrough_s')}),
+      )
+      .addMenu({label: 'File'}, menu => menu
+        .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N'], onSelect: () => onSelect()})
+        .addMenuItem({label: 'Open', icon: 'folder', onSelect: () => onSelect()})
+        .addMenuItem({label: 'Make a Copy', icon: 'file_copy', onSelect: () => onSelect()})
+        .addMenu({label: 'Share', name: 'menu:share', icon: 'person_add'}, menu => menu
+          .addMenuItem({label: 'Share with others', icon: 'person_add', name: 'menuitem:share-with-others', onSelect: () => onSelect()})
+          .addMenuItem({label: 'Publish to web', icon: 'public', onSelect: () => onSelect()}),
+        )
+        .addMenuItem({label: 'Download', icon: 'download', onSelect: () => onSelect()})
+        .addMenuItem({label: 'Print', icon: 'print', onSelect: () => onSelect()}),
+      )
+      .addMenu({label: 'Edit', menu: {filter: {placeholder: 'Sueche...', notFoundText: 'Nüd gfunde.'}}}, menu => menu
+        .addMenuItem({label: 'Undo', icon: 'undo', accelerator: ['Ctrl', 'Z'], onSelect: () => onSelect()})
+        .addMenuItem({label: 'Redo', icon: 'redo', onSelect: () => onSelect()})
+        .addMenuItem({label: 'Cut', icon: 'content_cut', accelerator: ['Ctrl', 'X'], onSelect: () => onSelect()})
+        .addMenuItem({label: 'Copy', icon: 'content_copy', accelerator: ['Ctrl', 'C'], onSelect: () => onSelect()})
+        .addMenuItem({label: 'Paste', icon: 'content_paste', accelerator: ['Ctrl', 'V'], onSelect: () => onSelect()})
+        .addMenuItem({label: 'Find and replace', icon: 'find_replace', accelerator: ['Ctrl', 'F'], onSelect: () => onSelect()}),
       )
     );
   }

@@ -9,7 +9,7 @@
  */
 
 import {SciMenuOptions, SciMenuRef, SciMenuService} from './menu.service';
-import {computed, inject, Injectable, Provider, Signal} from '@angular/core';
+import {inject, Injectable, Injector, Provider, signal, Signal} from '@angular/core';
 import {SciMenuItemLike} from './menu.model';
 import {Disposable} from './common/disposable';
 import {SciMenuContextProvider} from './menu-context-provider';
@@ -17,10 +17,13 @@ import {coerceSignal} from './common/common';
 import {SciMenuAdapter} from './menu-adapter';
 import {SciDefaultMenuAdapter} from './default-menu-adapter';
 import {SciMenuContribution, SciToolbarContribution} from './menu-contribution.model';
+import {MaybeSignal} from './common/utility-types';
+import {createDestroyableInjector} from './common/injector.util';
 
 @Injectable({providedIn: 'root'})
 export class ɵSciMenuService implements SciMenuService {
 
+  private readonly _injector = inject(Injector);
   private readonly _menuAdapter = inject(SciMenuAdapter);
   private readonly _defaultMenuAdapter = inject(SciDefaultMenuAdapter);
   private readonly _environmentContext = coerceSignal(inject(SciMenuContextProvider, {optional: true})?.provideContext?.());
@@ -28,7 +31,7 @@ export class ɵSciMenuService implements SciMenuService {
   /** @inheritDoc */
   public open(name: `menu:${string}`, options: SciMenuOptions): SciMenuRef;
   public open(menuItems: SciMenuItemLike[], options: Omit<SciMenuOptions, 'context'>): SciMenuRef;
-  public open(nameOrMenuItems: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions): SciMenuRef {
+  public open(menuItemsOrName: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions): SciMenuRef {
     const context = new Map([...this._environmentContext?.() ?? new Map(), ...options.context ?? new Map()]);
 
     // Prevent default if opening context menu.
@@ -37,18 +40,24 @@ export class ɵSciMenuService implements SciMenuService {
       options.anchor.stopPropagation();
     }
 
-    const menuContributions = typeof nameOrMenuItems === 'string' ? this.menuContributions(nameOrMenuItems, context)() : nameOrMenuItems;
+    const injector = createDestroyableInjector({parent: this._injector});
+
+    const menuContributions = Array.isArray(menuItemsOrName) ? signal(menuItemsOrName) : this.menuContributions(menuItemsOrName, context, {injector});
     if (this._menuAdapter.openMenu) {
-      return this._menuAdapter.openMenu(menuContributions, options);
+      const menuRef = this._menuAdapter.openMenu(menuContributions, options);
+      menuRef.onClose(() => injector.destroy());
+      return menuRef;
     }
     else {
-      return this._defaultMenuAdapter.openMenu(menuContributions, options);
+      const menuRef = this._defaultMenuAdapter.openMenu(menuContributions, options);
+      menuRef.onClose(() => injector.destroy());
+      return menuRef;
     }
   }
 
   /** @inheritDoc */
-  public menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>): Signal<SciMenuItemLike[]> {
-    return computed(() => this._menuAdapter.menuContributions(location, context, this._defaultMenuAdapter)());
+  public menuContributions(location: MaybeSignal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: MaybeSignal<Map<string, unknown>>, options?: {injector?: Injector}): Signal<SciMenuItemLike[]> {
+    return this._menuAdapter.menuContributions(coerceSignal(location), coerceSignal(context), this._defaultMenuAdapter, options);
   }
 
   public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution | SciToolbarContribution): Disposable {

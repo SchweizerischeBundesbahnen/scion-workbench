@@ -40,16 +40,13 @@ export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${
 
     const environmentContext = coerceSignal(menuContextProvider?.provideContext?.());
     const context = computed(() => new Map<string, unknown>([...environmentContext?.() ?? new Map(), ...options?.context ?? new Map()]));
+    const menuItemContributions = menuService.menuContributions(location, context);
 
-    const menuItemContributions = computed(() => {
-      const menuItems = menuService.menuContributions(location, context())();
-      return untracked(() => collectMenuItemsWithAccelerator(menuItems));
-    });
-
-    const contextualAcceleratorTarget = coerceSignal(menuContextProvider?.provideAcceleratorTarget?.());
+    const target = menuContextProvider?.provideAcceleratorTarget();
+    const contextualAcceleratorTarget = coerceSignal(target);
 
     effect(onCleanup => {
-      const menuItems = menuItemContributions();
+      const menuItems = collectMenuItemsWithAccelerator(menuItemContributions());
       const target = options?.target ?? contextualAcceleratorTarget?.() ?? document;
       if (!menuItems.length) {
         return;
@@ -78,10 +75,13 @@ export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${
 
         onCleanup(() => subscription.unsubscribe());
       });
-    }, {injector});
+    });
 
     return {
-      dispose: () => injector.destroy(),
+      dispose: () => {
+        debugger;
+        injector.destroy()
+      },
     }
   });
 }

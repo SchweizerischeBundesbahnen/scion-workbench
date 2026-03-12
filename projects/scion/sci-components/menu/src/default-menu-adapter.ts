@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationRef, Binding, ComponentRef, computed, createComponent, DestroyRef, DOCUMENT, ElementRef, EnvironmentInjector, inject, Injectable, Injector, inputBinding, runInInjectionContext, signal, Signal, ViewContainerRef, WritableSignal} from '@angular/core';
+import {ApplicationRef, assertNotInReactiveContext, Binding, ComponentRef, computed, createComponent, DestroyRef, DOCUMENT, ElementRef, EnvironmentInjector, inject, Injectable, Injector, inputBinding, runInInjectionContext, signal, Signal, untracked, ViewContainerRef, WritableSignal} from '@angular/core';
 import {Disposable} from './common/disposable';
 import {SciMenuItemLike} from './menu.model';
 import {SciMenuAdapter} from './menu-adapter';
@@ -25,12 +25,13 @@ import {sortMenuItems} from './menu-item-sorter';
 import {SciToolbarFactory} from './toolbar/toolbar.factory';
 import {SciMenuContribution, SciToolbarContribution} from './menu-contribution.model';
 import {createDestroyableInjector} from './common/injector.util';
+import {MaybeSignal} from './common/utility-types';
+import {coerceSignal, ɵassertInInjectionContext} from './common/common';
 
 @Injectable({providedIn: 'root'})
 export class SciDefaultMenuAdapter implements SciMenuAdapter {
 
   private readonly _contributions = new Map<`menu:${string}` | `toolbar:${string}` | `group:${string}`, WritableSignal<Array<SciMenuContribution | SciToolbarContribution>>>;
-
   private readonly _injector = inject(Injector);
 
   /** @inheritDoc */
@@ -50,54 +51,62 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
   }
 
   /** @inheritDoc */
-  public menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>): Signal<SciMenuItemLike[]> {
-    // If no contributions are registered yet, register signal for the signal to "emit" when contributions are registered later.
-    if (!this._contributions.has(location)) {
-      this._contributions.set(location, signal([]));
+  public menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, next: SciMenuAdapter, options?: {injector?: Injector}): Signal<SciMenuItemLike[]> {
+    assertNotInReactiveContext(this.menuContributions, 'Call menuContributions() in a non-reactive (non-tracking) context, such as within the untracked() function.');
+    if (!options?.injector) {
+      ɵassertInInjectionContext(this.menuContributions, 'Call menuContributions() in an injection context, as it may allocate resources that are not released until the injection context is destroyed.')
     }
-    const contributions = this._contributions.get(location)!;
 
-    return computed(() => sortMenuItems(contributions()
-      // Check if context matches
-      .filter(contribution => {
-        const requiredContext = contribution.requiredContext;
-        for (const [name, value] of requiredContext.entries() ?? []) {
-          if (!Objects.isEqual(context.get(name), value, {ignoreArrayOrder: true})) {
-            return false;
+    const injector = options?.injector ?? inject(Injector);
+
+    return computed(() => {
+      // If no contributions are registered yet, register signal for the signal to "emit" when contributions are registered later.
+      if (!this._contributions.has(location())) {
+        this._contributions.set(location(), signal([]));
+      }
+      const contributions = this._contributions.get(location())!;
+
+      return sortMenuItems(contributions()
+        // Check if the calling context matches the contribution's required context.
+        .filter(contribution => {
+          const requiredContext = contribution.requiredContext;
+          for (const [name, value] of requiredContext.entries() ?? []) {
+            if (!Objects.isEqual(context().get(name), value, {ignoreArrayOrder: true})) {
+              return false;
+            }
           }
-        }
-        return true;
-      })
-      // Construct contribution, recursively.
-      .flatMap((contribution: SciMenuContribution | SciToolbarContribution): SciMenuItemLike[] => {
-        if (contribution.scope === 'menu') {
-          const factoryFn: ((menu: SciMenuFactory, context: Map<string, unknown>) => void) = contribution.factory;
-          const menuFactory = new ɵSciMenuFactory();
-          runInInjectionContext(this._injector, () => factoryFn(menuFactory, context));
-          return menuFactory.menuItems.map(menuItem => ({...menuItem, position: contribution.position}));
-        }
-        if (contribution.scope === 'toolbar') {
-          const factoryFn: (toolbar: SciToolbarFactory, context: Map<string, unknown>) => void = contribution.factory;
-          const toolbarFactory = new ɵSciToolbarFactory();
-          runInInjectionContext(this._injector, () => factoryFn(toolbarFactory, context));
-          return toolbarFactory.menuItems.map(menuItem => ({...menuItem, position: contribution.position}));
-        }
+          return true;
+        })
+        // Construct contribution, recursively.
+        .flatMap((contribution: SciMenuContribution | SciToolbarContribution): SciMenuItemLike[] => {
+          if (contribution.scope === 'menu') {
+            const factoryFn: ((menu: SciMenuFactory, context: Map<string, unknown>) => void) = contribution.factory;
+            const menuFactory = new ɵSciMenuFactory();
+            runInInjectionContext(injector, () => factoryFn(menuFactory, context()));
+            return menuFactory.menuItems.map(menuItem => ({...menuItem, position: contribution.position}));
+          }
+          if (contribution.scope === 'toolbar') {
+            const factoryFn: (toolbar: SciToolbarFactory, context: Map<string, unknown>) => void = contribution.factory;
+            const toolbarFactory = new ɵSciToolbarFactory();
+            runInInjectionContext(injector, () => factoryFn(toolbarFactory, context()));
+            return toolbarFactory.menuItems.map(menuItem => ({...menuItem, position: contribution.position}));
+          }
 
-        throw Error(`Unsupported location '${location}'. Location must start with 'menu:', 'toolbar:', or 'group(menu|toolbar):'.`);
-      })
-      // Add other contributions recursively.
-      .map(menuItem => this.addMenuContributions(menuItem, context))
-      // Filter empty groups and menus
-      .flatMap(filterEmpty),
-    ), {equal: Objects.isEqual});
+          throw Error(`Unsupported location '${location}'. Location must start with 'menu:', 'toolbar:', or 'group(menu|toolbar):'.`);
+        })
+        // Add contributions, recursively to each submenu or group.
+        .map(menuItem => this.addMenuContributions(menuItem, context(), {injector}))
+        // Filter empty submenus and groups.
+        .flatMap(filterEmpty));
+    }, {equal: Objects.isEqual});
   }
 
-  private addMenuContributions(menuItem: SciMenuItemLike, context: Map<string, unknown>): SciMenuItemLike {
+  private addMenuContributions(menuItem: SciMenuItemLike, context: Map<string, unknown>, options?: {injector?: Injector}): SciMenuItemLike {
     if (menuItem.type === 'menu-item') {
       return {
         ...menuItem,
         actions: menuItem.actions
-          .map(action => this.addMenuContributions(action, context))
+          .map(action => this.addMenuContributions(action, context, options))
           .flatMap(filterEmpty),
       };
     }
@@ -105,13 +114,13 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
     return {
       ...menuItem,
       children: sortMenuItems(menuItem.children
-        .concat(menuItem.name ? this.menuContributions(menuItem.name, context)() : [])
-        .map(child => this.addMenuContributions(child, context))),
+        .concat(menuItem.name ? untracked(() => this.menuContributions(signal(menuItem.name!), signal(context), this, {injector: options?.injector}))() : [])
+        .map(child => this.addMenuContributions(child, context, options))),
     };
   }
 
   /** @inheritDoc */
-  public openMenu(menuItems: SciMenuItemLike[], options: Omit<SciMenuOptions, 'context'>): SciMenuRef {
+  public openMenu(menuItems: Signal<SciMenuItemLike[]>, options: Omit<SciMenuOptions, 'context'>): SciMenuRef {
     // Create injection context to dispose resources when closing the menu.
     const injector = createDestroyableInjector({parent: this._injector});
 
@@ -120,26 +129,20 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
       const anchorElement = options.anchor instanceof ElementRef || options.anchor instanceof HTMLElement ? coerceElement(options.anchor) : this.createVirtualAnchor(options.anchor, {viewContainerRef: options.viewContainerRef});
 
       // Create menu popover.
-      try {
-        const componentRef = this.createMenuPopover(menuItems, anchorElement, options);
-        componentRef.onDestroy(() => injector.destroy());
+      const componentRef = this.createMenuPopover(menuItems, anchorElement, options);
+      componentRef.onDestroy(() => injector.destroy());
 
-        return {
-          close: () => componentRef.destroy(),
-          onClose: onClose => componentRef.hostView.destroyed ? onClose() : componentRef.onDestroy(onClose), // Call callback immediately if already destroyed.
-        };
-      }
-      catch (error) {
-        injector.destroy();
-        throw error;
-      }
+      return {
+        close: () => componentRef.destroy(),
+        onClose: onClose => componentRef.hostView.destroyed ? onClose() : componentRef.onDestroy(onClose), // Call callback immediately if already destroyed.
+      };
     });
   }
 
-  private createMenuPopover(menuItems: SciMenuItemLike[], anchorElement: HTMLElement, options: Omit<SciMenuOptions, 'context'>): ComponentRef<MenuComponent> {
+  private createMenuPopover(menuItems: MaybeSignal<SciMenuItemLike[]>, anchorElement: HTMLElement, options: Omit<SciMenuOptions, 'context'>): ComponentRef<MenuComponent> {
     const anchorSize = dimension(anchorElement);
     const bindings: Binding[] = [
-      inputBinding('menuItems', signal(menuItems)),
+      inputBinding('menuItems', coerceSignal(menuItems)),
       inputBinding('filter', signal(options.filter)),
       inputBinding('sizeInput', signal(options.size)),
       inputBinding('anchorWidth', computed(() => anchorSize().offsetWidth)),

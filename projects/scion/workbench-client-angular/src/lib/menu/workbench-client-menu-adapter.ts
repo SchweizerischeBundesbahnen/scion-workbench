@@ -1,12 +1,12 @@
 import {Disposable, SciMenuAdapter, SciMenuContribution, SciMenuItemLike, SciToolbarContribution, ɵcreateSciMenu, ɵcreateSciToolbar} from '@scion/sci-components/menu';
-import {assertInInjectionContext, DestroyRef, inject, Injector, Signal, untracked} from '@angular/core';
+import {assertInInjectionContext, assertNotInReactiveContext, DestroyRef, effect, inject, Injector, signal, Signal, untracked} from '@angular/core';
 import {UUID} from '@scion/toolkit/uuid';
 import {mapToBody, MessageClient, MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
 import {WorkbenchClientMenuContributionFactoryCommand, WorkbenchClientMenuContributionRegisterCommand, WorkbenchClientMenuItemLike, WorkbenchClientMenuItemListCommand} from '@scion/workbench-client';
 import {fromRemoteSignal, toRemoteSignal} from './remote-signal';
 import {map} from 'rxjs';
-import {toSignal} from '@angular/core/rxjs-interop';
 import {createDestroyableInjector} from '../common/injector.util';
+import {ɵassertInInjectionContext} from '../common/common';
 
 export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
 
@@ -55,15 +55,31 @@ export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
     }
   }
 
-  public menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>, next: SciMenuAdapter): Signal<SciMenuItemLike[]> {
-    return untracked(() => { // untracked because invoked in a reactive context.
-      const command: WorkbenchClientMenuItemListCommand = {location, context};
-      return toSignal(this._messageClient.request$<WorkbenchClientMenuItemLike[]>('workbench/menu/items', command)
-        .pipe(
-          mapToBody(),
-          map(menuItems => transformToSignalMenuModel(menuItems, {injector: this._injector})),
-        ), {initialValue: [], injector: this._injector});
-    });
+  public menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, next: SciMenuAdapter, options?: {injector?: Injector}): Signal<SciMenuItemLike[]> {
+    assertNotInReactiveContext(this.menuContributions, 'Call menuContributions() in a non-reactive (non-tracking) context. Each invocation creates a new subscription, asynchronously setting the signal\'s value, leading to an infinite loop if called in a reactive context.');
+    if (!options?.injector) {
+      ɵassertInInjectionContext(this.menuContributions, 'Call menuContributions() in an injection context, as it allocates resources that are not released until the injection context is destroyed.')
+    }
+    const injector = options?.injector ?? inject(Injector);
+    const menuContributions = signal<SciMenuItemLike[]>([]);
+
+    effect(onCleanup => {
+      const command: WorkbenchClientMenuItemListCommand = {location: location(), context: context()};
+
+      untracked(() => {
+        const subscription = this._messageClient.request$<WorkbenchClientMenuItemLike[]>('workbench/menu/items', command)
+          .pipe(
+            mapToBody(),
+            map(menuItems => transformToSignalMenuModel(menuItems, {injector: this._injector})),
+          )
+          .subscribe(menuItems => {
+            menuContributions.set(menuItems);
+          });
+        onCleanup(() => subscription.unsubscribe());
+      });
+    }, {injector});
+
+    return menuContributions;
   }
 }
 
