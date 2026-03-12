@@ -19,4 +19,5 @@ export interface ɵWorkbenchClientMenuContributionFactoryCommand {
 export interface ɵWorkbenchClientMenuOpenCommand {
   menu: `menu:${string}` | WorkbenchClientMenuItemLike[];
   options: WorkbenchClientMenuOpenOptions;
+  context: Map<string, unknown>;
 }

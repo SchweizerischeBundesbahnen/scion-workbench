@@ -2,7 +2,7 @@ import {Disposable, SciMenuAdapter, SciMenuContribution, SciMenuItemLike, SciMen
 import {assertInInjectionContext, assertNotInReactiveContext, DestroyRef, effect, ElementRef, inject, Injector, signal, Signal, untracked} from '@angular/core';
 import {UUID} from '@scion/toolkit/uuid';
 import {mapToBody, MessageClient, MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
-import {ɵWorkbenchClientMenuContributionFactoryCommand, ɵWorkbenchClientMenuContributionRegisterCommand, WorkbenchClientMenuItemLike, ɵWorkbenchClientMenuItemListCommand, ɵWorkbenchClientMenuOpenCommand, WorkbenchClientMenuOrigin} from '@scion/workbench-client';
+import {WorkbenchClientMenuItemLike, WorkbenchClientMenuOpenOptions, WorkbenchClientMenuOrigin, ɵWorkbenchClientMenuContributionFactoryCommand, ɵWorkbenchClientMenuContributionRegisterCommand, ɵWorkbenchClientMenuItemListCommand, ɵWorkbenchClientMenuOpenCommand} from '@scion/workbench-client';
 import {fromRemoteSignal, toRemoteSignal} from './remote-signal';
 import {firstValueFrom, map} from 'rxjs';
 import {createDestroyableInjector} from '../common/injector.util';
@@ -93,10 +93,15 @@ export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
       options: {
         anchor: coerceAnchor(options.anchor),
         align: options.align,
-        size: options.size,
-        filter: options.filter,
+        size: {
+          width: options.size?.width,
+          minWidth: options.size?.minWidth,
+          maxWidth: options.size?.maxWidth,
+        },
+        filter: coerceFilter(options.filter),
         cssClass: options.cssClass,
       },
+      context: options.context ?? new Map(),
     }) satisfies ɵWorkbenchClientMenuOpenCommand));
 
     whenClose.finally(() => injector.destroy());
@@ -238,4 +243,17 @@ function coerceAnchor(anchor: HTMLElement | ElementRef<HTMLElement> | SciMenuOri
   else {
     return {x: anchor.x, y: anchor.y, width: anchor.width, height: anchor.height};
   }
+}
+
+function coerceFilter(filter: SciMenuOptions['filter'] | undefined): WorkbenchClientMenuOpenOptions['filter'] | undefined {
+  if (filter === undefined) {
+    return undefined;
+  }
+  if (typeof filter === 'boolean') {
+    return filter;
+  }
+  return {
+    placeholder: filter.placeholder,
+    notFoundText: filter.notFoundText,
+  };
 }

@@ -4,6 +4,14 @@
   gap: 1em;
   padding: 1em;
 
+  > div.context-menu {
+    border: 1px solid var(--sci-color-border);
+    border-radius: var(--sci-corner);
+    padding: .5em;
+    background-color: var(--sci-color-gray-100);
+    cursor: default;
+  }
+
   sci-toolbar {
     height: 25px;
   }

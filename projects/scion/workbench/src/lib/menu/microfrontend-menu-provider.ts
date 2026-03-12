@@ -2,8 +2,8 @@ import {DestroyRef, EnvironmentInjector, EnvironmentProviders, inject, Injector,
 import {mapToBody, MessageClient} from '@scion/microfrontend-platform';
 import {takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '@scion/workbench';
-import {ɵWorkbenchClientMenuContributionFactoryCommand, ɵWorkbenchClientMenuContributionRegisterCommand, WorkbenchClientMenuItemLike, ɵWorkbenchClientMenuItemListCommand, ɵWorkbenchClientMenuOpenCommand, WorkbenchClientMenuOrigin} from '@scion/workbench-client';
-import {contributeMenu, SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuItemLike, SciMenuService, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
+import {WorkbenchClientMenuItemLike, WorkbenchClientMenuOpenOptions, WorkbenchClientMenuOrigin, ɵWorkbenchClientMenuContributionFactoryCommand, ɵWorkbenchClientMenuContributionRegisterCommand, ɵWorkbenchClientMenuItemListCommand, ɵWorkbenchClientMenuOpenCommand} from '@scion/workbench-client';
+import {contributeMenu, SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuItemLike, SciMenuOptions, SciMenuService, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
 import {finalize, map} from 'rxjs/operators';
 import {fromRemoteSignal, toRemoteSignal} from './remote-signal';
 import {UUID} from '@scion/toolkit/uuid';
@@ -100,10 +100,8 @@ function installMenuOpener(): void {
         minWidth: command.options.size?.minWidth,
         maxWidth: command.options.size?.maxWidth,
       },
-      filter: typeof command.options.filter === 'boolean' ? command.options.filter : {
-        placeholder: command.options.filter?.placeholder,
-        notFoundText: command.options.filter?.notFoundText,
-      },
+      filter: coerceFilter(command.options.filter),
+      context: command.context,
       cssClass: command.options.cssClass,
     });
 
@@ -380,4 +378,17 @@ export function provideWorkbenchClientMenu(): EnvironmentProviders {
       installMenuOpener();
     }, {phase: MicrofrontendPlatformStartupPhase.PostStartup}),
   ]);
+}
+
+function coerceFilter(filter: WorkbenchClientMenuOpenOptions['filter'] | undefined): SciMenuOptions['filter'] | undefined {
+  if (filter === undefined) {
+    return undefined;
+  }
+  if (typeof filter === 'boolean') {
+    return filter;
+  }
+  return {
+    placeholder: filter.placeholder,
+    notFoundText: filter.notFoundText,
+  };
 }
