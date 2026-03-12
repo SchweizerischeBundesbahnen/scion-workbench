@@ -8,14 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, Signal} from '@angular/core';
+import {inject} from '@angular/core';
 import {SciMenuContextProvider} from '@scion/sci-components/menu';
 import {WorkbenchDialog, WorkbenchNotification, WorkbenchPart, WorkbenchView} from '@scion/workbench-client';
+import {MaybeSignal} from '../common/utility-types';
 
 export class MicrofrontendMenuContextProvider implements SciMenuContextProvider {
 
   /** @inheritDoc */
-  public provideContext(): Map<string, unknown> | Signal<Map<string, unknown>> {
+  public provideContext(): MaybeSignal<Map<string, unknown>> {
     const view = inject(WorkbenchView, {optional: true});
     if (view) {
       return new Map<string, unknown>().set('viewId', view.id);
@@ -40,7 +41,7 @@ export class MicrofrontendMenuContextProvider implements SciMenuContextProvider 
   }
 
   /** @inheritDoc */
-  public provideAcceleratorTarget(): Signal<Element | undefined> | undefined {
+  public provideAcceleratorTarget(): MaybeSignal<Element | undefined> {
     // const view = inject(ɵWorkbenchView, {optional: true});
     // if (view) {
     //   return view.slot.portal.element;

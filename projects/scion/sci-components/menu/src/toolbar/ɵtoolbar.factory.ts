@@ -5,7 +5,7 @@ import {SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarGroupFactory, Sc
 import {coerceSignal} from '../common/common';
 import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model';
 import {ɵSciMenuFactory} from '../menu/ɵmenu.factory';
-import {OneOf} from '../common/utility-types';
+import {MaybeSignal, OneOf} from '../common/utility-types';
 import {ComponentType} from '@angular/cdk/portal';
 
 export class ɵSciToolbarFactory implements SciToolbarFactory {
@@ -13,9 +13,9 @@ export class ɵSciToolbarFactory implements SciToolbarFactory {
   public readonly menuItems = [] as SciMenuItemLike[];
 
   /** @inheritDoc */
-  public addToolbarItem(icon: string | Signal<string>, onSelect: () => void): this;
+  public addToolbarItem(icon: MaybeSignal<string>, onSelect: () => void): this;
   public addToolbarItem(descriptor: SciToolbarItemDescriptor): this;
-  public addToolbarItem(iconOrDescriptor: string | Signal<string> | SciToolbarItemDescriptor, onSelect?: () => void): this {
+  public addToolbarItem(iconOrDescriptor: MaybeSignal<string> | SciToolbarItemDescriptor, onSelect?: () => void): this {
     const descriptor = coerceToolbarItemDescriptor(iconOrDescriptor, onSelect);
 
     this.menuItems.push({
@@ -40,9 +40,9 @@ export class ɵSciToolbarFactory implements SciToolbarFactory {
   }
 
   /** @inheritDoc */
-  public addMenu(icon: string | Signal<string>, menuFactoryFn: (menu: SciMenuFactory) => void): this;
+  public addMenu(icon: MaybeSignal<string>, menuFactoryFn: (menu: SciMenuFactory) => void): this;
   public addMenu(descriptor: SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this;
-  public addMenu(iconOrDescriptor: string | Signal<string> | SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this {
+  public addMenu(iconOrDescriptor: MaybeSignal<string> | SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this {
     const descriptor = coerceMenuDescriptor(iconOrDescriptor);
 
     // Construct menu.
@@ -96,14 +96,14 @@ export class ɵSciToolbarFactory implements SciToolbarFactory {
   }
 }
 
-function coerceToolbarItemDescriptor(iconOrDescriptor: string | Signal<string> | SciToolbarItemDescriptor, onSelect?: () => void): SciToolbarItemDescriptor {
+function coerceToolbarItemDescriptor(iconOrDescriptor: MaybeSignal<string> | SciToolbarItemDescriptor, onSelect?: () => void): SciToolbarItemDescriptor {
   if (typeof iconOrDescriptor === 'string' || isSignal(iconOrDescriptor)) {
     return {icon: iconOrDescriptor, onSelect: onSelect!};
   }
   return iconOrDescriptor;
 }
 
-function coerceMenuDescriptor(iconOrDescriptor: string | Signal<string> | SciToolbarMenuDescriptor): SciToolbarMenuDescriptor {
+function coerceMenuDescriptor(iconOrDescriptor: MaybeSignal<string> | SciToolbarMenuDescriptor): SciToolbarMenuDescriptor {
   if (typeof iconOrDescriptor === 'string' || isSignal(iconOrDescriptor)) {
     return {icon: iconOrDescriptor};
   }
@@ -117,7 +117,7 @@ function coerceGroupDescriptor(factoryOrDescriptor: ((group: SciToolbarGroupFact
   return [factoryOrDescriptor, factoryIfDescriptor];
 }
 
-function coerceLabel(label: string | Signal<string> | ComponentType<unknown> | undefined): OneOf<{text?: Signal<string>; component?: ComponentType<unknown>}> | undefined {
+function coerceLabel(label: MaybeSignal<string> | ComponentType<unknown> | undefined): OneOf<{text?: Signal<string>; component?: ComponentType<unknown>}> | undefined {
   if (!label) {
     return undefined;
   }

@@ -5,16 +5,16 @@ import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model
 import {coerceSignal} from '../common/common';
 import {ɵSciToolbarFactory} from '../toolbar/ɵtoolbar.factory';
 import {ComponentType} from '@angular/cdk/portal';
-import {OneOf} from '../common/utility-types';
+import {MaybeSignal, OneOf} from '../common/utility-types';
 
 export class ɵSciMenuFactory implements SciMenuFactory {
 
   public readonly menuItems = [] as SciMenuItemLike[];
 
   /** @inheritDoc */
-  public addMenuItem(label: string | Signal<string>, onSelect: () => boolean | void): this;
+  public addMenuItem(label: MaybeSignal<string>, onSelect: () => boolean | void): this;
   public addMenuItem(descriptor: SciMenuItemDescriptor): this;
-  public addMenuItem(labelOrDescriptor: string | Signal<string> | SciMenuItemDescriptor, onSelect?: () => boolean | void): this {
+  public addMenuItem(labelOrDescriptor: MaybeSignal<string> | SciMenuItemDescriptor, onSelect?: () => boolean | void): this {
     const descriptor = coerceMenuItemDescriptor(labelOrDescriptor, onSelect);
 
     // Construct actions toolbar.
@@ -43,9 +43,9 @@ export class ɵSciMenuFactory implements SciMenuFactory {
   }
 
   /** @inheritDoc */
-  public addMenu(label: string | Signal<string>, menuFactoryFn: (menu: SciMenuFactory) => void): this ;
+  public addMenu(label: MaybeSignal<string>, menuFactoryFn: (menu: SciMenuFactory) => void): this ;
   public addMenu(descriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this ;
-  public addMenu(labelOrDescriptor: string | Signal<string> | SciMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this {
+  public addMenu(labelOrDescriptor: MaybeSignal<string> | SciMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this {
     const descriptor = coerceMenuDescriptor(labelOrDescriptor);
 
     // Construct menu.
@@ -113,14 +113,14 @@ function computeCollapsible(groupDescriptor: SciMenuGroupDescriptor): {collapsed
   return {collapsed: false};
 }
 
-function coerceMenuItemDescriptor(labelOrDescriptor: string | Signal<string> | SciMenuItemDescriptor, onSelect?: () => boolean | void): SciMenuItemDescriptor {
+function coerceMenuItemDescriptor(labelOrDescriptor: MaybeSignal<string> | SciMenuItemDescriptor, onSelect?: () => boolean | void): SciMenuItemDescriptor {
   if (typeof labelOrDescriptor === 'string' || isSignal(labelOrDescriptor)) {
     return {label: labelOrDescriptor, onSelect: onSelect!};
   }
   return labelOrDescriptor;
 }
 
-function coerceMenuDescriptor(labelOrDescriptor: string | Signal<string> | SciMenuDescriptor): SciMenuDescriptor {
+function coerceMenuDescriptor(labelOrDescriptor: MaybeSignal<string> | SciMenuDescriptor): SciMenuDescriptor {
   if (typeof labelOrDescriptor === 'string' || isSignal(labelOrDescriptor)) {
     return {label: labelOrDescriptor};
   }
@@ -134,7 +134,7 @@ function coerceGroupDescriptor(factoryOrDescriptor: ((group: SciMenuGroupFactory
   return [factoryOrDescriptor, factoryIfDescriptor];
 }
 
-function coerceLabel(label: string | Signal<string> | ComponentType<unknown>): OneOf<{text?: Signal<string>; component?: ComponentType<unknown>}> {
+function coerceLabel(label: MaybeSignal<string> | ComponentType<unknown>): OneOf<{text?: Signal<string>; component?: ComponentType<unknown>}> {
   if (typeof label === 'string' || isSignal(label)) {
     return {text: coerceSignal(label)};
   }

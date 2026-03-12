@@ -8,17 +8,17 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Signal} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
 import {SciToolbarFactory} from '../toolbar/toolbar.factory';
+import {MaybeSignal} from '../common/utility-types';
 
 export interface SciMenuFactory {
   // Describe that onSelect can call `inject` to get any required dependencies.
-  addMenuItem(label: string | Signal<string>, onSelect: () => boolean | void): this;
+  addMenuItem(label: MaybeSignal<string>, onSelect: () => boolean | void): this;
 
   addMenuItem(descriptor: SciMenuItemDescriptor): this;
 
-  addMenu(label: string | Signal<string>, menuFactoryFn: (menu: SciMenuFactory) => void): this;
+  addMenu(label: MaybeSignal<string>, menuFactoryFn: (menu: SciMenuFactory) => void): this;
 
   addMenu(descriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this;
 
@@ -31,12 +31,12 @@ export type SciMenuGroupFactory = SciMenuFactory;
 
 export interface SciMenuItemDescriptor {
   name?: `menuitem:${string}`;
-  label: string | Signal<string> | ComponentType<unknown>;
-  icon?: string | Signal<string>;
-  checked?: boolean | Signal<boolean>;
-  tooltip?: string | Signal<string>;
+  label: MaybeSignal<string> | ComponentType<unknown>;
+  icon?: MaybeSignal<string>;
+  checked?: MaybeSignal<boolean>;
+  tooltip?: MaybeSignal<string>;
   accelerator?: string[];
-  disabled?: boolean | Signal<boolean>;
+  disabled?: MaybeSignal<boolean>;
   actions?: (actions: SciToolbarFactory) => void;
   onFilter?: (filter: string) => boolean;
   cssClass?: string | string[];
@@ -47,10 +47,10 @@ export interface SciMenuItemDescriptor {
 
 export interface SciMenuDescriptor {
   name?: `menu:${string}`;
-  label: string | Signal<string> | ComponentType<unknown>;
-  icon?: string | Signal<string>;
-  tooltip?: string | Signal<string>;
-  disabled?: boolean | Signal<boolean>;
+  label: MaybeSignal<string> | ComponentType<unknown>;
+  icon?: MaybeSignal<string>;
+  tooltip?: MaybeSignal<string>;
+  disabled?: MaybeSignal<boolean>;
   menu?: {
     width?: string;
     minWidth?: string;
@@ -64,9 +64,9 @@ export interface SciMenuDescriptor {
 
 export interface SciMenuGroupDescriptor {
   name?: `group:${string}`;
-  label?: string | Signal<string>;
+  label?: MaybeSignal<string>;
   collapsible?: boolean | {collapsed: boolean};
-  disabled?: boolean | Signal<boolean>;
+  disabled?: MaybeSignal<boolean>;
   cssClass?: string | string[];
   /** Arbitrary metadata associated with the menu. */
   data?: {[key: string]: string};
