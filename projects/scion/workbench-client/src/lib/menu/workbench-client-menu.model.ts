@@ -13,7 +13,6 @@ export interface WorkbenchClientMenuItem {
   actions: WorkbenchClientMenuItemLike[];
   cssClass?: string[];
   position?: WorkbenchClientMenuContributionPosition;
-  data?: {[key: string]: string};
 }
 
 export interface WorkbenchClientMenu {
@@ -34,7 +33,6 @@ export interface WorkbenchClientMenu {
   };
   cssClass?: string[];
   children: WorkbenchClientMenuItemLike[];
-  data?: {[key: string]: string};
 }
 
 export interface WorkbenchClientMenuGroup {
@@ -47,7 +45,6 @@ export interface WorkbenchClientMenuGroup {
   disabled: boolean;
   children: WorkbenchClientMenuItemLike[];
   cssClass?: string[];
-  data?: {[key: string]: string};
 }
 
 export type WorkbenchClientMenuContributionPosition = OneOf<{

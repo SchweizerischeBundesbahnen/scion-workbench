@@ -104,7 +104,6 @@ function transformToWorkbenchClientModel(menuItems: SciMenuItemLike[], options?:
           actions: transformToWorkbenchClientModel(menuItem.actions, {injector}),
           cssClass: menuItem.cssClass,
           position: menuItem.position,
-          data: menuItem.data,
         };
       }
       case 'menu': {
@@ -126,7 +125,6 @@ function transformToWorkbenchClientModel(menuItems: SciMenuItemLike[], options?:
           },
           cssClass: menuItem.cssClass,
           children: transformToWorkbenchClientModel(menuItem.children, {injector}),
-          data: menuItem.data,
         };
       }
       case 'group': {
@@ -140,7 +138,6 @@ function transformToWorkbenchClientModel(menuItems: SciMenuItemLike[], options?:
           disabled: fromRemoteSignal(`disabled-${menuItemId}`, menuItem.disabled, {injector}),
           children: transformToWorkbenchClientModel(menuItem.children, {injector}),
           cssClass: menuItem.cssClass,
-          data: menuItem.data,
         };
       }
     }
@@ -167,7 +164,6 @@ function transformToSignalMenuModel(menuItems: WorkbenchClientMenuItemLike[], op
           cssClass: menuItem.cssClass,
           position: menuItem.position,
           onSelect: () => true,
-          data: menuItem.data,
         };
       }
       case 'menu': {
@@ -188,7 +184,6 @@ function transformToSignalMenuModel(menuItems: WorkbenchClientMenuItemLike[], op
           },
           cssClass: menuItem.cssClass,
           children: transformToSignalMenuModel(menuItem.children, {injector}),
-          data: menuItem.data,
         };
       }
       case 'group': {
@@ -201,7 +196,6 @@ function transformToSignalMenuModel(menuItems: WorkbenchClientMenuItemLike[], op
           disabled: toRemoteSignal(`disabled-${menuItem.id}`, menuItem.disabled, {injector}),
           children: transformToSignalMenuModel(menuItem.children, {injector}),
           cssClass: menuItem.cssClass,
-          data: menuItem.data,
         };
       }
     }
