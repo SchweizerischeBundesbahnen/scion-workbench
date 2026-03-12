@@ -27,8 +27,5 @@ export abstract class SciMenuAdapter {
    */
   public abstract menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options?: {injector?: Injector}): Signal<SciMenuItemLike[]>;
 
-  /**
-   * TODO Optional or required?
-   */
-  public openMenu?(menuItems: Signal<SciMenuItemLike[]>, options: Omit<SciMenuOptions, 'context'>): SciMenuRef;
+  public abstract openMenu(menu: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions): SciMenuRef;
 }

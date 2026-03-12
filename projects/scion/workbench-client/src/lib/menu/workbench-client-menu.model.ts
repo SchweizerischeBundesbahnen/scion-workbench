@@ -54,3 +54,26 @@ export type WorkbenchClientMenuContributionPosition = OneOf<{
 }>;
 
 export type WorkbenchClientMenuItemLike = WorkbenchClientMenuItem | WorkbenchClientMenu | WorkbenchClientMenuGroup;
+
+export interface WorkbenchClientMenuOpenOptions {
+  anchor: WorkbenchClientMenuOrigin,
+  /**
+   * Controls where to align the menu relative to the menu anchor, unless there is not enough space available in that area. Defaults to `south`.
+   */
+  align?: 'vertical' | 'horizontal';
+
+  size?: {
+    width?: string
+    minWidth?: string;
+    maxWidth?: string;
+  };
+  filter?: boolean | {placeholder?: string; notFoundText?: string};
+  cssClass?: string[];
+}
+
+export type WorkbenchClientMenuOrigin = {
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
+};

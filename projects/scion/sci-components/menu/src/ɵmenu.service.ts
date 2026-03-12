@@ -9,23 +9,19 @@
  */
 
 import {SciMenuOptions, SciMenuRef, SciMenuService} from './menu.service';
-import {inject, Injectable, Injector, Provider, signal, Signal} from '@angular/core';
+import {inject, Injectable, Injector, Provider, Signal} from '@angular/core';
 import {SciMenuItemLike} from './menu.model';
 import {Disposable} from './common/disposable';
 import {SciMenuContextProvider} from './menu-context-provider';
 import {coerceSignal} from './common/common';
 import {SciMenuAdapter} from './menu-adapter';
-import {SciDefaultMenuAdapter} from './default-menu-adapter';
 import {SciMenuContribution, SciToolbarContribution} from './menu-contribution.model';
 import {MaybeSignal} from './common/utility-types';
-import {createDestroyableInjector} from './common/injector.util';
 
 @Injectable({providedIn: 'root'})
 export class ɵSciMenuService implements SciMenuService {
 
-  private readonly _injector = inject(Injector);
   private readonly _menuAdapter = inject(SciMenuAdapter);
-  private readonly _defaultMenuAdapter = inject(SciDefaultMenuAdapter);
   private readonly _environmentContext = coerceSignal(inject(SciMenuContextProvider, {optional: true})?.provideContext?.());
 
   /** @inheritDoc */
@@ -40,19 +36,7 @@ export class ɵSciMenuService implements SciMenuService {
       options.anchor.stopPropagation();
     }
 
-    const injector = createDestroyableInjector({parent: this._injector});
-
-    const menuContributions = Array.isArray(menuItemsOrName) ? signal(menuItemsOrName) : this.menuContributions(menuItemsOrName, context, {injector});
-    if (this._menuAdapter.openMenu) {
-      const menuRef = this._menuAdapter.openMenu(menuContributions, options);
-      menuRef.onClose(() => injector.destroy());
-      return menuRef;
-    }
-    else {
-      const menuRef = this._defaultMenuAdapter.openMenu(menuContributions, options);
-      menuRef.onClose(() => injector.destroy());
-      return menuRef;
-    }
+    return this._menuAdapter.openMenu(menuItemsOrName, {...options, context});
   }
 
   /** @inheritDoc */

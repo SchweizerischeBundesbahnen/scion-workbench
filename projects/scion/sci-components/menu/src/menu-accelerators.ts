@@ -79,7 +79,6 @@ export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${
 
     return {
       dispose: () => {
-        debugger;
         injector.destroy()
       },
     }

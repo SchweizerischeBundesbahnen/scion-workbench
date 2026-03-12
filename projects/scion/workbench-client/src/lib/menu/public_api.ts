@@ -8,6 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {type WorkbenchClientMenuContributionRegisterCommand, type WorkbenchClientMenuContributionFactoryCommand, type WorkbenchClientMenuItemListCommand} from './workbench-client-menu-commands';
-export {type WorkbenchClientMenu, type WorkbenchClientMenuGroup, type WorkbenchClientMenuItem, type WorkbenchClientMenuItemLike, type WorkbenchClientMenuContributionPosition} from './workbench-client-menu.model';
+export {type ɵWorkbenchClientMenuContributionRegisterCommand, type ɵWorkbenchClientMenuContributionFactoryCommand, type ɵWorkbenchClientMenuItemListCommand, type ɵWorkbenchClientMenuOpenCommand} from './workbench-client-menu-commands';
+export {type WorkbenchClientMenu, type WorkbenchClientMenuGroup, type WorkbenchClientMenuItem, type WorkbenchClientMenuItemLike, type WorkbenchClientMenuContributionPosition, type WorkbenchClientMenuOpenOptions, type WorkbenchClientMenuOrigin} from './workbench-client-menu.model';
 

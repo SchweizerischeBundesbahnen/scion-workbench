@@ -25,8 +25,7 @@ import {sortMenuItems} from './menu-item-sorter';
 import {SciToolbarFactory} from './toolbar/toolbar.factory';
 import {SciMenuContribution, SciToolbarContribution} from './menu-contribution.model';
 import {createDestroyableInjector} from './common/injector.util';
-import {MaybeSignal} from './common/utility-types';
-import {coerceSignal, ɵassertInInjectionContext} from './common/common';
+import {ɵassertInInjectionContext} from './common/common';
 
 @Injectable({providedIn: 'root'})
 export class SciDefaultMenuAdapter implements SciMenuAdapter {
@@ -120,9 +119,10 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
   }
 
   /** @inheritDoc */
-  public openMenu(menuItems: Signal<SciMenuItemLike[]>, options: Omit<SciMenuOptions, 'context'>): SciMenuRef {
+  public openMenu(menu: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions): SciMenuRef {
     // Create injection context to dispose resources when closing the menu.
     const injector = createDestroyableInjector({parent: this._injector});
+    const menuItems = Array.isArray(menu) ? signal(menu) : this.menuContributions(signal(menu), signal(options.context ?? new Map()), {injector});
 
     return runInInjectionContext(injector, () => {
       // Get or create anchor at specified origin.
@@ -139,10 +139,10 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
     });
   }
 
-  private createMenuPopover(menuItems: MaybeSignal<SciMenuItemLike[]>, anchorElement: HTMLElement, options: Omit<SciMenuOptions, 'context'>): ComponentRef<MenuComponent> {
+  private createMenuPopover(menuItems: Signal<SciMenuItemLike[]>, anchorElement: HTMLElement, options: SciMenuOptions): ComponentRef<MenuComponent> {
     const anchorSize = dimension(anchorElement);
     const bindings: Binding[] = [
-      inputBinding('menuItems', coerceSignal(menuItems)),
+      inputBinding('menuItems', menuItems),
       inputBinding('filter', signal(options.filter)),
       inputBinding('sizeInput', signal(options.size)),
       inputBinding('anchorWidth', computed(() => anchorSize().offsetWidth)),

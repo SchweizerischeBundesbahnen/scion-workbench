@@ -1,8 +1,8 @@
-import {EnvironmentInjector, EnvironmentProviders, inject, Injector, makeEnvironmentProviders, runInInjectionContext, Signal, untracked} from '@angular/core';
+import {DestroyRef, EnvironmentInjector, EnvironmentProviders, inject, Injector, makeEnvironmentProviders, runInInjectionContext, Signal, untracked} from '@angular/core';
 import {mapToBody, MessageClient} from '@scion/microfrontend-platform';
 import {takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '@scion/workbench';
-import {WorkbenchClientMenuContributionFactoryCommand, WorkbenchClientMenuContributionRegisterCommand, WorkbenchClientMenuItemLike, WorkbenchClientMenuItemListCommand} from '@scion/workbench-client';
+import {ɵWorkbenchClientMenuContributionFactoryCommand, ɵWorkbenchClientMenuContributionRegisterCommand, WorkbenchClientMenuItemLike, ɵWorkbenchClientMenuItemListCommand, ɵWorkbenchClientMenuOpenCommand, WorkbenchClientMenuOrigin} from '@scion/workbench-client';
 import {contributeMenu, SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuItemLike, SciMenuService, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
 import {finalize, map} from 'rxjs/operators';
 import {fromRemoteSignal, toRemoteSignal} from './remote-signal';
@@ -14,7 +14,7 @@ function installMenuRegistrator(): void {
   const environmentInjector = inject(EnvironmentInjector);
   const messageClient = inject(MessageClient);
 
-  messageClient.onMessage<WorkbenchClientMenuContributionRegisterCommand>('workbench/menu/contribution/:contributionId/register', message => {
+  messageClient.onMessage<ɵWorkbenchClientMenuContributionRegisterCommand>('workbench/menu/contribution/:contributionId/register', message => {
     const contributionId = message.params!.get('contributionId') as string;
     const contribution = message.body!;
 
@@ -32,7 +32,7 @@ function installMenuRegistrator(): void {
         let _remoteMenuItems = menuItemCache.find(it => Objects.isEqual(it.context, context))?.menuItems;
         untracked(() => {
           if (!_remoteMenuItems) {
-            const request$ = messageClient.request$<WorkbenchClientMenuItemLike[]>(`workbench/menu/contribution/${contributionId}/create`, {context} satisfies WorkbenchClientMenuContributionFactoryCommand).pipe(mapToBody());
+            const request$ = messageClient.request$<WorkbenchClientMenuItemLike[]>(`workbench/menu/contribution/${contributionId}/create`, {context} satisfies ɵWorkbenchClientMenuContributionFactoryCommand).pipe(mapToBody());
             _remoteMenuItems = toSignal(request$, {initialValue: []});
             menuItemCache.push({context, menuItems: _remoteMenuItems});
           }
@@ -62,7 +62,7 @@ function installMenuItemsReplier(): void {
   const messageClient = inject(MessageClient);
   const menuService = inject(SciMenuService);
 
-  messageClient.onMessage<WorkbenchClientMenuItemListCommand>('workbench/menu/items', request => {
+  messageClient.onMessage<ɵWorkbenchClientMenuItemListCommand>('workbench/menu/items', request => {
     const {location, context} = request.body!;
     const injector = createDestroyableInjector({parent: environmentInjector});
     const menuItems = menuService.menuContributions(location, context, {injector});
@@ -72,6 +72,53 @@ function installMenuItemsReplier(): void {
         map(menuItems => transformToWorkbenchClientModel(menuItems, {injector})),
         finalize(() => injector.destroy()),
       );
+  });
+}
+
+function installMenuOpener(): void {
+  const environmentInjector = inject(EnvironmentInjector);
+  const messageClient = inject(MessageClient);
+  const menuService = inject(SciMenuService);
+
+  messageClient.onMessage<ɵWorkbenchClientMenuOpenCommand, void>('workbench/menu/:menuId/open', message => {
+    const menuId = message.params!.get('menuId') as string;
+    const command = message.body!;
+    const injector = createDestroyableInjector({parent: environmentInjector});
+
+    const menu = Array.isArray(command.menu) ? transformToSignalMenuModel(command.menu, {injector}) : command.menu
+    // Open the menu.
+    const menuRef = menuService.open(menu, {
+      anchor: {
+        x: command.options.anchor.x,
+        y: command.options.anchor.y,
+        width: command.options.anchor.width,
+        height: command.options.anchor.height,
+      },
+      align: command.options.align,
+      size: {
+        width: command.options.size?.width,
+        minWidth: command.options.size?.minWidth,
+        maxWidth: command.options.size?.maxWidth,
+      },
+      filter: typeof command.options.filter === 'boolean' ? command.options.filter : {
+        placeholder: command.options.filter?.placeholder,
+        notFoundText: command.options.filter?.notFoundText,
+      },
+      cssClass: command.options.cssClass,
+    });
+
+    // Destroy injector when closing the menu.
+    menuRef.onClose(() => injector.destroy());
+
+    // Close menu when receiving a close request from the client.
+    messageClient.observe$<void>(`workbench/menu/${menuId}/close`)
+      .pipe(takeUntilDestroyed(injector.get(DestroyRef)))
+      .subscribe(() => menuRef.close());
+
+    // Wait until closing the menu.
+    return new Promise<void>(resolve => {
+      menuRef.onClose(resolve);
+    });
   });
 }
 
@@ -309,6 +356,20 @@ function transformToWorkbenchClientModel(menuItems: SciMenuItemLike[], options?:
 }
 
 /**
+ * Maps given context coordinates to absolute page coordinates.
+ */
+function mapToPageCoordinates(origin: WorkbenchClientMenuOrigin, relativeTo: DOMRect): WorkbenchClientMenuOrigin {
+  const xy = origin as Partial<WorkbenchClientMenuOrigin>;
+  if (xy.x !== undefined && xy.y !== undefined) {
+    return {
+      x: relativeTo.x + xy.x,
+      y: relativeTo.y + xy.y,
+    };
+  }
+  throw Error('[PopupOriginError] Illegal popup origin; must be "Point", "TopLeftPoint", "TopRightPoint", "BottomLeftPoint" or "BottomRightPoint".');
+}
+
+/**
  * Registers a set of DI providers to set up workbench menus.
  */
 export function provideWorkbenchClientMenu(): EnvironmentProviders {
@@ -316,6 +377,7 @@ export function provideWorkbenchClientMenu(): EnvironmentProviders {
     provideMicrofrontendPlatformInitializer(() => {
       installMenuRegistrator();
       installMenuItemsReplier();
+      installMenuOpener();
     }, {phase: MicrofrontendPlatformStartupPhase.PostStartup}),
   ]);
 }

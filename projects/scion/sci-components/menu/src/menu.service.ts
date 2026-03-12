@@ -3,10 +3,11 @@ import {ɵSciMenuService} from './ɵmenu.service';
 import {SciMenuItemLike} from './menu.model';
 import {MaybeSignal} from './common/utility-types';
 
+// TODO [menu] Consider moving open (with menuitems) and menuContributions to separate service
 @Injectable({providedIn: 'root', useExisting: ɵSciMenuService})
 export abstract class SciMenuService {
 
-  public abstract open(name: `menu:${string}`, options: SciMenuOptions): SciMenuRef;
+  public abstract open(menuItemsOrName: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions): SciMenuRef;
 
   /**
    * The function:

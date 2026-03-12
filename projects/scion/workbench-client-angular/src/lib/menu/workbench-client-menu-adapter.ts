@@ -1,12 +1,13 @@
-import {Disposable, SciMenuAdapter, SciMenuContribution, SciMenuItemLike, SciToolbarContribution, ɵcreateSciMenu, ɵcreateSciToolbar} from '@scion/sci-components/menu';
-import {assertInInjectionContext, assertNotInReactiveContext, DestroyRef, effect, inject, Injector, signal, Signal, untracked} from '@angular/core';
+import {Disposable, SciMenuAdapter, SciMenuContribution, SciMenuItemLike, SciMenuOptions, SciMenuOrigin, SciMenuRef, SciToolbarContribution, ɵcreateSciMenu, ɵcreateSciToolbar} from '@scion/sci-components/menu';
+import {assertInInjectionContext, assertNotInReactiveContext, DestroyRef, effect, ElementRef, inject, Injector, signal, Signal, untracked} from '@angular/core';
 import {UUID} from '@scion/toolkit/uuid';
 import {mapToBody, MessageClient, MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
-import {WorkbenchClientMenuContributionFactoryCommand, WorkbenchClientMenuContributionRegisterCommand, WorkbenchClientMenuItemLike, WorkbenchClientMenuItemListCommand} from '@scion/workbench-client';
+import {ɵWorkbenchClientMenuContributionFactoryCommand, ɵWorkbenchClientMenuContributionRegisterCommand, WorkbenchClientMenuItemLike, ɵWorkbenchClientMenuItemListCommand, ɵWorkbenchClientMenuOpenCommand, WorkbenchClientMenuOrigin} from '@scion/workbench-client';
 import {fromRemoteSignal, toRemoteSignal} from './remote-signal';
-import {map} from 'rxjs';
+import {firstValueFrom, map} from 'rxjs';
 import {createDestroyableInjector} from '../common/injector.util';
 import {ɵassertInInjectionContext} from '../common/common';
+import {coerceElement} from '@angular/cdk/coercion';
 
 export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
 
@@ -19,14 +20,14 @@ export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
     const contributionId = UUID.randomUUID();
     const injector = createDestroyableInjector({parent: this._injector});
 
-    void this._messageClient.publish<WorkbenchClientMenuContributionRegisterCommand>(`workbench/menu/contribution/${contributionId}/register`, {
+    void this._messageClient.publish<ɵWorkbenchClientMenuContributionRegisterCommand>(`workbench/menu/contribution/${contributionId}/register`, {
       location,
       scope: contribution.scope,
       requiredContext: contribution.requiredContext,
       position: contribution.position,
     });
 
-    const subscription = this._messageClient.onMessage<WorkbenchClientMenuContributionFactoryCommand, WorkbenchClientMenuItemLike[]>(`workbench/menu/contribution/${contributionId}/create`, request => {
+    const subscription = this._messageClient.onMessage<ɵWorkbenchClientMenuContributionFactoryCommand, WorkbenchClientMenuItemLike[]>(`workbench/menu/contribution/${contributionId}/create`, request => {
       const {context} = request.body!;
 
       console.log('>>> WorkbenchClentMenuAdapter.menuFactoryFn');
@@ -64,7 +65,7 @@ export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
     const menuContributions = signal<SciMenuItemLike[]>([]);
 
     effect(onCleanup => {
-      const command: WorkbenchClientMenuItemListCommand = {location: location(), context: context()};
+      const command: ɵWorkbenchClientMenuItemListCommand = {location: location(), context: context()};
 
       untracked(() => {
         const subscription = this._messageClient.request$<WorkbenchClientMenuItemLike[]>('workbench/menu/items', command)
@@ -80,6 +81,30 @@ export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
     }, {injector});
 
     return menuContributions;
+  }
+
+  public openMenu(menu: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions): SciMenuRef {
+    const injector = createDestroyableInjector({parent: this._injector});
+    const destroyRef = injector.get(DestroyRef);
+    const menuId = UUID.randomUUID();
+
+    const whenClose = firstValueFrom(this._messageClient.request$<void>(`workbench/menu/${menuId}/open`, ({
+      menu: Array.isArray(menu) ? transformToWorkbenchClientModel(menu, {injector}) : menu,
+      options: {
+        anchor: coerceAnchor(options.anchor),
+        align: options.align,
+        size: options.size,
+        filter: options.filter,
+        cssClass: options.cssClass,
+      },
+    }) satisfies ɵWorkbenchClientMenuOpenCommand));
+
+    whenClose.finally(() => injector.destroy());
+
+    return {
+      close: () => this._messageClient.publish<void>(`workbench/menu/${menuId}/close`),
+      onClose: onClose => destroyRef.destroyed ? onClose() : destroyRef.onDestroy(onClose),
+    }
   }
 }
 
@@ -200,4 +225,17 @@ function transformToSignalMenuModel(menuItems: WorkbenchClientMenuItemLike[], op
       }
     }
   });
+}
+
+function coerceAnchor(anchor: HTMLElement | ElementRef<HTMLElement> | SciMenuOrigin | MouseEvent): WorkbenchClientMenuOrigin {
+  if (anchor instanceof ElementRef || anchor instanceof HTMLElement) {
+    const {x, y, width, height} = coerceElement(anchor).getBoundingClientRect();
+    return {x, y, width, height};
+  }
+  else if (anchor instanceof MouseEvent) {
+    return {x: anchor.x, y: anchor.y};
+  }
+  else {
+    return {x: anchor.x, y: anchor.y, width: anchor.width, height: anchor.height};
+  }
 }
