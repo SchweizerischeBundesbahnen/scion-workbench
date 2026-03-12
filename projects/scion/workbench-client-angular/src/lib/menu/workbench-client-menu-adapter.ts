@@ -13,7 +13,7 @@ export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
   private readonly _messageClient = inject(MessageClient);
   private readonly _injector = inject(Injector);
 
-  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution | SciToolbarContribution, next: SciMenuAdapter): Disposable {
+  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution | SciToolbarContribution): Disposable {
     assertInInjectionContext(this.contributeMenu);
 
     const contributionId = UUID.randomUUID();
@@ -55,7 +55,7 @@ export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
     }
   }
 
-  public menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, next: SciMenuAdapter, options?: {injector?: Injector}): Signal<SciMenuItemLike[]> {
+  public menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options?: {injector?: Injector}): Signal<SciMenuItemLike[]> {
     assertNotInReactiveContext(this.menuContributions, 'Call menuContributions() in a non-reactive (non-tracking) context. Each invocation creates a new subscription, asynchronously setting the signal\'s value, leading to an infinite loop if called in a reactive context.');
     if (!options?.injector) {
       ɵassertInInjectionContext(this.menuContributions, 'Call menuContributions() in an injection context, as it allocates resources that are not released until the injection context is destroyed.')

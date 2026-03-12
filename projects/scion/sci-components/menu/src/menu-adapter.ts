@@ -18,14 +18,14 @@ import {SciMenuContribution, SciToolbarContribution} from './menu-contribution.m
 @Injectable({providedIn: 'root', useExisting: SciDefaultMenuAdapter})
 export abstract class SciMenuAdapter {
 
-  public abstract contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution | SciToolbarContribution, next: SciMenuAdapter): Disposable;
+  public abstract contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution | SciToolbarContribution): Disposable;
 
   /**
    * The function:
    * - Must be called within an injection context, or an explicit {@link Injector} passed.
    * - Must be called in a non-reactive (non-tracking) context.
    */
-  public abstract menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, next: SciMenuAdapter, options?: {injector?: Injector}): Signal<SciMenuItemLike[]>;
+  public abstract menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options?: {injector?: Injector}): Signal<SciMenuItemLike[]>;
 
   /**
    * TODO Optional or required?

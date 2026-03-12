@@ -57,11 +57,11 @@ export class ɵSciMenuService implements SciMenuService {
 
   /** @inheritDoc */
   public menuContributions(location: MaybeSignal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: MaybeSignal<Map<string, unknown>>, options?: {injector?: Injector}): Signal<SciMenuItemLike[]> {
-    return this._menuAdapter.menuContributions(coerceSignal(location), coerceSignal(context), this._defaultMenuAdapter, options);
+    return this._menuAdapter.menuContributions(coerceSignal(location), coerceSignal(context), options);
   }
 
   public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution | SciToolbarContribution): Disposable {
-    return this._menuAdapter.contributeMenu(location, contribution, this._defaultMenuAdapter);
+    return this._menuAdapter.contributeMenu(location, contribution);
   }
 }
 

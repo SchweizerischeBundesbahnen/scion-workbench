@@ -51,7 +51,7 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
   }
 
   /** @inheritDoc */
-  public menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, next: SciMenuAdapter, options?: {injector?: Injector}): Signal<SciMenuItemLike[]> {
+  public menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options?: {injector?: Injector}): Signal<SciMenuItemLike[]> {
     assertNotInReactiveContext(this.menuContributions, 'Call menuContributions() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     if (!options?.injector) {
       ɵassertInInjectionContext(this.menuContributions, 'Call menuContributions() in an injection context, as it may allocate resources that are not released until the injection context is destroyed.')
@@ -114,7 +114,7 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
     return {
       ...menuItem,
       children: sortMenuItems(menuItem.children
-        .concat(menuItem.name ? untracked(() => this.menuContributions(signal(menuItem.name!), signal(context), this, {injector: options?.injector}))() : [])
+        .concat(menuItem.name ? untracked(() => this.menuContributions(signal(menuItem.name!), signal(context), {injector: options?.injector}))() : [])
         .map(child => this.addMenuContributions(child, context, options))),
     };
   }
