@@ -87,8 +87,8 @@
   Show notification
 </button>
 
-@if (notificationOpenError) {
+@if (notificationOpenError()) {
   <output class="notification-open-error e2e-notification-open-error">
-    {{notificationOpenError}}
+    {{notificationOpenError()}}
   </output>
 }

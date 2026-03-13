@@ -21,17 +21,22 @@ export class SciKeyValueFieldPO {
 
   public async addEntries(entries: Record<string, unknown> | Map<string, unknown>): Promise<void> {
     const addButton = this._sciKeyValueFieldLocator.locator('button.e2e-add');
-    const lastKeyInput = this._sciKeyValueFieldLocator.locator('input.e2e-key').last();
-    const lastValueInput = this._sciKeyValueFieldLocator.locator('input.e2e-value').last();
+    const keyInputs = this._sciKeyValueFieldLocator.locator('input.e2e-key');
+    const valueInputs = this._sciKeyValueFieldLocator.locator('input.e2e-value');
 
     for (const [key, value] of coerceMap(entries).entries()) {
+      const rowIndex = await keyInputs.count();
       await addButton.click();
-      await lastKeyInput.fill(key);
-      await lastValueInput.fill(`${value}`);
+      // Wait for the new row to appear in the DOM before filling it.
+      await keyInputs.nth(rowIndex).waitFor({state: 'attached'});
+      await keyInputs.nth(rowIndex).fill(key);
+      await valueInputs.nth(rowIndex).fill(`${value}`);
     }
   }
 
   public async clear(): Promise<void> {
     await this._sciKeyValueFieldLocator.locator('button.e2e-clear').click();
+    // Wait for all rows to be removed from the DOM before returning.
+    await this._sciKeyValueFieldLocator.locator('input.e2e-key').first().waitFor({state: 'detached'});
   }
 }

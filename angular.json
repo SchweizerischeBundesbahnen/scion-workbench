@@ -26,6 +26,35 @@
           "options": {
             "tsConfig": "projects/scion/workbench/tsconfig.spec.json",
             "karmaConfig": "projects/scion/workbench/karma.conf.js",
+            "exclude": [
+              "**/*.zone.spec.ts"
+            ],
+            "inlineStyleLanguage": "scss",
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "projects/scion/workbench"
+              ]
+            },
+            "styles": [
+              "projects/scion/workbench/_index.scss"
+            ],
+            "assets": [
+              {
+                "glob": "scion-workbench-icons.*",
+                "input": "resources/scion-workbench-icons/fonts",
+                "output": "/fonts"
+              }
+            ]
+          }
+        },
+        "test-zone": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "tsConfig": "projects/scion/workbench/tsconfig.spec.json",
+            "karmaConfig": "projects/scion/workbench/karma.conf.js",
+            "include": [
+              "**/*.zone.spec.ts"
+            ],
             "inlineStyleLanguage": "scss",
             "stylePreprocessorOptions": {
               "includePaths": [
@@ -113,9 +142,6 @@
           "builder": "@angular/build:application",
           "options": {
             "browser": "apps/workbench-getting-started-app/src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
             "tsConfig": "apps/workbench-getting-started-app/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -206,9 +232,6 @@
           "builder": "@angular/build:application",
           "options": {
             "browser": "apps/workbench-testing-app/src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
             "tsConfig": "apps/workbench-testing-app/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -352,9 +375,6 @@
             "baseHref": "/subdir/",
             "index": "apps/workbench-testing-app/src/index.html",
             "main": "apps/workbench-testing-app/src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
             "tsConfig": "apps/workbench-testing-app/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -489,9 +509,6 @@
           "builder": "@angular/build:application",
           "options": {
             "browser": "apps/workbench-client-testing-app/src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
             "tsConfig": "apps/workbench-client-testing-app/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [

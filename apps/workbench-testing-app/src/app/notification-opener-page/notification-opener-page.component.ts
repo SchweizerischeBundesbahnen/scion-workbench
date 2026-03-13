@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, Type} from '@angular/core';
+import {Component, inject, signal, Type} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {NotificationService, Translatable, WorkbenchNotificationOptions, WorkbenchNotificationService} from '@scion/workbench';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
@@ -62,7 +62,7 @@ export default class NotificationOpenerPageComponent {
     legacyAPI: this._formBuilder.control(false),
   });
 
-  protected notificationOpenError: string | undefined;
+  protected notificationOpenError = signal<string | undefined>(undefined);
 
   protected onNotificationShow(): void {
     const count = this.form.controls.count.value || 1;
@@ -72,7 +72,7 @@ export default class NotificationOpenerPageComponent {
   }
 
   private showNotification(): void {
-    this.notificationOpenError = undefined;
+    this.notificationOpenError.set(undefined);
     try {
       if (this.form.controls.legacyAPI.value) {
         const options = this.form.controls.options.controls;
@@ -108,7 +108,7 @@ export default class NotificationOpenerPageComponent {
       }
     }
     catch (error) {
-      this.notificationOpenError = stringifyError(error) || 'Workbench Notification could not be opened';
+      this.notificationOpenError.set(stringifyError(error));
     }
   }
 

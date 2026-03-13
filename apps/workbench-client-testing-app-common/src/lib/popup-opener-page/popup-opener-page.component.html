@@ -78,15 +78,15 @@
   Open popup
 </button>
 
-@if (returnValue) {
+@if (returnValue()) {
   <output class="return-value e2e-return-value">
-    {{returnValue}}
+    {{returnValue()}}
   </output>
 }
 
-@if (popupError) {
+@if (popupError()) {
   <output class="popup-error e2e-popup-error">
-    {{popupError}}
+    {{popupError()}}
   </output>
 }
 

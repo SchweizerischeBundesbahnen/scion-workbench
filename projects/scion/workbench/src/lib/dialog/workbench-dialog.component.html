@@ -11,9 +11,9 @@
   <div class="dialog-box e2e-dialog-box" cdkTrapFocus>
     <header #header
             class="e2e-dialog-header"
-            [class.divider]="dialog.header?.divider() ?? true"
-            sciDimension (sciDimensionChange)="onHeaderDimensionChange($event)">
-      <ng-container *ngTemplateOutlet="dialog.header?.template ?? default_dialog_header"/>
+            [class.divider]="dialog.header()?.divider() ?? true"
+            sciDimension (sciDimensionChange)="onHeaderDimensionChange($event)" [emitOutsideAngular]="zonelessEnabled">
+      <ng-container *ngTemplateOutlet="dialog.header()?.template ?? default_dialog_header"/>
     </header>
 
     <sci-viewport class="e2e-dialog-slot">
@@ -23,9 +23,9 @@
     <!-- Extra DIV to capture bounds available to slotted content, excluding viewport content padding. May differ from the actual content size if content overflows or does not fill the slot. -->
     <div class="slot-bounds e2e-dialog-slot-bounds" #slot_bounds></div>
 
-    @if (dialog.footer || dialog.actions.length) {
-      <footer class="e2e-dialog-footer" [class.divider]="dialog.footer?.divider() ?? true">
-        <ng-container *ngTemplateOutlet="dialog.footer?.template ?? default_dialog_footer"/>
+    @if (dialog.footer() || dialog.actions().length) {
+      <footer class="e2e-dialog-footer" [class.divider]="dialog.footer()?.divider() ?? true">
+        <ng-container *ngTemplateOutlet="dialog.footer()?.template ?? default_dialog_footer"/>
       </footer>
     }
   </div>

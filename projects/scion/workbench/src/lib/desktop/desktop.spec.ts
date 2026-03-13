@@ -203,6 +203,7 @@ describe('Desktop', () => {
 
       // Close view.
       await TestBed.inject(WorkbenchViewRegistry).get('view.1').close();
+      await waitUntilStable();
 
       // Expect the desktop to display.
       expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.main-area"] wb-desktop-slot'))).not.toBeNull();
@@ -448,6 +449,7 @@ describe('Desktop', () => {
 
       // Close view.
       await TestBed.inject(WorkbenchViewRegistry).get('view.1').close();
+      await waitUntilStable();
 
       // Expect the desktop to display.
       expect(fixture.debugElement.query(By.css('wb-layout wb-desktop-slot'))).not.toBeNull();

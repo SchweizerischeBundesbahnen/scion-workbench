@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationConfig, EnvironmentProviders, makeEnvironmentProviders, provideZoneChangeDetection} from '@angular/core';
+import {ApplicationConfig, EnvironmentProviders, makeEnvironmentProviders} from '@angular/core';
 import {provideRouter, withComponentInputBinding, withHashLocation} from '@angular/router';
 import {routes} from './app.routes';
 import {environment} from '../environments/environment';
@@ -25,7 +25,6 @@ export const appConfig: ApplicationConfig = {
     provideWorkbenchClient(),
     provideWorkbenchTheme(),
     provideAnimationsIfEnabled(),
-    provideZoneChangeDetection(),
   ],
 };
 

@@ -16,6 +16,7 @@ import {WorkbenchMessageBoxService} from './workbench-message-box.service';
 import {Translatable} from '../text/workbench-text-provider.model';
 import {Logger, LoggerNames} from '../logging';
 import {WORKBENCH_ELEMENT} from '../workbench-element-references';
+import {ɵZoneless} from '../ɵzoneless.service';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})
@@ -23,6 +24,7 @@ export class ɵWorkbenchMessageBoxService implements WorkbenchMessageBoxService 
 
   private readonly _workbenchDialogService = inject(WorkbenchDialogService);
   private readonly _zone = inject(NgZone);
+  private readonly _zonelessEnabled = inject(ɵZoneless).enabled;
 
   constructor() {
     this.installServiceLifecycleLogger();
@@ -35,7 +37,7 @@ export class ɵWorkbenchMessageBoxService implements WorkbenchMessageBoxService 
     assertNotInReactiveContext(this.open, 'Call WorkbenchMessageBoxService.open() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
     // Ensure to run in Angular zone to display the message box even if called from outside the Angular zone, e.g. from an error handler.
-    if (!NgZone.isInAngularZone()) {
+    if (!this._zonelessEnabled && !NgZone.isInAngularZone()) {
       return this._zone.run(() => this.open(message, options));
     }
 

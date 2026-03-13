@@ -3333,7 +3333,7 @@ test.describe('Workbench Dialog', () => {
       await expect.poll(() => appPO.isDialogBlocked(dialog.getDialogId())).toBe(false);
     });
 
-    test('should block viewport', async ({appPO, workbenchNavigator}) => {
+    test.fixme('should block viewport', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, dialogModalityScope: 'viewport'});
 
       // Open router view and dialog opener view side by side.

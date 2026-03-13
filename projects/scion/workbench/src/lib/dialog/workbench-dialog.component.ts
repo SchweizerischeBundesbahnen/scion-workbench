@@ -25,6 +25,7 @@ import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneO
 import {filter, map, startWith, takeUntil} from 'rxjs/operators';
 import {fromMutation$} from '@scion/toolkit/observable';
 import {trackFocus} from '../focus/workbench-focus-tracker.service';
+import {ɵZoneless} from '../ɵzoneless.service';
 
 /**
  * Renders the content of a workbench dialog.
@@ -79,6 +80,7 @@ export class WorkbenchDialogComponent {
 
   protected readonly dialog = inject(ɵWorkbenchDialog);
 
+  protected readonly zonelessEnabled = inject(ɵZoneless).enabled;
   protected readonly headerHeight = signal<string | undefined>(undefined);
   protected readonly transformTranslateX = signal(0);
   protected readonly transformTranslateY = signal(0);

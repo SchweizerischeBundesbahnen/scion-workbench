@@ -111,7 +111,7 @@ export class ViewTabDragImageRenderer {
   private onWindowDrop(): void {
     // Wait for the zone to stabilize before disposing the tab drag image. Otherwise, the tabbar would flicker
     // because the tab has not yet been rendered at its new position.
-    this._zone.onStable
+    this._applicationRef.isStable
       .pipe(take(1))
       .subscribe(() => {
         this.disposeDragImage();

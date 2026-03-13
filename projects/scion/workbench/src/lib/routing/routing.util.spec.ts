@@ -12,7 +12,7 @@ import {Routing} from './routing.util';
 import {ComponentFixtureAutoDetect, TestBed} from '@angular/core/testing';
 import {ActivatedRoute, ActivatedRouteSnapshot, ChildrenOutletContexts, provideRouter, Router, RouterOutlet, UrlSegment} from '@angular/router';
 import {TestComponent} from '../testing/test.component';
-import {styleFixture, waitUntilWorkbenchStarted} from '../testing/testing.util';
+import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {WorkbenchRouter} from './workbench-router.service';
 import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
@@ -350,6 +350,7 @@ describe('Routing.resolveEffectiveRoute', () => {
 
     // Open view.
     await TestBed.inject(WorkbenchRouter).navigate(['view'], {target: 'view.100'});
+    await waitUntilStable();
 
     // Get the top-level `ActivatedRoute` of the view.
     const componentInjector = fixture.debugElement.query(By.directive(TestComponent)).injector;
@@ -386,6 +387,7 @@ describe('Routing.resolveEffectiveRoute', () => {
 
     // Open view.
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
+    await waitUntilStable();
 
     // Get the top-level `ActivatedRoute` of the view.
     const componentInjector = fixture.debugElement.query(By.directive(TestComponent)).injector;
@@ -422,6 +424,7 @@ describe('Routing.resolveEffectiveRoute', () => {
 
     // Open view.
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
+    await waitUntilStable();
 
     // Get the top-level `OutletContext` of the view.
     const componentInjector = fixture.debugElement.query(By.directive(TestComponent)).injector;

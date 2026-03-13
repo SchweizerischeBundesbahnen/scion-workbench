@@ -27,6 +27,7 @@ import {provideWorkbenchInitializer} from '../startup/workbench-initializer';
 import {WorkbenchPerspectiveRegistry} from './workbench-perspective.registry';
 import {WorkbenchDesktopDirective} from '../desktop/desktop.directive';
 import {WorkbenchLauncher} from '../startup/workbench-launcher.service';
+import {WorkbenchStartup} from '../startup/workbench-startup.service';
 
 describe('Workbench Perspective', () => {
 
@@ -424,18 +425,22 @@ describe('Workbench Perspective', () => {
 
     // Switch to perspective-2
     await workbenchService.switchPerspective('perspective-2');
+    await waitUntilStable();
     expect(fixture.debugElement.nativeElement.innerText).toEqual('Desktop Perspective 2 (main area navigation)');
 
     // Switch to perspective-3
     await workbenchService.switchPerspective('perspective-3');
+    await waitUntilStable();
     expect(fixture.debugElement.nativeElement.innerText).toEqual('Desktop Perspective 3 (wbDesktop)');
 
     // Switch to perspective-4
     await workbenchService.switchPerspective('perspective-4');
+    await waitUntilStable();
     expect(fixture.debugElement.nativeElement.innerText).toEqual('Desktop Perspective (wbDesktop)');
 
     // Switch to perspective-1
     await workbenchService.switchPerspective('perspective-1');
+    await waitUntilStable();
     expect(fixture.debugElement.nativeElement.innerText).toEqual('Desktop Perspective 1 (main area navigation)');
   });
 
@@ -468,7 +473,7 @@ describe('Workbench Perspective', () => {
     });
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitUntilWorkbenchStarted();
+    await TestBed.inject(WorkbenchStartup).whenDone;
 
     // Delay activation of the perspective.
     await firstValueFrom(timer(1000));

@@ -8,24 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ComponentFixture, TestBed, tick} from '@angular/core/testing';
-import {DebugElement, NgZone, Type} from '@angular/core';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {ApplicationRef, DebugElement, Type} from '@angular/core';
 import {By} from '@angular/platform-browser';
-import {animationFrameScheduler, exhaustMap, firstValueFrom, timer} from 'rxjs';
+import {animationFrameScheduler, firstValueFrom} from 'rxjs';
 import {WorkbenchStartup} from '../startup/workbench-startup.service';
 import {filter} from 'rxjs/operators';
 import {Commands} from '../routing/routing.model';
 import {UrlSegment} from '@angular/router';
 import {Routing} from '../routing/routing.util';
-
-/**
- * Simulates the asynchronous passage of time for the timers and detects the fixture for changes.
- */
-export function advance(fixture: ComponentFixture<any>): void {
-  tick();
-  fixture.detectChanges();
-  tick();
-}
 
 /**
  * Waits until the workbench has completed startup and applied the initial layout.
@@ -37,25 +28,18 @@ export async function waitUntilWorkbenchStarted(): Promise<void> {
 }
 
 /**
- * Waits until Angular zone has stabilized and all elapsed macrotasks (setTimeout) have been executed.
+ * Waits until all previously scheduled microtasks, for example those from promises, are executed.
  */
-export async function waitUntilStable(): Promise<void> {
-  return waitForCondition(async () => {
-    await new Promise<void>(resolve => animationFrameScheduler.schedule(() => setTimeout(resolve)));
-    return TestBed.inject(NgZone).isStable;
-  });
+export async function waitUntilIdle(): Promise<void> {
+  await new Promise<void>(resolve => requestIdleCallback(() => resolve()));
 }
 
 /**
- * Waits for a condition to be fulfilled.
+ * Waits until Angular has stabilized, i.e., has no pending tasks and all elapsed macrotasks (setTimeout) have been executed.
  */
-export async function waitForCondition(predicate: () => Promise<boolean>): Promise<void> {
-  const value$ = timer(0, 100)
-    .pipe(
-      exhaustMap(async () => await predicate()),
-      filter(Boolean),
-    );
-  await firstValueFrom(value$);
+export async function waitUntilStable(): Promise<void> {
+  await new Promise<void>(resolve => animationFrameScheduler.schedule(() => setTimeout(resolve)));
+  await firstValueFrom(TestBed.inject(ApplicationRef).isStable.pipe(filter(Boolean))).then();
 }
 
 /**
@@ -69,9 +53,9 @@ export function styleFixture<T>(fixture: ComponentFixture<T>): ComponentFixture<
 }
 
 /**
- * Clicks the element (button, link) matching the given selector.
+ * Clicks the element (button, link) matching the given selector, then waits until Angular has stabilized.
  */
-export function clickElement(appFixture: ComponentFixture<any>, viewType: Type<any>, elementSelector: string, failureMessage?: string): void {
+export async function clickElement(appFixture: ComponentFixture<any>, viewType: Type<any>, elementSelector: string, failureMessage?: string): Promise<void> {
   const failSuffix = failureMessage ? ` [${failureMessage}]` : '';
 
   const viewDebugElement = appFixture.debugElement.query(By.directive(viewType)) as DebugElement | null;
@@ -85,7 +69,7 @@ export function clickElement(appFixture: ComponentFixture<any>, viewType: Type<a
   }
 
   (linkDebugElement.nativeElement as HTMLElement).click();
-  advance(appFixture);
+  await waitUntilStable();
 }
 
 /**

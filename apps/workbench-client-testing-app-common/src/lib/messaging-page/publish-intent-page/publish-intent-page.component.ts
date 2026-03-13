@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {Intent, IntentClient} from '@scion/microfrontend-platform';
@@ -36,10 +36,10 @@ export class PublishIntentPageComponent {
     params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
   });
 
-  protected publishError: string | false | undefined;
+  protected publishError = signal<string | false | undefined>(undefined);
 
   protected onPublish(): void {
-    this.publishError = undefined;
+    this.publishError.set(undefined);
     const intent: Intent = {
       type: this.form.controls.type.value,
       qualifier: SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier) ?? undefined,
@@ -48,9 +48,9 @@ export class PublishIntentPageComponent {
     this._intentClient
       .publish(intent)
       .then(() => {
-        this.publishError = false;
+        this.publishError.set(false);
         this.form.reset();
       })
-      .catch((error: unknown) => this.publishError = stringifyError(error));
+      .catch((error: unknown) => this.publishError.set(stringifyError(error)));
   }
 }

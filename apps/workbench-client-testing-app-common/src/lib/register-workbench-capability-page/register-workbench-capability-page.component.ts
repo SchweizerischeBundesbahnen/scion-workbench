@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {Capability, ManifestService, ParamDefinition} from '@scion/microfrontend-platform';
@@ -74,8 +74,8 @@ export class RegisterWorkbenchCapabilityPageComponent {
 
   protected readonly WorkbenchCapabilities = WorkbenchCapabilities;
 
-  protected capability: Capability | undefined;
-  protected registerError: string | undefined;
+  protected capability = signal<Capability | undefined>(undefined);
+  protected registerError = signal<string | undefined>(undefined);
 
   constructor() {
     Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.signalReady();
@@ -109,15 +109,15 @@ export class RegisterWorkbenchCapabilityPageComponent {
       })() ?? undefined,
     };
 
-    this.capability = undefined;
-    this.registerError = undefined;
+    this.capability.set(undefined);
+    this.registerError.set(undefined);
 
     await this._manifestService.registerCapability(capability as Capability)
       .then(async id => {
-        this.capability = id ? (await firstValueFrom(this._manifestService.lookupCapabilities$({id})))[0] : undefined;
+        this.capability.set(id ? (await firstValueFrom(this._manifestService.lookupCapabilities$({id})))[0] : undefined);
         this.form.reset();
         this.form.setControl('qualifier', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
       })
-      .catch((error: unknown) => this.registerError = stringifyError(error));
+      .catch((error: unknown) => this.registerError.set(stringifyError(error)));
   }
 }

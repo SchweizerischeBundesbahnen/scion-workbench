@@ -15,7 +15,7 @@ import {TestComponent} from '../testing/test.component';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {MAIN_AREA, WorkbenchLayout} from './workbench-layout';
 import {WorkbenchComponent} from '../workbench.component';
-import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
+import {styleFixture, waitUntilIdle, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {WorkbenchService} from '../workbench.service';
 import {ɵWorkbenchLayoutFactory} from './ɵworkbench-layout.factory';
 import {WorkbenchLayoutStorageService} from './workbench-layout-storage.service';
@@ -192,12 +192,13 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // Modify the layout in quick succession.
     void workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.1'});
+    await waitUntilIdle(); // flush promises from first navigation
     void workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.2'});
     void workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.3'});
     void workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.4'});
     void workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.5'});
-    await waitUntilStable();
 
+    await waitUntilStable();
     // The first write is still in progress (because writes are throttled), blocking subsequent writes (serial execution).
     // Disable throttling to continue.
     storage.disableThrottlinig();

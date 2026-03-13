@@ -13,7 +13,7 @@ import {Component} from '@angular/core';
 import {provideRouter} from '@angular/router';
 import {firstValueFrom, Subject} from 'rxjs';
 import {toShowCustomMatcher} from '../../testing/jasmine/matcher/to-show.matcher';
-import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../../testing/testing.util';
+import {styleFixture, waitUntilIdle, waitUntilStable, waitUntilWorkbenchStarted} from '../../testing/testing.util';
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
 import {WorkbenchComponent} from '../../workbench.component';
 import {expect} from '../../testing/jasmine/matcher/custom-matchers.definition';
@@ -70,11 +70,11 @@ describe('Microfrontend Host Message Box', () => {
 
     // Start navigation in host message box 1.
     void TestBed.inject(WorkbenchMessageBoxService).open({component: 'message-box-1'});
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // Start parallel navigation in host message box 2.
     void TestBed.inject(WorkbenchMessageBoxService).open({component: 'message-box-2'});
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // First navigation should be blocked by the canActivate guard.
     expect(fixture.debugElement.parent).not.toShow(SpecMessageBox1Component);
@@ -83,7 +83,7 @@ describe('Microfrontend Host Message Box', () => {
 
     // Unblock first navigation.
     canActivateMessageBox1.next(true);
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // Both message boxes should be visible.
     expect(fixture.debugElement.parent).toShow(SpecMessageBox1Component);
@@ -126,11 +126,11 @@ describe('Microfrontend Host Message Box', () => {
 
     // Start navigation in a host message-box.
     void TestBed.inject(WorkbenchMessageBoxService).open({component: 'messagebox'});
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // Start parallel navigation in a view.
     void TestBed.inject(WorkbenchRouter).navigate(['path/to/view']);
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // First navigation should be blocked by the canActivate guard.
     expect(fixture.debugElement.parent).not.toShow(SpecMessageBox1Component);
@@ -182,11 +182,11 @@ describe('Microfrontend Host Message Box', () => {
 
     // Start navigation in a view.
     void TestBed.inject(WorkbenchRouter).navigate(['path/to/view']);
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // Start parallel navigation in a host message-box.
     void TestBed.inject(WorkbenchMessageBoxService).open({component: 'messagebox'});
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // First navigation should be blocked by the canActivate guard.
     expect(fixture.debugElement.parent).not.toShow(SpecViewComponent);
@@ -195,7 +195,7 @@ describe('Microfrontend Host Message Box', () => {
 
     // Unblock first navigation.
     canActivateView.next(true);
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // Message box and view components should be visible.
     expect(fixture.debugElement.parent).toShow(SpecViewComponent);

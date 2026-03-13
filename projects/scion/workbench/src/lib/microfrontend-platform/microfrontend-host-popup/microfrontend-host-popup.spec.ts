@@ -12,7 +12,7 @@ import {TestBed} from '@angular/core/testing';
 import {Component} from '@angular/core';
 import {provideRouter} from '@angular/router';
 import {firstValueFrom, Subject} from 'rxjs';
-import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../../testing/testing.util';
+import {waitUntilIdle, styleFixture, waitUntilWorkbenchStarted, waitUntilStable} from '../../testing/testing.util';
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
 import {WorkbenchComponent} from '../../workbench.component';
 import {expect} from '../../testing/jasmine/matcher/custom-matchers.definition';
@@ -70,11 +70,11 @@ describe('Microfrontend Host Popup', () => {
 
     // Start navigation in host popup 1.
     void TestBed.inject(WorkbenchPopupService).open({component: 'popup-1'}, {anchor: {top: 0, left: 0}, closeStrategy: {onFocusLost: false}});
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // Start parallel navigation in host popup 2.
     void TestBed.inject(WorkbenchPopupService).open({component: 'popup-2'}, {anchor: {top: 0, left: 0}, closeStrategy: {onFocusLost: false}});
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // First navigation should be blocked by the canActivate guard.
     expect(fixture.debugElement.parent).not.toShow(SpecPopup1Component);
@@ -126,11 +126,11 @@ describe('Microfrontend Host Popup', () => {
 
     // Start navigation in a host popup.
     void TestBed.inject(WorkbenchPopupService).open({component: 'popup'}, {anchor: {top: 0, left: 0}, closeStrategy: {onFocusLost: false}});
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // Start parallel navigation in a view.
     void TestBed.inject(WorkbenchRouter).navigate(['path/to/view']);
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // First navigation should be blocked by the canActivate guard.
     expect(fixture.debugElement.parent).not.toShow(SpecPopup1Component);
@@ -182,11 +182,11 @@ describe('Microfrontend Host Popup', () => {
 
     // Start navigation in a view.
     void TestBed.inject(WorkbenchRouter).navigate(['path/to/view']);
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // Start parallel navigation in a host popup.
     void TestBed.inject(WorkbenchPopupService).open({component: 'popup'}, {anchor: {top: 0, left: 0}, closeStrategy: {onFocusLost: false}});
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // First navigation should be blocked by the canActivate guard.
     expect(fixture.debugElement.parent).not.toShow(SpecViewComponent);

@@ -13,9 +13,9 @@
     Navigate
   </button>
 
-  @if (navigateError) {
+  @if (navigateError()) {
     <output class="navigate-error e2e-navigate-error">
-      {{navigateError}}
+      {{navigateError()}}
     </output>
   }
 </form>
