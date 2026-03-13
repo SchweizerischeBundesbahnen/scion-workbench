@@ -8,18 +8,17 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {Component, ElementRef, inject, input, output, viewChildren} from '@angular/core';
-import {KeyValuePipe} from '@angular/common';
 import {observeOn} from 'rxjs/operators';
 import {animationFrameScheduler, firstValueFrom} from 'rxjs';
 import {fromResize$} from '@scion/toolkit/observable';
 import {TextPipe} from '../../text/text.pipe';
+import {Maps} from '@scion/toolkit/util';
 
 @Component({
   selector: 'wb-message-box-footer',
   templateUrl: './message-box-footer.component.html',
   styleUrls: ['./message-box-footer.component.scss'],
   imports: [
-    KeyValuePipe,
     TextPipe,
   ],
   host: {
@@ -28,7 +27,7 @@ import {TextPipe} from '../../text/text.pipe';
 })
 export class MessageBoxFooterComponent {
 
-  public readonly actions = input.required<{[key: string]: string}>();
+  public readonly actions = input.required<Map<string, string>, {[key: string]: string}>({transform: Maps.coerce});
   public readonly severity = input.required<'info' | 'warn' | 'error'>();
   public readonly action = output<string>();
   public readonly preferredSizeChange = output<number>();
@@ -38,8 +37,6 @@ export class MessageBoxFooterComponent {
   constructor() {
     void this.emitPreferredSize();
   }
-
-  protected insertionSortOrderFn = (): number => 0;
 
   protected onAction(key: string): void {
     this.action.emit(key);

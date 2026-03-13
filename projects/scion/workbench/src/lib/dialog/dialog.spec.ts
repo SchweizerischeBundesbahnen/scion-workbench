@@ -1,7 +1,7 @@
 import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
-import {Component, DestroyRef, EnvironmentInjector, inject, InjectionToken, Injector, Type} from '@angular/core';
+import {styleFixture, waitUntilIdle, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
+import {Component, DestroyRef, EnvironmentInjector, inject, InjectionToken, Injector, signal, Type} from '@angular/core';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {WorkbenchDialogService} from './workbench-dialog.service';
@@ -235,13 +235,13 @@ describe('Dialog', () => {
     @Component({
       selector: 'spec-dialog',
       template: `
-        @if (showInputField) {
+        @if (showInputField()) {
           <input class="spec-input">
         }
       `,
     })
     class SpecDialogComponent {
-      public showInputField = false;
+      public showInputField = signal(false);
     }
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
@@ -250,7 +250,8 @@ describe('Dialog', () => {
 
     // Open dialog.
     void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent);
-    await waitUntilStable();
+    // Ensure navigation is complete.
+    await waitUntilIdle();
 
     // Expect dialog to show.
     expect(body).toShow(SpecDialogComponent);
@@ -260,8 +261,7 @@ describe('Dialog', () => {
 
     // Show input field.
     const dialogComponent = getDialogComponent(fixture, SpecDialogComponent);
-    dialogComponent.showInputField = true;
-    fixture.detectChanges();
+    dialogComponent.showInputField.set(true);
     await waitUntilStable();
 
     // Expect input field to have focus.
@@ -320,7 +320,7 @@ describe('Dialog', () => {
     @Component({
       selector: 'spec-dialog',
       template: `
-        @if (showHeader) {
+        @if (showHeader()) {
           <ng-template wbDialogHeader>
             <header class="spec-header">testee</header>
           </ng-template>
@@ -329,7 +329,7 @@ describe('Dialog', () => {
       imports: [WorkbenchDialogHeaderDirective],
     })
     class SpecDialogComponent {
-      public showHeader = false;
+      public showHeader = signal(false);
     }
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
@@ -352,13 +352,13 @@ describe('Dialog', () => {
 
     // Show header.
     const dialogComponent = getDialogComponent(fixture, SpecDialogComponent);
-    dialogComponent.showHeader = true;
-    fixture.detectChanges(); // Only trigger one change detection cycle.
+    dialogComponent.showHeader.set(true);
     await waitUntilStable();
 
     // Expect header to show.
     expect(body).toShow(By.css('header.spec-header'));
 
+    // TODO do we need this test?
     // Expect not to throw `ExpressionChangedAfterItHasBeenCheckedError`.
     expect(errors).not.toContain(jasmine.stringMatching(`ExpressionChangedAfterItHasBeenCheckedError`));
   });
@@ -371,7 +371,7 @@ describe('Dialog', () => {
     @Component({
       selector: 'spec-dialog',
       template: `
-        @if (showFooter) {
+        @if (showFooter()) {
           <ng-template wbDialogFooter>
             <footer class="spec-footer">testee</footer>
           </ng-template>
@@ -380,7 +380,7 @@ describe('Dialog', () => {
       imports: [WorkbenchDialogFooterDirective],
     })
     class SpecDialogComponent {
-      public showFooter = false;
+      public showFooter = signal(false);
     }
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
@@ -403,13 +403,13 @@ describe('Dialog', () => {
 
     // Show footer.
     const dialogComponent = getDialogComponent(fixture, SpecDialogComponent);
-    dialogComponent.showFooter = true;
-    fixture.detectChanges(); // Only trigger one change detection cycle.
+    dialogComponent.showFooter.set(true);
     await waitUntilStable();
 
     // Expect footer to show.
     expect(body).toShow(By.css('footer.spec-footer'));
 
+    // TODO: do we need the test
     // Expect not to throw `ExpressionChangedAfterItHasBeenCheckedError`.
     expect(errors).not.toContain(jasmine.stringMatching(`ExpressionChangedAfterItHasBeenCheckedError`));
   });
@@ -422,7 +422,7 @@ describe('Dialog', () => {
     @Component({
       selector: 'spec-dialog',
       template: `
-        @if (showAction) {
+        @if (showAction()) {
           <ng-template wbDialogAction>
             <button class="spec-action">click</button>
           </ng-template>
@@ -431,7 +431,7 @@ describe('Dialog', () => {
       imports: [WorkbenchDialogActionDirective],
     })
     class SpecDialogComponent {
-      public showAction = false;
+      public showAction = signal(false);
     }
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
@@ -454,13 +454,13 @@ describe('Dialog', () => {
 
     // Show action.
     const dialogComponent = getDialogComponent(fixture, SpecDialogComponent);
-    dialogComponent.showAction = true;
-    fixture.detectChanges(); // Only trigger one change detection cycle.
+    dialogComponent.showAction.set(true);
     await waitUntilStable();
 
     // Expect action to show.
     expect(body).toShow(By.css('button.spec-action'));
 
+    // TODO do we need this test
     // Expect not to throw `ExpressionChangedAfterItHasBeenCheckedError`.
     expect(errors).not.toContain(jasmine.stringMatching(`ExpressionChangedAfterItHasBeenCheckedError`));
   });

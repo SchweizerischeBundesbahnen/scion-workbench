@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, Injector, numberAttribute} from '@angular/core';
+import {Component, inject, Injector, numberAttribute, signal} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {WorkbenchNavigationExtras, WorkbenchRouter, WorkbenchRouterLinkDirective, WorkbenchService, WorkbenchView} from '@scion/workbench';
 import {NgTemplateOutlet} from '@angular/common';
@@ -16,8 +16,7 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SettingsService} from '../settings.service';
-import {MultiValueInputComponent, parseTypedObject, prune, stringifyError} from 'workbench-testing-app-common';
-import {RouterCommandsComponent} from 'workbench-testing-app-common';
+import {MultiValueInputComponent, parseTypedObject, prune, RouterCommandsComponent, stringifyError} from 'workbench-testing-app-common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {UUID} from '@scion/toolkit/uuid';
 
@@ -72,7 +71,7 @@ export default class RouterPageComponent {
     ],
   });
 
-  protected navigateError: string | undefined;
+  protected navigateError = signal<string | undefined>(undefined);
   protected extras: WorkbenchNavigationExtras = {};
 
   constructor() {
@@ -84,11 +83,11 @@ export default class RouterPageComponent {
   }
 
   protected onRouterNavigate(): void {
-    this.navigateError = undefined;
+    this.navigateError.set(undefined);
     this._wbRouter.navigate(this.form.controls.commands.value, this.extras)
       .then(success => success ? Promise.resolve() : Promise.reject(Error('Navigation failed')))
       .then(() => this.resetForm())
-      .catch((error: unknown) => this.navigateError = stringifyError(error));
+      .catch((error: unknown) => this.navigateError.set(stringifyError(error)));
   }
 
   protected onRouterLinkNavigate(): void {

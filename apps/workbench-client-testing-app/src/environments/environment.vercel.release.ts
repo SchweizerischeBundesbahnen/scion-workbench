@@ -17,6 +17,7 @@ const version = packageJson.version.replace(/\./g, '-');
  */
 export const environment = {
   animationEnabled: true,
+  zoneEnabled: false,
   apps: {
     app1: {
       symbolicName: 'workbench-client-testing-app1',

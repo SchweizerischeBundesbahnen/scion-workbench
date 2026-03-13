@@ -13,7 +13,7 @@ import {Component} from '@angular/core';
 import {provideRouter} from '@angular/router';
 import {firstValueFrom, Subject} from 'rxjs';
 import {toShowCustomMatcher} from '../../testing/jasmine/matcher/to-show.matcher';
-import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../../testing/testing.util';
+import {waitUntilIdle, styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../../testing/testing.util';
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
 import {WorkbenchComponent} from '../../workbench.component';
 import {expect} from '../../testing/jasmine/matcher/custom-matchers.definition';
@@ -70,11 +70,11 @@ describe('Microfrontend Host Dialog', () => {
 
     // Start navigation in host dialog 1.
     void TestBed.inject(WorkbenchDialogService).open({component: 'dialog-1'});
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // Start paralell navigation in host dialog 2.
     void TestBed.inject(WorkbenchDialogService).open({component: 'dialog-2'});
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // First navigation should be blocked by the canActivate guard.
     expect(fixture.debugElement.parent).not.toShow(SpecDialog1Component);
@@ -126,11 +126,11 @@ describe('Microfrontend Host Dialog', () => {
 
     // Start navigation in a host dialog.
     void TestBed.inject(WorkbenchDialogService).open({component: 'dialog'});
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // Start parallel navigation in a view.
     void TestBed.inject(WorkbenchRouter).navigate(['path/to/view']);
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // First navigation should be blocked by the canActivate guard.
     expect(fixture.debugElement.parent).not.toShow(SpecDialog1Component);
@@ -182,11 +182,11 @@ describe('Microfrontend Host Dialog', () => {
 
     // Start navigation in a view.
     void TestBed.inject(WorkbenchRouter).navigate(['path/to/view']);
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // Start parallel navigation in a host dialog.
     void TestBed.inject(WorkbenchDialogService).open({component: 'dialog'});
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // First navigation should be blocked by the canActivate guard.
     expect(fixture.debugElement.parent).not.toShow(SpecViewComponent);

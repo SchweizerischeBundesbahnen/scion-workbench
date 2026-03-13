@@ -32,7 +32,7 @@ export class MessageBoxOpenerPagePO implements WorkbenchViewPagePO {
   constructor(public view: ViewPO) {
     this.locator = view.locator.locator('app-message-box-opener-page');
     this.closeAction = this.locator.locator('output.e2e-close-action');
-    this.error = this.locator.locator('output.e2e-message-box-error');
+    this.error = this.locator.locator('output.e2e-open-error');
     this.openButton = this.locator.locator('button.e2e-open');
     this._appPO = new AppPO(this.locator.page());
   }

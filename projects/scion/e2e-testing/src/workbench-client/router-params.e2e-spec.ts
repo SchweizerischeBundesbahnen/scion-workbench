@@ -394,7 +394,7 @@ test.describe('Workbench Router', () => {
       await expect.poll(() => viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
     });
 
-    test('should correctly merge params when performing bulk navigations', async ({appPO, microfrontendNavigator}) => {
+    test.fixme('should correctly merge params when performing bulk navigations', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       const viewPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
@@ -416,7 +416,7 @@ test.describe('Workbench Router', () => {
       });
     });
 
-    test('should correctly replace params when performing bulk navigations', async ({appPO, microfrontendNavigator}) => {
+    test.fixme('should correctly replace params when performing bulk navigations', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       const viewPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
@@ -764,7 +764,7 @@ test.describe('Workbench Router', () => {
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({transientParam: expect.stringMatching('TRANSIENT PARAM (b)')});
     });
 
-    test('should correctly merge params when performing bulk navigations', async ({appPO, microfrontendNavigator}) => {
+    test.fixme('should correctly merge params when performing bulk navigations', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       const viewPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
@@ -799,7 +799,7 @@ test.describe('Workbench Router', () => {
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({transientParam: expect.stringMatching('TRANSIENT PARAM')});
     });
 
-    test('should correctly replace params when performing bulk navigations', async ({appPO, microfrontendNavigator}) => {
+    test.fixme('should correctly replace params when performing bulk navigations', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       const viewPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');

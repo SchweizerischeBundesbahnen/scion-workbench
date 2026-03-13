@@ -152,6 +152,9 @@ export class AppPO {
     if (options?.logLevel) {
       this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.LOG_LEVEL, options.logLevel);
     }
+    if (options?.zoneEnabled) {
+      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.ZONE_ENABLED, String(true));
+    }
 
     const featureQueryParams = new URLSearchParams();
     if (options?.stickyViewTab) {
@@ -614,6 +617,10 @@ export interface Options {
    * @deprecated since version 20.0.0-beta.6. Introduced in 20.0.0-beta.6 to maintain compatibility with applications setting view titles and headings in view microfrontends. API will be removed in version 22.
    */
   preloadInactiveMicrofrontendViews?: true;
+  /**
+   * Enables zone change detection in client app 1 if true. Defaults to `false`.
+   */
+  zoneEnabled?: boolean;
 }
 
 /**
@@ -683,6 +690,11 @@ export enum WorkbenchStartupQueryParams {
    * Query param to control whether to preload inactive microfrontend views not defining the `lazy` property.
    */
   PRELOAD_INACTIVE_MICROFRONTEND_VIEWS = 'preloadInactiveMicrofrontendViews',
+
+  /**
+   * Query param to set enable zone change detection for app1.
+   */
+  ZONE_ENABLED = 'zoneEnabled',
 }
 
 /**

@@ -206,6 +206,7 @@ test.describe('Workbench Part', () => {
     const partPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
 
     // Capture the part's component instance id.
+    await expect.poll(() => partPage.getComponentInstanceId()).not.toEqual('');
     const componentInstanceId = await partPage.getComponentInstanceId();
 
     // Close activity.

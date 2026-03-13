@@ -16,7 +16,7 @@ import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {WorkbenchView, WorkbenchViewNavigation} from './workbench-view.model';
 import {firstValueFrom, ReplaySubject, Subject} from 'rxjs';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
-import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
+import {waitUntilIdle, styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {By} from '@angular/platform-browser';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
@@ -1207,7 +1207,7 @@ describe('View', () => {
     @Component({
       selector: 'spec-view',
       template: `
-        @if (showAction) {
+        @if (showAction()) {
           <ng-template wbPartAction>
             <button class="spec-action">click</button>
           </ng-template>
@@ -1216,7 +1216,7 @@ describe('View', () => {
       imports: [WorkbenchPartActionDirective],
     })
     class SpecViewComponent {
-      public showAction = false;
+      public showAction = signal(false);
     }
 
     TestBed.configureTestingModule({
@@ -1248,13 +1248,13 @@ describe('View', () => {
 
     // Show action.
     const componentInstance = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecViewComponent>()!;
-    componentInstance.showAction = true;
-    fixture.detectChanges(); // Only trigger one change detection cycle.
+    componentInstance.showAction.set(true);
     await waitUntilStable();
 
     // Expect action to show.
     expect(body).toShow(By.css('button.spec-action'));
 
+    // TODO: do we need the test
     // Expect not to throw `ExpressionChangedAfterItHasBeenCheckedError`.
     expect(errors).not.toContain(jasmine.stringMatching(`ExpressionChangedAfterItHasBeenCheckedError`));
   });
@@ -2846,12 +2846,12 @@ describe('View', () => {
 
       // Wait until entering 'CanActivate' guard.
       await firstValueFrom(onCanActivate$);
-      await waitUntilStable();
+      await waitUntilIdle();
 
       // Continue navigation of view 2.
       canActivate$.next(true);
       await navigation2;
-      await waitUntilStable();
+      await waitUntilIdle();
 
       // Expect view 1 to be inactive.
       expect(view1.active()).toBeFalse();

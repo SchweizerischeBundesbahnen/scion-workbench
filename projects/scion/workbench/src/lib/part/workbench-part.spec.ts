@@ -1307,6 +1307,7 @@ describe('WorkbenchPart', () => {
 
       // Close view.
       await TestBed.inject(WorkbenchViewRegistry).get('view.1').close();
+      await waitUntilStable();
 
       // Expect scroll position to be restored.
       expect(mainAreaViewport.scrollTop).toBe(scrollTop);

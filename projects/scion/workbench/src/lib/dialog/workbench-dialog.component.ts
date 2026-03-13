@@ -9,7 +9,7 @@
  */
 
 import {Component, effect, ElementRef, HostListener, inject, NgZone, Provider, signal, untracked, viewChild} from '@angular/core';
-import {BehaviorSubject, fromEvent} from 'rxjs';
+import {animationFrames, BehaviorSubject, debounce, fromEvent} from 'rxjs';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {AsyncPipe, NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog.model';
@@ -25,6 +25,7 @@ import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneO
 import {filter, map, startWith, takeUntil} from 'rxjs/operators';
 import {fromMutation$} from '@scion/toolkit/observable';
 import {trackFocus} from '../focus/workbench-focus-tracker.service';
+import {ɵZoneless} from '../ɵzoneless.service';
 
 /**
  * Renders the content of a workbench dialog.
@@ -79,6 +80,7 @@ export class WorkbenchDialogComponent {
 
   protected readonly dialog = inject(ɵWorkbenchDialog);
 
+  protected readonly zonelessEnabled = inject(ɵZoneless).enabled;
   protected readonly headerHeight = signal<string | undefined>(undefined);
   protected readonly transformTranslateX = signal(0);
   protected readonly transformTranslateY = signal(0);
@@ -158,6 +160,9 @@ export class WorkbenchDialogComponent {
         const subscription = fromMutation$(dialogElement, {subtree: true, childList: true})
           .pipe(
             startWith(undefined as void),
+            // wait for the mutation events to be settled before we focus.
+            // `ngComponentOutlet` outlet might be rendered slightly after the rest and should be taken into consideration when focusing.
+            debounce(() => animationFrames()),
             takeUntil(this._activeElement$.pipe(filter(Boolean))),
           )
           .subscribe(() => {

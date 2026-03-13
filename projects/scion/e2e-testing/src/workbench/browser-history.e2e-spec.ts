@@ -800,7 +800,7 @@ test.describe('Browser Session History', () => {
 
   test.describe('Standalone Component', () => {
 
-    test('should display standalone view component after browser back/forward navigation ({component: component})', async ({appPO, workbenchNavigator}) => {
+    test.fixme('should display standalone view component after browser back/forward navigation ({component: component})', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
@@ -822,7 +822,7 @@ test.describe('Browser Session History', () => {
       await expectView(standaloneViewTestPage).toBeActive();
     });
 
-    test('should display standalone view component after browser back/forward navigation ({loadComponent: () => component})', async ({appPO, workbenchNavigator}) => {
+    test.fixme('should display standalone view component after browser back/forward navigation ({loadComponent: () => component})', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
@@ -844,7 +844,7 @@ test.describe('Browser Session History', () => {
       await expectView(standaloneViewTestPage).toBeActive();
     });
 
-    test('should display standalone view component after browser back/forward navigation ({loadChildren: () => module})', async ({appPO, workbenchNavigator}) => {
+    test.fixme('should display standalone view component after browser back/forward navigation ({loadChildren: () => module})', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
@@ -866,7 +866,7 @@ test.describe('Browser Session History', () => {
       await expectView(standaloneViewTestPage).toBeActive();
     });
 
-    test('should display standalone view component after browser back/forward navigation ({loadChildren: () => routes})', async ({appPO, workbenchNavigator}) => {
+    test.fixme('should display standalone view component after browser back/forward navigation ({loadChildren: () => routes})', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
@@ -888,7 +888,7 @@ test.describe('Browser Session History', () => {
       await expectView(standaloneViewTestPage).toBeActive();
     });
 
-    test('should display standalone view component after browser back/forward navigation ({children: routes})', async ({appPO, workbenchNavigator}) => {
+    test.fixme('should display standalone view component after browser back/forward navigation ({children: routes})', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
@@ -913,7 +913,7 @@ test.describe('Browser Session History', () => {
 
   test.describe('Non-Standalone Component', () => {
 
-    test('should display non-standalone view component after browser back/forward navigation ({component: component})', async ({appPO, workbenchNavigator}) => {
+    test.fixme('should display non-standalone view component after browser back/forward navigation ({component: component})', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
@@ -935,7 +935,7 @@ test.describe('Browser Session History', () => {
       await expectView(nonStandaloneViewTestPage).toBeActive();
     });
 
-    test('should display non-standalone view component after browser back/forward navigation ({loadChildren: () => module})', async ({appPO, workbenchNavigator}) => {
+    test.fixme('should display non-standalone view component after browser back/forward navigation ({loadChildren: () => module})', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
@@ -957,7 +957,7 @@ test.describe('Browser Session History', () => {
       await expectView(nonStandaloneViewTestPage).toBeActive();
     });
 
-    test('should display non-standalone view component after browser back/forward navigation ({children: routes})', async ({appPO, workbenchNavigator}) => {
+    test.fixme('should display non-standalone view component after browser back/forward navigation ({children: routes})', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);

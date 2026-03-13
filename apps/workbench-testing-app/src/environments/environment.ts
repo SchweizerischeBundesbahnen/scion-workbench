@@ -19,6 +19,7 @@
 
 import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
 import {hostAppManifest} from '../app/host-app.manifest';
+import {WorkbenchStartupQueryParams} from '../app/workbench/workbench-startup-query-params';
 
 /**
  * Environment used if starting the app locally.
@@ -30,7 +31,11 @@ const microfrontendPlatformConfig: MicrofrontendPlatformConfig = {
     intentionRegisterApiDisabled: false,
   },
   applications: [
-    {symbolicName: 'workbench-client-testing-app1', manifestUrl: 'http://localhost:4201/manifest-app1.json', intentionRegisterApiDisabled: false},
+    {
+      symbolicName: 'workbench-client-testing-app1',
+      manifestUrl: WorkbenchStartupQueryParams.zoneEnabled() ? 'http://localhost:4203/manifest-app1.json' : 'http://localhost:4201/manifest-app1.json',
+      intentionRegisterApiDisabled: false,
+    },
     {symbolicName: 'workbench-client-testing-app2', manifestUrl: 'http://localhost:4202/manifest-app2.json', intentionRegisterApiDisabled: false},
     {symbolicName: 'devtools', manifestUrl: 'https://microfrontend-platform-devtools-v2-0-0.scion.vercel.app/manifest.json', intentionCheckDisabled: true, scopeCheckDisabled: true},
   ],

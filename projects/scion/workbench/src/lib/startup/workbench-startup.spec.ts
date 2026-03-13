@@ -9,7 +9,7 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {ApplicationInitStatus, Component, inject, Injector, NgZone, provideAppInitializer, signal} from '@angular/core';
+import {ApplicationInitStatus, Component, inject, Injector, provideAppInitializer, signal} from '@angular/core';
 import {WorkbenchLauncher} from './workbench-launcher.service';
 import {provideWorkbench} from '../workbench.provider';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
@@ -165,48 +165,6 @@ describe('Workbench Startup', () => {
 
     await TestBed.inject(WorkbenchLauncher).launch();
     expect(injector).toBeDefined();
-  });
-
-  it('should run PreStartup function in Angular zone', async () => {
-    let insideZone: boolean | undefined;
-
-    TestBed.configureTestingModule({
-      providers: [
-        provideWorkbenchForTest(),
-        provideWorkbenchInitializer(() => void (insideZone = NgZone.isInAngularZone()), {phase: WorkbenchStartupPhase.PreStartup}),
-      ],
-    });
-
-    await TestBed.inject(WorkbenchLauncher).launch();
-    expect(insideZone).toBeTrue();
-  });
-
-  it('should run Startup function in Angular zone', async () => {
-    let insideZone: boolean | undefined;
-
-    TestBed.configureTestingModule({
-      providers: [
-        provideWorkbenchForTest(),
-        provideWorkbenchInitializer(() => void (insideZone = NgZone.isInAngularZone()), {phase: WorkbenchStartupPhase.Startup}),
-      ],
-    });
-
-    await TestBed.inject(WorkbenchLauncher).launch();
-    expect(insideZone).toBeTrue();
-  });
-
-  it('should run PostStartup function in Angular zone', async () => {
-    let insideZone: boolean | undefined;
-
-    TestBed.configureTestingModule({
-      providers: [
-        provideWorkbenchForTest(),
-        provideWorkbenchInitializer(() => void (insideZone = NgZone.isInAngularZone()), {phase: WorkbenchStartupPhase.PostStartup}),
-      ],
-    });
-
-    await TestBed.inject(WorkbenchLauncher).launch();
-    expect(insideZone).toBeTrue();
   });
 
   it('should block startup until activated the initial perspective', async () => {

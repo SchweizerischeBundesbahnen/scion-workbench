@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, inject, viewChild} from '@angular/core';
+import {Component, ElementRef, inject, signal, viewChild} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {CloseStrategy, DialogId, NotificationId, PartId, PopupId, PopupOrigin, ViewId, WORKBENCH_ELEMENT, WorkbenchElement, WorkbenchPopupService} from '@scion/workbench-client';
 import {Observable} from 'rxjs';
@@ -74,8 +74,8 @@ export class PopupOpenerPageComponent {
     }),
   });
 
-  protected popupError: string | undefined;
-  protected returnValue: string | undefined;
+  protected popupError = signal<string | undefined>(undefined);
+  protected returnValue = signal<string | undefined>(undefined);
 
   protected readonly nullList = `autocomplete-null-${UUID.randomUUID()}`;
 
@@ -89,8 +89,8 @@ export class PopupOpenerPageComponent {
     const options = this.form.controls.options.controls;
     const params = SciKeyValueFieldComponent.toDictionary(options.params);
 
-    this.popupError = undefined;
-    this.returnValue = undefined;
+    this.popupError.set(undefined);
+    this.returnValue.set(undefined);
 
     await this._popupService.open<string>(qualifier, {
       params: params ?? undefined,
@@ -103,8 +103,8 @@ export class PopupOpenerPageComponent {
       cssClass: options.cssClass.value,
       context: parseTypedString(options.context.value, {undefinedIfEmpty: true}),
     })
-      .then(result => this.returnValue = result)
-      .catch((error: unknown) => this.popupError = stringifyError(error) || 'Popup was closed with an error');
+      .then(result => this.returnValue.set(result))
+      .catch((error: unknown) => this.popupError.set(stringifyError(error)));
   }
 
   private observePopupOrigin$(): Observable<PopupOrigin> {

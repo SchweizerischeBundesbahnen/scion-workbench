@@ -34,6 +34,11 @@ export default defineConfig({
       reuseExistingServer: false,
     },
     {
+      command: 'npm run workbench-client-testing-app:zone:dist-serve',
+      port: 4203,
+      reuseExistingServer: false,
+    },
+    {
       command: 'npm run workbench-testing-app:basehref:dist-serve',
       port: 4300,
       reuseExistingServer: false,

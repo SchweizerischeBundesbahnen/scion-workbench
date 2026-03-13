@@ -1,11 +1,11 @@
-@for (action of actions() | keyvalue:insertionSortOrderFn; track action.key) {
+@for (action of actions(); track action[0]) {
   <button #action_button
-          (click)="onAction(action.key)"
+          (click)="onAction(action[0])"
           (keydown.arrowLeft)="onArrowKey($index, 'left')"
           (keydown.arrowRight)="onArrowKey($index, 'right')"
-          [attr.data-action]="action.key"
+          [attr.data-action]="action[0]"
           class="action e2e-action">
-    {{(action.value | wbText)()}}
+    {{(action[1] | wbText)()}}
   </button>
 
   @if (!$last) {

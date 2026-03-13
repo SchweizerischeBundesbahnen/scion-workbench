@@ -9,17 +9,19 @@
  */
 
 import {WorkbenchConfig} from '../workbench-config';
-import {assertNotInReactiveContext, computed, inject, Injectable, Injector, NgZone, signal, ɵZONELESS_ENABLED} from '@angular/core';
+import {assertNotInReactiveContext, computed, inject, Injectable, Injector, NgZone, signal} from '@angular/core';
 import {runWorkbenchInitializers, WorkbenchStartupPhase} from './workbench-initializer';
 import {Logger, LoggerNames} from '../logging';
 import {WorkbenchLauncher} from './workbench-launcher.service';
 import {resolveWhen} from '../common/resolve-when.util';
+import {ɵZoneless} from '../ɵzoneless.service';
 
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchLauncher implements WorkbenchLauncher {
 
   private readonly _logger: Logger;
   private readonly _zone: NgZone;
+  private readonly _zonelessEnabled: boolean;
   private readonly _injector: Injector;
   private readonly _whenStarted = resolveWhen(computed(() => this.state() === LaunchState.Started));
 
@@ -31,13 +33,10 @@ export class ɵWorkbenchLauncher implements WorkbenchLauncher {
       throw Error(`[WorkbenchError] Missing required workbench providers. Did you forget to call 'provideWorkbench()' in the providers array of 'bootstrapApplication' or the root 'NgModule'?`);
     }
 
-    if (inject(ɵZONELESS_ENABLED, {optional: true})) {
-      throw Error(`[WorkbenchError] SCION Workbench does not support zoneless. Add 'provideZoneChangeDetection()' to the list of providers in your app.config.ts or main.ts. Support is planned for 2026.`);
-    }
-
     // Do not inject dependencies before the above check to avoid `NullInjectorError` error.
     this._logger = inject(Logger);
     this._zone = inject(NgZone);
+    this._zonelessEnabled = inject(ɵZoneless).enabled;
     this._injector = inject(Injector);
   }
 
@@ -46,7 +45,7 @@ export class ɵWorkbenchLauncher implements WorkbenchLauncher {
     assertNotInReactiveContext(this.launch, 'Call WorkbenchLauncher.launch() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
     // Ensure to run in the Angular zone to check the workbench for changes even if called from outside the Angular zone, e.g. in unit tests.
-    if (!NgZone.isInAngularZone()) {
+    if (!this._zonelessEnabled && !NgZone.isInAngularZone()) {
       return this._zone.run(() => this.launch());
     }
 

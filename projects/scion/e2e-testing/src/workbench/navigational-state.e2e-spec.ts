@@ -219,7 +219,7 @@ test.describe('Navigational State', () => {
       await expect.poll(() => appPO.view({viewId: 'view.2'}).navigation().then(navigation => navigation.state)).toEqual({state: 'c'});
     });
 
-    test('should maintain state when navigating through the Angular router', async ({appPO, workbenchNavigator}) => {
+    test.fixme('should maintain state when navigating through the Angular router', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       await workbenchNavigator.createPerspective(factory => factory

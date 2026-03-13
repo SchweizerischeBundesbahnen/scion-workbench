@@ -2839,6 +2839,7 @@ describe('WorkbenchLayout', () => {
 
     // Switch perspective, causing the layout to be serialized and deserialized.
     await TestBed.inject(WorkbenchService).switchPerspective('perspective-2');
+    await waitUntilStable();
     await TestBed.inject(WorkbenchService).switchPerspective('perspective-1');
     await waitUntilStable();
 
@@ -3500,6 +3501,7 @@ describe('WorkbenchLayout', () => {
 
       // Toggle activity.1.
       await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.1'));
+      await waitUntilStable();
       expect(fixture).toEqualWorkbenchLayout({
         activityLayout: {
           toolbars: {
@@ -3552,6 +3554,7 @@ describe('WorkbenchLayout', () => {
 
       // Toggle activity.2.
       await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.2'));
+      await waitUntilStable();
       expect(fixture).toEqualWorkbenchLayout({
         activityLayout: {
           toolbars: {
@@ -3604,6 +3607,7 @@ describe('WorkbenchLayout', () => {
 
       // Toggle activity.3.
       await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.3'));
+      await waitUntilStable();
       expect(fixture).toEqualWorkbenchLayout({
         activityLayout: {
           toolbars: {
@@ -3656,6 +3660,7 @@ describe('WorkbenchLayout', () => {
 
       // Toggle activity.4
       await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.4'));
+      await waitUntilStable();
       expect(fixture).toEqualWorkbenchLayout({
         activityLayout: {
           toolbars: {
@@ -3708,6 +3713,7 @@ describe('WorkbenchLayout', () => {
 
       // Toggle activity.5.
       await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.5'));
+      await waitUntilStable();
       expect(fixture).toEqualWorkbenchLayout({
         activityLayout: {
           toolbars: {
@@ -3763,6 +3769,7 @@ describe('WorkbenchLayout', () => {
 
       // Toggle activity.6.
       await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.6'));
+      await waitUntilStable();
       expect(fixture).toEqualWorkbenchLayout({
         activityLayout: {
           toolbars: {
@@ -3818,6 +3825,7 @@ describe('WorkbenchLayout', () => {
 
       // Toggle activity.7.
       await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.7'));
+      await waitUntilStable();
       expect(fixture).toEqualWorkbenchLayout({
         activityLayout: {
           toolbars: {
@@ -3873,6 +3881,7 @@ describe('WorkbenchLayout', () => {
 
       // Toggle activity.8.
       await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.8'));
+      await waitUntilStable();
       expect(fixture).toEqualWorkbenchLayout({
         activityLayout: {
           toolbars: {
@@ -3928,6 +3937,7 @@ describe('WorkbenchLayout', () => {
 
       // Toggle activity.9.
       await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.9'));
+      await waitUntilStable();
       expect(fixture).toEqualWorkbenchLayout({
         activityLayout: {
           toolbars: {
@@ -3984,6 +3994,7 @@ describe('WorkbenchLayout', () => {
 
       // Toggle activity.10.
       await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.10'));
+      await waitUntilStable();
       expect(fixture).toEqualWorkbenchLayout({
         activityLayout: {
           toolbars: {
@@ -4040,6 +4051,7 @@ describe('WorkbenchLayout', () => {
 
       // Toggle activity.11.
       await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.11'));
+      await waitUntilStable();
       expect(fixture).toEqualWorkbenchLayout({
         activityLayout: {
           toolbars: {
@@ -4096,6 +4108,7 @@ describe('WorkbenchLayout', () => {
 
       // Toggle activity.12.
       await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.12'));
+      await waitUntilStable();
       expect(fixture).toEqualWorkbenchLayout({
         activityLayout: {
           toolbars: {

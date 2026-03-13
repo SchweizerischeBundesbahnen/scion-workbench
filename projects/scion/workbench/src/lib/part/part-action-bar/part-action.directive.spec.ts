@@ -10,7 +10,7 @@
 
 import {TestBed} from '@angular/core/testing';
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
-import {styleFixture, waitUntilWorkbenchStarted} from '../../testing/testing.util';
+import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../../testing/testing.util';
 import {WorkbenchComponent} from '../../workbench.component';
 import {WorkbenchService} from '../../workbench.service';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
@@ -417,6 +417,7 @@ describe('PartActionDirective', () => {
 
     // Open view in left part.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: 'part.left', activateView: true}));
+    await waitUntilStable();
 
     // Expect no action in left part.
     expect(leftPart.actions()).toEqual([]);
@@ -424,6 +425,7 @@ describe('PartActionDirective', () => {
 
     // Close view.
     await TestBed.inject(WorkbenchService).getView('view.100')!.close();
+    await waitUntilStable();
 
     // Expect action in left part.
     expect(leftPart.actions()).toEqual([jasmine.objectContaining({cssClass: 'testee'})]);

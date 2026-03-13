@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, input} from '@angular/core';
+import {Component, inject, input, signal} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WorkbenchPart, WorkbenchService} from '@scion/workbench';
 import {MultiValueInputComponent, stringifyError, undefinedIfEmpty} from 'workbench-testing-app-common';
@@ -49,10 +49,10 @@ export default class RegisterPartActionPageComponent {
     }),
   });
 
-  protected registerError: string | false | undefined;
+  protected registerError = signal<string | false | undefined>(undefined);
 
   protected onRegister(): void {
-    this.registerError = undefined;
+    this.registerError.set(undefined);
     // Capture form values because the action will be constructed asynchronously.
     const canMatchPartIds = undefinedIfEmpty(this.form.controls.canMatch.controls.part.value.split(/\s+/).filter(Boolean));
     const canMatchViewIds = undefinedIfEmpty(this.form.controls.canMatch.controls.view.value.split(/\s+/).filter(Boolean));
@@ -87,11 +87,11 @@ export default class RegisterPartActionPageComponent {
           return {content: TextComponent, inputs: {text: content}, align, cssClass};
         }
       });
-      this.registerError = false;
+      this.registerError.set(false);
       this.resetForm();
     }
     catch (error) {
-      this.registerError = stringifyError(error);
+      this.registerError.set(stringifyError(error));
     }
   }
 

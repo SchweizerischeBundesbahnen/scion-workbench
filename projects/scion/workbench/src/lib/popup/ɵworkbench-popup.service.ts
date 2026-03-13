@@ -16,6 +16,7 @@ import {createInvocationContext, WorkbenchInvocationContext} from '../invocation
 import {WorkbenchPopupService} from './workbench-popup.service';
 import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchPopupOptions} from './workbench-popup.options';
+import {ɵZoneless} from '../ɵzoneless.service';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})
@@ -25,13 +26,14 @@ export class ɵWorkbenchPopupService implements WorkbenchPopupService {
   private readonly _rootInjector = inject(ApplicationRef).injector;
   private readonly _popupRegistry = inject(WorkbenchPopupRegistry);
   private readonly _zone = inject(NgZone);
+  private readonly _zonelessEnabled = inject(ɵZoneless).enabled;
 
   /** @inheritDoc */
   public async open<R>(component: ComponentType<unknown>, options: WorkbenchPopupOptions): Promise<R | undefined> {
     assertNotInReactiveContext(this.open, 'Call WorkbenchPopupService.open() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
     // Ensure to run in Angular zone to display the popup even when called from outside the Angular zone.
-    if (!NgZone.isInAngularZone()) {
+    if (!this._zonelessEnabled && !NgZone.isInAngularZone()) {
       return this._zone.run(() => this.open(component, options));
     }
 

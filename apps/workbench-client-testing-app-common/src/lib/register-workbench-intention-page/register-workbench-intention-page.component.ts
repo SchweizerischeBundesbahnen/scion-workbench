@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Intention, ManifestService} from '@scion/microfrontend-platform';
 import {WORKBENCH_ELEMENT, WorkbenchCapabilities, WorkbenchElement} from '@scion/workbench-client';
@@ -39,8 +39,8 @@ export class RegisterWorkbenchIntentionPageComponent {
 
   protected readonly WorkbenchCapabilities = WorkbenchCapabilities;
 
-  protected intentionId: string | undefined;
-  protected registerError: string | undefined;
+  protected intentionId = signal<string | undefined>(undefined);
+  protected registerError = signal<string | undefined>(undefined);
 
   constructor() {
     Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.signalReady();
@@ -52,15 +52,15 @@ export class RegisterWorkbenchIntentionPageComponent {
       qualifier: SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier) ?? undefined,
     };
 
-    this.intentionId = undefined;
-    this.registerError = undefined;
+    this.intentionId.set(undefined);
+    this.registerError.set(undefined);
 
     await this._manifestService.registerIntention(intention)
       .then(id => {
-        this.intentionId = id;
+        this.intentionId.set(id);
         this.form.reset();
         this.form.setControl('qualifier', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
       })
-      .catch((error: unknown) => this.registerError = stringifyError(error));
+      .catch((error: unknown) => this.registerError.set(stringifyError(error)));
   }
 }
