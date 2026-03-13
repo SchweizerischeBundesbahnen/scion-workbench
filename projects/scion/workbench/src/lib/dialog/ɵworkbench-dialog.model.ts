@@ -68,9 +68,9 @@ export class ɵWorkbenchDialog implements WorkbenchDialog, Blockable, Blocking {
   public readonly modal: boolean;
   public readonly blinking$ = new BehaviorSubject(false);
 
-  public header: WorkbenchDialogHeaderDirective | undefined;
-  public footer: WorkbenchDialogFooterDirective | undefined;
-  public actions = new Array<WorkbenchDialogActionDirective>();
+  public readonly footer = signal<WorkbenchDialogFooterDirective | undefined>(undefined);
+  public readonly actions = signal(new Array<WorkbenchDialogActionDirective>());
+  public readonly header = signal<WorkbenchDialogHeaderDirective | undefined>(undefined);
 
   constructor(public id: DialogId,
               public component: ComponentType<unknown>,
@@ -153,37 +153,37 @@ export class ɵWorkbenchDialog implements WorkbenchDialog, Blockable, Blocking {
   }
 
   public registerHeader(header: WorkbenchDialogHeaderDirective): Disposable {
-    this.header = header;
+    this.header.set(header);
     return {
       dispose: () => {
-        if (this.header === header) {
-          this.header = undefined;
+        if (this.header() === header) {
+          this.header.set(undefined);
         }
       },
     };
   }
 
   public registerFooter(footer: WorkbenchDialogFooterDirective): Disposable {
-    if (this.actions.length) {
+    if (this.actions().length) {
       throw Error('[DialogInitError] Custom dialog footer not supported if using dialog actions.');
     }
-    this.footer = footer;
+    this.footer.set(footer);
     return {
       dispose: () => {
-        if (this.footer === footer) {
-          this.footer = undefined;
+        if (this.footer() === footer) {
+          this.footer.set(undefined);
         }
       },
     };
   }
 
   public registerAction(action: WorkbenchDialogActionDirective): Disposable {
-    if (this.footer) {
+    if (this.footer()) {
       throw Error('[DialogInitError] Dialog actions not supported if using a custom dialog footer.');
     }
-    this.actions = this.actions.concat(action);
+    this.actions.update(actions => actions.concat(action));
     return {
-      dispose: () => this.actions = this.actions.filter(candidate => candidate !== action),
+      dispose: () => this.actions.update(actions => actions.filter(candidate => candidate !== action)),
     };
   }
 

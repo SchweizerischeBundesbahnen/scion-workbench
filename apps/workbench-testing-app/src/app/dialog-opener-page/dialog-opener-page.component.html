@@ -58,15 +58,15 @@
   Open dialog
 </button>
 
-@if (returnValue) {
+@if (returnValue()) {
   <output class="return-value e2e-return-value">
-    {{returnValue}}
+    {{returnValue()}}
   </output>
 }
 
-@if (dialogError) {
+@if (dialogError()) {
   <output class="dialog-error e2e-dialog-error">
-    {{dialogError}}
+    {{dialogError()}}
   </output>
 }
 

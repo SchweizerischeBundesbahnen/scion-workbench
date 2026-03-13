@@ -21,10 +21,10 @@
     "postinstall": "cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium",
 
     "copy-src": "run-p copy-src:*",
-    "copy-src:scion-toolkit": "cpx --clean --watch --verbose ../scion-toolkit/projects/scion/toolkit/** ./src-lib/@scion/toolkit",
-    "copy-src:scion-components": "cpx --clean --watch --verbose ../scion-toolkit/projects/scion/components/** ./src-lib/@scion/components",
-    "copy-src:scion-components.internal": "cpx --clean --watch --verbose ../scion-toolkit/projects/scion/components.internal/** ./src-lib/@scion/components.internal",
-    "copy-src:scion-microfrontend-platform": "cpx --clean --watch --verbose ../scion-microfrontend-platform/projects/scion/microfrontend-platform/** ./src-lib/@scion/microfrontend-platform",
+    "copy-src:scion-toolkit": "cpx --clean --watch --verbose \"../scion-toolkit/projects/scion/toolkit/**\", \",./src-lib/@scion/toolkit\"",
+    "copy-src:scion-components": "cpx --clean --watch --verbose \"../scion-toolkit/projects/scion/components/**\" \"./src-lib/@scion/components\"",
+    "copy-src:scion-components.internal": "cpx --clean --watch --verbose \"../scion-toolkit/projects/scion/components.internal/**\" \"./src-lib/@scion/components.internal\"",
+    "copy-src:scion-microfrontend-platform": "cpx --clean --watch --verbose \"../scion-microfrontend-platform/projects/scion/microfrontend-platform/**\" \"./src-lib/@scion/microfrontend-platform\"",
 
     "workbench-client:build": "ng build --configuration production @scion/workbench-client",
     "workbench-client:lint": "ng lint @scion/workbench-client",
