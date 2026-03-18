@@ -25,7 +25,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {rootEffect} from '../common/root-effect';
 import ActivatedMicrofrontendComponent from '../activated-microfrontend/activated-microfrontend.component';
-import {contributeMenu, installMenuAccelerators, SciMenuService} from '@scion/sci-components/menu';
+import {contributeMenu, installMenuAccelerators, SciMenuService, SciToolbarComponent} from '@scion/sci-components/menu';
 import {Notification1Component} from '../notification-1/notification-1.component';
 
 @Component({
@@ -47,6 +47,7 @@ import {Notification1Component} from '../notification-1/notification-1.component
     WorkbenchPartActionDirective,
     MultiValueInputComponent,
     ActivatedMicrofrontendComponent,
+    SciToolbarComponent,
   ],
 })
 export default class ViewPageComponent {
@@ -71,6 +72,31 @@ export default class ViewPageComponent {
     if (!inject(WorkbenchStartup).done()) {
       throw Error('[LifecycleError] Component constructed before the workbench startup completed!'); // Do not remove as required by `startup.e2e-spec.ts` in [#1]
     }
+
+    function onSelect(): void {
+
+    }
+
+    contributeMenu('toolbar:view', toolbar => toolbar
+      .addGroup(group => group
+        .addGroup(group => group
+          .addToolbarItem('home', onSelect)
+          .addToolbarItem('favorite', onSelect)
+          .addToolbarItem('train', onSelect),
+        ),
+      )
+      .addGroup(group => group
+        .addGroup(group => group
+          .addGroup(group => group
+            .addGroup(group => group
+              .addToolbarItem('home', onSelect)
+              .addToolbarItem('favorite', onSelect)
+              .addToolbarItem('train', onSelect),
+            ),
+          ),
+        ),
+      ),
+    );
 
     this.partActions = this.computePartActions();
     this.installViewActiveStateLogger();

@@ -119,7 +119,7 @@ export class PartBarComponent {
     const viewsInsideTabbar = this.part.views().filter(view => view.scrolledIntoView());
     const viewsOutsideTabbar = this.part.views().filter(view => !view.scrolledIntoView());
 
-    toolbar.addMenu({icon: 'arrow_downward', tooltip: untracked(() => text('%workbench.show_open_tabs.tooltip')), menu: {filter: true}}, menu => {
+    toolbar.addMenu({icon: 'arrow_downward', tooltip: untracked(() => text('%workbench.show_open_tabs.tooltip')), menu: {filter: true, maxHeight: '300px'}}, menu => {
       // Add group for views that are scrolled out the tab bar.
       menu.addGroup(group => {
         for (const view of viewsOutsideTabbar) {
@@ -130,6 +130,8 @@ export class PartBarComponent {
             label: computed(() => title() || ''),
             tooltip: computed(() => join([title(), heading()], {delimiter: '\n'})),
             actions: actions => actions.addToolbarItem('close', () => void view.close()),
+            checked: view.active,
+            disabled: view.active,
             onSelect: () => void view.activate(),
           });
         }
@@ -145,6 +147,8 @@ export class PartBarComponent {
             label: computed(() => title() || ''),
             tooltip: computed(() => join([title(), heading()], {delimiter: '\n'})),
             actions: actions => actions.addToolbarItem('close', () => void view.close()),
+            checked: view.active,
+            disabled: view.active,
             onSelect: () => void view.activate(),
           });
         }

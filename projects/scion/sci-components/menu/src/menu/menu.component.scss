@@ -23,8 +23,11 @@ $icon-size: 18px;
   overflow: hidden;
   cursor: var(--sci-workbench-button-cursor);
 
-  &:hover:where(:not(:disabled)) {
-    background-color: var(--sci-workbench-menu-background-color-hover);
+  // Do not hover menu items while scrolling.
+  @container not style(--ɵmenu-scrolling: true) {
+    &:hover:where(:not(:disabled)) {
+      background-color: var(--sci-workbench-menu-background-color-hover);
+    }
   }
 
   &:active:where(:not(:disabled)) {
@@ -50,7 +53,6 @@ $icon-size: 18px;
 
 :host {
   --ɵsci-menu-padding: #{$padding_menu};
-
   display: grid;
   gap: $menu_item_gap .5em;
   overflow: hidden;
@@ -61,7 +63,7 @@ $icon-size: 18px;
   border-radius: 0.5rem;
   color: var(--sci-color-text);
   background-color: var(--sci-color-background-elevation);
-  padding: $padding_menu;
+  padding: var(--ɵsci-menu-padding);
   margin: unset; // unset native popover styling
   inset: unset; // unset native popover styling
   outline: none;
@@ -102,6 +104,45 @@ $icon-size: 18px;
     }
   }
 
+  &:has(> sci-viewport) {
+    padding: var(--ɵsci-menu-padding) 0;
+
+    // TODO [menu] find better solution
+    > header.group-header {
+      margin: 0 var(--ɵsci-menu-padding);
+    }
+
+    > button.group-header {
+      margin: 0 var(--ɵsci-menu-padding);
+    }
+
+    > div.filter {
+      margin: 0 var(--ɵsci-menu-padding);
+    }
+  }
+
+  > sci-viewport {
+    grid-column: 1/-1; // consume all columns
+    max-height: var(--ɵmenu-max-height);
+
+    &::part(content) {
+      grid-column: 1/-1; // consume all columns
+      display: grid;
+      gap: $menu_item_gap .5em;
+      grid-template-columns:
+      // === Menu subgrid ===
+        auto // glyph area for icons and check marks
+        1fr; // label area
+      padding: 0 var(--ɵsci-menu-padding);
+    }
+  }
+
+  &.no-glyph-area > sci-viewport::part(content) {
+    grid-template-columns:
+      // === Menu subgrid ===
+      1fr; // label area
+  }
+
   > div.filter {
     grid-column: 1/-1; // consume all columns
     display: inline-grid;
@@ -118,7 +159,7 @@ $icon-size: 18px;
     margin-bottom: .5em;
   }
 
-  > div.filter.no-items-message {
+  div.no-items-message {
     grid-column: 1/-1;
     justify-self: center;
     display: block;
@@ -128,7 +169,7 @@ $icon-size: 18px;
   }
 
   // Add before separator
-  > *:not(hr) + sci-menu-group::before {
+  *:not(hr) + sci-menu-group:has(:not(:scope > sci-menu-group))::before {
     content: '';
     grid-column: 1/-1;
     height: 1px;
@@ -136,15 +177,16 @@ $icon-size: 18px;
   }
 
   // Add after separator
-  > sci-menu-group:not(:last-child):not(:has(+ sci-menu-group))::after {
+  sci-menu-group:not(:last-child):not(:has(+ sci-menu-group))::after {
     content: '';
     grid-column: 1/-1;
     height: 1px;
     background-color: var(--sci-color-border);
   }
 
-  > button.menu-item {
+  button.menu-item {
     @include button();
+
     grid-column: 1/-1; // consume all columns
     display: inline-grid;
     grid-template-columns: subgrid;
@@ -189,6 +231,11 @@ $icon-size: 18px;
 
         &:hover {
           --sci-toolbar-toolitem-background-color-active: color-mix(in srgb, var(--sci-workbench-button-background-color-active) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+        }
+
+        // Hide actions toolbar while scrolling.
+        @container style(--ɵmenu-scrolling: true) {
+          display: none;
         }
       }
     }

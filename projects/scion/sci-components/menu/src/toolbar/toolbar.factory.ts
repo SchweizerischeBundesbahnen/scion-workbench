@@ -58,6 +58,7 @@ export interface SciToolbarMenuDescriptor {
     width?: string;
     minWidth?: string;
     maxWidth?: string;
+    maxHeight?: string;
     filter?: boolean | {placeholder?: string; notFoundText?: string};
   };
   cssClass?: string | string[];

@@ -64,6 +64,7 @@ export class ɵSciMenuFactory implements SciMenuFactory {
         width: descriptor.menu?.width,
         minWidth: descriptor.menu?.minWidth,
         maxWidth: descriptor.menu?.maxWidth,
+        maxHeight: descriptor.menu?.maxHeight,
         filter: descriptor.menu?.filter,
       },
       children: menuFactory.menuItems,

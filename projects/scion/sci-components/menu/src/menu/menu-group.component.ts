@@ -1,4 +1,4 @@
-import {ApplicationRef, ChangeDetectionStrategy, Component, computed, createComponent, effect, ElementRef, EnvironmentInjector, inject, Injector, input, inputBinding, untracked} from '@angular/core';
+import {ApplicationRef, ChangeDetectionStrategy, Component, computed, createComponent, effect, ElementRef, EnvironmentInjector, inject, Injector, input, inputBinding, signal, untracked} from '@angular/core';
 import {MenuComponent} from './menu.component';
 import {SciMenuGroup} from '../menu.model';
 
@@ -31,6 +31,7 @@ export class MenuItemGroupComponent {
         environmentInjector,
         hostElement,
         bindings: [
+          inputBinding('type', signal('group')),
           inputBinding('menuItems', computed(() => this.group().children)),
           inputBinding('disabled', this.disabled),
           inputBinding('group', computed(() => ({

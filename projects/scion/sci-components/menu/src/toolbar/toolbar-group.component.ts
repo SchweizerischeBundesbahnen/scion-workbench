@@ -46,9 +46,10 @@ export class SciToolGroupComponent {
             cssClass: activeSubMenuItem.menu.cssClass,
             filter: activeSubMenuItem.menu.menu.filter,
             size: {
+              width: activeSubMenuItem.menu.menu.width,
               minWidth: activeSubMenuItem.menu.menu.minWidth,
               maxWidth: activeSubMenuItem.menu.menu.maxWidth,
-              width: activeSubMenuItem.menu.menu.width,
+              maxHeight: activeSubMenuItem.menu.menu.maxHeight,
             },
             align: 'vertical',
           });

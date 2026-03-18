@@ -163,6 +163,7 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
   private createMenuPopover(menuItems: Signal<SciMenuItemLike[]>, anchorElement: HTMLElement, options: SciMenuOptions & {focus?: boolean}): ComponentRef<MenuComponent> {
     const anchorSize = dimension(anchorElement);
     const bindings: Binding[] = [
+      inputBinding('type', signal('menu')),
       inputBinding('menuItems', menuItems),
       inputBinding('filter', signal(options.filter)),
       inputBinding('sizeInput', signal(options.size)),

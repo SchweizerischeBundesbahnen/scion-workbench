@@ -105,7 +105,7 @@ export class ViewTabComponent {
 
   protected onContextmenu(event: MouseEvent): void {
     // void this._viewMenuService.showMenu({x: event.clientX, y: event.clientY}, this.view().id);
-    this._menuService.open('menu:workbench.view.contextmenu', {anchor: event, context: new Map().set('viewId', this.view().id), size: {minWidth: '20em'}}); // TODO [menu] remove minWidth; width not working
+    this._menuService.open('menu:workbench.view.contextmenu', {anchor: event, context: new Map().set('viewId', this.view().id), size: {width: '20em'}});
   }
 
   protected onDragStart(event: DragEvent): void {

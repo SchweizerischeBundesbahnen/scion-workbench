@@ -4,11 +4,14 @@ import {MenuItemGroupComponent} from './menu-group.component';
 import {MenuFilterComponent} from './menu-filter.component';
 import {MenuFilter} from './menu-filter.service';
 import {ToolbarStateDirective} from '../toolbar/toolbar-state.directive';
-import {NgComponentOutlet} from '@angular/common';
+import {NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
 import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model';
 import {ɵSciMenuService} from '../ɵmenu.service';
 import {SciToolGroupComponent} from '../toolbar/toolbar-group.component';
 import {NULL_MENU_CONTRIBUTIONS} from '../menu-contribution.model';
+import {SciViewportComponent} from '@scion/components/viewport';
+import {concat, fromEvent, map, NEVER, of, switchMap, timer} from 'rxjs';
+import {toObservable, toSignal} from '@angular/core/rxjs-interop';
 
 /**
  * Represents a menu or a group of menu items.
@@ -27,6 +30,8 @@ import {NULL_MENU_CONTRIBUTIONS} from '../menu-contribution.model';
     SciToolGroupComponent,
     ToolbarStateDirective,
     NgComponentOutlet,
+    SciViewportComponent,
+    NgTemplateOutlet,
   ],
   providers: [
     MenuFilter,
@@ -37,16 +42,19 @@ import {NULL_MENU_CONTRIBUTIONS} from '../menu-contribution.model';
     '[style.width]': 'size()?.width',
     '[style.min-width]': 'size()?.minWidth',
     '[style.max-width]': 'size()?.maxWidth',
+    '[style.--ɵmenu-max-height]': 'size()?.maxHeight',
+    '[style.--ɵmenu-scrolling]': 'scrolling() ? `true` : null',
     '[class]': 'cssClass()',
   },
 })
 export class MenuComponent {
 
+  public readonly type = input.required<'menu' | 'group'>();
   public readonly menuItems = input.required<Array<SciMenuItem | SciMenu | SciMenuGroup>>();
   public readonly disabled = input<boolean>();
   public readonly filter = input<boolean | {placeholder?: string; notFoundText?: string}>(false);
   public readonly group = input<{label?: string, collapsible: boolean, collapsed: boolean}>();
-  public readonly sizeInput = input<{width?: string; minWidth?: string; maxWidth?: string}>();
+  public readonly sizeInput = input<{width?: string; minWidth?: string; maxWidth?: string; maxHeight?: string}>();
   public readonly glyphArea = input<boolean>();
   public readonly anchorWidth = input(undefined, {transform: (width: number | undefined): string | undefined => width ? `${width}px` : undefined});
   public readonly cssClass = input<string[]>();
@@ -61,6 +69,8 @@ export class MenuComponent {
   protected readonly hasGlyphArea = computed(() => this.glyphArea() ?? (!!this.filter() || requiresGlyphArea(this.menuItems())));
   protected readonly menuItemsFiltered = computed(() => this.menuItems().filter(menuItem => this.matchesFilter(menuItem)()));
   protected readonly popoverAnchor = viewChild.required('popover_anchor', {read: ViewContainerRef});
+  protected readonly viewport = viewChild(SciViewportComponent);
+  protected readonly scrolling = this.computeScrolling();
   protected readonly activeSubMenuItem = linkedSignal<SciMenuItemLike[], {menu: SciMenu, element: HTMLElement} | null>({
     source: this.menuItems,  // reset active sub menu item when this component is re-used
     computation: () => null,
@@ -87,7 +97,8 @@ export class MenuComponent {
     return {
       width: this.sizeInput()?.width,
       minWidth: this.anchorWidth() ? `max(${preferredMinWidth}, ${this.anchorWidth()})` : preferredMinWidth,
-      maxWidth: this.sizeInput()?.maxWidth ?? '24em',
+      maxWidth: this.sizeInput()?.maxWidth ?? this.sizeInput()?.width ?? '24em',
+      maxHeight: this.sizeInput()?.maxHeight,
     };
   });
 
@@ -122,6 +133,12 @@ export class MenuComponent {
             viewContainerRef: this.popoverAnchor(),
             cssClass: activeSubMenuItem.menu.cssClass,
             filter: activeSubMenuItem.menu.menu.filter,
+            size: {
+              width: activeSubMenuItem.menu.menu.width,
+              minWidth: activeSubMenuItem.menu.menu.minWidth,
+              maxWidth: activeSubMenuItem.menu.menu.maxWidth,
+              maxHeight: activeSubMenuItem.menu.menu.maxHeight,
+            },
             align: 'horizontal',
             focus: false,
           });
@@ -166,6 +183,14 @@ export class MenuComponent {
 
   protected onActionToolbarMenuOpen(open: boolean): void {
     this._actionToolbarMenuOpen.set(open);
+  }
+
+  private computeScrolling(): Signal<boolean> {
+    return toSignal(toObservable(this.viewport)
+      .pipe(
+        switchMap(viewport => viewport ? fromEvent(viewport.viewportElement, 'scroll') : NEVER),
+        switchMap(() => concat(of(true), timer(150).pipe(map(() => false)))),
+      ), {initialValue: false});
   }
 
   private matchesFilter(menuItem: SciMenuItem | SciMenu | SciMenuGroup): Signal<boolean> {
@@ -214,5 +239,6 @@ function requiresGlyphArea(menuItems: SciMenuItemLike[]): boolean {
 interface PreferredSize {
   width?: string;
   minWidth?: string;
-  maxWidth?: string
+  maxWidth?: string;
+  maxHeight?: string;
 }
