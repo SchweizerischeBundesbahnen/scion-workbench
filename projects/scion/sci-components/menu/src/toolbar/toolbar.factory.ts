@@ -8,18 +8,18 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Signal} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
 import {SciMenuFactory} from '../menu/menu.factory';
+import {MaybeSignal} from '../common/utility-types';
 
 export interface SciToolbarFactory {
 
   // Describe that onSelect can call `inject` to get any required dependencies.
-  addToolbarItem(icon: string | Signal<string>, onSelect: () => void): this;
+  addToolbarItem(icon: MaybeSignal<string>, onSelect: () => void): this;
 
   addToolbarItem(descriptor: SciToolbarItemDescriptor): this;
 
-  addMenu(icon: string | Signal<string>, menuFactoryFn: (menu: SciMenuFactory) => void): this;
+  addMenu(icon: string | MaybeSignal<string>, menuFactoryFn: (menu: SciMenuFactory) => void): this;
 
   addMenu(descriptor: SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this;
 
@@ -32,12 +32,12 @@ export type SciToolbarGroupFactory = SciToolbarFactory;
 
 export interface SciToolbarItemDescriptor {
   name?: `menuitem:${string}`;
-  label?: string | Signal<string> | ComponentType<unknown>;
-  icon: string | Signal<string>;
-  checked?: boolean | Signal<boolean>;
-  tooltip?: string | Signal<string>;
+  label?: MaybeSignal<string> | ComponentType<unknown>;
+  icon: MaybeSignal<string>;
+  checked?: MaybeSignal<boolean>;
+  tooltip?: MaybeSignal<string>;
   accelerator?: string[];
-  disabled?: boolean | Signal<boolean>;
+  disabled?: MaybeSignal<boolean>;
   cssClass?: string | string[];
   onSelect: () => void;
   /** Arbitrary metadata associated with the menu. */
@@ -46,10 +46,10 @@ export interface SciToolbarItemDescriptor {
 
 export interface SciToolbarMenuDescriptor {
   name?: `menu:${string}`;
-  label?: Signal<string> | string | ComponentType<unknown>;
-  icon?: string | Signal<string>;
-  tooltip?: string | Signal<string>;
-  disabled?: boolean | Signal<boolean>;
+  label?: MaybeSignal<string> | ComponentType<unknown>;
+  icon?: MaybeSignal<string>;
+  tooltip?: MaybeSignal<string>;
+  disabled?: MaybeSignal<boolean>;
   /**
    * Controls the display of a visual marker for menu dropdown. Defaults to `true`.
    */
@@ -67,7 +67,7 @@ export interface SciToolbarMenuDescriptor {
 
 export interface SciToolbarGroupDescriptor {
   name?: `group:${string}`;
-  disabled?: boolean | Signal<boolean>;
+  disabled?: MaybeSignal<boolean>;
   cssClass?: string | string[];
   /** Arbitrary metadata associated with the menu. */
   data?: {[key: string]: string};

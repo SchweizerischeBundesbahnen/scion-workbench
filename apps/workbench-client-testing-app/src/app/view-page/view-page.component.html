@@ -1,3 +1,13 @@
+<sci-toolbar name="toolbar:testee"/>
+
+<div class="toolbar">
+
+  <button (click)="toggleMenu1()">Menu 1 ({{contributionRef1 ? 'contributed' : 'not contributed'}})</button>
+  <button (click)="toggleMenu2()">Menu 2 ({{contributionRef2 ? 'contributed' : 'not contributed'}})</button>
+</div>
+
+<div class="context-menu" (contextmenu)="onContextMenuOpen($event)">Right-click to open a context menu</div>
+
 <section>
   <sci-form-field label="View ID">
     <span class="e2e-view-id">{{view.id}}</span>

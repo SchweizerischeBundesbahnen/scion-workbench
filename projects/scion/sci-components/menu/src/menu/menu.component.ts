@@ -4,14 +4,16 @@ import {MenuItemGroupComponent} from './menu-group.component';
 import {MenuFilterComponent} from './menu-filter.component';
 import {MenuFilter} from './menu-filter.service';
 import {ToolbarStateDirective} from '../toolbar/toolbar-state.directive';
-import {MenuItemStateDirective} from './menu-item-state.directive';
 import {NgComponentOutlet} from '@angular/common';
 import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model';
 import {ɵSciMenuService} from '../ɵmenu.service';
 import {SciToolGroupComponent} from '../toolbar/toolbar-group.component';
+import {NULL_MENU_CONTRIBUTIONS} from '../menu-contribution.model';
 
 /**
  * Represents a menu or a group of menu items.
+ *
+ * TODO This component is not reused anymore, thus remove comments below.
  */
 @Component({
   selector: 'sci-menu',
@@ -24,7 +26,6 @@ import {SciToolGroupComponent} from '../toolbar/toolbar-group.component';
     MenuFilterComponent,
     SciToolGroupComponent,
     ToolbarStateDirective,
-    MenuItemStateDirective,
     NgComponentOutlet,
   ],
   providers: [
@@ -65,6 +66,8 @@ export class MenuComponent {
     computation: () => null,
   });
 
+  protected readonly NULL_MENU_CONTRIBUTION = NULL_MENU_CONTRIBUTIONS;
+
   protected readonly isGroupExpanded = linkedSignal(() => {
     const group = this.group();
 
@@ -91,8 +94,9 @@ export class MenuComponent {
   constructor() {
     // Maintain stable width when expanding/collapsing groups or hovering menu item when displaying the actions toolbar.
     afterRenderEffect(() => {
-      this.menuItems(); // re-evaluate when re-used
-      this.size.update(size => ({...size, width: `${this._host.getBoundingClientRect().width}px`}));
+      if (this.menuItems().length) { // capture initial width only when having menu items.
+        this.size.update(size => ({...size, width: `${this._host.getBoundingClientRect().width}px`}));
+      }
     });
 
     // Close action menu when this component is re-used.
@@ -119,6 +123,7 @@ export class MenuComponent {
             cssClass: activeSubMenuItem.menu.cssClass,
             filter: activeSubMenuItem.menu.menu.filter,
             align: 'horizontal',
+            focus: false,
           });
           ref.onClose(() => {
             // do not close other menu

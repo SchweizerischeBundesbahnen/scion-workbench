@@ -2,4 +2,4 @@
  * Entry point for all public APIs of this package.
  */
 
-export * from './lib/workbench-client-angular';
+export {provideWorkbenchClientAngular} from './lib/workbench-client-angular.provider';

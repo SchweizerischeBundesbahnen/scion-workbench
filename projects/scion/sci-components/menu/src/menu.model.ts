@@ -1,6 +1,7 @@
 import {Signal} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
 import {SciMenuContributionPosition} from './menu-contribution.model';
+import {OneOf} from './common/utility-types';
 
 /**
  * INPUTS FOR DESCRIPTION: https://www.electronjs.org/docs/latest/api/menu-item
@@ -8,7 +9,10 @@ import {SciMenuContributionPosition} from './menu-contribution.model';
 export interface SciMenuItem {
   type: 'menu-item'
   name?: `menuitem:${string}`;
-  label?: Signal<string | ComponentType<unknown>>;
+  label?: OneOf<{
+    text?: Signal<string>;
+    component?: ComponentType<unknown>;
+  }>;
   icon?: Signal<string>;
   tooltip?: Signal<string>;
   accelerator?: string[];
@@ -27,7 +31,10 @@ export interface SciMenuItem {
 export interface SciMenu {
   type: 'menu'
   name?: `menu:${string}`;
-  label?: Signal<string | ComponentType<unknown>>;
+  label?: OneOf<{
+    text?: Signal<string>;
+    component?: ComponentType<unknown>;
+  }>;
   icon?: Signal<string>;
   tooltip?: Signal<string>;
   disabled: Signal<boolean>; // Consider renaming to enabled; https://www.electronjs.org/docs/latest/api/menu-item

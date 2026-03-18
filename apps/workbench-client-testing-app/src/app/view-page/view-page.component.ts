@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {Component, computed, inject, Injector, signal, WritableSignal} from '@angular/core';
 import {FormGroup, FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {CanCloseRef, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {ActivatedRoute} from '@angular/router';
@@ -25,6 +25,7 @@ import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {contributeMenu, Disposable, SciMenuService, SciToolbarComponent} from '@scion/sci-components/menu';
 
 @Component({
   selector: 'app-view-page',
@@ -44,6 +45,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
     SciKeyValueFieldComponent,
     SciViewportComponent,
     FormsModule,
+    SciToolbarComponent,
   ],
 })
 export default class ViewPageComponent {
@@ -51,6 +53,7 @@ export default class ViewPageComponent {
   private readonly _formBuilder = inject(NonNullableFormBuilder);
   private readonly _router = inject(WorkbenchRouter);
   private readonly _messageBoxService = inject(WorkbenchMessageBoxService);
+  private readonly _menuService = inject(SciMenuService);
 
   protected readonly view = inject(WorkbenchView);
   protected readonly route = inject(ActivatedRoute);
@@ -96,6 +99,155 @@ export default class ViewPageComponent {
       .subscribe(capability => {
         console.debug(`[ViewCapability$::first] [component=ViewPageComponent@${this.uuid}, capabilityId=${capability.metadata!.id}]`);
       });
+
+    this.contributeToolbar();
+    if (1 + 1) {
+      // return;
+    }
+    this.contributeContextMenu();
+  }
+
+  protected contributionRef1: Disposable | undefined;
+  protected contributionRef2: Disposable | undefined;
+  private injector = inject(Injector);
+
+  protected toggleMenu1(): void {
+    if (this.contributionRef1) {
+      this.contributionRef1.dispose();
+      this.contributionRef1 = undefined;
+    }
+    else {
+      this.contributionRef1 = contributeMenu('toolbar:router-page', menu => {
+          console.log('>>> factory contribute menu 1');
+          menu
+            .addToolbarItem('favorite', onSelect);
+        }
+        , {requiredContext: new Map().set('viewId', undefined), injector: this.injector});
+    }
+  }
+
+  protected toggleMenu2(): void {
+    if (this.contributionRef2) {
+      this.contributionRef2.dispose();
+      this.contributionRef2 = undefined;
+    }
+    else {
+      this.contributionRef2 = contributeMenu('toolbar:router-page', menu => {
+          console.log('>>> factory contribute menu 2');
+
+          menu
+            .addToolbarItem('train', onSelect);
+        }
+        , {requiredContext: new Map().set('viewId', undefined), injector: this.injector});
+    }
+  }
+
+  private contributeToolbar(): void {
+    const sig = signal(true);
+    // setInterval(() => {
+    //   sig.update(value => !value);
+    // }, 2000);
+
+    contributeMenu('toolbar:testee', toolbar => {
+        toolbar.addToolbarItem({icon: 'home', onSelect});
+        if (sig()) {
+          toolbar.addToolbarItem({icon: 'train', onSelect});
+        }
+      },
+    );
+
+    // contributeMenu('toolbar:router-page', menu => menu
+    //     .addToolbarItem('favorite', onSelect)
+    //   , {requiredContext: new Map().set('viewId', undefined)});
+    // contributeMenu('toolbar:router-page', menu => menu
+    //     .addToolbarItem('cancel', onSelect)
+    //   , {requiredContext: new Map().set('viewId', undefined)});
+
+    if (1 + 1) {
+      // return;
+    }
+    contributeMenu('menu:workbench.part.additions', menu => menu
+      .addMenuItem({label: 'Home', icon: 'home', onSelect})
+      .addMenuItem({label: 'Train', icon: 'train', onSelect}),
+    );
+
+    contributeMenu('toolbar:workbench.part', toolbar => toolbar
+        .addToolbarItem('home', onSelect),
+      // .addToolbarItem('train', onSelect),
+    );
+
+    const flags = signal(new Set<string>()
+      .add('always_select_opened_element')
+      .add('server_and_database_objects')
+      .add('schema_objects')
+      .add('object_elements')
+      .add('use_natural_order_when_sorting')
+      .add('single_object_levels')
+      .add('generate_objects')
+      .add('virtual_objects')
+      .add('query_files')
+      .add('format_italic')
+      .add('single_object_levels'),
+    );
+    const viewMode = signal('dock_pinned');
+    const moveTo = signal('left_top');
+
+    contributeMenu('menu:workbench.part.additions', menu => menu
+      .addMenu({label: 'File', menu: {filter: {placeholder: 'hello', notFoundText: 'nüd found'}}}, menu => menu
+        .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N'], onSelect: () => onSelect()})
+        .addMenuItem({label: 'Open', icon: 'folder', onSelect: () => onSelect()})
+        .addMenuItem({label: 'Make a Copy', icon: 'file_copy', onSelect: () => onSelect()})
+        .addMenu({label: 'Share', name: 'menu:share', icon: 'person_add'}, menu => menu
+          .addMenuItem({label: 'Share with others', icon: 'person_add', name: 'menuitem:share-with-others', onSelect: () => onSelect()})
+          .addMenuItem({label: 'Publish to web', icon: 'public', onSelect: () => onSelect()})
+          .addMenu({label: 'Text', icon: 'format_bold'}, menu => menu
+            .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], onSelect: () => onSelect()})
+            .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], onSelect: () => onSelect()})
+            .addMenuItem({label: 'Underline', icon: 'format_underlined', onSelect: () => onSelect()})
+            .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s', onSelect: () => onSelect()})
+            .addMenu({label: 'Size', icon: 'format_bold'}, menu => menu
+              .addMenuItem('Increase font size', () => onSelect())
+              .addMenuItem('Decrease font size', () => onSelect()),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    contributeMenu('toolbar:testee', toolbar => toolbar
+      .addGroup(group => group
+        .addGroup(group => group
+          .addToolbarItem('lens_blur', () => onSelect())
+          .addToolbarItem('lens_blur', () => onSelect())
+          .addToolbarItem('lens_blur', () => onSelect()),
+        ),
+      )
+      .addGroup(group => group
+        .addToolbarItem({icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], checked: computed(() => flags().has('format_bold')), onSelect: () => toggleMultiFlag(flags, 'format_bold')})
+        .addToolbarItem({icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], checked: computed(() => flags().has('format_italic')), onSelect: () => toggleMultiFlag(flags, 'format_italic')})
+        .addToolbarItem({icon: 'format_underlined', checked: computed(() => flags().has('format_underlined')), onSelect: () => toggleMultiFlag(flags, 'format_underlined')})
+        .addToolbarItem({icon: 'strikethrough_s', checked: computed(() => flags().has('strikethrough_s')), onSelect: () => toggleMultiFlag(flags, 'strikethrough_s')}),
+      )
+      .addMenu({label: 'File'}, menu => menu
+        .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N'], onSelect: () => onSelect()})
+        .addMenuItem({label: 'Open', icon: 'folder', onSelect: () => onSelect()})
+        .addMenuItem({label: 'Make a Copy', icon: 'file_copy', onSelect: () => onSelect()})
+        .addMenu({label: 'Share', name: 'menu:share', icon: 'person_add'}, menu => menu
+          .addMenuItem({label: 'Share with others', icon: 'person_add', name: 'menuitem:share-with-others', onSelect: () => onSelect()})
+          .addMenuItem({label: 'Publish to web', icon: 'public', onSelect: () => onSelect()}),
+        )
+        .addMenuItem({label: 'Download', icon: 'download', onSelect: () => onSelect()})
+        .addMenuItem({label: 'Print', icon: 'print', onSelect: () => onSelect()}),
+      )
+      .addMenu({label: 'Edit', menu: {filter: {placeholder: 'Sueche...', notFoundText: 'Nüd gfunde.'}}}, menu => menu
+        .addMenuItem({label: 'Undo', icon: 'undo', accelerator: ['Ctrl', 'Z'], onSelect: () => onSelect()})
+        .addMenuItem({label: 'Redo', icon: 'redo', onSelect: () => onSelect()})
+        .addMenuItem({label: 'Cut', icon: 'content_cut', accelerator: ['Ctrl', 'X'], onSelect: () => onSelect()})
+        .addMenuItem({label: 'Copy', icon: 'content_copy', accelerator: ['Ctrl', 'C'], onSelect: () => onSelect()})
+        .addMenuItem({label: 'Paste', icon: 'content_paste', accelerator: ['Ctrl', 'V'], onSelect: () => onSelect()})
+        .addMenuItem({label: 'Find and replace', icon: 'find_replace', accelerator: ['Ctrl', 'F'], onSelect: () => onSelect()}),
+      ),
+    );
   }
 
   private async confirmClosing(): Promise<boolean> {
@@ -187,4 +339,80 @@ export default class ViewPageComponent {
       console.debug(`[${logPrefix}] [component=ViewPageComponent@${this.uuid}]`);
     });
   }
+
+  protected onContextMenuOpen(event: PointerEvent): void {
+    this._menuService.open('menu:contextmenu', {anchor: event});
+  }
+
+  private contributeContextMenu(): void {
+    contributeMenu('menu:contextmenu', (menu, context) => menu
+      .addMenuItem({label: 'Expand All', disabled: context.get('partId') === 'part.d7b1190a', accelerator: ['Ctrl', 'NumPad', '+'], onSelect: onSelect})
+      .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-'], onSelect: onSelect})
+      .addGroup(group => group
+        .addMenuItem({label: 'Navigate with Single Click', checked: computed(() => flags().has('navigate_with_single_click')), onSelect: () => toggleMultiFlag(flags, 'navigate_with_single_click')})
+        .addMenuItem({label: 'Always Select Opened Element', checked: computed(() => flags().has('always_select_opened_element')), onSelect: () => toggleMultiFlag(flags, 'always_select_opened_element')},
+        )
+        .addGroup(group => group
+          .addMenuItem({label: 'Speed Search', icon: 'search', accelerator: ['Ctrl', 'F'], onSelect: () => console.log('>>> speed search (Ctrl + F)', context)}),
+        )
+        .addGroup(group => group
+          .addMenu({label: 'View Mode'}, menu => menu
+            .addMenuItem({label: 'Dock Pinned', checked: computed(() => viewMode() === 'dock_pinned'), onSelect: () => viewMode.set('dock_pinned')})
+            .addMenuItem({label: 'Dock Unpinned', checked: computed(() => viewMode() === 'dock_unpinned'), onSelect: () => viewMode.set('dock_unpinned')})
+            .addMenuItem({label: 'Undock', checked: computed(() => viewMode() === 'unddock'), onSelect: () => viewMode.set('unddock')})
+            .addMenuItem({label: 'Float', checked: computed(() => viewMode() === 'float'), onSelect: () => viewMode.set('float')})
+            .addMenuItem({label: 'Window', checked: computed(() => viewMode() === 'window'), onSelect: () => viewMode.set('window')}))
+          .addMenu({label: 'Move To'}, menu => menu
+            .addMenuItem({label: 'Left Top', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_top'), onSelect: () => moveTo.set('left_top')})
+            .addMenuItem({label: 'Left Bottom', icon: 'dock_to_left', disabled: computed(() => moveTo() === 'left_bottom'), onSelect: () => moveTo.set('left_bottom')})
+            .addMenuItem({label: 'Bottom Left', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_left'), onSelect: () => moveTo.set('bottom_left')})
+            .addMenuItem({label: 'Bottom Right', icon: 'dock_to_bottom', disabled: computed(() => moveTo() === 'bottom_right'), onSelect: () => moveTo.set('bottom_right')})
+            .addMenuItem({label: 'Right Bottom', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_bottom'), onSelect: () => moveTo.set('right_bottom')})
+            .addMenuItem({label: 'Right Top', icon: 'dock_to_right', disabled: computed(() => moveTo() === 'right_top'), onSelect: () => moveTo.set('right_top')}),
+          )
+          .addMenu({label: 'Resize'}, menu => menu
+            .addMenuItem('Stretch to Left', onSelect)
+            .addMenuItem('Stretch to Right', onSelect)
+            .addMenuItem('Stretch to Top', onSelect)
+            .addMenuItem('Stretch to Bottom', onSelect)
+            .addMenuItem('Maximize Tool Window', onSelect),
+          ),
+        )
+        .addMenuItem('Remove from Sidebar', onSelect),
+      ),
+    )
+  }
 }
+
+function onSelect(): void {
+
+}
+
+function toggleMultiFlag(flags: WritableSignal<Set<string>>, flag: string): void {
+  flags.update(flags => {
+    const newFlags = new Set(flags);
+    if (flags.has(flag)) {
+      newFlags.delete(flag);
+    }
+    else {
+      newFlags.add(flag);
+    }
+    return newFlags;
+  });
+}
+
+const flags = signal(new Set<string>()
+  .add('always_select_opened_element')
+  .add('server_and_database_objects')
+  .add('schema_objects')
+  .add('object_elements')
+  .add('use_natural_order_when_sorting')
+  .add('single_object_levels')
+  .add('generate_objects')
+  .add('virtual_objects')
+  .add('query_files')
+  .add('format_italic')
+  .add('single_object_levels'),
+);
+const viewMode = signal('dock_pinned');
+const moveTo = signal('left_top');

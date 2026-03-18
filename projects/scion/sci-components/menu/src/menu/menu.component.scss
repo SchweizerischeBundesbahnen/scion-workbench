@@ -64,6 +64,7 @@ $icon-size: 18px;
   padding: $padding_menu;
   margin: unset; // unset native popover styling
   inset: unset; // unset native popover styling
+  outline: none;
   grid-template-columns:
     // === Menu subgrid ===
     auto // glyph area for icons and check marks

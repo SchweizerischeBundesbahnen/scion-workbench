@@ -8,21 +8,22 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {computed, EnvironmentProviders, inject, makeEnvironmentProviders, Signal} from '@angular/core';
+import {computed, EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
 import {SciMenuContextProvider} from '@scion/sci-components/menu';
-import {WorkbenchView} from '../view/workbench-view.model';
-import {WorkbenchPart} from '../part/workbench-part.model';
-import {WorkbenchDialog} from '../dialog/workbench-dialog.model';
-import {WorkbenchNotification} from '../notification/workbench-notification.model';
-import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
-import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
-import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog.model';
-import {ɵWorkbenchNotification} from '../notification/ɵworkbench-notification.model';
+import {WorkbenchView} from '../../view/workbench-view.model';
+import {WorkbenchPart} from '../../part/workbench-part.model';
+import {WorkbenchDialog} from '../../dialog/workbench-dialog.model';
+import {WorkbenchNotification} from '../../notification/workbench-notification.model';
+import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
+import {ɵWorkbenchPart} from '../../part/ɵworkbench-part.model';
+import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog.model';
+import {ɵWorkbenchNotification} from '../../notification/ɵworkbench-notification.model';
+import {MaybeSignal} from '../../common/utility-types';
 
 class WorkbenchMenuContextProvider implements SciMenuContextProvider {
 
   /** @inheritDoc */
-  public provideContext(): Map<string, unknown> | Signal<Map<string, unknown>> {
+  public provideContext(): MaybeSignal<Map<string, unknown>> {
     const view = inject(WorkbenchView, {optional: true});
     if (view) {
       return computed(() => new Map<string, unknown>()
@@ -55,7 +56,7 @@ class WorkbenchMenuContextProvider implements SciMenuContextProvider {
   }
 
   /** @inheritDoc */
-  public provideAcceleratorTarget(): Signal<Element | undefined> | undefined {
+  public provideAcceleratorTarget(): MaybeSignal<Element | undefined> {
     const view = inject(ɵWorkbenchView, {optional: true});
     if (view) {
       return view.slot.portal.element;

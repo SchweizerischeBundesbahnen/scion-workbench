@@ -1,18 +1,20 @@
 import {SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuGroupFactory, SciMenuItemDescriptor} from './menu.factory';
-import {isSignal, Signal} from '@angular/core';
+import {inject, Injector, isSignal, runInInjectionContext, Signal} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model';
 import {coerceSignal} from '../common/common';
 import {ɵSciToolbarFactory} from '../toolbar/ɵtoolbar.factory';
+import {ComponentType} from '@angular/cdk/portal';
+import {MaybeSignal, OneOf} from '../common/utility-types';
 
 export class ɵSciMenuFactory implements SciMenuFactory {
 
   public readonly menuItems = [] as SciMenuItemLike[];
 
   /** @inheritDoc */
-  public addMenuItem(label: string | Signal<string>, onSelect: () => boolean | void): this;
+  public addMenuItem(label: MaybeSignal<string>, onSelect: () => boolean | void): this;
   public addMenuItem(descriptor: SciMenuItemDescriptor): this;
-  public addMenuItem(labelOrDescriptor: string | Signal<string> | SciMenuItemDescriptor, onSelect?: () => boolean | void): this {
+  public addMenuItem(labelOrDescriptor: MaybeSignal<string> | SciMenuItemDescriptor, onSelect?: () => boolean | void): this {
     const descriptor = coerceMenuItemDescriptor(labelOrDescriptor, onSelect);
 
     // Construct actions toolbar.
@@ -23,7 +25,7 @@ export class ɵSciMenuFactory implements SciMenuFactory {
     this.menuItems.push({
       type: 'menu-item',
       name: descriptor.name,
-      label: coerceSignal(descriptor.label),
+      label: coerceLabel(descriptor.label),
       icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
       checked: 'checked' in descriptor ? coerceSignal(descriptor.checked) : undefined,
       tooltip: coerceSignal(descriptor.tooltip),
@@ -41,9 +43,9 @@ export class ɵSciMenuFactory implements SciMenuFactory {
   }
 
   /** @inheritDoc */
-  public addMenu(label: string | Signal<string>, menuFactoryFn: (menu: SciMenuFactory) => void): this ;
+  public addMenu(label: MaybeSignal<string>, menuFactoryFn: (menu: SciMenuFactory) => void): this ;
   public addMenu(descriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this ;
-  public addMenu(labelOrDescriptor: string | Signal<string> | SciMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this {
+  public addMenu(labelOrDescriptor: MaybeSignal<string> | SciMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this {
     const descriptor = coerceMenuDescriptor(labelOrDescriptor);
 
     // Construct menu.
@@ -54,7 +56,7 @@ export class ɵSciMenuFactory implements SciMenuFactory {
     this.menuItems.push({
       type: 'menu',
       name: descriptor.name,
-      label: coerceSignal(descriptor.label),
+      label: coerceLabel(descriptor.label),
       icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
       tooltip: coerceSignal(descriptor.tooltip),
       disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
@@ -111,14 +113,14 @@ function computeCollapsible(groupDescriptor: SciMenuGroupDescriptor): {collapsed
   return {collapsed: false};
 }
 
-function coerceMenuItemDescriptor(labelOrDescriptor: string | Signal<string> | SciMenuItemDescriptor, onSelect?: () => boolean | void): SciMenuItemDescriptor {
+function coerceMenuItemDescriptor(labelOrDescriptor: MaybeSignal<string> | SciMenuItemDescriptor, onSelect?: () => boolean | void): SciMenuItemDescriptor {
   if (typeof labelOrDescriptor === 'string' || isSignal(labelOrDescriptor)) {
     return {label: labelOrDescriptor, onSelect: onSelect!};
   }
   return labelOrDescriptor;
 }
 
-function coerceMenuDescriptor(labelOrDescriptor: string | Signal<string> | SciMenuDescriptor): SciMenuDescriptor {
+function coerceMenuDescriptor(labelOrDescriptor: MaybeSignal<string> | SciMenuDescriptor): SciMenuDescriptor {
   if (typeof labelOrDescriptor === 'string' || isSignal(labelOrDescriptor)) {
     return {label: labelOrDescriptor};
   }
@@ -130,4 +132,18 @@ function coerceGroupDescriptor(factoryOrDescriptor: ((group: SciMenuGroupFactory
     return [{}, factoryOrDescriptor];
   }
   return [factoryOrDescriptor, factoryIfDescriptor];
+}
+
+function coerceLabel(label: MaybeSignal<string> | ComponentType<unknown>): OneOf<{text?: Signal<string>; component?: ComponentType<unknown>}> {
+  if (typeof label === 'string' || isSignal(label)) {
+    return {text: coerceSignal(label)};
+  }
+  return {component: label};
+}
+
+export function ɵcreateSciMenu(menuFactoryFn: (menu: SciMenuFactory | SciMenuGroupFactory, context: Map<string, unknown>) => void, context: Map<string, unknown>, options?: {injector?: Injector}): SciMenuItemLike[] {
+  const injector = options?.injector ?? inject(Injector);
+  const menuFactory = new ɵSciMenuFactory();
+  runInInjectionContext(injector, () => menuFactoryFn(menuFactory, context));
+  return menuFactory.menuItems;
 }

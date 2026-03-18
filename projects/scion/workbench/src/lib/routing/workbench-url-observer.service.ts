@@ -32,6 +32,7 @@ import {PartId, ViewId} from '../workbench.identifiers';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 import {MPartGrid} from '../layout/workbench-grid.model';
+import {createDestroyableInjector} from '../common/injector.util';
 
 /**
  * Tracks the browser URL for workbench layout changes.
@@ -255,13 +256,13 @@ export class WorkbenchUrlObserver {
 
   private createWorkbenchPart(partId: PartId, layout: ɵWorkbenchLayout): ɵWorkbenchPart {
     // Construct the handle in an injection context that shares the part's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
-    const partInjector = Injector.create({parent: this._injector, providers: [], name: `Workbench Part ${partId}`});
+    const partInjector = createDestroyableInjector({parent: this._injector, name: `Workbench Part ${partId}`});
     return runInInjectionContext(partInjector, () => new ɵWorkbenchPart(partId, layout));
   }
 
   private createWorkbenchView(viewId: ViewId, layout: ɵWorkbenchLayout): ɵWorkbenchView {
     // Construct the handle in an injection context that shares the view's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
-    const viewInjector = Injector.create({parent: this._injector, providers: [], name: `Workbench View ${viewId}`});
+    const viewInjector = createDestroyableInjector({parent: this._injector, name: `Workbench View ${viewId}`});
     return runInInjectionContext(viewInjector, () => new ɵWorkbenchView(viewId, layout));
   }
 

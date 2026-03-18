@@ -1,25 +1,27 @@
 import {SciMenuFactory} from '../menu/menu.factory';
-import {isSignal, Signal} from '@angular/core';
+import {inject, Injector, isSignal, runInInjectionContext, Signal} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarGroupFactory, SciToolbarItemDescriptor, SciToolbarMenuDescriptor} from './toolbar.factory';
 import {coerceSignal} from '../common/common';
 import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model';
 import {ɵSciMenuFactory} from '../menu/ɵmenu.factory';
+import {MaybeSignal, OneOf} from '../common/utility-types';
+import {ComponentType} from '@angular/cdk/portal';
 
 export class ɵSciToolbarFactory implements SciToolbarFactory {
 
   public readonly menuItems = [] as SciMenuItemLike[];
 
   /** @inheritDoc */
-  public addToolbarItem(icon: string | Signal<string>, onSelect: () => void): this;
+  public addToolbarItem(icon: MaybeSignal<string>, onSelect: () => void): this;
   public addToolbarItem(descriptor: SciToolbarItemDescriptor): this;
-  public addToolbarItem(iconOrDescriptor: string | Signal<string> | SciToolbarItemDescriptor, onSelect?: () => void): this {
+  public addToolbarItem(iconOrDescriptor: MaybeSignal<string> | SciToolbarItemDescriptor, onSelect?: () => void): this {
     const descriptor = coerceToolbarItemDescriptor(iconOrDescriptor, onSelect);
 
     this.menuItems.push({
       type: 'menu-item',
       name: descriptor.name,
-      label: coerceSignal(descriptor.label),
+      label: coerceLabel(descriptor.label),
       icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
       checked: 'checked' in descriptor ? coerceSignal(descriptor.checked) : undefined,
       tooltip: coerceSignal(descriptor.tooltip),
@@ -38,9 +40,9 @@ export class ɵSciToolbarFactory implements SciToolbarFactory {
   }
 
   /** @inheritDoc */
-  public addMenu(icon: string | Signal<string>, menuFactoryFn: (menu: SciMenuFactory) => void): this;
+  public addMenu(icon: MaybeSignal<string>, menuFactoryFn: (menu: SciMenuFactory) => void): this;
   public addMenu(descriptor: SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this;
-  public addMenu(iconOrDescriptor: string | Signal<string> | SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this {
+  public addMenu(iconOrDescriptor: MaybeSignal<string> | SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this {
     const descriptor = coerceMenuDescriptor(iconOrDescriptor);
 
     // Construct menu.
@@ -51,7 +53,7 @@ export class ɵSciToolbarFactory implements SciToolbarFactory {
     this.menuItems.push({
       type: 'menu',
       name: descriptor.name,
-      label: coerceSignal(descriptor.label),
+      label: coerceLabel(descriptor.label),
       icon: coerceSignal('icon' in descriptor ? descriptor.icon : undefined),
       tooltip: coerceSignal(descriptor.tooltip),
       disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
@@ -94,14 +96,14 @@ export class ɵSciToolbarFactory implements SciToolbarFactory {
   }
 }
 
-function coerceToolbarItemDescriptor(iconOrDescriptor: string | Signal<string> | SciToolbarItemDescriptor, onSelect?: () => void): SciToolbarItemDescriptor {
+function coerceToolbarItemDescriptor(iconOrDescriptor: MaybeSignal<string> | SciToolbarItemDescriptor, onSelect?: () => void): SciToolbarItemDescriptor {
   if (typeof iconOrDescriptor === 'string' || isSignal(iconOrDescriptor)) {
     return {icon: iconOrDescriptor, onSelect: onSelect!};
   }
   return iconOrDescriptor;
 }
 
-function coerceMenuDescriptor(iconOrDescriptor: string | Signal<string> | SciToolbarMenuDescriptor): SciToolbarMenuDescriptor {
+function coerceMenuDescriptor(iconOrDescriptor: MaybeSignal<string> | SciToolbarMenuDescriptor): SciToolbarMenuDescriptor {
   if (typeof iconOrDescriptor === 'string' || isSignal(iconOrDescriptor)) {
     return {icon: iconOrDescriptor};
   }
@@ -113,4 +115,21 @@ function coerceGroupDescriptor(factoryOrDescriptor: ((group: SciToolbarGroupFact
     return [{}, factoryOrDescriptor];
   }
   return [factoryOrDescriptor, factoryIfDescriptor];
+}
+
+function coerceLabel(label: MaybeSignal<string> | ComponentType<unknown> | undefined): OneOf<{text?: Signal<string>; component?: ComponentType<unknown>}> | undefined {
+  if (!label) {
+    return undefined;
+  }
+  if (typeof label === 'string' || isSignal(label)) {
+    return {text: coerceSignal(label)};
+  }
+  return {component: label};
+}
+
+export function ɵcreateSciToolbar(toolbarFactoryFn: (menu: SciToolbarFactory | SciToolbarGroupFactory, context: Map<string, unknown>) => void, context: Map<string, unknown>, options?: {injector?: Injector}): SciMenuItemLike[] {
+  const injector = options?.injector ?? inject(Injector);
+  const toolbarFactory = new ɵSciToolbarFactory();
+  runInInjectionContext(injector, () => toolbarFactoryFn(toolbarFactory, context));
+  return toolbarFactory.menuItems;
 }

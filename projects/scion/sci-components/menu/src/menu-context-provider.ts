@@ -8,12 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable, Signal} from '@angular/core';
+import {Injectable} from '@angular/core';
+import {MaybeSignal} from './common/utility-types';
 
 @Injectable()
 export abstract class SciMenuContextProvider {
 
-  public abstract provideContext?(): Map<string, unknown> | Signal<Map<string, unknown>>;
+  public abstract provideContext?(): MaybeSignal<Map<string, unknown>>;
 
-  public abstract provideAcceleratorTarget(): Element | undefined | Signal<Element | undefined>;
+  public abstract provideAcceleratorTarget(): MaybeSignal<Element | undefined>;
 }

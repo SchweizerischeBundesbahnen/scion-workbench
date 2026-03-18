@@ -99,9 +99,13 @@ export class AppComponent implements DoCheck {
       .addMenuItem('Remove from Sidebar', () => this.onAction()),
     );
 
-    if (1 + 1) {
-      return;
-    }
+    contributeMenu({location: 'toolbar:testee'}, menu => menu
+      .addToolbarItem({label: 'Teams From Host', icon: 'groups', onSelect: () => this.onAction()}),
+    );
+
+    contributeMenu({location: 'menu:share'}, menu => menu
+      .addMenuItem({label: 'Teams from Host', icon: 'groups', onSelect: () => this.onAction()}),
+    );
 
     const flags = signal(new Set<string>()
       .add('always_select_opened_element')
@@ -118,7 +122,7 @@ export class AppComponent implements DoCheck {
     );
     const paragraphStyle = signal<string>('');
 
-    if (1 + 1 === 3) {
+    if (1 + 1 === 2) {
       contributeMenu('toolbar:workbench.part.secondary', toolbar => toolbar
         .addMenu({label: 'File', menu: {filter: {placeholder: 'hello', notFoundText: 'nüd found'}}}, menu => menu
           .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N'], onSelect: () => this.onAction()})

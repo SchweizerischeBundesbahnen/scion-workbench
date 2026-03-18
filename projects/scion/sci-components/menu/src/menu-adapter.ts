@@ -8,22 +8,24 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable, Signal} from '@angular/core';
+import {Injectable, Injector, Signal} from '@angular/core';
 import {SciMenuOptions, SciMenuRef} from './menu.service';
 import {Disposable} from './common/disposable';
 import {SciMenuItemLike} from './menu.model';
 import {SciDefaultMenuAdapter} from './default-menu-adapter';
-import {SciGroupContribution, SciMenuContribution} from './menu-contribution.model';
+import {SciMenuContribution, SciToolbarContribution} from './menu-contribution.model';
 
 @Injectable({providedIn: 'root', useExisting: SciDefaultMenuAdapter})
 export abstract class SciMenuAdapter {
 
-  public abstract contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution | SciGroupContribution, next: SciMenuAdapter): Disposable;
-
-  public abstract menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>, next: SciMenuAdapter): Signal<SciMenuItemLike[]>;
+  public abstract contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution | SciToolbarContribution): Disposable;
 
   /**
-   * TODO Optional or required?
+   * The function:
+   * - Must be called within an injection context, or an explicit {@link Injector} passed.
+   * - Must be called in a non-reactive (non-tracking) context.
    */
-  public openMenu?(menuItems: SciMenuItemLike[], options: Omit<SciMenuOptions, 'context'>): SciMenuRef;
+  public abstract menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options?: {injector?: Injector}): Signal<SciMenuItemLike[]>;
+
+  public abstract openMenu(menu: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions & {focus?: boolean}): SciMenuRef;
 }

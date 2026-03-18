@@ -1,13 +1,11 @@
-import {ElementRef, Injectable, Signal, ViewContainerRef} from '@angular/core';
+import {ElementRef, Injectable, ViewContainerRef} from '@angular/core';
 import {ɵSciMenuService} from './ɵmenu.service';
-import {SciMenuItemLike} from './menu.model';
 
+// TODO [menu] Consider moving open (with menuitems) and menuContributions to separate service
 @Injectable({providedIn: 'root', useExisting: ɵSciMenuService})
 export abstract class SciMenuService {
 
   public abstract open(name: `menu:${string}`, options: SciMenuOptions): SciMenuRef;
-
-  public abstract menuContributions(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>): Signal<SciMenuItemLike[]>;
 }
 
 export interface SciMenuOptions {

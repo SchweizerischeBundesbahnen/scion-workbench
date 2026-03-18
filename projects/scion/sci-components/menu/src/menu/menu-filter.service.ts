@@ -27,8 +27,8 @@ export class MenuFilter {
           return false;
         }
 
-        const label = menuItem.label?.();
-        if (typeof label === 'string' && !label.match(filter)) {
+        const label = menuItem.label?.text?.();
+        if (label && !label.match(filter)) {
           return false;
         }
       }

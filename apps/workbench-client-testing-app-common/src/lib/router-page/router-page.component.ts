@@ -17,6 +17,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {UUID} from '@scion/toolkit/uuid';
 import {MultiValueInputComponent, parseTypedObject, prune, stringifyError} from 'workbench-testing-app-common';
 import {Beans} from '@scion/toolkit/bean-manager';
+import {SciToolbarComponent} from '@scion/sci-components/menu';
 
 @Component({
   selector: 'app-router-page',
@@ -28,6 +29,7 @@ import {Beans} from '@scion/toolkit/bean-manager';
     SciKeyValueFieldComponent,
     SciCheckboxComponent,
     MultiValueInputComponent,
+    SciToolbarComponent,
   ],
 })
 export class RouterPageComponent {
@@ -50,6 +52,8 @@ export class RouterPageComponent {
   protected readonly positionList = `position-list-${UUID.randomUUID()}`;
 
   protected navigateError: string | undefined;
+  protected toolbar1 = true;
+  protected toolbar2 = true;
 
   constructor() {
     Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.signalReady();
@@ -80,6 +84,15 @@ export class RouterPageComponent {
     this.form.reset();
     this.form.setControl('qualifier', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
     this.form.setControl('params', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
+  }
+
+  protected toggleToolbar1(): void {
+    this.toolbar1 = !this.toolbar1;
+  }
+
+  protected toggleToolbar2(): void {
+    this.toolbar2 = !this.toolbar2;
+
   }
 }
 
