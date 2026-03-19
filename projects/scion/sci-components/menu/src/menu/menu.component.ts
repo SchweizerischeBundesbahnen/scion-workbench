@@ -153,8 +153,9 @@ export class MenuComponent {
   }
 
   protected onSelect(menuItem: SciMenuItem): void {
-    runInInjectionContext(this._injector, () => {
-      if (menuItem.onSelect()) {
+    // TODO [menu] Disable during action until promise resolved.
+    void runInInjectionContext(this._injector, async () => {
+      if (await menuItem.onSelect()) {
         this.close();
       }
     });

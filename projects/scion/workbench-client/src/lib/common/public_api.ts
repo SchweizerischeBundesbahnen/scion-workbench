@@ -8,5 +8,5 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {type Empty} from './utility-types';
+export {type Empty, type OneOf, type MaybeAsync} from './utility-types';
 export {type Disposable} from './disposable';

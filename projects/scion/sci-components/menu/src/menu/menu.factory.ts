@@ -14,7 +14,7 @@ import {MaybeSignal} from '../common/utility-types';
 
 export interface SciMenuFactory {
   // Describe that onSelect can call `inject` to get any required dependencies.
-  addMenuItem(label: MaybeSignal<string>, onSelect: () => boolean | void): this;
+  addMenuItem(label: MaybeSignal<string>, onSelect: () => boolean | void | Promise<boolean | void>): this;
 
   addMenuItem(descriptor: SciMenuItemDescriptor): this;
 
@@ -40,9 +40,7 @@ export interface SciMenuItemDescriptor {
   actions?: (actions: SciToolbarFactory) => void;
   onFilter?: (filter: string) => boolean;
   cssClass?: string | string[];
-  onSelect: () => boolean | void;
-  /** Arbitrary metadata associated with the menu. */
-  data?: {[key: string]: string};
+  onSelect: () => boolean | void | Promise<boolean | void>;
 }
 
 export interface SciMenuDescriptor {
@@ -59,8 +57,6 @@ export interface SciMenuDescriptor {
     filter?: boolean | {placeholder?: string; notFoundText?: string};
   };
   cssClass?: string | string[];
-  /** Arbitrary metadata associated with the menu. */
-  data?: {[key: string]: string};
 }
 
 export interface SciMenuGroupDescriptor {
@@ -69,6 +65,4 @@ export interface SciMenuGroupDescriptor {
   collapsible?: boolean | {collapsed: boolean};
   disabled?: MaybeSignal<boolean>;
   cssClass?: string | string[];
-  /** Arbitrary metadata associated with the menu. */
-  data?: {[key: string]: string};
 }

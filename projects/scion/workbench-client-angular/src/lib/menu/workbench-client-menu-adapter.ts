@@ -1,81 +1,90 @@
-import {Disposable, SciMenuAdapter, SciMenuContribution, SciMenuItemLike, SciMenuOptions, SciMenuOrigin, SciMenuRef, SciToolbarContribution, ɵcreateSciMenu, ɵcreateSciToolbar} from '@scion/sci-components/menu';
-import {assertInInjectionContext, assertNotInReactiveContext, DestroyRef, effect, ElementRef, inject, Injector, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
-import {UUID} from '@scion/toolkit/uuid';
-import {mapToBody, MessageClient, MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
-import {WORKBENCH_ELEMENT, WorkbenchClientMenuItemLike, WorkbenchClientMenuOpenOptions, WorkbenchClientMenuOrigin, WorkbenchElement, ɵWorkbenchClientMenuContributionCreateCommand, ɵWorkbenchClientMenuContributionRegisterCommand, ɵWorkbenchClientMenuItemLookupCommand, ɵWorkbenchClientMenuOpenCommand} from '@scion/workbench-client';
-import {fromRemoteSignal, toRemoteSignal} from './remote-signal';
-import {firstValueFrom, map, Observable} from 'rxjs';
-import {createDestroyableInjector} from '../common/injector.util';
-import {prune, ɵassertInInjectionContext} from '../common/common';
+import {Disposable, SciMenuAdapter, SciMenuContribution, SciMenuItemLike, SciMenuOptions, SciMenuOrigin, SciMenuRef, SciToolbarContribution} from '@scion/sci-components/menu';
+import {assertInInjectionContext, assertNotInReactiveContext, effect, ElementRef, inject, Injector, linkedSignal, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
+import {WorkbenchMenuContributionLocation, WorkbenchMenuGroupContributionLocation, WorkbenchMenuOpenOptions, WorkbenchMenuOrigin, WorkbenchToolbarContributionLocation, WorkbenchToolbarGroupContributionLocation, ɵWorkbenchMenuService} from '@scion/workbench-client';
+import {first, map, Observable} from 'rxjs';
+import {ɵassertInInjectionContext} from '../common/common';
 import {coerceElement} from '@angular/cdk/coercion';
-import {Beans} from '@scion/toolkit/bean-manager';
+import {WorkbenchClientMenuFactoryDelegate} from './workbench-client-menu-factory-delegate';
+import {WorkbenchClientToolbarFactoryDelegate} from './workbench-client-toolbar-factory-delegate';
+import {SciMenuModel, toLazyObservable} from './workbench-client-menu-transform';
+import {UUID} from '@scion/toolkit/uuid';
 
 export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
 
-  private readonly _messageClient = inject(MessageClient);
+  private readonly _workbenchMenuService = inject(ɵWorkbenchMenuService);
   private readonly _injector = inject(Injector);
 
   /** @inheritDoc */
   public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution | SciToolbarContribution): Disposable {
     assertInInjectionContext(this.contributeMenu);
+    const {scope, name} = parseLocation(location, contribution);
+    const injector = this._injector;
 
-    const contributionId = UUID.randomUUID();
-    const contributionInjector = createDestroyableInjector({parent: this._injector});
+    // Delegate to `WorkbenchMenuService.contributeMenu()` of `@scion/workbench-client`.
+    switch (scope) {
+      case 'menu': {
+        const menuContribution = contribution as SciMenuContribution;
+        const location = {location: `menu:${name}`, ...contribution.position} satisfies WorkbenchMenuContributionLocation;
 
-    void this._messageClient.publish<ɵWorkbenchClientMenuContributionRegisterCommand>(`workbench/menu/contribution/${contributionId}/register`, {
-      location,
-      scope: contribution.scope,
-      requiredContext: contribution.requiredContext,
-      position: contribution.position,
-    });
+        // Delegate contribution to `WorkbenchMenuService.contributeMenu` of `@scion/workbench-client`.
+        return this._workbenchMenuService.contributeMenu(location, (menu, context) => {
+          return tracked(() => menuContribution.factory(new WorkbenchClientMenuFactoryDelegate(menu), context));
+        }, {requiredContext: contribution.requiredContext});
+      }
+      case 'group(menu)': {
+        const menuContribution = contribution as SciMenuContribution;
+        const location = {location: `group(menu):${name}`, ...contribution.position} satisfies WorkbenchMenuGroupContributionLocation;
 
-    const subscription = this._messageClient.onMessage<ɵWorkbenchClientMenuContributionCreateCommand, WorkbenchClientMenuItemLike[]>(`workbench/menu/contribution/${contributionId}/create`, request => {
-      const {context} = request.body!;
+        // Delegate contribution to `WorkbenchMenuService.contributeMenu` of `@scion/workbench-client`.
+        return this._workbenchMenuService.contributeMenu(location, (group, context) => {
+          return tracked(() => menuContribution.factory(new WorkbenchClientMenuFactoryDelegate(group), context));
+        }, {requiredContext: contribution.requiredContext});
+      }
+      case 'toolbar': {
+        const toolbarContribution = contribution as SciToolbarContribution;
+        const location = {location: `toolbar:${name}`, ...contribution.position} satisfies WorkbenchToolbarContributionLocation;
 
-      console.warn('>>> [Client] menu factory', location, context);
+        // Delegate contribution to `WorkbenchMenuService.contributeMenu` of `@scion/workbench-client`.
+        return this._workbenchMenuService.contributeMenu(location, (toolbar, context) => {
+          return tracked(() => toolbarContribution.factory(new WorkbenchClientToolbarFactoryDelegate(toolbar), context));
+        }, {requiredContext: contribution.requiredContext});
+      }
+      case 'group(toolbar)': {
+        const toolbarContribution = contribution as SciToolbarContribution;
+        const location = {location: `group(toolbar):${name}`, ...contribution.position} satisfies WorkbenchToolbarGroupContributionLocation;
 
-      return new Observable<WorkbenchClientMenuItemLike[]>(observer => {
-        const effectRef = effect(onCleanup => { // describe why effect -> creating menu in reactive context
-          const injector = createDestroyableInjector({parent: contributionInjector});
+        // Delegate contribution to `WorkbenchMenuService.contributeMenu` of `@scion/workbench-client`.
+        return this._workbenchMenuService.contributeMenu(location, (group, context) => {
+          return tracked(() => toolbarContribution.factory(new WorkbenchClientToolbarFactoryDelegate(group), context));
+        }, {requiredContext: contribution.requiredContext});
+      }
+    }
 
-          runInInjectionContext(injector, () => {
-            if (contribution.scope === 'menu') {
-              const menuItems = ɵcreateSciMenu(contribution.factory, context);
-              untracked(() => observer.next(transformToWorkbenchClientModel(menuItems)));
-            }
-            else if (contribution.scope === 'toolbar') {
-              const menuItems = ɵcreateSciToolbar(contribution.factory, context);
-              untracked(() => observer.next(transformToWorkbenchClientModel(menuItems)));
-            }
-            else {
-              observer.next([]);
-            }
-          });
-
-          onCleanup(() => injector.destroy());
-          onCleanup(() => console.warn('>>> [Client] menu factory effect DESTROY', location, context));
-        }, {injector: contributionInjector});
-
-        return () => effectRef.destroy(); // all locations are gone
+    /**
+     * Runs given function in a reactive context, returning an observable emitting when tracked dependencies change.
+     */
+    function tracked(fn: () => void): Observable<unknown> {
+      // Wrap factory in a signal to notify when tracked signals change.
+      const executeFn = linkedSignal({
+        source: () => undefined,
+        computation: (_source, previous) => {
+          if (!previous) {
+            runInInjectionContext(injector, fn);
+          }
+          return UUID.randomUUID();
+        },
       });
-    });
 
-    // Unregister contribution
-    contributionInjector.get(DestroyRef).onDestroy(() => {
-      subscription.unsubscribe();
-      void this._messageClient.publish(`workbench/menu/contribution/${contributionId}/unregister`);
-    });
+      // Execute immediately for synchronous menu creation.
+      const initialExecutionIdentifier = executeFn();
 
-    // Unregister menu contributions when stopping the platform, e.g., when closing the view, part, ..., or during hot code replacement.
-    void MicrofrontendPlatform.whenState(PlatformState.Stopping).then(() => contributionInjector.destroy());
-
-    return {
-      dispose: () => contributionInjector.destroy(),
+      // Create observable running the function in a reactive context, emitting when tracked dependencies change.
+      return toLazyObservable(executeFn, {injector}).pipe(first(executionIdentifier => executionIdentifier !== initialExecutionIdentifier)); // skip emission of initial execution
     }
   }
 
   /** @inheritDoc */
-  public menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options?: {injector?: Injector}): Signal<SciMenuItemLike[]> {
+  public menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options ?: {injector?: Injector}): Signal<SciMenuItemLike[]> {
     assertNotInReactiveContext(this.menuContributions, 'Call menuContributions() in a non-reactive (non-tracking) context. Each invocation creates a new subscription, asynchronously setting the signal\'s value, leading to an infinite loop if called in a reactive context.');
     if (!options?.injector) {
       ɵassertInInjectionContext(this.menuContributions, 'Call menuContributions() in an injection context, as it allocates resources that are not released until the injection context is destroyed.')
@@ -84,17 +93,13 @@ export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
     const menuContributions = signal<SciMenuItemLike[]>([]);
 
     effect(onCleanup => {
-      const command: ɵWorkbenchClientMenuItemLookupCommand = {location: location(), context: context()};
+      const _location = location();
+      const _context = context();
 
       untracked(() => {
-        const subscription = this._messageClient.request$<WorkbenchClientMenuItemLike[]>('workbench/menu/items', command)
-          .pipe(
-            mapToBody(),
-            map(menuItems => transformToSignalMenuModel(menuItems, {injector: this._injector})),
-          )
-          .subscribe(menuItems => {
-            menuContributions.set(menuItems);
-          });
+        const subscription = this._workbenchMenuService.menuContributions$(_location, _context)
+          .pipe(map(menuItems => SciMenuModel.transformToSciMenuModel(menuItems, {injector: this._injector})))
+          .subscribe(menuItems => menuContributions.set(menuItems));
         onCleanup(() => subscription.unsubscribe());
       });
     }, {injector});
@@ -103,159 +108,31 @@ export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
   }
 
   /** @inheritDoc */
-  public openMenu(menu: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions & {focus?: boolean}): SciMenuRef {
-    const injector = createDestroyableInjector({parent: this._injector});
-    const destroyRef = injector.get(DestroyRef);
-    const menuId = UUID.randomUUID();
-    const whenClose = firstValueFrom(this._messageClient.request$<void>(`workbench/menu/${menuId}/open`, {
-      menu: Array.isArray(menu) ? transformToWorkbenchClientModel(menu, {injector}) : menu,
-      options: prune({
-        anchor: coerceAnchor(options.anchor),
-        align: options.align,
-        size: {
-          width: options.size?.width,
-          minWidth: options.size?.minWidth,
-          maxWidth: options.size?.maxWidth,
-        },
-        filter: coerceFilter(options.filter),
-        focus: options.focus,
-        cssClass: options.cssClass,
-      }),
-      context: options.context ?? new Map(),
-      workbenchElementId: Beans.get<WorkbenchElement>(WORKBENCH_ELEMENT).id,
-    } satisfies ɵWorkbenchClientMenuOpenCommand));
+  public openMenu(menuLike: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions & {focus?: boolean}): SciMenuRef {
+    const menu = Array.isArray(menuLike) ? SciMenuModel.transformToWorkbenchMenuModel(menuLike, {injector: this._injector}) : menuLike;
 
-    whenClose.finally(() => injector.destroy());
+    const menuRef = this._workbenchMenuService.open(menu, {
+      anchor: coerceAnchor(options.anchor),
+      align: options.align,
+      size: {
+        width: options.size?.width,
+        minWidth: options.size?.minWidth,
+        maxWidth: options.size?.maxWidth,
+      },
+      filter: coerceFilter(options.filter),
+      focus: options.focus,
+      cssClass: options.cssClass,
+      context: options.context ?? new Map(),
+    });
 
     return {
-      close: () => this._messageClient.publish<void>(`workbench/menu/${menuId}/close`),
-      onClose: onClose => destroyRef.destroyed ? onClose() : destroyRef.onDestroy(onClose),
-    }
+      close: () => menuRef.close(),
+      onClose: onClose => menuRef.onClose(onClose),
+    };
   }
 }
 
-function transformToWorkbenchClientModel(menuItems: SciMenuItemLike[], options?: {injector?: Injector}): WorkbenchClientMenuItemLike[] {
-  const injector = options?.injector ?? inject(Injector);
-
-  return menuItems.map((menuItem: SciMenuItemLike): WorkbenchClientMenuItemLike => {
-    const menuItemId = UUID.randomUUID();
-
-    switch (menuItem.type) {
-      case 'menu-item': {
-        return {
-          id: menuItemId,
-          type: menuItem.type,
-          name: menuItem.name,
-          label: fromRemoteSignal(`label-${menuItemId}`, menuItem.label?.text, {injector}),
-          icon: fromRemoteSignal(`icon-${menuItemId}`, menuItem.icon, {injector}),
-          tooltip: fromRemoteSignal(`tooltip-${menuItemId}`, menuItem.tooltip, {injector}),
-          accelerator: menuItem.accelerator,
-          disabled: fromRemoteSignal(`disabled-${menuItemId}`, menuItem.disabled, {injector}),
-          checked: fromRemoteSignal(`checked-${menuItemId}`, menuItem.checked, {injector}),
-          actions: transformToWorkbenchClientModel(menuItem.actions, {injector}),
-          cssClass: menuItem.cssClass,
-          position: menuItem.position,
-        };
-      }
-      case 'menu': {
-        return {
-          id: menuItemId,
-          type: menuItem.type,
-          name: menuItem.name,
-          label: fromRemoteSignal(`label-${menuItemId}`, menuItem.label?.text, {injector}),
-          icon: fromRemoteSignal(`icon-${menuItemId}`, menuItem.icon, {injector}),
-          tooltip: fromRemoteSignal(`tooltip-${menuItemId}`, menuItem.tooltip, {injector}),
-          disabled: fromRemoteSignal(`disabled-${menuItemId}`, menuItem.disabled, {injector}),
-          visualMenuHint: menuItem.visualMenuHint,
-          position: menuItem.position,
-          menu: {
-            width: menuItem.menu.width,
-            minWidth: menuItem.menu.minWidth,
-            maxWidth: menuItem.menu.maxWidth,
-            maxHeight: menuItem.menu.maxHeight,
-            filter: menuItem.menu.filter,
-          },
-          cssClass: menuItem.cssClass,
-          children: transformToWorkbenchClientModel(menuItem.children, {injector}),
-        };
-      }
-      case 'group': {
-        return {
-          id: menuItemId,
-          type: menuItem.type,
-          name: menuItem.name,
-          label: fromRemoteSignal(`label-${menuItemId}`, menuItem.label, {injector}),
-          collapsible: menuItem.collapsible,
-          position: menuItem.position,
-          disabled: fromRemoteSignal(`disabled-${menuItemId}`, menuItem.disabled, {injector}),
-          children: transformToWorkbenchClientModel(menuItem.children, {injector}),
-          cssClass: menuItem.cssClass,
-        };
-      }
-    }
-  });
-}
-
-function transformToSignalMenuModel(menuItems: WorkbenchClientMenuItemLike[], options?: {injector?: Injector}): SciMenuItemLike[] {
-  const injector = options?.injector ?? inject(Injector);
-
-  return menuItems.map((menuItem: WorkbenchClientMenuItemLike): SciMenuItemLike => {
-    switch (menuItem.type) {
-      case 'menu-item': {
-        return {
-          type: menuItem.type,
-          name: menuItem.name,
-          label: menuItem.label ? {text: toRemoteSignal(`label-${menuItem.id}`, menuItem.label, {injector})} : undefined,
-          icon: toRemoteSignal(`icon-${menuItem.id}`, menuItem.icon, {injector}),
-          tooltip: toRemoteSignal(`tooltip-${menuItem.id}`, menuItem.tooltip, {injector}),
-          accelerator: menuItem.accelerator,
-          disabled: toRemoteSignal(`disabled-${menuItem.id}`, menuItem.disabled, {injector}),
-          checked: toRemoteSignal(`checked-${menuItem.id}`, menuItem.checked, {injector}),
-          actions: transformToSignalMenuModel(menuItem.actions, {injector}),
-          // matchesFilter: (filter: string) => true; // TODO
-          cssClass: menuItem.cssClass,
-          position: menuItem.position,
-          onSelect: () => true,
-        };
-      }
-      case 'menu': {
-        return {
-          type: menuItem.type,
-          name: menuItem.name,
-          label: menuItem.label ? {text: toRemoteSignal(`label-${menuItem.id}`, menuItem.label, {injector})} : undefined,
-          icon: toRemoteSignal(`icon-${menuItem.id}`, menuItem.icon, {injector}),
-          tooltip: toRemoteSignal(`tooltip-${menuItem.id}`, menuItem.tooltip, {injector}),
-          disabled: toRemoteSignal(`disabled-${menuItem.id}`, menuItem.disabled, {injector}),
-          visualMenuHint: menuItem.visualMenuHint,
-          position: menuItem.position,
-          menu: {
-            width: menuItem.menu.width,
-            minWidth: menuItem.menu.minWidth,
-            maxWidth: menuItem.menu.maxWidth,
-            maxHeight: menuItem.menu.maxHeight,
-            filter: menuItem.menu.filter,
-          },
-          cssClass: menuItem.cssClass,
-          children: transformToSignalMenuModel(menuItem.children, {injector}),
-        };
-      }
-      case 'group': {
-        return {
-          type: menuItem.type,
-          name: menuItem.name,
-          label: toRemoteSignal(`label-${menuItem.id}`, menuItem.label, {injector}),
-          collapsible: menuItem.collapsible,
-          position: menuItem.position,
-          disabled: toRemoteSignal(`disabled-${menuItem.id}`, menuItem.disabled, {injector}),
-          children: transformToSignalMenuModel(menuItem.children, {injector}),
-          cssClass: menuItem.cssClass,
-        };
-      }
-    }
-  });
-}
-
-function coerceAnchor(anchor: HTMLElement | ElementRef<HTMLElement> | SciMenuOrigin | MouseEvent): WorkbenchClientMenuOrigin {
+function coerceAnchor(anchor: HTMLElement | ElementRef<HTMLElement> | SciMenuOrigin | MouseEvent): WorkbenchMenuOrigin {
   if (anchor instanceof ElementRef || anchor instanceof HTMLElement) {
     const {x, y, width, height} = coerceElement(anchor).getBoundingClientRect();
     return {x, y, width, height};
@@ -268,7 +145,7 @@ function coerceAnchor(anchor: HTMLElement | ElementRef<HTMLElement> | SciMenuOri
   }
 }
 
-function coerceFilter(filter: SciMenuOptions['filter'] | undefined): WorkbenchClientMenuOpenOptions['filter'] | undefined {
+function coerceFilter(filter: SciMenuOptions['filter'] | undefined): WorkbenchMenuOpenOptions['filter'] | undefined {
   if (filter === undefined) {
     return undefined;
   }
@@ -279,4 +156,16 @@ function coerceFilter(filter: SciMenuOptions['filter'] | undefined): WorkbenchCl
     placeholder: filter.placeholder,
     notFoundText: filter.notFoundText,
   };
+}
+
+function parseLocation(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution | SciToolbarContribution): {scope: 'menu' | 'toolbar' | 'group(menu)' | 'group(toolbar)'; name: string} {
+  const regex = /^(?<type>.+):(?<name>.+)$/;
+  const {name} = regex.exec(location)!.groups!;
+
+  if (location.startsWith('menu:') || location.startsWith('toolbar:')) {
+    return {scope: contribution.scope, name: name!};
+  }
+  else {
+    return {scope: `group(${contribution.scope})`, name: name!};
+  }
 }

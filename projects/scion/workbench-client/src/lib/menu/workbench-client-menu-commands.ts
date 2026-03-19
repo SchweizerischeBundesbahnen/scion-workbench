@@ -1,11 +1,11 @@
-import {WorkbenchClientMenuContributionPosition, WorkbenchClientMenuItemLike, WorkbenchClientMenuOpenOptions} from './workbench-client-menu.model';
+import {WorkbenchMenuItemTransferableLike, WorkbenchMenuContributionPosition, WorkbenchMenuOpenOptions} from './workbench-client-menu.model';
 import {DialogId, NotificationId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 
 export interface ɵWorkbenchClientMenuContributionRegisterCommand {
   location: `menu:${string}` | `toolbar:${string}` | `group:${string}`,
   scope: 'menu' | 'toolbar',
   requiredContext: Map<string, unknown>;
-  position?: WorkbenchClientMenuContributionPosition;
+  position?: WorkbenchMenuContributionPosition;
 }
 
 export interface ɵWorkbenchClientMenuContributionCreateCommand {
@@ -18,8 +18,8 @@ export interface ɵWorkbenchClientMenuItemLookupCommand {
 }
 
 export interface ɵWorkbenchClientMenuOpenCommand {
-  menu: `menu:${string}` | WorkbenchClientMenuItemLike[];
-  options: WorkbenchClientMenuOpenOptions;
+  menu: `menu:${string}` | WorkbenchMenuItemTransferableLike[];
+  options: WorkbenchMenuOpenOptions;
   context: Map<string, unknown>;
   workbenchElementId: ViewId | PartId | DialogId | PopupId | NotificationId;
 }

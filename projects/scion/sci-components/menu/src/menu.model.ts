@@ -23,9 +23,7 @@ export interface SciMenuItem {
   matchesFilter?: (filter: string) => boolean;
   cssClass?: string[];
   position?: SciMenuContributionPosition;
-  onSelect: () => boolean;
-  /** Arbitrary metadata associated with the menu. */
-  data?: {[key: string]: string};
+  onSelect: () => Promise<boolean>;
 }
 
 export interface SciMenu {
@@ -50,8 +48,6 @@ export interface SciMenu {
   };
   cssClass?: string[];
   children: SciMenuItemLike[];
-  /** Arbitrary metadata associated with the menu. */
-  data?: {[key: string]: string};
 }
 
 export interface SciMenuGroup {
@@ -64,8 +60,6 @@ export interface SciMenuGroup {
   // visible: Signal<boolean>; // Consider providing visible
   children: SciMenuItemLike[];
   cssClass?: string[];
-  /** Arbitrary metadata associated with the menu. */
-  data?: {[key: string]: string};
 }
 
 export type SciMenuItemLike = SciMenuItem | SciMenu | SciMenuGroup;

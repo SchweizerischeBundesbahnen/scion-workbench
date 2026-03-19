@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, numberAttribute} from '@angular/core';
+import {Component, inject, Injector, numberAttribute, signal} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WORKBENCH_ELEMENT, WorkbenchElement, WorkbenchNavigationExtras, WorkbenchRouter} from '@scion/workbench-client';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
@@ -17,7 +17,8 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {UUID} from '@scion/toolkit/uuid';
 import {MultiValueInputComponent, parseTypedObject, prune, stringifyError} from 'workbench-testing-app-common';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {SciToolbarComponent} from '@scion/sci-components/menu';
+import {contributeMenu, SciToolbarComponent} from '@scion/sci-components/menu';
+import {Disposable} from '@scion/workbench';
 
 @Component({
   selector: 'app-router-page',
@@ -52,11 +53,25 @@ export class RouterPageComponent {
   protected readonly positionList = `position-list-${UUID.randomUUID()}`;
 
   protected navigateError: string | undefined;
+  protected injector = inject(Injector);
   protected toolbar1 = true;
   protected toolbar2 = true;
+  protected registration: Disposable | undefined;
+  private state = signal(false);
 
   constructor() {
     Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.signalReady();
+
+    console.log('>>> hellpo');
+
+    contributeMenu('toolbar:testee', toolbar => toolbar
+        .addToolbarItem({
+          icon: 'play_circle',
+          onSelect: () => {
+            this.state.update(state => !state);
+          },
+        })
+      , {requiredContext: new Map().set('viewId', undefined)});
   }
 
   protected async onNavigate(): Promise<void> {
@@ -93,6 +108,24 @@ export class RouterPageComponent {
   protected toggleToolbar2(): void {
     this.toolbar2 = !this.toolbar2;
 
+  }
+
+  protected toggleRegistratoin(): void {
+    if (this.registration) {
+      this.registration.dispose();
+      this.registration = undefined;
+    }
+    else {
+      this.registration = contributeMenu('toolbar:testee', toolbar => {
+        console.log(`>>> DEVELOPER FACTORY FUNCTION [state=${this.state()}]`);
+        if (this.state()) {
+          toolbar.addToolbarItem('home', () => {
+            console.log('>>> on click');
+          })
+        }
+      }, {requiredContext: new Map().set('viewId', undefined), injector: this.injector})
+
+    }
   }
 }
 

@@ -40,8 +40,6 @@ export interface SciToolbarItemDescriptor {
   disabled?: MaybeSignal<boolean>;
   cssClass?: string | string[];
   onSelect: () => void;
-  /** Arbitrary metadata associated with the menu. */
-  data?: {[key: string]: string};
 }
 
 export interface SciToolbarMenuDescriptor {
@@ -62,14 +60,10 @@ export interface SciToolbarMenuDescriptor {
     filter?: boolean | {placeholder?: string; notFoundText?: string};
   };
   cssClass?: string | string[];
-  /** Arbitrary metadata associated with the menu. */
-  data?: {[key: string]: string};
 }
 
 export interface SciToolbarGroupDescriptor {
   name?: `group:${string}`;
   disabled?: MaybeSignal<boolean>;
   cssClass?: string | string[];
-  /** Arbitrary metadata associated with the menu. */
-  data?: {[key: string]: string};
 }

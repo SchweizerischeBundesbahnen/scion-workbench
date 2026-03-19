@@ -17,12 +17,12 @@ export function contributeMenu(location: `toolbar:${string}` | SciToolbarContrib
 export function contributeMenu(location: `group(menu):${string}` | SciMenuGroupContributionLocation, groupFactoryFn: (group: SciMenuGroupFactory, context: Map<string, unknown>) => void, options?: SciMenuContributionOptions): Disposable;
 export function contributeMenu(location: `group(toolbar):${string}` | SciToolbarGroupContributionLocation, groupFactoryFn: (group: SciToolbarGroupFactory, context: Map<string, unknown>) => void, options?: SciMenuContributionOptions): Disposable;
 /** @internal */
-export function contributeMenu(locationLike: string | SciContributionLocation, factoryFn: Function, options?: SciMenuContributionOptions): Disposable;
-export function contributeMenu(locationLike: string | SciContributionLocation, factoryFn: Function, options?: SciMenuContributionOptions): Disposable {
+export function contributeMenu(locationLike: string | SciMenuContributionLocationLike, factoryFn: Function, options?: SciMenuContributionOptions): Disposable;
+export function contributeMenu(locationLike: string | SciMenuContributionLocationLike, factoryFn: Function, options?: SciMenuContributionOptions): Disposable {
   assertNotInReactiveContext(contributeMenu, 'Call contributeMenu in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
   const injector = createDestroyableInjector({parent: options?.injector});
-  const {location, before, after, position} = typeof locationLike === 'string' ? {location: locationLike} as SciContributionLocation : locationLike;
+  const {location, before, after, position} = typeof locationLike === 'string' ? {location: locationLike} as SciMenuContributionLocationLike : locationLike;
 
   const menuService = injector.get(ɵSciMenuService);
   const menuContextProvider = injector.get(SciMenuContextProvider, null, {optional: true});
@@ -35,7 +35,7 @@ export function contributeMenu(locationLike: string | SciContributionLocation, f
       if (location.startsWith('menu:') || location.startsWith('group(menu):')) {
         const contributionRef = menuService.contributeMenu(normalizeLocation(location), {
           scope: 'menu',
-          factory: factoryFn as unknown as (menu: SciMenuFactory | SciMenuGroupFactory, context: Map<string, unknown>) => void,
+          factory: factoryFn as (menu: SciMenuFactory | SciMenuGroupFactory, context: Map<string, unknown>) => void,
           requiredContext,
           position: prune({before, after, position} as SciMenuContributionPosition, {pruneIfEmpty: true}),
         });
@@ -44,7 +44,7 @@ export function contributeMenu(locationLike: string | SciContributionLocation, f
       else {
         const contributionRef = menuService.contributeMenu(normalizeLocation(location), {
           scope: 'toolbar',
-          factory: factoryFn as unknown as (toolbar: SciToolbarFactory | SciToolbarGroupFactory, context: Map<string, unknown>) => void,
+          factory: factoryFn as (toolbar: SciToolbarFactory | SciToolbarGroupFactory, context: Map<string, unknown>) => void,
           requiredContext,
           position: prune({before, after, position} as SciMenuContributionPosition, {pruneIfEmpty: true}),
         });
@@ -76,4 +76,4 @@ export interface SciMenuContributionOptions {
   requiredContext?: Map<string, unknown>;
 }
 
-export type SciContributionLocation = SciMenuContributionLocation | SciToolbarContributionLocation | SciMenuGroupContributionLocation | SciToolbarGroupContributionLocation;
+export type SciMenuContributionLocationLike = SciMenuContributionLocation | SciToolbarContributionLocation | SciMenuGroupContributionLocation | SciToolbarGroupContributionLocation;

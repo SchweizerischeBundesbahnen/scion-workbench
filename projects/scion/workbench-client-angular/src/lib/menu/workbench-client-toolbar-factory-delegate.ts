@@ -1,16 +1,20 @@
-import {SciMenuFactory} from '../menu/menu.factory';
-import {isSignal, Signal} from '@angular/core';
-import {Arrays} from '@scion/toolkit/util';
-import {SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarGroupFactory, SciToolbarItemDescriptor, SciToolbarMenuDescriptor} from './toolbar.factory';
-import {coerceSignal} from '../common/common';
-import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model';
-import {ɵSciMenuFactory} from '../menu/ɵmenu.factory';
-import {MaybeSignal, OneOf} from '../common/utility-types';
+import {WorkbenchMenuFactory, WorkbenchToolbarFactory, WorkbenchToolbarGroupFactory} from '@scion/workbench-client';
+import {inject, Injector, isSignal, runInInjectionContext} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
+import {MaybeSignal} from '../common/utility-types';
+import {SciMenuFactory, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarGroupFactory, SciToolbarItemDescriptor, SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
+import {WorkbenchClientMenuFactoryDelegate} from './workbench-client-menu-factory-delegate';
+import {toLazyObservable} from './workbench-client-menu-transform';
 
-export class ɵSciToolbarFactory implements SciToolbarFactory {
+/**
+ * Represents a {@link SciToolbarFactory} that delegates to {@link WorkbenchToolbarFactory} of `@scion/workbench-client`.
+ */
+export class WorkbenchClientToolbarFactoryDelegate implements SciToolbarFactory {
 
-  public readonly menuItems = [] as SciMenuItemLike[];
+  private readonly _injector = inject(Injector);
+
+  constructor(private readonly _delegate: WorkbenchToolbarFactory) {
+  }
 
   /** @inheritDoc */
   public addToolbarItem(icon: MaybeSignal<string>, onSelect: () => void): this;
@@ -18,22 +22,17 @@ export class ɵSciToolbarFactory implements SciToolbarFactory {
   public addToolbarItem(iconOrDescriptor: MaybeSignal<string> | SciToolbarItemDescriptor, onSelect?: () => void): this {
     const descriptor = coerceToolbarItemDescriptor(iconOrDescriptor, onSelect);
 
-    this.menuItems.push({
-      type: 'menu-item',
+    this._delegate.addToolbarItem({
       name: descriptor.name,
-      label: coerceLabel(descriptor.label),
-      icon: coerceSignal(descriptor.icon),
-      checked: coerceSignal(descriptor.checked),
-      tooltip: coerceSignal(descriptor.tooltip),
+      label: toLazyObservable(coerceLabel(descriptor.label)),
+      icon: toLazyObservable(descriptor.icon),
+      checked: toLazyObservable(descriptor.checked),
+      tooltip: toLazyObservable(descriptor.tooltip),
       accelerator: descriptor.accelerator,
-      disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
-      actions: [],
-      cssClass: Arrays.coerce(descriptor.cssClass),
-      onSelect: async () => {
-        descriptor.onSelect();
-        return false;
-      },
-    } satisfies SciMenuItem);
+      disabled: toLazyObservable(descriptor.disabled),
+      cssClass: descriptor.cssClass,
+      onSelect: () => runInInjectionContext(this._injector, descriptor.onSelect),
+    });
 
     return this;
   }
@@ -44,19 +43,13 @@ export class ɵSciToolbarFactory implements SciToolbarFactory {
   public addMenu(iconOrDescriptor: MaybeSignal<string> | SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this {
     const descriptor = coerceMenuDescriptor(iconOrDescriptor);
 
-    // Construct menu.
-    const menuFactory = new ɵSciMenuFactory();
-    menuFactoryFn(menuFactory);
-
-    // Add menu.
-    this.menuItems.push({
-      type: 'menu',
+    this._delegate.addMenu({
       name: descriptor.name,
-      label: coerceLabel(descriptor.label),
-      icon: coerceSignal(descriptor.icon),
-      tooltip: coerceSignal(descriptor.tooltip),
-      disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
-      visualMenuHint: descriptor.visualMenuHint ?? true,
+      label: toLazyObservable(coerceLabel(descriptor.label)),
+      icon: toLazyObservable(descriptor.icon),
+      tooltip: toLazyObservable(descriptor.tooltip),
+      disabled: toLazyObservable(descriptor.disabled),
+      visualMenuHint: descriptor.visualMenuHint,
       menu: {
         width: descriptor.menu?.width,
         minWidth: descriptor.menu?.minWidth,
@@ -64,9 +57,11 @@ export class ɵSciToolbarFactory implements SciToolbarFactory {
         maxHeight: descriptor.menu?.maxHeight,
         filter: descriptor.menu?.filter,
       },
-      children: menuFactory.menuItems,
-      cssClass: Arrays.coerce(descriptor.cssClass),
-    } satisfies SciMenu);
+      cssClass: descriptor.cssClass,
+    }, (menu: WorkbenchMenuFactory): void => {
+      const sciMenu = new WorkbenchClientMenuFactoryDelegate(menu);
+      menuFactoryFn(sciMenu);
+    });
 
     return this;
   }
@@ -77,18 +72,14 @@ export class ɵSciToolbarFactory implements SciToolbarFactory {
   public addGroup(factoryOrDescriptor: ((group: SciToolbarGroupFactory) => void) | SciToolbarGroupDescriptor, factoryIfDescriptor?: (group: SciToolbarGroupFactory) => void): this {
     const [descriptor, groupFactoryFn] = coerceGroupDescriptor(factoryOrDescriptor, factoryIfDescriptor);
 
-    // Construct group.
-    const groupFactory = new ɵSciToolbarFactory();
-    groupFactoryFn?.(groupFactory);
-
-    // Add group.
-    this.menuItems.push({
-      type: 'group',
+    this._delegate.addGroup({
       name: descriptor.name,
-      disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
-      children: groupFactory.menuItems,
-      cssClass: Arrays.coerce(descriptor.cssClass),
-    } satisfies SciMenuGroup);
+      disabled: toLazyObservable(descriptor.disabled),
+      cssClass: descriptor.cssClass,
+    }, (group: WorkbenchToolbarGroupFactory): void => {
+      const sciToolbarGroup = new WorkbenchClientToolbarFactoryDelegate(group);
+      groupFactoryFn?.(sciToolbarGroup);
+    });
 
     return this;
   }
@@ -115,12 +106,13 @@ function coerceGroupDescriptor(factoryOrDescriptor: ((group: SciToolbarGroupFact
   return [factoryOrDescriptor, factoryIfDescriptor];
 }
 
-function coerceLabel(label: MaybeSignal<string> | ComponentType<unknown> | undefined): OneOf<{text?: Signal<string>; component?: ComponentType<unknown>}> | undefined {
+function coerceLabel(label: MaybeSignal<string> | ComponentType<unknown> | undefined): MaybeSignal<string> | undefined {
   if (!label) {
     return undefined;
   }
   if (typeof label === 'string' || isSignal(label)) {
-    return {text: coerceSignal(label)};
+    return label;
   }
-  return {component: label};
+
+  throw Error('[MenuDefinitionError] Component not supported as menu label.');
 }

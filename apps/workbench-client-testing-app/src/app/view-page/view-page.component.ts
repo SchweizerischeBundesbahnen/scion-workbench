@@ -10,10 +10,10 @@
 
 import {Component, computed, inject, Injector, signal, WritableSignal} from '@angular/core';
 import {FormGroup, FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {CanCloseRef, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
+import {CanCloseRef, WorkbenchMenuService, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
-import {MonoTypeOperatorFunction, NEVER} from 'rxjs';
+import {interval, map, MonoTypeOperatorFunction, NEVER} from 'rxjs';
 import {finalize, startWith, take} from 'rxjs/operators';
 import {APP_INSTANCE_ID} from '../app-instance-id';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
@@ -54,6 +54,7 @@ export default class ViewPageComponent {
   private readonly _router = inject(WorkbenchRouter);
   private readonly _messageBoxService = inject(WorkbenchMessageBoxService);
   private readonly _menuService = inject(SciMenuService);
+  private readonly _workbenchMenuService = inject(WorkbenchMenuService);
 
   protected readonly view = inject(WorkbenchView);
   protected readonly route = inject(ActivatedRoute);
@@ -100,16 +101,56 @@ export default class ViewPageComponent {
         console.debug(`[ViewCapability$::first] [component=ViewPageComponent@${this.uuid}, capabilityId=${capability.metadata!.id}]`);
       });
 
-    this.contributeToolbar();
+    // const bold = signal(false);
+    // contributeMenu('toolbar:testee', toolbar => toolbar
+    //   .addToolbarItem({
+    //     icon: 'format_bold', checked: bold, onSelect: () => {
+    //       bold.update(bold => !bold);
+    //     },
+    //   }),
+    // )
+
+    // setInterval(() => {
+    //   console.log('>>> state', state());
+    // }, 3000);
+
+    // const state = signal(false);
+    // contributeMenu('toolbar:testee', toolbar => toolbar
+    //   .addToolbarItem({
+    //     icon: 'play_circle',
+    //     onSelect: () => {
+    //       state.update(state => !state);
+    //     },
+    //   }),
+    // );
+    //
+    // contributeMenu('toolbar:testee', toolbar => {
+    //     console.log(`>>> DEVELOPER FACTORY FUNCTION [state=${state()}]`);
+    //     if (state()) {
+    //       toolbar.addToolbarItem('home', onSelect)
+    //     }
+    //   },
+    // )
+
     if (1 + 1) {
-      // return;
+      return;
     }
+
+    this.contributeToolbar();
+    this.contributeClientMenu();
+    this.contributeClientPartToolbar();
     this.contributeContextMenu();
   }
 
   protected contributionRef1: Disposable | undefined;
   protected contributionRef2: Disposable | undefined;
+  protected toolbarVisible = true;
   private injector = inject(Injector);
+
+  protected toggleToolbar(): void {
+    this.toolbarVisible = !this.toolbarVisible;
+
+  }
 
   protected toggleMenu1(): void {
     if (this.contributionRef1) {
@@ -142,17 +183,103 @@ export default class ViewPageComponent {
     }
   }
 
-  private contributeToolbar(): void {
-    const sig = signal(true);
-    // setInterval(() => {
-    //   sig.update(value => !value);
-    // }, 2000);
+  private contributeClientMenu(): void {
+    const label$ = interval(2000)
+      .pipe(
+        map(index => UUID.randomUUID()),
+        startWith('initial'),
+      );
 
+    const injector = inject(Injector);
+
+    this._workbenchMenuService.contributeMenu('toolbar:workbench.part', toolbar => toolbar,
+      // .addToolbarItem('favorite', onSelect)
+      // .addToolbarItem('home', onSelect)
+      // .addToolbarItem('train', onSelect)
+      // .addGroup(group => group
+      //   .addToolbarItem({icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], checked: toObservable(computed(() => flags().has('format_bold')), {injector}), onSelect: () => toggleMultiFlag(flags, 'format_bold')})
+      // .addToolbarItem({icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], checked: toObservable(computed(() => flags().has('format_italic')), {injector}), onSelect: () => toggleMultiFlag(flags, 'format_italic')})
+      // .addToolbarItem({icon: 'format_underlined', checked: toObservable(computed(() => flags().has('format_underlined')), {injector}), onSelect: () => toggleMultiFlag(flags, 'format_underlined')})
+      // .addToolbarItem({icon: 'strikethrough_s', checked: toObservable(computed(() => flags().has('strikethrough_s')), {injector}), onSelect: () => toggleMultiFlag(flags, 'strikethrough_s')}),
+      // )
+      //   .addMenu({icon: 'more_vert', visualMenuHint: false, menu: {filter: {placeholder: 'hello', notFoundText: 'nüd found'}}}, menu => menu
+      //     .addGroup(group => group
+      //       .addMenuItem({label: 'bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], checked: toObservable(computed(() => flags().has('format_bold')), {injector}), onSelect: () => toggleMultiFlag(flags, 'format_bold')})
+      //       .addMenuItem({
+      //         label: 'italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], checked: toObservable(computed(() => flags().has('format_italic')), {injector}), onSelect: () => {
+      //           toggleMultiFlag(flags, 'format_italic')
+      //           return true;
+      //         },
+      //       })
+      //       .addMenuItem({label: 'underlined', icon: 'format_underlined', checked: toObservable(computed(() => flags().has('format_underlined')), {injector}), onSelect: () => toggleMultiFlag(flags, 'format_underlined')})
+      //       .addMenuItem({label: 'strikethrough', icon: 'strikethrough_s', checked: toObservable(computed(() => flags().has('strikethrough_s')), {injector}), onSelect: () => toggleMultiFlag(flags, 'strikethrough_s')}),
+      //     )
+      //     .addMenuItem({
+      //       label: label$, icon: 'article', accelerator: ['Ctrl', 'N'], onSelect: () => {
+      //         console.log('>>> click');
+      //         // return true;
+      //       },
+      //     })
+      //     .addMenuItem({label: 'Open', icon: 'folder', onSelect: () => onSelect()})
+      //     .addMenuItem({label: 'Make a Copy', icon: 'file_copy', onSelect: () => onSelect()})
+      //     .addMenu({label: 'Share', name: 'menu:share', icon: 'person_add'}, menu => menu
+      //       .addMenuItem({label: 'Share with others', icon: 'person_add', name: 'menuitem:share-with-others', onSelect: () => onSelect()})
+      //       .addMenuItem({label: 'Publish to web', icon: 'public', onSelect: () => onSelect()})
+      //       .addMenu({label: 'Text', icon: 'format_bold'}, menu => menu
+      //         .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], onSelect: () => onSelect()})
+      //         .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], onSelect: () => onSelect()})
+      //         .addMenuItem({label: 'Underline', icon: 'format_underlined', onSelect: () => onSelect()})
+      //         .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s', onSelect: () => onSelect()})
+      //         .addMenu({label: 'Size', icon: 'format_bold'}, menu => menu
+      //           .addMenuItem('Increase font size', () => onSelect())
+      //           .addMenuItem('Decrease font size', () => onSelect()),
+      //         ),
+      //       ),
+      //     ),
+      //   ),
+    )
+  }
+
+  private contributeClientPartToolbar(): void {
+    // this._workbenchMenuService.contributeMenu('toolbar:workbench.part', toolbar => toolbar
+    this._workbenchMenuService.contributeMenu('menu:workbench.part.additions', menu => menu
+      .addMenu({icon: 'computer', label: 'Client', menu: {filter: {placeholder: 'hello', notFoundText: 'nüd found'}}}, menu => menu
+        .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N'], onSelect: () => onSelect()})
+        .addMenuItem({label: 'Open', icon: 'folder', onSelect: () => onSelect()})
+        .addMenuItem({label: 'Make a Copy', icon: 'file_copy', onSelect: () => onSelect()})
+        .addMenu({label: 'Share', name: 'menu:share', icon: 'person_add'}, menu => menu
+          .addMenuItem({label: 'Share with others', icon: 'person_add', name: 'menuitem:share-with-others', onSelect: () => onSelect()})
+          .addMenuItem({label: 'Publish to web', icon: 'public', onSelect: () => onSelect()})
+          .addMenu({label: 'Text', icon: 'format_bold'}, menu => menu
+            .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], onSelect: () => onSelect()})
+            .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], onSelect: () => onSelect()})
+            .addMenuItem({label: 'Underline', icon: 'format_underlined', onSelect: () => onSelect()})
+            .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s', onSelect: () => onSelect()})
+            .addMenu({label: 'Size', icon: 'format_bold'}, menu => menu
+              .addMenuItem('Increase font size', () => onSelect())
+              .addMenuItem('Decrease font size', () => onSelect()),
+            ),
+          ),
+        ),
+      ),
+    )
+  }
+
+  private contributeToolbar(): void {
     contributeMenu('toolbar:testee', toolbar => {
-        toolbar.addToolbarItem({icon: 'home', onSelect});
-        if (sig()) {
-          toolbar.addToolbarItem({icon: 'train', onSelect});
-        }
+        toolbar.addToolbarItem({icon: 'settings', onSelect})
+          .addGroup(group => group
+            .addToolbarItem({icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], checked: computed(() => flags().has('format_bold')), onSelect: () => toggleMultiFlag(flags, 'format_bold')})
+            .addToolbarItem({icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], checked: computed(() => flags().has('format_italic')), onSelect: () => toggleMultiFlag(flags, 'format_italic')})
+            .addToolbarItem({icon: 'format_underlined', checked: computed(() => flags().has('format_underlined')), onSelect: () => toggleMultiFlag(flags, 'format_underlined')})
+            .addToolbarItem({icon: 'strikethrough_s', checked: computed(() => flags().has('strikethrough_s')), onSelect: () => toggleMultiFlag(flags, 'strikethrough_s')}),
+          )
+          .addMenu({icon: 'folder'}, menu => menu
+            .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], checked: computed(() => flags().has('format_bold')), onSelect: () => toggleMultiFlag(flags, 'format_bold')})
+            .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], checked: computed(() => flags().has('format_italic')), onSelect: () => toggleMultiFlag(flags, 'format_italic')})
+            .addMenuItem({label: 'Underline', icon: 'format_underlined', checked: computed(() => flags().has('format_underlined')), onSelect: () => toggleMultiFlag(flags, 'format_underlined')})
+            .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s', checked: computed(() => flags().has('strikethrough_s')), onSelect: () => toggleMultiFlag(flags, 'strikethrough_s')}),
+          )
       },
     );
 
@@ -382,6 +509,10 @@ export default class ViewPageComponent {
       ),
     )
   }
+
+  protected onContextMenuWorkbenchClientOpen(event: PointerEvent): void {
+    this._workbenchMenuService.open('menu:contextmenu', {anchor: event});
+  }
 }
 
 function onSelect(): void {
@@ -414,5 +545,6 @@ const flags = signal(new Set<string>()
   .add('format_italic')
   .add('single_object_levels'),
 );
+
 const viewMode = signal('dock_pinned');
 const moveTo = signal('left_top');

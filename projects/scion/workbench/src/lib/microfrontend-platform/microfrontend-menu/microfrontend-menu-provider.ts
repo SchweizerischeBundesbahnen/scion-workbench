@@ -1,17 +1,16 @@
-import {DestroyRef, DOCUMENT, EnvironmentInjector, EnvironmentProviders, inject, Injector, makeEnvironmentProviders, signal, Signal, untracked} from '@angular/core';
+import {DestroyRef, DOCUMENT, EnvironmentProviders, inject, Injector, makeEnvironmentProviders, signal, Signal, untracked} from '@angular/core';
 import {mapToBody, MessageClient} from '@scion/microfrontend-platform';
 import {takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-interop';
-import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '@scion/workbench';
-import {WorkbenchClientMenuItemLike, WorkbenchClientMenuOpenOptions, WorkbenchClientMenuOrigin, ɵWorkbenchClientMenuContributionCreateCommand, ɵWorkbenchClientMenuContributionRegisterCommand, ɵWorkbenchClientMenuItemLookupCommand, ɵWorkbenchClientMenuOpenCommand} from '@scion/workbench-client';
-import {SciMenuAdapter, SciMenuContributionPosition, SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuItemLike, SciMenuOptions, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
+import {WorkbenchMenuItemLike, WorkbenchMenuItems, WorkbenchMenuItemTransferableLike, WorkbenchMenuOpenOptions, ɵWorkbenchClientMenuContributionCreateCommand, ɵWorkbenchClientMenuContributionRegisterCommand, ɵWorkbenchClientMenuItemLookupCommand, ɵWorkbenchClientMenuOpenCommand} from '@scion/workbench-client';
+import {SciMenuAdapter, SciMenuContributionPosition, SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuOptions, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
 import {finalize, map} from 'rxjs/operators';
-import {fromRemoteSignal, toRemoteSignal} from './remote-signal';
-import {UUID} from '@scion/toolkit/uuid';
 import {Objects} from '@scion/toolkit/util';
 import {createDestroyableInjector} from '../../common/injector.util';
 import {prune} from '../../common/prune.util';
-import {fromEvent} from 'rxjs';
+import {fromEvent, Observable, switchMap} from 'rxjs';
 import {createInvocationContext} from '../../invocation-context/invocation-context';
+import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
+import {SciMenuModel} from './workbench-client-menu-transform';
 
 // TODO move to support
 function installMenuRegisterHandler(): void {
@@ -36,17 +35,21 @@ function installMenuRegisterHandler(): void {
         // We must memoize the signal for therequest not to be performed anew.
         const menuItems = menuItemsCache.computeIfAbsent(context, () => untracked(() => {
           const command: ɵWorkbenchClientMenuContributionCreateCommand = {context};
-          const menuItems$ = messageClient.request$<WorkbenchClientMenuItemLike[]>(`workbench/menu/contribution/${contributionId}/create`, command).pipe(mapToBody());
+          const menuItems$ = messageClient.request$<WorkbenchMenuItemTransferableLike[]>(`workbench/menu/contribution/${contributionId}/create`, command)
+            .pipe(
+              mapToBody(),
+              map(menuItems => WorkbenchMenuItems.fromTransferable(menuItems)),
+            );
           return toSignal(menuItems$, {initialValue: []});
         }))();
 
         untracked(() => {
           // Populate menu or toolbar.
           if (contribution.scope === 'menu') {
-            populateMenu(factory as SciMenuFactory, transformToSignalMenuModel(menuItems));
+            populateMenu(factory as SciMenuFactory, menuItems);
           }
           else if (contribution.scope === 'toolbar') {
-            populateToolbar(factory as SciToolbarFactory, transformToSignalMenuModel(menuItems));
+            populateToolbar(factory as SciToolbarFactory, menuItems);
           }
         });
       },
@@ -63,35 +66,35 @@ function installMenuRegisterHandler(): void {
 }
 
 function installMenuItemLookupHandler(): void {
-  const environmentInjector = inject(EnvironmentInjector);
+  const rootInjector = inject(Injector);
   const messageClient = inject(MessageClient);
   const menuAdapter = inject(SciMenuAdapter);
 
-  messageClient.onMessage<ɵWorkbenchClientMenuItemLookupCommand>('workbench/menu/items', request => {
+  messageClient.onMessage<ɵWorkbenchClientMenuItemLookupCommand, WorkbenchMenuItemTransferableLike[]>('workbench/menu/items', request => {
     const {location, context} = request.body!;
-    const injector = createDestroyableInjector({parent: environmentInjector});
+    const injector = createDestroyableInjector({parent: rootInjector});
 
+    console.log('>>> lookup for location', location);
     const menuItems = menuAdapter.menuContributions(signal(location), signal(context), {injector});
     return toObservable(menuItems, {injector})
       .pipe(
-        map(menuItems => transformToWorkbenchClientModel(menuItems, {injector})),
+        switchMap(menuItems => WorkbenchMenuItems.toTransferable$(SciMenuModel.transformToWorkbenchMenuModel(menuItems, {injector}))),
         finalize(() => injector.destroy()),
       );
   });
 }
 
 function installMenuOpenHandler(): void {
-  const environmentInjector = inject(EnvironmentInjector);
+  const rootInjector = inject(Injector);
   const messageClient = inject(MessageClient);
   const menuAdapter = inject(SciMenuAdapter);
 
-  messageClient.onMessage<ɵWorkbenchClientMenuOpenCommand, void>('workbench/menu/:menuId/open', request => {
-    const menuId = request.params!.get('menuId') as string;
+  messageClient.onMessage<ɵWorkbenchClientMenuOpenCommand, void>('workbench/menu/open', request => {
     const command = request.body!;
-    const injector = createDestroyableInjector({parent: environmentInjector});
+    const injector = createDestroyableInjector({parent: rootInjector});
     const invocationContext = createInvocationContext(command.workbenchElementId, {injector});
+    const menu = Array.isArray(command.menu) ? SciMenuModel.transformToSciMenuModel(WorkbenchMenuItems.fromTransferable(command.menu), {injector}) : command.menu
 
-    const menu = Array.isArray(command.menu) ? transformToSignalMenuModel(command.menu, {injector}) : command.menu
     // Open the menu.
     const menuRef = menuAdapter.openMenu(menu, prune({
       anchor: {
@@ -112,17 +115,13 @@ function installMenuOpenHandler(): void {
       cssClass: command.options.cssClass,
     }));
 
-    // Destroy injector when closing the menu.
-    menuRef.onClose(() => injector.destroy());
-
-    // Close menu when receiving a close request from the client.
-    messageClient.observe$<void>(`workbench/menu/${menuId}/close`)
-      .pipe(takeUntilDestroyed(injector.get(DestroyRef)))
-      .subscribe(() => menuRef.close());
-
     // Wait until closing the menu.
-    return new Promise<void>(resolve => {
-      menuRef.onClose(resolve);
+    return new Observable<never>(observer => {
+      menuRef.onClose(() => observer.complete());
+      return () => {
+        injector.destroy()
+        menuRef.close();
+      }
     });
   });
 }
@@ -147,33 +146,32 @@ function installMenuCloseHandler(): void {
 /**
  * Populates given menu with passed menu items.
  */
-function populateMenu(menu: SciMenuFactory, menuItems: SciMenuItemLike[]): void {
+function populateMenu(menu: SciMenuFactory, menuItems: WorkbenchMenuItemLike[]): void {
   for (const menuItem of menuItems) {
     switch (menuItem.type) {
       case 'menu-item': {
         menu.addMenuItem({
           name: menuItem.name,
-          label: menuItem.label?.text!,
-          icon: menuItem.icon,
-          checked: menuItem.checked,
-          tooltip: menuItem.tooltip,
+          label: toSignal(menuItem.label!, {requireSync: true}),
+          icon: menuItem.icon && toSignal(menuItem.icon, {requireSync: true}),
+          checked: menuItem.checked && toSignal(menuItem.checked, {requireSync: true}),
+          tooltip: menuItem.tooltip && toSignal(menuItem.tooltip, {requireSync: true}),
           accelerator: menuItem.accelerator,
-          disabled: menuItem.disabled,
+          disabled: toSignal(menuItem.disabled, {requireSync: true}),
           actions: actions => populateToolbar(actions, menuItem.actions),
           // onFilter?: (filter: string) => boolean;
           cssClass: menuItem.cssClass,
-          onSelect: () => true,
-          data: menuItem.data,
+          onSelect: () => menuItem.select(),
         });
         break;
       }
       case 'menu': {
         const menuDescriptor: SciMenuDescriptor = {
           name: menuItem.name,
-          label: menuItem.label?.text!,
-          icon: menuItem.icon,
-          tooltip: menuItem.tooltip,
-          disabled: menuItem.disabled,
+          label: toSignal(menuItem.label!, {requireSync: true}),
+          icon: menuItem.icon && toSignal(menuItem.icon, {requireSync: true}),
+          tooltip: menuItem.tooltip && toSignal(menuItem.tooltip, {requireSync: true}),
+          disabled: toSignal(menuItem.disabled, {requireSync: true}),
           menu: {
             width: menuItem.menu.width,
             minWidth: menuItem.menu.minWidth,
@@ -182,7 +180,6 @@ function populateMenu(menu: SciMenuFactory, menuItems: SciMenuItemLike[]): void 
             filter: menuItem.menu.filter,
           },
           cssClass: menuItem.cssClass,
-          data: menuItem.data,
         };
         menu.addMenu(menuDescriptor, menu => populateMenu(menu, menuItem.children));
         break;
@@ -190,11 +187,10 @@ function populateMenu(menu: SciMenuFactory, menuItems: SciMenuItemLike[]): void 
       case 'group': {
         const groupDescriptor: SciMenuGroupDescriptor = {
           name: menuItem.name,
-          label: menuItem.label,
+          label: menuItem.label && toSignal(menuItem.label, {requireSync: true}),
           collapsible: menuItem.collapsible,
-          disabled: menuItem.disabled,
+          disabled: toSignal(menuItem.disabled, {requireSync: true}),
           cssClass: menuItem.cssClass,
-          data: menuItem.data,
         };
         menu.addGroup(groupDescriptor, group => populateMenu(group, menuItem.children));
         break;
@@ -206,33 +202,30 @@ function populateMenu(menu: SciMenuFactory, menuItems: SciMenuItemLike[]): void 
 /**
  * Populates given toolbar with passed menu items.
  */
-function populateToolbar(toolbar: SciToolbarFactory, menuItems: SciMenuItemLike[]): void {
+function populateToolbar(toolbar: SciToolbarFactory, menuItems: WorkbenchMenuItemLike[]): void {
   for (const menuItem of menuItems) {
     switch (menuItem.type) {
       case 'menu-item': {
         toolbar.addToolbarItem({
           name: menuItem.name,
-          label: menuItem.label?.text,
-          icon: menuItem.icon!,
-          checked: menuItem.checked,
-          tooltip: menuItem.tooltip,
+          label: menuItem.label && toSignal(menuItem.label, {requireSync: true}),
+          icon: toSignal(menuItem.icon!, {requireSync: true}),
+          checked: menuItem.checked && toSignal(menuItem.checked, {requireSync: true}),
+          tooltip: menuItem.tooltip && toSignal(menuItem.tooltip, {requireSync: true}),
           accelerator: menuItem.accelerator,
-          disabled: menuItem.disabled,
+          disabled: toSignal(menuItem.disabled, {requireSync: true}),
           cssClass: menuItem.cssClass,
-          onSelect: () => {
-            // TODO
-          },
-          data: menuItem.data,
+          onSelect: () => menuItem.select(),
         });
         break;
       }
       case 'menu': {
         const menuDescriptor: SciToolbarMenuDescriptor = {
           name: menuItem.name,
-          label: menuItem.label?.text,
-          icon: menuItem.icon,
-          tooltip: menuItem.tooltip,
-          disabled: menuItem.disabled,
+          label: menuItem.label && toSignal(menuItem.label, {requireSync: true}),
+          icon: menuItem.icon && toSignal(menuItem.icon, {requireSync: true}),
+          tooltip: menuItem.tooltip && toSignal(menuItem.tooltip, {requireSync: true}),
+          disabled: toSignal(menuItem.disabled, {requireSync: true}),
           visualMenuHint: menuItem.visualMenuHint,
           menu: {
             width: menuItem.menu.width,
@@ -242,7 +235,6 @@ function populateToolbar(toolbar: SciToolbarFactory, menuItems: SciMenuItemLike[
             filter: menuItem.menu.filter,
           },
           cssClass: menuItem.cssClass,
-          data: menuItem.data,
         };
         toolbar.addMenu(menuDescriptor, menu => populateMenu(menu, menuItem.children));
         break;
@@ -250,149 +242,14 @@ function populateToolbar(toolbar: SciToolbarFactory, menuItems: SciMenuItemLike[
       case 'group': {
         const groupDescriptor: SciToolbarGroupDescriptor = {
           name: menuItem.name,
-          disabled: menuItem.disabled,
+          disabled: toSignal(menuItem.disabled, {requireSync: true}),
           cssClass: menuItem.cssClass,
-          data: menuItem.data,
         };
         toolbar.addGroup(groupDescriptor, group => populateToolbar(group, menuItem.children));
         break;
       }
     }
   }
-}
-
-function transformToSignalMenuModel(menuItems: WorkbenchClientMenuItemLike[], options?: {injector?: Injector}): SciMenuItemLike[] {
-  const injector = options?.injector ?? inject(Injector);
-
-  return menuItems.map((menuItem: WorkbenchClientMenuItemLike): SciMenuItemLike => {
-    switch (menuItem.type) {
-      case 'menu-item': {
-        return {
-          type: menuItem.type,
-          name: menuItem.name,
-          label: menuItem.label ? {text: toRemoteSignal(`label-${menuItem.id}`, menuItem.label, {injector})} : undefined,
-          icon: toRemoteSignal(`icon-${menuItem.id}`, menuItem.icon, {injector}),
-          tooltip: toRemoteSignal(`tooltip-${menuItem.id}`, menuItem.tooltip, {injector}),
-          accelerator: menuItem.accelerator,
-          disabled: toRemoteSignal(`disabled-${menuItem.id}`, menuItem.disabled, {injector}),
-          checked: toRemoteSignal(`checked-${menuItem.id}`, menuItem.checked, {injector}),
-          actions: transformToSignalMenuModel(menuItem.actions, {injector}),
-          // matchesFilter: (filter: string) => true; // TODO
-          cssClass: menuItem.cssClass,
-          position: menuItem.position,
-          onSelect: () => true,
-        };
-      }
-      case 'menu': {
-        return {
-          type: menuItem.type,
-          name: menuItem.name,
-          label: menuItem.label ? {text: toRemoteSignal(`label-${menuItem.id}`, menuItem.label, {injector})} : undefined,
-          icon: toRemoteSignal(`icon-${menuItem.id}`, menuItem.icon, {injector}),
-          tooltip: toRemoteSignal(`tooltip-${menuItem.id}`, menuItem.tooltip, {injector}),
-          disabled: toRemoteSignal(`disabled-${menuItem.id}`, menuItem.disabled, {injector}),
-          visualMenuHint: menuItem.visualMenuHint,
-          position: menuItem.position,
-          menu: {
-            width: menuItem.menu.width,
-            minWidth: menuItem.menu.minWidth,
-            maxWidth: menuItem.menu.maxWidth,
-            maxHeight: menuItem.menu.maxHeight,
-            filter: menuItem.menu.filter,
-          },
-          cssClass: menuItem.cssClass,
-          children: transformToSignalMenuModel(menuItem.children, {injector}),
-        };
-      }
-      case 'group': {
-        return {
-          type: menuItem.type,
-          name: menuItem.name,
-          label: toRemoteSignal(`label-${menuItem.id}`, menuItem.label, {injector}),
-          collapsible: menuItem.collapsible,
-          position: menuItem.position,
-          disabled: toRemoteSignal(`disabled-${menuItem.id}`, menuItem.disabled, {injector}),
-          children: transformToSignalMenuModel(menuItem.children, {injector}),
-          cssClass: menuItem.cssClass,
-        };
-      }
-    }
-  });
-}
-
-function transformToWorkbenchClientModel(menuItems: SciMenuItemLike[], options?: {injector?: Injector}): WorkbenchClientMenuItemLike[] {
-  const injector = options?.injector ?? inject(Injector);
-
-  return menuItems.map((menuItem: SciMenuItemLike): WorkbenchClientMenuItemLike => {
-    const menuItemId = UUID.randomUUID();
-    switch (menuItem.type) {
-      case 'menu-item': {
-        return {
-          id: menuItemId,
-          type: menuItem.type,
-          name: menuItem.name,
-          label: fromRemoteSignal(`label-${menuItemId}`, menuItem.label?.text, {injector}),
-          icon: fromRemoteSignal(`icon-${menuItemId}`, menuItem.icon, {injector}),
-          tooltip: fromRemoteSignal(`tooltip-${menuItemId}`, menuItem.tooltip, {injector}),
-          accelerator: menuItem.accelerator,
-          disabled: fromRemoteSignal(`disabled-${menuItemId}`, menuItem.disabled, {injector}),
-          checked: fromRemoteSignal(`checked-${menuItemId}`, menuItem.checked, {injector}),
-          actions: transformToWorkbenchClientModel(menuItem.actions, {injector}),
-          cssClass: menuItem.cssClass,
-          position: menuItem.position,
-        };
-      }
-      case 'menu': {
-        return {
-          id: menuItemId,
-          type: menuItem.type,
-          name: menuItem.name,
-          label: fromRemoteSignal(`label-${menuItemId}`, menuItem.label?.text, {injector}),
-          icon: fromRemoteSignal(`icon-${menuItemId}`, menuItem.icon, {injector}),
-          tooltip: fromRemoteSignal(`tooltip-${menuItemId}`, menuItem.tooltip, {injector}),
-          disabled: fromRemoteSignal(`disabled-${menuItemId}`, menuItem.disabled, {injector}),
-          visualMenuHint: menuItem.visualMenuHint,
-          position: menuItem.position,
-          menu: {
-            width: menuItem.menu.width,
-            minWidth: menuItem.menu.minWidth,
-            maxWidth: menuItem.menu.maxWidth,
-            maxHeight: menuItem.menu.maxHeight,
-            filter: menuItem.menu.filter,
-          },
-          cssClass: menuItem.cssClass,
-          children: transformToWorkbenchClientModel(menuItem.children, {injector}),
-        };
-      }
-      case 'group': {
-        return {
-          id: menuItemId,
-          type: menuItem.type,
-          name: menuItem.name,
-          label: fromRemoteSignal(`label-${menuItemId}`, menuItem.label, {injector}),
-          collapsible: menuItem.collapsible,
-          position: menuItem.position,
-          disabled: fromRemoteSignal(`disabled-${menuItemId}`, menuItem.disabled, {injector}),
-          children: transformToWorkbenchClientModel(menuItem.children, {injector}),
-          cssClass: menuItem.cssClass,
-        };
-      }
-    }
-  });
-}
-
-/**
- * Maps given context coordinates to absolute page coordinates.
- */
-function mapToPageCoordinates(origin: WorkbenchClientMenuOrigin, relativeTo: DOMRect): WorkbenchClientMenuOrigin {
-  const xy = origin as Partial<WorkbenchClientMenuOrigin>;
-  if (xy.x !== undefined && xy.y !== undefined) {
-    return {
-      x: relativeTo.x + xy.x,
-      y: relativeTo.y + xy.y,
-    };
-  }
-  throw Error('[PopupOriginError] Illegal popup origin; must be "Point", "TopLeftPoint", "TopRightPoint", "BottomLeftPoint" or "BottomRightPoint".');
 }
 
 /**
@@ -409,7 +266,7 @@ export function provideWorkbenchClientMenu(): EnvironmentProviders {
   ]);
 }
 
-function coerceFilter(filter: WorkbenchClientMenuOpenOptions['filter'] | undefined): SciMenuOptions['filter'] | undefined {
+function coerceFilter(filter: WorkbenchMenuOpenOptions['filter'] | undefined): SciMenuOptions['filter'] | undefined {
   if (filter === undefined) {
     return undefined;
   }
@@ -424,9 +281,9 @@ function coerceFilter(filter: WorkbenchClientMenuOpenOptions['filter'] | undefin
 
 class WorkbenchClientMenuItemsCache {
 
-  private readonly _cache = new Array<{context: Map<string, unknown>, menuItems: Signal<WorkbenchClientMenuItemLike[]>}>;
+  private readonly _cache = new Array<{context: Map<string, unknown>, menuItems: Signal<WorkbenchMenuItemLike[]>}>;
 
-  public computeIfAbsent(context: Map<string, unknown>, computeFn: () => Signal<WorkbenchClientMenuItemLike[]>): Signal<WorkbenchClientMenuItemLike[]> {
+  public computeIfAbsent(context: Map<string, unknown>, computeFn: () => Signal<WorkbenchMenuItemLike[]>): Signal<WorkbenchMenuItemLike[]> {
     const cachedMenuItems = this._cache.find(cacheEntry => Objects.isEqual(cacheEntry.context, context))?.menuItems;
     if (cachedMenuItems) {
       return cachedMenuItems;

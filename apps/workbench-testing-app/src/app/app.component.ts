@@ -64,6 +64,11 @@ export class AppComponent implements DoCheck {
     installGlasspaneHighlighter();
     installMicrofrontendApplicationLabels();
 
+
+    if (1 + 1) {
+      return;
+    }
+
     contributeMenu('menu:additions', menu => menu
       .addMenuItem({icon: 'home', label: 'Home', onSelect: () => this.onAction()}),
     );
