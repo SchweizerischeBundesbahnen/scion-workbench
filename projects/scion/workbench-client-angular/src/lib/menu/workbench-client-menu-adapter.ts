@@ -1,13 +1,14 @@
 import {Disposable, SciMenuAdapter, SciMenuContribution, SciMenuItemLike, SciMenuOptions, SciMenuOrigin, SciMenuRef, SciToolbarContribution} from '@scion/sci-components/menu';
 import {assertInInjectionContext, assertNotInReactiveContext, effect, ElementRef, inject, Injector, linkedSignal, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
-import {WorkbenchMenuContributionLocation, WorkbenchMenuGroupContributionLocation, WorkbenchMenuOpenOptions, WorkbenchMenuOrigin, WorkbenchToolbarContributionLocation, WorkbenchToolbarGroupContributionLocation, ɵWorkbenchMenuService} from '@scion/workbench-client';
+import {WorkbenchMenuContributionLocation, WorkbenchMenuGroupContributionLocation, WorkbenchMenuOptions, WorkbenchMenuOrigin, WorkbenchToolbarContributionLocation, WorkbenchToolbarGroupContributionLocation, ɵWorkbenchMenuService} from '@scion/workbench-client';
 import {first, map, Observable} from 'rxjs';
 import {ɵassertInInjectionContext} from '../common/common';
 import {coerceElement} from '@angular/cdk/coercion';
 import {WorkbenchClientMenuFactoryDelegate} from './workbench-client-menu-factory-delegate';
 import {WorkbenchClientToolbarFactoryDelegate} from './workbench-client-toolbar-factory-delegate';
-import {SciMenuModel, toLazyObservable} from './workbench-client-menu-transform';
+import {SciMenuItems} from './workbench-client-menu-transform';
 import {UUID} from '@scion/toolkit/uuid';
+import {toLazyObservable} from '../common/lazy-observable.util';
 
 export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
 
@@ -98,7 +99,7 @@ export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
 
       untracked(() => {
         const subscription = this._workbenchMenuService.menuContributions$(_location, _context)
-          .pipe(map(menuItems => SciMenuModel.transformToSciMenuModel(menuItems, {injector: this._injector})))
+          .pipe(map(menuItemProxies => SciMenuItems.fromWorkbenchMenuItemProxies(menuItemProxies, {injector: this._injector})))
           .subscribe(menuItems => menuContributions.set(menuItems));
         onCleanup(() => subscription.unsubscribe());
       });
@@ -109,7 +110,7 @@ export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
 
   /** @inheritDoc */
   public openMenu(menuLike: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions & {focus?: boolean}): SciMenuRef {
-    const menu = Array.isArray(menuLike) ? SciMenuModel.transformToWorkbenchMenuModel(menuLike, {injector: this._injector}) : menuLike;
+    const menu = Array.isArray(menuLike) ? SciMenuItems.toWorkbenchMenuItems(menuLike, {injector: this._injector}) : menuLike;
 
     const menuRef = this._workbenchMenuService.open(menu, {
       anchor: coerceAnchor(options.anchor),
@@ -132,20 +133,14 @@ export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
   }
 }
 
-function coerceAnchor(anchor: HTMLElement | ElementRef<HTMLElement> | SciMenuOrigin | MouseEvent): WorkbenchMenuOrigin {
-  if (anchor instanceof ElementRef || anchor instanceof HTMLElement) {
-    const {x, y, width, height} = coerceElement(anchor).getBoundingClientRect();
-    return {x, y, width, height};
+function coerceAnchor(anchor: HTMLElement | ElementRef<HTMLElement> | SciMenuOrigin | MouseEvent): HTMLElement | WorkbenchMenuOrigin | MouseEvent {
+  if (anchor instanceof ElementRef) {
+    return coerceElement(anchor);
   }
-  else if (anchor instanceof MouseEvent) {
-    return {x: anchor.x, y: anchor.y};
-  }
-  else {
-    return {x: anchor.x, y: anchor.y, width: anchor.width, height: anchor.height};
-  }
+  return anchor;
 }
 
-function coerceFilter(filter: SciMenuOptions['filter'] | undefined): WorkbenchMenuOpenOptions['filter'] | undefined {
+function coerceFilter(filter: SciMenuOptions['filter'] | undefined): WorkbenchMenuOptions['filter'] | undefined {
   if (filter === undefined) {
     return undefined;
   }

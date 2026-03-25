@@ -8,16 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {MaybeAsync} from '../common/utility-types';
+import {MaybeObservable} from '../common/utility-types';
 import {WorkbenchToolbarFactory} from './workbench-toolbar.factory';
 
 export interface WorkbenchMenuFactory {
   // Describe that onSelect can call `inject` to get any required dependencies.
-  addMenuItem(label: MaybeAsync<string>, onSelect: () => boolean | void | Promise<boolean | void>): this;
+  addMenuItem(label: MaybeObservable<string>, onSelect: () => boolean | void | Promise<boolean | void>): this;
 
   addMenuItem(descriptor: WorkbenchMenuItemDescriptor): this;
 
-  addMenu(label: MaybeAsync<string>, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this;
+  addMenu(label: MaybeObservable<string>, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this;
 
   addMenu(descriptor: WorkbenchMenuDescriptor, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this;
 
@@ -30,12 +30,12 @@ export type WorkbenchMenuGroupFactory = WorkbenchMenuFactory;
 
 export interface WorkbenchMenuItemDescriptor {
   name?: `menuitem:${string}`;
-  label: MaybeAsync<string>;
-  icon?: MaybeAsync<string>;
-  checked?: MaybeAsync<boolean>;
-  tooltip?: MaybeAsync<string>;
+  label: MaybeObservable<string>;
+  icon?: MaybeObservable<string>;
+  checked?: MaybeObservable<boolean>;
+  tooltip?: MaybeObservable<string>;
   accelerator?: string[];
-  disabled?: MaybeAsync<boolean>;
+  disabled?: MaybeObservable<boolean>;
   actions?: (actions: WorkbenchToolbarFactory) => void;
   onFilter?: (filter: string) => boolean;
   cssClass?: string | string[];
@@ -44,10 +44,10 @@ export interface WorkbenchMenuItemDescriptor {
 
 export interface WorkbenchMenuDescriptor {
   name?: `menu:${string}`;
-  label: MaybeAsync<string>;
-  icon?: MaybeAsync<string>;
-  tooltip?: MaybeAsync<string>;
-  disabled?: MaybeAsync<boolean>;
+  label: MaybeObservable<string>;
+  icon?: MaybeObservable<string>;
+  tooltip?: MaybeObservable<string>;
+  disabled?: MaybeObservable<boolean>;
   menu?: {
     width?: string;
     minWidth?: string;
@@ -60,8 +60,8 @@ export interface WorkbenchMenuDescriptor {
 
 export interface WorkbenchMenuGroupDescriptor {
   name?: `group:${string}`;
-  label?: MaybeAsync<string>;
+  label?: MaybeObservable<string>;
   collapsible?: boolean | {collapsed: boolean};
-  disabled?: MaybeAsync<boolean>;
+  disabled?: MaybeObservable<boolean>;
   cssClass?: string | string[];
 }

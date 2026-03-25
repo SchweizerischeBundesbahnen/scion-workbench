@@ -8,17 +8,17 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {MaybeAsync} from '../common/utility-types';
+import {MaybeObservable} from '../common/utility-types';
 import {WorkbenchMenuFactory} from './workbench-menu.factory';
 
 export interface WorkbenchToolbarFactory {
 
   // Describe that onSelect can call `inject` to get any required dependencies.
-  addToolbarItem(icon: MaybeAsync<string>, onSelect: () => void): this;
+  addToolbarItem(icon: MaybeObservable<string>, onSelect: () => void): this;
 
   addToolbarItem(descriptor: WorkbenchToolbarItemDescriptor): this;
 
-  addMenu(icon: string | MaybeAsync<string>, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this;
+  addMenu(icon: string | MaybeObservable<string>, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this;
 
   addMenu(descriptor: WorkbenchToolbarMenuDescriptor, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this;
 
@@ -31,22 +31,22 @@ export type WorkbenchToolbarGroupFactory = WorkbenchToolbarFactory;
 
 export interface WorkbenchToolbarItemDescriptor {
   name?: `menuitem:${string}`;
-  label?: MaybeAsync<string>;
-  icon: MaybeAsync<string>;
-  checked?: MaybeAsync<boolean>;
-  tooltip?: MaybeAsync<string>;
+  label?: MaybeObservable<string>;
+  icon: MaybeObservable<string>;
+  checked?: MaybeObservable<boolean>;
+  tooltip?: MaybeObservable<string>;
   accelerator?: string[];
-  disabled?: MaybeAsync<boolean>;
+  disabled?: MaybeObservable<boolean>;
   cssClass?: string | string[];
   onSelect: () => void;
 }
 
 export interface WorkbenchToolbarMenuDescriptor {
   name?: `menu:${string}`;
-  label?: MaybeAsync<string>;
-  icon?: MaybeAsync<string>;
-  tooltip?: MaybeAsync<string>;
-  disabled?: MaybeAsync<boolean>;
+  label?: MaybeObservable<string>;
+  icon?: MaybeObservable<string>;
+  tooltip?: MaybeObservable<string>;
+  disabled?: MaybeObservable<boolean>;
   /**
    * Controls the display of a visual marker for menu dropdown. Defaults to `true`.
    */
@@ -63,6 +63,6 @@ export interface WorkbenchToolbarMenuDescriptor {
 
 export interface WorkbenchToolbarGroupDescriptor {
   name?: `group:${string}`;
-  disabled?: MaybeAsync<boolean>;
+  disabled?: MaybeObservable<boolean>;
   cssClass?: string | string[];
 }

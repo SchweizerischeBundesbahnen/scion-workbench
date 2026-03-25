@@ -4,7 +4,7 @@ import {ComponentType} from '@angular/cdk/portal';
 import {MaybeSignal} from '../common/utility-types';
 import {SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuGroupFactory, SciMenuItemDescriptor} from '@scion/sci-components/menu';
 import {WorkbenchClientToolbarFactoryDelegate} from './workbench-client-toolbar-factory-delegate';
-import {toLazyObservable} from './workbench-client-menu-transform';
+import {toLazyObservable} from '../common/lazy-observable.util';
 
 /**
  * Represents a {@link SciMenuFactory} that delegates to {@link WorkbenchMenuFactory} of `@scion/workbench-client`.

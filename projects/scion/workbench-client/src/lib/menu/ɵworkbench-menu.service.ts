@@ -1,7 +1,7 @@
 import {WorkbenchMenuService} from './workbench-menu.service';
 import {WorkbenchMenuFactory, WorkbenchMenuGroupFactory} from './workbench-menu.factory';
 import {WorkbenchToolbarFactory, WorkbenchToolbarGroupFactory} from './workbench-toolbar.factory';
-import {WorkbenchMenuContributionLocation, WorkbenchMenuContributionLocationLike, WorkbenchMenuContributionOptions, WorkbenchMenuContributionPosition, WorkbenchMenuGroupContributionLocation, WorkbenchMenuItemLike, WorkbenchMenuItems, WorkbenchMenuItemTransferableLike, WorkbenchMenuOpenOptions, WorkbenchMenuOptions, WorkbenchMenuOrigin, WorkbenchMenuRef, WorkbenchToolbarContributionLocation, WorkbenchToolbarGroupContributionLocation} from './workbench-client-menu.model';
+import {WorkbenchMenuContributionLocation, WorkbenchMenuContributionLocationLike, WorkbenchMenuContributionOptions, WorkbenchMenuContributionPosition, WorkbenchMenuGroupContributionLocation, WorkbenchMenuItemLike, WorkbenchMenuItemProxyLike, WorkbenchMenuItems, WorkbenchMenuItemTransferableLike, WorkbenchMenuOptions, WorkbenchMenuOrigin, WorkbenchMenuRef, WorkbenchToolbarContributionLocation, WorkbenchToolbarGroupContributionLocation} from './workbench-client-menu.model';
 import {Disposable} from '../common/disposable';
 import {UUID} from '@scion/toolkit/uuid';
 import {Beans} from '@scion/toolkit/bean-manager';
@@ -133,7 +133,7 @@ export class ɵWorkbenchMenuService implements WorkbenchMenuService {
     }
   }
 
-  public menuContributions$(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>): Observable<WorkbenchMenuItemLike[]> {
+  public menuContributions$(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>): Observable<WorkbenchMenuItemProxyLike[]> {
     const command: ɵWorkbenchClientMenuItemLookupCommand = {
       location,
       context: new Map([...createEnvironmentContext(), ...context]),
@@ -176,7 +176,7 @@ function createEnvironmentContext(): Map<string, unknown> {
   return new Map();
 }
 
-function coerceAnchor(anchor: HTMLElement | WorkbenchMenuOrigin | MouseEvent): WorkbenchMenuOrigin {
+function coerceAnchor(anchor: HTMLElement | WorkbenchMenuOrigin | MouseEvent): ɵWorkbenchClientMenuOpenCommand['options']['anchor'] {
   if (anchor instanceof HTMLElement) {
     const {x, y, width, height} = coerceElement(anchor).getBoundingClientRect();
     return {x, y, width, height};
@@ -189,7 +189,7 @@ function coerceAnchor(anchor: HTMLElement | WorkbenchMenuOrigin | MouseEvent): W
   }
 }
 
-function coerceFilter(filter: SciMenuOptions['filter'] | undefined): WorkbenchMenuOpenOptions['filter'] | undefined {
+function coerceFilter(filter: SciMenuOptions['filter'] | undefined): ɵWorkbenchClientMenuOpenCommand['options']['filter'] | undefined {
   if (filter === undefined) {
     return undefined;
   }

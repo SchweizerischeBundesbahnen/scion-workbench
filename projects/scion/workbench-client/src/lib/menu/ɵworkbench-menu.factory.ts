@@ -1,20 +1,19 @@
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchMenuDescriptor, WorkbenchMenuFactory, WorkbenchMenuGroupDescriptor, WorkbenchMenuGroupFactory, WorkbenchMenuItemDescriptor} from './workbench-menu.factory';
 import {WorkbenchMenu, WorkbenchMenuGroup, WorkbenchMenuItem, WorkbenchMenuItemLike} from './workbench-client-menu.model';
-import {MaybeAsync} from '../common/utility-types';
+import {MaybeObservable} from '../common/utility-types';
 import {isObservable} from 'rxjs';
 import {UUID} from '@scion/toolkit/uuid';
 import {ɵWorkbenchToolbarFactory} from './ɵworkbench-toolbar.factory';
-import {coerceObservable} from '@angular/cdk/coercion/private';
 
 export class ɵWorkbenchMenuFactory implements WorkbenchMenuFactory {
 
   public readonly menuItems = [] as WorkbenchMenuItemLike[];
 
   /** @inheritDoc */
-  public addMenuItem(label: MaybeAsync<string>, onSelect: () => boolean | void | Promise<boolean | void>): this;
+  public addMenuItem(label: MaybeObservable<string>, onSelect: () => boolean | void | Promise<boolean | void>): this;
   public addMenuItem(descriptor: WorkbenchMenuItemDescriptor): this;
-  public addMenuItem(labelOrDescriptor: MaybeAsync<string> | WorkbenchMenuItemDescriptor, onSelect?: () => boolean | void | Promise<boolean | void>): this {
+  public addMenuItem(labelOrDescriptor: MaybeObservable<string> | WorkbenchMenuItemDescriptor, onSelect?: () => boolean | void | Promise<boolean | void>): this {
     const descriptor = coerceMenuItemDescriptor(labelOrDescriptor, onSelect);
 
     // Construct actions toolbar.
@@ -25,15 +24,15 @@ export class ɵWorkbenchMenuFactory implements WorkbenchMenuFactory {
     this.menuItems.push(new WorkbenchMenuItem({
       id: UUID.randomUUID(),
       name: descriptor.name,
-      label: coerceObservable(descriptor.label),
-      icon: descriptor.icon && coerceObservable(descriptor.icon),
-      checked: descriptor.checked && coerceObservable(descriptor.checked),
-      tooltip: descriptor.tooltip && coerceObservable(descriptor.tooltip),
+      label: descriptor.label,
+      icon: descriptor.icon,
+      checked: descriptor.checked,
+      tooltip: descriptor.tooltip,
       accelerator: descriptor.accelerator,
-      disabled: coerceObservable(descriptor.disabled ?? false),
+      disabled: descriptor.disabled ?? false,
       actions: actionsFactory.menuItems,
       cssClass: Arrays.coerce(descriptor.cssClass),
-      onSelect: descriptor.onSelect,
+      onSelect: async () => await descriptor.onSelect() ?? descriptor.checked === undefined, // Close if the callback returns true. Defaults to closing non-checkable menu items.
     }));
 
     // TODO [menu] throw error if icon and checked
@@ -41,9 +40,9 @@ export class ɵWorkbenchMenuFactory implements WorkbenchMenuFactory {
   }
 
   /** @inheritDoc */
-  public addMenu(label: MaybeAsync<string>, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this ;
+  public addMenu(label: MaybeObservable<string>, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this ;
   public addMenu(descriptor: WorkbenchMenuDescriptor, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this ;
-  public addMenu(labelOrDescriptor: MaybeAsync<string> | WorkbenchMenuDescriptor, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this {
+  public addMenu(labelOrDescriptor: MaybeObservable<string> | WorkbenchMenuDescriptor, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this {
     const descriptor = coerceMenuDescriptor(labelOrDescriptor);
 
     // Construct menu.
@@ -54,10 +53,10 @@ export class ɵWorkbenchMenuFactory implements WorkbenchMenuFactory {
     this.menuItems.push(new WorkbenchMenu({
       id: UUID.randomUUID(),
       name: descriptor.name,
-      label: coerceObservable(descriptor.label),
-      icon: descriptor.icon && coerceObservable(descriptor.icon),
-      tooltip: descriptor.tooltip && coerceObservable(descriptor.tooltip),
-      disabled: coerceObservable(descriptor.disabled ?? false),
+      label: descriptor.label,
+      icon: descriptor.icon,
+      tooltip: descriptor.tooltip,
+      disabled: descriptor.disabled ?? false,
       cssClass: Arrays.coerce(descriptor.cssClass),
       children: menuFactory.menuItems,
       menu: {
@@ -86,9 +85,9 @@ export class ɵWorkbenchMenuFactory implements WorkbenchMenuFactory {
     this.menuItems.push(new WorkbenchMenuGroup({
       id: UUID.randomUUID(),
       name: descriptor.name,
-      label: descriptor.label && coerceObservable(descriptor.label),
+      label: descriptor.label,
       collapsible: coerceCollapsible(descriptor),
-      disabled: coerceObservable(descriptor.disabled ?? false),
+      disabled: descriptor.disabled ?? false,
       children: groupFactory.menuItems,
       cssClass: Arrays.coerce(descriptor.cssClass),
     }));
@@ -110,14 +109,14 @@ function coerceCollapsible(groupDescriptor: WorkbenchMenuGroupDescriptor): {coll
   return {collapsed: false};
 }
 
-function coerceMenuItemDescriptor(labelOrDescriptor: MaybeAsync<string> | WorkbenchMenuItemDescriptor, onSelect?: () => boolean | void | Promise<boolean | void>): WorkbenchMenuItemDescriptor {
+function coerceMenuItemDescriptor(labelOrDescriptor: MaybeObservable<string> | WorkbenchMenuItemDescriptor, onSelect?: () => boolean | void | Promise<boolean | void>): WorkbenchMenuItemDescriptor {
   if (typeof labelOrDescriptor === 'string' || isObservable(labelOrDescriptor)) {
     return {label: labelOrDescriptor, onSelect: onSelect!};
   }
   return labelOrDescriptor;
 }
 
-function coerceMenuDescriptor(labelOrDescriptor: MaybeAsync<string> | WorkbenchMenuDescriptor): WorkbenchMenuDescriptor {
+function coerceMenuDescriptor(labelOrDescriptor: MaybeObservable<string> | WorkbenchMenuDescriptor): WorkbenchMenuDescriptor {
   if (typeof labelOrDescriptor === 'string' || isObservable(labelOrDescriptor)) {
     return {label: labelOrDescriptor};
   }

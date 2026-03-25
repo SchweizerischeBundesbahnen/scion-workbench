@@ -1,75 +1,77 @@
-import {effect, inject, Injector, isSignal, untracked} from '@angular/core';
-import {WorkbenchMenu, WorkbenchMenuGroup, WorkbenchMenuItem, WorkbenchMenuItemLike} from '@scion/workbench-client';
+import {inject, Injector} from '@angular/core';
+import {WorkbenchMenu, WorkbenchMenuGroup, WorkbenchMenuItem, WorkbenchMenuItemLike, WorkbenchMenuItemProxyLike} from '@scion/workbench-client';
 import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '@scion/sci-components/menu';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {UUID} from '@scion/toolkit/uuid';
-import {MaybeSignal} from '../../common/utility-types';
-import {Observable, of} from 'rxjs';
+import {toLazyObservable} from '../common/lazy-observable.util';
 
-// WorkbenchMenuItemLike <> SciMenuItemLike
-// Equivalent to workbench-client-menu-transform.ts in @scion/workbench-client-angular
-export namespace SciMenuModel {
+/**
+ * Provides transformations between {@link SciMenuItemLike} of `@scion/components` and {@link WorkbenchMenuItemLike} of `@scion/workbench-client` menu models.
+ *
+ * Equivalent to `workbench-client-menu-transform.ts` in `@scion/workbench-client-angular`.
+ */
+export namespace SciMenuItems {
 
-  export function transformToSciMenuModel(menuItems: WorkbenchMenuItemLike[], options?: {injector?: Injector}): SciMenuItemLike[] {
+  export function fromWorkbenchMenuItemProxies(menuItemProxies: WorkbenchMenuItemProxyLike[], options?: {injector?: Injector}): SciMenuItemLike[] {
     const injector = options?.injector ?? inject(Injector);
 
-    return menuItems.map((menuItem: WorkbenchMenuItemLike): SciMenuItemLike => {
-      switch (menuItem.type) {
+    return menuItemProxies.map((menuItemProxy: WorkbenchMenuItemProxyLike): SciMenuItemLike => {
+      switch (menuItemProxy.type) {
         case 'menu-item': {
           return {
-            type: menuItem.type,
-            name: menuItem.name,
-            label: menuItem.label && {text: toSignal(menuItem.label, {injector, requireSync: true})},
-            icon: menuItem.icon && toSignal(menuItem.icon, {injector, requireSync: true}),
-            tooltip: menuItem.tooltip && toSignal(menuItem.tooltip, {injector, requireSync: true}),
-            accelerator: menuItem.accelerator,
-            disabled: toSignal(menuItem.disabled, {injector, requireSync: true}),
-            checked: menuItem.checked && toSignal(menuItem.checked, {injector, requireSync: true}),
-            actions: SciMenuModel.transformToSciMenuModel(menuItem.actions, {injector}),
+            type: menuItemProxy.type,
+            name: menuItemProxy.name,
+            label: menuItemProxy.label && {text: toSignal(menuItemProxy.label, {injector, requireSync: true})},
+            icon: menuItemProxy.icon && toSignal(menuItemProxy.icon, {injector, requireSync: true}),
+            tooltip: menuItemProxy.tooltip && toSignal(menuItemProxy.tooltip, {injector, requireSync: true}),
+            accelerator: menuItemProxy.accelerator,
+            disabled: toSignal(menuItemProxy.disabled, {injector, requireSync: true}),
+            checked: menuItemProxy.checked && toSignal(menuItemProxy.checked, {injector, requireSync: true}),
+            actions: SciMenuItems.fromWorkbenchMenuItemProxies(menuItemProxy.actions, {injector}),
             // matchesFilter: (filter: string) => true; // TODO
-            cssClass: menuItem.cssClass,
-            position: menuItem.position,
-            onSelect: () => menuItem.select(),
+            cssClass: menuItemProxy.cssClass,
+            position: menuItemProxy.position,
+            onSelect: () => menuItemProxy.select(),
           } satisfies SciMenuItem;
         }
         case 'menu': {
           return {
-            type: menuItem.type,
-            name: menuItem.name,
-            label: menuItem.label && {text: toSignal(menuItem.label, {injector, requireSync: true})},
-            icon: menuItem.icon && toSignal(menuItem.icon, {injector, requireSync: true}),
-            tooltip: menuItem.tooltip && toSignal(menuItem.tooltip, {injector, requireSync: true}),
-            disabled: toSignal(menuItem.disabled, {injector, requireSync: true}),
-            visualMenuHint: menuItem.visualMenuHint,
-            position: menuItem.position,
+            type: menuItemProxy.type,
+            name: menuItemProxy.name,
+            label: menuItemProxy.label && {text: toSignal(menuItemProxy.label, {injector, requireSync: true})},
+            icon: menuItemProxy.icon && toSignal(menuItemProxy.icon, {injector, requireSync: true}),
+            tooltip: menuItemProxy.tooltip && toSignal(menuItemProxy.tooltip, {injector, requireSync: true}),
+            disabled: toSignal(menuItemProxy.disabled, {injector, requireSync: true}),
+            visualMenuHint: menuItemProxy.visualMenuHint,
+            position: menuItemProxy.position,
             menu: {
-              width: menuItem.menu.width,
-              minWidth: menuItem.menu.minWidth,
-              maxWidth: menuItem.menu.maxWidth,
-              maxHeight: menuItem.menu.maxHeight,
-              filter: menuItem.menu.filter,
+              width: menuItemProxy.menu.width,
+              minWidth: menuItemProxy.menu.minWidth,
+              maxWidth: menuItemProxy.menu.maxWidth,
+              maxHeight: menuItemProxy.menu.maxHeight,
+              filter: menuItemProxy.menu.filter,
             },
-            cssClass: menuItem.cssClass,
-            children: SciMenuModel.transformToSciMenuModel(menuItem.children, {injector}),
+            cssClass: menuItemProxy.cssClass,
+            children: SciMenuItems.fromWorkbenchMenuItemProxies(menuItemProxy.children, {injector}),
           } satisfies SciMenu;
         }
         case 'group': {
           return {
-            type: menuItem.type,
-            name: menuItem.name,
-            label: menuItem.label && toSignal(menuItem.label, {injector, requireSync: true}),
-            collapsible: menuItem.collapsible,
-            position: menuItem.position,
-            disabled: toSignal(menuItem.disabled, {injector, requireSync: true}),
-            cssClass: menuItem.cssClass,
-            children: SciMenuModel.transformToSciMenuModel(menuItem.children, {injector}),
+            type: menuItemProxy.type,
+            name: menuItemProxy.name,
+            label: menuItemProxy.label && toSignal(menuItemProxy.label, {injector, requireSync: true}),
+            collapsible: menuItemProxy.collapsible,
+            position: menuItemProxy.position,
+            disabled: toSignal(menuItemProxy.disabled, {injector, requireSync: true}),
+            cssClass: menuItemProxy.cssClass,
+            children: SciMenuItems.fromWorkbenchMenuItemProxies(menuItemProxy.children, {injector}),
           } satisfies SciMenuGroup;
         }
       }
     });
   }
 
-  export function transformToWorkbenchMenuModel(menuItems: SciMenuItemLike[], options?: {injector?: Injector}): WorkbenchMenuItemLike[] {
+  export function toWorkbenchMenuItems(menuItems: SciMenuItemLike[], options?: {injector?: Injector}): WorkbenchMenuItemLike[] {
     const injector = options?.injector ?? inject(Injector);
 
     return menuItems.map((menuItem: SciMenuItemLike): WorkbenchMenuItemLike => {
@@ -90,7 +92,7 @@ export namespace SciMenuModel {
             accelerator: menuItem.accelerator,
             disabled: toLazyObservable(menuItem.disabled, {injector}),
             checked: toLazyObservable(menuItem.checked, {injector}),
-            actions: SciMenuModel.transformToWorkbenchMenuModel(menuItem.actions, {injector}),
+            actions: SciMenuItems.toWorkbenchMenuItems(menuItem.actions, {injector}),
             cssClass: menuItem.cssClass,
             position: menuItem.position,
             // matchesFilter: filter => menuItem?.matchesFilter(filter),
@@ -119,7 +121,7 @@ export namespace SciMenuModel {
               filter: menuItem.menu.filter,
             },
             cssClass: menuItem.cssClass,
-            children: SciMenuModel.transformToWorkbenchMenuModel(menuItem.children, {injector}),
+            children: SciMenuItems.toWorkbenchMenuItems(menuItem.children, {injector}),
           });
         }
         case 'group': {
@@ -131,43 +133,10 @@ export namespace SciMenuModel {
             collapsible: menuItem.collapsible,
             position: menuItem.position,
             cssClass: menuItem.cssClass,
-            children: SciMenuModel.transformToWorkbenchMenuModel(menuItem.children, {injector}),
+            children: SciMenuItems.toWorkbenchMenuItems(menuItem.children, {injector}),
           });
         }
       }
     });
   }
-}
-
-function toLazyObservable<T>(signal: MaybeSignal<NonNullable<T>>, options?: {injector?: Injector}): Observable<NonNullable<T>>;
-function toLazyObservable<T>(signal: MaybeSignal<T> | undefined, options?: {injector?: Injector}): Observable<NonNullable<T>> | undefined;
-function toLazyObservable<T>(signal: MaybeSignal<T> | undefined, options?: {injector?: Injector}): Observable<T> | undefined {
-  if (signal === undefined) {
-    return undefined;
-  }
-  if (!isSignal(signal)) {
-    return of(signal);
-  }
-
-  const injector = options?.injector ?? inject(Injector);
-  return new Observable(observer => {
-    const initialValue = signal();
-    let isFirstEffectRun = true;
-
-    // Emit initial value synchronously.
-    observer.next(initialValue);
-
-    const effectRef = effect(() => {
-      const value = signal();
-
-      untracked(() => {
-        if (!isFirstEffectRun || initialValue !== value) {
-          observer.next(value);
-        }
-        isFirstEffectRun = false;
-      });
-    }, {injector, manualCleanup: true});
-
-    return () => effectRef.destroy();
-  });
 }

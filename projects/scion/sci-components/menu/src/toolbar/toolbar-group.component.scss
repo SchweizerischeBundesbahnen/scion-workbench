@@ -64,8 +64,8 @@ $icon-size: 18px;
         border: $size solid transparent;
         border-right-color: var(--sci-color-text-subtle);
         border-bottom-color: var(--sci-color-text-subtle);
-        bottom: calc(var(--sci-corner) / 2);
-        right: calc(var(--sci-corner) / 2);
+        bottom: calc(var(--sci-corner) / 4);
+        right: calc(var(--sci-corner) / 4);
       }
     }
 

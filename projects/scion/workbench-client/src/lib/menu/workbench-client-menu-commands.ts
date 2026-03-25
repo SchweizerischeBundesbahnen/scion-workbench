@@ -1,4 +1,4 @@
-import {WorkbenchMenuItemTransferableLike, WorkbenchMenuContributionPosition, WorkbenchMenuOpenOptions} from './workbench-client-menu.model';
+import {WorkbenchMenuContributionPosition, WorkbenchMenuItemTransferableLike} from './workbench-client-menu.model';
 import {DialogId, NotificationId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 
 export interface ɵWorkbenchClientMenuContributionRegisterCommand {
@@ -19,7 +19,23 @@ export interface ɵWorkbenchClientMenuItemLookupCommand {
 
 export interface ɵWorkbenchClientMenuOpenCommand {
   menu: `menu:${string}` | WorkbenchMenuItemTransferableLike[];
-  options: WorkbenchMenuOpenOptions;
+  options: {
+    anchor: {
+      x: number;
+      y: number;
+      width?: number;
+      height?: number;
+    },
+    align?: 'vertical' | 'horizontal';
+    size?: {
+      width?: string
+      minWidth?: string;
+      maxWidth?: string;
+    };
+    filter?: boolean | {placeholder?: string; notFoundText?: string};
+    focus?: boolean;
+    cssClass?: string[];
+  };
   context: Map<string, unknown>;
   workbenchElementId: ViewId | PartId | DialogId | PopupId | NotificationId;
 }
