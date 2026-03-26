@@ -1,7 +1,5 @@
 import {WorkbenchMenuService} from './workbench-menu.service';
-import {WorkbenchMenuFactory, WorkbenchMenuGroupFactory} from './workbench-menu.factory';
-import {WorkbenchToolbarFactory, WorkbenchToolbarGroupFactory} from './workbench-toolbar.factory';
-import {WorkbenchMenuContributionLocation, WorkbenchMenuContributionLocationLike, WorkbenchMenuContributionOptions, WorkbenchMenuContributionPosition, WorkbenchMenuGroupContributionLocation, WorkbenchMenuItemLike, WorkbenchMenuItemProxyLike, WorkbenchMenuItems, WorkbenchMenuItemTransferableLike, WorkbenchMenuOptions, WorkbenchMenuOrigin, WorkbenchMenuRef, WorkbenchToolbarContributionLocation, WorkbenchToolbarGroupContributionLocation} from './workbench-client-menu.model';
+import {WorkbenchMenuContributionLocation, WorkbenchMenuContributionLocationLike, WorkbenchMenuContributionOptions, WorkbenchMenuContributionPosition, WorkbenchMenuFactoryFn, WorkbenchMenuFactoryFnLike, WorkbenchMenuGroupContributionLocation, WorkbenchMenuGroupFactoryFn, WorkbenchMenuItemLike, WorkbenchMenuItemProxyLike, WorkbenchMenuItems, WorkbenchMenuItemTransferableLike, WorkbenchMenuOptions, WorkbenchMenuOrigin, WorkbenchMenuRef, WorkbenchToolbarContributionLocation, WorkbenchToolbarFactoryFn, WorkbenchToolbarGroupContributionLocation, WorkbenchToolbarGroupFactoryFn} from './workbench-client-menu.model';
 import {Disposable} from '../common/disposable';
 import {UUID} from '@scion/toolkit/uuid';
 import {Beans} from '@scion/toolkit/bean-manager';
@@ -9,7 +7,7 @@ import {MessageClient, MicrofrontendPlatform, PlatformState} from '@scion/microf
 import {ɵWorkbenchMenuFactory} from './ɵworkbench-menu.factory';
 import {ɵWorkbenchToolbarFactory} from './ɵworkbench-toolbar.factory';
 import {prune} from '../common/prune.util';
-import {ɵWorkbenchClientMenuContributionCreateCommand, ɵWorkbenchClientMenuContributionRegisterCommand, ɵWorkbenchClientMenuItemLookupCommand, ɵWorkbenchClientMenuOpenCommand} from './workbench-client-menu-commands';
+import {ɵWorkbenchMenuContributionConstructCommand, ɵWorkbenchMenuContributionRegisterCommand, ɵWorkbenchMenuItemLookupCommand, ɵWorkbenchMenuOpenCommand} from './workbench-client-menu-commands';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {WorkbenchDialog} from '../dialog/workbench-dialog.model';
@@ -19,62 +17,62 @@ import {WORKBENCH_ELEMENT, WorkbenchElement} from '@scion/workbench-client';
 import {SciMenuOptions} from '@scion/sci-components/menu';
 import {coerceElement} from '@angular/cdk/coercion';
 import {map, switchMap, tap} from 'rxjs/operators';
+import {parseMenuLocation} from './workbench-menu-location-parser';
 
 export class ɵWorkbenchMenuService implements WorkbenchMenuService {
 
   private readonly _messageClient = Beans.get(MessageClient);
 
   /** @inheritDoc */
-  public contributeMenu(location: `menu:${string}` | WorkbenchMenuContributionLocation, menuFactoryFn: (menu: WorkbenchMenuFactory, context: Map<string, unknown>) => void | Observable<unknown>, options?: WorkbenchMenuContributionOptions): Disposable;
-  public contributeMenu(location: `toolbar:${string}` | WorkbenchToolbarContributionLocation, menuFactoryFn: (toolbar: WorkbenchToolbarFactory, context: Map<string, unknown>) => void | Observable<unknown>, options?: WorkbenchMenuContributionOptions): Disposable;
-  public contributeMenu(location: `group(menu):${string}` | WorkbenchMenuGroupContributionLocation, groupFactoryFn: (group: WorkbenchMenuGroupFactory, context: Map<string, unknown>) => void | Observable<unknown>, options?: WorkbenchMenuContributionOptions): Disposable;
-  public contributeMenu(location: `group(toolbar):${string}` | WorkbenchToolbarGroupContributionLocation, groupFactoryFn: (group: WorkbenchToolbarGroupFactory, context: Map<string, unknown>) => void | Observable<unknown>, options?: WorkbenchMenuContributionOptions): Disposable;
-  public contributeMenu(locationLike: string | WorkbenchMenuContributionLocationLike, factoryFn: Function, options?: WorkbenchMenuContributionOptions): Disposable {
+  public contributeMenu(location: `menu:${string}` | WorkbenchMenuContributionLocation, menuFactoryFn: WorkbenchMenuFactoryFn, options?: WorkbenchMenuContributionOptions): Disposable;
+  public contributeMenu(location: `toolbar:${string}` | WorkbenchToolbarContributionLocation, toolbarFactoryFn: WorkbenchToolbarFactoryFn, options?: WorkbenchMenuContributionOptions): Disposable;
+  public contributeMenu(location: `group(menu):${string}` | WorkbenchMenuGroupContributionLocation, groupFactoryFn: WorkbenchMenuGroupFactoryFn, options?: WorkbenchMenuContributionOptions): Disposable;
+  public contributeMenu(location: `group(toolbar):${string}` | WorkbenchToolbarGroupContributionLocation, groupFactoryFn: WorkbenchToolbarGroupFactoryFn, options?: WorkbenchMenuContributionOptions): Disposable;
+  public contributeMenu(locationLike: string | WorkbenchMenuContributionLocationLike, factoryFn: WorkbenchMenuFactoryFnLike, options?: WorkbenchMenuContributionOptions): Disposable {
     const {location, before, after, position} = typeof locationLike === 'string' ? {location: locationLike} as WorkbenchMenuContributionLocationLike : locationLike;
 
     const contributionId = UUID.randomUUID();
-    const scope = location.startsWith('menu:') || location.startsWith('group(menu):') ? 'menu' : 'toolbar';
+    const {scope} = parseMenuLocation(location);
 
     // Register contribution.
-    void this._messageClient.publish<ɵWorkbenchClientMenuContributionRegisterCommand>(`workbench/menu/contribution/${contributionId}/register`, {
-      scope,
-      location: normalizeLocation(location),
+    void this._messageClient.publish<ɵWorkbenchMenuContributionRegisterCommand>(`workbench/menu/contribution/${contributionId}/register`, {
+      location: location,
       requiredContext: new Map([...createEnvironmentContext(), ...options?.requiredContext ?? new Map()]),
       position: prune({before, after, position} as WorkbenchMenuContributionPosition, {pruneIfEmpty: true}),
     });
 
     // Subscribe for menu construction requests.
-    const subscription = this._messageClient.onMessage<ɵWorkbenchClientMenuContributionCreateCommand, WorkbenchMenuItemTransferableLike[]>(`workbench/menu/contribution/${contributionId}/create`, request => {
+    const subscription = this._messageClient.onMessage<ɵWorkbenchMenuContributionConstructCommand, WorkbenchMenuItemTransferableLike[]>(`workbench/menu/contribution/${contributionId}/construct`, request => {
       const {context} = request.body!;
 
       console.warn('>>> [ClientTS] menu factory', location, context);
 
       return of(createMenu())
         .pipe(
-          expand(({notifier$}) => notifier$.pipe(take(1), map(() => createMenu()))),
+          expand(({stale$}) => stale$.pipe(take(1), map(() => createMenu()))),
           switchMap(({menuItems}) => WorkbenchMenuItems.toTransferable$(menuItems)),
         );
 
-      function createMenu(): {menuItems: WorkbenchMenuItemLike[]; notifier$: Observable<unknown>} {
+      function createMenu(): {menuItems: WorkbenchMenuItemLike[]; stale$: Observable<unknown>} {
         switch (scope) {
           case 'menu': {
-            const fn = factoryFn as (menu: WorkbenchMenuFactory | WorkbenchMenuGroupFactory, context: Map<string, unknown>) => void | Observable<unknown>;
-            const factory = new ɵWorkbenchMenuFactory();
-            const notifier$ = fn(factory, context);
+            const menuFactory = new ɵWorkbenchMenuFactory();
+            const menuFactoryFn = factoryFn as WorkbenchMenuFactoryFn | WorkbenchMenuGroupFactoryFn;
+            const stale$ = menuFactoryFn(menuFactory, context);
 
             return {
-              menuItems: factory.menuItems,
-              notifier$: notifier$ instanceof Observable ? notifier$ : EMPTY,
+              menuItems: menuFactory.menuItems,
+              stale$: stale$ instanceof Observable ? stale$ : EMPTY,
             };
           }
           case 'toolbar': {
-            const fn = factoryFn as (menu: WorkbenchToolbarFactory | WorkbenchToolbarGroupFactory, context: Map<string, unknown>) => void | Observable<unknown>;
-            const factory = new ɵWorkbenchToolbarFactory();
-            const notifier$ = fn(factory, context);
+            const toolbarFactory = new ɵWorkbenchToolbarFactory();
+            const toolbarFactoryFn = factoryFn as WorkbenchToolbarFactoryFn | WorkbenchToolbarGroupFactoryFn;
+            const stale$ = toolbarFactoryFn(toolbarFactory, context);
 
             return {
-              menuItems: factory.menuItems,
-              notifier$: notifier$ instanceof Observable ? notifier$ : EMPTY,
+              menuItems: toolbarFactory.menuItems,
+              stale$: stale$ instanceof Observable ? stale$ : EMPTY,
             };
           }
         }
@@ -122,7 +120,7 @@ export class ɵWorkbenchMenuService implements WorkbenchMenuService {
           }),
           context: new Map([...createEnvironmentContext(), ...options.context ?? new Map()]),
           workbenchElementId: Beans.get<WorkbenchElement>(WORKBENCH_ELEMENT).id,
-        } satisfies ɵWorkbenchClientMenuOpenCommand)
+        } satisfies ɵWorkbenchMenuOpenCommand)
           .pipe(tap({complete: () => void subscription.unsubscribe()}))), // cancel subscription when closing the menu, i.e., the request terminates.
       )
       .subscribe();
@@ -134,22 +132,13 @@ export class ɵWorkbenchMenuService implements WorkbenchMenuService {
   }
 
   public menuContributions$(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>): Observable<WorkbenchMenuItemProxyLike[]> {
-    const command: ɵWorkbenchClientMenuItemLookupCommand = {
+    const command: ɵWorkbenchMenuItemLookupCommand = {
       location,
       context: new Map([...createEnvironmentContext(), ...context]),
     };
     return this._messageClient.request$<WorkbenchMenuItemTransferableLike[]>('workbench/menu/items', command)
       .pipe(map(message => WorkbenchMenuItems.fromTransferable(message.body!)));
   }
-}
-
-function normalizeLocation(location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`): `menu:${string}` | `toolbar:${string}` | `group:${string}` {
-  const regex = /^group\((menu|toolbar)\):(?<name>.+)/;
-  const match = regex.exec(location);
-  if (match) {
-    return `group:${match.groups!['name']}`;
-  }
-  return location as `menu:${string}` | `toolbar:${string}`;
 }
 
 function createEnvironmentContext(): Map<string, unknown> {
@@ -176,7 +165,7 @@ function createEnvironmentContext(): Map<string, unknown> {
   return new Map();
 }
 
-function coerceAnchor(anchor: HTMLElement | WorkbenchMenuOrigin | MouseEvent): ɵWorkbenchClientMenuOpenCommand['options']['anchor'] {
+function coerceAnchor(anchor: HTMLElement | WorkbenchMenuOrigin | MouseEvent): ɵWorkbenchMenuOpenCommand['options']['anchor'] {
   if (anchor instanceof HTMLElement) {
     const {x, y, width, height} = coerceElement(anchor).getBoundingClientRect();
     return {x, y, width, height};
@@ -189,7 +178,7 @@ function coerceAnchor(anchor: HTMLElement | WorkbenchMenuOrigin | MouseEvent): �
   }
 }
 
-function coerceFilter(filter: SciMenuOptions['filter'] | undefined): ɵWorkbenchClientMenuOpenCommand['options']['filter'] | undefined {
+function coerceFilter(filter: SciMenuOptions['filter'] | undefined): ɵWorkbenchMenuOpenCommand['options']['filter'] | undefined {
   if (filter === undefined) {
     return undefined;
   }

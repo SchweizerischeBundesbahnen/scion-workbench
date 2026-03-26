@@ -5,6 +5,8 @@ import {mapToBody, MessageClient} from '@scion/microfrontend-platform';
 import {prune} from '../common/prune.util';
 import {createRemoteObservable$, remoteSubscriber$} from './remote-observable';
 import {Observables} from '@scion/toolkit/util';
+import {WorkbenchMenuFactory, WorkbenchMenuGroupFactory} from './workbench-menu.factory';
+import {WorkbenchToolbarFactory, WorkbenchToolbarGroupFactory} from './workbench-toolbar.factory';
 
 /**
  * Represents a {@link SciMenuItem} in @scion/workbench-client.
@@ -70,6 +72,8 @@ export class WorkbenchMenuItem {
 
 /**
  * Proxy for a {@link SciMenuItem} in @scion/workbench-client.
+ *
+ * @docs-private
  */
 export class WorkbenchMenuItemProxy {
 
@@ -191,6 +195,8 @@ export class WorkbenchMenu {
 
 /**
  * Proxy for a {@link SciMenu} in @scion/workbench-client.
+ *
+ * @docs-private
  */
 export class WorkbenchMenuProxy {
 
@@ -297,6 +303,8 @@ export class WorkbenchMenuGroup {
 
 /**
  * Proxy for a {@link SciMenuGroup} in @scion/workbench-client.
+ *
+ * @docs-private
  */
 export class WorkbenchMenuGroupProxy {
 
@@ -352,6 +360,13 @@ export type WorkbenchMenuGroupContributionLocation = {location: `group(menu):${s
 export type WorkbenchToolbarGroupContributionLocation = {location: `group(toolbar):${string}`} & WorkbenchMenuContributionPosition;
 
 export type WorkbenchMenuContributionLocationLike = WorkbenchMenuContributionLocation | WorkbenchToolbarContributionLocation | WorkbenchMenuGroupContributionLocation | WorkbenchToolbarGroupContributionLocation;
+
+export type WorkbenchMenuFactoryFn = (menu: WorkbenchMenuFactory, context: Map<string, unknown>) => void | WorkbenchMenuStaleNotifier;
+export type WorkbenchToolbarFactoryFn = (toolbar: WorkbenchToolbarFactory, context: Map<string, unknown>) => void | WorkbenchMenuStaleNotifier;
+export type WorkbenchMenuGroupFactoryFn = (group: WorkbenchMenuGroupFactory, context: Map<string, unknown>) => void | WorkbenchMenuStaleNotifier;
+export type WorkbenchToolbarGroupFactoryFn = (group: WorkbenchToolbarGroupFactory, context: Map<string, unknown>) => void | WorkbenchMenuStaleNotifier;
+export type WorkbenchMenuFactoryFnLike = WorkbenchMenuFactoryFn | WorkbenchToolbarFactoryFn | WorkbenchMenuGroupFactoryFn | WorkbenchToolbarGroupFactoryFn;
+export type WorkbenchMenuStaleNotifier = Observable<unknown>;
 
 export type WorkbenchMenuItemLike = WorkbenchMenuItem | WorkbenchMenu | WorkbenchMenuGroup;
 

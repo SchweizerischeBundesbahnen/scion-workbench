@@ -1,17 +1,11 @@
 import {OneOf} from './common/utility-types';
 import {SciMenuFactory, SciMenuGroupFactory} from './menu/menu.factory';
 import {SciToolbarFactory, SciToolbarGroupFactory} from './toolbar/toolbar.factory';
+import {Injector} from '@angular/core';
 
 export interface SciMenuContribution {
-  scope: 'menu',
-  factory: (menu: SciMenuFactory | SciMenuGroupFactory, context: Map<string, unknown>) => void;
-  requiredContext: Map<string, unknown>;
-  position?: SciMenuContributionPosition;
-}
-
-export interface SciToolbarContribution {
-  scope: 'toolbar',
-  factory: (toolbar: SciToolbarFactory | SciToolbarGroupFactory, context: Map<string, unknown>) => void;
+  scope: 'menu' | 'toolbar',
+  factoryFn: SciMenuFactoryFnLike;
   requiredContext: Map<string, unknown>;
   position?: SciMenuContributionPosition;
 }
@@ -24,11 +18,28 @@ export type SciMenuGroupContributionLocation = {location: `group(menu):${string}
 
 export type SciToolbarGroupContributionLocation = {location: `group(toolbar):${string}`} & SciMenuContributionPosition;
 
+export type SciMenuContributionLocationLike = SciMenuContributionLocation | SciToolbarContributionLocation | SciMenuGroupContributionLocation | SciToolbarGroupContributionLocation;
+
+export interface SciMenuContributionOptions {
+  /**
+   * This function must be called within an injection context, or an explicit {@link Injector} passed. Destroying the injection context will unregister contributed menus.
+   */
+  injector?: Injector;
+
+  requiredContext?: Map<string, unknown>;
+}
+
 export type SciMenuContributionPosition = OneOf<{
   before?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
   after?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
   position?: 'start' | 'end';
 }>;
+
+export type SciMenuFactoryFn = (menu: SciMenuFactory, context: Map<string, unknown>) => void;
+export type SciToolbarFactoryFn = (toolbar: SciToolbarFactory, context: Map<string, unknown>) => void;
+export type SciMenuGroupFactoryFn = (group: SciMenuGroupFactory, context: Map<string, unknown>) => void;
+export type SciToolbarGroupFactoryFn = (group: SciToolbarGroupFactory, context: Map<string, unknown>) => void;
+export type SciMenuFactoryFnLike = SciMenuFactoryFn | SciToolbarFactoryFn | SciMenuGroupFactoryFn | SciToolbarGroupFactoryFn;
 
 /**
  * Indicates no contributions found.

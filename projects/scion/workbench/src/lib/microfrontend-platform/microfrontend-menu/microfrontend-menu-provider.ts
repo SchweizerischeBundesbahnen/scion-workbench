@@ -1,8 +1,8 @@
 import {DestroyRef, DOCUMENT, EnvironmentProviders, inject, Injector, makeEnvironmentProviders, signal, Signal, untracked} from '@angular/core';
 import {mapToBody, MessageClient} from '@scion/microfrontend-platform';
 import {takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-interop';
-import {WorkbenchMenuItemProxyLike, WorkbenchMenuItems, WorkbenchMenuItemTransferableLike, ɵWorkbenchClientMenuContributionCreateCommand, ɵWorkbenchClientMenuContributionRegisterCommand, ɵWorkbenchClientMenuItemLookupCommand, ɵWorkbenchClientMenuOpenCommand} from '@scion/workbench-client';
-import {SciMenuAdapter, SciMenuContributionPosition, SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuOptions, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
+import {WorkbenchMenuItemProxyLike, WorkbenchMenuItems, WorkbenchMenuItemTransferableLike, ɵWorkbenchMenuContributionConstructCommand, ɵWorkbenchMenuContributionRegisterCommand, ɵWorkbenchMenuItemLookupCommand, ɵWorkbenchMenuOpenCommand} from '@scion/workbench-client';
+import {SciMenuAdapter, SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuGroupFactory, SciMenuOptions, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarGroupFactory, SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
 import {finalize, map} from 'rxjs/operators';
 import {Objects} from '@scion/toolkit/util';
 import {createDestroyableInjector} from '../../common/injector.util';
@@ -11,6 +11,7 @@ import {fromEvent, Observable, switchMap} from 'rxjs';
 import {createInvocationContext} from '../../invocation-context/invocation-context';
 import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
 import {SciMenuItems} from './workbench-client-menu-transform';
+import {parseMenuLocation} from './workbench-menu-location-parser';
 
 // TODO move to support
 function installMenuRegisterHandler(): void {
@@ -18,42 +19,40 @@ function installMenuRegisterHandler(): void {
   const menuAdapter = inject(SciMenuAdapter);
   const injector = inject(Injector);
 
-  messageClient.onMessage<ɵWorkbenchClientMenuContributionRegisterCommand>('workbench/menu/contribution/:contributionId/register', message => {
+  messageClient.onMessage<ɵWorkbenchMenuContributionRegisterCommand>('workbench/menu/contribution/:contributionId/register', message => {
     const contributionId = message.params!.get('contributionId') as string;
-    const contribution = message.body!;
+    const {location, position, requiredContext} = message.body!;
+    const {scope} = parseMenuLocation(location);
 
     const menuItemsCache = new WorkbenchClientMenuItemsCache();
-    const {before, after, position} = contribution.position ?? {};
 
     // Contribute menu.
-    const contributionRef = menuAdapter.contributeMenu(contribution.location, {
-      scope: contribution.scope,
-      requiredContext: contribution.requiredContext,
-      position: prune({before, after, position} as SciMenuContributionPosition, {pruneIfEmpty: true}),
-      factory: (factory: SciMenuFactory | SciToolbarFactory, context: Map<string, unknown>) => {
-        // Menu items are constructed asynchronously via messaging. Therefore, we create an initially empty signal and update it when receiving the menu items.
-        // We must memoize the signal for therequest not to be performed anew.
-        const menuItems = menuItemsCache.computeIfAbsent(context, () => untracked(() => {
-          const command: ɵWorkbenchClientMenuContributionCreateCommand = {context};
-          const menuItems$ = messageClient.request$<WorkbenchMenuItemTransferableLike[]>(`workbench/menu/contribution/${contributionId}/create`, command)
-            .pipe(
-              mapToBody(),
-              map(menuItems => WorkbenchMenuItems.fromTransferable(menuItems)),
-            );
-          return toSignal(menuItems$, {initialValue: []});
-        }))();
+    const contributionRef = menuAdapter.contributeMenu({location, ...position}, (factory: SciMenuFactory | SciMenuGroupFactory | SciToolbarFactory | SciToolbarGroupFactory, context: Map<string, unknown>) => {
+      // Menu items are constructed asynchronously via messaging. Therefore, we create an initially empty signal and update it when receiving the menu items.
+      // We must memoize the signal for therequest not to be performed anew.
+      const menuItems = menuItemsCache.computeIfAbsent(context, () => untracked(() => {
+        const command: ɵWorkbenchMenuContributionConstructCommand = {context};
+        const menuItems$ = messageClient.request$<WorkbenchMenuItemTransferableLike[]>(`workbench/menu/contribution/${contributionId}/construct`, command)
+          .pipe(
+            mapToBody(),
+            map(menuItems => WorkbenchMenuItems.fromTransferable(menuItems)),
+          );
+        return toSignal(menuItems$, {initialValue: []});
+      }))();
 
-        untracked(() => {
-          // Populate menu or toolbar.
-          if (contribution.scope === 'menu') {
-            populateMenu(factory as SciMenuFactory, menuItems);
+      untracked(() => {
+        switch (scope) {
+          case 'menu': {
+            populateMenu(factory as SciMenuFactory | SciMenuGroupFactory, menuItems);
+            break;
           }
-          else if (contribution.scope === 'toolbar') {
-            populateToolbar(factory as SciToolbarFactory, menuItems);
+          case 'toolbar': {
+            populateToolbar(factory as SciToolbarFactory | SciToolbarGroupFactory, menuItems);
+            break;
           }
-        });
-      },
-    });
+        }
+      });
+    }, {requiredContext});
 
     // Dispose menu when unregistering the contribution.
     const subscription = messageClient.observe$<void>(`workbench/menu/contribution/${contributionId}/unregister`)
@@ -70,11 +69,10 @@ function installMenuItemLookupHandler(): void {
   const messageClient = inject(MessageClient);
   const menuAdapter = inject(SciMenuAdapter);
 
-  messageClient.onMessage<ɵWorkbenchClientMenuItemLookupCommand, WorkbenchMenuItemTransferableLike[]>('workbench/menu/items', request => {
+  messageClient.onMessage<ɵWorkbenchMenuItemLookupCommand, WorkbenchMenuItemTransferableLike[]>('workbench/menu/items', request => {
     const {location, context} = request.body!;
     const injector = createDestroyableInjector({parent: rootInjector});
 
-    console.log('>>> lookup for location', location);
     const menuItems = menuAdapter.menuContributions(signal(location), signal(context), {injector});
     return toObservable(menuItems, {injector})
       .pipe(
@@ -89,7 +87,7 @@ function installMenuOpenHandler(): void {
   const messageClient = inject(MessageClient);
   const menuAdapter = inject(SciMenuAdapter);
 
-  messageClient.onMessage<ɵWorkbenchClientMenuOpenCommand, void>('workbench/menu/open', request => {
+  messageClient.onMessage<ɵWorkbenchMenuOpenCommand, void>('workbench/menu/open', request => {
     const command = request.body!;
     const injector = createDestroyableInjector({parent: rootInjector});
     const invocationContext = createInvocationContext(command.workbenchElementId, {injector});
@@ -146,7 +144,7 @@ function installMenuCloseHandler(): void {
 /**
  * Populates given menu with passed menu items.
  */
-function populateMenu(menu: SciMenuFactory, menuItemProxies: WorkbenchMenuItemProxyLike[]): void {
+function populateMenu(menu: SciMenuFactory | SciMenuGroupFactory, menuItemProxies: WorkbenchMenuItemProxyLike[]): void {
   for (const menuItemProxy of menuItemProxies) {
     switch (menuItemProxy.type) {
       case 'menu-item': {
@@ -202,7 +200,7 @@ function populateMenu(menu: SciMenuFactory, menuItemProxies: WorkbenchMenuItemPr
 /**
  * Populates given toolbar with passed menu items.
  */
-function populateToolbar(toolbar: SciToolbarFactory, menuItemProxies: WorkbenchMenuItemProxyLike[]): void {
+function populateToolbar(toolbar: SciToolbarFactory | SciToolbarGroupFactory, menuItemProxies: WorkbenchMenuItemProxyLike[]): void {
   for (const menuItemProxy of menuItemProxies) {
     switch (menuItemProxy.type) {
       case 'menu-item': {
@@ -266,7 +264,7 @@ export function provideWorkbenchClientMenu(): EnvironmentProviders {
   ]);
 }
 
-function coerceFilter(filter: ɵWorkbenchClientMenuOpenCommand['options']['filter'] | undefined): SciMenuOptions['filter'] | undefined {
+function coerceFilter(filter: ɵWorkbenchMenuOpenCommand['options']['filter'] | undefined): SciMenuOptions['filter'] | undefined {
   if (filter === undefined) {
     return undefined;
   }

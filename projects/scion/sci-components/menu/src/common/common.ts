@@ -16,6 +16,6 @@ export function ɵassertInInjectionContext(debugFn: Function, notFound: string):
     assertInInjectionContext(debugFn);
   }
   catch (error) {
-    throw Error(notFound ?? 'Must be called within an injection context, or an explicit injector passed.');
+    throw Error(notFound ?? `${debugFn.name}() can only be used within an injection context, or an explicit injector passed.`);
   }
 }

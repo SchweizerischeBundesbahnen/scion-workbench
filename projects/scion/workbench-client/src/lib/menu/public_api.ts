@@ -8,13 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {type ɵWorkbenchClientMenuContributionRegisterCommand, type ɵWorkbenchClientMenuContributionCreateCommand, type ɵWorkbenchClientMenuItemLookupCommand, type ɵWorkbenchClientMenuOpenCommand} from './workbench-client-menu-commands';
-export {type WorkbenchMenuContributionPosition, type WorkbenchMenuOrigin, type WorkbenchToolbarContributionLocation, type WorkbenchToolbarGroupContributionLocation, type WorkbenchMenuContributionLocation, type WorkbenchMenuGroupContributionLocation, type WorkbenchMenuContributionOptions, type WorkbenchMenuContributionLocationLike, type WorkbenchMenuOptions, type WorkbenchMenuRef} from './workbench-client-menu.model';
-export {WorkbenchMenu, WorkbenchMenuGroup, WorkbenchMenuItem, type WorkbenchMenuItemLike} from './workbench-client-menu.model';
-export {WorkbenchMenuProxy, WorkbenchMenuGroupProxy, WorkbenchMenuItemProxy, type WorkbenchMenuItemProxyLike} from './workbench-client-menu.model';
+export {type ɵWorkbenchMenuContributionRegisterCommand, type ɵWorkbenchMenuContributionConstructCommand, type ɵWorkbenchMenuItemLookupCommand, type ɵWorkbenchMenuOpenCommand} from './workbench-client-menu-commands';
+export {type WorkbenchMenuContributionPosition, type WorkbenchMenuOrigin, type WorkbenchToolbarContributionLocation, type WorkbenchToolbarGroupContributionLocation, type WorkbenchMenuContributionLocation, type WorkbenchMenuGroupContributionLocation, type WorkbenchMenuContributionOptions, type WorkbenchMenuContributionLocationLike, type WorkbenchMenuOptions, type WorkbenchMenuRef, WorkbenchMenu, WorkbenchMenuGroup, WorkbenchMenuItem, type WorkbenchMenuItemLike, WorkbenchMenuProxy, WorkbenchMenuGroupProxy, WorkbenchMenuItemProxy, type WorkbenchMenuItemProxyLike, type WorkbenchMenuFactoryFn, type WorkbenchToolbarFactoryFn, type WorkbenchMenuGroupFactoryFn, type WorkbenchToolbarGroupFactoryFn, type WorkbenchMenuFactoryFnLike, type WorkbenchMenuStaleNotifier, type WorkbenchMenuTransferable, type WorkbenchMenuItemTransferable, type WorkbenchMenuItemTransferableLike, type WorkbenchMenuGroupTransferable, WorkbenchMenuItems} from './workbench-client-menu.model';
 export {WorkbenchMenuService} from './workbench-menu.service';
 export {ɵWorkbenchMenuService} from './ɵworkbench-menu.service';
 export {type WorkbenchMenuDescriptor, type WorkbenchMenuFactory, type  WorkbenchMenuGroupDescriptor, type WorkbenchMenuGroupFactory, type WorkbenchMenuItemDescriptor} from './workbench-menu.factory';
 export {type WorkbenchToolbarFactory, type WorkbenchToolbarGroupDescriptor, type WorkbenchToolbarGroupFactory, type WorkbenchToolbarItemDescriptor, type WorkbenchToolbarMenuDescriptor} from './workbench-toolbar.factory';
-export {WorkbenchMenuItems, type WorkbenchMenuItemTransferableLike} from './workbench-client-menu.model';
 

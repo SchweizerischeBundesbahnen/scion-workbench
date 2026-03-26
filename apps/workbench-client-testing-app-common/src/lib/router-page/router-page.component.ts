@@ -62,8 +62,6 @@ export class RouterPageComponent {
   constructor() {
     Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.signalReady();
 
-    console.log('>>> hellpo');
-
     contributeMenu('toolbar:testee', toolbar => toolbar
         .addToolbarItem({
           icon: 'play_circle',
@@ -124,7 +122,6 @@ export class RouterPageComponent {
           })
         }
       }, {requiredContext: new Map().set('viewId', undefined), injector: this.injector})
-
     }
   }
 }

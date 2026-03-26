@@ -101,36 +101,36 @@ export default class ViewPageComponent {
         console.debug(`[ViewCapability$::first] [component=ViewPageComponent@${this.uuid}, capabilityId=${capability.metadata!.id}]`);
       });
 
-    // const bold = signal(false);
-    // contributeMenu('toolbar:testee', toolbar => toolbar
-    //   .addToolbarItem({
-    //     icon: 'format_bold', checked: bold, onSelect: () => {
-    //       bold.update(bold => !bold);
-    //     },
-    //   }),
-    // )
+    const bold = signal(false);
+    contributeMenu('toolbar:testee', toolbar => toolbar
+      .addToolbarItem({
+        icon: 'format_bold', checked: bold, onSelect: () => {
+          bold.update(bold => !bold);
+        },
+      }),
+    )
 
     // setInterval(() => {
     //   console.log('>>> state', state());
     // }, 3000);
 
-    // const state = signal(false);
-    // contributeMenu('toolbar:testee', toolbar => toolbar
-    //   .addToolbarItem({
-    //     icon: 'play_circle',
-    //     onSelect: () => {
-    //       state.update(state => !state);
-    //     },
-    //   }),
-    // );
+    const state = signal(false);
+    contributeMenu('toolbar:testee', toolbar => toolbar
+      .addToolbarItem({
+        icon: 'play_circle',
+        onSelect: () => {
+          state.update(state => !state);
+        },
+      }),
+    );
     //
-    // contributeMenu('toolbar:testee', toolbar => {
-    //     console.log(`>>> DEVELOPER FACTORY FUNCTION [state=${state()}]`);
-    //     if (state()) {
-    //       toolbar.addToolbarItem('home', onSelect)
-    //     }
-    //   },
-    // )
+    contributeMenu('toolbar:testee', toolbar => {
+        console.log(`>>> DEVELOPER FACTORY FUNCTION [state=${state()}]`);
+        if (state()) {
+          toolbar.addToolbarItem('home', onSelect)
+        }
+      },
+    )
 
     if (1 + 1) {
       return;

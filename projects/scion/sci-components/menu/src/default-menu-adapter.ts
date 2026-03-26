@@ -18,24 +18,34 @@ import {MenuComponent} from './menu/menu.component';
 import {dimension} from '@scion/components/dimension';
 import {UUID} from '@scion/toolkit/uuid';
 import {Objects} from '@scion/toolkit/util';
-import {SciMenuFactory} from './menu/menu.factory';
 import {ɵSciMenuFactory} from './menu/ɵmenu.factory';
 import {ɵSciToolbarFactory} from './toolbar/ɵtoolbar.factory';
 import {sortMenuItems} from './menu-item-sorter';
-import {SciToolbarFactory} from './toolbar/toolbar.factory';
-import {NULL_MENU_CONTRIBUTIONS, SciMenuContribution, SciToolbarContribution} from './menu-contribution.model';
+import {NULL_MENU_CONTRIBUTIONS, SciMenuContribution, SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuContributionPosition, SciMenuFactoryFn, SciMenuFactoryFnLike, SciMenuGroupFactoryFn, SciToolbarFactoryFn, SciToolbarGroupFactoryFn} from './menu-contribution.model';
 import {createDestroyableInjector} from './common/injector.util';
 import {ɵassertInInjectionContext} from './common/common';
+import {prune} from './common/prune.util';
+import {parseMenuLocation} from './menu-location-parser';
 
 @Injectable({providedIn: 'root'})
 export class SciDefaultMenuAdapter implements SciMenuAdapter {
 
-  private readonly _contributions = new Map<`menu:${string}` | `toolbar:${string}` | `group:${string}`, WritableSignal<Array<SciMenuContribution | SciToolbarContribution>>>;
-  private readonly _menuItemsCaches = new Map<SciMenuContribution | SciToolbarContribution, MenuItemsCache>;
+  private readonly _contributions = new Map<`menu:${string}` | `toolbar:${string}` | `group:${string}`, WritableSignal<Array<SciMenuContribution>>>;
+  private readonly _menuItemsCaches = new Map<SciMenuContribution, MenuItemsCache>;
   private readonly _injector = inject(Injector);
 
   /** @inheritDoc */
-  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution | SciToolbarContribution): Disposable {
+  public contributeMenu(locationLike: SciMenuContributionLocationLike, factoryFn: SciMenuFactoryFnLike, options?: SciMenuContributionOptions): Disposable {
+    const {location, scope} = parseMenuLocation(locationLike.location);
+    const {before, after, position} = locationLike;
+
+    const contribution: SciMenuContribution = {
+      scope: scope,
+      factoryFn: factoryFn,
+      position: prune({before, after, position} as SciMenuContributionPosition, {pruneIfEmpty: true}),
+      requiredContext: options?.requiredContext ?? new Map(),
+    }
+
     if (!this._contributions.has(location)) {
       this._contributions.set(location, signal([]));
     }
@@ -90,25 +100,25 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
       }
 
       return sortMenuItems(contributions()
-        .flatMap((contribution: SciMenuContribution | SciToolbarContribution): SciMenuItemLike[] => {
+        .flatMap((contribution: SciMenuContribution): SciMenuItemLike[] => {
           const menuItems = this._menuItemsCaches.get(contribution)!.computeIfAbsent(context(), context => {
             const injector = inject(Injector);
 
             return computed(() => {
-              if (contribution.scope === 'menu') {
-                const factoryFn: ((menu: SciMenuFactory, context: Map<string, unknown>) => void) = contribution.factory;
-                const menuFactory = new ɵSciMenuFactory();
-                runInInjectionContext(injector, () => factoryFn(menuFactory, context));
-                return menuFactory.menuItems.map(menuItem => ({...menuItem, position: contribution.position}));
+              switch (contribution.scope) {
+                case 'menu': {
+                  const menuFactory = new ɵSciMenuFactory();
+                  const menuFactoryFn = contribution.factoryFn as SciMenuFactoryFn | SciMenuGroupFactoryFn;
+                  runInInjectionContext(injector, () => menuFactoryFn(menuFactory, context));
+                  return menuFactory.menuItems.map(menuItem => ({...menuItem, position: contribution.position}));
+                }
+                case 'toolbar': {
+                  const toolbarFactory = new ɵSciToolbarFactory();
+                  const toolbarFactoryFn = contribution.factoryFn as SciToolbarFactoryFn | SciToolbarGroupFactoryFn;
+                  runInInjectionContext(injector, () => toolbarFactoryFn(toolbarFactory, context));
+                  return toolbarFactory.menuItems.map(menuItem => ({...menuItem, position: contribution.position}));
+                }
               }
-              if (contribution.scope === 'toolbar') {
-                const factoryFn: (toolbar: SciToolbarFactory, context: Map<string, unknown>) => void = contribution.factory;
-                const toolbarFactory = new ɵSciToolbarFactory();
-                runInInjectionContext(injector, () => factoryFn(toolbarFactory, context));
-                return toolbarFactory.menuItems.map(menuItem => ({...menuItem, position: contribution.position}));
-              }
-
-              throw Error(`Unsupported location '${location}'. Location must start with 'menu:', 'toolbar:', or 'group(menu|toolbar):'.`);
             });
           }, {injector: callingContextInjector, debugInfo: location()});
 

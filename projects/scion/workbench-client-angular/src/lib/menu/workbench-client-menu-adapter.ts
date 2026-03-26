@@ -1,6 +1,6 @@
-import {Disposable, SciMenuAdapter, SciMenuContribution, SciMenuItemLike, SciMenuOptions, SciMenuOrigin, SciMenuRef, SciToolbarContribution} from '@scion/sci-components/menu';
-import {assertInInjectionContext, assertNotInReactiveContext, effect, ElementRef, inject, Injector, linkedSignal, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
-import {WorkbenchMenuContributionLocation, WorkbenchMenuGroupContributionLocation, WorkbenchMenuOptions, WorkbenchMenuOrigin, WorkbenchToolbarContributionLocation, WorkbenchToolbarGroupContributionLocation, ɵWorkbenchMenuService} from '@scion/workbench-client';
+import {Disposable, SciMenuAdapter, SciMenuContributionLocation, SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuFactoryFn, SciMenuFactoryFnLike, SciMenuGroupContributionLocation, SciMenuGroupFactoryFn, SciMenuItemLike, SciMenuOptions, SciMenuOrigin, SciMenuRef, SciToolbarContributionLocation, SciToolbarFactoryFn, SciToolbarGroupContributionLocation, SciToolbarGroupFactoryFn} from '@scion/sci-components/menu';
+import {assertNotInReactiveContext, effect, ElementRef, inject, Injector, linkedSignal, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
+import {WorkbenchMenuOptions, WorkbenchMenuOrigin, ɵWorkbenchMenuService} from '@scion/workbench-client';
 import {first, map, Observable} from 'rxjs';
 import {ɵassertInInjectionContext} from '../common/common';
 import {coerceElement} from '@angular/cdk/coercion';
@@ -16,48 +16,35 @@ export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
   private readonly _injector = inject(Injector);
 
   /** @inheritDoc */
-  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution | SciToolbarContribution): Disposable {
-    assertInInjectionContext(this.contributeMenu);
-    const {scope, name} = parseLocation(location, contribution);
+  public contributeMenu(location: SciMenuContributionLocationLike, factoryFn: SciMenuFactoryFnLike, options?: SciMenuContributionOptions): Disposable {
     const injector = this._injector;
+    const [scope] = location.location.split(':', 1) as ['menu' | 'toolbar' | 'group(menu)' | 'group(toolbar)', string];
 
-    // Delegate to `WorkbenchMenuService.contributeMenu()` of `@scion/workbench-client`.
+    // Delegate to `WorkbenchMenuService.contributeMenu` of `@scion/workbench-client`.
     switch (scope) {
       case 'menu': {
-        const menuContribution = contribution as SciMenuContribution;
-        const location = {location: `menu:${name}`, ...contribution.position} satisfies WorkbenchMenuContributionLocation;
-
-        // Delegate contribution to `WorkbenchMenuService.contributeMenu` of `@scion/workbench-client`.
-        return this._workbenchMenuService.contributeMenu(location, (menu, context) => {
-          return tracked(() => menuContribution.factory(new WorkbenchClientMenuFactoryDelegate(menu), context));
-        }, {requiredContext: contribution.requiredContext});
+        return this._workbenchMenuService.contributeMenu(location as SciMenuContributionLocation, (menu, context) => {
+          const menuFactoryFn = factoryFn as SciMenuFactoryFn;
+          return tracked(() => menuFactoryFn(new WorkbenchClientMenuFactoryDelegate(menu), context));
+        }, {requiredContext: options?.requiredContext});
       }
       case 'group(menu)': {
-        const menuContribution = contribution as SciMenuContribution;
-        const location = {location: `group(menu):${name}`, ...contribution.position} satisfies WorkbenchMenuGroupContributionLocation;
-
-        // Delegate contribution to `WorkbenchMenuService.contributeMenu` of `@scion/workbench-client`.
-        return this._workbenchMenuService.contributeMenu(location, (group, context) => {
-          return tracked(() => menuContribution.factory(new WorkbenchClientMenuFactoryDelegate(group), context));
-        }, {requiredContext: contribution.requiredContext});
+        return this._workbenchMenuService.contributeMenu(location as SciMenuGroupContributionLocation, (group, context) => {
+          const groupFactoryFn = factoryFn as SciMenuGroupFactoryFn;
+          return tracked(() => groupFactoryFn(new WorkbenchClientMenuFactoryDelegate(group), context));
+        }, {requiredContext: options?.requiredContext});
       }
       case 'toolbar': {
-        const toolbarContribution = contribution as SciToolbarContribution;
-        const location = {location: `toolbar:${name}`, ...contribution.position} satisfies WorkbenchToolbarContributionLocation;
-
-        // Delegate contribution to `WorkbenchMenuService.contributeMenu` of `@scion/workbench-client`.
-        return this._workbenchMenuService.contributeMenu(location, (toolbar, context) => {
-          return tracked(() => toolbarContribution.factory(new WorkbenchClientToolbarFactoryDelegate(toolbar), context));
-        }, {requiredContext: contribution.requiredContext});
+        return this._workbenchMenuService.contributeMenu(location as SciToolbarContributionLocation, (toolbar, context) => {
+          const toolbarFactoryFn = factoryFn as SciToolbarFactoryFn;
+          return tracked(() => toolbarFactoryFn(new WorkbenchClientToolbarFactoryDelegate(toolbar), context));
+        }, {requiredContext: options?.requiredContext});
       }
       case 'group(toolbar)': {
-        const toolbarContribution = contribution as SciToolbarContribution;
-        const location = {location: `group(toolbar):${name}`, ...contribution.position} satisfies WorkbenchToolbarGroupContributionLocation;
-
-        // Delegate contribution to `WorkbenchMenuService.contributeMenu` of `@scion/workbench-client`.
-        return this._workbenchMenuService.contributeMenu(location, (group, context) => {
-          return tracked(() => toolbarContribution.factory(new WorkbenchClientToolbarFactoryDelegate(group), context));
-        }, {requiredContext: contribution.requiredContext});
+        return this._workbenchMenuService.contributeMenu(location as SciToolbarGroupContributionLocation, (group, context) => {
+          const groupFactoryFn = factoryFn as SciToolbarGroupFactoryFn;
+          return tracked(() => groupFactoryFn(new WorkbenchClientToolbarFactoryDelegate(group), context));
+        }, {requiredContext: options?.requiredContext});
       }
     }
 
@@ -151,16 +138,4 @@ function coerceFilter(filter: SciMenuOptions['filter'] | undefined): WorkbenchMe
     placeholder: filter.placeholder,
     notFoundText: filter.notFoundText,
   };
-}
-
-function parseLocation(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution | SciToolbarContribution): {scope: 'menu' | 'toolbar' | 'group(menu)' | 'group(toolbar)'; name: string} {
-  const regex = /^(?<type>.+):(?<name>.+)$/;
-  const {name} = regex.exec(location)!.groups!;
-
-  if (location.startsWith('menu:') || location.startsWith('toolbar:')) {
-    return {scope: contribution.scope, name: name!};
-  }
-  else {
-    return {scope: `group(${contribution.scope})`, name: name!};
-  }
 }

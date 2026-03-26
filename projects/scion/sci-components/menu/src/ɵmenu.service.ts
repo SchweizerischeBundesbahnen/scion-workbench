@@ -15,7 +15,7 @@ import {Disposable} from './common/disposable';
 import {SciMenuContextProvider} from './menu-context-provider';
 import {coerceSignal} from './common/common';
 import {SciMenuAdapter} from './menu-adapter';
-import {SciMenuContribution, SciToolbarContribution} from './menu-contribution.model';
+import {SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuFactoryFnLike} from './menu-contribution.model';
 import {MaybeSignal} from './common/utility-types';
 
 @Injectable({providedIn: 'root'})
@@ -43,15 +43,13 @@ export class ɵSciMenuService implements SciMenuService {
    * The function:
    * - Must be called within an injection context, or an explicit {@link Injector} passed.
    * - Must be called in a non-reactive (non-tracking) context.
-   *
-   * @internal
    */
   public menuContributions(location: MaybeSignal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: MaybeSignal<Map<string, unknown>>, options?: {injector?: Injector}): Signal<SciMenuItemLike[]> {
     return this._menuAdapter.menuContributions(coerceSignal(location), coerceSignal(context), options);
   }
 
-  public contributeMenu(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, contribution: SciMenuContribution | SciToolbarContribution): Disposable {
-    return this._menuAdapter.contributeMenu(location, contribution);
+  public contributeMenu(location: SciMenuContributionLocationLike, factoryFn: SciMenuFactoryFnLike, options?: SciMenuContributionOptions): Disposable {
+    return this._menuAdapter.contributeMenu(location, factoryFn, options);
   }
 }
 
