@@ -1,6 +1,6 @@
 import {Disposable, SciMenuAdapter, SciMenuContributionLocation, SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuFactoryFn, SciMenuFactoryFnLike, SciMenuGroupContributionLocation, SciMenuGroupFactoryFn, SciMenuItemLike, SciMenuOptions, SciMenuOrigin, SciMenuRef, SciToolbarContributionLocation, SciToolbarFactoryFn, SciToolbarGroupContributionLocation, SciToolbarGroupFactoryFn} from '@scion/sci-components/menu';
-import {assertNotInReactiveContext, effect, ElementRef, inject, Injector, linkedSignal, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
-import {WorkbenchMenuFactory, WorkbenchMenuGroupFactory, WorkbenchMenuOptions, WorkbenchMenuOrigin, WorkbenchToolbarFactory, WorkbenchToolbarGroupFactory, ɵWorkbenchMenuService} from '@scion/workbench-client';
+import {assertNotInReactiveContext, effect, ElementRef, inject, Injector, linkedSignal, Provider, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
+import {WorkbenchMenuFactory, WorkbenchMenuGroupFactory, WorkbenchMenuOptions, WorkbenchMenuOrigin, WorkbenchMenuService, WorkbenchToolbarFactory, WorkbenchToolbarGroupFactory, ɵWorkbenchMenuService} from '@scion/workbench-client';
 import {map} from 'rxjs';
 import {ɵassertInInjectionContext} from '../common/common';
 import {coerceElement} from '@angular/cdk/coercion';
@@ -8,8 +8,9 @@ import {WorkbenchClientMenuFactoryDelegate} from './workbench-client-menu-factor
 import {WorkbenchClientToolbarFactoryDelegate} from './workbench-client-toolbar-factory-delegate';
 import {SciMenuItems} from './workbench-client-menu-transform';
 import {createDestroyableInjector} from '../common/injector.util';
+import {Beans} from '@scion/toolkit/bean-manager';
 
-export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
+export class WorkbenchClientAngularMenuAdapter implements SciMenuAdapter {
 
   private readonly _workbenchMenuService = inject(ɵWorkbenchMenuService);
   private readonly _injector = inject(Injector);
@@ -145,4 +146,12 @@ function coerceFilter(filter: SciMenuOptions['filter'] | undefined): WorkbenchMe
     placeholder: filter.placeholder,
     notFoundText: filter.notFoundText,
   };
+}
+
+export function provideWorkbenchClientAngularMenuAdapter(): Provider[] {
+  return [
+    {provide: SciMenuAdapter, useClass: WorkbenchClientAngularMenuAdapter},
+    {provide: WorkbenchMenuService, useFactory: () => Beans.get(WorkbenchMenuService)},
+    {provide: ɵWorkbenchMenuService, useFactory: () => Beans.get(ɵWorkbenchMenuService)},
+  ];
 }

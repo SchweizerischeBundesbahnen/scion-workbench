@@ -1,8 +1,8 @@
 import {Provider} from '@angular/core';
-import {provideWorkbenchClientMenuAdapter} from './menu/workbench-client-menu-adapter.provider';
+import {provideWorkbenchClientAngularMenuAdapter} from './menu/workbench-client-angular-menu-adapter';
 
 export function provideWorkbenchClientAngular(): Provider[] {
   return [
-    provideWorkbenchClientMenuAdapter(),
+    provideWorkbenchClientAngularMenuAdapter(),
   ];
 }
