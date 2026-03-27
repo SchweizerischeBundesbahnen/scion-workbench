@@ -40,15 +40,15 @@ export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${
 
     const environmentContext = coerceSignal(menuContextProvider?.provideContext?.());
     const context = computed(() => new Map<string, unknown>([...environmentContext?.() ?? new Map(), ...options?.context ?? new Map()]));
-    const menuItemContributions = menuService.menuContributions(location, context, {metadata: options?.metadata});
+    const menuItems = menuService.menuItems(location, context, {metadata: options?.metadata});
 
     const target = menuContextProvider?.provideAcceleratorTarget();
     const contextualAcceleratorTarget = coerceSignal(target);
 
     effect(onCleanup => {
-      const menuItems = collectMenuItemsWithAccelerator(menuItemContributions());
+      const acceleratedMenuItems = collectMenuItemsWithAccelerator(menuItems());
       const target = options?.target ?? contextualAcceleratorTarget?.() ?? document;
-      if (!menuItems.length) {
+      if (!acceleratedMenuItems.length) {
         return;
       }
 
@@ -59,7 +59,7 @@ export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${
             const key = (event.key as string | undefined)?.toLowerCase() ?? ''; // `event.key` can be `undefined`, for example, when selecting an option from an input element's datalist.
             const modifiers = getModifierState(event);
 
-            const matchingMenuItems = menuItems.filter(menuItem => matchesMenuItemAccelerator(menuItem, {key, modifiers}));
+            const matchingMenuItems = acceleratedMenuItems.filter(menuItem => matchesMenuItemAccelerator(menuItem, {key, modifiers}));
             if (!matchingMenuItems.length) {
               return;
             }

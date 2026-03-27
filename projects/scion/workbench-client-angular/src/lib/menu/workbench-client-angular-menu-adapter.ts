@@ -1,14 +1,14 @@
 import {Disposable, SciMenuAdapter, SciMenuContributionLocation, SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuFactoryFn, SciMenuFactoryFnLike, SciMenuGroupContributionLocation, SciMenuGroupFactoryFn, SciMenuItemLike, SciMenuOptions, SciMenuOrigin, SciMenuRef, SciToolbarContributionLocation, SciToolbarFactoryFn, SciToolbarGroupContributionLocation, SciToolbarGroupFactoryFn} from '@scion/sci-components/menu';
 import {assertNotInReactiveContext, effect, ElementRef, inject, Injector, linkedSignal, Provider, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
 import {WorkbenchMenuFactory, WorkbenchMenuGroupFactory, WorkbenchMenuOptions, WorkbenchMenuOrigin, WorkbenchMenuService, WorkbenchToolbarFactory, WorkbenchToolbarGroupFactory, ɵWorkbenchMenuService} from '@scion/workbench-client';
-import {map} from 'rxjs';
-import {ɵassertInInjectionContext} from '../common/common';
 import {coerceElement} from '@angular/cdk/coercion';
 import {WorkbenchClientMenuFactoryDelegate} from './workbench-client-menu-factory-delegate';
 import {WorkbenchClientToolbarFactoryDelegate} from './workbench-client-toolbar-factory-delegate';
 import {SciMenuItems} from './workbench-client-menu-transform';
 import {createDestroyableInjector} from '../common/injector.util';
 import {Beans} from '@scion/toolkit/bean-manager';
+import {ɵassertInInjectionContext} from '../common/common';
+import {map} from 'rxjs/operators';
 
 export class WorkbenchClientAngularMenuAdapter implements SciMenuAdapter {
 
@@ -84,20 +84,19 @@ export class WorkbenchClientAngularMenuAdapter implements SciMenuAdapter {
   }
 
   /** @inheritDoc */
-  public menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuItemLike[]> {
-    assertNotInReactiveContext(this.menuContributions, 'Call menuContributions() in a non-reactive (non-tracking) context. Each invocation creates a new subscription, asynchronously setting the signal\'s value, leading to an infinite loop if called in a reactive context.');
+  public menuItems(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuItemLike[]> {
+    assertNotInReactiveContext(this.menuItems, 'Call menuItems() in a non-reactive (non-tracking) context. Each invocation creates a new subscription, asynchronously setting the signal\'s value, leading to an infinite loop if called in a reactive context.');
     if (!options.injector) {
-      ɵassertInInjectionContext(this.menuContributions, 'Call menuContributions() in an injection context, as it allocates resources that are not released until the injection context is destroyed.')
+      ɵassertInInjectionContext(this.menuItems, 'Call menuItems() in an injection context, as it allocates resources that are not released until the injection context is destroyed.')
     }
     const injector = options.injector ?? inject(Injector);
     const menuContributions = signal<SciMenuItemLike[]>([]);
 
     effect(onCleanup => {
-      const _location = location();
-      const _context = context();
+      const tracked = {location: location(), context: context()};
 
       untracked(() => {
-        const subscription = this._workbenchMenuService.menuContributions$(_location, _context)
+        const subscription = this._workbenchMenuService.menuItems$(tracked.location, tracked.context)
           .pipe(map(menuItemProxies => SciMenuItems.fromWorkbenchMenuItemProxies(menuItemProxies, {injector: this._injector})))
           .subscribe(menuItems => menuContributions.set(menuItems));
         onCleanup(() => subscription.unsubscribe());

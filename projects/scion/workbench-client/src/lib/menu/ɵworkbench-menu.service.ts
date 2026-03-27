@@ -129,7 +129,7 @@ export class ɵWorkbenchMenuService implements WorkbenchMenuService {
   /**
    * metadata: Arbitrary metadata to be associated with the operation.
    */
-  public menuConntributions$(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>, options?: {metadata?: {[key: string]: unknown}}): Observable<WorkbenchMenuItemProxyLike[]> {
+  public menuItems$(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>, options?: {metadata?: {[key: string]: unknown}}): Observable<WorkbenchMenuItemProxyLike[]> {
     const command: ɵWorkbenchMenuItemLookupCommand = {
       location,
       context: new Map([...createEnvironmentContext(), ...context]),

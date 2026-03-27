@@ -34,6 +34,8 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
   private readonly _contributions = new Map<`menu:${string}` | `toolbar:${string}` | `group:${string}`, WritableSignal<Array<SciMenuContribution>>>;
   private readonly _menuItemsCaches = new Map<SciMenuContribution, MenuItemsCache>;
   private readonly _injector = inject(Injector);
+  /** Internal reference to this registry that proxies calls through the menu adapter chain. Use for internal method calls. */
+  private readonly _proxy = interceptMenuRegistry(this);
 
   /** @inheritDoc */
   public contributeMenu(locationLike: SciMenuContributionLocationLike, factoryFn: SciMenuFactoryFnLike, options: SciMenuContributionOptions): Disposable {
@@ -66,59 +68,68 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
   }
 
   /** @inheritDoc */
-  public menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuItemLike[]> {
-    assertNotInReactiveContext(this.menuContributions, 'Call menuContributions() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    if (!options.injector) {
-      ɵassertInInjectionContext(this.menuContributions, 'Call menuContributions() in an injection context, as it may allocate resources that are not released until the injection context is destroyed.')
-    }
-
-    const callingContextInjector = options.injector ?? inject(Injector);
-
-    const contributions = computed(() => {
-      // If no contributions are registered yet, register signal for the signal to "emit" when contributions are registered later.
+  public menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuContribution[]> {
+    return computed(() => {
+      // Ensure the location is tracked for later registrations.
       if (!this._contributions.has(location())) {
         this._contributions.set(location(), signal([]));
       }
-      return this._contributions.get(location())!().filter(contribution => {
+      const contributions = this._contributions.get(location())!();
+
+      // Filter contributions matching the calling context.
+      return untracked(() => contributions.filter(contribution => {
         const requiredContext = contribution.requiredContext;
         for (const [name, value] of requiredContext.entries() ?? []) {
-          // Skip if the context value is `undefined`, i.e., cleared from required context.
+          // Skip check if the required context value has been cleared.
           if (value === undefined) {
             continue;
           }
 
+          // Only include contributions matching the calling context.
           if (!Objects.isEqual(context().get(name), value, {ignoreArrayOrder: true})) {
             return false;
           }
         }
         return true;
-      });
+      }));
     }, {equal: (a, b) => Objects.isEqual(a, b)});
+  }
+
+  /** @inheritDoc */
+  public menuItems(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuItemLike[]> {
+    assertNotInReactiveContext(this.menuItems, 'Call menuItems() in a non-reactive (non-tracking) context, such as within the untracked() function.');
+    if (!options.injector) {
+      ɵassertInInjectionContext(this.menuItems, 'Call menuItems() in an injection context, as it may allocate resources that are not released until the injection context is destroyed.')
+    }
+
+    const callingContextInjector = options.injector ?? inject(Injector);
+    const menuContributions = this._proxy.menuContributions(location, context, options);
+    const proxy = this._proxy;
 
     // Construct contribution, recursively.
     return computed(() => {
-      if (!contributions().length) {
+      if (!menuContributions().length) {
         return NULL_MENU_CONTRIBUTIONS;
       }
 
-      return sortMenuItems(contributions()
-        .flatMap((contribution: SciMenuContribution): SciMenuItemLike[] => {
-          const menuItems = this._menuItemsCaches.get(contribution)!.computeIfAbsent(context(), context => {
+      return sortMenuItems(menuContributions()
+        .flatMap((menuContribution: SciMenuContribution): SciMenuItemLike[] => {
+          const menuItems = this._menuItemsCaches.get(menuContribution)!.computeIfAbsent(context(), context => {
             const injector = inject(Injector);
 
             return computed(() => {
-              switch (contribution.scope) {
+              switch (menuContribution.scope) {
                 case 'menu': {
                   const menuFactory = new ɵSciMenuFactory();
-                  const menuFactoryFn = contribution.factoryFn as SciMenuFactoryFn | SciMenuGroupFactoryFn;
+                  const menuFactoryFn = menuContribution.factoryFn as SciMenuFactoryFn | SciMenuGroupFactoryFn;
                   runInInjectionContext(injector, () => menuFactoryFn(menuFactory, context));
-                  return menuFactory.menuItems.map(menuItem => ({...menuItem, position: contribution.position}));
+                  return menuFactory.menuItems.map(menuItem => ({...menuItem, position: menuContribution.position}));
                 }
                 case 'toolbar': {
                   const toolbarFactory = new ɵSciToolbarFactory();
-                  const toolbarFactoryFn = contribution.factoryFn as SciToolbarFactoryFn | SciToolbarGroupFactoryFn;
+                  const toolbarFactoryFn = menuContribution.factoryFn as SciToolbarFactoryFn | SciToolbarGroupFactoryFn;
                   runInInjectionContext(injector, () => toolbarFactoryFn(toolbarFactory, context));
-                  return toolbarFactory.menuItems.map(menuItem => ({...menuItem, position: contribution.position}));
+                  return toolbarFactory.menuItems.map(menuItem => ({...menuItem, position: menuContribution.position}));
                 }
               }
             });
@@ -127,35 +138,35 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
           return menuItems();
         })
         // Add contributions, recursively for each submenu or group.
-        .map(menuItem => this.addMenuContributions(menuItem, context(), {injector: callingContextInjector, metadata: options.metadata}))
+        .map(menuItem => addMenuContributions(menuItem, context(), {injector: callingContextInjector, metadata: options.metadata}))
         // Filter empty submenus and groups.
         .flatMap(filterEmpty));
     });
-  }
 
-  private addMenuContributions(menuItem: SciMenuItemLike, context: Map<string, unknown>, options?: {injector?: Injector; metadata?: {[key: string]: unknown}}): SciMenuItemLike {
-    if (menuItem.type === 'menu-item') {
+    function addMenuContributions(menuItem: SciMenuItemLike, context: Map<string, unknown>, options?: {injector?: Injector; metadata?: {[key: string]: unknown}}): SciMenuItemLike {
+      if (menuItem.type === 'menu-item') {
+        return {
+          ...menuItem,
+          actions: menuItem.actions
+            .map(action => addMenuContributions(action, context, options))
+            .flatMap(filterEmpty),
+        };
+      }
+
       return {
         ...menuItem,
-        actions: menuItem.actions
-          .map(action => this.addMenuContributions(action, context, options))
-          .flatMap(filterEmpty),
+        children: sortMenuItems(menuItem.children
+          .concat(menuItem.name ? untracked(() => proxy.menuItems(signal(menuItem.name!), signal(context), {injector: options?.injector, metadata: options?.metadata}))() : [])
+          .map(child => addMenuContributions(child, context, options))),
       };
     }
-
-    return {
-      ...menuItem,
-      children: sortMenuItems(menuItem.children
-        .concat(menuItem.name ? untracked(() => this.menuContributions(signal(menuItem.name!), signal(context), {injector: options?.injector, metadata: options?.metadata}))() : [])
-        .map(child => this.addMenuContributions(child, context, options))),
-    };
   }
 
   /** @inheritDoc */
   public openMenu(menu: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions): SciMenuRef {
     // Create injection context to dispose resources when closing the menu.
     const injector = createDestroyableInjector({parent: this._injector});
-    const menuItems = Array.isArray(menu) ? signal(menu) : this.menuContributions(signal(menu), signal(options.context ?? new Map()), {injector, metadata: options.metadata});
+    const menuItems = Array.isArray(menu) ? signal(menu) : this._proxy.menuItems(signal(menu), signal(options.context ?? new Map()), {injector, metadata: options.metadata});
 
     return runInInjectionContext(injector, () => {
       // Get or create anchor at specified origin.
@@ -331,7 +342,6 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
 
     return virtualAnchorElement;
   }
-
 }
 
 function setAttributes(element: HTMLElement, attributes: {[name: string]: string | null}): void {
@@ -430,6 +440,7 @@ export function interceptMenuRegistry(menuRegistry: SciMenuRegistry): SciMenuReg
   return menuAdapters.reduceRight((next: SciMenuAdapterChain, adapter: SciMenuAdapter) => ({
       contributeMenu: (location, factoryFn, options) => adapter.contributeMenu ? adapter.contributeMenu(location, factoryFn, options, next) : next.contributeMenu(location, factoryFn, options),
       menuContributions: (location, context, options) => adapter.menuContributions ? adapter.menuContributions(location, context, options, next) : next.menuContributions(location, context, options),
+      menuItems: (location, context, options) => adapter.menuItems ? adapter.menuItems(location, context, options, next) : next.menuItems(location, context, options),
       openMenu: (menu, options) => adapter.openMenu ? adapter.openMenu(menu, options, next) : next.openMenu(menu, options),
     }),
     menuRegistry,

@@ -12,7 +12,7 @@ import {Injectable, Injector, Signal} from '@angular/core';
 import {SciMenuOptions, SciMenuRef} from './menu.service';
 import {Disposable} from './common/disposable';
 import {SciMenuItemLike} from './menu.model';
-import {SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuFactoryFnLike} from './menu-contribution.model';
+import {SciMenuContribution, SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuFactoryFnLike} from './menu-contribution.model';
 
 /**
  * Allows intercepting calls to the menu registry.
@@ -26,7 +26,9 @@ export abstract class SciMenuAdapter {
 
   public abstract contributeMenu?(location: SciMenuContributionLocationLike, factoryFn: SciMenuFactoryFnLike, options: SciMenuContributionOptions, next: SciMenuAdapterChain): Disposable;
 
-  public abstract menuContributions?(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}, next: SciMenuAdapterChain): Signal<SciMenuItemLike[]>;
+  public abstract menuContributions?(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}, next: SciMenuAdapterChain): Signal<SciMenuContribution[]>;
+
+  public abstract menuItems?(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}, next: SciMenuAdapterChain): Signal<SciMenuItemLike[]>;
 
   public abstract openMenu?(menu: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions, next: SciMenuAdapterChain): SciMenuRef;
 }
@@ -38,7 +40,9 @@ export interface SciMenuAdapterChain {
 
   contributeMenu(location: SciMenuContributionLocationLike, factoryFn: SciMenuFactoryFnLike, options: SciMenuContributionOptions): Disposable;
 
-  menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuItemLike[]>;
+  menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuContribution[]>;
+
+  menuItems(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuItemLike[]>;
 
   openMenu(menu: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions): SciMenuRef;
 }

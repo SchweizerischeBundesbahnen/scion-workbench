@@ -72,7 +72,7 @@ function installMenuItemLookupHandler(): void {
     const {location, context, metadata} = request.body!;
     const injector = createDestroyableInjector({parent: rootInjector});
 
-    const menuItems = menuService.menuContributions(location, context, {injector, metadata});
+    const menuItems = menuService.menuItems(location, context, {injector, metadata});
     return toObservable(menuItems, {injector})
       .pipe(
         switchMap(menuItems => WorkbenchMenuItems.toTransferable$(SciMenuItems.toWorkbenchMenuItems(menuItems, {injector}))),
