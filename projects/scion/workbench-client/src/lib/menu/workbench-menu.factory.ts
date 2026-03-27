@@ -24,6 +24,19 @@ export interface WorkbenchMenuFactory {
   addGroup(groupFactoryFn: (group: WorkbenchMenuGroupFactory) => void): this;
 
   addGroup(descriptor: WorkbenchMenuGroupDescriptor, groupFactoryFn?: (group: WorkbenchMenuGroupFactory) => void): this;
+
+  /**
+   * Instructs the menu to re-create, invoking the menu factory function anew.
+   *
+   * Use if menu items depend on conditions that have changed.
+   */
+  invalidate: () => void;
+  /**
+   * Registers a callback to be executed when the menu is re-created (due to invalidation) or disposed.
+   *
+   * Use for cleaning up allocated resources like subscriptions.
+   */
+  onCleanup: (onCleanup: () => void) => void;
 }
 
 export type WorkbenchMenuGroupFactory = WorkbenchMenuFactory;

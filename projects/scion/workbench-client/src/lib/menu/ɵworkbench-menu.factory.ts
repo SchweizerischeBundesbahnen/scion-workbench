@@ -2,13 +2,17 @@ import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchMenuDescriptor, WorkbenchMenuFactory, WorkbenchMenuGroupDescriptor, WorkbenchMenuGroupFactory, WorkbenchMenuItemDescriptor} from './workbench-menu.factory';
 import {WorkbenchMenu, WorkbenchMenuGroup, WorkbenchMenuItem, WorkbenchMenuItemLike} from './workbench-client-menu.model';
 import {MaybeObservable} from '../common/utility-types';
-import {isObservable} from 'rxjs';
+import {isObservable, Subject} from 'rxjs';
 import {UUID} from '@scion/toolkit/uuid';
 import {ɵWorkbenchToolbarFactory} from './ɵworkbench-toolbar.factory';
+import {DestroyRef} from '../common/destroy-ref';
 
 export class ɵWorkbenchMenuFactory implements WorkbenchMenuFactory {
 
+  private readonly _destroyRef = new DestroyRef();
+
   public readonly menuItems = [] as WorkbenchMenuItemLike[];
+  public readonly invalidate$ = new Subject<void>();
 
   /** @inheritDoc */
   public addMenuItem(label: MaybeObservable<string>, onSelect: () => boolean | void | Promise<boolean | void>): this;
@@ -93,6 +97,20 @@ export class ɵWorkbenchMenuFactory implements WorkbenchMenuFactory {
     }));
 
     return this;
+  }
+
+  /** @inheritDoc */
+  public invalidate(): void {
+    this.invalidate$.next();
+  }
+
+  /** @inheritDoc */
+  public onCleanup(onCleanup: () => void): void {
+    this._destroyRef.onDestroy(onCleanup);
+  }
+
+  public destroy(): void {
+    this._destroyRef.destroy();
   }
 }
 

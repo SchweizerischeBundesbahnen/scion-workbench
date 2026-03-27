@@ -361,12 +361,11 @@ export type WorkbenchToolbarGroupContributionLocation = {location: `group(toolba
 
 export type WorkbenchMenuContributionLocationLike = WorkbenchMenuContributionLocation | WorkbenchToolbarContributionLocation | WorkbenchMenuGroupContributionLocation | WorkbenchToolbarGroupContributionLocation;
 
-export type WorkbenchMenuFactoryFn = (menu: WorkbenchMenuFactory, context: Map<string, unknown>) => void | WorkbenchMenuStaleNotifier;
-export type WorkbenchToolbarFactoryFn = (toolbar: WorkbenchToolbarFactory, context: Map<string, unknown>) => void | WorkbenchMenuStaleNotifier;
-export type WorkbenchMenuGroupFactoryFn = (group: WorkbenchMenuGroupFactory, context: Map<string, unknown>) => void | WorkbenchMenuStaleNotifier;
-export type WorkbenchToolbarGroupFactoryFn = (group: WorkbenchToolbarGroupFactory, context: Map<string, unknown>) => void | WorkbenchMenuStaleNotifier;
+export type WorkbenchMenuFactoryFn = (menu: WorkbenchMenuFactory, context: Map<string, unknown>) => void;
+export type WorkbenchToolbarFactoryFn = (toolbar: WorkbenchToolbarFactory, context: Map<string, unknown>) => void;
+export type WorkbenchMenuGroupFactoryFn = (group: WorkbenchMenuGroupFactory, context: Map<string, unknown>) => void;
+export type WorkbenchToolbarGroupFactoryFn = (group: WorkbenchToolbarGroupFactory, context: Map<string, unknown>) => void;
 export type WorkbenchMenuFactoryFnLike = WorkbenchMenuFactoryFn | WorkbenchToolbarFactoryFn | WorkbenchMenuGroupFactoryFn | WorkbenchToolbarGroupFactoryFn;
-export type WorkbenchMenuStaleNotifier = Observable<unknown>;
 
 export type WorkbenchMenuItemLike = WorkbenchMenuItem | WorkbenchMenu | WorkbenchMenuGroup;
 

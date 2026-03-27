@@ -1,14 +1,13 @@
 import {Disposable, SciMenuAdapter, SciMenuContributionLocation, SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuFactoryFn, SciMenuFactoryFnLike, SciMenuGroupContributionLocation, SciMenuGroupFactoryFn, SciMenuItemLike, SciMenuOptions, SciMenuOrigin, SciMenuRef, SciToolbarContributionLocation, SciToolbarFactoryFn, SciToolbarGroupContributionLocation, SciToolbarGroupFactoryFn} from '@scion/sci-components/menu';
 import {assertNotInReactiveContext, effect, ElementRef, inject, Injector, linkedSignal, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
-import {WorkbenchMenuOptions, WorkbenchMenuOrigin, ɵWorkbenchMenuService} from '@scion/workbench-client';
-import {first, map, Observable} from 'rxjs';
+import {WorkbenchMenuFactory, WorkbenchMenuGroupFactory, WorkbenchMenuOptions, WorkbenchMenuOrigin, WorkbenchToolbarFactory, WorkbenchToolbarGroupFactory, ɵWorkbenchMenuService} from '@scion/workbench-client';
+import {map} from 'rxjs';
 import {ɵassertInInjectionContext} from '../common/common';
 import {coerceElement} from '@angular/cdk/coercion';
 import {WorkbenchClientMenuFactoryDelegate} from './workbench-client-menu-factory-delegate';
 import {WorkbenchClientToolbarFactoryDelegate} from './workbench-client-toolbar-factory-delegate';
 import {SciMenuItems} from './workbench-client-menu-transform';
-import {UUID} from '@scion/toolkit/uuid';
-import {toLazyObservable} from '../common/lazy-observable.util';
+import {createDestroyableInjector} from '../common/injector.util';
 
 export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
 
@@ -17,7 +16,7 @@ export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
 
   /** @inheritDoc */
   public contributeMenu(location: SciMenuContributionLocationLike, factoryFn: SciMenuFactoryFnLike, options?: SciMenuContributionOptions): Disposable {
-    const injector = this._injector;
+    const rootInjector = this._injector;
     const [scope] = location.location.split(':', 1) as ['menu' | 'toolbar' | 'group(menu)' | 'group(toolbar)', string];
 
     // Delegate to `WorkbenchMenuService.contributeMenu` of `@scion/workbench-client`.
@@ -25,49 +24,57 @@ export class WorkbenchClientMenuAdapter implements SciMenuAdapter {
       case 'menu': {
         return this._workbenchMenuService.contributeMenu(location as SciMenuContributionLocation, (menu, context) => {
           const menuFactoryFn = factoryFn as SciMenuFactoryFn;
-          return tracked(() => menuFactoryFn(new WorkbenchClientMenuFactoryDelegate(menu), context));
+          return tracked(() => menuFactoryFn(new WorkbenchClientMenuFactoryDelegate(menu), context), menu);
         }, {requiredContext: options?.requiredContext});
       }
       case 'group(menu)': {
         return this._workbenchMenuService.contributeMenu(location as SciMenuGroupContributionLocation, (group, context) => {
           const groupFactoryFn = factoryFn as SciMenuGroupFactoryFn;
-          return tracked(() => groupFactoryFn(new WorkbenchClientMenuFactoryDelegate(group), context));
+          return tracked(() => groupFactoryFn(new WorkbenchClientMenuFactoryDelegate(group), context), group);
         }, {requiredContext: options?.requiredContext});
       }
       case 'toolbar': {
         return this._workbenchMenuService.contributeMenu(location as SciToolbarContributionLocation, (toolbar, context) => {
           const toolbarFactoryFn = factoryFn as SciToolbarFactoryFn;
-          return tracked(() => toolbarFactoryFn(new WorkbenchClientToolbarFactoryDelegate(toolbar), context));
+          return tracked(() => toolbarFactoryFn(new WorkbenchClientToolbarFactoryDelegate(toolbar), context), toolbar);
         }, {requiredContext: options?.requiredContext});
       }
       case 'group(toolbar)': {
         return this._workbenchMenuService.contributeMenu(location as SciToolbarGroupContributionLocation, (group, context) => {
           const groupFactoryFn = factoryFn as SciToolbarGroupFactoryFn;
-          return tracked(() => groupFactoryFn(new WorkbenchClientToolbarFactoryDelegate(group), context));
+          return tracked(() => groupFactoryFn(new WorkbenchClientToolbarFactoryDelegate(group), context), group);
         }, {requiredContext: options?.requiredContext});
       }
     }
 
     /**
-     * Runs given function in a reactive context, returning an observable emitting when tracked dependencies change.
+     * Runs given function in a reactive context.
      */
-    function tracked(fn: () => void): Observable<unknown> {
-      // Wrap factory in a signal to notify when tracked signals change.
+    function tracked(fn: () => void, factory: WorkbenchMenuFactory | WorkbenchToolbarFactory | WorkbenchMenuGroupFactory | WorkbenchToolbarGroupFactory): void {
+      const injector = createDestroyableInjector({parent: rootInjector});
+
+      // The menu factory function must be called synchronously. Since an effect runs asynchronously, we wrap the function call in a signal that we invoke immediately.
+      // We then pass the signal to an effect to track changes. When tracked dependencies change, we only invalidate the menu, causing the re-creating of the menu.
       const executeFn = linkedSignal({
         source: () => undefined,
         computation: (_source, previous) => {
+          // Create the menu if called for the first time.
           if (!previous) {
             runInInjectionContext(injector, fn);
           }
-          return UUID.randomUUID();
+          else {
+            // If 'previous' is set, this is a reactive update, not the initial call.
+            untracked(() => factory.invalidate());
+          }
         },
       });
 
       // Execute immediately for synchronous menu creation.
-      const initialExecutionIdentifier = executeFn();
+      executeFn();
 
-      // Create observable running the function in a reactive context, emitting when tracked dependencies change.
-      return toLazyObservable(executeFn, {injector}).pipe(first(executionIdentifier => executionIdentifier !== initialExecutionIdentifier)); // skip emission of initial execution
+      // Bind signal to a reactive context.
+      effect(() => executeFn(), {injector});
+      factory.onCleanup(() => injector.destroy());
     }
   }
 

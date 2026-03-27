@@ -12,11 +12,11 @@ import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {WorkbenchDialog} from '../dialog/workbench-dialog.model';
 import {WorkbenchNotification} from '../notification/workbench-notification.model';
-import {EMPTY, expand, Observable, of, take} from 'rxjs';
+import {expand, Observable, of, take} from 'rxjs';
 import {WORKBENCH_ELEMENT, WorkbenchElement} from '@scion/workbench-client';
 import {SciMenuOptions} from '@scion/sci-components/menu';
 import {coerceElement} from '@angular/cdk/coercion';
-import {map, switchMap, tap} from 'rxjs/operators';
+import {finalize, map, switchMap, tap} from 'rxjs/operators';
 import {parseMenuLocation} from './workbench-menu-location-parser';
 
 export class ɵWorkbenchMenuService implements WorkbenchMenuService {
@@ -47,33 +47,26 @@ export class ɵWorkbenchMenuService implements WorkbenchMenuService {
 
       console.warn('>>> [ClientTS] menu factory', location, context);
 
+      // Create the menu, re-creating it again when being invalidated.
       return of(createMenu())
         .pipe(
-          expand(({stale$}) => stale$.pipe(take(1), map(() => createMenu()))),
-          switchMap(({menuItems}) => WorkbenchMenuItems.toTransferable$(menuItems)),
+          expand(menu => menu.invalidate$.pipe(map(() => createMenu()), take(1), finalize(() => menu.destroy()))),
+          switchMap(menu => WorkbenchMenuItems.toTransferable$(menu.menuItems)),
         );
 
-      function createMenu(): {menuItems: WorkbenchMenuItemLike[]; stale$: Observable<unknown>} {
+      function createMenu(): ɵWorkbenchMenuFactory | ɵWorkbenchToolbarFactory {
         switch (scope) {
           case 'menu': {
             const menuFactory = new ɵWorkbenchMenuFactory();
             const menuFactoryFn = factoryFn as WorkbenchMenuFactoryFn | WorkbenchMenuGroupFactoryFn;
-            const stale$ = menuFactoryFn(menuFactory, context);
-
-            return {
-              menuItems: menuFactory.menuItems,
-              stale$: stale$ instanceof Observable ? stale$ : EMPTY,
-            };
+            menuFactoryFn(menuFactory, context);
+            return menuFactory;
           }
           case 'toolbar': {
             const toolbarFactory = new ɵWorkbenchToolbarFactory();
             const toolbarFactoryFn = factoryFn as WorkbenchToolbarFactoryFn | WorkbenchToolbarGroupFactoryFn;
-            const stale$ = toolbarFactoryFn(toolbarFactory, context);
-
-            return {
-              menuItems: toolbarFactory.menuItems,
-              stale$: stale$ instanceof Observable ? stale$ : EMPTY,
-            };
+            toolbarFactoryFn(toolbarFactory, context);
+            return toolbarFactory;
           }
         }
       }

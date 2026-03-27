@@ -3,13 +3,17 @@ import {WorkbenchToolbarFactory, WorkbenchToolbarGroupDescriptor, WorkbenchToolb
 import {WorkbenchMenu, WorkbenchMenuGroup, WorkbenchMenuItem, WorkbenchMenuItemLike} from './workbench-client-menu.model';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchMenuFactory} from './workbench-menu.factory';
-import {isObservable} from 'rxjs';
+import {isObservable, Subject} from 'rxjs';
 import {UUID} from '@scion/toolkit/uuid';
 import {ɵWorkbenchMenuFactory} from './ɵworkbench-menu.factory';
+import {DestroyRef} from '../common/destroy-ref';
 
 export class ɵWorkbenchToolbarFactory implements WorkbenchToolbarFactory {
 
+  private readonly _destroyRef = new DestroyRef();
+
   public readonly menuItems = [] as WorkbenchMenuItemLike[];
+  public readonly invalidate$ = new Subject<void>();
 
   /** @inheritDoc */
   public addToolbarItem(icon: MaybeObservable<string>, onSelect: () => void): this;
@@ -90,6 +94,20 @@ export class ɵWorkbenchToolbarFactory implements WorkbenchToolbarFactory {
     }));
 
     return this;
+  }
+
+  /** @inheritDoc */
+  public invalidate(): void {
+    this.invalidate$.next();
+  }
+
+  /** @inheritDoc */
+  public onCleanup(onCleanup: () => void): void {
+    this._destroyRef.onDestroy(onCleanup);
+  }
+
+  public destroy(): void {
+    this._destroyRef.destroy();
   }
 }
 
