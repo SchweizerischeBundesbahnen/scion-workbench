@@ -14,16 +14,12 @@ import {WorkbenchView} from '../../view/workbench-view.model';
 import {WorkbenchPart} from '../../part/workbench-part.model';
 import {WorkbenchDialog} from '../../dialog/workbench-dialog.model';
 import {WorkbenchNotification} from '../../notification/workbench-notification.model';
-import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
-import {ɵWorkbenchPart} from '../../part/ɵworkbench-part.model';
-import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog.model';
-import {ɵWorkbenchNotification} from '../../notification/ɵworkbench-notification.model';
 import {MaybeSignal} from '../../common/utility-types';
 
 class WorkbenchMenuContextProvider implements SciMenuContextProvider {
 
   /** @inheritDoc */
-  public provideContext(): MaybeSignal<Map<string, unknown>> {
+  public provideContext(): MaybeSignal<Map<string, unknown> | undefined> {
     const view = inject(WorkbenchView, {optional: true});
     if (view) {
       return computed(() => new Map<string, unknown>()
@@ -50,31 +46,6 @@ class WorkbenchMenuContextProvider implements SciMenuContextProvider {
     const notification = inject(WorkbenchNotification, {optional: true});
     if (notification) {
       return new Map<string, unknown>().set('notificationId', notification.id);
-    }
-
-    return new Map();
-  }
-
-  /** @inheritDoc */
-  public provideAcceleratorTarget(): MaybeSignal<Element | undefined> {
-    const view = inject(ɵWorkbenchView, {optional: true});
-    if (view) {
-      return view.slot.portal.element;
-    }
-
-    const part = inject(ɵWorkbenchPart, {optional: true});
-    if (part) {
-      return part.slot.portal.element;
-    }
-
-    const dialog = inject(ɵWorkbenchDialog, {optional: true});
-    if (dialog) {
-      return dialog.element;
-    }
-
-    const notification = inject(ɵWorkbenchNotification, {optional: true});
-    if (notification) {
-      return notification.portal.element;
     }
 
     return undefined;

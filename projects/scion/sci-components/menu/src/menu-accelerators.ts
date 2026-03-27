@@ -18,6 +18,7 @@ import {coerceSignal} from './common/common';
 import {SciMenuContextProvider} from './menu-context-provider';
 import {createDestroyableInjector} from './common/injector.util';
 import {ɵSciMenuService} from './ɵmenu.service';
+import {SciMenuAcceleratorTargetProvider} from './menu-accelerator-target-provider';
 
 /**
  * INPUTS FOR DOCUMENTING THIS FUNCTION:
@@ -35,6 +36,7 @@ export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${
   return runInInjectionContext(injector, () => {
     const menuService = inject(ɵSciMenuService);
     const menuContextProvider = inject(SciMenuContextProvider, {optional: true});
+    const menuAcceleratorTargetProvider = inject(SciMenuAcceleratorTargetProvider, {optional: true});
     const zone = inject(NgZone);
     const document = inject(DOCUMENT);
 
@@ -42,7 +44,7 @@ export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${
     const context = computed(() => new Map<string, unknown>([...environmentContext?.() ?? new Map(), ...options?.context ?? new Map()]));
     const menuItems = menuService.menuItems(location, context, {metadata: options?.metadata});
 
-    const target = menuContextProvider?.provideAcceleratorTarget();
+    const target = menuAcceleratorTargetProvider?.provideTarget();
     const contextualAcceleratorTarget = coerceSignal(target);
 
     effect(onCleanup => {

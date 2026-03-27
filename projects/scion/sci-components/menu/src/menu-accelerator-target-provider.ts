@@ -12,7 +12,7 @@ import {Injectable} from '@angular/core';
 import {MaybeSignal} from './common/utility-types';
 
 @Injectable()
-export abstract class SciMenuContextProvider {
+export abstract class SciMenuAcceleratorTargetProvider {
 
-  public abstract provideContext?(): MaybeSignal<Map<string, unknown> | undefined>;
+  public abstract provideTarget(): MaybeSignal<Element | undefined>;
 }
