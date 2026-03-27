@@ -18,6 +18,9 @@ import {SciMenuAdapter} from './menu-adapter';
 import {SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuFactoryFnLike} from './menu-contribution.model';
 import {MaybeSignal} from './common/utility-types';
 
+/**
+ * @docs-private Not public API. For internal use only.
+ */
 @Injectable({providedIn: 'root'})
 export class ɵSciMenuService implements SciMenuService {
 
@@ -25,9 +28,7 @@ export class ɵSciMenuService implements SciMenuService {
   private readonly _environmentContext = coerceSignal(inject(SciMenuContextProvider, {optional: true})?.provideContext?.());
 
   /** @inheritDoc */
-  public open(name: `menu:${string}`, options: SciMenuOptions & {focus?: boolean}): SciMenuRef;
-  public open(menuItems: SciMenuItemLike[], options: SciMenuOptions & {focus?: boolean}): SciMenuRef;
-  public open(menuItemsOrName: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions & {focus?: boolean}): SciMenuRef {
+  public open(menu: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions & {focus?: boolean}): SciMenuRef {
     const context = new Map([...this._environmentContext?.() ?? new Map(), ...options.context ?? new Map()]);
 
     // Prevent default if opening context menu.
@@ -36,7 +37,7 @@ export class ɵSciMenuService implements SciMenuService {
       options.anchor.stopPropagation();
     }
 
-    return this._menuAdapter.openMenu(menuItemsOrName, {...options, context});
+    return this._menuAdapter.openMenu(menu, {...options, context});
   }
 
   /**
