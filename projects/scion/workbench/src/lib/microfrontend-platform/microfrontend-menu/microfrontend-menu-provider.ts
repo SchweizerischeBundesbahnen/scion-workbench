@@ -20,7 +20,7 @@ function installMenuContributionHandler(): void {
 
   messageClient.onMessage<ɵWorkbenchMenuContributionRegisterCommand>('workbench/menu/contribution/:contributionId/register', message => {
     const contributionId = message.params!.get('contributionId') as string;
-    const {location, position, requiredContext} = message.body!;
+    const {location, position, requiredContext, metadata} = message.body!;
     const {scope} = parseMenuLocation(location);
 
     const menuItemsCache = new WorkbenchClientMenuItemsCache();
@@ -51,7 +51,7 @@ function installMenuContributionHandler(): void {
           }
         }
       });
-    }, {requiredContext});
+    }, {requiredContext, metadata});
 
     // Dispose menu when unregistering the contribution.
     const subscription = messageClient.observe$<void>(`workbench/menu/contribution/${contributionId}/unregister`)
@@ -69,10 +69,10 @@ function installMenuItemLookupHandler(): void {
   const rootInjector = inject(Injector);
 
   messageClient.onMessage<ɵWorkbenchMenuItemLookupCommand, WorkbenchMenuItemTransferableLike[]>('workbench/menu/items', request => {
-    const {location, context} = request.body!;
+    const {location, context, metadata} = request.body!;
     const injector = createDestroyableInjector({parent: rootInjector});
 
-    const menuItems = menuService.menuContributions(location, context, {injector});
+    const menuItems = menuService.menuContributions(location, context, {injector, metadata});
     return toObservable(menuItems, {injector})
       .pipe(
         switchMap(menuItems => WorkbenchMenuItems.toTransferable$(SciMenuItems.toWorkbenchMenuItems(menuItems, {injector}))),
@@ -110,6 +110,7 @@ function installMenuOpenHandler(): void {
       focus: command.options.focus,
       context: command.context,
       cssClass: command.options.cssClass,
+      metadata: command.options.metadata,
     }));
 
     // Wait until closing the menu.

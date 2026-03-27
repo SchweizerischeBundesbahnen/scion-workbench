@@ -5,6 +5,7 @@ export interface ɵWorkbenchMenuContributionRegisterCommand {
   location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`,
   requiredContext: Map<string, unknown>;
   position?: WorkbenchMenuContributionPosition;
+  metadata?: {[key: string]: unknown};
 }
 
 export interface ɵWorkbenchMenuContributionConstructCommand {
@@ -14,6 +15,7 @@ export interface ɵWorkbenchMenuContributionConstructCommand {
 export interface ɵWorkbenchMenuItemLookupCommand {
   location: `menu:${string}` | `toolbar:${string}` | `group:${string}`,
   context: Map<string, unknown>;
+  metadata?: {[key: string]: unknown};
 }
 
 export interface ɵWorkbenchMenuOpenCommand {
@@ -34,6 +36,7 @@ export interface ɵWorkbenchMenuOpenCommand {
     filter?: boolean | {placeholder?: string; notFoundText?: string};
     focus?: boolean;
     cssClass?: string[];
+    metadata?: {[key: string]: unknown};
   };
   context: Map<string, unknown>;
   workbenchElementId: ViewId | PartId | DialogId | PopupId | NotificationId;

@@ -8,6 +8,10 @@ export interface SciMenuContribution {
   factoryFn: SciMenuFactoryFnLike;
   requiredContext: Map<string, unknown>;
   position?: SciMenuContributionPosition;
+  /**
+   * Arbitrary metadata to be associated with the contribution.
+   */
+  metadata: {[key: string]: unknown};
 }
 
 export type SciMenuContributionLocation = {location: `menu:${string}`} & SciMenuContributionPosition;
@@ -26,7 +30,15 @@ export interface SciMenuContributionOptions {
    */
   injector?: Injector;
 
+  /**
+   * Context required by the contribution.
+   */
   requiredContext?: Map<string, unknown>;
+
+  /**
+   * Arbitrary metadata to be associated with the contribution.
+   */
+  metadata?: {[key: string]: unknown};
 }
 
 export type SciMenuContributionPosition = OneOf<{

@@ -39,6 +39,7 @@ export class ɵWorkbenchMenuService implements WorkbenchMenuService {
       location: location,
       requiredContext: new Map([...createEnvironmentContext(), ...options?.requiredContext ?? new Map()]),
       position: prune({before, after, position} as WorkbenchMenuContributionPosition, {pruneIfEmpty: true}),
+      metadata: options?.metadata,
     });
 
     // Subscribe for menu construction requests.
@@ -110,6 +111,7 @@ export class ɵWorkbenchMenuService implements WorkbenchMenuService {
             filter: coerceFilter(options.filter),
             focus: options.focus,
             cssClass: options.cssClass,
+            metadata: options.metadata,
           }),
           context: new Map([...createEnvironmentContext(), ...options.context ?? new Map()]),
           workbenchElementId: Beans.get<WorkbenchElement>(WORKBENCH_ELEMENT).id,
@@ -124,10 +126,14 @@ export class ɵWorkbenchMenuService implements WorkbenchMenuService {
     }
   }
 
-  public menuContributions$(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>): Observable<WorkbenchMenuItemProxyLike[]> {
+  /**
+   * metadata: Arbitrary metadata to be associated with the operation.
+   */
+  public menuConntributions$(location: `menu:${string}` | `toolbar:${string}` | `group:${string}`, context: Map<string, unknown>, options?: {metadata?: {[key: string]: unknown}}): Observable<WorkbenchMenuItemProxyLike[]> {
     const command: ɵWorkbenchMenuItemLookupCommand = {
       location,
       context: new Map([...createEnvironmentContext(), ...context]),
+      metadata: options?.metadata,
     };
     return this._messageClient.request$<WorkbenchMenuItemTransferableLike[]>('workbench/menu/items', command)
       .pipe(map(message => WorkbenchMenuItems.fromTransferable(message.body!)));

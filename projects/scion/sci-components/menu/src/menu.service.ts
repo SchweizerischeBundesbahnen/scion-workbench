@@ -44,6 +44,10 @@ export interface SciMenuOptions {
   };
   filter?: boolean | {placeholder?: string; notFoundText?: string};
   cssClass?: string[];
+  /**
+   * Arbitrary metadata to be associated with the operation.
+   */
+  metadata?: {[key: string]: unknown};
 }
 
 /**

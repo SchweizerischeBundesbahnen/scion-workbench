@@ -45,6 +45,7 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
       factoryFn: factoryFn,
       position: prune({before, after, position} as SciMenuContributionPosition, {pruneIfEmpty: true}),
       requiredContext: options.requiredContext ?? new Map(),
+      metadata: options.metadata ?? {},
     }
 
     if (!this._contributions.has(location)) {
@@ -65,7 +66,7 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
   }
 
   /** @inheritDoc */
-  public menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector}): Signal<SciMenuItemLike[]> {
+  public menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuItemLike[]> {
     assertNotInReactiveContext(this.menuContributions, 'Call menuContributions() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     if (!options.injector) {
       ɵassertInInjectionContext(this.menuContributions, 'Call menuContributions() in an injection context, as it may allocate resources that are not released until the injection context is destroyed.')
@@ -126,13 +127,13 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
           return menuItems();
         })
         // Add contributions, recursively for each submenu or group.
-        .map(menuItem => this.addMenuContributions(menuItem, context(), {injector: callingContextInjector}))
+        .map(menuItem => this.addMenuContributions(menuItem, context(), {injector: callingContextInjector, metadata: options.metadata}))
         // Filter empty submenus and groups.
         .flatMap(filterEmpty));
     });
   }
 
-  private addMenuContributions(menuItem: SciMenuItemLike, context: Map<string, unknown>, options?: {injector?: Injector}): SciMenuItemLike {
+  private addMenuContributions(menuItem: SciMenuItemLike, context: Map<string, unknown>, options?: {injector?: Injector; metadata?: {[key: string]: unknown}}): SciMenuItemLike {
     if (menuItem.type === 'menu-item') {
       return {
         ...menuItem,
@@ -145,7 +146,7 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
     return {
       ...menuItem,
       children: sortMenuItems(menuItem.children
-        .concat(menuItem.name ? untracked(() => this.menuContributions(signal(menuItem.name!), signal(context), {injector: options?.injector}))() : [])
+        .concat(menuItem.name ? untracked(() => this.menuContributions(signal(menuItem.name!), signal(context), {injector: options?.injector, metadata: options?.metadata}))() : [])
         .map(child => this.addMenuContributions(child, context, options))),
     };
   }
@@ -154,7 +155,7 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
   public openMenu(menu: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions): SciMenuRef {
     // Create injection context to dispose resources when closing the menu.
     const injector = createDestroyableInjector({parent: this._injector});
-    const menuItems = Array.isArray(menu) ? signal(menu) : this.menuContributions(signal(menu), signal(options.context ?? new Map()), {injector});
+    const menuItems = Array.isArray(menu) ? signal(menu) : this.menuContributions(signal(menu), signal(options.context ?? new Map()), {injector, metadata: options.metadata});
 
     return runInInjectionContext(injector, () => {
       // Get or create anchor at specified origin.

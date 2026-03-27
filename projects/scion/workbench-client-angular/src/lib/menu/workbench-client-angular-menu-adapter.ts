@@ -26,25 +26,25 @@ export class WorkbenchClientAngularMenuAdapter implements SciMenuAdapter {
         return this._workbenchMenuService.contributeMenu(location as SciMenuContributionLocation, (menu, context) => {
           const menuFactoryFn = factoryFn as SciMenuFactoryFn;
           return tracked(() => menuFactoryFn(new WorkbenchClientMenuFactoryDelegate(menu), context), menu);
-        }, {requiredContext: options.requiredContext});
+        }, {requiredContext: options.requiredContext, metadata: options.metadata});
       }
       case 'group(menu)': {
         return this._workbenchMenuService.contributeMenu(location as SciMenuGroupContributionLocation, (group, context) => {
           const groupFactoryFn = factoryFn as SciMenuGroupFactoryFn;
           return tracked(() => groupFactoryFn(new WorkbenchClientMenuFactoryDelegate(group), context), group);
-        }, {requiredContext: options.requiredContext});
+        }, {requiredContext: options.requiredContext, metadata: options.metadata});
       }
       case 'toolbar': {
         return this._workbenchMenuService.contributeMenu(location as SciToolbarContributionLocation, (toolbar, context) => {
           const toolbarFactoryFn = factoryFn as SciToolbarFactoryFn;
           return tracked(() => toolbarFactoryFn(new WorkbenchClientToolbarFactoryDelegate(toolbar), context), toolbar);
-        }, {requiredContext: options.requiredContext});
+        }, {requiredContext: options.requiredContext, metadata: options.metadata});
       }
       case 'group(toolbar)': {
         return this._workbenchMenuService.contributeMenu(location as SciToolbarGroupContributionLocation, (group, context) => {
           const groupFactoryFn = factoryFn as SciToolbarGroupFactoryFn;
           return tracked(() => groupFactoryFn(new WorkbenchClientToolbarFactoryDelegate(group), context), group);
-        }, {requiredContext: options.requiredContext});
+        }, {requiredContext: options.requiredContext, metadata: options.metadata});
       }
     }
 
@@ -84,7 +84,7 @@ export class WorkbenchClientAngularMenuAdapter implements SciMenuAdapter {
   }
 
   /** @inheritDoc */
-  public menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector}): Signal<SciMenuItemLike[]> {
+  public menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuItemLike[]> {
     assertNotInReactiveContext(this.menuContributions, 'Call menuContributions() in a non-reactive (non-tracking) context. Each invocation creates a new subscription, asynchronously setting the signal\'s value, leading to an infinite loop if called in a reactive context.');
     if (!options.injector) {
       ɵassertInInjectionContext(this.menuContributions, 'Call menuContributions() in an injection context, as it allocates resources that are not released until the injection context is destroyed.')

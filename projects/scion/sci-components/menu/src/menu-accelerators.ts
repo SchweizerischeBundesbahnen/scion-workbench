@@ -40,7 +40,7 @@ export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${
 
     const environmentContext = coerceSignal(menuContextProvider?.provideContext?.());
     const context = computed(() => new Map<string, unknown>([...environmentContext?.() ?? new Map(), ...options?.context ?? new Map()]));
-    const menuItemContributions = menuService.menuContributions(location, context);
+    const menuItemContributions = menuService.menuContributions(location, context, {metadata: options?.metadata});
 
     const target = menuContextProvider?.provideAcceleratorTarget();
     const contextualAcceleratorTarget = coerceSignal(target);
@@ -135,4 +135,5 @@ export interface SciMenuAcceleratorOptions {
   target?: Element;
   context?: Map<string, unknown>;
   injector?: Injector;
+  metadata?: {[key: string]: unknown};
 }

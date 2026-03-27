@@ -375,6 +375,11 @@ export type WorkbenchMenuItemTransferableLike = WorkbenchMenuItemTransferable | 
 
 export interface WorkbenchMenuContributionOptions {
   requiredContext?: Map<string, unknown>;
+
+  /**
+   * Arbitrary metadata to be associated with the contribution.
+   */
+  metadata?: {[key: string]: unknown};
 }
 
 export interface WorkbenchMenuOptions {
@@ -408,6 +413,10 @@ export interface WorkbenchMenuOptions {
   };
   filter?: boolean | {placeholder?: string; notFoundText?: string};
   cssClass?: string[];
+  /**
+   * Arbitrary metadata to be associated with the operation.
+   */
+  metadata?: {[key: string]: unknown};
 }
 
 export type WorkbenchMenuOrigin = {
