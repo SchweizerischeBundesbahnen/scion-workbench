@@ -28,7 +28,7 @@ export class ɵSciMenuService implements SciMenuService {
   private readonly _environmentContext = coerceSignal(inject(SciMenuContextProvider, {optional: true})?.provideContext?.());
 
   /** @inheritDoc */
-  public open(menu: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions & {focus?: boolean}): SciMenuRef {
+  public open(menu: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions): SciMenuRef {
     const context = new Map([...this._environmentContext?.() ?? new Map(), ...options.context ?? new Map()]);
 
     // Prevent default if opening context menu.

@@ -31,6 +31,10 @@ export interface SciMenuOptions {
    * Controls where the menu will be added to the DOM. If not specified, adds the menu after the anchor element.
    */
   viewContainerRef?: ViewContainerRef;
+  /**
+   * Controls if to focus the menu. Defaults to `true`.
+   */
+  focus?: boolean;
 
   size?: {
     width?: string

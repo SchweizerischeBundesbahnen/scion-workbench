@@ -150,7 +150,7 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
   }
 
   /** @inheritDoc */
-  public openMenu(menu: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions & {focus?: boolean}): SciMenuRef {
+  public openMenu(menu: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions): SciMenuRef {
     // Create injection context to dispose resources when closing the menu.
     const injector = createDestroyableInjector({parent: this._injector});
     const menuItems = Array.isArray(menu) ? signal(menu) : this.menuContributions(signal(menu), signal(options.context ?? new Map()), {injector});
@@ -170,7 +170,7 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
     });
   }
 
-  private createMenuPopover(menuItems: Signal<SciMenuItemLike[]>, anchorElement: HTMLElement, options: SciMenuOptions & {focus?: boolean}): ComponentRef<MenuComponent> {
+  private createMenuPopover(menuItems: Signal<SciMenuItemLike[]>, anchorElement: HTMLElement, options: SciMenuOptions): ComponentRef<MenuComponent> {
     const anchorSize = dimension(anchorElement);
     const bindings: Binding[] = [
       inputBinding('type', signal('menu')),

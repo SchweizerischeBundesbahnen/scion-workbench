@@ -108,7 +108,7 @@ export class WorkbenchClientAngularMenuAdapter implements SciMenuAdapter {
   }
 
   /** @inheritDoc */
-  public openMenu(menuLike: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions & {focus?: boolean}): SciMenuRef {
+  public openMenu(menuLike: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions): SciMenuRef {
     const menu = Array.isArray(menuLike) ? SciMenuItems.toWorkbenchMenuItems(menuLike, {injector: this._injector}) : menuLike;
 
     const menuRef = this._workbenchMenuService.open(menu, {

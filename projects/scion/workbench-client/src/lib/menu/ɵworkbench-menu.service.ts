@@ -86,7 +86,7 @@ export class ɵWorkbenchMenuService implements WorkbenchMenuService {
   }
 
   /** @inheritDoc */
-  public open(menuLike: `menu:${string}` | WorkbenchMenuItemLike[], options: WorkbenchMenuOptions & {focus?: boolean}): WorkbenchMenuRef {
+  public open(menuLike: `menu:${string}` | WorkbenchMenuItemLike[], options: WorkbenchMenuOptions): WorkbenchMenuRef {
     // Prevent default if opening context menu.
     if (options.anchor instanceof MouseEvent && options.anchor.type === 'contextmenu') {
       options.anchor.preventDefault();

@@ -396,7 +396,10 @@ export interface WorkbenchMenuOptions {
    * Controls where to align the menu relative to the menu anchor, unless there is not enough space available in that area. Defaults to `south`.
    */
   align?: 'vertical' | 'horizontal';
-
+  /**
+   * Controls if to focus the menu. Defaults to `true`.
+   */
+  focus?: boolean;
   size?: {
     width?: string
     minWidth?: string;
