@@ -9,9 +9,9 @@
  */
 
 import {ApplicationRef, assertNotInReactiveContext, Binding, ComponentRef, computed, createComponent, DestroyableInjector, DestroyRef, DOCUMENT, effect, ElementRef, EnvironmentInjector, inject, Injectable, Injector, inputBinding, runInInjectionContext, signal, Signal, untracked, ViewContainerRef, WritableSignal} from '@angular/core';
+import {SciMenuRegistry} from './menu.registry';
 import {Disposable} from './common/disposable';
 import {SciMenuItemLike} from './menu.model';
-import {SciMenuAdapter} from './menu-adapter';
 import {SciMenuOptions, SciMenuOrigin, SciMenuRef} from './menu.service';
 import {coerceElement} from '@angular/cdk/coercion';
 import {MenuComponent} from './menu/menu.component';
@@ -26,16 +26,17 @@ import {createDestroyableInjector} from './common/injector.util';
 import {ɵassertInInjectionContext} from './common/common';
 import {prune} from './common/prune.util';
 import {parseMenuLocation} from './menu-location-parser';
+import {SciMenuAdapter, SciMenuAdapterChain} from './menu-adapter.model';
 
 @Injectable({providedIn: 'root'})
-export class SciDefaultMenuAdapter implements SciMenuAdapter {
+export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
 
   private readonly _contributions = new Map<`menu:${string}` | `toolbar:${string}` | `group:${string}`, WritableSignal<Array<SciMenuContribution>>>;
   private readonly _menuItemsCaches = new Map<SciMenuContribution, MenuItemsCache>;
   private readonly _injector = inject(Injector);
 
   /** @inheritDoc */
-  public contributeMenu(locationLike: SciMenuContributionLocationLike, factoryFn: SciMenuFactoryFnLike, options?: SciMenuContributionOptions): Disposable {
+  public contributeMenu(locationLike: SciMenuContributionLocationLike, factoryFn: SciMenuFactoryFnLike, options: SciMenuContributionOptions): Disposable {
     const {location, scope} = parseMenuLocation(locationLike.location);
     const {before, after, position} = locationLike;
 
@@ -43,7 +44,7 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
       scope: scope,
       factoryFn: factoryFn,
       position: prune({before, after, position} as SciMenuContributionPosition, {pruneIfEmpty: true}),
-      requiredContext: options?.requiredContext ?? new Map(),
+      requiredContext: options.requiredContext ?? new Map(),
     }
 
     if (!this._contributions.has(location)) {
@@ -64,13 +65,13 @@ export class SciDefaultMenuAdapter implements SciMenuAdapter {
   }
 
   /** @inheritDoc */
-  public menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options?: {injector?: Injector}): Signal<SciMenuItemLike[]> {
+  public menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector}): Signal<SciMenuItemLike[]> {
     assertNotInReactiveContext(this.menuContributions, 'Call menuContributions() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    if (!options?.injector) {
+    if (!options.injector) {
       ɵassertInInjectionContext(this.menuContributions, 'Call menuContributions() in an injection context, as it may allocate resources that are not released until the injection context is destroyed.')
     }
 
-    const callingContextInjector = options?.injector ?? inject(Injector);
+    const callingContextInjector = options.injector ?? inject(Injector);
 
     const contributions = computed(() => {
       // If no contributions are registered yet, register signal for the signal to "emit" when contributions are registered later.
@@ -414,4 +415,22 @@ export interface CacheEntry {
   menuItems: Signal<SciMenuItemLike[]>;
   refCount: number;
   dispose: () => void;
+}
+
+/**
+ * Intercepts calls to the menu registry by chaining registered menu adapters.
+ *
+ * Each adapter can handle the call, modify it, or pass it to the next.
+ */
+export function interceptMenuRegistry(menuRegistry: SciMenuRegistry): SciMenuRegistry {
+  // TODO [Angular 22] Remove cast when Angular supports type safety for multi-injection with abstract class DI tokens. See https://github.com/angular/angular/issues/55555
+  const menuAdapters = inject(SciMenuAdapter, {optional: true}) as SciMenuAdapter[] | null ?? [];
+
+  return menuAdapters.reduceRight((next: SciMenuAdapterChain, adapter: SciMenuAdapter) => ({
+      contributeMenu: (location, factoryFn, options) => adapter.contributeMenu ? adapter.contributeMenu(location, factoryFn, options, next) : next.contributeMenu(location, factoryFn, options),
+      menuContributions: (location, context, options) => adapter.menuContributions ? adapter.menuContributions(location, context, options, next) : next.menuContributions(location, context, options),
+      openMenu: (menu, options) => adapter.openMenu ? adapter.openMenu(menu, options, next) : next.openMenu(menu, options),
+    }),
+    menuRegistry,
+  );
 }

@@ -14,9 +14,10 @@ import {SciMenuItemLike} from './menu.model';
 import {Disposable} from './common/disposable';
 import {SciMenuContextProvider} from './menu-context-provider';
 import {coerceSignal} from './common/common';
-import {SciMenuAdapter} from './menu-adapter';
 import {SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuFactoryFnLike} from './menu-contribution.model';
 import {MaybeSignal} from './common/utility-types';
+import {SciMenuRegistry} from './menu.registry';
+import {interceptMenuRegistry} from './ɵmenu.registry';
 
 /**
  * @docs-private Not public API. For internal use only.
@@ -24,7 +25,7 @@ import {MaybeSignal} from './common/utility-types';
 @Injectable({providedIn: 'root'})
 export class ɵSciMenuService implements SciMenuService {
 
-  private readonly _menuAdapter = inject(SciMenuAdapter);
+  private readonly _menuRegistry = interceptMenuRegistry(inject(SciMenuRegistry));
   private readonly _environmentContext = coerceSignal(inject(SciMenuContextProvider, {optional: true})?.provideContext?.());
 
   /** @inheritDoc */
@@ -37,20 +38,22 @@ export class ɵSciMenuService implements SciMenuService {
       options.anchor.stopPropagation();
     }
 
-    return this._menuAdapter.openMenu(menu, {...options, context});
+    return this._menuRegistry.openMenu(menu, {...options, context});
   }
 
   /**
    * The function:
    * - Must be called within an injection context, or an explicit {@link Injector} passed.
    * - Must be called in a non-reactive (non-tracking) context.
+   *
+   * metadata: Arbitrary metadata to be associated with the operation.
    */
-  public menuContributions(location: MaybeSignal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: MaybeSignal<Map<string, unknown>>, options?: {injector?: Injector}): Signal<SciMenuItemLike[]> {
-    return this._menuAdapter.menuContributions(coerceSignal(location), coerceSignal(context), options);
+  public menuItems(location: MaybeSignal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: MaybeSignal<Map<string, unknown>>, options?: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuItemLike[]> {
+    return this._menuRegistry.menuItems(coerceSignal(location), coerceSignal(context), options ?? {});
   }
 
   public contributeMenu(location: SciMenuContributionLocationLike, factoryFn: SciMenuFactoryFnLike, options?: SciMenuContributionOptions): Disposable {
-    return this._menuAdapter.contributeMenu(location, factoryFn, options);
+    return this._menuRegistry.contributeMenu(location, factoryFn, options ?? {});
   }
 }
 
