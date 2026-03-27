@@ -61,6 +61,7 @@ export class WorkbenchClientAngularMenuAdapter implements SciMenuAdapter {
         computation: (_source, previous) => {
           // Create the menu if called for the first time.
           if (!previous) {
+            console.warn('>>> [ClientAngularAdapter] instantiate menu factory', location);
             runInInjectionContext(injector, fn);
           }
           else {
@@ -75,7 +76,10 @@ export class WorkbenchClientAngularMenuAdapter implements SciMenuAdapter {
 
       // Bind signal to a reactive context.
       effect(() => executeFn(), {injector});
-      factory.onCleanup(() => injector.destroy());
+      factory.onCleanup(() => {
+        console.warn('>>> [ClientAngularAdapter] destroy (previous) menu instance (onCleanup)', location);
+        injector.destroy()
+      });
     }
   }
 

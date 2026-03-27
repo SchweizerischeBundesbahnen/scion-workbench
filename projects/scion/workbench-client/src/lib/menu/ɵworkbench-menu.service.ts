@@ -45,7 +45,7 @@ export class ɵWorkbenchMenuService implements WorkbenchMenuService {
     const subscription = this._messageClient.onMessage<ɵWorkbenchMenuContributionConstructCommand, WorkbenchMenuItemTransferableLike[]>(`workbench/menu/contribution/${contributionId}/construct`, request => {
       const {context} = request.body!;
 
-      console.warn('>>> [ClientTS] menu factory', location, context);
+      console.warn('>>> [ClientMenuService] instantiate menu factory', location, context);
 
       // Create the menu, re-creating it again when being invalidated.
       return of(createMenu())
