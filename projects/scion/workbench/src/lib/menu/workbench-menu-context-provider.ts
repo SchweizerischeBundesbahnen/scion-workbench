@@ -10,11 +10,11 @@
 
 import {computed, EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
 import {SciMenuContextProvider} from '@scion/sci-components/menu';
-import {WorkbenchView} from '../../view/workbench-view.model';
-import {WorkbenchPart} from '../../part/workbench-part.model';
-import {WorkbenchDialog} from '../../dialog/workbench-dialog.model';
-import {WorkbenchNotification} from '../../notification/workbench-notification.model';
-import {MaybeSignal} from '../../common/utility-types';
+import {WorkbenchView} from '../view/workbench-view.model';
+import {WorkbenchPart} from '../part/workbench-part.model';
+import {WorkbenchDialog} from '../dialog/workbench-dialog.model';
+import {WorkbenchNotification} from '../notification/workbench-notification.model';
+import {MaybeSignal} from '../common/utility-types';
 
 class WorkbenchMenuContextProvider implements SciMenuContextProvider {
 

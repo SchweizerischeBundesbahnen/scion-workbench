@@ -10,11 +10,11 @@
 
 import {EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
 import {SciMenuAcceleratorTargetProvider} from '@scion/sci-components/menu';
-import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
-import {ɵWorkbenchPart} from '../../part/ɵworkbench-part.model';
-import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog.model';
-import {ɵWorkbenchNotification} from '../../notification/ɵworkbench-notification.model';
-import {MaybeSignal} from '../../common/utility-types';
+import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
+import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
+import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog.model';
+import {ɵWorkbenchNotification} from '../notification/ɵworkbench-notification.model';
+import {MaybeSignal} from '../common/utility-types';
 
 class WorkbenchMenuAcceleratorTargetProvider implements SciMenuAcceleratorTargetProvider {
 

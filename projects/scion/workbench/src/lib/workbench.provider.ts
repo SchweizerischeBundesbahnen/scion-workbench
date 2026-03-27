@@ -29,8 +29,8 @@ import {provideWorkbenchPartContext} from './part/workbench-part-context.provide
 import {provideWorkbenchDialogContext} from './dialog/workbench-dialog-context.provider';
 import {provideWorkbenchPopupContext} from './popup/workbench-popup-context.provider';
 import {provideWorkbenchNotificationContext} from './notification/workbench-notification-context.provider';
-import {provideWorkbenchMenuContextProvider} from './microfrontend-platform/microfrontend-menu/workbench-menu-context-provider';
-import {provideWorkbenchMenuAcceleratorTargetProvider} from './microfrontend-platform/microfrontend-menu/workbench-menu-accelerator-target-provider';
+import {provideWorkbenchMenuContextProvider} from './menu/workbench-menu-context-provider';
+import {provideWorkbenchMenuAcceleratorTargetProvider} from './menu/workbench-menu-accelerator-target-provider';
 
 /**
  * Enables and configures the SCION Workbench, returning a set of dependency-injection providers to be registered in Angular.
