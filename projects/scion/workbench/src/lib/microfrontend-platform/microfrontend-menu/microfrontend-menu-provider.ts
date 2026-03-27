@@ -20,7 +20,7 @@ function installMenuContributionHandler(): void {
 
   messageClient.onMessage<ɵWorkbenchMenuContributionRegisterCommand>('workbench/menu/contribution/:contributionId/register', message => {
     const contributionId = message.params!.get('contributionId') as string;
-    const {location, position, requiredContext, metadata} = message.body!;
+    const {location, position, requiredContext, metadata, contributionInstant} = message.body!;
     const {scope} = parseMenuLocation(location);
 
     const menuItemsCache = new WorkbenchClientMenuItemsCache();
@@ -51,7 +51,7 @@ function installMenuContributionHandler(): void {
           }
         }
       });
-    }, {requiredContext, metadata});
+    }, {requiredContext, metadata, contributionInstant});
 
     // Dispose menu when unregistering the contribution.
     const subscription = messageClient.observe$<void>(`workbench/menu/contribution/${contributionId}/unregister`)

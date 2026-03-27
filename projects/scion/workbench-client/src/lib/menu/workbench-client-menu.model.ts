@@ -380,6 +380,8 @@ export interface WorkbenchMenuContributionOptions {
    * Arbitrary metadata to be associated with the contribution.
    */
   metadata?: {[key: string]: unknown};
+
+  contributionInstant?: number;
 }
 
 export interface WorkbenchMenuOptions {

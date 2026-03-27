@@ -6,6 +6,7 @@ export interface ɵWorkbenchMenuContributionRegisterCommand {
   requiredContext: Map<string, unknown>;
   position?: WorkbenchMenuContributionPosition;
   metadata?: {[key: string]: unknown};
+  contributionInstant?: number;
 }
 
 export interface ɵWorkbenchMenuContributionConstructCommand {

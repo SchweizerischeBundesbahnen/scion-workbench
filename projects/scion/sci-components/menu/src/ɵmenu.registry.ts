@@ -27,12 +27,14 @@ import {ɵassertInInjectionContext} from './common/common';
 import {prune} from './common/prune.util';
 import {parseMenuLocation} from './menu-location-parser';
 import {SciMenuAdapter, SciMenuAdapterChain} from './menu-adapter.model';
+import {SciMenuContributionInstantProvider} from './menu-contribution-instant.provider';
 
 @Injectable({providedIn: 'root'})
 export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
 
   private readonly _contributions = new Map<`menu:${string}` | `toolbar:${string}` | `group:${string}`, WritableSignal<Array<SciMenuContribution>>>;
   private readonly _menuItemsCaches = new Map<SciMenuContribution, MenuItemsCache>;
+  private readonly _contributionInstantProvider = inject(SciMenuContributionInstantProvider);
   private readonly _injector = inject(Injector);
   /** Internal reference to this registry that proxies calls through the menu adapter chain. Use for internal method calls. */
   private readonly _proxy = interceptMenuRegistry(this);
@@ -47,6 +49,7 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
       factoryFn: factoryFn,
       position: prune({before, after, position} as SciMenuContributionPosition, {pruneIfEmpty: true}),
       requiredContext: options.requiredContext ?? new Map(),
+      contributionInstant: options.contributionInstant ?? this._contributionInstantProvider.next(),
       metadata: options.metadata ?? {},
     }
 
@@ -76,22 +79,26 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
       }
       const contributions = this._contributions.get(location())!();
 
-      // Filter contributions matching the calling context.
-      return untracked(() => contributions.filter(contribution => {
-        const requiredContext = contribution.requiredContext;
-        for (const [name, value] of requiredContext.entries() ?? []) {
-          // Skip check if the required context value has been cleared.
-          if (value === undefined) {
-            continue;
-          }
+      return untracked(() => contributions
+        // Filter contributions not matching the calling context.
+        .filter(contribution => {
+          const requiredContext = contribution.requiredContext;
+          for (const [name, value] of requiredContext.entries() ?? []) {
+            // Skip check if the required context value has been cleared.
+            if (value === undefined) {
+              continue;
+            }
 
-          // Only include contributions matching the calling context.
-          if (!Objects.isEqual(context().get(name), value, {ignoreArrayOrder: true})) {
-            return false;
+            // Only include contributions matching the calling context.
+            if (!Objects.isEqual(context().get(name), value, {ignoreArrayOrder: true})) {
+              return false;
+            }
           }
-        }
-        return true;
-      }));
+          return true;
+        })
+        // Sort contributions by contribution instant.
+        .sort((a, b) => a.contributionInstant - b.contributionInstant),
+      );
     }, {equal: (a, b) => Objects.isEqual(a, b)});
   }
 

@@ -40,6 +40,7 @@ export class ɵWorkbenchMenuService implements WorkbenchMenuService {
       requiredContext: new Map([...createEnvironmentContext(), ...options?.requiredContext ?? new Map()]),
       position: prune({before, after, position} as WorkbenchMenuContributionPosition, {pruneIfEmpty: true}),
       metadata: options?.metadata,
+      contributionInstant: options?.contributionInstant,
     });
 
     // Subscribe for menu construction requests.

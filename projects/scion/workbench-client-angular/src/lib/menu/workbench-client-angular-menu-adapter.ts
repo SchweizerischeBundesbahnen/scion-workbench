@@ -26,25 +26,25 @@ export class WorkbenchClientAngularMenuAdapter implements SciMenuAdapter {
         return this._workbenchMenuService.contributeMenu(location as SciMenuContributionLocation, (menu, context) => {
           const menuFactoryFn = factoryFn as SciMenuFactoryFn;
           return tracked(() => menuFactoryFn(new WorkbenchClientMenuFactoryDelegate(menu), context), menu);
-        }, {requiredContext: options.requiredContext, metadata: options.metadata});
+        }, {requiredContext: options.requiredContext, metadata: options.metadata, contributionInstant: options.contributionInstant});
       }
       case 'group(menu)': {
         return this._workbenchMenuService.contributeMenu(location as SciMenuGroupContributionLocation, (group, context) => {
           const groupFactoryFn = factoryFn as SciMenuGroupFactoryFn;
           return tracked(() => groupFactoryFn(new WorkbenchClientMenuFactoryDelegate(group), context), group);
-        }, {requiredContext: options.requiredContext, metadata: options.metadata});
+        }, {requiredContext: options.requiredContext, metadata: options.metadata, contributionInstant: options.contributionInstant});
       }
       case 'toolbar': {
         return this._workbenchMenuService.contributeMenu(location as SciToolbarContributionLocation, (toolbar, context) => {
           const toolbarFactoryFn = factoryFn as SciToolbarFactoryFn;
           return tracked(() => toolbarFactoryFn(new WorkbenchClientToolbarFactoryDelegate(toolbar), context), toolbar);
-        }, {requiredContext: options.requiredContext, metadata: options.metadata});
+        }, {requiredContext: options.requiredContext, metadata: options.metadata, contributionInstant: options.contributionInstant});
       }
       case 'group(toolbar)': {
         return this._workbenchMenuService.contributeMenu(location as SciToolbarGroupContributionLocation, (group, context) => {
           const groupFactoryFn = factoryFn as SciToolbarGroupFactoryFn;
           return tracked(() => groupFactoryFn(new WorkbenchClientToolbarFactoryDelegate(group), context), group);
-        }, {requiredContext: options.requiredContext, metadata: options.metadata});
+        }, {requiredContext: options.requiredContext, metadata: options.metadata, contributionInstant: options.contributionInstant});
       }
     }
 
