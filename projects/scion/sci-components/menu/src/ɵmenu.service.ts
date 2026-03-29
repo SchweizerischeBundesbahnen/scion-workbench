@@ -14,10 +14,10 @@ import {SciMenuItemLike} from './menu.model';
 import {Disposable} from './common/disposable';
 import {SciMenuContextProvider} from './menu-context-provider';
 import {coerceSignal} from './common/common';
-import {SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuFactoryFnLike} from './menu-contribution.model';
+import {SciMenuContribution, SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuFactoryFnLike} from './menu-contribution.model';
 import {MaybeSignal} from './common/utility-types';
 import {SciMenuRegistry} from './menu.registry';
-import {interceptMenuRegistry} from './ɵmenu.registry';
+import {SciMenuAdapter, SciMenuAdapterChain} from './menu-adapter.model';
 
 /**
  * @docs-private Not public API. For internal use only.
@@ -52,9 +52,32 @@ export class ɵSciMenuService implements SciMenuService {
     return this._menuRegistry.menuItems(coerceSignal(location), coerceSignal(context), options ?? {});
   }
 
+  public menuContributions(location: MaybeSignal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: MaybeSignal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuContribution[]> {
+    return this._menuRegistry.menuContributions(coerceSignal(location), coerceSignal(context), options ?? {});
+  }
+
   public contributeMenu(location: SciMenuContributionLocationLike, factoryFn: SciMenuFactoryFnLike, options?: SciMenuContributionOptions): Disposable {
     return this._menuRegistry.contributeMenu(location, factoryFn, options ?? {});
   }
+}
+
+/**
+ * Intercepts calls to the menu registry by chaining registered menu adapters.
+ *
+ * Each adapter can handle the call, modify it, or pass it to the next.
+ */
+function interceptMenuRegistry(menuRegistry: SciMenuRegistry): SciMenuRegistry {
+  // TODO [Angular 22] Remove cast when Angular supports type safety for multi-injection with abstract class DI tokens. See https://github.com/angular/angular/issues/55555
+  const menuAdapters = inject(SciMenuAdapter, {optional: true}) as SciMenuAdapter[] | null ?? [];
+
+  return menuAdapters.reduceRight((next: SciMenuAdapterChain, adapter: SciMenuAdapter) => ({
+      contributeMenu: (location, factoryFn, options) => adapter.contributeMenu ? adapter.contributeMenu(location, factoryFn, options, next) : next.contributeMenu(location, factoryFn, options),
+      menuContributions: (location, context, options) => adapter.menuContributions ? adapter.menuContributions(location, context, options, next) : next.menuContributions(location, context, options),
+      menuItems: (location, context, options) => adapter.menuItems ? adapter.menuItems(location, context, options, next) : next.menuItems(location, context, options),
+      openMenu: (menu, options) => adapter.openMenu ? adapter.openMenu(menu, options, next) : next.openMenu(menu, options),
+    }),
+    menuRegistry,
+  );
 }
 
 /**
