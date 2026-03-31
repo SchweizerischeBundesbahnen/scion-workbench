@@ -30,14 +30,12 @@ Add `provideWorkbench()` to the list of providers in your `app.config.ts`.
 ```ts
 import {ApplicationConfig} from '@angular/core';
 import {provideRouter} from '@angular/router';
-import {provideAnimations} from '@angular/platform-browser/animations';
 import {provideWorkbench} from '@scion/workbench';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideWorkbench(),
     provideRouter([]), // required by the SCION Workbench
-    provideAnimations(), // temporary: required until SCION Workbench drops the deprecated Angular animations dependency.
   ],
 };
 ```
@@ -47,14 +45,12 @@ If you are not using `app.config.ts`, register the SCION Workbench directly in `
 ```ts
 import {bootstrapApplication} from '@angular/platform-browser';
 import {provideRouter} from '@angular/router';
-import {provideAnimations} from '@angular/platform-browser/animations';
 import {provideWorkbench} from '@scion/workbench';
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideWorkbench(),
     provideRouter([]), // required by the SCION Workbench
-    provideAnimations(), // temporary: required until SCION Workbench drops the deprecated Angular animations dependency.
   ],
 });
 ```

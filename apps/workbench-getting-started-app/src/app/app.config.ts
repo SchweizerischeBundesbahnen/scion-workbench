@@ -11,7 +11,6 @@
 import {ApplicationConfig} from '@angular/core';
 import {MAIN_AREA, provideWorkbench, WorkbenchLayoutFactory} from '@scion/workbench';
 import {provideRouter, withComponentInputBinding, withHashLocation} from '@angular/router';
-import {provideAnimations} from '@angular/platform-browser/animations';
 
 /**
  * Central place to configure the workbench-getting-started-app.
@@ -31,6 +30,5 @@ export const appConfig: ApplicationConfig = {
       {path: 'todos', loadComponent: () => import('./todos/todos.component')},
       {path: 'todos/:id', loadComponent: () => import('./todo/todo.component')},
     ], withComponentInputBinding(), withHashLocation()),
-    provideAnimations(),
   ],
 };

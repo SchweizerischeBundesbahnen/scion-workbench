@@ -11,7 +11,6 @@
 import {WorkbenchConfig} from '../workbench-config';
 import {EnvironmentProviders, inject, makeEnvironmentProviders, provideEnvironmentInitializer} from '@angular/core';
 import {provideWorkbench} from '../workbench.provider';
-import {provideNoopAnimations} from '@angular/platform-browser/animations';
 import {MAIN_AREA_INITIAL_PART_ID} from '../layout/ɵworkbench-layout';
 import {ComponentFixtureAutoDetect} from '@angular/core/testing';
 import {Router} from '@angular/router';
@@ -41,7 +40,6 @@ import {PartId} from '../workbench.identifiers';
 export function provideWorkbenchForTest(config?: WorkbenchConfig & {mainAreaInitialPartId?: PartId}): EnvironmentProviders {
   return makeEnvironmentProviders([
     provideWorkbench(config),
-    provideNoopAnimations(),
     config?.mainAreaInitialPartId ? {provide: MAIN_AREA_INITIAL_PART_ID, useValue: config.mainAreaInitialPartId} : [],
     {provide: ComponentFixtureAutoDetect, useValue: true},
     provideEnvironmentInitializer(() => inject(Router).initialNavigation()),

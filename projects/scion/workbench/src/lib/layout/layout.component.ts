@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject, input, ChangeDetectionStrategy} from '@angular/core';
+import {Component, computed, inject, input, ChangeDetectionStrategy, signal, Signal, effect} from '@angular/core';
 import {ActivityBarComponent} from '../activity/activity-bar/activity-bar.component';
 import {WorkbenchLayoutService} from './workbench-layout.service';
 import {SciSashboxComponent, SciSashDirective} from '@scion/components/sashbox';
@@ -44,7 +44,7 @@ import {WorkbenchDesktop} from '../desktop/workbench-desktop.model';
   // Required for backward compatibility for zone-based applications to support child components with eager change detection.
   changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
   host: {
-    '[@.disabled]': 'perspectiveService.switchingPerspective() || perspectiveService.resettingPerspective()',
+    '[style.--sci-sashbox-animation-disabled]': 'animationDisabled()',
   },
 })
 export class LayoutComponent {
@@ -72,6 +72,8 @@ export class LayoutComponent {
 
   protected readonly perspectiveService = inject(WorkbenchPerspectiveService);
 
+  protected readonly animationDisabled = this.computeAnimationDisabled();
+
   /**
    * Determines if a view can be dropped to the main grid.
    */
@@ -85,6 +87,32 @@ export class LayoutComponent {
   protected readonly canDropInMainGrid = computed(() => {
     return !this.layout().hasActivities() || this.layout().parts({grid: 'main'}).some(part => part.id !== MAIN_AREA);
   });
+
+  /**
+   * Delay, so the animationDisabled state is actually written to the DOM.
+   * If we apply the state directly, the flag flips to fast and the animations won't get disabled.
+   */
+  private computeAnimationDisabled(): Signal<boolean> {
+    const animationDisabled = signal(false);
+
+    effect(onCleanup => {
+      const perspectiveChanging = this.perspectiveService.switchingPerspective() || this.perspectiveService.resettingPerspective();
+
+      if (perspectiveChanging) {
+        // Disable immediately to prevent enter animation.
+        animationDisabled.set(true);
+      }
+      else {
+        // Disable deferred to prevent leave animation.
+        const rafId = requestAnimationFrame(() => animationDisabled.set(false));
+
+        // Prevent stale frame callbacks from re-enabling animations during rapid toggles.
+        onCleanup(() => cancelAnimationFrame(rafId));
+      }
+    });
+
+    return animationDisabled;
+  }
 
   protected onSashStart(): void {
     this._workbenchLayoutService.signalResizing(true);

@@ -11,7 +11,6 @@
 import {ApplicationConfig} from '@angular/core';
 import {provideRouter, withHashLocation} from '@angular/router';
 import {routes} from './app.routes';
-import {provideAnimations} from '@angular/platform-browser/animations';
 import {provideWorkbench} from '@scion/workbench';
 import {workbenchConfig} from './workbench.config';
 
@@ -32,7 +31,6 @@ export const AppWithRedirect = {
           providers: [
             provideWorkbench(workbenchConfig),
             provideRouter(routes(options), withHashLocation()),
-            provideAnimations(),
           ],
         };
       case 'workbench-after-router':
@@ -40,7 +38,6 @@ export const AppWithRedirect = {
           providers: [
             provideRouter(routes(options), withHashLocation()),
             provideWorkbench(workbenchConfig),
-            provideAnimations(),
           ],
         };
       default: {
