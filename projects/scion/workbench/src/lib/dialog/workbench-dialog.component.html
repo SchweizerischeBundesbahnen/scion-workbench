@@ -1,11 +1,10 @@
 <div class="dialog e2e-dialog"
      [class.blinking]="dialog.blinking$ | async"
+     [class.animate]="dialog.animate"
      [tabindex]="-1"
      wbMovable [wbHandle]="header" (wbMovableMove)="onMove($event)"
      (mousedown)="onDialogMouseDown()"
      wbResizable [wbResizableEnabled]="dialog.resizable()" (wbResizableResize)="onResize($event)"
-     @enter
-     [@.disabled]="!dialog.animate"
      wbGlassPane
      #dialog_element>
   <div class="dialog-box e2e-dialog-box" cdkTrapFocus>

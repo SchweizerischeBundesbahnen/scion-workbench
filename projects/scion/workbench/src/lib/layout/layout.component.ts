@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject, input} from '@angular/core';
+import {Component, computed, effect, inject, input, Signal, signal} from '@angular/core';
 import {ActivityBarComponent} from '../activity/activity-bar/activity-bar.component';
 import {WorkbenchLayoutService} from './workbench-layout.service';
 import {SciSashboxComponent, SciSashDirective} from '@scion/components/sashbox';
@@ -42,7 +42,7 @@ import {WorkbenchDesktop} from '../desktop/workbench-desktop.model';
     WorkbenchPortalOutletDirective,
   ],
   host: {
-    '[@.disabled]': 'perspectiveService.switchingPerspective() || perspectiveService.resettingPerspective()',
+    '[style.--sci-sashbox-animation-disabled]': 'animationDisabled()',
   },
 })
 export class LayoutComponent {
@@ -70,6 +70,8 @@ export class LayoutComponent {
 
   protected readonly perspectiveService = inject(WorkbenchPerspectiveService);
 
+  protected readonly animationDisabled = this.computeAnimationDisabled();
+
   /**
    * Determines if a view can be dropped to the main grid.
    */
@@ -83,6 +85,19 @@ export class LayoutComponent {
   protected readonly canDropInMainGrid = computed(() => {
     return !this.layout().hasActivities() || this.layout().parts({grid: 'main'}).some(part => part.id !== MAIN_AREA);
   });
+
+  private computeAnimationDisabled(): Signal<boolean> {
+    const animationDisabled = signal(false);
+
+    effect(() => {
+      const perspectiveChanging = this.perspectiveService.switchingPerspective() || this.perspectiveService.resettingPerspective();
+      requestAnimationFrame(() => {
+        animationDisabled.set(perspectiveChanging);
+      });
+    });
+
+    return animationDisabled;
+  }
 
   protected onSashStart(): void {
     this._workbenchLayoutService.signalResizing(true);

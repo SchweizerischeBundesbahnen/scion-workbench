@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationConfig, EnvironmentProviders, inject, makeEnvironmentProviders, provideZoneChangeDetection} from '@angular/core';
+import {ApplicationConfig, inject, provideZoneChangeDetection} from '@angular/core';
 import {PreloadAllModules, provideRouter, withComponentInputBinding, withHashLocation, withPreloading} from '@angular/router';
 import {routes} from './app.routes';
 import {workbenchConfig} from './workbench.config';
@@ -16,8 +16,6 @@ import {provideConfirmWorkbenchStartup} from './workbench/confirm-workbench-star
 import {provideThrottleCapabilityLookupInterceptor} from './workbench/throttle-capability-lookup';
 import {provideWorkbenchLifecycleHookLoggers} from './workbench/workbench-lifecycle-hook-loggers';
 import {provideDevToolsInterceptor} from './devtools/devtools-capability-interceptor';
-import {environment} from '../environments/environment';
-import {provideAnimations, provideNoopAnimations} from '@angular/platform-browser/animations';
 import {provideWorkbench, provideWorkbenchInitializer} from '@scion/workbench';
 import {provideMainAreaInitialPartId} from './workbench/main-area-initial-part-id.provider';
 import {provideDesignTokens} from './workbench/provide-design-tokens';
@@ -46,19 +44,7 @@ export const appConfig: ApplicationConfig = {
     provideWorkbenchLifecycleHookLoggers(),
     provideDevToolsInterceptor(),
     provideWorkbenchInitializer(() => void inject(ActiveWorkbenchElementCollector)),
-    provideAnimationsIfEnabled(),
     provideValueFromStorage(),
     provideZoneChangeDetection(),
   ],
 };
-
-/**
- * Provides a set of DI providers to enable/disable Angular animations based on the environment.
- *
- * Animations should be disabled end-to-end tests.
- */
-function provideAnimationsIfEnabled(): EnvironmentProviders {
-  return makeEnvironmentProviders([
-    environment.animationEnabled ? provideAnimations() : provideNoopAnimations(),
-  ]);
-}

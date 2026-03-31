@@ -56,7 +56,6 @@ import {provideWorkbenchNotificationContext} from './notification/workbench-noti
  * ```ts
  * import {MAIN_AREA, provideWorkbench, WorkbenchLayoutFactory} from '@scion/workbench';
  * import {provideRouter} from '@angular/router';
- * import {provideAnimations} from '@angular/platform-browser/animations';
  * import {bootstrapApplication} from '@angular/platform-browser';
  *
  * bootstrapApplication(AppComponent, {
@@ -73,7 +72,6 @@ import {provideWorkbenchNotificationContext} from './notification/workbench-noti
  *       {path: 'overview', loadComponent: () => import('./overview/overview.component')},
  *       {path: 'todos', loadComponent: () => import('./todos/todos.component')},
  *     ]),
- *     provideAnimations(),
  *   ],
  * });
  * ```

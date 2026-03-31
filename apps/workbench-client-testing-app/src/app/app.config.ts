@@ -8,11 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationConfig, EnvironmentProviders, makeEnvironmentProviders, provideZoneChangeDetection} from '@angular/core';
+import {ApplicationConfig, provideZoneChangeDetection} from '@angular/core';
 import {provideRouter, withComponentInputBinding, withHashLocation} from '@angular/router';
 import {routes} from './app.routes';
-import {environment} from '../environments/environment';
-import {provideAnimations, provideNoopAnimations} from '@angular/platform-browser/animations';
 import {provideWorkbenchClient} from './workbench-client/workbench-client.provider';
 import {provideWorkbenchTheme} from './theme/workbench-theme-switcher';
 
@@ -24,18 +22,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withHashLocation(), withComponentInputBinding()),
     provideWorkbenchClient(),
     provideWorkbenchTheme(),
-    provideAnimationsIfEnabled(),
     provideZoneChangeDetection(),
   ],
 };
-
-/**
- * Provides a set of DI providers to enable/disable Angular animations based on the environment.
- *
- * Animations should be disabled end-to-end tests.
- */
-function provideAnimationsIfEnabled(): EnvironmentProviders {
-  return makeEnvironmentProviders([
-    environment.animationEnabled ? provideAnimations() : provideNoopAnimations(),
-  ]);
-}

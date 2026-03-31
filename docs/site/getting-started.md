@@ -58,13 +58,11 @@ Add `provideWorkbench()` to the list of providers in your `app.config.ts`. Added
     import {ApplicationConfig, provideZoneChangeDetection} from '@angular/core';
 [+] import {provideWorkbench} from '@scion/workbench';
 [+] import {provideRouter, withComponentInputBinding} from '@angular/router';
-[+] import {provideAnimations} from '@angular/platform-browser/animations';
     
     export const appConfig: ApplicationConfig = {
       providers: [
 [+]     provideWorkbench(),
 [+]     provideRouter([], withComponentInputBinding()),
-[+]     provideAnimations(), // temporary: required until SCION Workbench drops the deprecated Angular animations dependency.
 [+]     provideZoneChangeDetection(), // temporary: enable zone.js-based change detection until `@scion/workbench` is zoneless.
          // To add zone.js:
          // 1) For a new app, create it with the `--zoneless=false` flag.
@@ -214,7 +212,6 @@ We will use the `TodoService` to get some sample todos. You can download the `to
         import {ApplicationConfig, provideZoneChangeDetection} from '@angular/core';
         import {provideWorkbench} from '@scion/workbench';
         import {provideRouter, withComponentInputBinding} from '@angular/router';
-        import {provideAnimations} from '@angular/platform-browser/animations';
     
         export const appConfig: ApplicationConfig = {
           providers: [
@@ -222,7 +219,6 @@ We will use the `TodoService` to get some sample todos. You can download the `to
             provideRouter([
     [+]       {path: 'overview', loadComponent: () => import('./overview/overview.component')},
             ], withComponentInputBinding()),
-            provideAnimations(),
             provideZoneChangeDetection(),
           ],
        };
@@ -235,7 +231,6 @@ We will use the `TodoService` to get some sample todos. You can download the `to
        import {ApplicationConfig, provideZoneChangeDetection} from '@angular/core';
        import {provideWorkbench} from '@scion/workbench';
        import {provideRouter, withComponentInputBinding} from '@angular/router';
-       import {provideAnimations} from '@angular/platform-browser/animations';
    [+] import {MAIN_AREA, WorkbenchLayoutFactory} from '@scion/workbench';
    
        export const appConfig: ApplicationConfig = {
@@ -248,7 +243,6 @@ We will use the `TodoService` to get some sample todos. You can download the `to
            provideRouter([
              {path: 'overview', loadComponent: () => import('./overview/overview.component')},
            ], withComponentInputBinding()),
-           provideAnimations(),
            provideZoneChangeDetection(),
          ],
       };
@@ -312,7 +306,6 @@ We will use the `TodoService` to get some sample todos. You can download the `to
         import {ApplicationConfig, provideZoneChangeDetection} from '@angular/core';
         import {provideWorkbench} from '@scion/workbench';
         import {provideRouter, withComponentInputBinding} from '@angular/router';
-        import {provideAnimations} from '@angular/platform-browser/animations';
     
         export const appConfig: ApplicationConfig = {
           providers: [
@@ -321,7 +314,6 @@ We will use the `TodoService` to get some sample todos. You can download the `to
               {path: 'overview', loadComponent: () => import('./overview/overview.component')},
     [+]       {path: 'todos', loadComponent: () => import('./todos/todos.component')}, 
             ], withComponentInputBinding()),
-            provideAnimations(),
             provideZoneChangeDetection(),
           ],
        };
@@ -335,7 +327,6 @@ We will use the `TodoService` to get some sample todos. You can download the `to
        import {ApplicationConfig, provideZoneChangeDetection} from '@angular/core';
        import {provideWorkbench} from '@scion/workbench';
        import {provideRouter, withComponentInputBinding} from '@angular/router';
-       import {provideAnimations} from '@angular/platform-browser/animations';
        import {MAIN_AREA, WorkbenchLayoutFactory} from '@scion/workbench';
    
        export const appConfig: ApplicationConfig = {
@@ -352,7 +343,6 @@ We will use the `TodoService` to get some sample todos. You can download the `to
              {path: 'overview', loadComponent: () => import('./overview/overview.component')},
              {path: 'todos', loadComponent: () => import('./todos/todos.component')}, 
            ], withComponentInputBinding()),
-           provideAnimations(),
            provideZoneChangeDetection(),
          ],
       };
@@ -440,7 +430,6 @@ In this step, we will create a component to open a todo in a view in the main ar
        import {ApplicationConfig, provideZoneChangeDetection} from '@angular/core';
        import {provideWorkbench} from '@scion/workbench';
        import {provideRouter, withComponentInputBinding} from '@angular/router';
-       import {provideAnimations} from '@angular/platform-browser/animations';
        import {MAIN_AREA, WorkbenchLayoutFactory} from '@scion/workbench';
    
        export const appConfig: ApplicationConfig = {
@@ -457,7 +446,6 @@ In this step, we will create a component to open a todo in a view in the main ar
            {path: 'todos', loadComponent: () => import('./todos/todos.component')},
    [+]     {path: 'todos/:id', loadComponent: () => import('./todo/todo.component')},  
          ], withComponentInputBinding()),
-         provideAnimations(),
          provideZoneChangeDetection(),
         ],
        };

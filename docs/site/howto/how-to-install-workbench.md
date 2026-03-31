@@ -30,14 +30,12 @@ Add `provideWorkbench()` to the list of providers in your `app.config.ts`.
 ```ts
 import {ApplicationConfig, provideZoneChangeDetection} from '@angular/core';
 import {provideRouter} from '@angular/router';
-import {provideAnimations} from '@angular/platform-browser/animations';
 import {provideWorkbench} from '@scion/workbench';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideWorkbench(),
     provideRouter([]), // required by the SCION Workbench
-    provideAnimations(), // temporary: required until SCION Workbench drops the deprecated Angular animations dependency.
     provideZoneChangeDetection(), // temporary: enable zone.js-based change detection until `@scion/workbench` is zoneless.
       // To add zone.js:
       // 1) For a new app, create it with the `--zoneless=false` flag.
@@ -52,14 +50,12 @@ If you are not using `app.config.ts`, register the SCION Workbench directly in `
 import {provideZoneChangeDetection} from '@angular/core';
 import {bootstrapApplication} from '@angular/platform-browser';
 import {provideRouter} from '@angular/router';
-import {provideAnimations} from '@angular/platform-browser/animations';
 import {provideWorkbench} from '@scion/workbench';
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideWorkbench(),
     provideRouter([]), // required by the SCION Workbench
-    provideAnimations(), // temporary: required until SCION Workbench drops the deprecated Angular animations dependency.
     provideZoneChangeDetection(), // temporary: enable zone.js-based change detection until `@scion/workbench` is zoneless.
       // To add zone.js:
       // 1) For a new app, create it with the `--zoneless=false` flag.
