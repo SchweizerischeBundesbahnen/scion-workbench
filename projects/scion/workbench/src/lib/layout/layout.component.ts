@@ -86,6 +86,10 @@ export class LayoutComponent {
     return !this.layout().hasActivities() || this.layout().parts({grid: 'main'}).some(part => part.id !== MAIN_AREA);
   });
 
+  /**
+   * Delay, so the animationDisabled state is actually written to the DOM.
+   * If we apply the state directly, the flag flips to fast and the animations won't get disabled.
+   */
   private computeAnimationDisabled(): Signal<boolean> {
     const animationDisabled = signal(false);
 

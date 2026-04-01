@@ -42,6 +42,7 @@ export class WorkbenchPortalOutletDirective {
 
     // Insert a pseudo-element before the portal to detect when Angular is about to destroy the portal.
     // This element gets destroyed first, enabling the portal to detach to prevent destruction.
+    // TODO [Animations]: The scroll position and focus cannot be read in this hook
     this._viewContainerRef.createEmbeddedView(nullTemplate).onDestroy(() => !this.destroyOnDetach() && this.detach(this.portal()));
 
     // Add an extra element between the pseudo-element and the portal to prevent breaking Angular's destroy algorithm.
