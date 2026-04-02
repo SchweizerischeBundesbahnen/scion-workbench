@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {WorkbenchClient} from './workbench-client';
+export {WorkbenchClient, type WorkbenchClientConfiguration} from './workbench-client';
 export {WorkbenchCapabilities} from './workbench-capabilities.enum';
 export {ɵWorkbenchCommands} from './ɵworkbench-commands';
 export {type ViewId, type PartId, type DialogId, type PopupId, type NotificationId, type ActivityId} from './workbench.identifiers';

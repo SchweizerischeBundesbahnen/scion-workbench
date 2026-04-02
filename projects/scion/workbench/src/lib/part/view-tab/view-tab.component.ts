@@ -21,7 +21,7 @@ import {ViewId, WORKBENCH_ID} from '../../workbench.identifiers';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {boundingClientRect} from '@scion/components/dimension';
 import {UUID} from '@scion/toolkit/uuid';
-import {TextPipe} from '../../text/text.pipe';
+import {SciTextPipe} from '@scion/sci-components/text';
 import {IconComponent} from '../../icon/icon.component';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {installMenuAccelerators, SciMenuService} from '@scion/sci-components/menu';
@@ -37,7 +37,7 @@ import {installMenuAccelerators, SciMenuService} from '@scion/sci-components/men
   styleUrls: ['./view-tab.component.scss'],
   imports: [
     CdkPortalOutlet,
-    TextPipe,
+    SciTextPipe,
     IconComponent,
   ],
   host: {

@@ -12,6 +12,8 @@ import {NULL_MENU_CONTRIBUTIONS} from '../menu-contribution.model';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {concat, fromEvent, map, NEVER, of, switchMap, timer} from 'rxjs';
 import {toObservable, toSignal} from '@angular/core/rxjs-interop';
+import {SciTextPipe, Translatable} from '@scion/sci-components/text';
+import {RequireOne} from '@scion/sci-components/common';
 
 /**
  * Represents a menu or a group of menu items.
@@ -32,6 +34,7 @@ import {toObservable, toSignal} from '@angular/core/rxjs-interop';
     NgComponentOutlet,
     SciViewportComponent,
     NgTemplateOutlet,
+    SciTextPipe,
   ],
   providers: [
     MenuFilter,
@@ -52,7 +55,7 @@ export class MenuComponent {
   public readonly type = input.required<'menu' | 'group'>();
   public readonly menuItems = input.required<Array<SciMenuItem | SciMenu | SciMenuGroup>>();
   public readonly disabled = input<boolean>();
-  public readonly filter = input<boolean | {placeholder?: string; notFoundText?: string}>(false);
+  public readonly filter = input<{placeholder?: Signal<Translatable>; notFoundText?: Signal<Translatable>}>();
   public readonly group = input<{label?: string, collapsible: boolean, collapsed: boolean}>();
   public readonly sizeInput = input<{width?: string; minWidth?: string; maxWidth?: string; maxHeight?: string}>();
   public readonly glyphArea = input<boolean>();
@@ -132,7 +135,7 @@ export class MenuComponent {
             anchor: activeSubMenuItem.element,
             viewContainerRef: this.popoverAnchor(),
             cssClass: activeSubMenuItem.menu.cssClass,
-            filter: activeSubMenuItem.menu.menu.filter,
+            filter: activeSubMenuItem.menu.menu.filter as RequireOne<{placeholder?: Signal<Translatable>; notFoundText?: Signal<Translatable>}> | undefined,
             size: {
               width: activeSubMenuItem.menu.menu.width,
               minWidth: activeSubMenuItem.menu.menu.minWidth,

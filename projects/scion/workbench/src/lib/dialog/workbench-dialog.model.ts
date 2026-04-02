@@ -9,8 +9,8 @@
  */
 
 import {Signal} from '@angular/core';
-import {Translatable} from '../text/workbench-text-provider.model';
 import {DialogId} from '../workbench.identifiers';
+import {Translatable} from '@scion/sci-components/text';
 
 /**
  * Handle to interact with a dialog opened via {@link WorkbenchDialogService}.

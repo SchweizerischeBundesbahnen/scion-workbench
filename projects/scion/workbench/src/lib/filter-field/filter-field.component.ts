@@ -14,7 +14,7 @@ import {noop} from 'rxjs';
 import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {UUID} from '@scion/toolkit/uuid';
-import {TextPipe} from '../text/text.pipe';
+import {SciTextPipe} from '@scion/sci-components/text';
 import {IconComponent} from '../icon/icon.component';
 
 /**
@@ -27,7 +27,7 @@ import {IconComponent} from '../icon/icon.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
-    TextPipe,
+    SciTextPipe,
     IconComponent,
   ],
   providers: [

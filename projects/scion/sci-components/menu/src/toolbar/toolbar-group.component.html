@@ -1,5 +1,5 @@
 @for (menuItem of menuItems(); track $index) {
-  @let disabled = this.disabled() || menuItem.disabled();
+  @let disabled = this.disabled() || menuItem.disabled?.() || false;
 
   @switch (menuItem.type) {
     @case ('menu-item') {
@@ -10,35 +10,37 @@
         @if (menuItem.icon?.()) {
           <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon?.()}}</span>
         }
-        @if (menuItem.label?.text?.(); as label) {
-          <span class="label">{{label}}</span>
-        } @else if (menuItem.label?.component; as component) {
+        @if (menuItem.labelText) {
+          <span class="label">{{menuItem.labelText()}}</span>
+        } @else if (menuItem.labelComponent) {
           <span class="label">
-            <ng-container *ngComponentOutlet="component"/>
+            <ng-container *ngComponentOutlet="menuItem.labelComponent"/>
           </span>
         }
       </button>
     }
     @case ('menu') {
+      @let hasLabel = menuItem.labelText || menuItem.labelComponent;
       <button [attr.disabled]="disabled || null"
               [class.active]="activeSubMenuItem()?.menu === menuItem"
-              [class.visual-menu-hint]="menuItem.icon?.() && !menuItem.label && menuItem.visualMenuHint"
+              [class.visual-menu-hint]="menuItem.icon?.() && !hasLabel && menuItem.visualMenuHint"
               [class]="menuItem.cssClass" class="menu-item submenu-item"
               (click)="onSubMenuClick({menu: menuItem, element: element})"
               #element>
-        @if (menuItem.icon?.()) {
-          <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon?.()}}</span>
+        @if (menuItem.icon) {
+          <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon()}}</span>
         }
-        @if (menuItem.label?.text?.(); as label) {
-          <span class="label">{{label}}</span>
-        } @else if (menuItem.label?.component; as component) {
+
+        @if (menuItem.labelText) {
+          <span class="label">{{menuItem.labelText()}}</span>
+        } @else if (menuItem.labelComponent) {
           <span class="label">
-            <ng-container *ngComponentOutlet="component"/>
+            <ng-container *ngComponentOutlet="menuItem.labelComponent"/>
           </span>
         }
 
         <!-- Add chevron for label menus -->
-        @if (menuItem.label && menuItem.visualMenuHint) {
+        @if (hasLabel && menuItem.visualMenuHint) {
           <span class="material-symbols-rounded" translate="no">keyboard_arrow_down</span>
         }
       </button>

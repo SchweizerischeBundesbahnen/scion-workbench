@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {type WorkbenchTextProviderFn, type Translatable} from './workbench-text-provider.model';
-export {TextPipe} from './text.pipe';
+export {type SciTextProviderFn, type Translatable} from './text-provider.model';
+export {provideTextProvider} from './text.provider';
+export {SciTextPipe} from './text.pipe';
 export {text} from './text';

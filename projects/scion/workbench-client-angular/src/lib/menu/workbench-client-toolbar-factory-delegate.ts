@@ -1,10 +1,20 @@
-import {WorkbenchMenuFactory, WorkbenchToolbarFactory, WorkbenchToolbarGroupFactory} from '@scion/workbench-client';
+/*
+ * Copyright (c) 2018-2026 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
+import {MaybeObservable, Translatable, WorkbenchMenuFactory, WorkbenchToolbarFactory, WorkbenchToolbarGroupFactory} from '@scion/workbench-client';
 import {inject, Injector, isSignal, runInInjectionContext} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
-import {MaybeSignal} from '../common/utility-types';
 import {SciMenuFactory, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarGroupFactory, SciToolbarItemDescriptor, SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
 import {WorkbenchClientMenuFactoryDelegate} from './workbench-client-menu-factory-delegate';
 import {toLazyObservable} from '../common/lazy-observable.util';
+import {MaybeSignal, RequireOne} from '@scion/sci-components/common';
 
 /**
  * Represents a {@link SciToolbarFactory} that delegates to {@link WorkbenchToolbarFactory} of `@scion/workbench-client`.
@@ -42,6 +52,7 @@ export class WorkbenchClientToolbarFactoryDelegate implements SciToolbarFactory 
   public addMenu(descriptor: SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this;
   public addMenu(iconOrDescriptor: MaybeSignal<string> | SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this {
     const descriptor = coerceMenuDescriptor(iconOrDescriptor);
+    const filter = coerceFilterDescriptor(descriptor);
 
     this._delegate.addMenu({
       name: descriptor.name,
@@ -55,7 +66,10 @@ export class WorkbenchClientToolbarFactoryDelegate implements SciToolbarFactory 
         minWidth: descriptor.menu?.minWidth,
         maxWidth: descriptor.menu?.maxWidth,
         maxHeight: descriptor.menu?.maxHeight,
-        filter: descriptor.menu?.filter,
+        filter: filter && {
+          placeholder: toLazyObservable(filter.placeholder),
+          notFoundText: toLazyObservable(filter.notFoundText),
+        } as RequireOne<{placeholder?: MaybeObservable<Translatable>; notFoundText?: MaybeObservable<Translatable>}> | undefined,
       },
       cssClass: descriptor.cssClass,
     }, (menu: WorkbenchMenuFactory): void => {
@@ -115,4 +129,16 @@ function coerceLabel(label: MaybeSignal<string> | ComponentType<unknown> | undef
   }
 
   throw Error('[MenuDefinitionError] Component not supported as menu label.');
+}
+
+function coerceFilterDescriptor(menuDescriptor: SciToolbarMenuDescriptor): {placeholder?: MaybeSignal<Translatable>; notFoundText?: MaybeSignal<Translatable>} | undefined {
+  const filter = menuDescriptor.menu?.filter;
+
+  if (typeof filter === 'object') {
+    return {
+      placeholder: filter.placeholder,
+      notFoundText: filter.notFoundText,
+    };
+  }
+  return filter === true ? {} : undefined;
 }

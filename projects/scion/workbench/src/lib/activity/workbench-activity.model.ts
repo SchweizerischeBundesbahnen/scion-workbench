@@ -9,7 +9,7 @@
  */
 
 import {ActivityId} from '../workbench.identifiers';
-import {Translatable} from '../text/workbench-text-provider.model';
+import {Translatable} from '@scion/sci-components/text';
 
 /**
  * Defines the arrangement of docked parts (also referred to as activities) in the workbench.

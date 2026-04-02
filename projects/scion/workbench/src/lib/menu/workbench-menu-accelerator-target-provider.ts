@@ -14,7 +14,7 @@ import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog.model';
 import {ɵWorkbenchNotification} from '../notification/ɵworkbench-notification.model';
-import {MaybeSignal} from '../common/utility-types';
+import {MaybeSignal} from '@scion/sci-components/common';
 
 class WorkbenchMenuAcceleratorTargetProvider implements SciMenuAcceleratorTargetProvider {
 

@@ -11,8 +11,7 @@
 import {Component, inject} from '@angular/core';
 import {eNOTIFICATION_MESSAGE_PARAM} from '@scion/workbench-client';
 import {UUID} from '@scion/toolkit/uuid';
-import {Translatable} from '../../../text/workbench-text-provider.model';
-import {TextPipe} from '../../../text/text.pipe';
+import {SciTextPipe, Translatable} from '@scion/sci-components/text';
 import {createRemoteTranslatable} from '../../microfrontend-text/remote-text-provider';
 import {ActivatedMicrofrontend} from '../../microfrontend-host/microfrontend-host.model';
 
@@ -26,7 +25,7 @@ import {ActivatedMicrofrontend} from '../../microfrontend-host/microfrontend-hos
   styleUrls: ['./notification-text-message.component.scss'],
   templateUrl: './notification-text-message.component.html',
   imports: [
-    TextPipe,
+    SciTextPipe,
   ],
   host: {
     '[class.empty]': '!message?.length',

@@ -8,16 +8,17 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {MaybeObservable} from '../common/utility-types';
+import {MaybeObservable, RequireOne} from '../common/utility-types';
 import {WorkbenchToolbarFactory} from './workbench-toolbar.factory';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 export interface WorkbenchMenuFactory {
   // Describe that onSelect can call `inject` to get any required dependencies.
-  addMenuItem(label: MaybeObservable<string>, onSelect: () => boolean | void | Promise<boolean | void>): this;
+  addMenuItem(label: MaybeObservable<Translatable>, onSelect: () => boolean | void | Promise<boolean | void>): this;
 
   addMenuItem(descriptor: WorkbenchMenuItemDescriptor): this;
 
-  addMenu(label: MaybeObservable<string>, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this;
+  addMenu(label: MaybeObservable<Translatable>, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this;
 
   addMenu(descriptor: WorkbenchMenuDescriptor, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this;
 
@@ -43,10 +44,10 @@ export type WorkbenchMenuGroupFactory = WorkbenchMenuFactory;
 
 export interface WorkbenchMenuItemDescriptor {
   name?: `menuitem:${string}`;
-  label: MaybeObservable<string>;
+  label: MaybeObservable<Translatable>;
   icon?: MaybeObservable<string>;
   checked?: MaybeObservable<boolean>;
-  tooltip?: MaybeObservable<string>;
+  tooltip?: MaybeObservable<Translatable>;
   accelerator?: string[];
   disabled?: MaybeObservable<boolean>;
   actions?: (actions: WorkbenchToolbarFactory) => void;
@@ -57,23 +58,23 @@ export interface WorkbenchMenuItemDescriptor {
 
 export interface WorkbenchMenuDescriptor {
   name?: `menu:${string}`;
-  label: MaybeObservable<string>;
+  label: MaybeObservable<Translatable>;
   icon?: MaybeObservable<string>;
-  tooltip?: MaybeObservable<string>;
+  tooltip?: MaybeObservable<Translatable>;
   disabled?: MaybeObservable<boolean>;
   menu?: {
     width?: string;
     minWidth?: string;
     maxWidth?: string;
     maxHeight?: string;
-    filter?: boolean | {placeholder?: string; notFoundText?: string};
+    filter?: boolean | RequireOne<{placeholder?: MaybeObservable<Translatable>; notFoundText?: MaybeObservable<Translatable>}>;
   };
   cssClass?: string | string[];
 }
 
 export interface WorkbenchMenuGroupDescriptor {
   name?: `group:${string}`;
-  label?: MaybeObservable<string>;
+  label?: MaybeObservable<Translatable>;
   collapsible?: boolean | {collapsed: boolean};
   disabled?: MaybeObservable<boolean>;
   cssClass?: string | string[];

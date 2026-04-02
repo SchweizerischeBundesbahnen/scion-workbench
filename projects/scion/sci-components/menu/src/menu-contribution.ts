@@ -2,10 +2,10 @@ import {assertInInjectionContext, assertNotInReactiveContext, effect, inject, ru
 import {Disposable} from './common/disposable';
 import {ɵSciMenuService} from './ɵmenu.service';
 import {SciMenuContextProvider} from './menu-context-provider';
-import {coerceSignal} from './common/common';
 import {SciMenuContributionLocation, SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuFactoryFn, SciMenuFactoryFnLike, SciMenuGroupContributionLocation, SciMenuGroupFactoryFn, SciToolbarContributionLocation, SciToolbarFactoryFn, SciToolbarGroupContributionLocation, SciToolbarGroupFactoryFn} from './menu-contribution.model';
 import {createDestroyableInjector} from './common/injector.util';
 import {SciMenuContributionInstantProvider} from './menu-contribution-instant.provider';
+import {coerceSignal} from '@scion/sci-components/common';
 
 /**
  * By default, the contribution will be unregistered when the current injection context is destroyed.

@@ -65,6 +65,7 @@ export class RouterPageComponent {
     contributeMenu('toolbar:testee', toolbar => toolbar
         .addToolbarItem({
           icon: 'play_circle',
+          label: '%play.label',
           onSelect: () => {
             this.state.update(state => !state);
           },

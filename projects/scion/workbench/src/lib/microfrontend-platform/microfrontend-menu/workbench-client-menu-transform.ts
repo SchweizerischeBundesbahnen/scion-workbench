@@ -21,11 +21,11 @@ export namespace SciMenuItems {
           return {
             type: menuItemProxy.type,
             name: menuItemProxy.name,
-            label: menuItemProxy.label && {text: toSignal(menuItemProxy.label, {injector, requireSync: true})},
+            labelText: menuItemProxy.label && toSignal(menuItemProxy.label, {injector, requireSync: true}),
             icon: menuItemProxy.icon && toSignal(menuItemProxy.icon, {injector, requireSync: true}),
             tooltip: menuItemProxy.tooltip && toSignal(menuItemProxy.tooltip, {injector, requireSync: true}),
             accelerator: menuItemProxy.accelerator,
-            disabled: toSignal(menuItemProxy.disabled, {injector, requireSync: true}),
+            disabled: menuItemProxy.disabled && toSignal(menuItemProxy.disabled, {injector, requireSync: true}),
             checked: menuItemProxy.checked && toSignal(menuItemProxy.checked, {injector, requireSync: true}),
             actions: SciMenuItems.fromWorkbenchMenuItemProxies(menuItemProxy.actions, {injector}),
             // matchesFilter: (filter: string) => true; // TODO
@@ -38,10 +38,10 @@ export namespace SciMenuItems {
           return {
             type: menuItemProxy.type,
             name: menuItemProxy.name,
-            label: menuItemProxy.label && {text: toSignal(menuItemProxy.label, {injector, requireSync: true})},
+            labelText: menuItemProxy.label && toSignal(menuItemProxy.label, {injector, requireSync: true}),
             icon: menuItemProxy.icon && toSignal(menuItemProxy.icon, {injector, requireSync: true}),
             tooltip: menuItemProxy.tooltip && toSignal(menuItemProxy.tooltip, {injector, requireSync: true}),
-            disabled: toSignal(menuItemProxy.disabled, {injector, requireSync: true}),
+            disabled: menuItemProxy.disabled && toSignal(menuItemProxy.disabled, {injector, requireSync: true}),
             visualMenuHint: menuItemProxy.visualMenuHint,
             position: menuItemProxy.position,
             menu: {
@@ -49,7 +49,10 @@ export namespace SciMenuItems {
               minWidth: menuItemProxy.menu.minWidth,
               maxWidth: menuItemProxy.menu.maxWidth,
               maxHeight: menuItemProxy.menu.maxHeight,
-              filter: menuItemProxy.menu.filter,
+              filter: menuItemProxy.menu.filter && {
+                placeholder: menuItemProxy.menu.filter.placeholder && toSignal(menuItemProxy.menu.filter.placeholder, {injector, requireSync: true}),
+                notFoundText: menuItemProxy.menu.filter.notFoundText && toSignal(menuItemProxy.menu.filter.notFoundText, {injector, requireSync: true}),
+              },
             },
             cssClass: menuItemProxy.cssClass,
             children: SciMenuItems.fromWorkbenchMenuItemProxies(menuItemProxy.children, {injector}),
@@ -62,7 +65,7 @@ export namespace SciMenuItems {
             label: menuItemProxy.label && toSignal(menuItemProxy.label, {injector, requireSync: true}),
             collapsible: menuItemProxy.collapsible,
             position: menuItemProxy.position,
-            disabled: toSignal(menuItemProxy.disabled, {injector, requireSync: true}),
+            disabled: menuItemProxy.disabled && toSignal(menuItemProxy.disabled, {injector, requireSync: true}),
             cssClass: menuItemProxy.cssClass,
             children: SciMenuItems.fromWorkbenchMenuItemProxies(menuItemProxy.children, {injector}),
           } satisfies SciMenuGroup;
@@ -79,14 +82,14 @@ export namespace SciMenuItems {
 
       switch (menuItem.type) {
         case 'menu-item': {
-          if (menuItem.label?.component) {
+          if (menuItem.labelComponent) {
             throw Error('[MenuDefinitionError] Component not supported as menu label.');
           }
 
           return new WorkbenchMenuItem({
             id: menuItemId,
             name: menuItem.name,
-            label: toLazyObservable(menuItem.label?.text, {injector}),
+            label: toLazyObservable(menuItem.labelText, {injector}),
             icon: toLazyObservable(menuItem.icon, {injector}),
             tooltip: toLazyObservable(menuItem.tooltip, {injector}),
             accelerator: menuItem.accelerator,
@@ -100,14 +103,14 @@ export namespace SciMenuItems {
           });
         }
         case 'menu': {
-          if (menuItem.label?.component) {
+          if (menuItem.labelComponent) {
             throw Error('[MenuDefinitionError] Component not supported as menu label.');
           }
 
           return new WorkbenchMenu({
             id: menuItemId,
             name: menuItem.name,
-            label: toLazyObservable(menuItem.label?.text, {injector}),
+            label: toLazyObservable(menuItem.labelText, {injector}),
             icon: toLazyObservable(menuItem.icon, {injector}),
             tooltip: toLazyObservable(menuItem.tooltip, {injector}),
             disabled: toLazyObservable(menuItem.disabled, {injector}),
@@ -118,7 +121,10 @@ export namespace SciMenuItems {
               minWidth: menuItem.menu.minWidth,
               maxWidth: menuItem.menu.maxWidth,
               maxHeight: menuItem.menu.maxHeight,
-              filter: menuItem.menu.filter,
+              filter: menuItem.menu.filter && {
+                placeholder: toLazyObservable(menuItem.menu.filter.placeholder, {injector}),
+                notFoundText: toLazyObservable(menuItem.menu.filter.notFoundText, {injector}),
+              },
             },
             cssClass: menuItem.cssClass,
             children: SciMenuItems.toWorkbenchMenuItems(menuItem.children, {injector}),

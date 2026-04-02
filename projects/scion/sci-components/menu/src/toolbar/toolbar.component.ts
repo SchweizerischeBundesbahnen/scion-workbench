@@ -1,10 +1,10 @@
 import {ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, Injector, input, Signal, untracked, ViewContainerRef} from '@angular/core';
 import {SciToolGroupComponent} from './toolbar-group.component';
 import {SciMenuContextProvider} from '../menu-context-provider';
-import {coerceSignal} from '../common/common';
 import {coerceElement} from '@angular/cdk/coercion';
 import {installMenuAccelerators} from '../menu-accelerators';
 import {ɵSciMenuService} from '../ɵmenu.service';
+import {coerceSignal} from '@scion/sci-components/common';
 
 @Component({
   selector: 'sci-toolbar',

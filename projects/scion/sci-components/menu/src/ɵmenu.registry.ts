@@ -142,26 +142,28 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
           return menuItems();
         })
         // Add contributions, recursively for each submenu or group.
-        .map(menuItem => addMenuContributions(menuItem, context(), {injector: callingContextInjector, metadata: options.metadata}))
+        .map(menuItem => federateMenu(menuItem, context(), {injector: callingContextInjector, metadata: options.metadata}))
         // Filter empty submenus and groups.
-        .flatMap(filterEmpty));
+        .flatMap(filterEmpty))
     });
 
-    function addMenuContributions(menuItem: SciMenuItemLike, context: Map<string, unknown>, options?: {injector?: Injector; metadata?: {[key: string]: unknown}}): SciMenuItemLike {
+    /**
+     * Federates passed menu or group with contributions based on its name. Federation is recursive.
+     */
+    function federateMenu(menuItem: SciMenuItemLike, context: Map<string, unknown>, options?: {injector?: Injector; metadata?: {[key: string]: unknown}}): SciMenuItemLike {
       if (menuItem.type === 'menu-item') {
         return {
           ...menuItem,
           actions: menuItem.actions
-            .map(action => addMenuContributions(action, context, options))
+            .map(action => federateMenu(action, context, options))
             .flatMap(filterEmpty),
         };
       }
 
+      const contributions = menuItem.name ? untracked(() => menuService.menuItems(menuItem.name!, context, {injector: options?.injector, metadata: options?.metadata}))() : [];
       return {
         ...menuItem,
-        children: sortMenuItems(menuItem.children
-          .concat(menuItem.name ? untracked(() => menuService.menuItems(menuItem.name!, context, {injector: options?.injector, metadata: options?.metadata}))() : [])
-          .map(child => addMenuContributions(child, context, options))),
+        children: sortMenuItems(menuItem.children.concat(contributions).map(child => federateMenu(child, context, options))),
       };
     }
   }

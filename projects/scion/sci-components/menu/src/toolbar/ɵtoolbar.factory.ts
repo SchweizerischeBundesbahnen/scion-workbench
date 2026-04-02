@@ -2,12 +2,16 @@ import {SciMenuFactory} from '../menu/menu.factory';
 import {isSignal, Signal} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarGroupFactory, SciToolbarItemDescriptor, SciToolbarMenuDescriptor} from './toolbar.factory';
-import {coerceSignal} from '../common/common';
 import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model';
 import {ɵSciMenuFactory} from '../menu/ɵmenu.factory';
-import {MaybeSignal, OneOf} from '../common/utility-types';
+import {coerceSignal, MaybeSignal} from '@scion/sci-components/common';
 import {ComponentType} from '@angular/cdk/portal';
+import {Translatable} from '@scion/sci-components/text';
+import {translate} from '../menu-translate.util';
 
+/**
+ * Translation note: Texts are translated when added (not lazily when rendered) to simplify filtering.
+ */
 export class ɵSciToolbarFactory implements SciToolbarFactory {
 
   public readonly menuItems = [] as SciMenuItemLike[];
@@ -21,12 +25,13 @@ export class ɵSciToolbarFactory implements SciToolbarFactory {
     this.menuItems.push({
       type: 'menu-item',
       name: descriptor.name,
-      label: coerceLabel(descriptor.label),
+      labelText: translate(coerceLabelText(descriptor.label)),
+      labelComponent: coerceLabelComponent(descriptor.label),
       icon: coerceSignal(descriptor.icon),
       checked: coerceSignal(descriptor.checked),
-      tooltip: coerceSignal(descriptor.tooltip),
+      tooltip: translate(descriptor.tooltip),
       accelerator: descriptor.accelerator,
-      disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
+      disabled: coerceSignal(descriptor.disabled),
       actions: [],
       cssClass: Arrays.coerce(descriptor.cssClass),
       onSelect: async () => {
@@ -52,17 +57,18 @@ export class ɵSciToolbarFactory implements SciToolbarFactory {
     this.menuItems.push({
       type: 'menu',
       name: descriptor.name,
-      label: coerceLabel(descriptor.label),
+      labelText: translate(coerceLabelText(descriptor.label)),
+      labelComponent: coerceLabelComponent(descriptor.label),
       icon: coerceSignal(descriptor.icon),
-      tooltip: coerceSignal(descriptor.tooltip),
-      disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
+      tooltip: translate(descriptor.tooltip),
+      disabled: coerceSignal(descriptor.disabled),
       visualMenuHint: descriptor.visualMenuHint ?? true,
       menu: {
         width: descriptor.menu?.width,
         minWidth: descriptor.menu?.minWidth,
         maxWidth: descriptor.menu?.maxWidth,
         maxHeight: descriptor.menu?.maxHeight,
-        filter: descriptor.menu?.filter,
+        filter: coerceFilterDescriptor(descriptor),
       },
       children: menuFactory.menuItems,
       cssClass: Arrays.coerce(descriptor.cssClass),
@@ -85,7 +91,7 @@ export class ɵSciToolbarFactory implements SciToolbarFactory {
     this.menuItems.push({
       type: 'group',
       name: descriptor.name,
-      disabled: coerceSignal(descriptor.disabled, {defaultValue: false}),
+      disabled: coerceSignal(descriptor.disabled),
       children: groupFactory.menuItems,
       cssClass: Arrays.coerce(descriptor.cssClass),
     } satisfies SciMenuGroup);
@@ -115,12 +121,28 @@ function coerceGroupDescriptor(factoryOrDescriptor: ((group: SciToolbarGroupFact
   return [factoryOrDescriptor, factoryIfDescriptor];
 }
 
-function coerceLabel(label: MaybeSignal<string> | ComponentType<unknown> | undefined): OneOf<{text?: Signal<string>; component?: ComponentType<unknown>}> | undefined {
-  if (!label) {
-    return undefined;
-  }
+function coerceLabelText(label: MaybeSignal<Translatable> | ComponentType<unknown> | undefined): MaybeSignal<string> | undefined {
   if (typeof label === 'string' || isSignal(label)) {
-    return {text: coerceSignal(label)};
+    return label;
   }
-  return {component: label};
+  return undefined;
+}
+
+function coerceLabelComponent(label: MaybeSignal<Translatable> | ComponentType<unknown> | undefined): ComponentType<unknown> | undefined {
+  if (typeof label === 'function' && !isSignal(label)) {
+    return label;
+  }
+  return undefined;
+}
+
+function coerceFilterDescriptor(menuDescriptor: SciToolbarMenuDescriptor): {placeholder?: Signal<Translatable>; notFoundText?: Signal<Translatable>} | undefined {
+  const filter = menuDescriptor.menu?.filter;
+
+  if (typeof filter === 'object') {
+    return {
+      placeholder: coerceSignal(filter.placeholder),
+      notFoundText: coerceSignal(filter.notFoundText),
+    };
+  }
+  return filter === true ? {} : undefined;
 }

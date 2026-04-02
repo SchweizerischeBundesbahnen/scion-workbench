@@ -1,6 +1,6 @@
 <!-- Title -->
 @if (part.title()) {
-  <span class="title e2e-title" (mousedown)="onPartBarMouseDown($event)">{{(part.title() | wbText)()}}</span>
+  <span class="title e2e-title" (mousedown)="onPartBarMouseDown($event)">{{(part.title() | sciText)()}}</span>
 }
 
 <!-- View Tabs -->
@@ -39,12 +39,12 @@
 
 <!-- View List Dropdown -->
 @if (part.views().length) {
-  <wb-view-list-button [title]="('%workbench.show_open_tabs.tooltip' | wbText)()"/>
+  <wb-view-list-button [title]="('%scion.workbench.show_open_tabs.tooltip' | sciText)()"/>
 }
 
 <!-- Minimize Button -->
 @if (part.canMinimize()) {
-  <button (click)="onMinimize()" [title]="('%workbench.minimize.tooltip' | wbText)()" class="minimize e2e-minimize">
+  <button (click)="onMinimize()" [title]="('%scion.workbench.minimize.tooltip' | sciText)()" class="minimize e2e-minimize">
     <wb-icon icon="workbench.minimize"/>
   </button>
 }

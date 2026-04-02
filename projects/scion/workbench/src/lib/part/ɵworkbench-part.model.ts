@@ -32,13 +32,13 @@ import {MainAreaPartComponent} from './main-area-part/main-area-part.component';
 import {PartComponent} from './part.component';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
-import {Translatable} from '../text/workbench-text-provider.model';
 import {boundingClientRect} from '@scion/components/dimension';
 import {Blockable} from '../glass-pane/blockable';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog.model';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
 import {WORKBENCH_PART_CONTEXT} from './workbench-part-context.provider';
 import {Objects} from '@scion/toolkit/util';
+import {Translatable} from '@scion/sci-components/text';
 
 /** @inheritDoc */
 export class ɵWorkbenchPart implements WorkbenchPart, Blockable {

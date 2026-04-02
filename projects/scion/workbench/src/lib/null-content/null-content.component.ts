@@ -9,7 +9,7 @@
  */
 
 import {Component, inject, isDevMode} from '@angular/core';
-import {TextPipe} from '../text/text.pipe';
+import {SciTextPipe} from '@scion/sci-components/text';
 import {WorkbenchView} from '../view/workbench-view.model';
 
 /**
@@ -20,7 +20,7 @@ import {WorkbenchView} from '../view/workbench-view.model';
   templateUrl: './null-content.component.html',
   styleUrls: ['./null-content.component.scss'],
   imports: [
-    TextPipe,
+    SciTextPipe,
   ],
 })
 export class NullContentComponent {

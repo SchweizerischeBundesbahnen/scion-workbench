@@ -18,7 +18,7 @@ import {WorkbenchPart} from '../workbench-part.model';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ViewListItemComponent} from '../view-list-item/view-list-item.component';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {text} from '../../text/text';
+import {text} from '@scion/sci-components/text';
 
 @Component({
   selector: 'wb-view-list',

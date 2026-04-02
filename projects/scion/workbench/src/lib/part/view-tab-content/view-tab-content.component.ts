@@ -10,7 +10,7 @@
 
 import {Component, inject} from '@angular/core';
 import {WorkbenchView} from '../../view/workbench-view.model';
-import {TextPipe} from '../../text/text.pipe';
+import {SciTextPipe} from '@scion/sci-components/text';
 import {IconComponent} from '../../icon/icon.component';
 
 @Component({
@@ -18,7 +18,7 @@ import {IconComponent} from '../../icon/icon.component';
   templateUrl: './view-tab-content.component.html',
   styleUrls: ['./view-tab-content.component.scss'],
   imports: [
-    TextPipe,
+    SciTextPipe,
     IconComponent,
   ],
 })

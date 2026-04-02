@@ -13,9 +13,9 @@ import {WorkbenchDialogService} from '../dialog/workbench-dialog.service';
 import {WorkbenchMessageBoxComponent} from './workbench-message-box.component';
 import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchMessageBoxService} from './workbench-message-box.service';
-import {Translatable} from '../text/workbench-text-provider.model';
 import {Logger, LoggerNames} from '../logging';
 import {WORKBENCH_ELEMENT} from '../workbench-element-references';
+import {Translatable} from '@scion/sci-components/text';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})

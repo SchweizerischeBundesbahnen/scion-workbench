@@ -61,10 +61,12 @@ export default class TextTestPageComponent {
     this._sessionStorage.put(`textprovider.values.${key}`, parseTypedString(value));
   }
 
+  // TODO [menu] not supported anymore
   protected onRegisterTextProvider(): void {
     void this._messageClient.publish(`textprovider/${this.appSymbolicName}/register`);
   }
 
+  // TODO [menu] not supported anymore
   protected onUnregisterTextProvider(): void {
     void this._messageClient.publish(`textprovider/${this.appSymbolicName}/unregister`);
   }

@@ -13,7 +13,7 @@ import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {DialogPO} from '../../dialog.po';
 import {WorkbenchDialogPagePO} from './workbench-dialog-page.po';
-import {Translatable} from '@scion/workbench';
+import {Translatable} from '@scion/sci-components/text';
 import {DomRect, fromRect} from '../../helper/testing.util';
 import {ActivatedMicrofrontendPO} from './activated-microfrontend.po';
 

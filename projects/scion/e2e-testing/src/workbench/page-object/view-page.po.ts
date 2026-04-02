@@ -16,8 +16,9 @@ import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Params} from '@angular/router';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
-import {NavigationData, NavigationState, Translatable} from '@scion/workbench';
+import {NavigationData, NavigationState} from '@scion/workbench';
 import {ActivatedMicrofrontendPO} from './activated-microfrontend.po';
+import {Translatable} from '@scion/sci-components/text';
 
 /**
  * Page object to interact with {@link ViewPageComponent}.

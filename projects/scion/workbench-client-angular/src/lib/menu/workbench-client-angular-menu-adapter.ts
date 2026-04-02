@@ -1,6 +1,16 @@
+/*
+ * Copyright (c) 2018-2026 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
 import {Disposable, SciMenuAdapter, SciMenuContributionLocation, SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuFactoryFn, SciMenuFactoryFnLike, SciMenuGroupContributionLocation, SciMenuGroupFactoryFn, SciMenuItemLike, SciMenuOptions, SciMenuOrigin, SciMenuRef, SciToolbarContributionLocation, SciToolbarFactoryFn, SciToolbarGroupContributionLocation, SciToolbarGroupFactoryFn} from '@scion/sci-components/menu';
-import {assertNotInReactiveContext, effect, ElementRef, inject, Injector, linkedSignal, Provider, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
-import {WorkbenchMenuFactory, WorkbenchMenuGroupFactory, WorkbenchMenuOptions, WorkbenchMenuOrigin, WorkbenchMenuService, WorkbenchToolbarFactory, WorkbenchToolbarGroupFactory, ɵWorkbenchMenuService} from '@scion/workbench-client';
+import {assertNotInReactiveContext, effect, ElementRef, EnvironmentProviders, inject, Injector, linkedSignal, makeEnvironmentProviders, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
+import {MaybeObservable, WorkbenchMenuFactory, WorkbenchMenuGroupFactory, WorkbenchMenuOrigin, WorkbenchMenuService, WorkbenchToolbarFactory, WorkbenchToolbarGroupFactory, ɵWorkbenchMenuService} from '@scion/workbench-client';
 import {coerceElement} from '@angular/cdk/coercion';
 import {WorkbenchClientMenuFactoryDelegate} from './workbench-client-menu-factory-delegate';
 import {WorkbenchClientToolbarFactoryDelegate} from './workbench-client-toolbar-factory-delegate';
@@ -9,7 +19,13 @@ import {createDestroyableInjector} from '../common/injector.util';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {ɵassertInInjectionContext} from '../common/common';
 import {map} from 'rxjs/operators';
+import {MaybeSignal, RequireOne} from '@scion/sci-components/common';
+import {Translatable} from '@scion/sci-components/text';
+import {toLazyObservable} from '../common/lazy-observable.util';
 
+/**
+ * Delegates menu contribution to `@scion/workbench`, enabling rendering of menu popover in the workbench host application and federation of menu items contributed by different micro apps.
+ */
 export class WorkbenchClientAngularMenuAdapter implements SciMenuAdapter {
 
   private readonly _workbenchMenuService = inject(ɵWorkbenchMenuService);
@@ -109,7 +125,7 @@ export class WorkbenchClientAngularMenuAdapter implements SciMenuAdapter {
   /** @inheritDoc */
   public openMenu(menuLike: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions): SciMenuRef {
     const menu = Array.isArray(menuLike) ? SciMenuItems.toWorkbenchMenuItems(menuLike, {injector: this._injector}) : menuLike;
-
+    const filter = coerceFilterDescriptor(options.filter);
     const menuRef = this._workbenchMenuService.open(menu, {
       anchor: coerceAnchor(options.anchor),
       align: options.align,
@@ -118,7 +134,10 @@ export class WorkbenchClientAngularMenuAdapter implements SciMenuAdapter {
         minWidth: options.size?.minWidth,
         maxWidth: options.size?.maxWidth,
       },
-      filter: coerceFilter(options.filter),
+      filter: filter && {
+        placeholder: toLazyObservable(filter?.placeholder, {injector: this._injector}),
+        notFoundText: toLazyObservable(filter?.notFoundText, {injector: this._injector}),
+      } as RequireOne<{placeholder?: MaybeObservable<Translatable>; notFoundText?: MaybeObservable<Translatable>}> | undefined,
       focus: options.focus,
       cssClass: options.cssClass,
       context: options.context ?? new Map(),
@@ -138,23 +157,23 @@ function coerceAnchor(anchor: HTMLElement | ElementRef<HTMLElement> | SciMenuOri
   return anchor;
 }
 
-function coerceFilter(filter: SciMenuOptions['filter'] | undefined): WorkbenchMenuOptions['filter'] | undefined {
-  if (filter === undefined) {
-    return undefined;
+function coerceFilterDescriptor(filter: SciMenuOptions['filter'] | undefined): {placeholder?: MaybeSignal<Translatable>; notFoundText?: MaybeSignal<Translatable>} | undefined {
+  if (typeof filter === 'object') {
+    return {
+      placeholder: filter.placeholder,
+      notFoundText: filter.notFoundText,
+    };
   }
-  if (typeof filter === 'boolean') {
-    return filter;
-  }
-  return {
-    placeholder: filter.placeholder,
-    notFoundText: filter.notFoundText,
-  };
+  return filter === true ? {} : undefined;
 }
 
-export function provideWorkbenchClientAngularMenuAdapter(): Provider[] {
-  return [
+/**
+ * Enables rendering of menu popover in the workbench host application and federation of menu items contributed by different micro apps.
+ */
+export function provideWorkbenchMenuAdapter(): EnvironmentProviders {
+  return makeEnvironmentProviders([
     {provide: SciMenuAdapter, useClass: WorkbenchClientAngularMenuAdapter, multi: true},
     {provide: WorkbenchMenuService, useFactory: () => Beans.get(WorkbenchMenuService)},
     {provide: ɵWorkbenchMenuService, useFactory: () => Beans.get(ɵWorkbenchMenuService)},
-  ];
+  ]);
 }

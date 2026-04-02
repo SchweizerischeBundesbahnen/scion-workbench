@@ -16,7 +16,8 @@
   @if (filter) {
     <div class="filter">
       <span class="icon material-symbols-rounded filter" translate="no">search</span>
-      <sci-menu-filter (textChange)="onFilterChange($event)" [placeholder]="(typeof filter === 'object' && filter.placeholder) || 'Type to filter'"/>
+      @let message = filter.placeholder?.() ?? '%scion.components.menu.type_to_filter.action';
+      <sci-menu-filter (textChange)="onFilterChange($event)" [placeholder]="(message | sciText)()"/>
     </div>
     <hr>
   }
@@ -32,7 +33,7 @@
 
   <ng-template #menu_items>
     @for (menuItem of menuItemsFiltered(); track $index) {
-      @let disabled = this.disabled() || menuItem.disabled();
+      @let disabled = this.disabled() || menuItem.disabled?.() || false;
 
       @switch (menuItem.type) {
         @case ('menu-item') {
@@ -50,12 +51,12 @@
             }
 
             <div class="content">
-              @if (menuItem.label?.text?.(); as label) {
-                <span class="label">{{label}}</span>
-              } @else if (menuItem.label?.component; as component) {
+              @if (menuItem.labelText) {
+                <span class="label">{{menuItem.labelText()}}</span>
+              } @else if (menuItem.labelComponent) {
                 <span class="label">
-                <ng-container *ngComponentOutlet="component"/>
-              </span>
+                  <ng-container *ngComponentOutlet="menuItem.labelComponent"/>
+                </span>
               }
 
               @if (menuItem.accelerator?.length) {
@@ -84,12 +85,12 @@
               <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon?.()}}</span>
             }
             <div class="content">
-              @if (menuItem.label?.text?.(); as label) {
-                <span class="label">{{label}}</span>
-              } @else if (menuItem.label?.component; as component) {
+              @if (menuItem.labelText) {
+                <span class="label">{{menuItem.labelText()}}</span>
+              } @else if (menuItem.labelComponent) {
                 <span class="label">
-                <ng-container *ngComponentOutlet="component"/>
-              </span>
+                  <ng-container *ngComponentOutlet="menuItem.labelComponent"/>
+                </span>
               }
               <span class="icon material-symbols-rounded sub-menu-chevron" translate="no">arrow_right</span>
             </div>
@@ -104,7 +105,8 @@
       }
     } @empty {
       @if (filter || menuItems() === NULL_MENU_CONTRIBUTION) {
-        <div class="no-items-message">{{(typeof filter === 'object' && filter.notFoundText) || 'No items found.'}}</div>
+        @let message = filter?.notFoundText?.() ?? '%scion.components.menu.no_items.message';
+        <div class="message no-items">{{(message | sciText)()}}</div>
       }
     }
   </ng-template>

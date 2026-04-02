@@ -14,11 +14,11 @@ import {Disposable} from './common/disposable';
 import {fromEvent} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {Objects} from '@scion/toolkit/util';
-import {coerceSignal} from './common/common';
 import {SciMenuContextProvider} from './menu-context-provider';
 import {createDestroyableInjector} from './common/injector.util';
 import {ɵSciMenuService} from './ɵmenu.service';
 import {SciMenuAcceleratorTargetProvider} from './menu-accelerator-target-provider';
+import {coerceSignal} from '@scion/sci-components/common';
 
 /**
  * INPUTS FOR DOCUMENTING THIS FUNCTION:
@@ -103,7 +103,7 @@ function collectMenuItemsWithAccelerator(menuContributions: SciMenuItemLike[]): 
  * Tests if the accelerator of given menu item matches given keystroke.
  */
 function matchesMenuItemAccelerator(menuItem: SciMenuItem, keystroke: {key: string; modifiers: string[]}): boolean {
-  if (menuItem.disabled()) { // TODO also visible check
+  if (menuItem.disabled?.()) { // TODO [menu] also visible check
     return false;
   }
 

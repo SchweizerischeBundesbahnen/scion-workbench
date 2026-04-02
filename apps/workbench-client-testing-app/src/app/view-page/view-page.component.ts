@@ -104,7 +104,10 @@ export default class ViewPageComponent {
     const bold = signal(false);
     contributeMenu('toolbar:testee', toolbar => toolbar
       .addToolbarItem({
-        icon: 'format_bold', checked: bold, onSelect: () => {
+        icon: 'format_bold',
+        label: '%bold.label',
+        checked: bold,
+        onSelect: () => {
           bold.update(bold => !bold);
         },
       }),
@@ -123,7 +126,15 @@ export default class ViewPageComponent {
         },
       }),
     );
-    //
+    contributeMenu('toolbar:testee', toolbar => toolbar
+      .addMenu({label: '%viewmode.label'}, menu => menu
+        .addMenuItem({label: '%docked_pinned.label', checked: computed(() => viewMode() === 'dock_pinned'), onSelect: () => viewMode.set('dock_pinned')})
+        .addMenuItem({label: 'Dock Unpinned', checked: computed(() => viewMode() === 'dock_unpinned'), onSelect: () => viewMode.set('dock_unpinned')})
+        .addMenuItem({label: 'Undock', checked: computed(() => viewMode() === 'unddock'), onSelect: () => viewMode.set('unddock')})
+        .addMenuItem({label: 'Float', checked: computed(() => viewMode() === 'float'), onSelect: () => viewMode.set('float')})
+        .addMenuItem({label: 'Window', checked: computed(() => viewMode() === 'window'), onSelect: () => viewMode.set('window')})),
+    );
+
     contributeMenu('toolbar:testee', toolbar => {
         console.log(`>>> DEVELOPER FACTORY FUNCTION [state=${state()}]`);
         if (state()) {
@@ -132,6 +143,7 @@ export default class ViewPageComponent {
       },
     )
 
+    this.contributeContextMenu();
     if (1 + 1) {
       return;
     }
@@ -139,7 +151,6 @@ export default class ViewPageComponent {
     this.contributeToolbar();
     this.contributeClientMenu();
     this.contributeClientPartToolbar();
-    this.contributeContextMenu();
   }
 
   protected contributionRef1: Disposable | undefined;
@@ -483,8 +494,8 @@ export default class ViewPageComponent {
           .addMenuItem({label: 'Speed Search', icon: 'search', accelerator: ['Ctrl', 'F'], onSelect: () => console.log('>>> speed search (Ctrl + F)', context)}),
         )
         .addGroup(group => group
-          .addMenu({label: 'View Mode'}, menu => menu
-            .addMenuItem({label: 'Dock Pinned', checked: computed(() => viewMode() === 'dock_pinned'), onSelect: () => viewMode.set('dock_pinned')})
+          .addMenu({label: '%viewmode.label'}, menu => menu
+            .addMenuItem({label: '%docked_pinned.label', checked: computed(() => viewMode() === 'dock_pinned'), onSelect: () => viewMode.set('dock_pinned')})
             .addMenuItem({label: 'Dock Unpinned', checked: computed(() => viewMode() === 'dock_unpinned'), onSelect: () => viewMode.set('dock_unpinned')})
             .addMenuItem({label: 'Undock', checked: computed(() => viewMode() === 'unddock'), onSelect: () => viewMode.set('unddock')})
             .addMenuItem({label: 'Float', checked: computed(() => viewMode() === 'float'), onSelect: () => viewMode.set('float')})

@@ -10,7 +10,7 @@
 
 import {Component, inject} from '@angular/core';
 import {ɵWorkbenchDialog} from '../ɵworkbench-dialog.model';
-import {TextPipe} from '../../text/text.pipe';
+import {SciTextPipe} from '@scion/sci-components/text';
 import {IconComponent} from '../../icon/icon.component';
 
 /**
@@ -21,7 +21,7 @@ import {IconComponent} from '../../icon/icon.component';
   templateUrl: './dialog-header.component.html',
   styleUrls: ['./dialog-header.component.scss'],
   imports: [
-    TextPipe,
+    SciTextPipe,
     IconComponent,
   ],
 })

@@ -1,5 +1,7 @@
 import {ElementRef, Injectable, ViewContainerRef} from '@angular/core';
 import {ɵSciMenuService} from './ɵmenu.service';
+import {Translatable} from '@scion/sci-components/text';
+import {MaybeSignal, RequireOne} from '@scion/sci-components/common';
 
 // TODO [menu] Consider moving open (with menuitems) and menuContributions to separate service
 @Injectable({providedIn: 'root', useExisting: ɵSciMenuService})
@@ -42,7 +44,7 @@ export interface SciMenuOptions {
     maxWidth?: string;
     maxHeight?: string;
   };
-  filter?: boolean | {placeholder?: string; notFoundText?: string};
+  filter?: boolean | RequireOne<{placeholder?: MaybeSignal<Translatable>; notFoundText?: MaybeSignal<Translatable>}>;
   cssClass?: string[];
   /**
    * Arbitrary metadata to be associated with the operation.

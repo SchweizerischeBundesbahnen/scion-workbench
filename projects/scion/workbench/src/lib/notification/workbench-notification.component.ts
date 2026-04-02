@@ -11,7 +11,7 @@
 import {Component, DOCUMENT, effect, ElementRef, inject, NgZone, Provider, signal, untracked, viewChild} from '@angular/core';
 import {fromEvent, NEVER, Observable, timer} from 'rxjs';
 import {NgComponentOutlet} from '@angular/common';
-import {TextPipe} from '../text/text.pipe';
+import {SciTextPipe} from '@scion/sci-components/text';
 import {IconComponent} from '../icon/icon.component';
 import {ɵWorkbenchNotification} from './ɵworkbench-notification.model';
 import {RemoveLegacyInputPipe} from './remove-legacy-input.pipe';
@@ -30,7 +30,7 @@ import {contributeMenu, SciToolbarComponent} from '@scion/sci-components/menu';
   templateUrl: './workbench-notification.component.html',
   styleUrl: './workbench-notification.component.scss',
   imports: [
-    TextPipe,
+    SciTextPipe,
     IconComponent,
     NgComponentOutlet,
     RemoveLegacyInputPipe,

@@ -2,7 +2,7 @@ import {DestroyRef, DOCUMENT, EnvironmentProviders, inject, Injector, makeEnviro
 import {mapToBody, MessageClient} from '@scion/microfrontend-platform';
 import {takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {WorkbenchMenuItemProxyLike, WorkbenchMenuItems, WorkbenchMenuItemTransferableLike, ɵWorkbenchMenuContributionConstructCommand, ɵWorkbenchMenuContributionRegisterCommand, ɵWorkbenchMenuItemLookupCommand, ɵWorkbenchMenuOpenCommand} from '@scion/workbench-client';
-import {SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuGroupFactory, SciMenuOptions, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarGroupFactory, SciToolbarMenuDescriptor, ɵSciMenuService} from '@scion/sci-components/menu';
+import {SciMenu, SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuGroupFactory, SciMenuOptions, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarGroupFactory, SciToolbarMenuDescriptor, ɵSciMenuService} from '@scion/sci-components/menu';
 import {finalize, map} from 'rxjs/operators';
 import {Objects} from '@scion/toolkit/util';
 import {createDestroyableInjector} from '../../common/injector.util';
@@ -12,6 +12,9 @@ import {createInvocationContext} from '../../invocation-context/invocation-conte
 import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
 import {SciMenuItems} from './workbench-client-menu-transform';
 import {parseMenuLocation} from './workbench-menu-location-parser';
+import {RequireOne} from '../../common/utility-types';
+import {MaybeSignal} from '@scion/sci-components/common';
+import {Translatable} from '@scion/sci-components/text';
 
 function installMenuContributionHandler(): void {
   const menuService = inject(ɵSciMenuService);
@@ -90,27 +93,30 @@ function installMenuOpenHandler(): void {
     const command = request.body!;
     const injector = createDestroyableInjector({parent: rootInjector});
     const invocationContext = createInvocationContext(command.workbenchElementId, {injector});
-    const menu = Array.isArray(command.menu) ? SciMenuItems.fromWorkbenchMenuItemProxies(WorkbenchMenuItems.fromTransferable(command.menu), {injector}) : command.menu
+
+    // Unmarshall the menu.
+    const menu = SciMenuItems.fromWorkbenchMenuItemProxies(WorkbenchMenuItems.fromTransferable([command.menu]), {injector})[0] as SciMenu;
 
     // Open the menu.
-    const menuRef = menuService.open(menu, prune({
+    const menuRef = menuService.open(menu.name ?? menu.children, prune({
       anchor: {
-        x: command.options.anchor.x + (invocationContext?.bounds()?.x ?? 0),
-        y: command.options.anchor.y + (invocationContext?.bounds()?.y ?? 0),
-        width: command.options.anchor.width,
-        height: command.options.anchor.height,
+        x: command.anchor.x + (invocationContext?.bounds()?.x ?? 0),
+        y: command.anchor.y + (invocationContext?.bounds()?.y ?? 0),
+        width: command.anchor.width,
+        height: command.anchor.height,
       },
-      align: command.options.align,
+      align: command.align,
       size: {
-        width: command.options.size?.width,
-        minWidth: command.options.size?.minWidth,
-        maxWidth: command.options.size?.maxWidth,
+        width: menu.menu.width,
+        minWidth: menu.menu.minWidth,
+        maxWidth: menu.menu.maxWidth,
+        maxHeight: menu.menu.maxHeight,
       },
-      filter: coerceFilter(command.options.filter),
-      focus: command.options.focus,
+      filter: menu.menu.filter as SciMenuOptions['filter'],
+      focus: command.focus,
       context: command.context,
-      cssClass: command.options.cssClass,
-      metadata: command.options.metadata,
+      cssClass: menu.cssClass,
+      metadata: command.metadata,
     }));
 
     // Wait until closing the menu.
@@ -155,7 +161,7 @@ function populateMenu(menu: SciMenuFactory | SciMenuGroupFactory, menuItemProxie
           checked: menuItemProxy.checked && toSignal(menuItemProxy.checked, {requireSync: true}),
           tooltip: menuItemProxy.tooltip && toSignal(menuItemProxy.tooltip, {requireSync: true}),
           accelerator: menuItemProxy.accelerator,
-          disabled: toSignal(menuItemProxy.disabled, {requireSync: true}),
+          disabled: menuItemProxy.disabled && toSignal(menuItemProxy.disabled, {requireSync: true}),
           actions: actions => populateToolbar(actions, menuItemProxy.actions),
           // onFilter?: (filter: string) => boolean;
           cssClass: menuItemProxy.cssClass,
@@ -169,13 +175,16 @@ function populateMenu(menu: SciMenuFactory | SciMenuGroupFactory, menuItemProxie
           label: toSignal(menuItemProxy.label!, {requireSync: true}),
           icon: menuItemProxy.icon && toSignal(menuItemProxy.icon, {requireSync: true}),
           tooltip: menuItemProxy.tooltip && toSignal(menuItemProxy.tooltip, {requireSync: true}),
-          disabled: toSignal(menuItemProxy.disabled, {requireSync: true}),
+          disabled: menuItemProxy.disabled && toSignal(menuItemProxy.disabled, {requireSync: true}),
           menu: {
             width: menuItemProxy.menu.width,
             minWidth: menuItemProxy.menu.minWidth,
             maxWidth: menuItemProxy.menu.maxWidth,
             maxHeight: menuItemProxy.menu.maxHeight,
-            filter: menuItemProxy.menu.filter,
+            filter: menuItemProxy.menu.filter && {
+              placeholder: menuItemProxy.menu.filter.placeholder && toSignal(menuItemProxy.menu.filter.placeholder, {requireSync: true}),
+              notFoundText: menuItemProxy.menu.filter.notFoundText && toSignal(menuItemProxy.menu.filter.notFoundText, {requireSync: true}),
+            } as boolean | RequireOne<{placeholder?: MaybeSignal<Translatable>; notFoundText?: MaybeSignal<Translatable>}> | undefined,
           },
           cssClass: menuItemProxy.cssClass,
         };
@@ -187,7 +196,7 @@ function populateMenu(menu: SciMenuFactory | SciMenuGroupFactory, menuItemProxie
           name: menuItemProxy.name,
           label: menuItemProxy.label && toSignal(menuItemProxy.label, {requireSync: true}),
           collapsible: menuItemProxy.collapsible,
-          disabled: toSignal(menuItemProxy.disabled, {requireSync: true}),
+          disabled: menuItemProxy.disabled && toSignal(menuItemProxy.disabled, {requireSync: true}),
           cssClass: menuItemProxy.cssClass,
         };
         menu.addGroup(groupDescriptor, group => populateMenu(group, menuItemProxy.children));
@@ -211,7 +220,7 @@ function populateToolbar(toolbar: SciToolbarFactory | SciToolbarGroupFactory, me
           checked: menuItemProxy.checked && toSignal(menuItemProxy.checked, {requireSync: true}),
           tooltip: menuItemProxy.tooltip && toSignal(menuItemProxy.tooltip, {requireSync: true}),
           accelerator: menuItemProxy.accelerator,
-          disabled: toSignal(menuItemProxy.disabled, {requireSync: true}),
+          disabled: menuItemProxy.disabled && toSignal(menuItemProxy.disabled, {requireSync: true}),
           cssClass: menuItemProxy.cssClass,
           onSelect: () => menuItemProxy.select(),
         });
@@ -223,14 +232,17 @@ function populateToolbar(toolbar: SciToolbarFactory | SciToolbarGroupFactory, me
           label: menuItemProxy.label && toSignal(menuItemProxy.label, {requireSync: true}),
           icon: menuItemProxy.icon && toSignal(menuItemProxy.icon, {requireSync: true}),
           tooltip: menuItemProxy.tooltip && toSignal(menuItemProxy.tooltip, {requireSync: true}),
-          disabled: toSignal(menuItemProxy.disabled, {requireSync: true}),
+          disabled: menuItemProxy.disabled && toSignal(menuItemProxy.disabled, {requireSync: true}),
           visualMenuHint: menuItemProxy.visualMenuHint,
           menu: {
             width: menuItemProxy.menu.width,
             minWidth: menuItemProxy.menu.minWidth,
             maxWidth: menuItemProxy.menu.maxWidth,
             maxHeight: menuItemProxy.menu.maxHeight,
-            filter: menuItemProxy.menu.filter,
+            filter: menuItemProxy.menu.filter && {
+              placeholder: menuItemProxy.menu.filter.placeholder && toSignal(menuItemProxy.menu.filter.placeholder, {requireSync: true}),
+              notFoundText: menuItemProxy.menu.filter.notFoundText && toSignal(menuItemProxy.menu.filter.notFoundText, {requireSync: true}),
+            } as boolean | RequireOne<{placeholder?: MaybeSignal<Translatable>; notFoundText?: MaybeSignal<Translatable>}>,
           },
           cssClass: menuItemProxy.cssClass,
         };
@@ -240,7 +252,7 @@ function populateToolbar(toolbar: SciToolbarFactory | SciToolbarGroupFactory, me
       case 'group': {
         const groupDescriptor: SciToolbarGroupDescriptor = {
           name: menuItemProxy.name,
-          disabled: toSignal(menuItemProxy.disabled, {requireSync: true}),
+          disabled: menuItemProxy.disabled && toSignal(menuItemProxy.disabled, {requireSync: true}),
           cssClass: menuItemProxy.cssClass,
         };
         toolbar.addGroup(groupDescriptor, group => populateToolbar(group, menuItemProxy.children));
@@ -262,19 +274,6 @@ export function provideMicrofrontendMenu(): EnvironmentProviders {
       installMenuCloseHandler();
     }, {phase: MicrofrontendPlatformStartupPhase.PostStartup}),
   ]);
-}
-
-function coerceFilter(filter: ɵWorkbenchMenuOpenCommand['options']['filter'] | undefined): SciMenuOptions['filter'] | undefined {
-  if (filter === undefined) {
-    return undefined;
-  }
-  if (typeof filter === 'boolean') {
-    return filter;
-  }
-  return {
-    placeholder: filter.placeholder,
-    notFoundText: filter.notFoundText,
-  };
 }
 
 class WorkbenchClientMenuItemsCache {

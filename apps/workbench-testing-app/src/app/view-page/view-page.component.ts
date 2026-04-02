@@ -127,8 +127,8 @@ export default class ViewPageComponent {
           .addMenuItem({label: 'Speed Search', icon: 'search', accelerator: ['Ctrl', 'F'], onSelect: () => console.log('>>> speed search (Ctrl + F)', context)}),
         )
         .addGroup(group => group
-          .addMenu({label: 'View Mode'}, menu => menu
-            .addMenuItem({label: 'Dock Pinned', checked: computed(() => viewMode() === 'dock_pinned'), onSelect: () => viewMode.set('dock_pinned')})
+          .addMenu({label: '%viewmode1.label'}, menu => menu
+            .addMenuItem({label: '%docked_pinned1.label', checked: computed(() => viewMode() === 'dock_pinned'), onSelect: () => viewMode.set('dock_pinned')})
             .addMenuItem({label: 'Dock Unpinned', checked: computed(() => viewMode() === 'dock_unpinned'), onSelect: () => viewMode.set('dock_unpinned')})
             .addMenuItem({label: 'Undock', checked: computed(() => viewMode() === 'unddock'), onSelect: () => viewMode.set('unddock')})
             .addMenuItem({label: 'Float', checked: computed(() => viewMode() === 'float'), onSelect: () => viewMode.set('float')})

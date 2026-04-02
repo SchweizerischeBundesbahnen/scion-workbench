@@ -13,9 +13,10 @@ import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {Locator} from '@playwright/test';
 import {ViewPO} from '../../view.po';
-import {Translatable, WorkbenchMessageBoxOptions} from '@scion/workbench';
+import {WorkbenchMessageBoxOptions} from '@scion/workbench';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
 import {AppPO} from '../../app.po';
+import {Translatable} from '@scion/sci-components/text';
 
 /**
  * Page object to interact with {@link MessageBoxOpenerPageComponent}.

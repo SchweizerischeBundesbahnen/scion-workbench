@@ -65,6 +65,12 @@
           "@scion/sci-components/menu": [
             "./projects/scion/sci-components/menu/src/public_api",
           ],
+          "@scion/sci-components/text": [
+            "./projects/scion/sci-components/text/src/public_api",
+          ],
+          "@scion/sci-components/common": [
+            "./projects/scion/sci-components/common/src/public_api",
+          ],
           "workbench-client-angular": [
             "./dist/workbench-client-angular"
           ],

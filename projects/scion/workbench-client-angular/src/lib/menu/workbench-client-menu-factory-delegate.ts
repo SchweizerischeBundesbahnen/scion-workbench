@@ -1,10 +1,21 @@
-import {WorkbenchMenuFactory, WorkbenchMenuGroupFactory, WorkbenchToolbarFactory} from '@scion/workbench-client';
+/*
+ * Copyright (c) 2018-2026 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
+import {MaybeObservable, WorkbenchMenuFactory, WorkbenchMenuGroupFactory, WorkbenchToolbarFactory} from '@scion/workbench-client';
 import {inject, Injector, isSignal, runInInjectionContext} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
-import {MaybeSignal} from '../common/utility-types';
 import {SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuGroupFactory, SciMenuItemDescriptor} from '@scion/sci-components/menu';
 import {WorkbenchClientToolbarFactoryDelegate} from './workbench-client-toolbar-factory-delegate';
 import {toLazyObservable} from '../common/lazy-observable.util';
+import {MaybeSignal, RequireOne} from '@scion/sci-components/common';
+import {Translatable} from '@scion/sci-components/text';
 
 /**
  * Represents a {@link SciMenuFactory} that delegates to {@link WorkbenchMenuFactory} of `@scion/workbench-client`.
@@ -17,9 +28,9 @@ export class WorkbenchClientMenuFactoryDelegate implements SciMenuFactory {
   }
 
   /** @inheritDoc */
-  public addMenuItem(label: MaybeSignal<string>, onSelect: () => boolean | void | Promise<boolean | void>): this;
+  public addMenuItem(label: MaybeSignal<Translatable>, onSelect: () => boolean | void | Promise<boolean | void>): this;
   public addMenuItem(descriptor: SciMenuItemDescriptor): this;
-  public addMenuItem(labelOrDescriptor: MaybeSignal<string> | SciMenuItemDescriptor, onSelect?: () => boolean | void | Promise<boolean | void>): this {
+  public addMenuItem(labelOrDescriptor: MaybeSignal<Translatable> | SciMenuItemDescriptor, onSelect?: () => boolean | void | Promise<boolean | void>): this {
     const descriptor = coerceMenuItemDescriptor(labelOrDescriptor, onSelect);
 
     this._delegate.addMenuItem({
@@ -43,10 +54,11 @@ export class WorkbenchClientMenuFactoryDelegate implements SciMenuFactory {
   }
 
   /** @inheritDoc */
-  public addMenu(label: MaybeSignal<string>, menuFactoryFn: (menu: SciMenuFactory) => void): this ;
+  public addMenu(label: MaybeSignal<Translatable>, menuFactoryFn: (menu: SciMenuFactory) => void): this ;
   public addMenu(descriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this ;
-  public addMenu(labelOrDescriptor: MaybeSignal<string> | SciMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this {
+  public addMenu(labelOrDescriptor: MaybeSignal<Translatable> | SciMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this {
     const descriptor = coerceMenuDescriptor(labelOrDescriptor);
+    const filter = coerceFilterDescriptor(descriptor);
 
     this._delegate.addMenu({
       name: descriptor.name,
@@ -59,7 +71,10 @@ export class WorkbenchClientMenuFactoryDelegate implements SciMenuFactory {
         minWidth: descriptor.menu?.minWidth,
         maxWidth: descriptor.menu?.maxWidth,
         maxHeight: descriptor.menu?.maxHeight,
-        filter: descriptor.menu?.filter,
+        filter: filter && {
+          placeholder: toLazyObservable(filter.placeholder),
+          notFoundText: toLazyObservable(filter.notFoundText),
+        } as RequireOne<{placeholder?: MaybeObservable<Translatable>; notFoundText?: MaybeObservable<Translatable>}> | undefined,
       },
       cssClass: descriptor.cssClass,
     }, (menu: WorkbenchMenuFactory): void => {
@@ -133,3 +148,14 @@ function coerceLabel(label: MaybeSignal<string> | ComponentType<unknown>): Maybe
   throw Error('[MenuDefinitionError] Component not supported as menu label.');
 }
 
+function coerceFilterDescriptor(menuDescriptor: SciMenuDescriptor): {placeholder?: MaybeSignal<Translatable>; notFoundText?: MaybeSignal<Translatable>} | undefined {
+  const filter = menuDescriptor.menu?.filter;
+
+  if (typeof filter === 'object') {
+    return {
+      placeholder: filter.placeholder,
+      notFoundText: filter.notFoundText,
+    };
+  }
+  return filter === true ? {} : undefined;
+}

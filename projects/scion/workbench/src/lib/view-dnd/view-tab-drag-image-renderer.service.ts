@@ -24,7 +24,7 @@ import {WorkbenchPart} from '../part/workbench-part.model';
 import {Disposable} from '../common/disposable';
 import {throwError} from '../common/throw-error.util';
 import {UUID} from '@scion/toolkit/uuid';
-import {Translatable} from '../text/workbench-text-provider.model';
+import {Translatable} from '@scion/sci-components/text';
 
 export type ConstrainFn = (rect: DOMRect) => DOMRect;
 

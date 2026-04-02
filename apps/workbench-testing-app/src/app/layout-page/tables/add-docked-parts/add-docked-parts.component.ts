@@ -14,9 +14,10 @@ import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {MultiValueInputComponent, parseTypedString} from 'workbench-testing-app-common';
-import {ActivityId, Translatable} from '@scion/workbench';
+import {ActivityId} from '@scion/workbench';
 import {UUID} from '@scion/toolkit/uuid';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {Translatable} from '@scion/sci-components/text';
 
 @Component({
   selector: 'app-add-docked-parts',

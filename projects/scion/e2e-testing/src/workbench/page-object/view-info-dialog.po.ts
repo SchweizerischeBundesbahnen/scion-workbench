@@ -12,8 +12,9 @@ import {Locator} from '@playwright/test';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {DialogPO} from '../../dialog.po';
 import {WorkbenchDialogPagePO} from './workbench-dialog-page.po';
-import {NavigationData, NavigationState, PartId, Translatable, ViewId} from '@scion/workbench';
+import {NavigationData, NavigationState, PartId, ViewId} from '@scion/workbench';
 import {Data, Params} from '@angular/router';
+import {Translatable} from '@scion/sci-components/text';
 
 /**
  * Page object to interact with {@link ViewInfoDialogComponent}.

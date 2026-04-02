@@ -10,13 +10,14 @@
 
 import {firstValueFrom, Subscription} from 'rxjs';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {ACTIVATION_CONTEXT, APP_IDENTITY, ContextService, IntentClient, IS_PLATFORM_HOST, ManifestService, MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
+import {ACTIVATION_CONTEXT, APP_IDENTITY, ContextService, IS_PLATFORM_HOST, ManifestService, MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
 import {Disposable} from '../common/disposable';
-import {WorkbenchTextProviderCapability, WorkbenchTextProviderFn} from './workbench-text-provider.model';
+import {WorkbenchTextProviderFn, ɵWORKBNCH_CLIENT_TEXT_PROVIDER} from './workbench-text-provider.model';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
+import {installTextIntentHandler, registerTextProviderCapability} from './ɵworkbench-text-provider-capability-installer';
 
 /**
- * Provides texts to the SCION Workbench and micro apps.
+ * Provides texts to the SCION Workbench and other micro apps.
  *
  * A text provider is a function that returns the text for a translation key.
  *
@@ -24,10 +25,11 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
  *
  * This function must be called in an Activator.
  *
- * @param textProvider - Function to provide the text for a translation key.
  * @return Object to unregister the text provider.
+ *
+ * @deprecated since version 1.0.0-beta.41. Marked for removal.
  */
-export function registerTextProvider(textProvider: WorkbenchTextProviderFn): Disposable {
+export function registerLegacyTextProvider(): Disposable {
   const resources = new Subscription();
 
   // Wait until starting or started the platform.
@@ -37,40 +39,20 @@ export function registerTextProvider(textProvider: WorkbenchTextProviderFn): Dis
       await throwIfAlreadyRegistered();
 
       // Register 'text-provider' capability.
-      const appSymbolicName = Beans.get<string>(APP_IDENTITY);
-      const capability: WorkbenchTextProviderCapability = {
-        type: WorkbenchCapabilities.TextProvider,
-        qualifier: {provider: appSymbolicName},
-        private: false,
-        description: `Provides texts of '${appSymbolicName}' application.`,
-        params: [
-          {
-            name: 'key',
-            required: true,
-            description: '{string} - Translation key of the text.',
-          },
-          {
-            name: 'params',
-            required: false,
-            description: '{dictionary} - Parameters used for text interpolation.',
-          },
-        ],
-      };
-      const manifestService = Beans.get(ManifestService);
-      const capabilityId = await manifestService.registerCapability(capability);
-      if (capabilityId === null) {
+      const capability = await registerTextProviderCapability();
+      if (!capability) {
         return;
       }
 
-      resources.add(() => void manifestService.unregisterCapabilities({id: capabilityId}));
+      // Install intent handler to reply to text requests.
+      const textProvider = Beans.get<WorkbenchTextProviderFn>(ɵWORKBNCH_CLIENT_TEXT_PROVIDER);
+      const intentHandler = installTextIntentHandler(capability, (key, params) => textProvider(key, params));
 
-      // Install intent handler.
-      const intentSubscription = Beans.get(IntentClient).onIntent<void, string | undefined>({type: capability.type, qualifier: capability.qualifier}, ({intent}) => {
-        const key = intent.params!.get('key') as string;
-        const params = intent.params!.get('params') as Record<string, string> | undefined ?? {};
-        return textProvider(key, params);
-      });
-      resources.add(intentSubscription);
+      // Release resources when stopping the platform, e.g., during hot code replacement.
+      const resources = new Subscription();
+      resources.add(() => void Beans.get(ManifestService).unregisterCapabilities({id: capability.metadata!.id}));
+      resources.add(intentHandler);
+
     })
     .catch((error: unknown) => {
       console.error(`[WorkbenchClientError] Failed to register text provider for application '${Beans.opt(APP_IDENTITY)}'. Caused by: `, error);

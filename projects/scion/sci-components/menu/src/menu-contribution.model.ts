@@ -1,7 +1,7 @@
-import {OneOf} from './common/utility-types';
 import {SciMenuFactory, SciMenuGroupFactory} from './menu/menu.factory';
 import {SciToolbarFactory, SciToolbarGroupFactory} from './toolbar/toolbar.factory';
 import {Injector} from '@angular/core';
+import {OneOf} from '@scion/sci-components/common';
 
 export interface SciMenuContribution {
   scope: 'menu' | 'toolbar',

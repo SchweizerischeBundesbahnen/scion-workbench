@@ -1,4 +1,4 @@
-import {MaybeObservable, OneOf} from '../common/utility-types';
+import {MaybeObservable, OneOf, RequireOne} from '../common/utility-types';
 import {combineLatest, concatWith, firstValueFrom, NEVER, Observable, of, Subscription} from 'rxjs';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {mapToBody, MessageClient} from '@scion/microfrontend-platform';
@@ -7,6 +7,7 @@ import {createRemoteObservable$, remoteSubscriber$} from './remote-observable';
 import {Observables} from '@scion/toolkit/util';
 import {WorkbenchMenuFactory, WorkbenchMenuGroupFactory} from './workbench-menu.factory';
 import {WorkbenchToolbarFactory, WorkbenchToolbarGroupFactory} from './workbench-toolbar.factory';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * Represents a {@link SciMenuItem} in @scion/workbench-client.
@@ -22,7 +23,7 @@ export class WorkbenchMenuItem {
     icon?: MaybeObservable<string>;
     tooltip?: MaybeObservable<string>;
     accelerator?: string[];
-    disabled: MaybeObservable<boolean> | boolean;
+    disabled?: MaybeObservable<boolean>;
     checked?: MaybeObservable<boolean>;
     actions: WorkbenchMenuItemLike[];
     cssClass?: string[];
@@ -84,24 +85,24 @@ export class WorkbenchMenuItemProxy {
   public readonly icon?: Observable<string>;
   public readonly tooltip?: Observable<string>;
   public readonly accelerator?: string[];
-  public readonly disabled: Observable<boolean>;
+  public readonly disabled?: Observable<boolean>;
   public readonly checked?: Observable<boolean>;
   public readonly actions: WorkbenchMenuItemProxyLike[];
   public readonly cssClass?: string[];
   public readonly position?: WorkbenchMenuContributionPosition;
 
-  constructor(menuItem: WorkbenchMenuItemTransferable) {
-    this.id = menuItem.id;
-    this.name = menuItem.name;
-    this.label = remoteSubscriber$({relayId: this.id, property: 'label', initialValue: menuItem.label});
-    this.icon = remoteSubscriber$({relayId: this.id, property: 'icon', initialValue: menuItem.icon});
-    this.tooltip = remoteSubscriber$({relayId: this.id, property: 'tooltip', initialValue: menuItem.tooltip});
-    this.accelerator = menuItem.accelerator;
-    this.disabled = remoteSubscriber$({relayId: this.id, property: 'disabled', initialValue: menuItem.disabled});
-    this.checked = remoteSubscriber$({relayId: this.id, property: 'checked', initialValue: menuItem.checked});
-    this.actions = WorkbenchMenuItems.fromTransferable(menuItem.actions);
-    this.cssClass = menuItem.cssClass;
-    this.position = menuItem.position;
+  constructor(transferable: WorkbenchMenuItemTransferable) {
+    this.id = transferable.id;
+    this.name = transferable.name;
+    this.label = remoteSubscriber$({relayId: this.id, property: 'label', initialValue: transferable.label});
+    this.icon = remoteSubscriber$({relayId: this.id, property: 'icon', initialValue: transferable.icon});
+    this.tooltip = remoteSubscriber$({relayId: this.id, property: 'tooltip', initialValue: transferable.tooltip});
+    this.accelerator = transferable.accelerator;
+    this.disabled = remoteSubscriber$({relayId: this.id, property: 'disabled', initialValue: transferable.disabled});
+    this.checked = remoteSubscriber$({relayId: this.id, property: 'checked', initialValue: transferable.checked});
+    this.actions = WorkbenchMenuItems.fromTransferable(transferable.actions);
+    this.cssClass = transferable.cssClass;
+    this.position = transferable.position;
   }
 
   /**
@@ -123,7 +124,7 @@ export interface WorkbenchMenuItemTransferable {
   icon?: string;
   tooltip?: string;
   accelerator?: string[];
-  disabled: boolean;
+  disabled?: boolean;
   checked?: boolean;
   actions: WorkbenchMenuItemTransferableLike[];
   cssClass?: string[];
@@ -143,7 +144,7 @@ export class WorkbenchMenu {
     label?: MaybeObservable<string>;
     icon?: MaybeObservable<string>;
     tooltip?: MaybeObservable<string>;
-    disabled: MaybeObservable<boolean>;
+    disabled?: MaybeObservable<boolean>;
     visualMenuHint?: boolean;
     position?: WorkbenchMenuContributionPosition;
     cssClass?: string[];
@@ -153,7 +154,7 @@ export class WorkbenchMenu {
       minWidth?: string;
       maxWidth?: string;
       maxHeight?: string;
-      filter?: boolean | {placeholder?: string; notFoundText?: string};
+      filter?: {placeholder?: MaybeObservable<string>; notFoundText?: MaybeObservable<string>};
     }
   }) {
   }
@@ -167,9 +168,11 @@ export class WorkbenchMenu {
         icon: Observables.coerce(this._menu.icon),
         tooltip: Observables.coerce(this._menu.tooltip),
         disabled: Observables.coerce(this._menu.disabled),
+        filterPlaceholder: Observables.coerce(this._menu.menu.filter?.placeholder),
+        filterNotFoundText: Observables.coerce(this._menu.menu.filter?.notFoundText),
         children: WorkbenchMenuItems.toTransferable$(this._menu.children),
       },
-      mapTo: ({label, icon, tooltip, disabled, children}): WorkbenchMenuTransferable => prune({
+      mapTo: ({label, icon, tooltip, disabled, children, filterPlaceholder, filterNotFoundText}): WorkbenchMenuTransferable => prune({
         id: this._menu.id,
         type: 'menu',
         name: this._menu.name,
@@ -184,7 +187,7 @@ export class WorkbenchMenu {
           minWidth: this._menu.menu.minWidth,
           maxWidth: this._menu.menu.maxWidth,
           maxHeight: this._menu.menu.maxHeight,
-          filter: this._menu.menu.filter,
+          filter: this._menu.menu.filter && {placeholder: filterPlaceholder, notFoundText: filterNotFoundText},
         },
         cssClass: this._menu.cssClass,
         children: children,
@@ -206,7 +209,7 @@ export class WorkbenchMenuProxy {
   public readonly label?: Observable<string>;
   public readonly icon?: Observable<string>;
   public readonly tooltip?: Observable<string>;
-  public readonly disabled: Observable<boolean>;
+  public readonly disabled?: Observable<boolean>;
   public readonly visualMenuHint?: boolean;
   public readonly position?: WorkbenchMenuContributionPosition;
   public readonly cssClass?: string[];
@@ -216,21 +219,30 @@ export class WorkbenchMenuProxy {
     minWidth?: string;
     maxWidth?: string;
     maxHeight?: string;
-    filter?: boolean | {placeholder?: string; notFoundText?: string};
+    filter?: {placeholder?: Observable<string>; notFoundText?: Observable<string>};
   };
 
-  constructor(menu: WorkbenchMenuTransferable) {
-    this.id = menu.id;
-    this.name = menu.name;
-    this.label = remoteSubscriber$({relayId: this.id, property: 'label', initialValue: menu.label});
-    this.icon = remoteSubscriber$({relayId: this.id, property: 'icon', initialValue: menu.icon});
-    this.tooltip = remoteSubscriber$({relayId: this.id, property: 'tooltip', initialValue: menu.tooltip});
-    this.disabled = remoteSubscriber$({relayId: this.id, property: 'disabled', initialValue: menu.disabled});
-    this.visualMenuHint = menu.visualMenuHint;
-    this.position = menu.position;
-    this.cssClass = menu.cssClass;
-    this.children = WorkbenchMenuItems.fromTransferable(menu.children);
-    this.menu = menu.menu;
+  constructor(transferable: WorkbenchMenuTransferable) {
+    this.id = transferable.id;
+    this.name = transferable.name;
+    this.label = remoteSubscriber$({relayId: this.id, property: 'label', initialValue: transferable.label});
+    this.icon = remoteSubscriber$({relayId: this.id, property: 'icon', initialValue: transferable.icon});
+    this.tooltip = remoteSubscriber$({relayId: this.id, property: 'tooltip', initialValue: transferable.tooltip});
+    this.disabled = remoteSubscriber$({relayId: this.id, property: 'disabled', initialValue: transferable.disabled});
+    this.visualMenuHint = transferable.visualMenuHint;
+    this.position = transferable.position;
+    this.cssClass = transferable.cssClass;
+    this.children = WorkbenchMenuItems.fromTransferable(transferable.children);
+    this.menu = {
+      width: transferable.menu.width,
+      minWidth: transferable.menu.minWidth,
+      maxWidth: transferable.menu.maxWidth,
+      maxHeight: transferable.menu.maxHeight,
+      filter: transferable.menu.filter && {
+        placeholder: remoteSubscriber$({relayId: this.id, property: 'filterPlaceholder', initialValue: transferable.menu.filter.placeholder}),
+        notFoundText: remoteSubscriber$({relayId: this.id, property: 'filterNotFoundText', initialValue: transferable.menu.filter.notFoundText}),
+      },
+    }
   }
 }
 
@@ -244,7 +256,7 @@ export interface WorkbenchMenuTransferable {
   label?: string;
   icon?: string;
   tooltip?: string;
-  disabled: boolean;
+  disabled?: boolean;
   visualMenuHint?: boolean;
   position?: WorkbenchMenuContributionPosition;
   menu: {
@@ -252,7 +264,7 @@ export interface WorkbenchMenuTransferable {
     minWidth?: string;
     maxWidth?: string;
     maxHeight?: string;
-    filter?: boolean | {placeholder?: string; notFoundText?: string};
+    filter?: {placeholder?: string; notFoundText?: string};
   };
   cssClass?: string[];
   children: WorkbenchMenuItemTransferableLike[];
@@ -269,7 +281,7 @@ export class WorkbenchMenuGroup {
     id: string;
     name?: `group:${string}`;
     label?: MaybeObservable<string>;
-    disabled: MaybeObservable<boolean>;
+    disabled?: MaybeObservable<boolean>;
     collapsible?: {collapsed: boolean} | false;
     position?: WorkbenchMenuContributionPosition;
     children: WorkbenchMenuItemLike[];
@@ -312,21 +324,21 @@ export class WorkbenchMenuGroupProxy {
   public readonly type = 'group';
   public readonly name?: `group:${string}`;
   public readonly label?: Observable<string>;
-  public readonly disabled: Observable<boolean>;
+  public readonly disabled?: Observable<boolean>;
   public readonly collapsible?: {collapsed: boolean} | false;
   public readonly position?: WorkbenchMenuContributionPosition;
   public readonly children: WorkbenchMenuItemProxyLike[];
   public readonly cssClass?: string[];
 
-  constructor(group: WorkbenchMenuGroupTransferable) {
-    this.id = group.id;
-    this.name = group.name;
-    this.label = remoteSubscriber$({relayId: this.id, property: 'label', initialValue: group.label});
-    this.collapsible = group.collapsible;
-    this.position = group.position;
-    this.disabled = remoteSubscriber$({relayId: this.id, property: 'disabled', initialValue: group.disabled});
-    this.children = WorkbenchMenuItems.fromTransferable(group.children);
-    this.cssClass = group.cssClass;
+  constructor(transferable: WorkbenchMenuGroupTransferable) {
+    this.id = transferable.id;
+    this.name = transferable.name;
+    this.label = remoteSubscriber$({relayId: this.id, property: 'label', initialValue: transferable.label});
+    this.collapsible = transferable.collapsible;
+    this.position = transferable.position;
+    this.disabled = remoteSubscriber$({relayId: this.id, property: 'disabled', initialValue: transferable.disabled});
+    this.children = WorkbenchMenuItems.fromTransferable(transferable.children);
+    this.cssClass = transferable.cssClass;
   }
 }
 
@@ -346,7 +358,7 @@ export interface WorkbenchMenuGroupTransferable {
   label?: string;
   collapsible?: {collapsed: boolean} | false;
   position?: WorkbenchMenuContributionPosition;
-  disabled: boolean;
+  disabled?: boolean;
   children: WorkbenchMenuItemTransferableLike[];
   cssClass?: string[];
 }
@@ -413,7 +425,7 @@ export interface WorkbenchMenuOptions {
     maxWidth?: string;
     maxHeight?: string;
   };
-  filter?: boolean | {placeholder?: string; notFoundText?: string};
+  filter?: boolean | RequireOne<{placeholder?: MaybeObservable<Translatable>; notFoundText?: MaybeObservable<Translatable>}>;
   cssClass?: string[];
   /**
    * Arbitrary metadata to be associated with the operation.
@@ -448,11 +460,11 @@ export namespace WorkbenchMenuItems {
     return transferable.map((transferable: WorkbenchMenuItemTransferableLike): WorkbenchMenuItemProxyLike => {
       switch (transferable.type) {
         case 'menu-item':
-          return new WorkbenchMenuItemProxy(transferable)
+          return new WorkbenchMenuItemProxy(transferable);
         case 'menu':
-          return new WorkbenchMenuProxy(transferable)
+          return new WorkbenchMenuProxy(transferable);
         case 'group':
-          return new WorkbenchMenuGroupProxy(transferable)
+          return new WorkbenchMenuGroupProxy(transferable);
       }
     });
   }

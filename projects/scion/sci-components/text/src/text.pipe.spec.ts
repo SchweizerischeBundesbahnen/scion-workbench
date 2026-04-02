@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2025 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,13 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {Component, EnvironmentProviders, input, makeEnvironmentProviders, signal, WritableSignal} from '@angular/core';
 import {ComponentFixtureAutoDetect, TestBed} from '@angular/core/testing';
-import {WORKBENCH_TEXT_PROVIDER, WorkbenchTextProviderFn} from './workbench-text-provider.model';
-import {TextPipe} from './text.pipe';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {Observable, Subscriber} from 'rxjs';
+import {SciTextPipe} from './text.pipe';
+import {ɵSCI_TEXT_PROVIDER, SciTextProviderFn} from './text-provider.model';
 
 describe('Text Pipe', () => {
 
@@ -33,9 +32,9 @@ describe('Text Pipe', () => {
 
     @Component({
       selector: 'spec-testee',
-      template: '{{(key() | wbText)()}}',
+      template: '{{(key() | sciText)()}}',
       imports: [
-        TextPipe,
+        SciTextPipe,
       ],
     })
     class SpecRootComponent {
@@ -75,9 +74,9 @@ describe('Text Pipe', () => {
 
     @Component({
       selector: 'spec-testee',
-      template: '{{(key() | wbText)()}}',
+      template: '{{(key() | sciText)()}}',
       imports: [
-        TextPipe,
+        SciTextPipe,
       ],
     })
     class SpecRootComponent {
@@ -161,9 +160,9 @@ describe('Text Pipe', () => {
   });
 });
 
-function provideTextProvider(textProvider: WorkbenchTextProviderFn): EnvironmentProviders {
+function provideTextProvider(textProvider: SciTextProviderFn): EnvironmentProviders {
   return makeEnvironmentProviders([{
-    provide: WORKBENCH_TEXT_PROVIDER,
+    provide: ɵSCI_TEXT_PROVIDER,
     useValue: textProvider,
     multi: true,
   }]);

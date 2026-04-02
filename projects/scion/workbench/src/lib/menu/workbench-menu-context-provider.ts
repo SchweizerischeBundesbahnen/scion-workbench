@@ -14,7 +14,7 @@ import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {WorkbenchDialog} from '../dialog/workbench-dialog.model';
 import {WorkbenchNotification} from '../notification/workbench-notification.model';
-import {MaybeSignal} from '../common/utility-types';
+import {MaybeSignal} from '@scion/sci-components/common';
 
 class WorkbenchMenuContextProvider implements SciMenuContextProvider {
 

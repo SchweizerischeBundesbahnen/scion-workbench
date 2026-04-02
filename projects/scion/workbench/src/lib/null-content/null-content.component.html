@@ -1,7 +1,7 @@
 @if (isDevMode && view) {
-  @let hint = '%workbench.null_view_developer_hint.message;view=' + (view.alternativeId ?? view.id) | wbText;
-  @let tooltip = '%workbench.dev_mode_only_hint.tooltip' | wbText;
+  @let hint = '%scion.workbench.null_view_developer_hint.message;view=' + (view.alternativeId ?? view.id) | sciText;
+  @let tooltip = '%scion.workbench.dev_mode_only_hint.tooltip' | sciText;
   <section class="developer-hint" [title]="tooltip()" [innerHTML]="hint()"></section>
 } @else {
-  {{('%workbench.null_content.message' | wbText)()}}
+  {{('%scion.workbench.null_content.message' | sciText)()}}
 }

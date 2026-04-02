@@ -13,9 +13,8 @@ import {inject, Injectable, Injector, Provider, Signal} from '@angular/core';
 import {SciMenuItemLike} from './menu.model';
 import {Disposable} from './common/disposable';
 import {SciMenuContextProvider} from './menu-context-provider';
-import {coerceSignal} from './common/common';
 import {SciMenuContribution, SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuFactoryFnLike} from './menu-contribution.model';
-import {MaybeSignal} from './common/utility-types';
+import {coerceSignal, MaybeSignal} from '@scion/sci-components/common';
 import {SciMenuRegistry} from './menu.registry';
 import {SciMenuAdapter, SciMenuAdapterChain} from './menu-adapter.model';
 
@@ -81,9 +80,9 @@ function interceptMenuRegistry(menuRegistry: SciMenuRegistry): SciMenuRegistry {
 }
 
 /**
- * Provides {@link WorkbenchDialogService} for dependency injection.
+ * Provides {@link SciMenuService} for dependency injection.
  */
-export function provideSciMenuService(): Provider[] {
+export function provideMenuService(): Provider[] {
   return [
     ɵSciMenuService,
     {provide: SciMenuService, useExisting: ɵSciMenuService},

@@ -9,7 +9,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {MaybeSignal} from './common/utility-types';
+import {MaybeSignal} from '@scion/sci-components/common';
 
 @Injectable()
 export abstract class SciMenuContextProvider {

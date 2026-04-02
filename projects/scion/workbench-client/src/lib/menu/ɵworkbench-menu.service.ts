@@ -1,5 +1,5 @@
 import {WorkbenchMenuService} from './workbench-menu.service';
-import {WorkbenchMenuContributionLocation, WorkbenchMenuContributionLocationLike, WorkbenchMenuContributionOptions, WorkbenchMenuContributionPosition, WorkbenchMenuFactoryFn, WorkbenchMenuFactoryFnLike, WorkbenchMenuGroupContributionLocation, WorkbenchMenuGroupFactoryFn, WorkbenchMenuItemLike, WorkbenchMenuItemProxyLike, WorkbenchMenuItems, WorkbenchMenuItemTransferableLike, WorkbenchMenuOptions, WorkbenchMenuOrigin, WorkbenchMenuRef, WorkbenchToolbarContributionLocation, WorkbenchToolbarFactoryFn, WorkbenchToolbarGroupContributionLocation, WorkbenchToolbarGroupFactoryFn} from './workbench-client-menu.model';
+import {WorkbenchMenu, WorkbenchMenuContributionLocation, WorkbenchMenuContributionLocationLike, WorkbenchMenuContributionOptions, WorkbenchMenuContributionPosition, WorkbenchMenuFactoryFn, WorkbenchMenuFactoryFnLike, WorkbenchMenuGroupContributionLocation, WorkbenchMenuGroupFactoryFn, WorkbenchMenuItemLike, WorkbenchMenuItemProxyLike, WorkbenchMenuItems, WorkbenchMenuItemTransferableLike, WorkbenchMenuOptions, WorkbenchMenuOrigin, WorkbenchMenuRef, WorkbenchMenuTransferable, WorkbenchToolbarContributionLocation, WorkbenchToolbarFactoryFn, WorkbenchToolbarGroupContributionLocation, WorkbenchToolbarGroupFactoryFn} from './workbench-client-menu.model';
 import {Disposable} from '../common/disposable';
 import {UUID} from '@scion/toolkit/uuid';
 import {Beans} from '@scion/toolkit/bean-manager';
@@ -13,11 +13,10 @@ import {WorkbenchPart} from '../part/workbench-part.model';
 import {WorkbenchDialog} from '../dialog/workbench-dialog.model';
 import {WorkbenchNotification} from '../notification/workbench-notification.model';
 import {expand, Observable, of, take} from 'rxjs';
-import {WORKBENCH_ELEMENT, WorkbenchElement} from '@scion/workbench-client';
-import {SciMenuOptions} from '@scion/sci-components/menu';
-import {coerceElement} from '@angular/cdk/coercion';
+import {MaybeObservable, WORKBENCH_ELEMENT, WorkbenchElement} from '@scion/workbench-client';
 import {finalize, map, switchMap, tap} from 'rxjs/operators';
 import {parseMenuLocation} from './workbench-menu-location-parser';
+import {translate} from './workbench-menu-translate.util';
 
 export class ɵWorkbenchMenuService implements WorkbenchMenuService {
 
@@ -95,29 +94,35 @@ export class ɵWorkbenchMenuService implements WorkbenchMenuService {
       options.anchor.stopPropagation();
     }
 
-    const menu$: Observable<`menu:${string}` | WorkbenchMenuItemTransferableLike[]> = Array.isArray(menuLike) ? WorkbenchMenuItems.toTransferable$(menuLike) : of(menuLike);
+    const filter = coerceFilterDescriptor(options.filter);
+    const menu = new WorkbenchMenu({
+      id: UUID.randomUUID(),
+      name: Array.isArray(menuLike) ? undefined : menuLike,
+      children: Array.isArray(menuLike) ? menuLike : [],
+      cssClass: options.cssClass,
+      menu: {
+        minWidth: options.size?.minWidth,
+        maxWidth: options.size?.maxWidth,
+        maxHeight: options.size?.maxHeight,
+        filter: filter && {
+          placeholder: translate(filter.placeholder),
+          notFoundText: translate(filter.notFoundText),
+        },
+      },
+    });
 
-    const subscription = menu$
+    const subscription = menu.toTransferable$()
       .pipe(
-        switchMap(menu => this._messageClient.request$<void>(`workbench/menu/open`, {
+        map((menu: WorkbenchMenuTransferable): ɵWorkbenchMenuOpenCommand => ({
           menu: menu,
-          options: prune({
-            anchor: coerceAnchor(options.anchor),
-            align: options.align,
-            size: {
-              width: options.size?.width,
-              minWidth: options.size?.minWidth,
-              maxWidth: options.size?.maxWidth,
-            },
-            filter: coerceFilter(options.filter),
-            focus: options.focus,
-            cssClass: options.cssClass,
-            metadata: options.metadata,
-          }),
-          context: new Map([...createEnvironmentContext(), ...options.context ?? new Map()]),
+          anchor: coerceAnchor(options.anchor),
+          align: options.align,
+          focus: options.focus,
           workbenchElementId: Beans.get<WorkbenchElement>(WORKBENCH_ELEMENT).id,
-        } satisfies ɵWorkbenchMenuOpenCommand)
-          .pipe(tap({complete: () => void subscription.unsubscribe()}))), // cancel subscription when closing the menu, i.e., the request terminates.
+          context: new Map([...createEnvironmentContext(), ...options.context ?? new Map()]),
+          metadata: options.metadata,
+        })),
+        switchMap(command => Beans.get(MessageClient).request$<void>('workbench/menu/open', command).pipe(tap({complete: () => void subscription.unsubscribe()}))), // cancel subscription when closing the menu.
       )
       .subscribe();
 
@@ -165,9 +170,9 @@ function createEnvironmentContext(): Map<string, unknown> {
   return new Map();
 }
 
-function coerceAnchor(anchor: HTMLElement | WorkbenchMenuOrigin | MouseEvent): ɵWorkbenchMenuOpenCommand['options']['anchor'] {
+function coerceAnchor(anchor: HTMLElement | WorkbenchMenuOrigin | MouseEvent): ɵWorkbenchMenuOpenCommand['anchor'] {
   if (anchor instanceof HTMLElement) {
-    const {x, y, width, height} = coerceElement(anchor).getBoundingClientRect();
+    const {x, y, width, height} = anchor.getBoundingClientRect();
     return {x, y, width, height};
   }
   else if (anchor instanceof MouseEvent) {
@@ -178,15 +183,12 @@ function coerceAnchor(anchor: HTMLElement | WorkbenchMenuOrigin | MouseEvent): �
   }
 }
 
-function coerceFilter(filter: SciMenuOptions['filter'] | undefined): ɵWorkbenchMenuOpenCommand['options']['filter'] | undefined {
-  if (filter === undefined) {
-    return undefined;
+function coerceFilterDescriptor(filter: WorkbenchMenuOptions['filter'] | undefined): {placeholder?: MaybeObservable<string>; notFoundText?: MaybeObservable<string>} | undefined {
+  if (typeof filter === 'object') {
+    return {
+      placeholder: filter.placeholder,
+      notFoundText: filter.notFoundText,
+    };
   }
-  if (typeof filter === 'boolean') {
-    return filter;
-  }
-  return {
-    placeholder: filter.placeholder,
-    notFoundText: filter.notFoundText,
-  };
+  return filter === true ? {} : undefined;
 }

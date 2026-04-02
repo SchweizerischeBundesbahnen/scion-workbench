@@ -12,7 +12,7 @@ import {NotificationPO} from '../../notification.po';
 import {coerceArray, DomRect, fromRect} from '../../helper/testing.util';
 import {Locator} from '@playwright/test';
 import {WorkbenchNotificationPagePO} from './workbench-notification-page.po';
-import {Translatable} from '@scion/workbench';
+import {Translatable} from '@scion/sci-components/text';
 import {ActivatedMicrofrontendPO} from './activated-microfrontend.po';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 

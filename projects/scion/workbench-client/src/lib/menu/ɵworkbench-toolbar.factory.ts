@@ -7,7 +7,12 @@ import {isObservable, Subject} from 'rxjs';
 import {UUID} from '@scion/toolkit/uuid';
 import {ɵWorkbenchMenuFactory} from './ɵworkbench-menu.factory';
 import {DestroyRef} from '../common/destroy-ref';
+import {Translatable} from '../text/workbench-text-provider.model';
+import {translate} from './workbench-menu-translate.util';
 
+/**
+ * Translation note: Texts are translated when added (not lazily using remote translatable) to avoid flickering when opening menus.
+ */
 export class ɵWorkbenchToolbarFactory implements WorkbenchToolbarFactory {
 
   private readonly _destroyRef = new DestroyRef();
@@ -24,12 +29,12 @@ export class ɵWorkbenchToolbarFactory implements WorkbenchToolbarFactory {
     this.menuItems.push(new WorkbenchMenuItem({
       id: UUID.randomUUID(),
       name: descriptor.name,
-      label: descriptor.label,
+      label: translate(descriptor.label),
       icon: descriptor.icon,
       checked: descriptor.checked,
-      tooltip: descriptor.tooltip,
+      tooltip: translate(descriptor.tooltip),
       accelerator: descriptor.accelerator,
-      disabled: descriptor.disabled ?? false,
+      disabled: descriptor.disabled,
       actions: [],
       cssClass: Arrays.coerce(descriptor.cssClass),
       onSelect: async () => {
@@ -46,6 +51,7 @@ export class ɵWorkbenchToolbarFactory implements WorkbenchToolbarFactory {
   public addMenu(descriptor: WorkbenchToolbarMenuDescriptor, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this;
   public addMenu(iconOrDescriptor: MaybeObservable<string> | WorkbenchToolbarMenuDescriptor, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this {
     const descriptor = coerceMenuDescriptor(iconOrDescriptor);
+    const filter = coerceFilterDescriptor(descriptor);
 
     // Construct menu.
     const menuFactory = new ɵWorkbenchMenuFactory();
@@ -55,10 +61,10 @@ export class ɵWorkbenchToolbarFactory implements WorkbenchToolbarFactory {
     this.menuItems.push(new WorkbenchMenu({
       id: UUID.randomUUID(),
       name: descriptor.name,
-      label: descriptor.label,
+      label: translate(descriptor.label),
       icon: descriptor.icon,
-      tooltip: descriptor.tooltip,
-      disabled: descriptor.disabled ?? false,
+      tooltip: translate(descriptor.tooltip),
+      disabled: descriptor.disabled,
       visualMenuHint: descriptor.visualMenuHint ?? true,
       cssClass: Arrays.coerce(descriptor.cssClass),
       children: menuFactory.menuItems,
@@ -67,7 +73,10 @@ export class ɵWorkbenchToolbarFactory implements WorkbenchToolbarFactory {
         minWidth: descriptor.menu?.minWidth,
         maxWidth: descriptor.menu?.maxWidth,
         maxHeight: descriptor.menu?.maxHeight,
-        filter: descriptor.menu?.filter,
+        filter: filter && {
+          placeholder: translate(filter.placeholder),
+          notFoundText: translate(filter.notFoundText),
+        },
       },
     }));
 
@@ -88,7 +97,7 @@ export class ɵWorkbenchToolbarFactory implements WorkbenchToolbarFactory {
     this.menuItems.push(new WorkbenchMenuGroup({
       id: UUID.randomUUID(),
       name: descriptor.name,
-      disabled: descriptor.disabled ?? false,
+      disabled: descriptor.disabled,
       children: groupFactory.menuItems,
       cssClass: Arrays.coerce(descriptor.cssClass),
     }));
@@ -130,4 +139,16 @@ function coerceGroupDescriptor(factoryOrDescriptor: ((group: WorkbenchToolbarGro
     return [{}, factoryOrDescriptor];
   }
   return [factoryOrDescriptor, factoryIfDescriptor];
+}
+
+function coerceFilterDescriptor(menuDescriptor: WorkbenchToolbarMenuDescriptor): {placeholder?: MaybeObservable<Translatable>; notFoundText?: MaybeObservable<Translatable>} | undefined {
+  const filter = menuDescriptor.menu?.filter;
+
+  if (typeof filter === 'object') {
+    return {
+      placeholder: filter.placeholder,
+      notFoundText: filter.notFoundText,
+    };
+  }
+  return filter === true ? {} : undefined;
 }

@@ -31,7 +31,7 @@ import {Disposable} from '../common/disposable';
 import {Blockable} from '../glass-pane/blockable';
 import {Blocking} from '../glass-pane/blocking';
 import {boundingClientRect} from '@scion/components/dimension';
-import {Translatable} from '../text/workbench-text-provider.model';
+import {Translatable} from '@scion/sci-components/text';
 import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
 import {DialogId} from '../workbench.identifiers';
 import {WorkbenchInvocationContext} from '../invocation-context/invocation-context';

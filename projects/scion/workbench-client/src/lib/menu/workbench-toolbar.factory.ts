@@ -8,8 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {MaybeObservable} from '../common/utility-types';
+import {MaybeObservable, RequireOne} from '../common/utility-types';
 import {WorkbenchMenuFactory} from './workbench-menu.factory';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 export interface WorkbenchToolbarFactory {
 
@@ -44,10 +45,10 @@ export type WorkbenchToolbarGroupFactory = WorkbenchToolbarFactory;
 
 export interface WorkbenchToolbarItemDescriptor {
   name?: `menuitem:${string}`;
-  label?: MaybeObservable<string>;
+  label?: MaybeObservable<Translatable>;
   icon: MaybeObservable<string>;
   checked?: MaybeObservable<boolean>;
-  tooltip?: MaybeObservable<string>;
+  tooltip?: MaybeObservable<Translatable>;
   accelerator?: string[];
   disabled?: MaybeObservable<boolean>;
   cssClass?: string | string[];
@@ -56,9 +57,9 @@ export interface WorkbenchToolbarItemDescriptor {
 
 export interface WorkbenchToolbarMenuDescriptor {
   name?: `menu:${string}`;
-  label?: MaybeObservable<string>;
+  label?: MaybeObservable<Translatable>;
   icon?: MaybeObservable<string>;
-  tooltip?: MaybeObservable<string>;
+  tooltip?: MaybeObservable<Translatable>;
   disabled?: MaybeObservable<boolean>;
   /**
    * Controls the display of a visual marker for menu dropdown. Defaults to `true`.
@@ -69,7 +70,7 @@ export interface WorkbenchToolbarMenuDescriptor {
     minWidth?: string;
     maxWidth?: string;
     maxHeight?: string;
-    filter?: boolean | {placeholder?: string; notFoundText?: string};
+    filter?: boolean | RequireOne<{placeholder?: MaybeObservable<Translatable>; notFoundText?: MaybeObservable<Translatable>}>;
   };
   cssClass?: string | string[];
 }

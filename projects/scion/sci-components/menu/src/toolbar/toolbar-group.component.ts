@@ -2,6 +2,8 @@ import {ChangeDetectionStrategy, Component, effect, inject, Injector, input, lin
 import {NgComponentOutlet} from '@angular/common';
 import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model';
 import {ɵSciMenuService} from '../ɵmenu.service';
+import {MaybeSignal, RequireOne} from '@scion/sci-components/common';
+import {Translatable} from '@scion/sci-components/text';
 
 @Component({
   selector: 'sci-toolbar-group',
@@ -44,7 +46,7 @@ export class SciToolGroupComponent {
             anchor: activeSubMenuItem.element,
             viewContainerRef,
             cssClass: activeSubMenuItem.menu.cssClass,
-            filter: activeSubMenuItem.menu.menu.filter,
+            filter: activeSubMenuItem.menu.menu.filter as RequireOne<{placeholder?: MaybeSignal<Translatable>; notFoundText?: MaybeSignal<Translatable>}> | boolean | undefined,
             size: {
               width: activeSubMenuItem.menu.menu.width,
               minWidth: activeSubMenuItem.menu.menu.minWidth,

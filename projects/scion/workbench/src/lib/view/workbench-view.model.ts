@@ -14,7 +14,7 @@ import {WorkbenchPart} from '../part/workbench-part.model';
 import {NavigationData, NavigationState} from '../routing/routing.model';
 import {Signal} from '@angular/core';
 import {ViewId} from '../workbench.identifiers';
-import {Translatable} from '../text/workbench-text-provider.model';
+import {Translatable} from '@scion/sci-components/text';
 
 /**
  * A view is a visual workbench element for displaying content stacked or side-by-side in the workbench layout.

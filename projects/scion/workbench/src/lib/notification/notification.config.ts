@@ -10,7 +10,7 @@
 
 import {Injector, ViewContainerRef} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
-import {Translatable} from '../text/workbench-text-provider.model';
+import {Translatable} from '@scion/sci-components/text';
 
 /**
  * Controls the appearance and behavior of a notification.

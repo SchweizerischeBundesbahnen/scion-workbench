@@ -10,15 +10,16 @@
 
 import {ComponentType} from '@angular/cdk/portal';
 import {SciToolbarFactory} from '../toolbar/toolbar.factory';
-import {MaybeSignal} from '../common/utility-types';
+import {MaybeSignal, RequireOne} from '@scion/sci-components/common';
+import {Translatable} from '@scion/sci-components/text';
 
 export interface SciMenuFactory {
   // Describe that onSelect can call `inject` to get any required dependencies.
-  addMenuItem(label: MaybeSignal<string>, onSelect: () => boolean | void | Promise<boolean | void>): this;
+  addMenuItem(label: MaybeSignal<Translatable>, onSelect: () => boolean | void | Promise<boolean | void>): this;
 
   addMenuItem(descriptor: SciMenuItemDescriptor): this;
 
-  addMenu(label: MaybeSignal<string>, menuFactoryFn: (menu: SciMenuFactory) => void): this;
+  addMenu(label: MaybeSignal<Translatable>, menuFactoryFn: (menu: SciMenuFactory) => void): this;
 
   addMenu(descriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this;
 
@@ -31,10 +32,10 @@ export type SciMenuGroupFactory = SciMenuFactory;
 
 export interface SciMenuItemDescriptor {
   name?: `menuitem:${string}`;
-  label: MaybeSignal<string> | ComponentType<unknown>;
+  label: MaybeSignal<Translatable> | ComponentType<unknown>;
   icon?: MaybeSignal<string>;
   checked?: MaybeSignal<boolean>;
-  tooltip?: MaybeSignal<string>;
+  tooltip?: MaybeSignal<Translatable>;
   accelerator?: string[];
   disabled?: MaybeSignal<boolean>;
   actions?: (actions: SciToolbarFactory) => void;
@@ -45,23 +46,23 @@ export interface SciMenuItemDescriptor {
 
 export interface SciMenuDescriptor {
   name?: `menu:${string}`;
-  label: MaybeSignal<string> | ComponentType<unknown>;
+  label: MaybeSignal<Translatable> | ComponentType<unknown>;
   icon?: MaybeSignal<string>;
-  tooltip?: MaybeSignal<string>;
+  tooltip?: MaybeSignal<Translatable>;
   disabled?: MaybeSignal<boolean>;
   menu?: {
     width?: string;
     minWidth?: string;
     maxWidth?: string;
     maxHeight?: string;
-    filter?: boolean | {placeholder?: string; notFoundText?: string};
+    filter?: boolean | RequireOne<{placeholder?: MaybeSignal<Translatable>; notFoundText?: MaybeSignal<Translatable>}>;
   };
   cssClass?: string | string[];
 }
 
 export interface SciMenuGroupDescriptor {
   name?: `group:${string}`;
-  label?: MaybeSignal<string>;
+  label?: MaybeSignal<Translatable>;
   collapsible?: boolean | {collapsed: boolean};
   disabled?: MaybeSignal<boolean>;
   cssClass?: string | string[];

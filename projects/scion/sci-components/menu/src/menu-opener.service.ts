@@ -18,6 +18,8 @@ import {UUID} from '@scion/toolkit/uuid';
 import {NULL_MENU_CONTRIBUTIONS} from './menu-contribution.model';
 import {createDestroyableInjector} from './common/injector.util';
 import {ɵSciMenuService} from '@scion/sci-components/menu';
+import {coerceSignal} from '@scion/sci-components/common';
+import {Translatable} from '@scion/sci-components/text';
 
 @Injectable({providedIn: 'root'})
 export class SciMenuOpener {
@@ -59,7 +61,7 @@ export class SciMenuOpener {
     const bindings: Binding[] = [
       inputBinding('type', signal('menu')),
       inputBinding('menuItems', menuItems),
-      inputBinding('filter', signal(options.filter)),
+      inputBinding('filter', signal(coerceFilterDescriptor(options.filter))),
       inputBinding('sizeInput', signal(options.size)),
       inputBinding('anchorWidth', computed(() => anchorSize().offsetWidth)),
       inputBinding('cssClass', signal(options.cssClass)),
@@ -235,4 +237,14 @@ function setStyles(element: HTMLElement, styles: {[style: string]: string | null
       element.style.setProperty(name, value);
     }
   });
+}
+
+function coerceFilterDescriptor(filter: SciMenuOptions['filter'] | undefined): {placeholder?: Signal<Translatable>; notFoundText?: Signal<Translatable>} | undefined {
+  if (typeof filter === 'object') {
+    return {
+      placeholder: coerceSignal(filter.placeholder),
+      notFoundText: coerceSignal(filter.notFoundText),
+    };
+  }
+  return filter === true ? {} : undefined;
 }

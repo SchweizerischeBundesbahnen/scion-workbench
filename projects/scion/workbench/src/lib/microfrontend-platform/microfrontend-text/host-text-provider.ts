@@ -8,41 +8,52 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {createEnvironmentInjector, EnvironmentInjector, EnvironmentProviders, inject, Injector, makeEnvironmentProviders} from '@angular/core';
-import {map} from 'rxjs';
-import {provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
-import {WorkbenchClient} from '@scion/workbench-client';
-import {toObservable} from '@angular/core/rxjs-interop';
-import {text} from '../../text/text';
-import {finalize} from 'rxjs/operators';
+import {DestroyRef, EnvironmentProviders, inject, Injector, makeEnvironmentProviders} from '@angular/core';
+import {map, Observable} from 'rxjs';
+import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
+import {WorkbenchTextProviderFn, ɵWorkbenchTextProviderCapabilityInstaller, ɵWORKBNCH_CLIENT_TEXT_PROVIDER} from '@scion/workbench-client';
+import {text} from '@scion/sci-components/text';
+import {Beans} from '@scion/toolkit/bean-manager';
+import {createDestroyableInjector} from '../../common/injector.util';
+import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
+
+/**
+ * Provides texts of the host app to micro apps.
+ */
+function hostTextProvider(): WorkbenchTextProviderFn {
+  const rootInjector = inject(Injector);
+
+  return (key: string, params: {[name: string]: string}): MaybeObservable<string | undefined> => {
+    // Delegate to text provider registered in @scion/components.
+    // Use a wrapper observable to bind `text()` to the lifecycle of the subscription.
+    return new Observable(observer => {
+      const injector = createDestroyableInjector({parent: rootInjector});
+
+      toObservable(text(`%${key}`, {params, injector}), {injector})
+        .pipe(
+          map(text => text !== '' && text !== key ? text : undefined), // emit `undefined` if not found the text
+          takeUntilDestroyed(injector.get(DestroyRef)),
+        )
+        .subscribe(observer);
+
+      return () => injector.destroy();
+    });
+  };
+}
 
 /**
  * Registers a text provider for micro apps to request texts from the host app.
  */
 export function provideHostTextProvider(): EnvironmentProviders {
   return makeEnvironmentProviders([
-    provideMicrofrontendPlatformInitializer(() => {
-      const injector = inject(Injector);
-
-      WorkbenchClient.registerTextProvider((key, params) => {
-        const translatable = Object.entries(params).reduce((translatable, [name, value]) => `${translatable};${name}=${encodeSemicolons(value)}`, `%${key}`);
-        const environmentInjector = createEnvironmentInjector([], injector.get(EnvironmentInjector));
-
-        return toObservable(text(translatable, {injector: environmentInjector}), {injector: environmentInjector})
-          .pipe(
-            map(text => text !== '' && text !== key ? text : undefined), // emit `undefined` if not found the text
-            finalize(() => environmentInjector.destroy()), // free resources when the communication terminates
-          );
-      });
-    }),
+    provideMicrofrontendPlatformInitializer(onPreStartup, {phase: MicrofrontendPlatformStartupPhase.PreStartup}),
   ]);
+
+  function onPreStartup(): void {
+    Beans.register(ɵWORKBNCH_CLIENT_TEXT_PROVIDER, {useValue: hostTextProvider()});
+    Beans.registerInitializer({useClass: ɵWorkbenchTextProviderCapabilityInstaller});
+  }
 }
 
-/**
- * Encodes semicolons (`;`) as `\\;` to prevent interpretation as interpolation parameter separators.
- *
- * @see Translatable
- */
-function encodeSemicolons(value: string): string {
-  return value.replaceAll(';', '\\;');
-}
+// TODO [menu] Move to @scion/toolkit
+type MaybeObservable<T> = T | Observable<T>;

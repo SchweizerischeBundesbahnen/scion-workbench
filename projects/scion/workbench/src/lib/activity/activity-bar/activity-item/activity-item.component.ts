@@ -12,7 +12,7 @@ import {Component, computed, inject, input, Signal, untracked} from '@angular/co
 import {MActivity} from '../../workbench-activity.model';
 import {ɵWorkbenchRouter} from '../../../routing/ɵworkbench-router.service';
 import {IconComponent} from '../../../icon/icon.component';
-import {text} from '../../../text/text';
+import {text} from '@scion/sci-components/text';
 import {WorkbenchLayoutService} from '../../../layout/workbench-layout.service';
 import {isPartId, isViewId} from '../../../workbench.identifiers';
 import {WorkbenchFocusMonitor} from '../../../focus/workbench-focus-tracker.service';

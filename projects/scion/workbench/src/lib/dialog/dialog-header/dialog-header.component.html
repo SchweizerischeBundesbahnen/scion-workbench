@@ -1,12 +1,12 @@
 @if (dialog.title(); as title) {
   <div class="title e2e-title">
-    <span>{{(title | wbText)()}}</span>
+    <span>{{(title | sciText)()}}</span>
   </div>
 }
 
 @if (dialog.closable()) {
   <button tabindex="-1" class="close e2e-close"
-          [title]="('%workbench.close.tooltip' | wbText)()"
+          [title]="('%scion.workbench.close.tooltip' | sciText)()"
           (mousedown)="onCloseMouseDown($event)"
           (click)="onCloseClick()">
     <wb-icon icon="workbench.close"/>

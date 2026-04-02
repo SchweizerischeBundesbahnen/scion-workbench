@@ -1,12 +1,12 @@
 <!-- Title -->
 @if (notification.title(); as title) {
-  <header class="e2e-title">{{(title | wbText)()}}</header>
+  <header class="e2e-title">{{(title | sciText)()}}</header>
 }
 
 <!-- Message -->
 <div class="slot e2e-slot" [class.text]="!!notification.slot.text?.length">
   @if (notification.slot.text?.length) {
-    {{(notification.slot.text | wbText)()}}
+    {{(notification.slot.text | sciText)()}}
   } @else if (notification.slot.component) {
     <sci-viewport class="e2e-notification-slot">
       <ng-container *ngComponentOutlet="notification.slot.component; inputs: notification.inputs | wbRemoveLegacyInput;"/>
@@ -21,7 +21,7 @@
   <sci-toolbar name="toolbar:workbench.notification"/>
 
   <button (click)="onClose()"
-          [title]="('%workbench.close.tooltip' | wbText)()"
+          [title]="('%scion.workbench.close.tooltip' | sciText)()"
           class="close e2e-close">
     <wb-icon icon="workbench.close"/>
   </button>

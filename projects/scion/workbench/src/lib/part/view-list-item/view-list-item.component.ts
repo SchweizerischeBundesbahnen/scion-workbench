@@ -16,7 +16,7 @@ import {WorkbenchConfig} from '../../workbench-config';
 import {ViewId} from '../../workbench.identifiers';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workbench.constants';
-import {TextPipe} from '../../text/text.pipe';
+import {SciTextPipe} from '@scion/sci-components/text';
 import {IconComponent} from '../../icon/icon.component';
 
 @Component({
@@ -26,7 +26,7 @@ import {IconComponent} from '../../icon/icon.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CdkPortalOutlet,
-    TextPipe,
+    SciTextPipe,
     IconComponent,
   ],
   host: {

@@ -4,7 +4,7 @@
 
 @if (view().closable()) {
   <button (click)="onClose()"
-          [title]="('%workbench.close.tooltip' | wbText)()"
+          [title]="('%scion.workbench.close.tooltip' | sciText)()"
           [disabled]="!view().isClosable()"
           class="close e2e-close">
     <wb-icon icon="workbench.close"/>

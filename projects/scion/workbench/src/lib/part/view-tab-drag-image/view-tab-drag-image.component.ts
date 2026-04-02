@@ -19,7 +19,7 @@ import {subscribeIn} from '@scion/toolkit/operators';
 import {distinctUntilChanged, map} from 'rxjs/operators';
 import {WorkbenchPartRegistry} from '../workbench-part.registry';
 import {IconComponent} from '../../icon/icon.component';
-import {TextPipe} from '../../text/text.pipe';
+import {SciTextPipe} from '@scion/sci-components/text';
 import {PartId} from '../../workbench.identifiers';
 
 /**
@@ -34,7 +34,7 @@ import {PartId} from '../../workbench.identifiers';
   ],
   imports: [
     CdkPortalOutlet,
-    TextPipe,
+    SciTextPipe,
     IconComponent,
   ],
   host: {

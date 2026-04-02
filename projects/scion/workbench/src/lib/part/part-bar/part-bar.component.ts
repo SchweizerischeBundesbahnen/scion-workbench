@@ -16,10 +16,9 @@ import {ViewTabBarComponent} from '../view-tab-bar/view-tab-bar.component';
 import {dimension} from '@scion/components/dimension';
 import {EMPTY, fromEvent, mergeMap, of, pairwise, withLatestFrom} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
-import {TextPipe} from '../../text/text.pipe';
+import {SciTextPipe, text} from '@scion/sci-components/text';
 import {IconComponent} from '../../icon/icon.component';
 import {contributeMenu, SciToolbarComponent, SciToolbarFactory} from '@scion/sci-components/menu';
-import {text} from '../../text/text';
 
 /**
  * DI token to inject the HTML element of the {@link PartBarComponent}.
@@ -33,7 +32,7 @@ export const PART_BAR_ELEMENT = new InjectionToken<HTMLElement>('PART_BAR_ELEMEN
   imports: [
     ViewTabBarComponent,
     ViewListButtonComponent,
-    TextPipe,
+    SciTextPipe,
     IconComponent,
     SciToolbarComponent,
   ],
@@ -119,7 +118,7 @@ export class PartBarComponent {
     const viewsInsideTabbar = this.part.views().filter(view => view.scrolledIntoView());
     const viewsOutsideTabbar = this.part.views().filter(view => !view.scrolledIntoView());
 
-    toolbar.addMenu({icon: 'arrow_downward', tooltip: untracked(() => text('%workbench.show_open_tabs.tooltip')), menu: {filter: true, maxHeight: '300px'}}, menu => {
+    toolbar.addMenu({icon: 'arrow_downward', tooltip: '%scion.workbench.show_open_tabs.tooltip', menu: {filter: {notFoundText: '%scion.workbench.no_views.message'}, maxHeight: '300px'}}, menu => {
       // Add group for views that are scrolled out the tab bar.
       menu.addGroup(group => {
         for (const view of viewsOutsideTabbar) {

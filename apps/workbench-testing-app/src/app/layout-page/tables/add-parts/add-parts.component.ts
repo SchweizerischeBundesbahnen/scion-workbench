@@ -13,10 +13,11 @@ import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDA
 import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
-import {MAIN_AREA, Translatable} from '@scion/workbench';
+import {MAIN_AREA} from '@scion/workbench';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {UUID} from '@scion/toolkit/uuid';
 import {MultiValueInputComponent} from 'workbench-testing-app-common';
+import {Translatable} from '@scion/sci-components/text';
 
 @Component({
   selector: 'app-add-parts',

@@ -14,9 +14,10 @@ import {PartPO} from './part.po';
 import {ViewTabContextMenuPO} from './view-tab-context-menu.po';
 import {ViewMoveDialogTestPagePO} from './workbench/page-object/test-pages/view-move-dialog-test-page.po';
 import {AppPO} from './app.po';
-import {PartId, Translatable, ViewId} from '@scion/workbench';
+import {PartId, ViewId} from '@scion/workbench';
 import {ViewInfo, ViewInfoDialogPO} from './workbench/page-object/view-info-dialog.po';
 import {ViewDrageHandlePO} from './view-drag-handle.po';
+import {Translatable} from '@scion/sci-components/text';
 
 /**
  * Handle for interacting with a workbench view tab.

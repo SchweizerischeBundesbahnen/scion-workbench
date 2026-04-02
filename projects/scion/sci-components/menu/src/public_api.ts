@@ -25,5 +25,5 @@ export {SciToolbarComponent} from './toolbar/toolbar.component';
 export {type SciMenuItem, type SciMenu, type SciMenuGroup, type SciMenuItemLike} from './menu.model';
 export {SciMenuContextProvider} from './menu-context-provider';
 export {SciMenuAcceleratorTargetProvider} from './menu-accelerator-target-provider';
-export {provideSciMenuService} from './ɵmenu.service';
+export {provideMenuService} from './ɵmenu.service';
 export {installMenuAccelerators, type SciMenuAcceleratorOptions} from './menu-accelerators';

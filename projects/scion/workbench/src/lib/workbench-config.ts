@@ -15,7 +15,7 @@ import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
 import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform/microfrontend-platform-config-loader';
 import {WorkbenchPerspectives} from './perspective/workbench-perspective.model';
 import {WorkbenchStorage} from './storage/workbench-storage';
-import {WorkbenchTextProviderFn} from './text/workbench-text-provider.model';
+import {SciTextProviderFn} from '@scion/sci-components/text';
 import {WorkbenchIconProviderFn} from './icon/workbench-icon-provider.model';
 import {WorkbenchLayoutFn} from './layout/workbench-layout';
 
@@ -47,40 +47,41 @@ export abstract class WorkbenchConfig {
    * Texts starting with the percent symbol (`%`) are passed to the text provider for translation, with the percent symbol omitted.
    *
    * The SCION Workbench uses the following translation keys for built-in texts:
-   * - workbench.clear.tooltip
-   * - workbench.close.action
-   * - workbench.close_all_tabs.action
-   * - workbench.close_other_tabs.action
-   * - workbench.close_tab.action
-   * - workbench.close_tab.tooltip
-   * - workbench.close_tabs_to_the_left.action
-   * - workbench.close_tabs_to_the_right.action
-   * - workbench.close.tooltip
-   * - workbench.dev_mode_only_hint.tooltip
-   * - workbench.minimize.tooltip
-   * - workbench.move_tab_down.action
-   * - workbench.move_tab_to_new_window.action
-   * - workbench.move_tab_to_the_left.action
-   * - workbench.move_tab_to_the_right.action
-   * - workbench.move_tab_up.action
-   * - workbench.null_content.message
-   * - workbench.null_view_developer_hint.message
-   * - workbench.ok.action
-   * - workbench.page_not_found.message
-   * - workbench.page_not_found.title
-   * - workbench.page_not_found_developer_hint.message
-   * - workbench.page_not_found_part.message
-   * - workbench.page_not_found_view.message
-   * - workbench.reset_perspective.action
-   * - workbench.show_open_tabs.tooltip
+   * - scion.workbench.clear.tooltip
+   * - scion.workbench.close.action
+   * - scion.workbench.close_all_tabs.action
+   * - scion.workbench.close_other_tabs.action
+   * - scion.workbench.close_tab.action
+   * - scion.workbench.close_tab.tooltip
+   * - scion.workbench.close_tabs_to_the_left.action
+   * - scion.workbench.close_tabs_to_the_right.action
+   * - scion.workbench.close.tooltip
+   * - scion.workbench.dev_mode_only_hint.tooltip
+   * - scion.workbench.minimize.tooltip
+   * - scion.workbench.move_tab_down.action
+   * - scion.workbench.move_tab_to_new_window.action
+   * - scion.workbench.move_tab_to_the_left.action
+   * - scion.workbench.move_tab_to_the_right.action
+   * - scion.workbench.move_tab_up.action
+   * - scion.workbench.no_views.message
+   * - scion.workbench.null_content.message
+   * - scion.workbench.null_view_developer_hint.message
+   * - scion.workbench.ok.action
+   * - scion.workbench.page_not_found.message
+   * - scion.workbench.page_not_found.title
+   * - scion.workbench.page_not_found_developer_hint.message
+   * - scion.workbench.page_not_found_part.message
+   * - scion.workbench.page_not_found_view.message
+   * - scion.workbench.reset_perspective.action
+   * - scion.workbench.show_open_tabs.tooltip
    *
    * The function:
    * - Can call `inject` to get any required dependencies.
    * - Can call `toSignal` to convert an Observable to a Signal.
    *
-   * @see WorkbenchTextProviderFn
+   * @see SciTextProviderFn
    */
-  public abstract textProvider?: WorkbenchTextProviderFn;
+  public abstract textProvider?: SciTextProviderFn;
 
   /**
    * Provides icons to the SCION Workbench.
@@ -210,7 +211,7 @@ export abstract class WorkbenchConfig {
  *
  * Each property represents a menu item, allowing customization of visibility, accelerators, and more.
  *
- * Texts can be changed or localized using a {@link WorkbenchTextProviderFn text provider} passed to {@link provideWorkbench} via the workbench config object.
+ * Texts can be changed or localized using a {@link SciTextProviderFn text provider} passed to {@link provideWorkbench} via the workbench config object.
  */
 export interface ViewMenuItemsConfig {
   /**
@@ -218,7 +219,7 @@ export interface ViewMenuItemsConfig {
    *
    * Set to `false` to exclude it.
    *
-   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * The menu item text can be changed or localized using a {@link SciTextProviderFn}.
    * Translation key: `workbench.close_tab.action`
    */
   close?: MenuItemConfig | false;
@@ -227,7 +228,7 @@ export interface ViewMenuItemsConfig {
    *
    * Set to `false` to exclude it.
    *
-   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * The menu item text can be changed or localized using a {@link SciTextProviderFn}.
    * Translation key: `workbench.close_other_tabs.action`
    */
   closeOthers?: MenuItemConfig | false;
@@ -236,7 +237,7 @@ export interface ViewMenuItemsConfig {
    *
    * Set to `false` to exclude it.
    *
-   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * The menu item text can be changed or localized using a {@link SciTextProviderFn}.
    * Translation key: `workbench.close_all_tabs.action`
    */
   closeAll?: MenuItemConfig | false;
@@ -245,7 +246,7 @@ export interface ViewMenuItemsConfig {
    *
    * Set to `false` to exclude it.
    *
-   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * The menu item text can be changed or localized using a {@link SciTextProviderFn}.
    * Translation key: `workbench.close_tabs_to_the_right.action`
    */
   closeToTheRight?: MenuItemConfig | false;
@@ -254,7 +255,7 @@ export interface ViewMenuItemsConfig {
    *
    * Set to `false` to exclude it.
    *
-   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * The menu item text can be changed or localized using a {@link SciTextProviderFn}.
    * Translation key: `workbench.close_tabs_to_the_left.action`
    */
   closeToTheLeft?: MenuItemConfig | false;
@@ -263,7 +264,7 @@ export interface ViewMenuItemsConfig {
    *
    * Set to `false` to exclude it.
    *
-   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * The menu item text can be changed or localized using a {@link SciTextProviderFn}.
    * Translation key: `workbench.move_tab_up.action`
    */
   moveUp?: MenuItemConfig | false;
@@ -272,7 +273,7 @@ export interface ViewMenuItemsConfig {
    *
    * Set to `false` to exclude it.
    *
-   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * The menu item text can be changed or localized using a {@link SciTextProviderFn}.
    * Translation key: `workbench.move_tab_to_the_right.action`
    */
   moveRight?: MenuItemConfig | false;
@@ -281,7 +282,7 @@ export interface ViewMenuItemsConfig {
    *
    * Set to `false` to exclude it.
    *
-   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * The menu item text can be changed or localized using a {@link SciTextProviderFn}.
    * Translation key: `workbenchworkbench.move_tab_down.action`
    */
   moveDown?: MenuItemConfig | false;
@@ -290,7 +291,7 @@ export interface ViewMenuItemsConfig {
    *
    * Set to `false` to exclude it.
    *
-   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * The menu item text can be changed or localized using a {@link SciTextProviderFn}.
    * Translation key: `workbench.move_tab_to_the_left.action`
    */
   moveLeft?: MenuItemConfig | false;
@@ -299,7 +300,7 @@ export interface ViewMenuItemsConfig {
    *
    * Set to `false` to exclude it.
    *
-   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * The menu item text can be changed or localized using a {@link SciTextProviderFn}.
    * Translation key: `workbench.move_tab_to_new_window.action`
    */
   moveToNewWindow?: MenuItemConfig | false;

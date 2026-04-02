@@ -10,7 +10,8 @@
 
 import {ComponentType} from '@angular/cdk/portal';
 import {SciMenuFactory} from '../menu/menu.factory';
-import {MaybeSignal} from '../common/utility-types';
+import {MaybeSignal, RequireOne} from '@scion/sci-components/common';
+import {Translatable} from '@scion/sci-components/text';
 
 export interface SciToolbarFactory {
 
@@ -32,10 +33,10 @@ export type SciToolbarGroupFactory = SciToolbarFactory;
 
 export interface SciToolbarItemDescriptor {
   name?: `menuitem:${string}`;
-  label?: MaybeSignal<string> | ComponentType<unknown>;
+  label?: MaybeSignal<Translatable> | ComponentType<unknown>;
   icon: MaybeSignal<string>;
   checked?: MaybeSignal<boolean>;
-  tooltip?: MaybeSignal<string>;
+  tooltip?: MaybeSignal<Translatable>;
   accelerator?: string[];
   disabled?: MaybeSignal<boolean>;
   cssClass?: string | string[];
@@ -44,9 +45,9 @@ export interface SciToolbarItemDescriptor {
 
 export interface SciToolbarMenuDescriptor {
   name?: `menu:${string}`;
-  label?: MaybeSignal<string> | ComponentType<unknown>;
+  label?: MaybeSignal<Translatable> | ComponentType<unknown>;
   icon?: MaybeSignal<string>;
-  tooltip?: MaybeSignal<string>;
+  tooltip?: MaybeSignal<Translatable>;
   disabled?: MaybeSignal<boolean>;
   /**
    * Controls the display of a visual marker for menu dropdown. Defaults to `true`.
@@ -57,7 +58,7 @@ export interface SciToolbarMenuDescriptor {
     minWidth?: string;
     maxWidth?: string;
     maxHeight?: string;
-    filter?: boolean | {placeholder?: string; notFoundText?: string};
+    filter?: boolean | RequireOne<{placeholder?: MaybeSignal<Translatable>; notFoundText?: MaybeSignal<Translatable>}>;
   };
   cssClass?: string | string[];
 }
