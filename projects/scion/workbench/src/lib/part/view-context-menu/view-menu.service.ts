@@ -30,6 +30,8 @@ import {text} from '@scion/sci-components/text';
 
 /**
  * Shows menu items of a {@link WorkbenchView} in a menu.
+ *
+ * TODO [menu] Consider moving menu contribution to another location.
  */
 @Injectable({providedIn: 'root'})
 export class ViewMenuService {

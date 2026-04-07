@@ -45,16 +45,18 @@ export class ɵSciMenuService implements SciMenuService {
    * - Must be called within an injection context, or an explicit {@link Injector} passed.
    * - Must be called in a non-reactive (non-tracking) context.
    *
-   * metadata: Arbitrary metadata to be associated with the operation.
+   * @docs-private Not public API. For internal use only.
    */
   public menuItems(location: MaybeSignal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: MaybeSignal<Map<string, unknown>>, options?: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuItemLike[]> {
     return this._menuRegistry.menuItems(coerceSignal(location), coerceSignal(context), options ?? {});
   }
 
+  /** @docs-private Not public API. For internal use only. */
   public menuContributions(location: MaybeSignal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: MaybeSignal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuContribution[]> {
     return this._menuRegistry.menuContributions(coerceSignal(location), coerceSignal(context), options ?? {});
   }
 
+  /** @docs-private Not public API. For internal use only. */
   public contributeMenu(location: SciMenuContributionLocationLike, factoryFn: SciMenuFactoryFnLike, options?: SciMenuContributionOptions): Disposable {
     return this._menuRegistry.contributeMenu(location, factoryFn, options ?? {});
   }

@@ -149,6 +149,7 @@ $icon-size: 18px;
     grid-template-columns: subgrid;
     align-items: center;
     padding: $padding_menu_item;
+    user-select: none;
   }
 
   > hr {

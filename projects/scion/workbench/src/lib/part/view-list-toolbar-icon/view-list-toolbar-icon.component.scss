@@ -1,17 +1,13 @@
-@use '../../common/workbench.mixin';
-
 :host {
-  @include workbench.icon-button-element-states() {
-    display: flex;
-    flex-direction: column;
-
-    &.menu-open {
-      background-color: var(--sci-workbench-button-background-color-hover);
-    }
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 14px;
+  gap: .125em;
 
   > wb-icon.menu-down {
     flex: none;
+    line-height: .75;
   }
 
   > span.count {

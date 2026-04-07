@@ -124,7 +124,7 @@ export abstract class WorkbenchConfig {
   /**
    * Specifies the component to display a view tab, enabling custom design or functionality.
    *
-   * The component can inject {@link WorkbenchView} and {@link VIEW_TAB_RENDERING_CONTEXT} to get a reference to the view and the rendering context.
+   * The component can inject {@link WorkbenchView} to get a reference to the view.
    */
   public abstract viewTabComponent?: ComponentType<unknown>;
 

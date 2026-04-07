@@ -132,6 +132,8 @@ export abstract class WorkbenchView {
 
   /**
    * Menu items associated with this view.
+   *
+   * TODO [menu] remove
    */
   public abstract readonly menuItems: Signal<WorkbenchMenuItem[]>;
 

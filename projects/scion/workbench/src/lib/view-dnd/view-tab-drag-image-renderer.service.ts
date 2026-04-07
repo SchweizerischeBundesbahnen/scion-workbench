@@ -19,7 +19,6 @@ import {ViewTabDragImageComponent} from '../part/view-tab-drag-image/view-tab-dr
 import {CanCloseFn, CanCloseRef, WorkbenchMenuItem} from '../workbench.model';
 import {ViewId} from '../workbench.identifiers';
 import {WorkbenchView, WorkbenchViewNavigation} from '../view/workbench-view.model';
-import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../workbench.constants';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {Disposable} from '../common/disposable';
 import {throwError} from '../common/throw-error.util';
@@ -143,7 +142,6 @@ export class ViewTabDragImageRenderer {
       parent: this._injector,
       providers: [
         {provide: WorkbenchView, useValue: new DragImageWorkbenchView(dragData)},
-        {provide: VIEW_TAB_RENDERING_CONTEXT, useValue: 'drag-image' satisfies ViewTabRenderingContext},
       ],
     })));
     // Detect for changes because constructed outside of Angular.

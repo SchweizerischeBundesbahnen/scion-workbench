@@ -36,12 +36,6 @@
 <!--  </div>-->
 <!--}-->
 
-
-<!-- View List Dropdown -->
-@if (part.views().length) {
-  <wb-view-list-button [title]="('%scion.workbench.show_open_tabs.tooltip' | sciText)()"/>
-}
-
 <!-- Minimize Button -->
 @if (part.canMinimize()) {
   <button (click)="onMinimize()" [title]="('%scion.workbench.minimize.tooltip' | sciText)()" class="minimize e2e-minimize">

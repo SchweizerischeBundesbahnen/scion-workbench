@@ -60,11 +60,6 @@
     flex: auto;
   }
 
-  > wb-view-list-button {
-    flex: none;
-    align-self: center;
-  }
-
   > button.minimize:is(button, #sci-reset) {
     @include workbench.icon-button-element-states() {
       flex: none;

@@ -17,20 +17,6 @@ import {Route} from '@angular/router';
 export const MAIN_AREA_LAYOUT_QUERY_PARAM = 'main_area';
 
 /**
- * Defines the context in which a viewtab is rendered.
- *
- * - `tab`: if rendered as view tab in the tabbar
- * - `list-item`:  if rendered as list item in the view list menu
- * - `drag-image`: if rendered as drag image while dragging a view tab
- */
-export type ViewTabRenderingContext = 'tab' | 'list-item' | 'drag-image';
-
-/**
- * DI token to inject the context in which the view tab is rendered.
- */
-export const VIEW_TAB_RENDERING_CONTEXT = new InjectionToken<ViewTabRenderingContext>('VIEW_TAB_RENDERING_CONTEXT');
-
-/**
  * Prefix used to identify an anonymous perspective that the workbench creates for views moved to a new window.
  */
 export const ANONYMOUS_PERSPECTIVE_ID_PREFIX = 'anonymous.';

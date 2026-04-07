@@ -13,10 +13,8 @@ import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {VIEW_DRAG_TRANSFER_TYPE, ViewDragService} from '../../view-dnd/view-drag.service';
 import {createElement} from '../../common/dom.util';
 import {CdkPortalOutlet, ComponentPortal} from '@angular/cdk/portal';
-import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workbench.constants';
 import {WorkbenchConfig} from '../../workbench-config';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
-import {ViewMenuService} from '../view-context-menu/view-menu.service';
 import {ViewId, WORKBENCH_ID} from '../../workbench.identifiers';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {boundingClientRect} from '@scion/components/dimension';
@@ -63,7 +61,6 @@ export class ViewTabComponent {
   private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _workbenchConfig = inject(WorkbenchConfig);
   private readonly _viewRegistry = inject(WorkbenchViewRegistry);
-  private readonly _viewMenuService = inject(ViewMenuService);
   private readonly _menuService = inject(SciMenuService);
   private readonly _layout = inject(WorkbenchLayoutService).layout;
   private readonly _injector = inject(Injector);
@@ -188,7 +185,6 @@ export class ViewTabComponent {
         parent: this._injector,
         providers: [
           {provide: WorkbenchView, useValue: this.view()},
-          {provide: VIEW_TAB_RENDERING_CONTEXT, useValue: 'tab' satisfies ViewTabRenderingContext},
         ],
       }));
     });
