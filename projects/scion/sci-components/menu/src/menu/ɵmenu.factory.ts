@@ -95,7 +95,7 @@ export class ɵSciMenuFactory implements SciMenuFactory {
       type: 'group',
       name: descriptor.name,
       label: translate(descriptor.label),
-      collapsible: coerceCollapsible(descriptor),
+      collapsible: coerceCollapsibleDescriptor(descriptor),
       disabled: coerceSignal(descriptor.disabled),
       children: groupFactory.menuItems,
       cssClass: Arrays.coerce(descriptor.cssClass),
@@ -103,19 +103,6 @@ export class ɵSciMenuFactory implements SciMenuFactory {
 
     return this;
   }
-}
-
-function coerceCollapsible(groupDescriptor: SciMenuGroupDescriptor): {collapsed: boolean} | false {
-  const collapsible = groupDescriptor.collapsible ?? false;
-  if (!collapsible) {
-    return false;
-  }
-
-  if (typeof groupDescriptor.collapsible === 'object') {
-    return groupDescriptor.collapsible;
-  }
-
-  return {collapsed: false};
 }
 
 function coerceMenuItemDescriptor(labelOrDescriptor: MaybeSignal<string> | SciMenuItemDescriptor, onSelect?: () => boolean | void | Promise<boolean | void>): SciMenuItemDescriptor {
@@ -163,4 +150,14 @@ function coerceFilterDescriptor(menuDescriptor: SciToolbarMenuDescriptor): {plac
     };
   }
   return filter === true ? {} : undefined;
+}
+
+function coerceCollapsibleDescriptor(groupDescriptor: SciMenuGroupDescriptor): {collapsed: boolean} | undefined {
+  const collapsible = groupDescriptor.collapsible;
+
+  if (typeof collapsible === 'object') {
+    return collapsible;
+  }
+
+  return collapsible === true ? {collapsed: false} : undefined;
 }

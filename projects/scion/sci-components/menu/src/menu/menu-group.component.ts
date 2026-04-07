@@ -25,7 +25,6 @@ export class MenuItemGroupComponent {
     // Run as effect (single-shot) to read input properties.
     effect(onCleanup => untracked(() => {
       const collapsible = this.group().collapsible;
-      const collapsed = collapsible ? collapsible.collapsed : false;
       const componentRef = createComponent(MenuComponent, {
         elementInjector,
         environmentInjector,
@@ -37,7 +36,7 @@ export class MenuItemGroupComponent {
           inputBinding('group', computed(() => ({
               label: this.group().label?.(),
               collapsible: !!collapsible,
-              collapsed,
+              collapsed: collapsible?.collapsed ?? false,
             })),
           ),
           inputBinding('glyphArea', this.glyphArea),

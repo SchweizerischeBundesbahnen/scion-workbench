@@ -282,7 +282,7 @@ export class WorkbenchMenuGroup {
     name?: `group:${string}`;
     label?: MaybeObservable<string>;
     disabled?: MaybeObservable<boolean>;
-    collapsible?: {collapsed: boolean} | false;
+    collapsible?: {collapsed: boolean};
     position?: WorkbenchMenuContributionPosition;
     children: WorkbenchMenuItemLike[];
     cssClass?: string[];
@@ -325,7 +325,7 @@ export class WorkbenchMenuGroupProxy {
   public readonly name?: `group:${string}`;
   public readonly label?: Observable<string>;
   public readonly disabled?: Observable<boolean>;
-  public readonly collapsible?: {collapsed: boolean} | false;
+  public readonly collapsible?: {collapsed: boolean};
   public readonly position?: WorkbenchMenuContributionPosition;
   public readonly children: WorkbenchMenuItemProxyLike[];
   public readonly cssClass?: string[];
@@ -356,7 +356,7 @@ export interface WorkbenchMenuGroupTransferable {
   type: 'group'
   name?: `group:${string}`;
   label?: string;
-  collapsible?: {collapsed: boolean} | false;
+  collapsible?: {collapsed: boolean};
   position?: WorkbenchMenuContributionPosition;
   disabled?: boolean;
   children: WorkbenchMenuItemTransferableLike[];

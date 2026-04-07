@@ -50,7 +50,7 @@ export interface SciMenuGroup {
   type: 'group'
   name?: `group:${string}`;
   label?: Signal<string>;
-  collapsible?: {collapsed: boolean} | false;
+  collapsible?: {collapsed: boolean};
   position?: SciMenuContributionPosition;
   disabled?: Signal<boolean>; // Consider renaming to enabled; https://www.electronjs.org/docs/latest/api/menu-item
   // visible: Signal<boolean>; // Consider providing visible

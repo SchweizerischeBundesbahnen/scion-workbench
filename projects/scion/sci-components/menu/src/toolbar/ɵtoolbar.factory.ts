@@ -121,7 +121,7 @@ function coerceGroupDescriptor(factoryOrDescriptor: ((group: SciToolbarGroupFact
   return [factoryOrDescriptor, factoryIfDescriptor];
 }
 
-function coerceLabelText(label: MaybeSignal<Translatable> | ComponentType<unknown> | undefined): MaybeSignal<string> | undefined {
+function coerceLabelText(label: MaybeSignal<Translatable> | ComponentType<unknown> | undefined): MaybeSignal<Translatable> | undefined {
   if (typeof label === 'string' || isSignal(label)) {
     return label;
   }

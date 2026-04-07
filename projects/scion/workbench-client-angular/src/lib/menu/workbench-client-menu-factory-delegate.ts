@@ -94,7 +94,7 @@ export class WorkbenchClientMenuFactoryDelegate implements SciMenuFactory {
     this._delegate.addGroup({
       name: descriptor.name,
       label: toLazyObservable(descriptor.label),
-      collapsible: coerceCollapsible(descriptor),
+      collapsible: descriptor.collapsible,
       disabled: toLazyObservable(descriptor.disabled),
       cssClass: descriptor.cssClass,
     }, (group: WorkbenchMenuGroupFactory): void => {
@@ -104,19 +104,6 @@ export class WorkbenchClientMenuFactoryDelegate implements SciMenuFactory {
 
     return this;
   }
-}
-
-function coerceCollapsible(groupDescriptor: SciMenuGroupDescriptor): {collapsed: boolean} | false {
-  const collapsible = groupDescriptor.collapsible ?? false;
-  if (!collapsible) {
-    return false;
-  }
-
-  if (typeof groupDescriptor.collapsible === 'object') {
-    return groupDescriptor.collapsible;
-  }
-
-  return {collapsed: false};
 }
 
 function coerceMenuItemDescriptor(labelOrDescriptor: MaybeSignal<string> | SciMenuItemDescriptor, onSelect?: () => boolean | void | Promise<boolean | void>): SciMenuItemDescriptor {

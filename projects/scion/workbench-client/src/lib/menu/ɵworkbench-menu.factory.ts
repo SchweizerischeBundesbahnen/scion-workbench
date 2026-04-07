@@ -99,7 +99,7 @@ export class ɵWorkbenchMenuFactory implements WorkbenchMenuFactory {
       id: UUID.randomUUID(),
       name: descriptor.name,
       label: translate(descriptor.label),
-      collapsible: coerceCollapsible(descriptor),
+      collapsible: coerceCollapsibleDescriptor(descriptor),
       disabled: descriptor.disabled,
       children: groupFactory.menuItems,
       cssClass: Arrays.coerce(descriptor.cssClass),
@@ -121,19 +121,6 @@ export class ɵWorkbenchMenuFactory implements WorkbenchMenuFactory {
   public destroy(): void {
     this._destroyRef.destroy();
   }
-}
-
-function coerceCollapsible(groupDescriptor: WorkbenchMenuGroupDescriptor): {collapsed: boolean} | false {
-  const collapsible = groupDescriptor.collapsible ?? false;
-  if (!collapsible) {
-    return false;
-  }
-
-  if (typeof groupDescriptor.collapsible === 'object') {
-    return groupDescriptor.collapsible;
-  }
-
-  return {collapsed: false};
 }
 
 function coerceMenuItemDescriptor(labelOrDescriptor: MaybeObservable<string> | WorkbenchMenuItemDescriptor, onSelect?: () => boolean | void | Promise<boolean | void>): WorkbenchMenuItemDescriptor {
@@ -169,3 +156,12 @@ function coerceFilterDescriptor(menuDescriptor: WorkbenchMenuDescriptor): {place
   return filter === true ? {} : undefined;
 }
 
+function coerceCollapsibleDescriptor(groupDescriptor: WorkbenchMenuGroupDescriptor): {collapsed: boolean} | undefined {
+  const collapsible = groupDescriptor.collapsible;
+
+  if (typeof collapsible === 'object') {
+    return collapsible;
+  }
+
+  return collapsible === true ? {collapsed: false} : undefined;
+}
