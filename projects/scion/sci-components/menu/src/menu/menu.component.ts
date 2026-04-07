@@ -42,9 +42,9 @@ import {RequireOne} from '@scion/sci-components/common';
   host: {
     '[class.no-glyph-area]': '!hasGlyphArea()',
     '[class.is-group]': '!!group()',
-    '[style.width]': 'size()?.width',
+    '[style.width]': 'size()?.width ?? \'var(--sci-workbench-contextmenu-width)\'',
     '[style.min-width]': 'size()?.minWidth',
-    '[style.max-width]': 'size()?.maxWidth',
+    '[style.max-width]': 'size()?.maxWidth ?? \'var(--sci-workbench-contextmenu-width)\'',
     '[style.--ɵmenu-max-height]': 'size()?.maxHeight',
     '[style.--ɵmenu-scrolling]': 'scrolling() ? `true` : null',
     '[class]': 'cssClass()',
@@ -100,7 +100,7 @@ export class MenuComponent {
     return {
       width: this.sizeInput()?.width,
       minWidth: this.anchorWidth() ? `max(${preferredMinWidth}, ${this.anchorWidth()})` : preferredMinWidth,
-      maxWidth: this.sizeInput()?.maxWidth ?? this.sizeInput()?.width ?? '24em',
+      maxWidth: this.sizeInput()?.maxWidth ?? this.sizeInput()?.width,
       maxHeight: this.sizeInput()?.maxHeight,
     };
   });
