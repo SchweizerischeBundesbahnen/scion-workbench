@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {WorkbenchPartAction} from '../workbench.model';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {Signal} from '@angular/core';
 import {NavigationData, NavigationState} from '../routing/routing.model';
@@ -104,11 +103,6 @@ export abstract class WorkbenchPart {
    * Gets views opened in this part.
    */
   public abstract readonly views: Signal<WorkbenchView[]>;
-
-  /**
-   * Actions associated with this part.
-   */
-  public abstract readonly actions: Signal<WorkbenchPartAction[]>;
 
   /**
    * Specifies CSS class(es) to add to the part, e.g., to locate the part in tests.

@@ -118,7 +118,7 @@ export class WorkbenchViewContextMenuService {
     function coerceComponent(legacyViewMenuItem: WorkbenchMenuItem, options: {view: WorkbenchView, providers: Provider[]}): SciComponentDescriptor {
       if (legacyViewMenuItem.content instanceof TemplateRef) {
         return {
-          component: LegacyTemplateMenuItemComponent,
+          component: MenuItemComponent,
           bindings: [
             inputBinding('template', signal(legacyViewMenuItem.content)),
             inputBinding('context', signal({$implicit: options.view, ...legacyViewMenuItem.inputs})),
@@ -277,10 +277,11 @@ export class WorkbenchViewContextMenuService {
 }
 
 @Component({
+  selector: 'wb-menu-item',
   template: '<ng-container *ngTemplateOutlet="template(); context: context()"/>',
   imports: [NgTemplateOutlet],
 })
-class LegacyTemplateMenuItemComponent {
+class MenuItemComponent {
 
   public readonly template = input.required<TemplateRef<unknown>>();
   public readonly context = input<{[name: string]: unknown}>();

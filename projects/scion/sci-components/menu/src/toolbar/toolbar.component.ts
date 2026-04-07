@@ -20,7 +20,7 @@ export class SciToolbarComponent {
 
   public readonly name = input.required<`toolbar:${string}`>();
   public readonly context = input<Map<string, unknown>>();
-  public readonly acceleratorTarget = input<Element | ElementRef<Element>>();
+  public readonly acceleratorTarget = input<Element | ElementRef<Element> | undefined>();
   public readonly viewContainerRef = input<ViewContainerRef | undefined>();
 
   private readonly _menuService = inject(ɵSciMenuService);

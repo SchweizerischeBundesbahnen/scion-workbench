@@ -7,19 +7,16 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {afterRenderEffect, assertNotInReactiveContext, computed, DestroyableInjector, effect, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, TemplateRef, untracked, WritableSignal} from '@angular/core';
-import {WorkbenchPartAction, WorkbenchPartActionFn} from '../workbench.model';
+import {afterRenderEffect, assertNotInReactiveContext, computed, DestroyableInjector, effect, inject, Injector, Signal, signal, untracked, WritableSignal} from '@angular/core';
 import {WORKBENCH_ELEMENT} from '../workbench-element-references';
 import {WorkbenchPart, WorkbenchPartNavigation} from './workbench-part.model';
 import {PartId} from '../workbench.identifiers';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
-import {ComponentType} from '@angular/cdk/portal';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {ActivatedRouteSnapshot, ChildrenOutletContexts} from '@angular/router';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
-import {WorkbenchPartActionRegistry} from './workbench-part-action.registry';
 import {ClassList} from '../common/class-list';
 import {Routing} from '../routing/routing.util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
@@ -67,7 +64,6 @@ export class ɵWorkbenchPart implements WorkbenchPart, Blockable {
   public readonly topRight = signal(false);
   public readonly activity = signal<MActivity | null>(null);
   public readonly canMinimize = computed(() => this.activity() !== null && this.topRight());
-  public readonly actions: Signal<WorkbenchPartAction[]>;
   public readonly activeView: Signal<ɵWorkbenchView | null>;
   public readonly views: Signal<ɵWorkbenchView[]>;
   public readonly classList = new ClassList();
@@ -86,7 +82,6 @@ export class ɵWorkbenchPart implements WorkbenchPart, Blockable {
   constructor(public readonly id: PartId, layout: ɵWorkbenchLayout) {
     this.mPart = signal(layout.part({partId: id}));
     this.gridName = signal(layout.grid({partId: id}).gridName);
-    this.actions = computePartActions(this);
     this.activeView = computeActiveView(this.mPart);
     this.views = computeViews(this.mPart);
     this.alternativeId = this.mPart().alternativeId;
@@ -374,39 +369,6 @@ function isActive(partId: PartId, layout: ɵWorkbenchLayout): boolean {
     return false;
   }
   return true;
-}
-
-/**
- * Computes actions matching this part.
- */
-function computePartActions(part: ɵWorkbenchPart): Signal<WorkbenchPartAction[]> {
-  const injector = Injector.create({
-    parent: inject(Injector),
-    providers: [
-      {provide: ɵWorkbenchPart, useValue: part},
-      {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
-    ],
-  });
-
-  // Use a differ to avoid re-creating every action on registration or change.
-  const differ = inject(IterableDiffers).find([]).create<WorkbenchPartActionFn>();
-  const partActionRegistry = inject(WorkbenchPartActionRegistry);
-  const partActions = new Map<WorkbenchPartActionFn, Signal<WorkbenchPartAction | null>>();
-
-  return computed(() => {
-    const changes = differ.diff(partActionRegistry.elements());
-    changes?.forEachAddedItem(({item: fn}) => partActions.set(fn, computed(() => constructPartAction(fn, injector))));
-    changes?.forEachRemovedItem(({item: fn}) => partActions.delete(fn));
-    return Array.from(partActions.values()).map(partAction => partAction()).filter(partAction => !!partAction);
-  }, {equal: (a, b) => Objects.isEqual(a, b)});
-
-  function constructPartAction(factoryFn: WorkbenchPartActionFn, injector: Injector): WorkbenchPartAction | null {
-    const action: WorkbenchPartAction | ComponentType<unknown> | TemplateRef<unknown> | null = runInInjectionContext(injector, () => factoryFn(inject(ɵWorkbenchPart)));
-    if (action instanceof TemplateRef || typeof action === 'function') {
-      return {content: action};
-    }
-    return action;
-  }
 }
 
 /**

@@ -33,6 +33,7 @@ class WorkbenchMenuContextProvider implements SciMenuContextProvider {
     if (part) {
       return computed(() => new Map<string, unknown>()
         .set('partId', part.id)
+        .set('viewId', PART_CONTEXT_VIEW_ID)
         .set('peripheral', part.peripheral())
         .set('mainArea', part.isInMainArea));
     }
@@ -56,3 +57,8 @@ export function provideWorkbenchMenuContextProvider(): EnvironmentProviders {
     {provide: SciMenuContextProvider, useClass: WorkbenchMenuContextProvider},
   ]);
 }
+
+/**
+ * Default value for `viewId` if in the context of a part.
+ */
+export const PART_CONTEXT_VIEW_ID = null;

@@ -8,35 +8,16 @@
   <wb-view-tab-bar [maxWidth]="maxViewTabBarWidth()"/>
 }
 
-<sci-toolbar name="toolbar:workbench.part.secondary" [context]="toolbarActiveViewContext()"/>
-<!-- Start Actions -->
-<!--@if (startActions().length) {-->
-<!--  <div class="actions">-->
-<!--    @for (action of startActions(); track action) {-->
-<!--      <wb-part-action [action]="action" [ngClass]="action.cssClass" data-align="start"/>-->
-<!--    }-->
-<!--  </div>-->
-<!--}-->
+<sci-toolbar name="toolbar:workbench.part.secondary" [context]="toolbarActiveViewContext()" [acceleratorTarget]="part.portal.element()"/>
 
 <!-- Filler -->
 <div class="filler e2e-filler" #filler (mousedown)="onPartBarMouseDown($event)"></div>
 
-
-<sci-toolbar name="toolbar:workbench.part" [context]="toolbarActiveViewContext()"/>
-
-<sci-toolbar name="toolbar:workbench.part.internal" [context]="toolbarActiveViewContext()"/>
-
-
-<!--&lt;!&ndash; End Actions &ndash;&gt;-->
-<!--@if (endActions().length) {-->
-<!--  <div class="actions">-->
-<!--    @for (action of endActions(); track action) {-->
-<!--      <wb-part-action [action]="action" [ngClass]="action.cssClass" data-align="end"/>-->
-<!--    }-->
-<!--  </div>-->
-<!--}-->
+<sci-toolbar name="toolbar:workbench.part" [context]="toolbarActiveViewContext()" [acceleratorTarget]="part.portal.element()"/>
+<sci-toolbar name="toolbar:workbench.part.internal" [context]="toolbarActiveViewContext()" [acceleratorTarget]="part.portal.element()"/>
 
 <!-- Minimize Button -->
+<!--TODO [menu] Implement as toolbar item? -->
 @if (part.canMinimize()) {
   <button (click)="onMinimize()" [title]="('%scion.workbench.minimize.tooltip' | sciText)()" class="minimize e2e-minimize">
     <wb-icon icon="workbench.minimize"/>

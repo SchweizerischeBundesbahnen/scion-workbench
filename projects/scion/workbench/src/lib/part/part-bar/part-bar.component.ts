@@ -20,6 +20,7 @@ import {IconComponent} from '../../icon/icon.component';
 import {contributeMenu, SciMenuGroupFactory, SciToolbarComponent, SciToolbarFactory} from '@scion/sci-components/menu';
 import {ViewListToolbarIconComponent} from '../view-list-toolbar-icon/view-list-toolbar-icon.component';
 import {WorkbenchView} from '../../view/workbench-view.model';
+import {PART_CONTEXT_VIEW_ID} from '../../menu/workbench-menu-context-provider';
 
 /**
  * DI token to inject the HTML element of the {@link PartBarComponent}.
@@ -47,10 +48,8 @@ export class PartBarComponent {
   private readonly _fillerElement = viewChild.required<ElementRef<HTMLElement>>('filler');
 
   protected readonly part = inject(ɵWorkbenchPart);
-  protected readonly startActions = computed(() => this.part.actions().filter(action => action.align === 'start'));
-  protected readonly endActions = computed(() => this.part.actions().filter(action => action.align !== 'start'));
   protected readonly maxViewTabBarWidth: Signal<number>;
-  protected readonly toolbarActiveViewContext = computed(() => new Map().set('viewId', this.part.activeView()?.id));
+  protected readonly toolbarActiveViewContext = computed(() => new Map().set('viewId', this.part.activeView()?.id ?? PART_CONTEXT_VIEW_ID));
 
   constructor() {
     this.maxViewTabBarWidth = this.calculateMaxViewTabBarWidth();

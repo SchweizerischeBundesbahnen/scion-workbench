@@ -75,9 +75,10 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
         this._contributions.set(location(), signal([]));
       }
       const contributions = this._contributions.get(location())!();
+      const environmentContext = context();
 
       return untracked(() => contributions
-        // Filter contributions not matching the calling context.
+        // Filter contributions not matching the environment context.
         .filter(contribution => {
           const requiredContext = contribution.requiredContext;
           for (const [name, value] of requiredContext.entries() ?? []) {
@@ -86,8 +87,8 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
               continue;
             }
 
-            // Only include contributions matching the calling context.
-            if (!Objects.isEqual(context().get(name), value, {ignoreArrayOrder: true})) {
+            // Only include contributions matching the environment context.
+            if (!Objects.isEqual(environmentContext.get(name), value, {ignoreArrayOrder: true})) {
               return false;
             }
           }

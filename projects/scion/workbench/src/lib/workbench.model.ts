@@ -41,6 +41,8 @@ export interface CanCloseRef {
  * Represents an action of a {@link WorkbenchPart}.
  *
  * Part actions are displayed in the part bar, enabling interaction with the part and its content. Actions can be aligned to the left or right.
+ *
+ * @deprecated since version 21.0.0-beta.6. Replaced by the new Workbench Menu API. Marked for removal in version 23.
  */
 export interface WorkbenchPartAction {
   /**
@@ -100,7 +102,7 @@ export interface WorkbenchPartAction {
  *
  * Right-clicking on a view tab opens a context menu to interact with the view and its content.
  *
- * @deprecated since version 21.0.0-beta.6. Replaced by the new Workbench Menu API. Use `contributeMenu` function to contribute to the view context menu: `contributeMenu('group(menu):workbench.view.contextmenu.additions', (menu, context) => menu.addMenuItem('%label', () => doSomething()))`. You can get a reference to the menu's contextual view using the passed context object: `inject(WorkbenchService).getView(context.get('viewId') as ViewId)`. Marked for removal in version 23.
+ * @deprecated since version 21.0.0-beta.6. Replaced by the new Workbench Menu API. Marked for removal in version 23.
  */
 export interface WorkbenchMenuItem {
   /**
@@ -182,6 +184,8 @@ export interface WorkbenchMenuItem {
  * - Can call `inject` to get any required dependencies.
  * - Runs in a reactive context and is called again when tracked signals change.
  *   Use Angular's `untracked` function to execute code outside this reactive context.
+ *
+ * @deprecated since version 21.0.0-beta.6. Replaced by the new Workbench Menu API. Marked for removal in version 23.
  */
 export type WorkbenchPartActionFn = (part: WorkbenchPart) => WorkbenchPartAction | ComponentType<unknown> | TemplateRef<unknown> | null;
 
@@ -194,7 +198,7 @@ export type WorkbenchPartActionFn = (part: WorkbenchPart) => WorkbenchPartAction
  * - Runs in a reactive context and is called again when tracked signals change.
  *   Use Angular's `untracked` function to execute code outside this reactive context.
  *
- * @deprecated since version 21.0.0-beta.6. Replaced by the new Workbench Menu API. Use `contributeMenu` function to contribute to the view context menu: `contributeMenu('group(menu):workbench.view.contextmenu.additions', (menu, context) => menu.addMenuItem('%label', () => doSomething()))`. You can get a reference to the menu's contextual view using the passed context object: `inject(WorkbenchService).getView(context.get('viewId') as ViewId)`. Marked for removal in version 23.
+ * @deprecated since version 21.0.0-beta.6. Replaced by the new Workbench Menu API. Marked for removal in version 23.
  */
 export type WorkbenchViewMenuItemFn = (view: WorkbenchView) => WorkbenchMenuItem | null;
 

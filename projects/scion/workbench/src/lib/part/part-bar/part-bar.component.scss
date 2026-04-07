@@ -38,18 +38,6 @@
     flex: initial;
   }
 
-  > div.actions {
-    flex: initial; // allow to shrink
-    display: flex;
-    align-items: center;
-    gap: var(--sci-workbench-part-bar-actions-gap);
-    padding-inline: var(--sci-workbench-part-bar-actions-padding-inline);
-
-    > wb-part-action {
-      flex: initial; // allow to shrink
-    }
-  }
-
   > sci-toolbar {
     flex: initial; // allow to shrink
     height: 25px;
