@@ -8,7 +8,7 @@
   <wb-view-tab-bar [maxWidth]="maxViewTabBarWidth()"/>
 }
 
-<sci-toolbar name="toolbar:workbench.part.secondary"/>
+<sci-toolbar name="toolbar:workbench.part.secondary" [context]="toolbarActiveViewContext()"/>
 <!-- Start Actions -->
 <!--@if (startActions().length) {-->
 <!--  <div class="actions">-->
@@ -22,9 +22,9 @@
 <div class="filler e2e-filler" #filler (mousedown)="onPartBarMouseDown($event)"></div>
 
 
-<sci-toolbar name="toolbar:workbench.part"/>
+<sci-toolbar name="toolbar:workbench.part" [context]="toolbarActiveViewContext()"/>
 
-<sci-toolbar name="toolbar:workbench.part.internal"/>
+<sci-toolbar name="toolbar:workbench.part.internal" [context]="toolbarActiveViewContext()"/>
 
 
 <!--&lt;!&ndash; End Actions &ndash;&gt;-->

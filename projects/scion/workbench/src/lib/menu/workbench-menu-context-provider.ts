@@ -33,7 +33,6 @@ class WorkbenchMenuContextProvider implements SciMenuContextProvider {
     if (part) {
       return computed(() => new Map<string, unknown>()
         .set('partId', part.id)
-        .set('viewId', part.activeView()?.id)
         .set('peripheral', part.peripheral())
         .set('mainArea', part.isInMainArea));
     }
