@@ -32,7 +32,8 @@ export class ɵSciMenuFactory implements SciMenuFactory {
       name: descriptor.name,
       labelText: translate(coerceLabelText(descriptor.label)),
       labelComponent: coerceLabelComponent(descriptor.label),
-      icon: coerceSignal(descriptor.icon),
+      iconLigature: coerceSignal(coerceIconLigature(descriptor.icon)),
+      iconComponent: coerceIconComponent(descriptor.icon),
       checked: coerceSignal(descriptor.checked),
       tooltip: translate(descriptor.tooltip),
       accelerator: descriptor.accelerator,
@@ -63,7 +64,8 @@ export class ɵSciMenuFactory implements SciMenuFactory {
       name: descriptor.name,
       labelText: translate(coerceLabelText(descriptor.label)),
       labelComponent: coerceLabelComponent(descriptor.label),
-      icon: coerceSignal(descriptor.icon),
+      iconLigature: coerceSignal(coerceIconLigature(descriptor.icon)),
+      iconComponent: coerceIconComponent(descriptor.icon),
       tooltip: translate(descriptor.tooltip),
       disabled: coerceSignal(descriptor.disabled),
       menu: {
@@ -136,6 +138,20 @@ function coerceLabelText(label: MaybeSignal<Translatable> | ComponentType<unknow
 function coerceLabelComponent(label: MaybeSignal<Translatable> | ComponentType<unknown>): ComponentType<unknown> | undefined {
   if (typeof label === 'function' && !isSignal(label)) {
     return label;
+  }
+  return undefined;
+}
+
+function coerceIconLigature(icon: MaybeSignal<string> | ComponentType<unknown> | undefined): MaybeSignal<string> | undefined {
+  if (typeof icon === 'string' || isSignal(icon)) {
+    return icon;
+  }
+  return undefined;
+}
+
+function coerceIconComponent(icon: MaybeSignal<string> | ComponentType<unknown> | undefined): ComponentType<unknown> | undefined {
+  if (typeof icon === 'function' && !isSignal(icon)) {
+    return icon;
   }
   return undefined;
 }

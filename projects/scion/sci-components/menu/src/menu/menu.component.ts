@@ -231,9 +231,9 @@ function requiresGlyphArea(menuItems: SciMenuItemLike[]): boolean {
   return menuItems.some(menuItem => {
     switch (menuItem.type) {
       case 'menu-item':
-        return menuItem.icon?.() || menuItem.checked !== undefined;
+        return !!menuItem.iconLigature || !!menuItem.iconComponent || !!menuItem.checked;
       case 'menu':
-        return menuItem.icon?.();
+        return !!menuItem.iconLigature || !!menuItem.iconComponent;
       case 'group':
         return menuItem.collapsible || requiresGlyphArea(menuItem.children);
     }

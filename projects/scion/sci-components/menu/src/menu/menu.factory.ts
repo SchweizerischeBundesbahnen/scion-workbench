@@ -33,7 +33,7 @@ export type SciMenuGroupFactory = SciMenuFactory;
 export interface SciMenuItemDescriptor {
   name?: `menuitem:${string}`;
   label: MaybeSignal<Translatable> | ComponentType<unknown>;
-  icon?: MaybeSignal<string>;
+  icon?: MaybeSignal<string> | ComponentType<unknown>;
   checked?: MaybeSignal<boolean>;
   tooltip?: MaybeSignal<Translatable>;
   accelerator?: string[];
@@ -47,7 +47,7 @@ export interface SciMenuItemDescriptor {
 export interface SciMenuDescriptor {
   name?: `menu:${string}`;
   label: MaybeSignal<Translatable> | ComponentType<unknown>;
-  icon?: MaybeSignal<string>;
+  icon?: MaybeSignal<string> | ComponentType<unknown>;
   tooltip?: MaybeSignal<Translatable>;
   disabled?: MaybeSignal<boolean>;
   menu?: {

@@ -36,7 +36,7 @@ export class WorkbenchClientMenuFactoryDelegate implements SciMenuFactory {
     this._delegate.addMenuItem({
       name: descriptor.name,
       label: toLazyObservable(coerceLabel(descriptor.label)),
-      icon: toLazyObservable(descriptor.icon),
+      icon: toLazyObservable(coerceIcon(descriptor.icon)),
       checked: toLazyObservable(descriptor.checked),
       tooltip: toLazyObservable(descriptor.tooltip),
       accelerator: descriptor.accelerator,
@@ -63,7 +63,7 @@ export class WorkbenchClientMenuFactoryDelegate implements SciMenuFactory {
     this._delegate.addMenu({
       name: descriptor.name,
       label: toLazyObservable(coerceLabel(descriptor.label)),
-      icon: toLazyObservable(descriptor.icon),
+      icon: toLazyObservable(coerceIcon(descriptor.icon)),
       tooltip: toLazyObservable(descriptor.tooltip),
       disabled: toLazyObservable(descriptor.disabled),
       menu: {
@@ -132,7 +132,7 @@ function coerceLabel(label: MaybeSignal<string> | ComponentType<unknown>): Maybe
     return label;
   }
 
-  throw Error('[MenuDefinitionError] Component not supported as menu label.');
+  throw Error('[MenuDefinitionError] Component not supported as label in microfrontend menu.');
 }
 
 function coerceFilterDescriptor(menuDescriptor: SciMenuDescriptor): {placeholder?: MaybeSignal<Translatable>; notFoundText?: MaybeSignal<Translatable>} | undefined {
@@ -145,4 +145,15 @@ function coerceFilterDescriptor(menuDescriptor: SciMenuDescriptor): {placeholder
     };
   }
   return filter === true ? {} : undefined;
+}
+
+function coerceIcon(icon: MaybeSignal<string> | ComponentType<unknown> | undefined): MaybeSignal<string> | undefined {
+  if (icon === undefined) {
+    return undefined;
+  }
+  if (typeof icon === 'string' || isSignal(icon)) {
+    return icon;
+  }
+
+  throw Error('[MenuDefinitionError] Component not supported as icon in microfrontend menu.');
 }

@@ -45,8 +45,14 @@
             @if (hasGlyphArea()) {
               @if (menuItem.checked !== undefined) {
                 <span class="icon material-symbols-rounded checkmark" translate="no">{{menuItem.checked() ? 'check' : ''}}</span>
+              } @else if (menuItem.iconLigature) {
+                <span class="icon material-symbols-rounded" translate="no">{{menuItem.iconLigature()}}</span>
+              } @else if (menuItem.iconComponent) {
+                <span class="icon">
+                  <ng-container *ngComponentOutlet="menuItem.iconComponent"/>
+                </span>
               } @else {
-                <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon?.()}}</span>
+                <span class="icon"></span>
               }
             }
 
@@ -82,7 +88,15 @@
                   (mouseenter)="onMenuItemMouseEnter({menu: menuItem, element: element})"
                   #element>
             @if (hasGlyphArea()) {
-              <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon?.()}}</span>
+              @if (menuItem.iconLigature) {
+                <span class="icon material-symbols-rounded" translate="no">{{menuItem.iconLigature()}}</span>
+              } @else if (menuItem.iconComponent) {
+                <span class="icon">
+                  <ng-container *ngComponentOutlet="menuItem.iconComponent"/>
+                </span>
+              } @else {
+                <span class="icon"></span>
+              }
             }
             <div class="content">
               @if (menuItem.labelText) {

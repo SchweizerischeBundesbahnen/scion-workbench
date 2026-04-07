@@ -34,7 +34,7 @@ export type SciToolbarGroupFactory = SciToolbarFactory;
 export interface SciToolbarItemDescriptor {
   name?: `menuitem:${string}`;
   label?: MaybeSignal<Translatable> | ComponentType<unknown>;
-  icon: MaybeSignal<string>;
+  icon: MaybeSignal<string> | ComponentType<unknown>;
   checked?: MaybeSignal<boolean>;
   tooltip?: MaybeSignal<Translatable>;
   accelerator?: string[];
@@ -46,7 +46,7 @@ export interface SciToolbarItemDescriptor {
 export interface SciToolbarMenuDescriptor {
   name?: `menu:${string}`;
   label?: MaybeSignal<Translatable> | ComponentType<unknown>;
-  icon?: MaybeSignal<string>;
+  icon?: MaybeSignal<string> | ComponentType<unknown>;
   tooltip?: MaybeSignal<Translatable>;
   disabled?: MaybeSignal<boolean>;
   /**

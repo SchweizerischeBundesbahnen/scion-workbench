@@ -11,7 +11,8 @@ export interface SciMenuItem {
   name?: `menuitem:${string}`;
   labelText?: Signal<string>;
   labelComponent?: ComponentType<unknown>;
-  icon?: Signal<string>;
+  iconLigature?: Signal<string>;
+  iconComponent?: ComponentType<unknown>;
   tooltip?: Signal<string>;
   accelerator?: string[];
   disabled?: Signal<boolean>; // Consider renaming to enabled; https://www.electronjs.org/docs/latest/api/menu-item
@@ -29,7 +30,8 @@ export interface SciMenu {
   name?: `menu:${string}`;
   labelText?: Signal<string>;
   labelComponent?: ComponentType<unknown>;
-  icon?: Signal<string>;
+  iconLigature?: Signal<string>;
+  iconComponent?: ComponentType<unknown>;
   tooltip?: Signal<string>;
   disabled?: Signal<boolean>; // Consider renaming to enabled; https://www.electronjs.org/docs/latest/api/menu-item
   // visible: Signal<boolean>; // Consider providing visible

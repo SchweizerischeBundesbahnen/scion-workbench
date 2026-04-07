@@ -7,9 +7,14 @@
               [class.checked]="menuItem.checked?.()"
               [class]="menuItem.cssClass" class="menu-item"
               (click)="onSelect(menuItem)">
-        @if (menuItem.icon?.()) {
-          <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon?.()}}</span>
+        @if (menuItem.iconLigature) {
+          <span class="icon material-symbols-rounded" translate="no">{{menuItem.iconLigature()}}</span>
+        } @else if (menuItem.iconComponent) {
+          <span class="icon">
+            <ng-container *ngComponentOutlet="menuItem.iconComponent"/>
+          </span>
         }
+
         @if (menuItem.labelText) {
           <span class="label">{{menuItem.labelText()}}</span>
         } @else if (menuItem.labelComponent) {
@@ -21,14 +26,19 @@
     }
     @case ('menu') {
       @let hasLabel = menuItem.labelText || menuItem.labelComponent;
+      @let hasIcon = menuItem.iconLigature || menuItem.iconComponent;
       <button [attr.disabled]="disabled || null"
               [class.active]="activeSubMenuItem()?.menu === menuItem"
-              [class.visual-menu-hint]="menuItem.icon?.() && !hasLabel && menuItem.visualMenuHint"
+              [class.visual-menu-hint]="hasIcon && !hasLabel && menuItem.visualMenuHint"
               [class]="menuItem.cssClass" class="menu-item submenu-item"
               (click)="onSubMenuClick({menu: menuItem, element: element})"
               #element>
-        @if (menuItem.icon) {
-          <span class="icon material-symbols-rounded" translate="no">{{menuItem.icon()}}</span>
+        @if (menuItem.iconLigature) {
+          <span class="icon material-symbols-rounded" translate="no">{{menuItem.iconLigature()}}</span>
+        } @else if (menuItem.iconComponent) {
+          <span class="icon">
+            <ng-container *ngComponentOutlet="menuItem.iconComponent"/>
+          </span>
         }
 
         @if (menuItem.labelText) {
