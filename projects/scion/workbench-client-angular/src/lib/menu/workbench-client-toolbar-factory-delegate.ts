@@ -14,7 +14,7 @@ import {ComponentType} from '@angular/cdk/portal';
 import {SciMenuFactory, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarGroupFactory, SciToolbarItemDescriptor, SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
 import {WorkbenchClientMenuFactoryDelegate} from './workbench-client-menu-factory-delegate';
 import {toLazyObservable} from '../common/lazy-observable.util';
-import {MaybeSignal, RequireOne} from '@scion/sci-components/common';
+import {MaybeSignal, RequireOne, SciComponentDescriptor} from '@scion/sci-components/common';
 
 /**
  * Represents a {@link SciToolbarFactory} that delegates to {@link WorkbenchToolbarFactory} of `@scion/workbench-client`.
@@ -120,7 +120,7 @@ function coerceGroupDescriptor(factoryOrDescriptor: ((group: SciToolbarGroupFact
   return [factoryOrDescriptor, factoryIfDescriptor];
 }
 
-function coerceLabel(label: MaybeSignal<string> | ComponentType<unknown> | undefined): MaybeSignal<string> | undefined {
+function coerceLabel(label: MaybeSignal<string> | ComponentType<unknown> | SciComponentDescriptor | undefined): MaybeSignal<string> | undefined {
   if (!label) {
     return undefined;
   }
@@ -131,7 +131,7 @@ function coerceLabel(label: MaybeSignal<string> | ComponentType<unknown> | undef
   throw Error('[MenuDefinitionError] Component not supported as label in microfrontend menu.');
 }
 
-function coerceIcon(icon: MaybeSignal<string> | ComponentType<unknown>): MaybeSignal<string> {
+function coerceIcon(icon: MaybeSignal<string> | ComponentType<unknown> | SciComponentDescriptor): MaybeSignal<string> {
   if (typeof icon === 'string' || isSignal(icon)) {
     return icon;
   }

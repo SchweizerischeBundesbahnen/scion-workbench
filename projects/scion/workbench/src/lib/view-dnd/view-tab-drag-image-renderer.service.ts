@@ -216,7 +216,6 @@ class DragImageWorkbenchView implements WorkbenchView {
   public readonly last = signal(true).asReadonly();
   public readonly position = signal(0).asReadonly();
   public readonly scrolledIntoView = signal(true).asReadonly();
-  public readonly menuItems = signal([]);
   public readonly isClosable: Signal<boolean>;
   public readonly activationInstant = signal(0);
   public readonly bounds = signal(undefined);

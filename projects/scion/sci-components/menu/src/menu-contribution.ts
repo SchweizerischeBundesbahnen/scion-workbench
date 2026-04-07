@@ -1,4 +1,4 @@
-import {assertInInjectionContext, assertNotInReactiveContext, effect, inject, runInInjectionContext, untracked} from '@angular/core';
+import {assertInInjectionContext, assertNotInReactiveContext, computed, effect, runInInjectionContext, untracked} from '@angular/core';
 import {Disposable} from './common/disposable';
 import {ɵSciMenuService} from './ɵmenu.service';
 import {SciMenuContextProvider} from './menu-context-provider';
@@ -6,6 +6,7 @@ import {SciMenuContributionLocation, SciMenuContributionLocationLike, SciMenuCon
 import {createDestroyableInjector} from './common/injector.util';
 import {SciMenuContributionInstantProvider} from './menu-contribution-instant.provider';
 import {coerceSignal} from '@scion/sci-components/common';
+import {Objects} from '@scion/toolkit/util';
 
 /**
  * By default, the contribution will be unregistered when the current injection context is destroyed.
@@ -28,10 +29,11 @@ export function contributeMenu(locationLike: string | SciMenuContributionLocatio
   const environmentContext = coerceSignal(runInInjectionContext(injector, () => menuContextProvider?.provideContext?.()));
 
   // Each contribution is assigned a unique contribution instant to keep its original order even if the reactive context changes.
-  const contributionInstant = options?.contributionInstant ?? inject(SciMenuContributionInstantProvider).next();
+  const contributionInstant = options?.contributionInstant ?? injector.get(SciMenuContributionInstantProvider).next();
+  const context = computed(() => new Map([...environmentContext?.() ?? new Map(), ...options?.requiredContext ?? new Map()]), {equal: Objects.isEqual});
 
   effect((onCleanup) => {
-    const requiredContext = new Map([...environmentContext?.() ?? new Map(), ...options?.requiredContext ?? new Map()]);
+    const requiredContext = context();
 
     untracked(() => {
       const contributionRef = menuService.contributeMenu(location, factoryFn, {...options, requiredContext, contributionInstant});

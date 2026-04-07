@@ -12,7 +12,7 @@ import {EnvironmentProviders, inject, makeEnvironmentProviders, provideEnvironme
 import {WorkbenchService} from './workbench.service';
 import {WorkbenchUrlObserver} from './routing/workbench-url-observer.service';
 import {WorkbenchConfig} from './workbench-config';
-import {ViewMenuService} from './part/view-context-menu/view-menu.service';
+import {WorkbenchViewContextMenuService} from './part/view-context-menu/workbench-view-context-menu.service';
 import {ViewMoveHandler} from './view/view-move-handler.service';
 import {provideWorkbenchMicrofrontendSupport} from './microfrontend-platform/workbench-microfrontend-support';
 import {provideLogging} from './logging';
@@ -131,7 +131,7 @@ export function provideWorkbench(config?: WorkbenchConfig): EnvironmentProviders
       useClass: config.storage ?? DefaultWorkbenchStorage,
     },
     provideWorkbenchInitializer(() => void inject(WorkbenchThemeSwitcher), {phase: WorkbenchStartupPhase.PreStartup}),
-    provideWorkbenchInitializer(() => void inject(ViewMenuService)),
+    provideWorkbenchInitializer(() => void inject(WorkbenchViewContextMenuService).registerBuiltInMenuItems()),
     provideWorkbenchInitializer(() => void inject(ViewMoveHandler)),
     provideWorkbenchInitializer(() => void inject(ViewTabDragImageRenderer)),
     provideWorkbenchInitializer(() => inject(WorkbenchPerspectiveService).init(), {phase: WorkbenchStartupPhase.PostStartup}),

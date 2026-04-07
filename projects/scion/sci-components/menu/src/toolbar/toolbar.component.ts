@@ -5,6 +5,7 @@ import {coerceElement} from '@angular/cdk/coercion';
 import {installMenuAccelerators} from '../menu-accelerators';
 import {ɵSciMenuService} from '../ɵmenu.service';
 import {coerceSignal} from '@scion/sci-components/common';
+import {Objects} from '@scion/toolkit/util';
 
 @Component({
   selector: 'sci-toolbar',
@@ -33,11 +34,15 @@ export class SciToolbarComponent {
 
   protected computeContext(): Signal<Map<string, unknown>> {
     const environmentContext = coerceSignal(inject(SciMenuContextProvider, {optional: true})?.provideContext?.());
-    return computed(() => new Map([...environmentContext?.() ?? new Map(), ...this.context() ?? new Map()]));
+    return computed(() => new Map([...environmentContext?.() ?? new Map(), ...this.context() ?? new Map()]), {equal: Objects.isEqual});
   }
 
   private installAccelerators(): void {
     const injector = inject(Injector);
+
+    // TODO [menu] Do we have to use a root effect? Was the case in previous implementation
+    // // Use root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+    // rootEffect(onCleanup => {
 
     effect(onCleanup => {
       const name = this.name();

@@ -4,7 +4,7 @@ import {MenuItemGroupComponent} from './menu-group.component';
 import {MenuFilterComponent} from './menu-filter.component';
 import {MenuFilter} from './menu-filter.service';
 import {ToolbarStateDirective} from '../toolbar/toolbar-state.directive';
-import {NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
+import {NgTemplateOutlet} from '@angular/common';
 import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model';
 import {ɵSciMenuService} from '../ɵmenu.service';
 import {SciToolGroupComponent} from '../toolbar/toolbar-group.component';
@@ -13,7 +13,7 @@ import {SciViewportComponent} from '@scion/components/viewport';
 import {concat, fromEvent, map, NEVER, of, switchMap, timer} from 'rxjs';
 import {toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {SciTextPipe, Translatable} from '@scion/sci-components/text';
-import {RequireOne} from '@scion/sci-components/common';
+import {RequireOne, SciComponentOutletDirective} from '@scion/sci-components/common';
 
 /**
  * Represents a menu or a group of menu items.
@@ -31,10 +31,10 @@ import {RequireOne} from '@scion/sci-components/common';
     MenuFilterComponent,
     SciToolGroupComponent,
     ToolbarStateDirective,
-    NgComponentOutlet,
     SciViewportComponent,
     NgTemplateOutlet,
     SciTextPipe,
+    SciComponentOutletDirective,
   ],
   providers: [
     MenuFilter,

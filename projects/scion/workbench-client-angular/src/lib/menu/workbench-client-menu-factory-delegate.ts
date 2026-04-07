@@ -14,7 +14,7 @@ import {ComponentType} from '@angular/cdk/portal';
 import {SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuGroupFactory, SciMenuItemDescriptor} from '@scion/sci-components/menu';
 import {WorkbenchClientToolbarFactoryDelegate} from './workbench-client-toolbar-factory-delegate';
 import {toLazyObservable} from '../common/lazy-observable.util';
-import {MaybeSignal, RequireOne} from '@scion/sci-components/common';
+import {MaybeSignal, RequireOne, SciComponentDescriptor} from '@scion/sci-components/common';
 import {Translatable} from '@scion/sci-components/text';
 
 /**
@@ -127,7 +127,7 @@ function coerceGroupDescriptor(factoryOrDescriptor: ((group: SciMenuGroupFactory
   return [factoryOrDescriptor, factoryIfDescriptor];
 }
 
-function coerceLabel(label: MaybeSignal<string> | ComponentType<unknown>): MaybeSignal<string> {
+function coerceLabel(label: MaybeSignal<string> | ComponentType<unknown> | SciComponentDescriptor): MaybeSignal<string> {
   if (typeof label === 'string' || isSignal(label)) {
     return label;
   }
@@ -147,7 +147,7 @@ function coerceFilterDescriptor(menuDescriptor: SciMenuDescriptor): {placeholder
   return filter === true ? {} : undefined;
 }
 
-function coerceIcon(icon: MaybeSignal<string> | ComponentType<unknown> | undefined): MaybeSignal<string> | undefined {
+function coerceIcon(icon: MaybeSignal<string> | ComponentType<unknown> | SciComponentDescriptor | undefined): MaybeSignal<string> | undefined {
   if (icon === undefined) {
     return undefined;
   }

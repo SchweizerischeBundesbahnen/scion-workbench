@@ -22,7 +22,7 @@ import {UUID} from '@scion/toolkit/uuid';
 import {SciTextPipe} from '@scion/sci-components/text';
 import {IconComponent} from '../../icon/icon.component';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
-import {installMenuAccelerators, SciMenuService} from '@scion/sci-components/menu';
+import {WorkbenchViewContextMenuService} from '../view-context-menu/workbench-view-context-menu.service';
 
 /**
  * IMPORTANT: HTML and CSS also used by {@link ViewTabDragImageComponent}.
@@ -61,9 +61,8 @@ export class ViewTabComponent {
   private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _workbenchConfig = inject(WorkbenchConfig);
   private readonly _viewRegistry = inject(WorkbenchViewRegistry);
-  private readonly _menuService = inject(SciMenuService);
+  private readonly _viewContextMenuService = inject(WorkbenchViewContextMenuService);
   private readonly _layout = inject(WorkbenchLayoutService).layout;
-  private readonly _injector = inject(Injector);
 
   public readonly host = inject(ElementRef).nativeElement as HTMLElement;
   public readonly view = input.required({alias: 'viewId', transform: (viewId: ViewId) => this._viewRegistry.get(viewId)});
@@ -101,8 +100,7 @@ export class ViewTabComponent {
   }
 
   protected onContextmenu(event: MouseEvent): void {
-    // void this._viewMenuService.showMenu({x: event.clientX, y: event.clientY}, this.view().id);
-    this._menuService.open('menu:workbench.view.contextmenu', {anchor: event, context: new Map().set('viewId', this.view().id), size: {width: '20em'}});
+    this._viewContextMenuService.open(event, {viewId: this.view().id});
   }
 
   protected onDragStart(event: DragEvent): void {
@@ -160,29 +158,25 @@ export class ViewTabComponent {
   }
 
   private installMenuAccelerators(): void {
-    const injector = inject(Injector);
+    const host = inject(ElementRef);
 
     effect(onCleanup => {
       const view = this.view();
 
       untracked(() => {
-        const ref = installMenuAccelerators('menu:workbench.view.contextmenu', {
-          target: this.host,
-          context: new Map().set('viewId', view.id),
-          injector,
-        });
-        onCleanup(() => ref.dispose());
+        const accelerators = this._viewContextMenuService.installAccelerators(host, {viewId: view.id});
+        onCleanup(() => accelerators.dispose());
       });
     });
-
-    // this._viewMenuService.installMenuAccelerators(this.host, this.view);
   }
 
   private createViewTabContentPortal(): Signal<ComponentPortal<unknown>> {
+    const injector = inject(Injector);
+
     return computed(() => {
       const componentType = this._workbenchConfig.viewTabComponent ?? ViewTabContentComponent;
       return new ComponentPortal(componentType, null, Injector.create({
-        parent: this._injector,
+        parent: injector,
         providers: [
           {provide: WorkbenchView, useValue: this.view()},
         ],

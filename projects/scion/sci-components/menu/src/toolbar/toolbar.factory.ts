@@ -10,7 +10,7 @@
 
 import {ComponentType} from '@angular/cdk/portal';
 import {SciMenuFactory} from '../menu/menu.factory';
-import {MaybeSignal, RequireOne} from '@scion/sci-components/common';
+import {MaybeSignal, RequireOne, SciComponentDescriptor} from '@scion/sci-components/common';
 import {Translatable} from '@scion/sci-components/text';
 
 export interface SciToolbarFactory {
@@ -33,8 +33,8 @@ export type SciToolbarGroupFactory = SciToolbarFactory;
 
 export interface SciToolbarItemDescriptor {
   name?: `menuitem:${string}`;
-  label?: MaybeSignal<Translatable> | ComponentType<unknown>;
-  icon: MaybeSignal<string> | ComponentType<unknown>;
+  label?: MaybeSignal<Translatable> | ComponentType<unknown> | SciComponentDescriptor;
+  icon: MaybeSignal<string> | ComponentType<unknown> | SciComponentDescriptor;
   checked?: MaybeSignal<boolean>;
   tooltip?: MaybeSignal<Translatable>;
   accelerator?: string[];
@@ -45,8 +45,8 @@ export interface SciToolbarItemDescriptor {
 
 export interface SciToolbarMenuDescriptor {
   name?: `menu:${string}`;
-  label?: MaybeSignal<Translatable> | ComponentType<unknown>;
-  icon?: MaybeSignal<string> | ComponentType<unknown>;
+  label?: MaybeSignal<Translatable> | ComponentType<unknown> | SciComponentDescriptor;
+  icon?: MaybeSignal<string> | ComponentType<unknown> | SciComponentDescriptor;
   tooltip?: MaybeSignal<Translatable>;
   disabled?: MaybeSignal<boolean>;
   /**

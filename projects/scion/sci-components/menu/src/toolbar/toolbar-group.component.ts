@@ -1,8 +1,7 @@
 import {ChangeDetectionStrategy, Component, effect, inject, Injector, input, linkedSignal, output, runInInjectionContext, signal, untracked, ViewContainerRef} from '@angular/core';
-import {NgComponentOutlet} from '@angular/common';
 import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model';
 import {ɵSciMenuService} from '../ɵmenu.service';
-import {MaybeSignal, RequireOne} from '@scion/sci-components/common';
+import {MaybeSignal, RequireOne, SciComponentOutletDirective} from '@scion/sci-components/common';
 import {Translatable} from '@scion/sci-components/text';
 
 @Component({
@@ -11,7 +10,7 @@ import {Translatable} from '@scion/sci-components/text';
   styleUrl: './toolbar-group.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    NgComponentOutlet,
+    SciComponentOutletDirective,
   ],
 })
 export class SciToolGroupComponent {

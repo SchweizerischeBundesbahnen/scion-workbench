@@ -20,7 +20,7 @@ import {WorkbenchView} from './workbench-view.model';
 import {OnAttach, OnDetach} from '../portal/wb-component-portal';
 import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-context.directive';
 import {FocusTrackerRef, trackFocus} from '../focus/workbench-focus-tracker.service';
-import {installMenuAccelerators} from '@scion/sci-components/menu';
+import {WorkbenchViewContextMenuService} from '../part/view-context-menu/workbench-view-context-menu.service';
 
 /**
  * Acts as a placeholder for a view's content that Angular fills based on the current router state of the associated view outlet.
@@ -105,8 +105,8 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
   }
 
   private installMenuAccelerators(): void {
-    installMenuAccelerators('menu:workbench.view.contextmenu');
-    // inject(ViewMenuService).installMenuAccelerators(inject(ElementRef), this.view);
+    const accelerators = inject(WorkbenchViewContextMenuService).installAccelerators(inject(ElementRef), {viewId: this.view.id});
+    inject(DestroyRef).onDestroy(() => accelerators.dispose());
   }
 
   /**

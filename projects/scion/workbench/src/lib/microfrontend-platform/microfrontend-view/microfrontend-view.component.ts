@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Injector, linkedSignal, Provider, signal, Signal, untracked, viewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, linkedSignal, Provider, signal, Signal, untracked, viewChild} from '@angular/core';
 import {firstValueFrom, MonoTypeOperatorFunction, switchMap, tap} from 'rxjs';
 import {filter, first, map, take} from 'rxjs/operators';
 import {ManifestService, mapToBody, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
@@ -20,7 +20,6 @@ import {CanCloseRef} from '../../workbench.model';
 import {IFRAME_OVERLAY_HOST} from '../../workbench-element-references';
 import {serializeExecution} from '../../common/operators';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
-import {ViewMenuService} from '../../part/view-context-menu/view-menu.service';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {stringifyError} from '../../common/stringify-error.util';
 import {MICROFRONTEND_VIEW_NAVIGATION_HINT, MICROFRONTEND_VIEW_STATE_TRANSIENT_PARAMS, splitMicrofrontendViewParams} from './microfrontend-view-routes';
@@ -37,6 +36,7 @@ import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provid
 import {prune} from '../../common/prune.util';
 import {MicrofrontendViewNavigationData} from './microfrontend-view-navigation-data';
 import {Routing} from '../../routing/routing.util';
+import {WorkbenchViewContextMenuService} from '../../part/view-context-menu/workbench-view-context-menu.service';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -63,6 +63,7 @@ export class MicrofrontendViewComponent {
   private readonly _messageClient = inject(MessageClient);
   private readonly _logger = inject(Logger);
   private readonly _workbenchRouter = inject(WorkbenchRouter);
+  private readonly _viewContextMenuService = inject(WorkbenchViewContextMenuService);
   private readonly _injector = inject(Injector);
   private readonly _changeDetectorRef = inject(ChangeDetectorRef);
 
@@ -240,7 +241,15 @@ export class MicrofrontendViewComponent {
     // Since the iframe is added at a top-level location in the DOM, that is, not as a child element of this component,
     // the workbench view misses keyboard events from embedded content. As a result, menu item accelerators of the context
     // menu of this view do not work, so we install the accelerators on the router outlet as well.
-    inject(ViewMenuService).installMenuAccelerators(this._routerOutletElement, this.view);
+    effect(onCleanup => {
+      const routerOutletElement = this._routerOutletElement();
+
+      untracked(() => {
+        const accelerators = this._viewContextMenuService.installAccelerators(routerOutletElement, {viewId: this.view.id});
+        onCleanup(() => accelerators.dispose());
+      });
+    });
+
   }
 
   /**
@@ -364,29 +373,31 @@ export class MicrofrontendViewComponent {
    * Computes keystrokes to bubble through the iframe boundary.
    */
   private computeKeyStrokesToBubble(): Signal<string[]> {
-    return computed(() => {
-      const accelerators = [
-        ...this._universalKeystrokes,
-        ...this.view.menuItems().map(menuItem => menuItem.accelerator ?? []),
-      ];
-
-      return accelerators
-        .filter(accelerator => accelerator.length)
-        .map(accelerator => accelerator.map(segment => {
-          // Normalize keystrokes according to `SciRouterOutletElement#keystrokes`
-          switch (segment) {
-            case 'ctrl':
-              return 'control';
-            case '.':
-              return 'dot';
-            case ' ':
-              return 'space';
-            default:
-              return segment;
-          }
-        }))
-        .map(accelerator => `keydown.${accelerator.join('.')}{preventDefault=true}`);
-    }, {equal: (a, b) => Objects.isEqual(a, b, {ignoreArrayOrder: true})});
+    // TODO [menu] Get accelerators of all menus, unless specifying other viewId
+    return signal([]);
+    // return computed(() => {
+    //   const accelerators = [
+    //     ...this._universalKeystrokes,
+    //     ...this.view.menuItems().map(menuItem => menuItem.accelerator ?? []),
+    //   ];
+    //
+    //   return accelerators
+    //     .filter(accelerator => accelerator.length)
+    //     .map(accelerator => accelerator.map(segment => {
+    //       // Normalize keystrokes according to `SciRouterOutletElement#keystrokes`
+    //       switch (segment) {
+    //         case 'ctrl':
+    //           return 'control';
+    //         case '.':
+    //           return 'dot';
+    //         case ' ':
+    //           return 'space';
+    //         default:
+    //           return segment;
+    //       }
+    //     }))
+    //     .map(accelerator => `keydown.${accelerator.join('.')}{preventDefault=true}`);
+    // }, {equal: (a, b) => Objects.isEqual(a, b, {ignoreArrayOrder: true})});
   }
 
   private propagateWorkbenchTheme(): void {

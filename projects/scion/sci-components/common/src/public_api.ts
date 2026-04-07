@@ -15,3 +15,4 @@
  */
 export {type MaybeSignal, type OneOf, type RequireOne} from './types';
 export {coerceSignal} from './coerce-signal.util';
+export {type SciComponentDescriptor, SciComponentOutletDirective} from './component-outlet.directive';

@@ -4,7 +4,7 @@ import {Arrays} from '@scion/toolkit/util';
 import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model';
 import {ɵSciToolbarFactory} from '../toolbar/ɵtoolbar.factory';
 import {ComponentType} from '@angular/cdk/portal';
-import {coerceSignal, MaybeSignal} from '@scion/sci-components/common';
+import {coerceSignal, MaybeSignal, SciComponentDescriptor} from '@scion/sci-components/common';
 import {Translatable} from '@scion/sci-components/text';
 import {translate} from '../menu-translate.util';
 import {SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
@@ -128,29 +128,35 @@ function coerceGroupDescriptor(factoryOrDescriptor: ((group: SciMenuGroupFactory
   return [factoryOrDescriptor, factoryIfDescriptor];
 }
 
-function coerceLabelText(label: MaybeSignal<Translatable> | ComponentType<unknown>): MaybeSignal<Translatable> | undefined {
+function coerceLabelText(label: MaybeSignal<Translatable> | ComponentType<unknown> | SciComponentDescriptor): MaybeSignal<Translatable> | undefined {
   if (typeof label === 'string' || isSignal(label)) {
     return label;
   }
   return undefined;
 }
 
-function coerceLabelComponent(label: MaybeSignal<Translatable> | ComponentType<unknown>): ComponentType<unknown> | undefined {
+function coerceLabelComponent(label: MaybeSignal<Translatable> | ComponentType<unknown> | SciComponentDescriptor): SciComponentDescriptor | undefined {
   if (typeof label === 'function' && !isSignal(label)) {
+    return {component: label};
+  }
+  else if (typeof label === 'object') {
     return label;
   }
   return undefined;
 }
 
-function coerceIconLigature(icon: MaybeSignal<string> | ComponentType<unknown> | undefined): MaybeSignal<string> | undefined {
+function coerceIconLigature(icon: MaybeSignal<string> | ComponentType<unknown> | SciComponentDescriptor | undefined): MaybeSignal<string> | undefined {
   if (typeof icon === 'string' || isSignal(icon)) {
     return icon;
   }
   return undefined;
 }
 
-function coerceIconComponent(icon: MaybeSignal<string> | ComponentType<unknown> | undefined): ComponentType<unknown> | undefined {
+function coerceIconComponent(icon: MaybeSignal<string> | ComponentType<unknown> | SciComponentDescriptor | undefined): SciComponentDescriptor | undefined {
   if (typeof icon === 'function' && !isSignal(icon)) {
+    return {component: icon};
+  }
+  else if (typeof icon === 'object') {
     return icon;
   }
   return undefined;

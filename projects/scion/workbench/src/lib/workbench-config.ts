@@ -311,6 +311,9 @@ export interface ViewMenuItemsConfig {
  */
 export interface MenuItemConfig {
   accelerator?: string[];
+  /**
+   * TODO [menu] Deprecate; not supported anyore; no replacement; Supped groups are 'close', 'move' and 'additions'. Otherwise, create a group as following...
+   */
   group?: string;
   cssClass?: string | string[];
 }

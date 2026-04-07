@@ -9,7 +9,7 @@
  */
 
 import {UrlSegment} from '@angular/router';
-import {CanCloseFn, CanCloseRef, WorkbenchMenuItem} from '../workbench.model';
+import {CanCloseFn, CanCloseRef} from '../workbench.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {NavigationData, NavigationState} from '../routing/routing.model';
 import {Signal} from '@angular/core';
@@ -129,13 +129,6 @@ export abstract class WorkbenchView {
    * Indicates whether the tab of this view is scrolled into the tabbar.
    */
   public abstract readonly scrolledIntoView: Signal<boolean>;
-
-  /**
-   * Menu items associated with this view.
-   *
-   * TODO [menu] remove
-   */
-  public abstract readonly menuItems: Signal<WorkbenchMenuItem[]>;
 
   /**
    * Gets the activation instant of this view.

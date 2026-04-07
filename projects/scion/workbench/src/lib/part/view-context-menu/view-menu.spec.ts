@@ -30,6 +30,7 @@ import {toShowCustomMatcher} from '../../testing/jasmine/matcher/to-show.matcher
 import {WorkbenchViewMenuItemDirective} from './view-menu-item.directive';
 import {WorkbenchDialogService} from '../../dialog/workbench-dialog.service';
 
+// TODO [menu] Use for new menu specs; move injection context tests to new spec for workbench view context menu, e.g., that view is available for injection
 describe('View Menu', () => {
 
   beforeEach(() => {

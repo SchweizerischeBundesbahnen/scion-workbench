@@ -49,7 +49,7 @@
                 <span class="icon material-symbols-rounded" translate="no">{{menuItem.iconLigature()}}</span>
               } @else if (menuItem.iconComponent) {
                 <span class="icon">
-                  <ng-container *ngComponentOutlet="menuItem.iconComponent"/>
+                  <ng-container *sciComponentOutlet="menuItem.iconComponent"/>
                 </span>
               } @else {
                 <span class="icon"></span>
@@ -61,7 +61,7 @@
                 <span class="label">{{menuItem.labelText()}}</span>
               } @else if (menuItem.labelComponent) {
                 <span class="label">
-                  <ng-container *ngComponentOutlet="menuItem.labelComponent"/>
+                  <ng-container *sciComponentOutlet="menuItem.labelComponent"/>
                 </span>
               }
 
@@ -92,7 +92,7 @@
                 <span class="icon material-symbols-rounded" translate="no">{{menuItem.iconLigature()}}</span>
               } @else if (menuItem.iconComponent) {
                 <span class="icon">
-                  <ng-container *ngComponentOutlet="menuItem.iconComponent"/>
+                  <ng-container *sciComponentOutlet="menuItem.iconComponent"/>
                 </span>
               } @else {
                 <span class="icon"></span>
@@ -103,7 +103,7 @@
                 <span class="label">{{menuItem.labelText()}}</span>
               } @else if (menuItem.labelComponent) {
                 <span class="label">
-                  <ng-container *ngComponentOutlet="menuItem.labelComponent"/>
+                  <ng-container *sciComponentOutlet="menuItem.labelComponent"/>
                 </span>
               }
               <span class="icon material-symbols-rounded sub-menu-chevron" translate="no">arrow_right</span>

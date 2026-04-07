@@ -2,6 +2,7 @@ import {Signal} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
 import {SciMenuContributionPosition} from './menu-contribution.model';
 import {Translatable} from '@scion/sci-components/text';
+import {SciComponentDescriptor} from '@scion/sci-components/common';
 
 /**
  * INPUTS FOR DESCRIPTION: https://www.electronjs.org/docs/latest/api/menu-item
@@ -10,9 +11,9 @@ export interface SciMenuItem {
   type: 'menu-item'
   name?: `menuitem:${string}`;
   labelText?: Signal<string>;
-  labelComponent?: ComponentType<unknown>;
+  labelComponent?: SciComponentDescriptor;
   iconLigature?: Signal<string>;
-  iconComponent?: ComponentType<unknown>;
+  iconComponent?: SciComponentDescriptor;
   tooltip?: Signal<string>;
   accelerator?: string[];
   disabled?: Signal<boolean>; // Consider renaming to enabled; https://www.electronjs.org/docs/latest/api/menu-item
@@ -29,9 +30,9 @@ export interface SciMenu {
   type: 'menu'
   name?: `menu:${string}`;
   labelText?: Signal<string>;
-  labelComponent?: ComponentType<unknown>;
+  labelComponent?: SciComponentDescriptor;
   iconLigature?: Signal<string>;
-  iconComponent?: ComponentType<unknown>;
+  iconComponent?: SciComponentDescriptor;
   tooltip?: Signal<string>;
   disabled?: Signal<boolean>; // Consider renaming to enabled; https://www.electronjs.org/docs/latest/api/menu-item
   // visible: Signal<boolean>; // Consider providing visible

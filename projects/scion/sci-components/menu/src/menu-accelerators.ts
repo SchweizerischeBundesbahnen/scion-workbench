@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {computed, DOCUMENT, effect, inject, Injector, NgZone, runInInjectionContext, untracked} from '@angular/core';
+import {computed, DOCUMENT, effect, ElementRef, inject, Injector, NgZone, runInInjectionContext, untracked} from '@angular/core';
 import {SciMenuItem, SciMenuItemLike} from './menu.model';
 import {Disposable} from './common/disposable';
 import {fromEvent} from 'rxjs';
@@ -19,6 +19,7 @@ import {createDestroyableInjector} from './common/injector.util';
 import {ɵSciMenuService} from './ɵmenu.service';
 import {SciMenuAcceleratorTargetProvider} from './menu-accelerator-target-provider';
 import {coerceSignal} from '@scion/sci-components/common';
+import {coerceElement} from '@angular/cdk/coercion';
 
 /**
  * INPUTS FOR DOCUMENTING THIS FUNCTION:
@@ -30,6 +31,8 @@ import {coerceSignal} from '@scion/sci-components/common';
  * Represents a keyboard shortcut (or accelerator) that lets a user perform an action using the keyboard instead of navigating the app UI (directly or through access keys).
  *
  * An accelerator key can be a single key, such as F1 - F12 and Esc, or a combination of keys (Ctrl + Shift + B, or Ctrl C) that invoke a command. They differ from access keys (mnemonics), which are typically modified with the Alt key and simply activate a command or control.
+ *
+ * Unsubscribes from keyboard events when the injection context is destroyed.
  */
 export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${string}`, options?: SciMenuAcceleratorOptions): Disposable {
   const injector = createDestroyableInjector({parent: options?.injector});
@@ -41,7 +44,7 @@ export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${
     const document = inject(DOCUMENT);
 
     const environmentContext = coerceSignal(menuContextProvider?.provideContext?.());
-    const context = computed(() => new Map<string, unknown>([...environmentContext?.() ?? new Map(), ...options?.context ?? new Map()]));
+    const context = computed(() => new Map<string, unknown>([...environmentContext?.() ?? new Map(), ...options?.context ?? new Map()]), {equal: Objects.isEqual});
     const menuItems = menuService.menuItems(location, context, {metadata: options?.metadata});
 
     const target = menuAcceleratorTargetProvider?.provideTarget();
@@ -49,7 +52,7 @@ export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${
 
     effect(onCleanup => {
       const acceleratedMenuItems = collectMenuItemsWithAccelerator(menuItems());
-      const target = options?.target ?? contextualAcceleratorTarget?.() ?? document;
+      const target = coerceElement(options?.target) ?? contextualAcceleratorTarget?.() ?? document;
       if (!acceleratedMenuItems.length) {
         return;
       }
@@ -134,7 +137,7 @@ function getModifierState(event: KeyboardEvent): string[] {
 }
 
 export interface SciMenuAcceleratorOptions {
-  target?: Element;
+  target?: Element | ElementRef<Element>;
   context?: Map<string, unknown>;
   injector?: Injector;
   metadata?: {[key: string]: unknown};
