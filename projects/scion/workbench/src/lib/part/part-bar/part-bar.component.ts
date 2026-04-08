@@ -16,7 +16,6 @@ import {dimension} from '@scion/components/dimension';
 import {EMPTY, fromEvent, mergeMap, of, pairwise, withLatestFrom} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {SciTextPipe, text} from '@scion/sci-components/text';
-import {IconComponent} from '../../icon/icon.component';
 import {contributeMenu, SciMenuGroupFactory, SciToolbarComponent, SciToolbarFactory} from '@scion/sci-components/menu';
 import {ViewListToolbarIconComponent} from '../view-list-toolbar-icon/view-list-toolbar-icon.component';
 import {WorkbenchView} from '../../view/workbench-view.model';
@@ -34,7 +33,6 @@ export const PART_BAR_ELEMENT = new InjectionToken<HTMLElement>('PART_BAR_ELEMEN
   imports: [
     ViewTabBarComponent,
     SciTextPipe,
-    IconComponent,
     SciToolbarComponent,
   ],
   providers: [
@@ -58,6 +56,7 @@ export class PartBarComponent {
     contributeMenu('toolbar:workbench.part.internal', toolbar => {
       this.contributeViewListMenu(toolbar);
       this.contributeAdditionsMenu(toolbar);
+      this.contributeMinimizeButton(toolbar);
     }, {requiredContext: new Map().set(WorkbenchMenuContextKeys.ViewId, undefined)}); // clear view constraint to contribute to parts with and without views
   }
 
@@ -72,10 +71,6 @@ export class PartBarComponent {
 
     // Prevent default to maintain focus on part and view content.
     event.preventDefault();
-  }
-
-  protected onMinimize(): void {
-    void this._router.navigate(layout => layout.toggleActivity(this.part.activity()!.id));
   }
 
   /**
@@ -140,7 +135,7 @@ export class PartBarComponent {
           actions: actions => {
             if (view.isClosable()) {
               actions.addToolbarItem({
-                icon: 'close', // TODO [menu] workbench.close icon
+                icon: 'close', // TODO [menu] icon ligature: workbench.close
                 tooltip: '%scion.workbench.close.tooltip',
                 cssClass: 'e2e-close',
                 onSelect: () => void view.close(),
@@ -152,6 +147,17 @@ export class PartBarComponent {
           onSelect: () => void view.activate(),
         });
       }
+    }
+  }
+
+  private contributeMinimizeButton(toolbar: SciToolbarFactory): void {
+    if (this.part.canMinimize()) {
+      toolbar.addToolbarItem({
+        icon: 'remove', // TODO [menu] icon ligature: workbench.minimize
+        tooltip: '%scion.workbench.minimize.tooltip',
+        cssClass: 'e2e-minimize',
+        onSelect: () => void this._router.navigate(layout => layout.toggleActivity(this.part.activity()!.id)),
+      });
     }
   }
 

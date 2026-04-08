@@ -48,13 +48,6 @@
     flex: auto;
   }
 
-  > button.minimize:is(button, #sci-reset) {
-    @include workbench.icon-button-element-states() {
-      flex: none;
-      align-self: center;
-    }
-  }
-
   // Pseudo element for rendering the bottom border of the tabbar.
   // Must precede the viewport for the active tab to overlay it.
   &:before {

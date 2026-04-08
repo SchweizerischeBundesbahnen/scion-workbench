@@ -15,11 +15,3 @@
 
 <sci-toolbar name="toolbar:workbench.part" [context]="toolbarActiveViewContext()" [acceleratorTarget]="part.portal.element()"/>
 <sci-toolbar name="toolbar:workbench.part.internal" [context]="toolbarActiveViewContext()" [acceleratorTarget]="part.portal.element()"/>
-
-<!-- Minimize Button -->
-<!--TODO [menu] Implement as toolbar item? -->
-@if (part.canMinimize()) {
-  <button (click)="onMinimize()" [title]="('%scion.workbench.minimize.tooltip' | sciText)()" class="minimize e2e-minimize">
-    <wb-icon icon="workbench.minimize"/>
-  </button>
-}
