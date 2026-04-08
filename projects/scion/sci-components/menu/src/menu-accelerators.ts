@@ -8,17 +8,17 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {computed, DOCUMENT, effect, ElementRef, inject, Injector, NgZone, runInInjectionContext, untracked} from '@angular/core';
+import {computed, DOCUMENT, effect, ElementRef, inject, Injector, NgZone, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
 import {SciMenuItem, SciMenuItemLike} from './menu.model';
 import {Disposable} from './common/disposable';
-import {fromEvent} from 'rxjs';
+import {fromEvent, merge} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
-import {Objects} from '@scion/toolkit/util';
+import {Arrays, Objects} from '@scion/toolkit/util';
 import {SciMenuContextProvider} from './menu-context-provider';
 import {createDestroyableInjector} from './common/injector.util';
 import {ɵSciMenuService} from './ɵmenu.service';
 import {SciMenuAcceleratorTargetProvider} from './menu-accelerator-target-provider';
-import {coerceSignal} from '@scion/sci-components/common';
+import {coerceSignal, MaybeArray} from '@scion/sci-components/common';
 import {coerceElement} from '@angular/cdk/coercion';
 
 /**
@@ -39,26 +39,22 @@ export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${
   return runInInjectionContext(injector, () => {
     const menuService = inject(ɵSciMenuService);
     const menuContextProvider = inject(SciMenuContextProvider, {optional: true});
-    const menuAcceleratorTargetProvider = inject(SciMenuAcceleratorTargetProvider, {optional: true});
     const zone = inject(NgZone);
-    const document = inject(DOCUMENT);
 
-    const environmentContext = coerceSignal(menuContextProvider?.provideContext?.());
+    const environmentContext = coerceSignal(menuContextProvider?.provideContext());
     const context = computed(() => new Map<string, unknown>([...environmentContext?.() ?? new Map(), ...options?.context ?? new Map()]), {equal: Objects.isEqual});
     const menuItems = menuService.menuItems(location, context, {metadata: options?.metadata});
-
-    const target = menuAcceleratorTargetProvider?.provideTarget();
-    const contextualAcceleratorTarget = coerceSignal(target);
+    const acceleratorTargets = computeAcceleratorTargets(options);
 
     effect(onCleanup => {
       const acceleratedMenuItems = collectMenuItemsWithAccelerator(menuItems());
-      const target = coerceElement(options?.target) ?? contextualAcceleratorTarget?.() ?? document;
       if (!acceleratedMenuItems.length) {
         return;
       }
+      const targets = acceleratorTargets();
 
       untracked(() => {
-        const subscription = fromEvent<KeyboardEvent>(target, 'keydown')
+        const subscription = merge(...targets.map(target => fromEvent<KeyboardEvent>(target, 'keydown')))
           .pipe(subscribeIn(fn => zone.runOutsideAngular(fn)))
           .subscribe(event => {
             const key = (event.key as string | undefined)?.toLowerCase() ?? ''; // `event.key` can be `undefined`, for example, when selecting an option from an input element's datalist.
@@ -86,6 +82,20 @@ export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${
       dispose: () => injector.destroy(),
     }
   });
+}
+
+function computeAcceleratorTargets(options?: SciMenuAcceleratorOptions): Signal<Array<Element | Document>> {
+  const targetFromOptions = Arrays.coerce(options?.target).map(coerceElement);
+  if (targetFromOptions.length) {
+    return signal(targetFromOptions);
+  }
+
+  const document = inject(DOCUMENT);
+  const targetProvider = inject(SciMenuAcceleratorTargetProvider, {optional: true});
+  const providedTarget = coerceSignal(targetProvider?.provideTarget());
+  const targetFromProvider = computed(() => Arrays.coerce(providedTarget?.()).map(coerceElement));
+
+  return computed(() => targetFromProvider?.().length ? targetFromProvider!() : [document]);
 }
 
 function collectMenuItemsWithAccelerator(menuContributions: SciMenuItemLike[]): SciMenuItem[] {
@@ -137,7 +147,7 @@ function getModifierState(event: KeyboardEvent): string[] {
 }
 
 export interface SciMenuAcceleratorOptions {
-  target?: Element | ElementRef<Element>;
+  target?: MaybeArray<Element | ElementRef<Element>>;
   context?: Map<string, unknown>;
   injector?: Injector;
   metadata?: {[key: string]: unknown};

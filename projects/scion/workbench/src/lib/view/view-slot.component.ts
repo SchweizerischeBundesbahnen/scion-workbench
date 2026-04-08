@@ -20,7 +20,6 @@ import {WorkbenchView} from './workbench-view.model';
 import {OnAttach, OnDetach} from '../portal/wb-component-portal';
 import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-context.directive';
 import {FocusTrackerRef, trackFocus} from '../focus/workbench-focus-tracker.service';
-import {WorkbenchViewContextMenuService} from '../part/view-context-menu/workbench-view-context-menu.service';
 
 /**
  * Acts as a placeholder for a view's content that Angular fills based on the current router state of the associated view outlet.
@@ -66,7 +65,6 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
     this._focusTrackerRef = trackFocus(this._host, this.view);
 
     this.installComponentLifecycleLogger();
-    this.installMenuAccelerators();
     this.unsetActiveElementOnPartDeactivate();
   }
 
@@ -102,11 +100,6 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
         this._activeElementBeforeDetach = activeElement;
       }
     }
-  }
-
-  private installMenuAccelerators(): void {
-    const accelerators = inject(WorkbenchViewContextMenuService).installAccelerators(inject(ElementRef), {viewId: this.view.id});
-    inject(DestroyRef).onDestroy(() => accelerators.dispose());
   }
 
   /**

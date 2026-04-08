@@ -13,6 +13,6 @@
  *
  * @see https://github.com/ng-packagr/ng-packagr/blob/master/docs/secondary-entrypoints.md
  */
-export {type MaybeSignal, type OneOf, type RequireOne} from './types';
+export {type MaybeSignal, type OneOf, type RequireOne, type MaybeArray} from './types';
 export {coerceSignal} from './coerce-signal.util';
 export {type SciComponentDescriptor, SciComponentOutletDirective} from './component-outlet.directive';

@@ -25,7 +25,7 @@ import {SciMenuAdapter, SciMenuAdapterChain} from './menu-adapter.model';
 export class ɵSciMenuService implements SciMenuService {
 
   private readonly _menuRegistry = interceptMenuRegistry(inject(SciMenuRegistry));
-  private readonly _environmentContext = coerceSignal(inject(SciMenuContextProvider, {optional: true})?.provideContext?.());
+  private readonly _environmentContext = coerceSignal(inject(SciMenuContextProvider, {optional: true})?.provideContext());
 
   /** @inheritDoc */
   public open(menu: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions): SciMenuRef {

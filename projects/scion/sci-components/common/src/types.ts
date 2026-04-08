@@ -32,3 +32,8 @@ export type OneOf<T> = {
  * Represents a value or a {@link Signal} of that value.
  */
 export type MaybeSignal<T> = T | Signal<T>;
+
+/**
+ * Represents a value or an array of that value.
+ */
+export type MaybeArray<T> = T | T[];

@@ -9,10 +9,10 @@
  */
 
 import {Injectable} from '@angular/core';
-import {MaybeSignal} from '@scion/sci-components/common';
+import {MaybeArray, MaybeSignal} from '@scion/sci-components/common';
 
 @Injectable()
 export abstract class SciMenuAcceleratorTargetProvider {
 
-  public abstract provideTarget(): MaybeSignal<Element | undefined>;
+  public abstract provideTarget(): MaybeSignal<MaybeArray<Element> | undefined>;
 }

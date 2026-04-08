@@ -8,11 +8,4 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable} from '@angular/core';
-import {MaybeSignal} from '@scion/sci-components/common';
-
-@Injectable()
-export abstract class SciMenuContextProvider {
-
-  public abstract provideContext(): MaybeSignal<Map<string, unknown> | undefined>;
-}
+export {WorkbenchMenuContextKeys} from './workbench-menu-context-provider';

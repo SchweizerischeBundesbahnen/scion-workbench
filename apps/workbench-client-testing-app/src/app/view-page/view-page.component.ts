@@ -26,6 +26,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {contributeMenu, Disposable, SciMenuService, SciToolbarComponent} from '@scion/sci-components/menu';
+import {WorkbenchMenuContextKeys} from '@scion/workbench';
 
 @Component({
   selector: 'app-view-page',
@@ -174,7 +175,7 @@ export default class ViewPageComponent {
           menu
             .addToolbarItem('favorite', onSelect);
         }
-        , {requiredContext: new Map().set('viewId', undefined), injector: this.injector});
+        , {requiredContext: new Map().set(WorkbenchMenuContextKeys.ViewId, undefined), injector: this.injector});
     }
   }
 
@@ -190,7 +191,7 @@ export default class ViewPageComponent {
           menu
             .addToolbarItem('train', onSelect);
         }
-        , {requiredContext: new Map().set('viewId', undefined), injector: this.injector});
+        , {requiredContext: new Map().set(WorkbenchMenuContextKeys.ViewId, undefined), injector: this.injector});
     }
   }
 
@@ -296,10 +297,10 @@ export default class ViewPageComponent {
 
     // contributeMenu('toolbar:router-page', menu => menu
     //     .addToolbarItem('favorite', onSelect)
-    //   , {requiredContext: new Map().set('viewId', undefined)});
+    //   , {requiredContext: new Map().set(WorkbenchMenuContextKeys.ViewId, undefined)});
     // contributeMenu('toolbar:router-page', menu => menu
     //     .addToolbarItem('cancel', onSelect)
-    //   , {requiredContext: new Map().set('viewId', undefined)});
+    //   , {requiredContext: new Map().set(WorkbenchMenuContextKeys.ViewId, undefined)});
 
     if (1 + 1) {
       // return;

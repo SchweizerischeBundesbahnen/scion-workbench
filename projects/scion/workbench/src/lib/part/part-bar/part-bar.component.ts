@@ -20,7 +20,7 @@ import {IconComponent} from '../../icon/icon.component';
 import {contributeMenu, SciMenuGroupFactory, SciToolbarComponent, SciToolbarFactory} from '@scion/sci-components/menu';
 import {ViewListToolbarIconComponent} from '../view-list-toolbar-icon/view-list-toolbar-icon.component';
 import {WorkbenchView} from '../../view/workbench-view.model';
-import {PART_CONTEXT_VIEW_ID} from '../../menu/workbench-menu-context-provider';
+import {PART_CONTEXT_VIEW_ID, WorkbenchMenuContextKeys} from '../../menu/workbench-menu-context-provider';
 
 /**
  * DI token to inject the HTML element of the {@link PartBarComponent}.
@@ -49,7 +49,7 @@ export class PartBarComponent {
 
   protected readonly part = inject(ɵWorkbenchPart);
   protected readonly maxViewTabBarWidth: Signal<number>;
-  protected readonly toolbarActiveViewContext = computed(() => new Map().set('viewId', this.part.activeView()?.id ?? PART_CONTEXT_VIEW_ID));
+  protected readonly toolbarActiveViewContext = computed(() => new Map().set(WorkbenchMenuContextKeys.ViewId, this.part.activeView()?.id ?? PART_CONTEXT_VIEW_ID));
 
   constructor() {
     this.maxViewTabBarWidth = this.calculateMaxViewTabBarWidth();
@@ -58,7 +58,7 @@ export class PartBarComponent {
     contributeMenu('toolbar:workbench.part.internal', toolbar => {
       this.contributeViewListMenu(toolbar);
       this.contributeAdditionsMenu(toolbar);
-    });
+    }, {requiredContext: new Map().set(WorkbenchMenuContextKeys.ViewId, undefined)}); // clear view constraint to contribute to parts with and without views
   }
 
   protected onPartBarMouseDown(event: Event): void {

@@ -18,7 +18,7 @@ import {UUID} from '@scion/toolkit/uuid';
 import {MultiValueInputComponent, parseTypedObject, prune, stringifyError} from 'workbench-testing-app-common';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {contributeMenu, SciToolbarComponent} from '@scion/sci-components/menu';
-import {Disposable} from '@scion/workbench';
+import {Disposable, WorkbenchMenuContextKeys} from '@scion/workbench';
 
 @Component({
   selector: 'app-router-page',
@@ -70,7 +70,7 @@ export class RouterPageComponent {
             this.state.update(state => !state);
           },
         })
-      , {requiredContext: new Map().set('viewId', undefined)});
+      , {requiredContext: new Map().set(WorkbenchMenuContextKeys.ViewId, undefined)});
   }
 
   protected async onNavigate(): Promise<void> {
@@ -122,7 +122,7 @@ export class RouterPageComponent {
             console.log('>>> on click');
           })
         }
-      }, {requiredContext: new Map().set('viewId', undefined), injector: this.injector})
+      }, {requiredContext: new Map().set(WorkbenchMenuContextKeys.ViewId, undefined), injector: this.injector})
     }
   }
 }

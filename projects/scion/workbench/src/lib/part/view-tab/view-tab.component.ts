@@ -158,13 +158,15 @@ export class ViewTabComponent {
   }
 
   private installMenuAccelerators(): void {
-    const host = inject(ElementRef);
+    const viewTabElement = inject(ElementRef).nativeElement as Element;
 
     effect(onCleanup => {
       const view = this.view();
+      const viewSlotElement = view.slot.portal.element();
+      const targets = [viewTabElement].concat(viewSlotElement ?? []);
 
       untracked(() => {
-        const accelerators = this._viewContextMenuService.installAccelerators(host, {viewId: view.id});
+        const accelerators = this._viewContextMenuService.installAccelerators(targets, {viewId: view.id});
         onCleanup(() => accelerators.dispose());
       });
     });

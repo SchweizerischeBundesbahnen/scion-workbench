@@ -1,10 +1,9 @@
 import {ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, Injector, input, Signal, untracked, ViewContainerRef} from '@angular/core';
 import {SciToolGroupComponent} from './toolbar-group.component';
 import {SciMenuContextProvider} from '../menu-context-provider';
-import {coerceElement} from '@angular/cdk/coercion';
 import {installMenuAccelerators} from '../menu-accelerators';
 import {ɵSciMenuService} from '../ɵmenu.service';
-import {coerceSignal} from '@scion/sci-components/common';
+import {coerceSignal, MaybeArray} from '@scion/sci-components/common';
 import {Objects} from '@scion/toolkit/util';
 
 @Component({
@@ -20,7 +19,7 @@ export class SciToolbarComponent {
 
   public readonly name = input.required<`toolbar:${string}`>();
   public readonly context = input<Map<string, unknown>>();
-  public readonly acceleratorTarget = input<Element | ElementRef<Element> | undefined>();
+  public readonly acceleratorTarget = input<MaybeArray<Element | ElementRef<Element>> | undefined>();
   public readonly viewContainerRef = input<ViewContainerRef | undefined>();
 
   private readonly _menuService = inject(ɵSciMenuService);
@@ -33,7 +32,7 @@ export class SciToolbarComponent {
   }
 
   protected computeContext(): Signal<Map<string, unknown>> {
-    const environmentContext = coerceSignal(inject(SciMenuContextProvider, {optional: true})?.provideContext?.());
+    const environmentContext = coerceSignal(inject(SciMenuContextProvider, {optional: true})?.provideContext());
     return computed(() => new Map([...environmentContext?.() ?? new Map(), ...this.context() ?? new Map()]), {equal: Objects.isEqual});
   }
 
@@ -46,7 +45,7 @@ export class SciToolbarComponent {
 
     effect(onCleanup => {
       const name = this.name();
-      const target = coerceElement(this.acceleratorTarget());
+      const target = this.acceleratorTarget();
       const context = this._context();
 
       untracked(() => {

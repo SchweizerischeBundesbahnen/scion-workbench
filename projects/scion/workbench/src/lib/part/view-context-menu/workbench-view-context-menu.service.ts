@@ -16,7 +16,7 @@ import {WorkbenchView} from '../../view/workbench-view.model';
 import {contributeMenu, Disposable, installMenuAccelerators, SciMenuGroupFactory, SciMenuService} from '@scion/sci-components/menu';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {WORKBENCH_ELEMENT} from '../../workbench-element-references';
-import {SciComponentDescriptor} from '@scion/sci-components/common';
+import {MaybeArray, SciComponentDescriptor} from '@scion/sci-components/common';
 import {createDestroyableInjector} from '../../common/injector.util';
 import {NgTemplateOutlet} from '@angular/common';
 import {WorkbenchMenuItem, WorkbenchViewMenuItemFn} from '../../workbench.model';
@@ -141,7 +141,7 @@ export class WorkbenchViewContextMenuService {
   /**
    * Installs view context menu keyboard shortcuts on the given element.
    */
-  public installAccelerators(target: ElementRef<HTMLElement> | HTMLElement, context: {viewId: ViewId}): Disposable {
+  public installAccelerators(target: MaybeArray<Element | ElementRef<Element>> | undefined, context: {viewId: ViewId}): Disposable {
     return installMenuAccelerators('menu:workbench.view.contextmenu', {
       target,
       context: this.createViewMenuContext(context.viewId), // Specify menu context to be independent of the invocation context.

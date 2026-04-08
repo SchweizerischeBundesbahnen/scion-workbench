@@ -23,29 +23,29 @@ class WorkbenchMenuContextProvider implements SciMenuContextProvider {
     const view = inject(WorkbenchView, {optional: true});
     if (view) {
       return computed(() => new Map<string, unknown>()
-        .set('viewId', view.id)
-        .set('partId', view.part().id)
-        .set('peripheral', view.part().peripheral())
-        .set('mainArea', view.part().isInMainArea));
+        .set(WorkbenchMenuContextKeys.ViewId, view.id)
+        .set(WorkbenchMenuContextKeys.PartId, view.part().id)
+        .set(WorkbenchMenuContextKeys.Peripheral, view.part().peripheral())
+        .set(WorkbenchMenuContextKeys.MainArea, view.part().isInMainArea));
     }
 
     const part = inject(WorkbenchPart, {optional: true});
     if (part) {
       return computed(() => new Map<string, unknown>()
-        .set('partId', part.id)
-        .set('viewId', PART_CONTEXT_VIEW_ID)
-        .set('peripheral', part.peripheral())
-        .set('mainArea', part.isInMainArea));
+        .set(WorkbenchMenuContextKeys.PartId, part.id)
+        .set(WorkbenchMenuContextKeys.ViewId, PART_CONTEXT_VIEW_ID)
+        .set(WorkbenchMenuContextKeys.Peripheral, part.peripheral())
+        .set(WorkbenchMenuContextKeys.MainArea, part.isInMainArea));
     }
 
     const dialog = inject(WorkbenchDialog, {optional: true});
     if (dialog) {
-      return new Map<string, unknown>().set('dialogId', dialog.id);
+      return new Map<string, unknown>().set(WorkbenchMenuContextKeys.DialogId, dialog.id);
     }
 
     const notification = inject(WorkbenchNotification, {optional: true});
     if (notification) {
-      return new Map<string, unknown>().set('notificationId', notification.id);
+      return new Map<string, unknown>().set(WorkbenchMenuContextKeys.NotificationId, notification.id);
     }
 
     return undefined;
@@ -62,3 +62,15 @@ export function provideWorkbenchMenuContextProvider(): EnvironmentProviders {
  * Default value for `viewId` if in the context of a part.
  */
 export const PART_CONTEXT_VIEW_ID = null;
+
+/**
+ * Workbench context keys used by workbench menus.
+ */
+export enum WorkbenchMenuContextKeys {
+  ViewId = 'viewId',
+  PartId = 'partId',
+  Peripheral = 'peripheral',
+  MainArea = 'mainArea',
+  DialogId = 'dialogId',
+  NotificationId = 'notificationId',
+}
