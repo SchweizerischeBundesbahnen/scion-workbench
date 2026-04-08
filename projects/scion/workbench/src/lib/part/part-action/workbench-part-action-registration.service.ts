@@ -20,7 +20,6 @@ import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {WorkbenchPart} from '../workbench-part.model';
 import {WORKBENCH_PART_CONTEXT} from '../workbench-part-context.provider';
 import {ComponentType} from '@angular/cdk/portal';
-import {noop} from 'rxjs';
 
 /**
  * Registers legacy part actions as toolbar items in the part toolbar.
@@ -81,9 +80,7 @@ export class WorkbenchPartActionRegistrationService {
         }
 
         toolbar.addToolbarItem({
-          // TODO [menu] should not be icon nor label, but component (addToolbarComponent)
-          icon: coerceComponent(legacyPartAction, {providers, part}),
-          onSelect: noop, // not supported by part actions
+          control: {...coerceComponent(legacyPartAction, {providers, part}), cssClass: legacyPartAction.cssClass},
           cssClass: legacyPartAction.cssClass,
         })
       }), {injector}); // Pass root injector to be independent of the invocation context.

@@ -125,6 +125,7 @@ export class WorkbenchViewContextMenuService {
           ],
           providers: options.providers,
           injector: legacyViewMenuItem.injector,
+          cssClass: legacyViewMenuItem.cssClass,
         };
       }
       else {
@@ -133,6 +134,7 @@ export class WorkbenchViewContextMenuService {
           bindings: Object.entries(legacyViewMenuItem.inputs ?? {}).map(([key, value]) => inputBinding(key, signal(value))),
           providers: options.providers,
           injector: legacyViewMenuItem.injector,
+          cssClass: legacyViewMenuItem.cssClass,
         };
       }
     }

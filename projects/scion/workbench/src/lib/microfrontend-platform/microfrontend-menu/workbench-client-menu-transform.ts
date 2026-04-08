@@ -88,6 +88,9 @@ export namespace SciMenuItems {
           if (menuItem.iconComponent) {
             throw Error('[MenuDefinitionError] Component not supported as icon in microfrontend menu.');
           }
+          if (menuItem.control) {
+            throw Error('[MenuDefinitionError] Control not supported in microfrontend toolbar.');
+          }
 
           return new WorkbenchMenuItem({
             id: menuItemId,

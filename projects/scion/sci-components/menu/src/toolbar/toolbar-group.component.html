@@ -3,26 +3,30 @@
 
   @switch (menuItem.type) {
     @case ('menu-item') {
-      <button [attr.disabled]="disabled || null"
-              [class.checked]="menuItem.checked?.()"
-              [class]="menuItem.cssClass" class="menu-item"
-              (click)="onSelect(menuItem)">
-        @if (menuItem.iconLigature) {
-          <span class="icon material-symbols-rounded" translate="no">{{menuItem.iconLigature()}}</span>
-        } @else if (menuItem.iconComponent) {
-          <span class="icon">
-            <ng-container *sciComponentOutlet="menuItem.iconComponent"/>
-          </span>
-        }
+      @if (menuItem.control) {
+        <ng-container *sciComponentOutlet="menuItem.control"/>
+      } @else {
+        <button [attr.disabled]="disabled || null"
+                [class.checked]="menuItem.checked?.()"
+                [class]="menuItem.cssClass" class="menu-item"
+                (click)="onSelect(menuItem)">
+          @if (menuItem.iconLigature) {
+            <span class="icon material-symbols-rounded" translate="no">{{menuItem.iconLigature()}}</span>
+          } @else if (menuItem.iconComponent) {
+            <span class="icon">
+              <ng-container *sciComponentOutlet="menuItem.iconComponent"/>
+            </span>
+          }
 
-        @if (menuItem.labelText) {
-          <span class="label">{{menuItem.labelText()}}</span>
-        } @else if (menuItem.labelComponent) {
-          <span class="label">
-            <ng-container *sciComponentOutlet="menuItem.labelComponent"/>
-          </span>
-        }
-      </button>
+          @if (menuItem.labelText) {
+            <span class="label">{{menuItem.labelText()}}</span>
+          } @else if (menuItem.labelComponent) {
+            <span class="label">
+              <ng-container *sciComponentOutlet="menuItem.labelComponent"/>
+            </span>
+          }
+        </button>
+      }
     }
     @case ('menu') {
       @let hasLabel = menuItem.labelText || menuItem.labelComponent;

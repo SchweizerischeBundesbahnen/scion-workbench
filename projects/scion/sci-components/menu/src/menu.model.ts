@@ -1,5 +1,4 @@
 import {Signal} from '@angular/core';
-import {ComponentType} from '@angular/cdk/portal';
 import {SciMenuContributionPosition} from './menu-contribution.model';
 import {Translatable} from '@scion/sci-components/text';
 import {SciComponentDescriptor} from '@scion/sci-components/common';
@@ -14,6 +13,7 @@ export interface SciMenuItem {
   labelComponent?: SciComponentDescriptor;
   iconLigature?: Signal<string>;
   iconComponent?: SciComponentDescriptor;
+  control?: SciComponentDescriptor; // only in toolbar, not menu
   tooltip?: Signal<string>;
   accelerator?: string[];
   disabled?: Signal<boolean>; // Consider renaming to enabled; https://www.electronjs.org/docs/latest/api/menu-item

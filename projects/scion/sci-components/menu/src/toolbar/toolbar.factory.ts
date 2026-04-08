@@ -20,6 +20,8 @@ export interface SciToolbarFactory {
 
   addToolbarItem(descriptor: SciToolbarItemDescriptor): this;
 
+  addToolbarItem(descriptor: SciToolbarControlDescriptor): this;
+
   addMenu(icon: string | MaybeSignal<string>, menuFactoryFn: (menu: SciMenuFactory) => void): this;
 
   addMenu(descriptor: SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this;
@@ -41,6 +43,13 @@ export interface SciToolbarItemDescriptor {
   disabled?: MaybeSignal<boolean>;
   cssClass?: string | string[];
   onSelect: () => void;
+}
+
+export interface SciToolbarControlDescriptor {
+  name?: `menuitem:${string}`;
+  control: ComponentType<unknown> | SciComponentDescriptor;
+  tooltip?: MaybeSignal<Translatable>;
+  cssClass?: string | string[];
 }
 
 export interface SciToolbarMenuDescriptor {

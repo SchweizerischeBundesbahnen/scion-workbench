@@ -11,7 +11,7 @@
 import {MaybeObservable, Translatable, WorkbenchMenuFactory, WorkbenchToolbarFactory, WorkbenchToolbarGroupFactory} from '@scion/workbench-client';
 import {inject, Injector, isSignal, runInInjectionContext} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
-import {SciMenuFactory, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarGroupFactory, SciToolbarItemDescriptor, SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
+import {SciMenuFactory, SciToolbarControlDescriptor, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarGroupFactory, SciToolbarItemDescriptor, SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
 import {WorkbenchClientMenuFactoryDelegate} from './workbench-client-menu-factory-delegate';
 import {toLazyObservable} from '../common/lazy-observable.util';
 import {MaybeSignal, RequireOne, SciComponentDescriptor} from '@scion/sci-components/common';
@@ -29,7 +29,8 @@ export class WorkbenchClientToolbarFactoryDelegate implements SciToolbarFactory 
   /** @inheritDoc */
   public addToolbarItem(icon: MaybeSignal<string>, onSelect: () => void): this;
   public addToolbarItem(descriptor: SciToolbarItemDescriptor): this;
-  public addToolbarItem(iconOrDescriptor: MaybeSignal<string> | SciToolbarItemDescriptor, onSelect?: () => void): this {
+  public addToolbarItem(descriptor: SciToolbarControlDescriptor): this;
+  public addToolbarItem(iconOrDescriptor: MaybeSignal<string> | SciToolbarItemDescriptor | SciToolbarControlDescriptor, onSelect?: () => void): this {
     const descriptor = coerceToolbarItemDescriptor(iconOrDescriptor, onSelect);
 
     this._delegate.addToolbarItem({
@@ -99,9 +100,12 @@ export class WorkbenchClientToolbarFactoryDelegate implements SciToolbarFactory 
   }
 }
 
-function coerceToolbarItemDescriptor(iconOrDescriptor: MaybeSignal<string> | SciToolbarItemDescriptor, onSelect?: () => void): SciToolbarItemDescriptor {
+function coerceToolbarItemDescriptor(iconOrDescriptor: MaybeSignal<string> | SciToolbarItemDescriptor | SciToolbarControlDescriptor, onSelect?: () => void): SciToolbarItemDescriptor {
   if (typeof iconOrDescriptor === 'string' || isSignal(iconOrDescriptor)) {
     return {icon: iconOrDescriptor, onSelect: onSelect!};
+  }
+  if ('control' in iconOrDescriptor) {
+    throw Error('[MenuDefinitionError] Control not supported in microfrontend toolbar.');
   }
   return iconOrDescriptor;
 }

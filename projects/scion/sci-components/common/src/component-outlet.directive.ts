@@ -44,11 +44,17 @@ export class SciComponentOutletDirective {
 function createComponent(viewContainerRef: ViewContainerRef, descriptor: SciComponentDescriptor): ComponentRef<unknown> {
   // Provide providers via host directive.
   @Directive({providers: descriptor.providers ?? []})
-  class InjectionContextDirective {
+  class ProvidersDirective {
+  }
+
+  // Provide CSS classes via host directive.
+  @Directive({host: {'[class]': 'descriptor.cssClass'}})
+  class CssClassDirective {
+    protected readonly descriptor = descriptor;
   }
 
   return viewContainerRef.createComponent(descriptor.component, {
-    directives: [InjectionContextDirective],
+    directives: [ProvidersDirective, CssClassDirective],
     bindings: descriptor.bindings,
     injector: descriptor.injector,
   });
@@ -73,9 +79,12 @@ export interface SciComponentDescriptor {
    * ```
    */
   injector?: Injector;
-
   /**
    * Specifies providers available for injection in the component.
    */
   providers?: Provider[];
+  /**
+   * Specifies CSS class(es) to add to the component, e.g., to locate the component in tests.
+   */
+  cssClass?: string | string[];
 }
