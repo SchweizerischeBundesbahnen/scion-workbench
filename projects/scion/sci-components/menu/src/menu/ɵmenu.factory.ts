@@ -41,6 +41,7 @@ export class ɵSciMenuFactory implements SciMenuFactory {
       actions: actionsFactory.menuItems,
       matchesFilter: descriptor.onFilter,
       cssClass: Arrays.coerce(descriptor.cssClass),
+      attributes: descriptor.attributes,
       onSelect: async () => await descriptor.onSelect() ?? descriptor.checked === undefined, // Close if the callback returns true. Defaults to closing non-checkable menu items.
     } satisfies SciMenuItem);
 

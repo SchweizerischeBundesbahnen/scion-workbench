@@ -52,7 +52,8 @@ export interface WorkbenchToolbarItemDescriptor {
   accelerator?: string[];
   disabled?: MaybeObservable<boolean>;
   cssClass?: string | string[];
-  onSelect: () => void;
+  attributes?: {[name: string]: string};
+  onSelect: () => boolean | void | Promise<boolean | void>;
 }
 
 export interface WorkbenchToolbarMenuDescriptor {

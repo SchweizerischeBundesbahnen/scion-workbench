@@ -26,7 +26,7 @@ export interface SciMenuOptions {
   anchor: HTMLElement | ElementRef<HTMLElement> | SciMenuOrigin | MouseEvent;
   context?: Map<string, unknown>;
   /**
-   * Controls where to align the menu relative to the menu anchor, unless there is not enough space available in that area. Defaults to `south`.
+   * Controls where to align the menu relative to the menu anchor, unless there is not enough space available in that area. Defaults to `vertical`.
    */
   align?: 'vertical' | 'horizontal';
   /**

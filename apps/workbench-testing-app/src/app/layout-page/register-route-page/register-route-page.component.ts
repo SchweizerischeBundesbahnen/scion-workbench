@@ -12,7 +12,7 @@ import {Component, inject, signal} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
 import {FieldValidationDirective, SciKeyValueFieldComponent} from 'workbench-testing-app-common';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
-import {SettingsService} from '../../settings.service';
+import {Settings} from '../../settings.service';
 import {form, Field, hidden, required} from '@angular/forms/signals';
 import {Qualifier} from '@scion/microfrontend-platform';
 import {RouteRegistrationService} from '../../route-registration.service';
@@ -31,7 +31,7 @@ import {RouteRegistrationService} from '../../route-registration.service';
 })
 export default class RegisterRoutePageComponent {
 
-  private readonly _settingsService = inject(SettingsService);
+  private readonly _settings = inject(Settings);
   private readonly _routeRegistrationService = inject(RouteRegistrationService);
   private readonly _initialFormValue = {
     path: '',
@@ -67,7 +67,7 @@ export default class RegisterRoutePageComponent {
   }
 
   public resetForm(): void {
-    if (this._settingsService.isEnabled('resetFormsOnSubmit')) {
+    if (this._settings.resetFormsOnSubmit()) {
       this.form().reset(this._initialFormValue);
     }
   }

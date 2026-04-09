@@ -41,6 +41,7 @@ export class ɵWorkbenchMenuFactory implements WorkbenchMenuFactory {
       disabled: descriptor.disabled,
       actions: actionsFactory.menuItems,
       cssClass: Arrays.coerce(descriptor.cssClass),
+      attributes: descriptor.attributes,
       onSelect: async () => await descriptor.onSelect() ?? descriptor.checked === undefined, // Close if the callback returns true. Defaults to closing non-checkable menu items.
     }));
 

@@ -40,6 +40,7 @@ export namespace SciMenuItems {
             actions: SciMenuItems.fromWorkbenchMenuItemProxies(menuItemProxy.actions, {injector}),
             // matchesFilter: (filter: string) => true; // TODO [menu]
             cssClass: menuItemProxy.cssClass,
+            attributes: menuItemProxy.attributes,
             position: menuItemProxy.position,
             onSelect: () => menuItemProxy.select(),
           } satisfies SciMenuItem;
@@ -113,6 +114,7 @@ export namespace SciMenuItems {
             checked: toLazyObservable(menuItem.checked, {injector}),
             actions: SciMenuItems.toWorkbenchMenuItems(menuItem.actions, {injector}),
             cssClass: menuItem.cssClass,
+            attributes: menuItem.attributes,
             position: menuItem.position,
             // matchesFilter: filter => menuItem?.matchesFilter(filter),
             onSelect: menuItem.onSelect,

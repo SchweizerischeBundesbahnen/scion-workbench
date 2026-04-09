@@ -39,6 +39,7 @@ export class WorkbenchViewContextMenuService {
   public open(event: MouseEvent, context: {viewId: ViewId}): void {
     this._menuService.open('menu:workbench.view.contextmenu', {
       anchor: event,
+      size: {width: 'var(--sci-workbench-contextmenu-width)'},
       context: this.createViewMenuContext(context.viewId), // Pass menu context to be independent of the invocation context.
     });
   }

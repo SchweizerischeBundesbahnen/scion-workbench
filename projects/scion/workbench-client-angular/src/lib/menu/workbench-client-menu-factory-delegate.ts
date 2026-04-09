@@ -47,6 +47,7 @@ export class WorkbenchClientMenuFactoryDelegate implements SciMenuFactory {
       },
       onFilter: descriptor.onFilter,
       cssClass: descriptor.cssClass,
+      attributes: descriptor.attributes,
       onSelect: () => runInInjectionContext(this._injector, descriptor.onSelect),
     });
 

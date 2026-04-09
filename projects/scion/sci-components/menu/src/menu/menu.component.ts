@@ -13,7 +13,7 @@ import {SciViewportComponent} from '@scion/components/viewport';
 import {concat, fromEvent, map, NEVER, of, switchMap, timer} from 'rxjs';
 import {toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {SciTextPipe, Translatable} from '@scion/sci-components/text';
-import {RequireOne, SciComponentOutletDirective} from '@scion/sci-components/common';
+import {RequireOne, SciAttributesDirective, SciComponentOutletDirective} from '@scion/sci-components/common';
 
 /**
  * Represents a menu or a group of menu items.
@@ -35,6 +35,7 @@ import {RequireOne, SciComponentOutletDirective} from '@scion/sci-components/com
     NgTemplateOutlet,
     SciTextPipe,
     SciComponentOutletDirective,
+    SciAttributesDirective,
   ],
   providers: [
     MenuFilter,
@@ -42,9 +43,9 @@ import {RequireOne, SciComponentOutletDirective} from '@scion/sci-components/com
   host: {
     '[class.no-glyph-area]': '!hasGlyphArea()',
     '[class.is-group]': '!!group()',
-    '[style.width]': 'size()?.width ?? \'var(--sci-workbench-contextmenu-width)\'',
+    '[style.width]': 'size()?.width',
     '[style.min-width]': 'size()?.minWidth',
-    '[style.max-width]': 'size()?.maxWidth ?? \'var(--sci-workbench-contextmenu-width)\'',
+    '[style.max-width]': 'size()?.maxWidth',
     '[style.--ɵmenu-max-height]': 'size()?.maxHeight',
     '[style.--ɵmenu-scrolling]': 'scrolling() ? `true` : null',
     '[class]': 'cssClass()',

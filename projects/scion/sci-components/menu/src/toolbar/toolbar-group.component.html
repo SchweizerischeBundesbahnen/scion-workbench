@@ -9,6 +9,7 @@
         <button [attr.disabled]="disabled || null"
                 [class.checked]="menuItem.checked?.()"
                 [class]="menuItem.cssClass" class="menu-item"
+                [sciAttributes]="menuItem.attributes"
                 (click)="onSelect(menuItem)">
           @if (menuItem.iconLigature) {
             <span class="icon material-symbols-rounded" translate="no">{{menuItem.iconLigature()}}</span>

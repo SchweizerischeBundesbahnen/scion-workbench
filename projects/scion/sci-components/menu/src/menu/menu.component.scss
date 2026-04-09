@@ -1,5 +1,6 @@
 $padding_menu: .3em;
 $padding_menu_item: 4px;
+$padding_label_left: 7.5px;
 $menu_item_gap: .25em;
 $font-size: 13px;
 $font-size-smaller: $font-size - 1px;
@@ -30,7 +31,7 @@ $icon-size: 18px;
     }
   }
 
-  &:active:where(:not(:disabled)) {
+  &:active:where(:not(:disabled)):focus { // guard with :focus to not style the menu button when clicking an action toolitem
     background-color: var(--sci-workbench-button-background-color-active);
   }
 
@@ -87,11 +88,28 @@ $icon-size: 18px;
     padding: unset;
     background-color: inherit;
 
+    &:not(.no-glyph-area) {
+      > header.group-header {
+        grid-column: 2;
+        padding-left: 0;
+      }
+    }
+
+    &.no-glyph-area {
+      > header.group-header {
+        grid-column: 1/-1; // consume all columns
+      }
+    }
+
     > header.group-header {
-      grid-column: 1/-1; // consume all columns
       user-select: none;
-      color: var(--sci-color-text-subtle);
-      padding: $padding_menu_item $padding_menu_item 0 $padding_menu_item;
+      color: var(--sci-color-text);
+      font-weight: 500;
+      @container style(--sci-color-scheme: dark) {
+        // TODO [menu] add sci-color-scheme token, currently simply color-scheme, not a CSS variable
+        font-weight: 600;
+      }
+      padding: .75em $padding_menu_item .5em $padding_menu_item + $padding_label_left;
       @include ellipsis-on-overflow();
     }
 
@@ -178,7 +196,7 @@ $icon-size: 18px;
   }
 
   // Add after separator
-  sci-menu-group:not(:last-child):not(:has(+ sci-menu-group))::after {
+  sci-menu-group:not(:last-child):not(:has(+ sci-menu-group, + sci-menu))::after { // + sci-menu to exclude opened submenu, which is rendered as the last child
     content: '';
     grid-column: 1/-1;
     height: 1px;
@@ -199,11 +217,12 @@ $icon-size: 18px;
     > div.content {
       display: flex;
       align-items: center;
-      gap: 1em;
+      gap: 2.5em;
       overflow: hidden; // to support ellipsis on label
 
+      // Add left padding if no glyph area.
       &:first-child > span.label {
-        padding-left: .5em;
+        padding-left: $padding_label_left;
       }
 
       > span.label {
@@ -223,15 +242,12 @@ $icon-size: 18px;
 
       > sci-toolbar-group.actions {
         flex: none;
-        padding-left: .25em;
-        border-left: 1px solid var(--sci-color-border);
         align-self: stretch;
-        --sci-toolbar-toolitem-background-color-hover: color-mix(in srgb, var(--sci-workbench-button-background-color-hover) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
-        --sci-toolbar-toolitem-background-color-checked: color-mix(in srgb, var(--sci-workbench-button-background-color-checked) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
-        --sci-toolbar-toolitem-border-radius: var(--sci-corner-small);
+        --sci-toolbar-toolbar-item-background-color-hover: color-mix(in srgb, var(--sci-workbench-button-background-color-hover) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+        --sci-toolbar-toolbar-item-border-radius: var(--sci-corner-small);
 
         &:hover {
-          --sci-toolbar-toolitem-background-color-active: color-mix(in srgb, var(--sci-workbench-button-background-color-active) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+          --sci-toolbar-toolbar-item-background-color-active: color-mix(in srgb, var(--sci-workbench-button-background-color-active) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
         }
 
         // Hide actions toolbar while scrolling.

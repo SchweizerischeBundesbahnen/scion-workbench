@@ -53,6 +53,7 @@ export interface WorkbenchMenuItemDescriptor {
   actions?: (actions: WorkbenchToolbarFactory) => void;
   onFilter?: (filter: string) => boolean;
   cssClass?: string | string[];
+  attributes?: {[name: string]: string};
   onSelect: () => boolean | void | Promise<boolean | void>;
 }
 

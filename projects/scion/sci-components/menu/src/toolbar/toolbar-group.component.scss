@@ -29,7 +29,9 @@ $icon-size: 18px;
     align-items: center;
     text-wrap: nowrap;
     padding: $padding_menu_item;
-    border-radius: var(--sci-toolbar-toolitem-border-radius);
+    border-radius: var(--sci-toolbar-toolbar-item-border-radius);
+    background-color: var(--sci-toolbar-toolbar-item-background-color);
+    color: var(--sci-toolbar-toolbar-item-text-color);
     user-select: none;
     overflow: hidden;
     cursor: var(--sci-workbench-button-cursor);
@@ -70,7 +72,7 @@ $icon-size: 18px;
     }
 
     &.checked:where(:not(:disabled)) {
-      background-color: var(--sci-toolbar-toolitem-background-color-checked);
+      background-color: var(--sci-toolbar-toolbar-item-background-color-checked);
     }
 
     &.checked {
@@ -78,11 +80,11 @@ $icon-size: 18px;
     }
 
     &:hover:where(:not(:disabled)) {
-      background-color: var(--sci-toolbar-toolitem-background-color-hover);
+      background-color: var(--sci-toolbar-toolbar-item-background-color-hover);
     }
 
     &:active:where(:not(:disabled)) {
-      background-color: var(--sci-toolbar-toolitem-background-color-active);
+      background-color: var(--sci-toolbar-toolbar-item-background-color-active);
     }
 
     &:focus:not(:focus-visible) {
@@ -98,7 +100,7 @@ $icon-size: 18px;
     }
 
     &.active {
-      background-color: var(--sci-toolbar-toolitem-background-color-hover);
+      background-color: var(--sci-toolbar-toolbar-item-background-color-hover);
     }
   }
 }

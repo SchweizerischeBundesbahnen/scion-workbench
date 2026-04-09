@@ -1,7 +1,7 @@
-import {ChangeDetectionStrategy, Component, effect, inject, Injector, input, linkedSignal, output, runInInjectionContext, signal, untracked, ViewContainerRef} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DOCUMENT, effect, inject, Injector, input, linkedSignal, output, runInInjectionContext, signal, untracked, ViewContainerRef} from '@angular/core';
 import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model';
 import {ɵSciMenuService} from '../ɵmenu.service';
-import {MaybeSignal, RequireOne, SciComponentOutletDirective} from '@scion/sci-components/common';
+import {MaybeSignal, RequireOne, SciAttributesDirective, SciComponentOutletDirective} from '@scion/sci-components/common';
 import {Translatable} from '@scion/sci-components/text';
 
 @Component({
@@ -11,6 +11,7 @@ import {Translatable} from '@scion/sci-components/text';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     SciComponentOutletDirective,
+    SciAttributesDirective,
   ],
 })
 export class SciToolGroupComponent {
@@ -23,6 +24,7 @@ export class SciToolGroupComponent {
   private readonly _menuService = inject(ɵSciMenuService);
   private readonly _injector = inject(Injector);
   private readonly _childGroupMenuOpen = signal(false);
+  private readonly _document = inject(DOCUMENT);
 
   protected readonly activeSubMenuItem = linkedSignal<SciMenuItemLike[], {menu: SciMenu, element: HTMLElement} | null>({
     source: this.menuItems,  // reset active sub menu item when this component is re-used
@@ -70,7 +72,12 @@ export class SciToolGroupComponent {
   }
 
   protected onSelect(menuItem: SciMenuItem): void {
-    runInInjectionContext(this._injector, () => void menuItem.onSelect());
+    // TODO [menu] Disable during action until promise resolved.
+    void runInInjectionContext(this._injector, async () => {
+      if (await menuItem.onSelect()) {
+        this.closeMenus(); // e.g., when clicking an action in a menu's action toolbar
+      }
+    });
   }
 
   protected onChildGroupMenuOpen(open: boolean): void {
@@ -79,6 +86,14 @@ export class SciToolGroupComponent {
 
   protected onSubMenuClick(menuItem: {menu: SciMenu, element: HTMLElement} | null): void {
     this.activeSubMenuItem.set(menuItem);
+  }
+
+  private closeMenus(): void {
+    const popover = this._document.documentElement.appendChild(this._document.createElement('div'));
+    popover.setAttribute('popover', '');
+    popover.style.setProperty('display', 'none');
+    popover.showPopover();
+    popover.remove();
   }
 }
 

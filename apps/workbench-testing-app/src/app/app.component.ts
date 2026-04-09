@@ -16,7 +16,7 @@ import {PartId, ViewId, WORKBENCH_ID, WorkbenchDialogService, WorkbenchRouter, W
 import {HeaderComponent} from './header/header.component';
 import {fromEvent} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
-import {SettingsService} from './settings.service';
+import {Settings} from './settings.service';
 import {installFocusHighlighter} from './focus-highlight/focus-highlighter';
 import {installGlasspaneHighlighter} from './glasspane-highlight/glasspane-highlighter';
 import {installMicrofrontendApplicationLabels} from './microfrontend-application-labels/microfrontend-application-labels';
@@ -42,7 +42,7 @@ import {ViewInfoDialogComponent} from './view-info-dialog/view-info-dialog.compo
 export class AppComponent implements DoCheck {
 
   private readonly _zone = inject(NgZone);
-  private readonly _logAngularChangeDetectionCycles = toSignal(inject(SettingsService).observe$('logAngularChangeDetectionCycles'));
+  private readonly _logAngularChangeDetectionCycles = inject(Settings).logAngularChangeDetectionCycles;
 
   protected readonly workbenchStartup = inject(WorkbenchStartup);
   protected readonly activePerspective = inject(WorkbenchService).activePerspective;

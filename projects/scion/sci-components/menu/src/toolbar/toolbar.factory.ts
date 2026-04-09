@@ -42,7 +42,8 @@ export interface SciToolbarItemDescriptor {
   accelerator?: string[];
   disabled?: MaybeSignal<boolean>;
   cssClass?: string | string[];
-  onSelect: () => void;
+  attributes?: {[name: string]: string};
+  onSelect: () => boolean | void | Promise<boolean | void>;
 }
 
 export interface SciToolbarControlDescriptor {
@@ -50,6 +51,7 @@ export interface SciToolbarControlDescriptor {
   control: ComponentType<unknown> | SciComponentDescriptor;
   tooltip?: MaybeSignal<Translatable>;
   cssClass?: string | string[];
+  attributes?: {[name: string]: string};
 }
 
 export interface SciToolbarMenuDescriptor {

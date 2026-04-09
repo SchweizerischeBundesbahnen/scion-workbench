@@ -165,6 +165,7 @@ function populateMenu(menu: SciMenuFactory | SciMenuGroupFactory, menuItemProxie
           actions: actions => populateToolbar(actions, menuItemProxy.actions),
           // onFilter?: (filter: string) => boolean;
           cssClass: menuItemProxy.cssClass,
+          attributes: menuItemProxy.attributes,
           onSelect: () => menuItemProxy.select(),
         });
         break;
@@ -222,6 +223,7 @@ function populateToolbar(toolbar: SciToolbarFactory | SciToolbarGroupFactory, me
           accelerator: menuItemProxy.accelerator,
           disabled: menuItemProxy.disabled && toSignal(menuItemProxy.disabled, {requireSync: true}),
           cssClass: menuItemProxy.cssClass,
+          attributes: menuItemProxy.attributes,
           onSelect: () => menuItemProxy.select(),
         });
         break;

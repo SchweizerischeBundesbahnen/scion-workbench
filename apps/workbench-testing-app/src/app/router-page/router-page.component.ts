@@ -15,9 +15,8 @@ import {NgTemplateOutlet} from '@angular/common';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
-import {SettingsService} from '../settings.service';
-import {MultiValueInputComponent, parseTypedObject, prune, stringifyError} from 'workbench-testing-app-common';
-import {RouterCommandsComponent} from 'workbench-testing-app-common';
+import {Settings} from '../settings.service';
+import {MultiValueInputComponent, parseTypedObject, prune, RouterCommandsComponent, stringifyError} from 'workbench-testing-app-common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {UUID} from '@scion/toolkit/uuid';
 
@@ -40,7 +39,7 @@ export default class RouterPageComponent {
 
   private readonly _formBuilder = inject(NonNullableFormBuilder);
   private readonly _wbRouter = inject(WorkbenchRouter);
-  private readonly _settingsService = inject(SettingsService);
+  private readonly _settings = inject(Settings);
 
   protected readonly workbenchService = inject(WorkbenchService);
   protected readonly targetList = `target-list-${UUID.randomUUID()}`;
@@ -113,7 +112,7 @@ export default class RouterPageComponent {
   }
 
   private resetForm(): void {
-    if (this._settingsService.isEnabled('resetFormsOnSubmit')) {
+    if (this._settings.resetFormsOnSubmit()) {
       this.form.reset();
       this.form.controls.extras.setControl('queryParams', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
       this.form.controls.extras.setControl('data', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));

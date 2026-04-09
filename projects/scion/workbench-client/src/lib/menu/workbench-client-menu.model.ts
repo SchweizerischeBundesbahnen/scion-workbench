@@ -27,6 +27,7 @@ export class WorkbenchMenuItem {
     checked?: MaybeObservable<boolean>;
     actions: WorkbenchMenuItemLike[];
     cssClass?: string[];
+    attributes?: {[name: string]: string};
     position?: WorkbenchMenuContributionPosition;
     onSelect: () => Promise<boolean>;
   }) {
@@ -59,6 +60,7 @@ export class WorkbenchMenuItem {
           disabled: disabled,
           actions: actions,
           cssClass: this._menuItem.cssClass,
+          attributes: this._menuItem.attributes,
           position: this._menuItem.position,
         }),
       }).subscribe(observer));
@@ -89,6 +91,7 @@ export class WorkbenchMenuItemProxy {
   public readonly checked?: Observable<boolean>;
   public readonly actions: WorkbenchMenuItemProxyLike[];
   public readonly cssClass?: string[];
+  public readonly attributes?: {[name: string]: string};
   public readonly position?: WorkbenchMenuContributionPosition;
 
   constructor(transferable: WorkbenchMenuItemTransferable) {
@@ -102,6 +105,7 @@ export class WorkbenchMenuItemProxy {
     this.checked = remoteSubscriber$({relayId: this.id, property: 'checked', initialValue: transferable.checked});
     this.actions = WorkbenchMenuItems.fromTransferable(transferable.actions);
     this.cssClass = transferable.cssClass;
+    this.attributes = transferable.attributes;
     this.position = transferable.position;
   }
 
@@ -128,6 +132,7 @@ export interface WorkbenchMenuItemTransferable {
   checked?: boolean;
   actions: WorkbenchMenuItemTransferableLike[];
   cssClass?: string[];
+  attributes?: {[name: string]: string};
   position?: WorkbenchMenuContributionPosition;
 }
 

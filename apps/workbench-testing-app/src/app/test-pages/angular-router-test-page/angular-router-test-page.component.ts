@@ -14,7 +14,7 @@ import {Router} from '@angular/router';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {RouterCommandsComponent} from 'workbench-testing-app-common';
 import {stringifyError} from 'workbench-testing-app-common';
-import {SettingsService} from '../../settings.service';
+import {Settings} from '../../settings.service';
 import {Commands} from '@scion/workbench';
 
 @Component({
@@ -30,7 +30,7 @@ import {Commands} from '@scion/workbench';
 export default class AngularRouterTestPageComponent {
 
   private readonly _router = inject(Router);
-  private readonly _settingsService = inject(SettingsService);
+  private readonly _settings = inject(Settings);
   private readonly _formBuilder = inject(NonNullableFormBuilder);
 
   protected readonly form = this._formBuilder.group({
@@ -55,7 +55,7 @@ export default class AngularRouterTestPageComponent {
   }
 
   private resetForm(): void {
-    if (this._settingsService.isEnabled('resetFormsOnSubmit')) {
+    if (this._settings.resetFormsOnSubmit()) {
       this.form.reset();
     }
   }

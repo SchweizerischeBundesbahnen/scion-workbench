@@ -16,3 +16,4 @@
 export {type MaybeSignal, type OneOf, type RequireOne, type MaybeArray} from './types';
 export {coerceSignal} from './coerce-signal.util';
 export {type SciComponentDescriptor, SciComponentOutletDirective} from './component-outlet.directive';
+export {SciAttributesDirective} from './attributes.directive';

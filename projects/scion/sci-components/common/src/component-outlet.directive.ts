@@ -8,8 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Binding, ComponentRef, Directive, effect, inject, Injector, input, Provider, untracked, ViewContainerRef} from '@angular/core';
+import {Binding, ComponentRef, Directive, effect, inject, Injector, input, inputBinding, Provider, untracked, ViewContainerRef} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
+import {SciAttributesDirective} from './attributes.directive';
+import {MaybeSignal} from './types';
+import {coerceSignal} from './coerce-signal.util';
 
 /**
  * Renders a component, similar to `ngComponentOutlet`, but with input bindings.
@@ -48,13 +51,17 @@ function createComponent(viewContainerRef: ViewContainerRef, descriptor: SciComp
   }
 
   // Provide CSS classes via host directive.
-  @Directive({host: {'[class]': 'descriptor.cssClass'}})
+  @Directive({host: {'[class]': 'cssClass?.()'}})
   class CssClassDirective {
-    protected readonly descriptor = descriptor;
+    protected readonly cssClass = coerceSignal(descriptor.cssClass);
   }
 
   return viewContainerRef.createComponent(descriptor.component, {
-    directives: [ProvidersDirective, CssClassDirective],
+    directives: [
+      ProvidersDirective,
+      CssClassDirective,
+      {type: SciAttributesDirective, bindings: [inputBinding('sciAttributes', coerceSignal(descriptor.attributes ?? {}))]},
+    ],
     bindings: descriptor.bindings,
     injector: descriptor.injector,
   });
@@ -86,5 +93,9 @@ export interface SciComponentDescriptor {
   /**
    * Specifies CSS class(es) to add to the component, e.g., to locate the component in tests.
    */
-  cssClass?: string | string[];
+  cssClass?: MaybeSignal<string | string[]>;
+  /**
+   * Specifies attributes to add to the component.
+   */
+  attributes?: {[name: string]: MaybeSignal<string>};
 }

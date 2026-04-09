@@ -42,6 +42,7 @@ export class WorkbenchClientToolbarFactoryDelegate implements SciToolbarFactory 
       accelerator: descriptor.accelerator,
       disabled: toLazyObservable(descriptor.disabled),
       cssClass: descriptor.cssClass,
+      attributes: descriptor.attributes,
       onSelect: () => runInInjectionContext(this._injector, descriptor.onSelect),
     });
 

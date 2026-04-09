@@ -1,9 +1,11 @@
 :host {
   display: block;
-  --sci-toolbar-toolitem-background-color-hover: var(--sci-workbench-button-background-color-hover);
-  --sci-toolbar-toolitem-background-color-active: var(--sci-workbench-button-background-color-active);
-  --sci-toolbar-toolitem-background-color-checked: var(--sci-workbench-button-background-color-checked);
-  --sci-toolbar-toolitem-border-radius: var(--sci-corner);
+  --sci-toolbar-toolbar-item-background-color-hover: var(--sci-workbench-button-background-color-hover);
+  --sci-toolbar-toolbar-item-background-color-active: var(--sci-workbench-button-background-color-active);
+  --sci-toolbar-toolbar-item-background-color-checked: var(--sci-workbench-button-background-color-checked);
+  --sci-toolbar-toolbar-item-border-radius: var(--sci-corner);
+  --sci-toolbar-toolbar-item-background-color: transparent;
+  --sci-toolbar-toolbar-item-text-color: var(--sci-color-text);
 
   > sci-toolbar-group {
     width: 100%;

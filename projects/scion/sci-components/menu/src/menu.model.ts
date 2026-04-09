@@ -22,6 +22,7 @@ export interface SciMenuItem {
   actions: SciMenuItemLike[];
   matchesFilter?: (filter: string) => boolean;
   cssClass?: string[];
+  attributes?: {[name: string]: string};
   position?: SciMenuContributionPosition;
   onSelect: () => Promise<boolean>;
 }

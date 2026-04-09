@@ -41,6 +41,7 @@
                   [attr.disabled]="disabled || null"
                   [class.checked]="menuItem.checked?.()"
                   [class]="menuItem.cssClass" class="menu-item"
+                  [sciAttributes]="menuItem.attributes"
                   (click)="onSelect(menuItem)">
             @if (hasGlyphArea()) {
               @if (menuItem.checked !== undefined) {

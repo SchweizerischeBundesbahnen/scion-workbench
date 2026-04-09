@@ -41,6 +41,7 @@ export interface SciMenuItemDescriptor {
   actions?: (actions: SciToolbarFactory) => void;
   onFilter?: (filter: string) => boolean;
   cssClass?: string | string[];
+  attributes?: {[name: string]: string};
   onSelect: () => boolean | void | Promise<boolean | void>;
 }
 

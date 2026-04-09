@@ -63,7 +63,8 @@ export class SciMenuOpener {
       inputBinding('menuItems', menuItems),
       inputBinding('filter', signal(coerceFilterDescriptor(options.filter))),
       inputBinding('sizeInput', signal(options.size)),
-      inputBinding('anchorWidth', computed(() => anchorSize().offsetWidth)),
+      inputBinding('sizeInput', signal(options.size)),
+      inputBinding('anchorWidth', computed(() => options.align === 'vertical' ? anchorSize().offsetWidth : undefined)),
       inputBinding('cssClass', signal(options.cssClass)),
     ];
 

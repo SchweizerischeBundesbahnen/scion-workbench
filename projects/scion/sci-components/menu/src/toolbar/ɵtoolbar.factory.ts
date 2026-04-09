@@ -27,11 +27,12 @@ export class ɵSciToolbarFactory implements SciToolbarFactory {
       this.menuItems.push({
         type: 'menu-item',
         name: descriptor.name,
-        control: {...coerceControlComponent(descriptor.control), cssClass: descriptor.cssClass},
+        control: {...coerceControlComponent(descriptor.control), cssClass: descriptor.cssClass, attributes: descriptor.attributes},
         tooltip: translate(descriptor.tooltip),
         actions: [],
         cssClass: Arrays.coerce(descriptor.cssClass),
-        onSelect: () => Promise.resolve(true),
+        attributes: descriptor.attributes,
+        onSelect: async () => true,
       } satisfies SciMenuItem);
     }
     else {
@@ -48,10 +49,8 @@ export class ɵSciToolbarFactory implements SciToolbarFactory {
         disabled: coerceSignal(descriptor.disabled),
         actions: [],
         cssClass: Arrays.coerce(descriptor.cssClass),
-        onSelect: async () => {
-          descriptor.onSelect();
-          return false;
-        },
+        attributes: descriptor.attributes,
+        onSelect: async () => await descriptor.onSelect() ?? descriptor.checked === undefined, // Close if the callback returns true. Defaults to closing non-checkable menu items.
       } satisfies SciMenuItem);
     }
 
