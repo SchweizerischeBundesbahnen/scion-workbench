@@ -47,12 +47,12 @@ export class ɵSciMenuService implements SciMenuService {
    *
    * @docs-private Not public API. For internal use only.
    */
-  public menuItems(location: MaybeSignal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: MaybeSignal<Map<string, unknown>>, options?: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuItemLike[]> {
+  public menuItems(location: MaybeSignal<`menu:${string}` | `toolbar:${string}`>, context: MaybeSignal<Map<string, unknown>>, options?: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuItemLike[]> {
     return this._menuRegistry.menuItems(coerceSignal(location), coerceSignal(context), options ?? {});
   }
 
   /** @docs-private Not public API. For internal use only. */
-  public menuContributions(location: MaybeSignal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: MaybeSignal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuContribution[]> {
+  public menuContributions(location: MaybeSignal<`menu:${string}` | `toolbar:${string}`>, context: MaybeSignal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuContribution[]> {
     return this._menuRegistry.menuContributions(coerceSignal(location), coerceSignal(context), options ?? {});
   }
 

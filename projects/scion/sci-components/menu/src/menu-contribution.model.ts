@@ -1,5 +1,5 @@
-import {SciMenuFactory, SciMenuGroupFactory} from './menu/menu.factory';
-import {SciToolbarFactory, SciToolbarGroupFactory} from './toolbar/toolbar.factory';
+import {SciMenuFactory} from './menu/menu.factory';
+import {SciToolbarFactory} from './toolbar/toolbar.factory';
 import {Injector} from '@angular/core';
 import {OneOf} from '@scion/sci-components/common';
 
@@ -16,14 +16,8 @@ export interface SciMenuContribution {
 }
 
 export type SciMenuContributionLocation = {location: `menu:${string}`} & SciMenuContributionPosition;
-
 export type SciToolbarContributionLocation = {location: `toolbar:${string}`} & SciMenuContributionPosition;
-
-export type SciMenuGroupContributionLocation = {location: `group(menu):${string}`} & SciMenuContributionPosition;
-
-export type SciToolbarGroupContributionLocation = {location: `group(toolbar):${string}`} & SciMenuContributionPosition;
-
-export type SciMenuContributionLocationLike = SciMenuContributionLocation | SciToolbarContributionLocation | SciMenuGroupContributionLocation | SciToolbarGroupContributionLocation;
+export type SciMenuContributionLocationLike = SciMenuContributionLocation | SciToolbarContributionLocation;
 
 export interface SciMenuContributionOptions {
   /**
@@ -45,16 +39,14 @@ export interface SciMenuContributionOptions {
 }
 
 export type SciMenuContributionPosition = OneOf<{
-  before?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
-  after?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
+  before?: `menuitem:${string}` | `menu:${string}:${string}` | `toolbar:${string}:${string}`;
+  after?: `menuitem:${string}` | `menu:${string}:${string}` | `toolbar:${string}:${string}`;
   position?: 'start' | 'end';
 }>;
 
 export type SciMenuFactoryFn = (menu: SciMenuFactory, context: Map<string, unknown>) => void;
 export type SciToolbarFactoryFn = (toolbar: SciToolbarFactory, context: Map<string, unknown>) => void;
-export type SciMenuGroupFactoryFn = (group: SciMenuGroupFactory, context: Map<string, unknown>) => void;
-export type SciToolbarGroupFactoryFn = (group: SciToolbarGroupFactory, context: Map<string, unknown>) => void;
-export type SciMenuFactoryFnLike = SciMenuFactoryFn | SciToolbarFactoryFn | SciMenuGroupFactoryFn | SciToolbarGroupFactoryFn;
+export type SciMenuFactoryFnLike = SciMenuFactoryFn | SciToolbarFactoryFn;
 
 /**
  * Indicates no contributions found.

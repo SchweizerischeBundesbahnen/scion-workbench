@@ -22,9 +22,9 @@ export interface WorkbenchMenuFactory {
 
   addMenu(descriptor: WorkbenchMenuDescriptor, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this;
 
-  addGroup(groupFactoryFn: (group: WorkbenchMenuGroupFactory) => void): this;
+  addGroup(groupFactoryFn: (group: WorkbenchMenuFactory) => void): this;
 
-  addGroup(descriptor: WorkbenchMenuGroupDescriptor, groupFactoryFn?: (group: WorkbenchMenuGroupFactory) => void): this;
+  addGroup(descriptor: WorkbenchMenuGroupDescriptor, groupFactoryFn?: (group: WorkbenchMenuFactory) => void): this;
 
   /**
    * Instructs the menu to re-create, invoking the menu factory function anew.
@@ -39,8 +39,6 @@ export interface WorkbenchMenuFactory {
    */
   onCleanup: (onCleanup: () => void) => void;
 }
-
-export type WorkbenchMenuGroupFactory = WorkbenchMenuFactory;
 
 export interface WorkbenchMenuItemDescriptor {
   name?: `menuitem:${string}`;
@@ -74,7 +72,7 @@ export interface WorkbenchMenuDescriptor {
 }
 
 export interface WorkbenchMenuGroupDescriptor {
-  name?: `group:${string}`;
+  name?: `menu:${string}:${string}`;
   label?: MaybeObservable<Translatable>;
   collapsible?: boolean | {collapsed: boolean};
   disabled?: MaybeObservable<boolean>;

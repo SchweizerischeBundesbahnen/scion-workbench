@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {MaybeObservable, Translatable, WorkbenchMenuFactory, WorkbenchToolbarFactory, WorkbenchToolbarGroupFactory} from '@scion/workbench-client';
+import {MaybeObservable, Translatable, WorkbenchMenuFactory, WorkbenchToolbarFactory} from '@scion/workbench-client';
 import {inject, Injector, isSignal, runInInjectionContext} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
-import {SciMenuFactory, SciToolbarControlDescriptor, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarGroupFactory, SciToolbarItemDescriptor, SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
+import {SciMenuFactory, SciToolbarControlDescriptor, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarItemDescriptor, SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
 import {WorkbenchClientMenuFactoryDelegate} from './workbench-client-menu-factory-delegate';
 import {toLazyObservable} from '../common/lazy-observable.util';
 import {MaybeSignal, RequireOne, SciComponentDescriptor} from '@scion/sci-components/common';
@@ -75,26 +75,24 @@ export class WorkbenchClientToolbarFactoryDelegate implements SciToolbarFactory 
       },
       cssClass: descriptor.cssClass,
     }, (menu: WorkbenchMenuFactory): void => {
-      const sciMenu = new WorkbenchClientMenuFactoryDelegate(menu);
-      menuFactoryFn(sciMenu);
+      menuFactoryFn(new WorkbenchClientMenuFactoryDelegate(menu));
     });
 
     return this;
   }
 
   /** @inheritDoc */
-  public addGroup(groupFactoryFn: (group: SciToolbarGroupFactory) => void): this;
-  public addGroup(descriptor: SciToolbarGroupDescriptor, groupFactoryFn?: (group: SciToolbarGroupFactory) => void): this;
-  public addGroup(factoryOrDescriptor: ((group: SciToolbarGroupFactory) => void) | SciToolbarGroupDescriptor, factoryIfDescriptor?: (group: SciToolbarGroupFactory) => void): this {
+  public addGroup(groupFactoryFn: (group: SciToolbarFactory) => void): this;
+  public addGroup(descriptor: SciToolbarGroupDescriptor, groupFactoryFn?: (group: SciToolbarFactory) => void): this;
+  public addGroup(factoryOrDescriptor: ((group: SciToolbarFactory) => void) | SciToolbarGroupDescriptor, factoryIfDescriptor?: (group: SciToolbarFactory) => void): this {
     const [descriptor, groupFactoryFn] = coerceGroupDescriptor(factoryOrDescriptor, factoryIfDescriptor);
 
     this._delegate.addGroup({
       name: descriptor.name,
       disabled: toLazyObservable(descriptor.disabled),
       cssClass: descriptor.cssClass,
-    }, (group: WorkbenchToolbarGroupFactory): void => {
-      const sciToolbarGroup = new WorkbenchClientToolbarFactoryDelegate(group);
-      groupFactoryFn?.(sciToolbarGroup);
+    }, (group: WorkbenchToolbarFactory): void => {
+      groupFactoryFn?.(new WorkbenchClientToolbarFactoryDelegate(group));
     });
 
     return this;
@@ -118,7 +116,7 @@ function coerceMenuDescriptor(iconOrDescriptor: MaybeSignal<string> | SciToolbar
   return iconOrDescriptor;
 }
 
-function coerceGroupDescriptor(factoryOrDescriptor: ((group: SciToolbarGroupFactory) => void) | SciToolbarGroupDescriptor, factoryIfDescriptor?: (group: SciToolbarGroupFactory) => void): [SciToolbarGroupDescriptor, ((group: SciToolbarGroupFactory) => void) | undefined] {
+function coerceGroupDescriptor(factoryOrDescriptor: ((group: SciToolbarFactory) => void) | SciToolbarGroupDescriptor, factoryIfDescriptor?: (group: SciToolbarFactory) => void): [SciToolbarGroupDescriptor, ((group: SciToolbarFactory) => void) | undefined] {
   if (typeof factoryOrDescriptor === 'function') {
     return [{}, factoryOrDescriptor];
   }

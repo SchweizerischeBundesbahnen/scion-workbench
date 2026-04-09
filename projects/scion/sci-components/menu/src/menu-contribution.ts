@@ -2,7 +2,7 @@ import {assertInInjectionContext, assertNotInReactiveContext, computed, effect, 
 import {Disposable} from './common/disposable';
 import {ɵSciMenuService} from './ɵmenu.service';
 import {SciMenuContextProvider} from './menu-context-provider';
-import {SciMenuContributionLocation, SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuFactoryFn, SciMenuFactoryFnLike, SciMenuGroupContributionLocation, SciMenuGroupFactoryFn, SciToolbarContributionLocation, SciToolbarFactoryFn, SciToolbarGroupContributionLocation, SciToolbarGroupFactoryFn} from './menu-contribution.model';
+import {SciMenuContributionLocation, SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuFactoryFn, SciMenuFactoryFnLike, SciToolbarContributionLocation, SciToolbarFactoryFn} from './menu-contribution.model';
 import {createDestroyableInjector} from './common/injector.util';
 import {SciMenuContributionInstantProvider} from './menu-contribution-instant.provider';
 import {coerceSignal} from '@scion/sci-components/common';
@@ -13,8 +13,6 @@ import {Objects} from '@scion/toolkit/util';
  */
 export function contributeMenu(location: `menu:${string}` | SciMenuContributionLocation, menuFactoryFn: SciMenuFactoryFn, options?: SciMenuContributionOptions): Disposable;
 export function contributeMenu(location: `toolbar:${string}` | SciToolbarContributionLocation, toolbarFactoryFn: SciToolbarFactoryFn, options?: SciMenuContributionOptions): Disposable;
-export function contributeMenu(location: `group(menu):${string}` | SciMenuGroupContributionLocation, groupFactoryFn: SciMenuGroupFactoryFn, options?: SciMenuContributionOptions): Disposable;
-export function contributeMenu(location: `group(toolbar):${string}` | SciToolbarGroupContributionLocation, groupFactoryFn: SciToolbarGroupFactoryFn, options?: SciMenuContributionOptions): Disposable;
 export function contributeMenu(locationLike: string | SciMenuContributionLocationLike, factoryFn: SciMenuFactoryFnLike, options?: SciMenuContributionOptions): Disposable {
   assertNotInReactiveContext(contributeMenu, 'Call contributeMenu in a non-reactive (non-tracking) context, such as within the untracked() function.');
   if (!options?.injector) {

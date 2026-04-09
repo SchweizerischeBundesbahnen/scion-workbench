@@ -64,7 +64,6 @@ export class AppComponent implements DoCheck {
     installGlasspaneHighlighter();
     installMicrofrontendApplicationLabels();
 
-
     if (1 + 1) {
       return;
     }
@@ -378,7 +377,7 @@ export class AppComponent implements DoCheck {
       .set('sample_layout_aligned_parts_app_2', 'Sample Microfrontend Layout App 2 (Aligned Parts)')
       .set('focus_test_perspective', 'Focus Test Perspective');
 
-    contributeMenu('group(toolbar):perspective.menu', menu => menu
+    contributeMenu('toolbar:perspective.menuitem:actions', toolbar => toolbar
       .addToolbarItem({icon: 'undo', tooltip: 'Reset Perspective', onSelect: () => console.log('>>> Reset default perspective')})
       .addMenu({icon: 'more_vert', visualMenuHint: false}, menu => menu
         .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+'], onSelect: () => this.onAction()})
@@ -420,22 +419,22 @@ export class AppComponent implements DoCheck {
 
     contributeMenu('toolbar:workbench.part.secondary', menu => menu
       .addMenu({label: computed(() => perspectiveLabels.get(perspective()) ?? perspective()), visualMenuHint: true}, menu => menu
-        .addMenuItem({label: 'A', checked: true, actions: actions => actions.addGroup({name: 'group:perspective.menu'}), onSelect: () => this.onAction()})
-        .addMenuItem({label: 'B', actions: actions => actions.addGroup({name: 'group:perspective.menu'}), onSelect: () => this.onAction()})
-        .addMenuItem({label: 'C', actions: actions => actions.addGroup({name: 'group:perspective.menu'}), onSelect: () => this.onAction()})
-        .addMenuItem({label: 'D', actions: actions => actions.addGroup({name: 'group:perspective.menu'}), onSelect: () => this.onAction()})
-        .addMenuItem({label: 'E', actions: actions => actions.addGroup({name: 'group:perspective.menu'}), onSelect: () => this.onAction()})
-        .addMenuItem({label: 'F', actions: actions => actions.addGroup({name: 'group:perspective.menu'}), onSelect: () => this.onAction()})
-        .addMenuItem({label: 'G', actions: actions => actions.addGroup({name: 'group:perspective.menu'}), onSelect: () => this.onAction()}),
+        .addMenuItem({label: 'A', checked: true, actions: actions => actions.addGroup({name: 'toolbar:perspective.menuitem:actions'}), onSelect: () => this.onAction()})
+        .addMenuItem({label: 'B', actions: actions => actions.addGroup({name: 'toolbar:perspective.menuitem:actions'}), onSelect: () => this.onAction()})
+        .addMenuItem({label: 'C', actions: actions => actions.addGroup({name: 'toolbar:perspective.menuitem:actions'}), onSelect: () => this.onAction()})
+        .addMenuItem({label: 'D', actions: actions => actions.addGroup({name: 'toolbar:perspective.menuitem:actions'}), onSelect: () => this.onAction()})
+        .addMenuItem({label: 'E', actions: actions => actions.addGroup({name: 'toolbar:perspective.menuitem:actions'}), onSelect: () => this.onAction()})
+        .addMenuItem({label: 'F', actions: actions => actions.addGroup({name: 'toolbar:perspective.menuitem:actions'}), onSelect: () => this.onAction()})
+        .addMenuItem({label: 'G', actions: actions => actions.addGroup({name: 'toolbar:perspective.menuitem:actions'}), onSelect: () => this.onAction()}),
       ),
     );
     contributeMenu('toolbar:workbench.part.secondary', menu => menu
       .addMenu({label: computed(() => perspectiveLabels.get(perspective()) ?? perspective())}, menu => menu
         .addMenuItem({
           label: 'Default Layout',
-          // actions: actions => actions.addGroup({name: 'group:perspective.menu'}),
+          // actions: actions => actions.addGroup({name: 'toolbar:perspective.menuitem:actions'}),
           actions: actions => actions
-            .addGroup({name: 'group:perspective.menu'})
+            .addGroup({name: 'toolbar:perspective.menuitem:actions'})
             .addMenu('home', menu => menu
               .addMenuItem('Sub Menu 1', () => this.onAction())
               .addMenu('Sub Menu 2', menu => menu
@@ -454,7 +453,7 @@ export class AppComponent implements DoCheck {
           .addMenu({label: 'Layout with Docked Parts'}, menu => menu
             .addMenuItem({
               label: 'Sample Layout 1',
-              actions: actions => actions.addGroup({name: 'group:perspective.menu'}),
+              actions: actions => actions.addGroup({name: 'toolbar:perspective.menuitem:actions'}),
               checked: computed(() => perspective() === 'sample_layout_docked_parts_1'),
               onSelect: () => {
                 perspective.set('sample_layout_docked_parts_1');
@@ -463,7 +462,7 @@ export class AppComponent implements DoCheck {
             })
             .addMenuItem({
               label: 'Sample Layout 2',
-              actions: actions => actions.addGroup({name: 'group:perspective.menu'}),
+              actions: actions => actions.addGroup({name: 'toolbar:perspective.menuitem:actions'}),
               checked: computed(() => perspective() === 'sample_layout_docked_parts_2'),
               onSelect: () => {
                 perspective.set('sample_layout_docked_parts_2');
@@ -474,7 +473,7 @@ export class AppComponent implements DoCheck {
           .addMenu({label: 'Layout with Aligned Parts'}, menu => menu
             .addMenuItem({
               label: 'Sample Layout 1',
-              actions: actions => actions.addGroup({name: 'group:perspective.menu'}),
+              actions: actions => actions.addGroup({name: 'toolbar:perspective.menuitem:actions'}),
               checked: computed(() => perspective() === 'sample_layout_aligned_parts_1'),
               onSelect: () => {
                 perspective.set('sample_layout_aligned_parts_1');
@@ -483,7 +482,7 @@ export class AppComponent implements DoCheck {
             })
             .addMenuItem({
               label: 'Sample Layout 2',
-              actions: actions => actions.addGroup({name: 'group:perspective.menu'}),
+              actions: actions => actions.addGroup({name: 'toolbar:perspective.menuitem:actions'}),
               checked: computed(() => perspective() === 'sample_layout_aligned_parts_2'),
               onSelect: () => {
                 perspective.set('sample_layout_aligned_parts_2');
@@ -496,7 +495,7 @@ export class AppComponent implements DoCheck {
           .addMenu({label: 'Layout with Docked Parts'}, menu => menu
             .addMenuItem({
               label: 'Sample Layout App 1',
-              actions: actions => actions.addGroup({name: 'group:perspective.menu'}),
+              actions: actions => actions.addGroup({name: 'toolbar:perspective.menuitem:actions'}),
               checked: computed(() => perspective() === 'sample_layout_docked_parts_app_1'),
               onSelect: () => {
                 perspective.set('sample_layout_docked_parts_app_1');
@@ -505,7 +504,7 @@ export class AppComponent implements DoCheck {
             })
             .addMenuItem({
               label: 'Sample Layout App 2',
-              actions: actions => actions.addGroup({name: 'group:perspective.menu'}),
+              actions: actions => actions.addGroup({name: 'toolbar:perspective.menuitem:actions'}),
               checked: computed(() => perspective() === 'sample_layout_docked_parts_app_2'),
               onSelect: () => {
                 perspective.set('sample_layout_docked_parts_app_2');
@@ -516,7 +515,7 @@ export class AppComponent implements DoCheck {
           .addMenu({label: 'Layout with Aligned Parts'}, menu => menu
             .addMenuItem({
               label: 'Sample Layout App 1',
-              actions: actions => actions.addGroup({name: 'group:perspective.menu'}),
+              actions: actions => actions.addGroup({name: 'toolbar:perspective.menuitem:actions'}),
               checked: computed(() => perspective() === 'sample_layout_aligned_parts_app_1'),
               onSelect: () => {
                 perspective.set('sample_layout_aligned_parts_app_1');
@@ -525,7 +524,7 @@ export class AppComponent implements DoCheck {
             })
             .addMenuItem({
               label: 'Sample Layout App 2',
-              actions: actions => actions.addGroup({name: 'group:perspective.menu'}),
+              actions: actions => actions.addGroup({name: 'toolbar:perspective.menuitem:actions'}),
               checked: computed(() => perspective() === 'sample_layout_aligned_parts_app_2'),
               onSelect: () => {
                 perspective.set('sample_layout_aligned_parts_app_2');
@@ -537,7 +536,7 @@ export class AppComponent implements DoCheck {
         .addGroup({label: 'Test Perspectives', collapsible: {collapsed: true}}, group => group
           .addMenuItem({
             label: 'Focus Test Perspective',
-            actions: actions => actions.addGroup({name: 'group:perspective.menu'}),
+            actions: actions => actions.addGroup({name: 'toolbar:perspective.menuitem:actions'}),
             checked: computed(() => perspective() === 'focus_test_perspective'),
             onSelect: () => {
               perspective.set('focus_test_perspective');
@@ -601,7 +600,7 @@ export class AppComponent implements DoCheck {
 
   private contributeViewContextMenuAdditions(): void {
     // Contribute menu item to move view to new window.
-    contributeMenu({location: 'group(menu):workbench.view.contextmenu.move', position: 'end'}, (menu, context) => {
+    contributeMenu({location: 'menu:workbench.view.contextmenu:move', position: 'end'}, (menu, context) => {
       const view = inject(WorkbenchService).getView(context.get('viewId') as ViewId)!;
 
       menu.addMenuItem({
@@ -615,7 +614,7 @@ export class AppComponent implements DoCheck {
     });
 
     // Contribute menu item to show view info.
-    contributeMenu('group(menu):workbench.view.contextmenu.additions', (menu, context) => {
+    contributeMenu('menu:workbench.view.contextmenu:additions', (menu, context) => {
       const view = inject(WorkbenchService).getView(context.get('viewId') as ViewId);
 
       menu.addMenuItem({

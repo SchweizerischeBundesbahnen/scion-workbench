@@ -1,5 +1,5 @@
 import {Arrays} from '@scion/toolkit/util';
-import {WorkbenchMenuDescriptor, WorkbenchMenuFactory, WorkbenchMenuGroupDescriptor, WorkbenchMenuGroupFactory, WorkbenchMenuItemDescriptor} from './workbench-menu.factory';
+import {WorkbenchMenuDescriptor, WorkbenchMenuFactory, WorkbenchMenuGroupDescriptor, WorkbenchMenuItemDescriptor} from './workbench-menu.factory';
 import {WorkbenchMenu, WorkbenchMenuGroup, WorkbenchMenuItem, WorkbenchMenuItemLike} from './workbench-client-menu.model';
 import {MaybeObservable} from '../common/utility-types';
 import {isObservable, Subject} from 'rxjs';
@@ -86,9 +86,9 @@ export class ɵWorkbenchMenuFactory implements WorkbenchMenuFactory {
   }
 
   /** @inheritDoc */
-  public addGroup(groupFactoryFn: (group: WorkbenchMenuGroupFactory) => void): this;
-  public addGroup(descriptor: WorkbenchMenuGroupDescriptor, groupFactoryFn?: (group: WorkbenchMenuGroupFactory) => void): this;
-  public addGroup(factoryOrDescriptor: ((group: WorkbenchMenuGroupFactory) => void) | WorkbenchMenuGroupDescriptor, factoryIfDescriptor?: (group: WorkbenchMenuGroupFactory) => void): this {
+  public addGroup(groupFactoryFn: (group: WorkbenchMenuFactory) => void): this;
+  public addGroup(descriptor: WorkbenchMenuGroupDescriptor, groupFactoryFn?: (group: WorkbenchMenuFactory) => void): this;
+  public addGroup(factoryOrDescriptor: ((group: WorkbenchMenuFactory) => void) | WorkbenchMenuGroupDescriptor, factoryIfDescriptor?: (group: WorkbenchMenuFactory) => void): this {
     const [descriptor, groupFactoryFn] = coerceGroupDescriptor(factoryOrDescriptor, factoryIfDescriptor);
 
     // Construct group.
@@ -138,7 +138,7 @@ function coerceMenuDescriptor(labelOrDescriptor: MaybeObservable<Translatable> |
   return labelOrDescriptor;
 }
 
-function coerceGroupDescriptor(factoryOrDescriptor: ((group: WorkbenchMenuGroupFactory) => void) | WorkbenchMenuGroupDescriptor, factoryIfDescriptor?: (group: WorkbenchMenuGroupFactory) => void): [WorkbenchMenuGroupDescriptor, ((group: WorkbenchMenuGroupFactory) => void) | undefined] {
+function coerceGroupDescriptor(factoryOrDescriptor: ((group: WorkbenchMenuFactory) => void) | WorkbenchMenuGroupDescriptor, factoryIfDescriptor?: (group: WorkbenchMenuFactory) => void): [WorkbenchMenuGroupDescriptor, ((group: WorkbenchMenuFactory) => void) | undefined] {
   if (typeof factoryOrDescriptor === 'function') {
     return [{}, factoryOrDescriptor];
   }

@@ -52,7 +52,7 @@ export interface SciMenu {
 
 export interface SciMenuGroup {
   type: 'group'
-  name?: `group:${string}`;
+  name?: `menu:${string}:${string}` | `toolbar:${string}:${string}`;
   label?: Signal<string>;
   collapsible?: {collapsed: boolean};
   position?: SciMenuContributionPosition;

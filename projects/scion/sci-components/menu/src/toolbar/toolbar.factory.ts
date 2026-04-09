@@ -26,12 +26,10 @@ export interface SciToolbarFactory {
 
   addMenu(descriptor: SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this;
 
-  addGroup(groupFactoryFn: (group: SciToolbarGroupFactory) => void): this;
+  addGroup(groupFactoryFn: (group: SciToolbarFactory) => void): this;
 
-  addGroup(descriptor: SciToolbarGroupDescriptor, groupFactoryFn?: (group: SciToolbarGroupFactory) => void): this;
+  addGroup(descriptor: SciToolbarGroupDescriptor, groupFactoryFn?: (group: SciToolbarFactory) => void): this;
 }
-
-export type SciToolbarGroupFactory = SciToolbarFactory;
 
 export interface SciToolbarItemDescriptor {
   name?: `menuitem:${string}`;
@@ -75,7 +73,7 @@ export interface SciToolbarMenuDescriptor {
 }
 
 export interface SciToolbarGroupDescriptor {
-  name?: `group:${string}`;
+  name?: `toolbar:${string}:${string}`;
   disabled?: MaybeSignal<boolean>;
   cssClass?: string | string[];
 }

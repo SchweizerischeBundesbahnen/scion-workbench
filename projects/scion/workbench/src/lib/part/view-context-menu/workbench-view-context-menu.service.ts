@@ -13,7 +13,7 @@ import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {MenuItemConfig, WorkbenchConfig} from '../../workbench-config';
 import {ViewId} from '../../workbench.identifiers';
 import {WorkbenchView} from '../../view/workbench-view.model';
-import {contributeMenu, Disposable, installMenuAccelerators, SciMenuGroupFactory, SciMenuService} from '@scion/sci-components/menu';
+import {contributeMenu, Disposable, installMenuAccelerators, SciMenuFactory, SciMenuService} from '@scion/sci-components/menu';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {WORKBENCH_ELEMENT} from '../../workbench-element-references';
 import {MaybeArray, SciComponentDescriptor} from '@scion/sci-components/common';
@@ -58,7 +58,7 @@ export class WorkbenchViewContextMenuService {
       const view = inject(WorkbenchViewRegistry).get(context.get('viewId') as ViewId);
 
       // Add 'close' group.
-      menu.addGroup({name: 'group:workbench.view.contextmenu.close'}, group => {
+      menu.addGroup({name: 'menu:workbench.view.contextmenu:close'}, group => {
         this.registerCloseMenuItem(config.close ?? {}, group, view);
         this.registerCloseOtherTabsMenuItem(config.closeOthers ?? {}, group, view);
         this.registerCloseAllTabsMenuItem(config.closeAll ?? {}, group, view);
@@ -67,7 +67,7 @@ export class WorkbenchViewContextMenuService {
       });
 
       // Add 'move' group.
-      menu.addGroup({name: 'group:workbench.view.contextmenu.move'}, group => {
+      menu.addGroup({name: 'menu:workbench.view.contextmenu:move'}, group => {
         this.registerMoveRightMenuItem(config.moveRight ?? {}, group, view);
         this.registerMoveLeftMenuItem(config.moveLeft ?? {}, group, view);
         this.registerMoveUpMenuItem(config.moveUp ?? {}, group, view);
@@ -79,7 +79,7 @@ export class WorkbenchViewContextMenuService {
       });
 
       // Add 'additions' group.
-      menu.addGroup({name: 'group:workbench.view.contextmenu.additions'});
+      menu.addGroup({name: 'menu:workbench.view.contextmenu:additions'});
     });
   }
 
@@ -87,7 +87,7 @@ export class WorkbenchViewContextMenuService {
    * Registers a legacy view menu contribution in the view context menu.
    */
   public registerLegacyMenuContribution(legacyViewMenuItemFn: WorkbenchViewMenuItemFn): Disposable {
-    const contribution = contributeMenu('group(menu):workbench.view.contextmenu.additions', ((group, context) => {
+    const contribution = contributeMenu('menu:workbench.view.contextmenu:additions', ((group, context) => {
       const view = this._viewRegistry.get(context.get('viewId') as ViewId); // TODO [menu] Remove once in correct injection context
 
       const providers: Provider[] = [
@@ -152,7 +152,7 @@ export class WorkbenchViewContextMenuService {
     });
   }
 
-  private registerCloseMenuItem(config: MenuItemConfig | false, group: SciMenuGroupFactory, view: WorkbenchView): void {
+  private registerCloseMenuItem(config: MenuItemConfig | false, group: SciMenuFactory, view: WorkbenchView): void {
     if (config) {
       group.addMenuItem({
         label: '%scion.workbench.close_tab.action',
@@ -164,7 +164,7 @@ export class WorkbenchViewContextMenuService {
     }
   }
 
-  private registerCloseOtherTabsMenuItem(config: MenuItemConfig | false, group: SciMenuGroupFactory, view: WorkbenchView): void {
+  private registerCloseOtherTabsMenuItem(config: MenuItemConfig | false, group: SciMenuFactory, view: WorkbenchView): void {
     if (config) {
       group.addMenuItem({
         label: '%scion.workbench.close_other_tabs.action',
@@ -176,7 +176,7 @@ export class WorkbenchViewContextMenuService {
     }
   }
 
-  private registerCloseAllTabsMenuItem(config: MenuItemConfig | false, group: SciMenuGroupFactory, view: WorkbenchView): void {
+  private registerCloseAllTabsMenuItem(config: MenuItemConfig | false, group: SciMenuFactory, view: WorkbenchView): void {
     if (config) {
       group.addMenuItem({
         label: '%scion.workbench.close_all_tabs.action',
@@ -187,7 +187,7 @@ export class WorkbenchViewContextMenuService {
     }
   }
 
-  private registerCloseRightTabsMenuItem(config: MenuItemConfig | false, group: SciMenuGroupFactory, view: WorkbenchView): void {
+  private registerCloseRightTabsMenuItem(config: MenuItemConfig | false, group: SciMenuFactory, view: WorkbenchView): void {
     if (config) {
       group.addMenuItem({
         label: '%scion.workbench.close_tabs_to_the_right.action',
@@ -198,7 +198,7 @@ export class WorkbenchViewContextMenuService {
     }
   }
 
-  private registerCloseLeftTabsMenuItem(config: MenuItemConfig | false, group: SciMenuGroupFactory, view: WorkbenchView): void {
+  private registerCloseLeftTabsMenuItem(config: MenuItemConfig | false, group: SciMenuFactory, view: WorkbenchView): void {
     if (config) {
       group.addMenuItem({
         label: '%scion.workbench.close_tabs_to_the_left.action',
@@ -209,7 +209,7 @@ export class WorkbenchViewContextMenuService {
     }
   }
 
-  private registerMoveRightMenuItem(config: MenuItemConfig | false, group: SciMenuGroupFactory, view: WorkbenchView): void {
+  private registerMoveRightMenuItem(config: MenuItemConfig | false, group: SciMenuFactory, view: WorkbenchView): void {
     if (config) {
       group.addMenuItem({
         label: '%scion.workbench.move_tab_to_the_right.action',
@@ -221,7 +221,7 @@ export class WorkbenchViewContextMenuService {
     }
   }
 
-  private registerMoveLeftMenuItem(config: MenuItemConfig | false, group: SciMenuGroupFactory, view: WorkbenchView): void {
+  private registerMoveLeftMenuItem(config: MenuItemConfig | false, group: SciMenuFactory, view: WorkbenchView): void {
     if (config) {
       group.addMenuItem({
         label: '%scion.workbench.move_tab_to_the_left.action',
@@ -232,7 +232,7 @@ export class WorkbenchViewContextMenuService {
     }
   }
 
-  private registerMoveUpMenuItem(config: MenuItemConfig | false, group: SciMenuGroupFactory, view: WorkbenchView): void {
+  private registerMoveUpMenuItem(config: MenuItemConfig | false, group: SciMenuFactory, view: WorkbenchView): void {
     if (config) {
       group.addMenuItem({
         label: '%scion.workbench.move_tab_up.action',
@@ -243,7 +243,7 @@ export class WorkbenchViewContextMenuService {
     }
   }
 
-  private registerMoveDownMenuItem(config: MenuItemConfig | false, group: SciMenuGroupFactory, view: WorkbenchView): void {
+  private registerMoveDownMenuItem(config: MenuItemConfig | false, group: SciMenuFactory, view: WorkbenchView): void {
     if (config) {
       group.addMenuItem({
         label: '%scion.workbench.move_tab_down.action',
@@ -254,7 +254,7 @@ export class WorkbenchViewContextMenuService {
     }
   }
 
-  private registerMoveToNewWindowMenuItem(config: MenuItemConfig | false, group: SciMenuGroupFactory, view: WorkbenchView): void {
+  private registerMoveToNewWindowMenuItem(config: MenuItemConfig | false, group: SciMenuFactory, view: WorkbenchView): void {
     if (!config || view.part().peripheral()) {
       return;
     }

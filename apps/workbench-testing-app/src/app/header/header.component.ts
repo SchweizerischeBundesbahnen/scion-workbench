@@ -16,7 +16,7 @@ import {Logger, LogLevel, WorkbenchPerspective, WorkbenchRouter, WorkbenchServic
 import {Settings} from '../settings.service';
 import {Maps} from '@scion/toolkit/util';
 import {comparePerspectives} from './perspective-comparator.util';
-import {contributeMenu, SciMenuGroupFactory, SciToolbarComponent, SciToolbarFactory} from '@scion/sci-components/menu';
+import {contributeMenu, SciMenuFactory, SciToolbarComponent, SciToolbarFactory} from '@scion/sci-components/menu';
 import {ThemeSwitcherComponent} from '../theme-switch-button/theme-switcher.component';
 
 @Component({
@@ -60,7 +60,7 @@ export class HeaderComponent {
     );
   }
 
-  private contributePanelAlignmentGroup(menu: SciMenuGroupFactory): void {
+  private contributePanelAlignmentGroup(menu: SciMenuFactory): void {
     menu.addMenu('Panel Alignment', menu => menu
       .addMenuItem({
         label: 'Left',
@@ -89,7 +89,7 @@ export class HeaderComponent {
     );
   }
 
-  private contributeRenderingFlagGroup(menu: SciMenuGroupFactory): void {
+  private contributeRenderingFlagGroup(menu: SciMenuFactory): void {
     menu.addGroup(group => group
       .addMenuItem({
         label: 'Enable Panel Animation',
@@ -133,7 +133,7 @@ export class HeaderComponent {
     );
   }
 
-  private contributeOpenGroup(menu: SciMenuGroupFactory): void {
+  private contributeOpenGroup(menu: SciMenuFactory): void {
     menu.addGroup(group => group
       .addMenu('Open View', menu => menu
         .addMenuItem({
@@ -171,7 +171,7 @@ export class HeaderComponent {
     );
   }
 
-  private contributeNavigateGroup(menu: SciMenuGroupFactory): void {
+  private contributeNavigateGroup(menu: SciMenuFactory): void {
     menu.addGroup(group => group.addMenu('Navigate Primary Router Outlet', menu => menu
       .addMenuItem({
         label: 'Navigate to Workbench Page',
@@ -196,7 +196,7 @@ export class HeaderComponent {
     ));
   }
 
-  private contributeLoggingGroup(menu: SciMenuGroupFactory): void {
+  private contributeLoggingGroup(menu: SciMenuFactory): void {
     menu.addGroup(group => group
       .addMenu('Log Level', menu => menu
         .addMenuItem({
@@ -262,7 +262,7 @@ export class HeaderComponent {
         });
     });
 
-    function contributePerspectiveMenuItems(group: SciMenuGroupFactory, perspectives: WorkbenchPerspective[]): void {
+    function contributePerspectiveMenuItems(group: SciMenuFactory, perspectives: WorkbenchPerspective[]): void {
       const workbenchService = inject(WorkbenchService);
 
       for (const perspective of perspectives) {

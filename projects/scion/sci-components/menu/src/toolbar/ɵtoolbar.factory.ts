@@ -1,7 +1,7 @@
 import {SciMenuFactory} from '../menu/menu.factory';
 import {isSignal, Signal} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
-import {SciToolbarControlDescriptor, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarGroupFactory, SciToolbarItemDescriptor, SciToolbarMenuDescriptor} from './toolbar.factory';
+import {SciToolbarControlDescriptor, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarItemDescriptor, SciToolbarMenuDescriptor} from './toolbar.factory';
 import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model';
 import {ɵSciMenuFactory} from '../menu/ɵmenu.factory';
 import {coerceSignal, MaybeSignal, SciComponentDescriptor} from '@scion/sci-components/common';
@@ -93,9 +93,9 @@ export class ɵSciToolbarFactory implements SciToolbarFactory {
   }
 
   /** @inheritDoc */
-  public addGroup(groupFactoryFn: (group: SciToolbarGroupFactory) => void): this;
-  public addGroup(descriptor: SciToolbarGroupDescriptor, groupFactoryFn?: (group: SciToolbarGroupFactory) => void): this;
-  public addGroup(factoryOrDescriptor: ((group: SciToolbarGroupFactory) => void) | SciToolbarGroupDescriptor, factoryIfDescriptor?: (group: SciToolbarGroupFactory) => void): this {
+  public addGroup(groupFactoryFn: (group: SciToolbarFactory) => void): this;
+  public addGroup(descriptor: SciToolbarGroupDescriptor, groupFactoryFn?: (group: SciToolbarFactory) => void): this;
+  public addGroup(factoryOrDescriptor: ((group: SciToolbarFactory) => void) | SciToolbarGroupDescriptor, factoryIfDescriptor?: (group: SciToolbarFactory) => void): this {
     const [descriptor, groupFactoryFn] = coerceGroupDescriptor(factoryOrDescriptor, factoryIfDescriptor);
 
     // Construct group.
@@ -129,7 +129,7 @@ function coerceMenuDescriptor(iconOrDescriptor: MaybeSignal<string> | SciToolbar
   return iconOrDescriptor;
 }
 
-function coerceGroupDescriptor(factoryOrDescriptor: ((group: SciToolbarGroupFactory) => void) | SciToolbarGroupDescriptor, factoryIfDescriptor?: (group: SciToolbarGroupFactory) => void): [SciToolbarGroupDescriptor, ((group: SciToolbarGroupFactory) => void) | undefined] {
+function coerceGroupDescriptor(factoryOrDescriptor: ((group: SciToolbarFactory) => void) | SciToolbarGroupDescriptor, factoryIfDescriptor?: (group: SciToolbarFactory) => void): [SciToolbarGroupDescriptor, ((group: SciToolbarFactory) => void) | undefined] {
   if (typeof factoryOrDescriptor === 'function') {
     return [{}, factoryOrDescriptor];
   }

@@ -2,7 +2,7 @@ import {DestroyRef, DOCUMENT, EnvironmentProviders, inject, Injector, makeEnviro
 import {mapToBody, MessageClient} from '@scion/microfrontend-platform';
 import {takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {WorkbenchMenuItemProxyLike, WorkbenchMenuItems, WorkbenchMenuItemTransferableLike, ɵWorkbenchMenuContributionConstructCommand, ɵWorkbenchMenuContributionRegisterCommand, ɵWorkbenchMenuItemLookupCommand, ɵWorkbenchMenuOpenCommand} from '@scion/workbench-client';
-import {SciMenu, SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuGroupFactory, SciMenuOptions, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarGroupFactory, SciToolbarMenuDescriptor, ɵSciMenuService} from '@scion/sci-components/menu';
+import {SciMenu, SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuOptions, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarMenuDescriptor, ɵSciMenuService} from '@scion/sci-components/menu';
 import {finalize, map} from 'rxjs/operators';
 import {Objects} from '@scion/toolkit/util';
 import {createDestroyableInjector} from '../../common/injector.util';
@@ -29,7 +29,7 @@ function installMenuContributionHandler(): void {
     const menuItemsCache = new WorkbenchClientMenuItemsCache();
 
     // Contribute menu.
-    const contributionRef = menuService.contributeMenu({location, ...position}, (factory: SciMenuFactory | SciMenuGroupFactory | SciToolbarFactory | SciToolbarGroupFactory, context: Map<string, unknown>) => {
+    const contributionRef = menuService.contributeMenu({location, ...position}, (factory: SciMenuFactory | SciToolbarFactory, context: Map<string, unknown>) => {
       // Menu items are constructed asynchronously via messaging. Therefore, we create an initially empty signal and update it when receiving the menu items.
       // We must memoize the signal for therequest not to be performed anew.
       const menuItems = menuItemsCache.computeIfAbsent(context, () => untracked(() => {
@@ -45,11 +45,11 @@ function installMenuContributionHandler(): void {
       untracked(() => {
         switch (scope) {
           case 'menu': {
-            populateMenu(factory as SciMenuFactory | SciMenuGroupFactory, menuItems);
+            populateMenu(factory as SciMenuFactory, menuItems);
             break;
           }
           case 'toolbar': {
-            populateToolbar(factory as SciToolbarFactory | SciToolbarGroupFactory, menuItems);
+            populateToolbar(factory as SciToolbarFactory, menuItems);
             break;
           }
         }
@@ -150,7 +150,7 @@ function installMenuCloseHandler(): void {
 /**
  * Populates given menu with passed menu items.
  */
-function populateMenu(menu: SciMenuFactory | SciMenuGroupFactory, menuItemProxies: WorkbenchMenuItemProxyLike[]): void {
+function populateMenu(menu: SciMenuFactory, menuItemProxies: WorkbenchMenuItemProxyLike[]): void {
   for (const menuItemProxy of menuItemProxies) {
     switch (menuItemProxy.type) {
       case 'menu-item': {
@@ -194,7 +194,7 @@ function populateMenu(menu: SciMenuFactory | SciMenuGroupFactory, menuItemProxie
       }
       case 'group': {
         const groupDescriptor: SciMenuGroupDescriptor = {
-          name: menuItemProxy.name,
+          name: menuItemProxy.name as `menu:${string}:${string}`,
           label: menuItemProxy.label && toSignal(menuItemProxy.label, {requireSync: true}),
           collapsible: menuItemProxy.collapsible,
           disabled: menuItemProxy.disabled && toSignal(menuItemProxy.disabled, {requireSync: true}),
@@ -210,7 +210,7 @@ function populateMenu(menu: SciMenuFactory | SciMenuGroupFactory, menuItemProxie
 /**
  * Populates given toolbar with passed menu items.
  */
-function populateToolbar(toolbar: SciToolbarFactory | SciToolbarGroupFactory, menuItemProxies: WorkbenchMenuItemProxyLike[]): void {
+function populateToolbar(toolbar: SciToolbarFactory, menuItemProxies: WorkbenchMenuItemProxyLike[]): void {
   for (const menuItemProxy of menuItemProxies) {
     switch (menuItemProxy.type) {
       case 'menu-item': {
@@ -253,7 +253,7 @@ function populateToolbar(toolbar: SciToolbarFactory | SciToolbarGroupFactory, me
       }
       case 'group': {
         const groupDescriptor: SciToolbarGroupDescriptor = {
-          name: menuItemProxy.name,
+          name: menuItemProxy.name as `toolbar:${string}:${string}`,
           disabled: menuItemProxy.disabled && toSignal(menuItemProxy.disabled, {requireSync: true}),
           cssClass: menuItemProxy.cssClass,
         };

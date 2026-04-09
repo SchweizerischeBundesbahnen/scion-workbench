@@ -5,8 +5,8 @@ import {mapToBody, MessageClient} from '@scion/microfrontend-platform';
 import {prune} from '../common/prune.util';
 import {createRemoteObservable$, remoteSubscriber$} from './remote-observable';
 import {Observables} from '@scion/toolkit/util';
-import {WorkbenchMenuFactory, WorkbenchMenuGroupFactory} from './workbench-menu.factory';
-import {WorkbenchToolbarFactory, WorkbenchToolbarGroupFactory} from './workbench-toolbar.factory';
+import {WorkbenchMenuFactory} from './workbench-menu.factory';
+import {WorkbenchToolbarFactory} from './workbench-toolbar.factory';
 import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
@@ -284,7 +284,7 @@ export class WorkbenchMenuGroup {
 
   constructor(private _group: {
     id: string;
-    name?: `group:${string}`;
+    name?: `menu:${string}:${string}` | `toolbar:${string}:${string}`;
     label?: MaybeObservable<string>;
     disabled?: MaybeObservable<boolean>;
     collapsible?: {collapsed: boolean};
@@ -327,7 +327,7 @@ export class WorkbenchMenuGroupProxy {
 
   public readonly id: string;
   public readonly type = 'group';
-  public readonly name?: `group:${string}`;
+  public readonly name?: `menu:${string}:${string}` | `toolbar:${string}:${string}`;
   public readonly label?: Observable<string>;
   public readonly disabled?: Observable<boolean>;
   public readonly collapsible?: {collapsed: boolean};
@@ -347,19 +347,13 @@ export class WorkbenchMenuGroupProxy {
   }
 }
 
-export type WorkbenchMenuContributionPosition = OneOf<{
-  before?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
-  after?: `menuitem:${string}` | `menu:${string}` | `group:${string}`;
-  position?: 'start' | 'end';
-}>;
-
 /**
  * Transfer object for {@link SciMenuGroup} snapshot in @scion/workbench-client.
  */
 export interface WorkbenchMenuGroupTransferable {
   id: string;
   type: 'group'
-  name?: `group:${string}`;
+  name?: `menu:${string}:${string}` | `toolbar:${string}:${string}`;
   label?: string;
   collapsible?: {collapsed: boolean};
   position?: WorkbenchMenuContributionPosition;
@@ -368,26 +362,22 @@ export interface WorkbenchMenuGroupTransferable {
   cssClass?: string[];
 }
 
+export type WorkbenchMenuContributionPosition = OneOf<{
+  before?: `menuitem:${string}` | `menu:${string}:${string}` | `toolbar:${string}:${string}`;
+  after?: `menuitem:${string}` | `menu:${string}:${string}` | `toolbar:${string}:${string}`;
+  position?: 'start' | 'end';
+}>;
+
 export type WorkbenchMenuContributionLocation = {location: `menu:${string}`} & WorkbenchMenuContributionPosition;
-
 export type WorkbenchToolbarContributionLocation = {location: `toolbar:${string}`} & WorkbenchMenuContributionPosition;
-
-export type WorkbenchMenuGroupContributionLocation = {location: `group(menu):${string}`} & WorkbenchMenuContributionPosition;
-
-export type WorkbenchToolbarGroupContributionLocation = {location: `group(toolbar):${string}`} & WorkbenchMenuContributionPosition;
-
-export type WorkbenchMenuContributionLocationLike = WorkbenchMenuContributionLocation | WorkbenchToolbarContributionLocation | WorkbenchMenuGroupContributionLocation | WorkbenchToolbarGroupContributionLocation;
+export type WorkbenchMenuContributionLocationLike = WorkbenchMenuContributionLocation | WorkbenchToolbarContributionLocation;
 
 export type WorkbenchMenuFactoryFn = (menu: WorkbenchMenuFactory, context: Map<string, unknown>) => void;
 export type WorkbenchToolbarFactoryFn = (toolbar: WorkbenchToolbarFactory, context: Map<string, unknown>) => void;
-export type WorkbenchMenuGroupFactoryFn = (group: WorkbenchMenuGroupFactory, context: Map<string, unknown>) => void;
-export type WorkbenchToolbarGroupFactoryFn = (group: WorkbenchToolbarGroupFactory, context: Map<string, unknown>) => void;
-export type WorkbenchMenuFactoryFnLike = WorkbenchMenuFactoryFn | WorkbenchToolbarFactoryFn | WorkbenchMenuGroupFactoryFn | WorkbenchToolbarGroupFactoryFn;
+export type WorkbenchMenuFactoryFnLike = WorkbenchMenuFactoryFn | WorkbenchToolbarFactoryFn;
 
 export type WorkbenchMenuItemLike = WorkbenchMenuItem | WorkbenchMenu | WorkbenchMenuGroup;
-
 export type WorkbenchMenuItemProxyLike = WorkbenchMenuItemProxy | WorkbenchMenuProxy | WorkbenchMenuGroupProxy;
-
 export type WorkbenchMenuItemTransferableLike = WorkbenchMenuItemTransferable | WorkbenchMenuTransferable | WorkbenchMenuGroupTransferable;
 
 export interface WorkbenchMenuContributionOptions {

@@ -23,12 +23,10 @@ export interface SciMenuFactory {
 
   addMenu(descriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this;
 
-  addGroup(groupFactoryFn: (group: SciMenuGroupFactory) => void): this;
+  addGroup(groupFactoryFn: (group: SciMenuFactory) => void): this;
 
-  addGroup(descriptor: SciMenuGroupDescriptor, groupFactoryFn?: (group: SciMenuGroupFactory) => void): this;
+  addGroup(descriptor: SciMenuGroupDescriptor, groupFactoryFn?: (group: SciMenuFactory) => void): this;
 }
-
-export type SciMenuGroupFactory = SciMenuFactory;
 
 export interface SciMenuItemDescriptor {
   name?: `menuitem:${string}`;
@@ -62,7 +60,7 @@ export interface SciMenuDescriptor {
 }
 
 export interface SciMenuGroupDescriptor {
-  name?: `group:${string}`;
+  name?: `menu:${string}:${string}`;
   label?: MaybeSignal<Translatable>;
   collapsible?: boolean | {collapsed: boolean};
   disabled?: MaybeSignal<boolean>;

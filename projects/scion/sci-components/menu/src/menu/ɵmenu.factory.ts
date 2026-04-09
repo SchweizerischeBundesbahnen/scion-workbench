@@ -1,4 +1,4 @@
-import {SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuGroupFactory, SciMenuItemDescriptor} from './menu.factory';
+import {SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuItemDescriptor} from './menu.factory';
 import {isSignal, Signal} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model';
@@ -84,9 +84,9 @@ export class ɵSciMenuFactory implements SciMenuFactory {
   }
 
   /** @inheritDoc */
-  public addGroup(groupFactoryFn: (group: SciMenuGroupFactory) => void): this;
-  public addGroup(descriptor: SciMenuGroupDescriptor, groupFactoryFn?: (group: SciMenuGroupFactory) => void): this;
-  public addGroup(factoryOrDescriptor: ((group: SciMenuGroupFactory) => void) | SciMenuGroupDescriptor, factoryIfDescriptor?: (group: SciMenuGroupFactory) => void): this {
+  public addGroup(groupFactoryFn: (group: SciMenuFactory) => void): this;
+  public addGroup(descriptor: SciMenuGroupDescriptor, groupFactoryFn?: (group: SciMenuFactory) => void): this;
+  public addGroup(factoryOrDescriptor: ((group: SciMenuFactory) => void) | SciMenuGroupDescriptor, factoryIfDescriptor?: (group: SciMenuFactory) => void): this {
     const [descriptor, groupFactoryFn] = coerceGroupDescriptor(factoryOrDescriptor, factoryIfDescriptor);
 
     // Construct group.
@@ -122,7 +122,7 @@ function coerceMenuDescriptor(labelOrDescriptor: MaybeSignal<string> | SciMenuDe
   return labelOrDescriptor;
 }
 
-function coerceGroupDescriptor(factoryOrDescriptor: ((group: SciMenuGroupFactory) => void) | SciMenuGroupDescriptor, factoryIfDescriptor?: (group: SciMenuGroupFactory) => void): [SciMenuGroupDescriptor, ((group: SciMenuGroupFactory) => void) | undefined] {
+function coerceGroupDescriptor(factoryOrDescriptor: ((group: SciMenuFactory) => void) | SciMenuGroupDescriptor, factoryIfDescriptor?: (group: SciMenuFactory) => void): [SciMenuGroupDescriptor, ((group: SciMenuFactory) => void) | undefined] {
   if (typeof factoryOrDescriptor === 'function') {
     return [{}, factoryOrDescriptor];
   }

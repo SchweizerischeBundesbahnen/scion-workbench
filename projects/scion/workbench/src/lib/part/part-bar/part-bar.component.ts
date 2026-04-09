@@ -16,7 +16,7 @@ import {dimension} from '@scion/components/dimension';
 import {EMPTY, fromEvent, mergeMap, of, pairwise, withLatestFrom} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {SciTextPipe, text} from '@scion/sci-components/text';
-import {contributeMenu, SciMenuGroupFactory, SciToolbarComponent, SciToolbarFactory} from '@scion/sci-components/menu';
+import {contributeMenu, SciMenuFactory, SciToolbarComponent, SciToolbarFactory} from '@scion/sci-components/menu';
 import {ViewListToolbarIconComponent} from '../view-list-toolbar-icon/view-list-toolbar-icon.component';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {PART_CONTEXT_VIEW_ID, WorkbenchMenuContextKeys} from '../../menu/workbench-menu-context-provider';
@@ -124,7 +124,7 @@ export class PartBarComponent {
       .addGroup(group => addViewMenuItems(group, this.part.views().filter(view => view.scrolledIntoView()))),
     );
 
-    function addViewMenuItems(group: SciMenuGroupFactory, views: WorkbenchView[]): void {
+    function addViewMenuItems(group: SciMenuFactory, views: WorkbenchView[]): void {
       for (const view of views) {
         const title = untracked(() => text(view.title));
         const heading = untracked(() => text(view.heading));

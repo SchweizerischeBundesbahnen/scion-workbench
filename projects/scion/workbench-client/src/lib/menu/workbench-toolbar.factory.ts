@@ -23,9 +23,9 @@ export interface WorkbenchToolbarFactory {
 
   addMenu(descriptor: WorkbenchToolbarMenuDescriptor, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this;
 
-  addGroup(groupFactoryFn: (group: WorkbenchToolbarGroupFactory) => void): this;
+  addGroup(groupFactoryFn: (group: WorkbenchToolbarFactory) => void): this;
 
-  addGroup(descriptor: WorkbenchToolbarGroupDescriptor, groupFactoryFn?: (group: WorkbenchToolbarGroupFactory) => void): this;
+  addGroup(descriptor: WorkbenchToolbarGroupDescriptor, groupFactoryFn?: (group: WorkbenchToolbarFactory) => void): this;
 
   /**
    * Instructs the menu to re-create, invoking the menu factory function anew.
@@ -40,8 +40,6 @@ export interface WorkbenchToolbarFactory {
    */
   onCleanup: (onCleanup: () => void) => void;
 }
-
-export type WorkbenchToolbarGroupFactory = WorkbenchToolbarFactory;
 
 export interface WorkbenchToolbarItemDescriptor {
   name?: `menuitem:${string}`;
@@ -77,7 +75,7 @@ export interface WorkbenchToolbarMenuDescriptor {
 }
 
 export interface WorkbenchToolbarGroupDescriptor {
-  name?: `group:${string}`;
+  name?: `toolbar:${string}:${string}`;
   disabled?: MaybeObservable<boolean>;
   cssClass?: string | string[];
 }

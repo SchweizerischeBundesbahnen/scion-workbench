@@ -17,7 +17,7 @@ import {Objects} from '@scion/toolkit/util';
 import {ɵSciMenuFactory} from './menu/ɵmenu.factory';
 import {ɵSciToolbarFactory} from './toolbar/ɵtoolbar.factory';
 import {sortMenuItems} from './menu-item-sorter';
-import {NULL_MENU_CONTRIBUTIONS, SciMenuContribution, SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuContributionPosition, SciMenuFactoryFn, SciMenuFactoryFnLike, SciMenuGroupFactoryFn, SciToolbarFactoryFn, SciToolbarGroupFactoryFn} from './menu-contribution.model';
+import {NULL_MENU_CONTRIBUTIONS, SciMenuContribution, SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuContributionPosition, SciMenuFactoryFn, SciMenuFactoryFnLike, SciToolbarFactoryFn} from './menu-contribution.model';
 import {createDestroyableInjector} from './common/injector.util';
 import {ɵassertInInjectionContext} from './common/common';
 import {prune} from './common/prune.util';
@@ -30,7 +30,7 @@ import {SciMenuOpener} from './menu-opener.service';
 @Injectable({providedIn: 'root'})
 export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
 
-  private readonly _contributions = new Map<`menu:${string}` | `toolbar:${string}` | `group:${string}`, WritableSignal<Array<SciMenuContribution>>>;
+  private readonly _contributions = new Map<`menu:${string}` | `toolbar:${string}`, WritableSignal<Array<SciMenuContribution>>>;
   private readonly _menuItemsCaches = new Map<SciMenuContribution, MenuItemsCache>;
   private readonly _contributionInstantProvider = inject(SciMenuContributionInstantProvider);
   private readonly _menuOpener = inject(SciMenuOpener);
@@ -38,7 +38,7 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
 
   /** @inheritDoc */
   public contributeMenu(locationLike: SciMenuContributionLocationLike, factoryFn: SciMenuFactoryFnLike, options: SciMenuContributionOptions): Disposable {
-    const {location, scope} = parseMenuLocation(locationLike.location);
+    const {scope, location} = parseMenuLocation(locationLike.location);
     const {before, after, position} = locationLike;
 
     const contribution: SciMenuContribution = {
@@ -68,7 +68,7 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
   }
 
   /** @inheritDoc */
-  public menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuContribution[]> {
+  public menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuContribution[]> {
     return computed(() => {
       // Ensure the location is tracked for later registrations.
       if (!this._contributions.has(location())) {
@@ -101,7 +101,7 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
   }
 
   /** @inheritDoc */
-  public menuItems(location: Signal<`menu:${string}` | `toolbar:${string}` | `group:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuItemLike[]> {
+  public menuItems(location: Signal<`menu:${string}` | `toolbar:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuItemLike[]> {
     assertNotInReactiveContext(this.menuItems, 'Call menuItems() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     if (!options.injector) {
       ɵassertInInjectionContext(this.menuItems, 'Call menuItems() in an injection context, as it may allocate resources that are not released until the injection context is destroyed.')
@@ -126,13 +126,13 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
               switch (menuContribution.scope) {
                 case 'menu': {
                   const menuFactory = new ɵSciMenuFactory();
-                  const menuFactoryFn = menuContribution.factoryFn as SciMenuFactoryFn | SciMenuGroupFactoryFn;
+                  const menuFactoryFn = menuContribution.factoryFn as SciMenuFactoryFn;
                   runInInjectionContext(injector, () => menuFactoryFn(menuFactory, context));
                   return menuFactory.menuItems.map(menuItem => ({...menuItem, position: menuContribution.position}));
                 }
                 case 'toolbar': {
                   const toolbarFactory = new ɵSciToolbarFactory();
-                  const toolbarFactoryFn = menuContribution.factoryFn as SciToolbarFactoryFn | SciToolbarGroupFactoryFn;
+                  const toolbarFactoryFn = menuContribution.factoryFn as SciToolbarFactoryFn;
                   runInInjectionContext(injector, () => toolbarFactoryFn(toolbarFactory, context));
                   return toolbarFactory.menuItems.map(menuItem => ({...menuItem, position: menuContribution.position}));
                 }

@@ -1,5 +1,5 @@
 import {MaybeObservable} from '../common/utility-types';
-import {WorkbenchToolbarFactory, WorkbenchToolbarGroupDescriptor, WorkbenchToolbarGroupFactory, WorkbenchToolbarItemDescriptor, WorkbenchToolbarMenuDescriptor} from './workbench-toolbar.factory';
+import {WorkbenchToolbarFactory, WorkbenchToolbarGroupDescriptor, WorkbenchToolbarItemDescriptor, WorkbenchToolbarMenuDescriptor} from './workbench-toolbar.factory';
 import {WorkbenchMenu, WorkbenchMenuGroup, WorkbenchMenuItem, WorkbenchMenuItemLike} from './workbench-client-menu.model';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchMenuFactory} from './workbench-menu.factory';
@@ -82,9 +82,9 @@ export class ɵWorkbenchToolbarFactory implements WorkbenchToolbarFactory {
   }
 
   /** @inheritDoc */
-  public addGroup(groupFactoryFn: (group: WorkbenchToolbarGroupFactory) => void): this;
-  public addGroup(descriptor: WorkbenchToolbarGroupDescriptor, groupFactoryFn?: (group: WorkbenchToolbarGroupFactory) => void): this;
-  public addGroup(factoryOrDescriptor: ((group: WorkbenchToolbarGroupFactory) => void) | WorkbenchToolbarGroupDescriptor, factoryIfDescriptor?: (group: WorkbenchToolbarGroupFactory) => void): this {
+  public addGroup(groupFactoryFn: (group: WorkbenchToolbarFactory) => void): this;
+  public addGroup(descriptor: WorkbenchToolbarGroupDescriptor, groupFactoryFn?: (group: WorkbenchToolbarFactory) => void): this;
+  public addGroup(factoryOrDescriptor: ((group: WorkbenchToolbarFactory) => void) | WorkbenchToolbarGroupDescriptor, factoryIfDescriptor?: (group: WorkbenchToolbarFactory) => void): this {
     const [descriptor, groupFactoryFn] = coerceGroupDescriptor(factoryOrDescriptor, factoryIfDescriptor);
 
     // Construct group.
@@ -132,7 +132,7 @@ function coerceMenuDescriptor(iconOrDescriptor: MaybeObservable<string> | Workbe
   return iconOrDescriptor;
 }
 
-function coerceGroupDescriptor(factoryOrDescriptor: ((group: WorkbenchToolbarGroupFactory) => void) | WorkbenchToolbarGroupDescriptor, factoryIfDescriptor?: (group: WorkbenchToolbarGroupFactory) => void): [WorkbenchToolbarGroupDescriptor, ((group: WorkbenchToolbarGroupFactory) => void) | undefined] {
+function coerceGroupDescriptor(factoryOrDescriptor: ((group: WorkbenchToolbarFactory) => void) | WorkbenchToolbarGroupDescriptor, factoryIfDescriptor?: (group: WorkbenchToolbarFactory) => void): [WorkbenchToolbarGroupDescriptor, ((group: WorkbenchToolbarFactory) => void) | undefined] {
   if (typeof factoryOrDescriptor === 'function') {
     return [{}, factoryOrDescriptor];
   }

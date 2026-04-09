@@ -1,9 +1,8 @@
-import {WorkbenchMenuContributionPosition, WorkbenchMenuItemTransferableLike, WorkbenchMenuTransferable} from './workbench-client-menu.model';
+import {WorkbenchMenuContributionPosition, WorkbenchMenuTransferable} from './workbench-client-menu.model';
 import {DialogId, NotificationId, PartId, PopupId, ViewId} from '../workbench.identifiers';
-import {Translatable} from '../text/workbench-text-provider.model';
 
 export interface ɵWorkbenchMenuContributionRegisterCommand {
-  location: `menu:${string}` | `toolbar:${string}` | `group(menu):${string}` | `group(toolbar):${string}`,
+  location: `menu:${string}` | `toolbar:${string}`,
   requiredContext: Map<string, unknown>;
   position?: WorkbenchMenuContributionPosition;
   metadata?: {[key: string]: unknown};
@@ -15,7 +14,7 @@ export interface ɵWorkbenchMenuContributionConstructCommand {
 }
 
 export interface ɵWorkbenchMenuItemLookupCommand {
-  location: `menu:${string}` | `toolbar:${string}` | `group:${string}`,
+  location: `menu:${string}` | `toolbar:${string}`,
   context: Map<string, unknown>;
   metadata?: {[key: string]: unknown};
 }
