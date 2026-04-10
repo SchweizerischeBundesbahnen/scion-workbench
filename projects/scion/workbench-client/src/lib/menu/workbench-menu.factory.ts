@@ -59,7 +59,6 @@ export interface WorkbenchMenuDescriptor {
   name?: `menu:${string}`;
   label: MaybeObservable<Translatable>;
   icon?: MaybeObservable<string>;
-  tooltip?: MaybeObservable<Translatable>;
   disabled?: MaybeObservable<boolean>;
   menu?: {
     width?: string;

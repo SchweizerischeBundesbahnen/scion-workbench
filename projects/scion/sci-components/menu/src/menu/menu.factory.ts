@@ -47,7 +47,6 @@ export interface SciMenuDescriptor {
   name?: `menu:${string}`;
   label: MaybeSignal<Translatable> | ComponentType<unknown> | SciComponentDescriptor;
   icon?: MaybeSignal<string> | ComponentType<unknown> | SciComponentDescriptor;
-  tooltip?: MaybeSignal<Translatable>;
   disabled?: MaybeSignal<boolean>;
   menu?: {
     width?: string;

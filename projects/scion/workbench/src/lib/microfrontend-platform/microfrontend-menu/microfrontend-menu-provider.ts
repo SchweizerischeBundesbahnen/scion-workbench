@@ -175,7 +175,6 @@ function populateMenu(menu: SciMenuFactory, menuItemProxies: WorkbenchMenuItemPr
           name: menuItemProxy.name,
           label: toSignal(menuItemProxy.label!, {requireSync: true}),
           icon: menuItemProxy.icon && toSignal(menuItemProxy.icon, {requireSync: true}),
-          tooltip: menuItemProxy.tooltip && toSignal(menuItemProxy.tooltip, {requireSync: true}),
           disabled: menuItemProxy.disabled && toSignal(menuItemProxy.disabled, {requireSync: true}),
           menu: {
             width: menuItemProxy.menu.width,

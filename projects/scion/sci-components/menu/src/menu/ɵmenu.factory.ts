@@ -67,7 +67,6 @@ export class ɵSciMenuFactory implements SciMenuFactory {
       labelComponent: coerceLabelComponent(descriptor.label),
       iconLigature: coerceSignal(coerceIconLigature(descriptor.icon)),
       iconComponent: coerceIconComponent(descriptor.icon),
-      tooltip: translate(descriptor.tooltip),
       disabled: coerceSignal(descriptor.disabled),
       menu: {
         width: descriptor.menu?.width,

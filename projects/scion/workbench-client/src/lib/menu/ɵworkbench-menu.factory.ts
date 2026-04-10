@@ -66,7 +66,6 @@ export class ɵWorkbenchMenuFactory implements WorkbenchMenuFactory {
       name: descriptor.name,
       label: translate(descriptor.label),
       icon: descriptor.icon,
-      tooltip: translate(descriptor.tooltip),
       disabled: descriptor.disabled,
       cssClass: Arrays.coerce(descriptor.cssClass),
       children: menuFactory.menuItems,
