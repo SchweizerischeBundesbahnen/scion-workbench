@@ -241,7 +241,25 @@ export default class ViewPageComponent {
         .addMenu({icon: 'format_list_numbered', label: 'Enumeration'}, menu => menu
           .addMenuItem({icon: 'format_list_bulleted', label: 'Bullet list', onSelect})
           .addMenuItem({icon: 'format_list_numbered', label: 'Number list', onSelect}),
-        ),
+        )
+        .addMenu({label: 'Align', icon: 'format_align_center'}, menu => menu
+          .addMenuItem({icon: 'format_align_left', label: 'Align left', onSelect})
+          .addMenuItem({icon: 'format_align_center', label: 'Align center', onSelect})
+          .addMenuItem({icon: 'format_align_right', label: 'Align right', onSelect})
+          .addMenuItem({icon: 'format_align_left', label: 'Align left', onSelect})
+          .addMenuItem({icon: 'format_align_center', label: 'Align center', onSelect})
+          .addMenuItem({icon: 'format_align_right', label: 'Align right', onSelect})
+          .addMenuItem({icon: 'format_align_left', label: 'Align left', onSelect})
+          .addMenuItem({icon: 'format_align_center', label: 'Align center', onSelect})
+          .addMenuItem({icon: 'format_align_right', label: 'Align right', onSelect})
+          .addMenuItem({icon: 'format_align_left', label: 'Align left', onSelect})
+          .addMenuItem({icon: 'format_align_center', label: 'Align center', onSelect})
+          .addMenuItem({icon: 'format_align_right', label: 'Align right', onSelect})
+          .addMenuItem({icon: 'format_align_left', label: 'Align left', onSelect})
+          .addMenuItem({icon: 'format_align_center', label: 'Align center', onSelect})
+          .addMenuItem({icon: 'format_align_right', label: 'Align right', onSelect})
+          .addMenuItem({icon: 'format_align_justify', label: 'Align justify', onSelect}),
+        )
       )
       .addGroup(group => group
         .addToolbarItem({icon: 'undo', accelerator: ['Ctrl', 'Z'], onSelect: () => onSelect()})

@@ -16,7 +16,7 @@
 // By setting `PLAYWRIGHT_BROWSERS_PATH=0`, chromium binaries are found in `node_modules`
 // https://playwright.dev/docs/ci#caching-browsers
 process.env.PLAYWRIGHT_BROWSERS_PATH = 0;
-process.env.CHROME_BIN = require('playwright-core').chromium.executablePath();
+process.env.CHROME_BIN = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 
 module.exports = function (config) {
   config.set({
@@ -54,9 +54,19 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
     autoWatch: true,
     browsers: [
-      process.env.HEADLESS ? 'HeadlessChrome' : 'Chrome',
+      process.env.HEADLESS ? 'HeadlessChrome' : 'FastChrome',
     ],
     customLaunchers: {
+      FastChrome: {
+        base: 'Chrome',
+        flags: [
+          '--disable-extensions',
+          '--disable-background-networking',
+          '--disable-background-timer-throttling',
+          '--disable-renderer-backgrounding',
+          '--disable-dev-shm-usage',
+        ],
+      },
       HeadlessChrome: {
         base: 'ChromeHeadless',
         flags: ['--no-sandbox'],

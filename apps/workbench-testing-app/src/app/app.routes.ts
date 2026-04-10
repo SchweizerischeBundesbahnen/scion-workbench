@@ -34,6 +34,11 @@ export const routes: Routes = [
     data: {[WorkbenchRouteData.title]: 'Workbench Router', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-router', pinToDesktop: true},
   },
   {
+    path: 'test-menu-contribution',
+    loadComponent: () => import('./menu-contribution-page/menu-contribution-page.component'),
+    data: {[WorkbenchRouteData.title]: 'Workbench Menu Contribution', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-menu-contribution', pinToDesktop: true},
+  },
+  {
     path: 'test-view',
     loadComponent: () => import('./view-page/view-page.component'),
     data: {[WorkbenchRouteData.title]: 'Workbench View', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-view', pinToDesktop: true},

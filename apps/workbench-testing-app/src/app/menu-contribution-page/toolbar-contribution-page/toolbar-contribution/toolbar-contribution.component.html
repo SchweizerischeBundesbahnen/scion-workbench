@@ -1,0 +1,76 @@
+<section class="actions">
+  <button (click)="onAddToolbarItem()" class="e2e-add-toolbar-item">Add Toolbar Item</button>
+  <button (click)="onAddMenu()" class="e2e-add-menu">Add Menu</button>
+  <button (click)="onAddGroup()" class="e2e-add-group">Add Group</button>
+</section>
+
+@for (toolbarItemFormGroup of form.controls.toolbarItems.controls; track $index) {
+  @switch (toolbarItemFormGroup.controls.type.value) {
+    @case ('menuitem') {
+      @let formGroup = asToolbarItemFormGroup(toolbarItemFormGroup);
+
+      <section class="toolbar-item">
+        <label>Name</label>
+        <label>Icon</label>
+        <label></label>
+
+        <!-- Name -->
+        <input [formControl]="formGroup.controls.name" class="e2e-name">
+        <!-- Icon -->
+        <input [formControl]="formGroup.controls.icon" class="e2e-icon">
+        <!-- Remove button -->
+        <button class="e2e-remove" (click)="onRemoveToolbarItem($index)" title="Remove Toolbar item" sciMaterialIcon>remove</button>
+      </section>
+    }
+    @case ('menu') {
+      @let formGroup = asToolbarMenuFormGroup(toolbarItemFormGroup);
+
+      <section class="menu">
+        <div>
+          <label>Name</label>
+          <label>Label</label>
+          <label>Icon</label>
+          <label>Tooltip</label>
+          <span class="checkbox">Disabled</span>
+          <label></label>
+
+          <!-- Name -->
+          <input [formControl]="formGroup.controls.name" class="e2e-name">
+          <!-- Label -->
+          <input [formControl]="formGroup.controls.label" class="e2e-label">
+          <!-- Icon -->
+          <input [formControl]="formGroup.controls.icon" class="e2e-icon">
+          <!-- Tooltip -->
+          <input [formControl]="formGroup.controls.tooltip" class="e2e-tooltip">
+          <!-- Disabled -->
+          <sci-checkbox [formControl]="formGroup.controls.disabled" class="e2e-disabled"/>
+          <!-- Remove button -->
+          <button class="e2e-remove" (click)="onRemoveToolbarItem($index)" title="Remove Menu" sciMaterialIcon>remove</button>
+        </div>
+
+        <app-menu-contribution [formControl]="formGroup.controls.children"/>
+      </section>
+    }
+    @case ('group') {
+      @let formGroup = asToolbarGroupFormGroup(toolbarItemFormGroup);
+
+      <section class="group">
+        <div>
+          <label>Name</label>
+          <span class="checkbox">Disabled</span>
+          <label></label>
+
+          <!-- Name -->
+          <input [formControl]="formGroup.controls.name" class="e2e-name">
+          <!-- Disabled -->
+          <sci-checkbox [formControl]="formGroup.controls.disabled" class="e2e-disabled"/>
+          <!-- Remove button -->
+          <button class="e2e-remove" (click)="onRemoveToolbarItem($index)" title="Remove Group" sciMaterialIcon>remove</button>
+        </div>
+
+        <app-menu-contribution [formControl]="formGroup.controls.children"/>
+      </section>
+    }
+  }
+}
+

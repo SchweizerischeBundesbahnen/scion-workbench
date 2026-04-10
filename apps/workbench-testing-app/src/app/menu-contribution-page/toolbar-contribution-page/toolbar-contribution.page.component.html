@@ -1,0 +1,11 @@
+<sci-toolbar name="toolbar:testee"/>
+
+<section>
+  <sci-form-field label="Location">
+    <input [formControl]="form.controls.location" class="e2e-location">
+  </sci-form-field>
+
+  <app-toolbar-contribution [formControl]="form.controls.toolbarItems"/>
+
+  <button (click)="onContributeToolbar()" [disabled]="form.invalid" class="e2e-contribute-toolbar" sci-primary>Contribute Toolbar</button>
+</section>

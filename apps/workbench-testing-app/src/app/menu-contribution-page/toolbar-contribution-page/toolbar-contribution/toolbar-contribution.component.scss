@@ -1,0 +1,84 @@
+@use '@scion/components.internal/design' as sci-design;
+
+:host {
+  display: grid;
+  gap: 1em;
+
+  > section.actions {
+    display: flex;
+    gap: 1em;
+  }
+
+  > section.toolbar-item {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr) auto;
+    gap: .5em .75em;
+    align-items: center;
+
+    > span.checkbox {
+      text-align: center;
+    }
+
+    > sci-checkbox {
+      justify-self: center;
+    }
+
+    > input {
+      @include sci-design.style-input-field();
+    }
+  }
+
+  > section.menu {
+    display: grid;
+    gap: 1em;
+    border: 1px solid var(--sci-color-border);
+    border-radius: var(--sci-corner);
+    padding: 1em;
+
+    > div {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr) min-content auto;
+      gap: .5em .75em;
+      align-items: center;
+
+      > span.checkbox {
+        text-align: center;
+      }
+
+      > sci-checkbox {
+        justify-self: center;
+      }
+
+      > input {
+        @include sci-design.style-input-field();
+      }
+    }
+  }
+
+  > section.group {
+    display: grid;
+    gap: 1em;
+    border: 1px solid var(--sci-color-border);
+    border-radius: var(--sci-corner);
+    padding: 1em;
+
+    > div {
+      display: grid;
+      grid-template-columns: 1fr min-content auto;
+      gap: .5em .75em;
+      align-items: center;
+
+      > span.checkbox {
+        text-align: center;
+      }
+
+      > sci-checkbox {
+        justify-self: center;
+      }
+
+      > input {
+        @include sci-design.style-input-field();
+      }
+    }
+  }
+}
