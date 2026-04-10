@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DOCUMENT, effect, inject, Injector, input, linkedSignal, output, runInInjectionContext, signal, untracked, ViewContainerRef} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DOCUMENT, effect, inject, Injector, input, linkedSignal, output, signal, untracked, ViewContainerRef} from '@angular/core';
 import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model';
 import {ɵSciMenuService} from '../ɵmenu.service';
 import {MaybeSignal, RequireOne, SciAttributesDirective, SciComponentOutletDirective} from '@scion/sci-components/common';
@@ -22,7 +22,6 @@ export class SciToolGroupComponent {
   public readonly menuOpen = output<boolean>();
 
   private readonly _menuService = inject(ɵSciMenuService);
-  private readonly _injector = inject(Injector);
   private readonly _childGroupMenuOpen = signal(false);
   private readonly _document = inject(DOCUMENT);
 
@@ -71,13 +70,10 @@ export class SciToolGroupComponent {
     });
   }
 
-  protected onSelect(menuItem: SciMenuItem): void {
-    // TODO [menu] Disable during action until promise resolved.
-    void runInInjectionContext(this._injector, async () => {
-      if (await menuItem.onSelect()) {
-        this.closeMenus(); // e.g., when clicking an action in a menu's action toolbar
-      }
-    });
+  protected async onSelect(menuItem: SciMenuItem): Promise<void> {
+    if (await menuItem.onSelect()) {
+      this.closeMenus(); // e.g., when clicking an action in a menu's action toolbar
+    }
   }
 
   protected onChildGroupMenuOpen(open: boolean): void {

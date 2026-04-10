@@ -12,7 +12,7 @@ import {Component, computed, DoCheck, DOCUMENT, inject, NgZone, signal, Signal, 
 import {filter, map, scan} from 'rxjs/operators';
 import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} from '@angular/router';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
-import {PartId, ViewId, WORKBENCH_ID, WorkbenchDialogService, WorkbenchMenuContextKeys, WorkbenchRouter, WorkbenchService, WorkbenchStartup} from '@scion/workbench';
+import {WORKBENCH_ID, WorkbenchDialogService, WorkbenchPart, WorkbenchRouter, WorkbenchService, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
 import {HeaderComponent} from './header/header.component';
 import {fromEvent} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
@@ -587,21 +587,20 @@ export class AppComponent implements DoCheck {
   }
 
   private contributeNewTabToolbarItem(): void {
-    contributeMenu('toolbar:workbench.part.tabbar', (toolbar, context) => {
-      const partId = context.get(WorkbenchMenuContextKeys.PartId) as PartId | undefined;
-      const peripheral = context.get('peripheral') as boolean | undefined;
-      if (!partId || peripheral) {
+    contributeMenu('toolbar:workbench.part.tabbar', toolbar => {
+      const part = inject(WorkbenchPart);
+      if (part.peripheral()) {
         return;
       }
 
-      toolbar.addToolbarItem('add', () => void this.workbenchRouter.navigate(['/start-page'], {target: 'blank', partId, position: 'end'}));
+      toolbar.addToolbarItem('add', () => void this.workbenchRouter.navigate(['/start-page'], {target: 'blank', partId: part.id, position: 'end'}));
     });
   }
 
   private contributeViewContextMenuAdditions(): void {
     // Contribute menu item to move view to new window.
-    contributeMenu({location: 'menu:workbench.view.contextmenu.internal:move'}, (menu, context) => {
-      const view = inject(WorkbenchService).getView(context.get(WorkbenchMenuContextKeys.ViewId) as ViewId)!; // TODO [menu] Remove once in correct injection context
+    contributeMenu({location: 'menu:workbench.view.contextmenu.internal:move'}, menu => {
+      const view = inject(WorkbenchView);
 
       menu.addMenuItem({
         label: 'Move View...',
@@ -614,8 +613,8 @@ export class AppComponent implements DoCheck {
     });
 
     // Contribute menu item to show view info.
-    contributeMenu('menu:workbench.view.contextmenu', (menu, context) => {
-      const view = inject(WorkbenchService).getView(context.get(WorkbenchMenuContextKeys.ViewId) as ViewId); // TODO [menu] Remove once in correct injection context
+    contributeMenu('menu:workbench.view.contextmenu', menu => {
+      const view = inject(WorkbenchView);
 
       menu.addMenuItem({
         label: 'Show View Info',

@@ -21,7 +21,6 @@ import {createDestroyableInjector} from '../../common/injector.util';
 import {NgTemplateOutlet} from '@angular/common';
 import {WorkbenchMenuItem, WorkbenchViewMenuItemFn} from '../../workbench.model';
 import {WORKBENCH_VIEW_CONTEXT} from '../../view/workbench-view-context.provider';
-import {WorkbenchMenuContextKeys} from '../../menu/workbench-menu-context-provider';
 
 /**
  * Provides the contextmenu of a view.
@@ -55,11 +54,11 @@ export class WorkbenchViewContextMenuService {
     }
 
     // Contribute contextmenu.
-    contributeMenu({location: 'menu:workbench.view.contextmenu.internal'}, (menu, context) => {
-      const view = inject(WorkbenchViewRegistry).get(context.get(WorkbenchMenuContextKeys.ViewId) as ViewId); // TODO [menu] Remove once in correct injection context
+    contributeMenu({location: 'menu:workbench.view.contextmenu.internal'}, menu => {
+      const view = inject(WorkbenchView);
 
       // Add 'close' group.
-      menu.addGroup({name: 'menu:workbench.view.contextmenu.internal:close'}, group => {
+      menu.addGroup(group => {
         this.registerCloseMenuItem(config.close ?? {}, group, view);
         this.registerCloseOtherTabsMenuItem(config.closeOthers ?? {}, group, view);
         this.registerCloseAllTabsMenuItem(config.closeAll ?? {}, group, view);
@@ -81,7 +80,6 @@ export class WorkbenchViewContextMenuService {
       menu.addGroup(group => {
         this.registerMoveToNewWindowMenuItem(config.moveToNewWindow ?? {}, group, view);
       });
-
     });
   }
 
@@ -89,21 +87,21 @@ export class WorkbenchViewContextMenuService {
    * Registers a legacy view menu contribution in the view context menu.
    */
   public registerLegacyMenuContribution(legacyViewMenuItemFn: WorkbenchViewMenuItemFn): Disposable {
-    const contribution = contributeMenu('menu:workbench.view.contextmenu', ((group, context) => {
-      const view = this._viewRegistry.get(context.get(WorkbenchMenuContextKeys.ViewId) as ViewId); // TODO [menu] Remove once in correct injection context
+    const contribution = contributeMenu('menu:workbench.view.contextmenu', group => {
+      const view = inject(ɵWorkbenchView);
+
+      const legacyViewMenuItem = legacyViewMenuItemFn(view);
+      if (!legacyViewMenuItem) {
+        return;
+      }
 
       const providers: Provider[] = [
         {provide: ɵWorkbenchView, useValue: view},
         {provide: WorkbenchView, useExisting: ɵWorkbenchView},
         {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchView},
-        this._injector.get(WORKBENCH_VIEW_CONTEXT, [], {optional: true}),
+        inject(WORKBENCH_VIEW_CONTEXT, {optional: true}) ?? [],
       ];
       const injector = createDestroyableInjector({providers});
-
-      const legacyViewMenuItem = runInInjectionContext(injector, () => legacyViewMenuItemFn(view));
-      if (!legacyViewMenuItem) {
-        return;
-      }
 
       group.addMenuItem({
         label: coerceComponent(legacyViewMenuItem, {providers, view}),
@@ -112,7 +110,7 @@ export class WorkbenchViewContextMenuService {
         disabled: legacyViewMenuItem.disabled,
         cssClass: legacyViewMenuItem.cssClass,
       })
-    }), {injector: this._injector}); // Pass root injector to be independent of the invocation context.
+    }, {injector: this._injector}); // Pass root injector to be independent of the invocation context.
 
     return {
       dispose: () => contribution.dispose(),

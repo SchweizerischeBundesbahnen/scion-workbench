@@ -1,4 +1,4 @@
-import {afterRenderEffect, ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, inject, Injector, input, linkedSignal, runInInjectionContext, signal, Signal, untracked, viewChild, ViewContainerRef} from '@angular/core';
+import {afterRenderEffect, ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, inject, input, linkedSignal, signal, Signal, untracked, viewChild, ViewContainerRef} from '@angular/core';
 import {FormatAcceleratorPipe} from './accelerator-format.pipe';
 import {MenuItemGroupComponent} from './menu-group.component';
 import {MenuFilterComponent} from './menu-filter.component';
@@ -67,7 +67,6 @@ export class MenuComponent {
   private readonly _menuFilter = inject(MenuFilter);
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _document = inject(DOCUMENT);
-  private readonly _injector = inject(Injector);
   private readonly _actionToolbarMenuOpen = signal(false);
 
   protected readonly hasGlyphArea = computed(() => this.glyphArea() ?? (!!this.filter() || requiresGlyphArea(this.menuItems())));
@@ -156,13 +155,11 @@ export class MenuComponent {
     });
   }
 
-  protected onSelect(menuItem: SciMenuItem): void {
+  protected async onSelect(menuItem: SciMenuItem): Promise<void> {
     // TODO [menu] Disable during action until promise resolved.
-    void runInInjectionContext(this._injector, async () => {
-      if (await menuItem.onSelect()) {
-        this.close();
-      }
-    });
+    if (await menuItem.onSelect()) {
+      this.close();
+    }
   }
 
   protected onGroupToggle(): void {

@@ -55,7 +55,7 @@ export class PartBarComponent {
 
     contributeMenu('toolbar:workbench.part.tabbar.internal', toolbar => {
       this.contributeTabbarAdditionsGroup(toolbar);
-    });
+    }, {requiredContext: new Map().set(WorkbenchMenuContextKeys.ViewId, undefined)}); // clear view constraint to contribute to parts with and without views
 
     contributeMenu('toolbar:workbench.part.toolbar.internal', toolbar => {
       this.contributeToolbarAdditionsGroup(toolbar);

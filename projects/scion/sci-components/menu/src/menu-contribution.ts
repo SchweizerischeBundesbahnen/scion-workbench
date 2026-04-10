@@ -1,4 +1,4 @@
-import {assertInInjectionContext, assertNotInReactiveContext, computed, effect, runInInjectionContext, untracked} from '@angular/core';
+import {assertInInjectionContext, assertNotInReactiveContext, computed, effect, inject, Injector, runInInjectionContext, untracked} from '@angular/core';
 import {Disposable} from './common/disposable';
 import {ɵSciMenuService} from './ɵmenu.service';
 import {SciMenuContextProvider} from './menu-context-provider';
@@ -19,12 +19,12 @@ export function contributeMenu(locationLike: string | SciMenuContributionLocatio
     assertInInjectionContext(contributeMenu);
   }
 
-  const injector = createDestroyableInjector({parent: options?.injector});
+  const injector = createDestroyableInjector({parent: options?.injector ?? inject(Injector)});
   const location = typeof locationLike === 'string' ? {location: locationLike} as SciMenuContributionLocationLike : locationLike;
 
   const menuService = injector.get(ɵSciMenuService);
   const menuContextProvider = injector.get(SciMenuContextProvider, null, {optional: true});
-  const environmentContext = coerceSignal(runInInjectionContext(injector, () => menuContextProvider?.provideContext()));
+  const environmentContext = coerceSignal(runInInjectionContext(injector, () => menuContextProvider?.injectEnvironmentContext()));
 
   // Each contribution is assigned a unique contribution instant to keep its original order even if the reactive context changes.
   const contributionInstant = options?.contributionInstant ?? injector.get(SciMenuContributionInstantProvider).next();

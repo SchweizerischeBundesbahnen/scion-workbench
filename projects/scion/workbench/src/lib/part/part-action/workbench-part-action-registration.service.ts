@@ -9,18 +9,15 @@
  */
 
 import {Component, inject, Injectable, Injector, input, inputBinding, Provider, runInInjectionContext, signal, TemplateRef} from '@angular/core';
-import {PartId} from '../../workbench.identifiers';
 import {contributeMenu, Disposable} from '@scion/sci-components/menu';
 import {WORKBENCH_ELEMENT} from '../../workbench-element-references';
 import {SciComponentDescriptor} from '@scion/sci-components/common';
 import {NgTemplateOutlet} from '@angular/common';
 import {WorkbenchPartAction, WorkbenchPartActionFn} from '../../workbench.model';
-import {WorkbenchPartRegistry} from '../workbench-part.registry';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {WorkbenchPart} from '../workbench-part.model';
 import {WORKBENCH_PART_CONTEXT} from '../workbench-part-context.provider';
 import {ComponentType} from '@angular/cdk/portal';
-import {WorkbenchMenuContextKeys} from '../../menu/workbench-menu-context-provider';
 
 /**
  * Registers legacy part actions as toolbar items in the part toolbar.
@@ -32,41 +29,32 @@ import {WorkbenchMenuContextKeys} from '../../menu/workbench-menu-context-provid
 @Injectable({providedIn: 'root'})
 export class WorkbenchPartActionRegistrationService {
 
-  private readonly _partRegistry = inject(WorkbenchPartRegistry);
   private readonly _injector = inject(Injector);
 
   /**
    * Registers specified part action as toolbar item in the part toolbar.
    */
   public registerLegacyPartAction(legacyPartActionFn: WorkbenchPartActionFn): Disposable {
-    const injector = this._injector;
-    const partRegistry = this._partRegistry;
-
-    const tabbarContribution = contributePartToolbar('toolbar:workbench.part.tabbar');
-    const toolbarContribution = contributePartToolbar('toolbar:workbench.part.toolbar');
-
-    return {
-      dispose: () => {
-        tabbarContribution.dispose();
-        toolbarContribution.dispose();
-      },
-    };
+    // Run in root injector to be independent of the invocation context.
+    return runInInjectionContext(this._injector, () => {
+      const tabbarContribution = contributePartToolbar('toolbar:workbench.part.tabbar');
+      const toolbarContribution = contributePartToolbar('toolbar:workbench.part.toolbar');
+      return {
+        dispose: () => {
+          tabbarContribution.dispose();
+          toolbarContribution.dispose();
+        },
+      };
+    });
 
     /**
      * Contributes the action to 'toolbar:workbench.part.toolbar' or 'toolbar:workbench.part.tabbar', depending on its alignment.
      */
     function contributePartToolbar(location: 'toolbar:workbench.part.toolbar' | 'toolbar:workbench.part.tabbar'): Disposable {
-      return contributeMenu(location, ((toolbar, context) => {
-        const part = partRegistry.get(context.get(WorkbenchMenuContextKeys.PartId) as PartId); // TODO [menu] Remove once in correct injection context
+      return contributeMenu(location, toolbar => {
+        const part = inject(ɵWorkbenchPart);
 
-        const providers: Provider[] = [
-          {provide: ɵWorkbenchPart, useValue: part},
-          {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
-          {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchPart},
-          injector.get(WORKBENCH_PART_CONTEXT, [], {optional: true}),
-        ];
-
-        const legacyPartAction = coercePartAction(runInInjectionContext(injector, () => legacyPartActionFn(part)));
+        const legacyPartAction = coercePartAction(legacyPartActionFn(part));
         if (!legacyPartAction) {
           return;
         }
@@ -80,11 +68,18 @@ export class WorkbenchPartActionRegistrationService {
           return;
         }
 
+        const providers: Provider[] = [
+          {provide: ɵWorkbenchPart, useValue: part},
+          {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
+          {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchPart},
+          inject(WORKBENCH_PART_CONTEXT, {optional: true}) ?? [],
+        ];
+
         toolbar.addToolbarItem({
           control: {...coerceComponent(legacyPartAction, {providers, part}), cssClass: legacyPartAction.cssClass},
           cssClass: legacyPartAction.cssClass,
         })
-      }), {injector}); // Pass root injector to be independent of the invocation context.
+      });
     }
 
     function coercePartAction(partActionLike: WorkbenchPartAction | ComponentType<unknown> | TemplateRef<unknown> | null): WorkbenchPartAction | null {

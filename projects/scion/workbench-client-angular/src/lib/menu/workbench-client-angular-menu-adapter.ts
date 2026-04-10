@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Disposable, SciMenuAdapter, SciMenuContributionLocation, SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuFactoryFn, SciMenuFactoryFnLike, SciMenuItemLike, SciMenuOptions, SciMenuOrigin, SciMenuRef, SciToolbarContributionLocation, SciToolbarFactoryFn} from '@scion/sci-components/menu';
+import {Disposable, SciMenuAdapter, SciMenuContextProvider, SciMenuContributionLocation, SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuFactoryFn, SciMenuFactoryFnLike, SciMenuItemLike, SciMenuOptions, SciMenuOrigin, SciMenuRef, SciToolbarContributionLocation, SciToolbarFactoryFn} from '@scion/sci-components/menu';
 import {assertNotInReactiveContext, effect, ElementRef, EnvironmentProviders, inject, Injector, linkedSignal, makeEnvironmentProviders, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
 import {MaybeObservable, WorkbenchMenuFactory, WorkbenchMenuOrigin, WorkbenchMenuService, WorkbenchToolbarFactory, ɵWorkbenchMenuService} from '@scion/workbench-client';
 import {coerceElement} from '@angular/cdk/coercion';
@@ -22,6 +22,7 @@ import {map} from 'rxjs/operators';
 import {MaybeSignal, RequireOne} from '@scion/sci-components/common';
 import {Translatable} from '@scion/sci-components/text';
 import {toLazyObservable} from '../common/lazy-observable.util';
+import {parseMenuLocation} from './workbench-menu-location-parser';
 
 /**
  * Delegates menu contribution to `@scion/workbench`, enabling rendering of menu popover in the workbench host application and federation of menu items contributed by different micro apps.
@@ -29,25 +30,37 @@ import {toLazyObservable} from '../common/lazy-observable.util';
 export class WorkbenchClientAngularMenuAdapter implements SciMenuAdapter {
 
   private readonly _workbenchMenuService = inject(ɵWorkbenchMenuService);
+  private readonly _menuContextProvider = inject(SciMenuContextProvider, {optional: true});
   private readonly _injector = inject(Injector);
 
   /** @inheritDoc */
   public contributeMenu(location: SciMenuContributionLocationLike, factoryFn: SciMenuFactoryFnLike, options: SciMenuContributionOptions): Disposable {
-    const rootInjector = this._injector;
-    const [scope] = location.location.split(':', 1) as ['menu' | 'toolbar', string];
+    const {scope} = parseMenuLocation(location.location);
 
     // Delegate to `WorkbenchMenuService.contributeMenu` of `@scion/workbench-client`.
     switch (scope) {
       case 'menu': {
         return this._workbenchMenuService.contributeMenu(location as SciMenuContributionLocation, (menu, context) => {
           const menuFactoryFn = factoryFn as SciMenuFactoryFn;
-          return tracked(() => menuFactoryFn(new WorkbenchClientMenuFactoryDelegate(menu), context), menu);
+
+          const injector = createDestroyableInjector({
+            parent: this._injector,
+            providers: this._menuContextProvider?.provideInjectionContext?.(context),
+          });
+
+          return runInInjectionContext(injector, () => tracked(() => menuFactoryFn(new WorkbenchClientMenuFactoryDelegate(menu), context), menu));
         }, {requiredContext: options.requiredContext, metadata: options.metadata, contributionInstant: options.contributionInstant});
       }
       case 'toolbar': {
         return this._workbenchMenuService.contributeMenu(location as SciToolbarContributionLocation, (toolbar, context) => {
           const toolbarFactoryFn = factoryFn as SciToolbarFactoryFn;
-          return tracked(() => toolbarFactoryFn(new WorkbenchClientToolbarFactoryDelegate(toolbar), context), toolbar);
+
+          const injector = createDestroyableInjector({
+            parent: this._injector,
+            providers: this._menuContextProvider?.provideInjectionContext?.(context),
+          });
+
+          return runInInjectionContext(injector, () => tracked(() => toolbarFactoryFn(new WorkbenchClientToolbarFactoryDelegate(toolbar), context), toolbar));
         }, {requiredContext: options.requiredContext, metadata: options.metadata, contributionInstant: options.contributionInstant});
       }
     }
@@ -56,7 +69,7 @@ export class WorkbenchClientAngularMenuAdapter implements SciMenuAdapter {
      * Runs given function in a reactive context.
      */
     function tracked(fn: () => void, factory: WorkbenchMenuFactory | WorkbenchToolbarFactory): void {
-      const injector = createDestroyableInjector({parent: rootInjector});
+      const injector = createDestroyableInjector({parent: inject(Injector)});
 
       // The menu factory function must be called synchronously. Since an effect runs asynchronously, we wrap the function call in a signal that we invoke immediately.
       // We then pass the signal to an effect to track changes. When tracked dependencies change, we only invalidate the menu, causing the re-creating of the menu.
@@ -66,7 +79,7 @@ export class WorkbenchClientAngularMenuAdapter implements SciMenuAdapter {
           // Create the menu if called for the first time.
           if (!previous) {
             console.warn('>>> [ClientAngularAdapter] instantiate menu factory', location);
-            runInInjectionContext(injector, fn);
+            fn();
           }
           else {
             // If 'previous' is set, this is a reactive update, not the initial call.

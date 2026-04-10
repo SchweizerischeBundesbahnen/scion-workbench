@@ -26,6 +26,7 @@ import {SciMenuAdapter} from './menu-adapter.model';
 import {SciMenuContributionInstantProvider} from './menu-contribution-instant.provider';
 import {ɵSciMenuService} from './ɵmenu.service';
 import {SciMenuOpener} from './menu-opener.service';
+import {SciMenuContextProvider} from '@scion/sci-components/menu';
 
 @Injectable({providedIn: 'root'})
 export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
@@ -35,6 +36,7 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
   private readonly _contributionInstantProvider = inject(SciMenuContributionInstantProvider);
   private readonly _menuOpener = inject(SciMenuOpener);
   private readonly _injector = inject(Injector);
+  private readonly _menuContextProvider = inject(SciMenuContextProvider, {optional: true});
 
   /** @inheritDoc */
   public contributeMenu(locationLike: SciMenuContributionLocationLike, factoryFn: SciMenuFactoryFnLike, options: SciMenuContributionOptions): Disposable {
@@ -120,7 +122,10 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
       return sortMenuItems(menuContributions()
         .flatMap((menuContribution: SciMenuContribution): SciMenuItemLike[] => {
           const menuItems = this._menuItemsCaches.get(menuContribution)!.computeIfAbsent(context(), context => {
-            const injector = inject(Injector);
+            const injector = createDestroyableInjector({
+              parent: inject(Injector),
+              providers: this._menuContextProvider?.provideInjectionContext?.(context),
+            });
 
             return computed(() => {
               switch (menuContribution.scope) {
