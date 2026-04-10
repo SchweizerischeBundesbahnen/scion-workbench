@@ -7,6 +7,7 @@
         <ng-container *sciComponentOutlet="menuItem.control"/>
       } @else {
         <button [attr.disabled]="disabled || null"
+                [attr.title]="menuItem.tooltip?.()"
                 [class.checked]="menuItem.checked?.()"
                 [class]="menuItem.cssClass" class="menu-item"
                 [sciAttributes]="menuItem.attributes"
@@ -33,6 +34,7 @@
       @let hasLabel = menuItem.labelText || menuItem.labelComponent;
       @let hasIcon = menuItem.iconLigature || menuItem.iconComponent;
       <button [attr.disabled]="disabled || null"
+              [attr.title]="menuItem.tooltip?.()"
               [class.active]="activeSubMenuItem()?.menu === menuItem"
               [class.visual-menu-hint]="hasIcon && !hasLabel && menuItem.visualMenuHint"
               [class]="menuItem.cssClass" class="menu-item submenu-item"

@@ -39,6 +39,7 @@
         @case ('menu-item') {
           <button (mouseenter)="onMenuItemMouseEnter(null)"
                   [attr.disabled]="disabled || null"
+                  [attr.title]="menuItem.tooltip?.()"
                   [class.checked]="menuItem.checked?.()"
                   [class]="menuItem.cssClass" class="menu-item"
                   [sciAttributes]="menuItem.attributes"
@@ -84,6 +85,7 @@
         }
         @case ('menu') {
           <button [attr.disabled]="disabled || null"
+                  [attr.title]="menuItem.tooltip?.()"
                   [class.active]="activeSubMenuItem()?.menu === menuItem"
                   [class]="menuItem.cssClass" class="menu-item"
                   (mouseenter)="onMenuItemMouseEnter({menu: menuItem, element: element})"
