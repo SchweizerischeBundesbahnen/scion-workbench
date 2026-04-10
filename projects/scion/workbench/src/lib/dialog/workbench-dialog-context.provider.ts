@@ -9,9 +9,9 @@
  */
 
 import {InjectionToken, Provider} from '@angular/core';
-import {provideWorkbenchDialogService} from './ɵworkbench-dialog.service';
-import {provideWorkbenchMessageBoxService} from '../message-box/ɵworkbench-message-box.service';
-import {provideWorkbenchPopupService} from '../popup/ɵworkbench-popup.service';
+import {provideWorkbenchMessageBoxService} from '../message-box/workbench-message-box-service.provider';
+import {provideWorkbenchDialogService} from './workbench-dialog-service.provider';
+import {provideWorkbenchPopupService} from '../popup/workbench-popup-service.provider';
 
 /**
  * DI token to register providers available for DI if in the context of a workbench dialog.
