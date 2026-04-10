@@ -53,6 +53,7 @@ import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneO
     '(mouseenter)': 'hover.set(true)',
     '(mouseleave)': 'hover.set(false)',
     '(auxclick)': 'onAuxClick($event)',
+    '(mousedown)': 'onMouseDown($event)',
     '(keydown.escape)': 'onEscape($event)',
   },
 })
@@ -86,6 +87,12 @@ export class WorkbenchNotificationComponent {
     if (event.button === 1) { // primary aux button
       event.preventDefault(); // prevent user-agent default action
       this.notification.close();
+    }
+  }
+
+  protected onMouseDown(event: MouseEvent): void {
+    if (event.button === 1) { // primary aux button
+      event.preventDefault(); // prevent middle-click scrolling; necessary for aux click to work
     }
   }
 
