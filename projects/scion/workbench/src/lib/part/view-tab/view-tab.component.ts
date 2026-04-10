@@ -52,6 +52,7 @@ import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
     '(click)': 'onClick()',
     '(auxclick)': 'onAuxClick($event)',
     '(contextmenu)': 'onContextmenu($event)',
+    '(mousedown)': 'onMouseDown($event)',
     '(dragstart)': 'onDragStart($event)',
     '(dragend)': 'onDragEnd()',
   },
@@ -98,6 +99,12 @@ export class ViewTabComponent {
     void this._viewMenuService.showMenu({x: event.clientX, y: event.clientY}, this.view().id);
     event.stopPropagation();
     event.preventDefault();
+  }
+
+  protected onMouseDown(event: MouseEvent): void {
+    if (event.button === 1) { // primary aux button
+      event.preventDefault(); // prevent middle-click scrolling; necessary for aux click to work
+    }
   }
 
   protected onDragStart(event: DragEvent): void {

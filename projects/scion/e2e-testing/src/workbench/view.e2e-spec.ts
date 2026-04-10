@@ -330,19 +330,46 @@ test.describe('Workbench View', () => {
     await expect(appPO.views()).toHaveCount(0);
   });
 
-  test('should close view via middle mouse button', async ({appPO, workbenchNavigator, page}) => {
+  test('should close view tab via auxiliary mouse button', async ({appPO, workbenchNavigator, page}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.navigate(['test-pages/input-field-test-page'], {cssClass: 'testee'});
-    await routerPage.view.tab.close();
-
-    const testPage = new InputFieldTestPagePO(appPO.view({cssClass: 'testee'}));
-    await testPage.clickInputField();
+    // Open view.
+    const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // Close view by pressing the middle mouse button.
-    await testPage.view.tab.locator.click({button: 'middle'});
+    await viewPage.view.tab.locator.click({button: 'middle'});
     await expect(appPO.views()).toHaveCount(0);
+  });
+
+  test('should prevent scrolling but close view tab on auxiliary mouse button click if tabbar overflows', async ({appPO, workbenchNavigator, page}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+    await appPO.setDesignToken('--sci-workbench-tab-min-width', '5rem');
+
+    // Add part with 10 views left to the main area.
+    await workbenchNavigator.modifyLayout(layout => layout
+      .addPart('part.left', {align: 'left', ratio: .25})
+      .addView('view.1', {partId: 'part.left'})
+      .addView('view.2', {partId: 'part.left'})
+      .addView('view.3', {partId: 'part.left'})
+      .addView('view.4', {partId: 'part.left'})
+      .addView('view.5', {partId: 'part.left'})
+      .addView('view.6', {partId: 'part.left'})
+      .addView('view.7', {partId: 'part.left'})
+      .addView('view.8', {partId: 'part.left'})
+      .addView('view.9', {partId: 'part.left'})
+      .addView('view.10', {partId: 'part.left'})
+      .activateView('view.1'),
+    );
+
+    // Expect tabbar to overflow (prerequisite).
+    await expect.poll(() => appPO.part({partId: 'part.left'}).bar.getHiddenTabCount()).toBeGreaterThan(1);
+
+    // Open view.
+    const view1 = appPO.view({viewId: 'view.1'});
+
+    // Close view by pressing the middle mouse button.
+    await view1.tab.locator.click({button: 'middle'});
+    await expect(appPO.views()).toHaveCount(9);
   });
 
   test('should close view via context menu', async ({appPO, workbenchNavigator}) => {
