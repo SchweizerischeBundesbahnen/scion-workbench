@@ -15,7 +15,7 @@ $icon-size: 18px;
   }
 
   // Add after separator
-  > sci-toolbar-group:not(:last-child):not(:has(+ sci-toolbar-group))::after {
+  > sci-toolbar-group:not(:last-child):not(:has(+ sci-toolbar-group, + sci-menu))::after { // + sci-menu to exclude opened submenu, which is rendered as the last child
     content: '';
     width: 1px;
     background-color: var(--sci-color-border);
