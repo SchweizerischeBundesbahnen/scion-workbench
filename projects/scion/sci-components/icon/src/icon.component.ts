@@ -118,3 +118,10 @@ function augmentIconDescriptor(): MonoTypeOperatorFunction<SciComponentDescripto
 @Directive({host: {'[style.font-size]': '"var(--sci-icon-size, 1em)"'}})
 class IconFontSizeDirective {
 }
+
+/**
+ * Acts as placeholder if no icon could be found.
+ */
+@Component({template: ''})
+export class NullIconComponent {
+}

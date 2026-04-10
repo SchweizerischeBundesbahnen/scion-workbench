@@ -1,0 +1,19 @@
+@use '@scion/components.internal/design' as sci-design;
+
+:host {
+  display: grid;
+  gap: 1em;
+
+  > section {
+    display: grid;
+    gap: 1em;
+  }
+
+  > div.context-menu {
+    border: 1px solid var(--sci-color-border);
+    border-radius: var(--sci-corner);
+    padding: .5em;
+    background-color: var(--sci-color-gray-100);
+    cursor: default;
+  }
+}

@@ -34,6 +34,7 @@ describe('IconComponent', () => {
         }),
         {provide: ComponentFixtureAutoDetect, useValue: true},
       ],
+      teardown: {destroyAfterEach: false},
     });
 
     @Component({selector: 'spec-icon-1', template: 'icon 1'})

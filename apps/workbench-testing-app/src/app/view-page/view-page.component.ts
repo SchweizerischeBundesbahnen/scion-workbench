@@ -84,7 +84,7 @@ export default class ViewPageComponent {
           .addToolbarItem('favorite', onSelect)
           .addToolbarItem('train', onSelect),
         )
-        .addMenu({icon: 'more_vert', visualMenuHint: false, name: 'menu:workbench.part.toolbar'}, menu => menu)
+        .addMenu({icon: 'more_vert', visualMenuHint: false, name: 'menu:workbench.part.toolbar'}, menu => menu),
       )
       .addGroup(group => group
         .addGroup(group => group
@@ -108,7 +108,7 @@ export default class ViewPageComponent {
       .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+'], onSelect: () => onAction()})
       .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-'], onSelect: () => onAction()})
       .addMenu({label: 'Additions', name: 'menu:additions'}, menu => menu)
-      .addGroup(group => group
+      .addGroup({collapsible: true}, group => group
         .addMenuItem({label: 'Navigate with Single Click', checked: computed(() => flags().has('navigate_with_single_click')), onSelect: () => toggleMultiFlag(flags, 'navigate_with_single_click')})
         .addMenuItem({label: 'Always Select Opened Element', checked: computed(() => flags().has('always_select_opened_element')), onSelect: () => toggleMultiFlag(flags, 'always_select_opened_element')}),
       )

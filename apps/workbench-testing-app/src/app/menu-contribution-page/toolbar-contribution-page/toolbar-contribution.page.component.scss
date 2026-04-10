@@ -1,0 +1,11 @@
+@use '@scion/components.internal/design' as sci-design;
+
+:host {
+  display: grid;
+  gap: 1em;
+
+  > section {
+    display: grid;
+    gap: 1em;
+  }
+}

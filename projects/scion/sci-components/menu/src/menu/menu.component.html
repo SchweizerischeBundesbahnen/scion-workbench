@@ -1,7 +1,7 @@
 <!-- Group header -->
 @if (group(); as group) {
   @if (group.collapsible) {
-    <button class="group-header" (click)="onGroupToggle()" (mouseenter)="onMenuItemMouseEnter(null)">
+    <button class="group-header e2e-group-header" (click)="onGroupToggle()" (mouseenter)="onMenuItemMouseEnter(null)">
       <!-- TODO [menu] use SCION icon -->
       <sci-icon>{{isGroupExpanded() ? 'keyboard_arrow_down' : 'chevron_right'}}</sci-icon>
       <span class="label">{{group.label}}</span>
@@ -42,7 +42,7 @@
                   [attr.disabled]="disabled || null"
                   [attr.title]="menuItem.tooltip?.()"
                   [class.checked]="menuItem.checked?.()"
-                  [class]="menuItem.cssClass" class="menu-item"
+                  [class]="menuItem.cssClass" class="menu-item e2e-menu-item"
                   [sciAttributes]="menuItem.attributes"
                   (click)="onSelect(menuItem)">
             @if (hasGlyphArea()) {
@@ -92,7 +92,7 @@
           <button [attr.disabled]="disabled || null"
                   [attr.title]="menuItem.tooltip?.()"
                   [class.active]="activeSubMenuItem()?.menu === menuItem"
-                  [class]="menuItem.cssClass" class="menu-item"
+                  [class]="menuItem.cssClass" class="menu-item e2e-menu-item"
                   (mouseenter)="onMenuItemMouseEnter({menu: menuItem, element: element})"
                   #element>
             @if (hasGlyphArea()) {
@@ -123,7 +123,8 @@
           <sci-menu-group [group]="menuItem"
                           [glyphArea]="hasGlyphArea()"
                           [disabled]="disabled"
-                          [class]="menuItem.cssClass"/>
+                          [class]="menuItem.cssClass"
+                          class="e2e-menu-item"/>
         }
       }
     } @empty {
