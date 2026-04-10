@@ -284,7 +284,7 @@ export class WorkbenchMenuGroup {
 
   constructor(private _group: {
     id: string;
-    name?: `menu:${string}:${string}` | `toolbar:${string}:${string}`;
+    name?: `menu:${string}` | `toolbar:${string}`;
     label?: MaybeObservable<string>;
     disabled?: MaybeObservable<boolean>;
     collapsible?: {collapsed: boolean};
@@ -327,7 +327,7 @@ export class WorkbenchMenuGroupProxy {
 
   public readonly id: string;
   public readonly type = 'group';
-  public readonly name?: `menu:${string}:${string}` | `toolbar:${string}:${string}`;
+  public readonly name?: `menu:${string}` | `toolbar:${string}`;
   public readonly label?: Observable<string>;
   public readonly disabled?: Observable<boolean>;
   public readonly collapsible?: {collapsed: boolean};
@@ -353,7 +353,7 @@ export class WorkbenchMenuGroupProxy {
 export interface WorkbenchMenuGroupTransferable {
   id: string;
   type: 'group'
-  name?: `menu:${string}:${string}` | `toolbar:${string}:${string}`;
+  name?: `menu:${string}` | `toolbar:${string}`;
   label?: string;
   collapsible?: {collapsed: boolean};
   position?: WorkbenchMenuContributionPosition;
@@ -363,10 +363,16 @@ export interface WorkbenchMenuGroupTransferable {
 }
 
 export type WorkbenchMenuContributionPosition = OneOf<{
-  before?: `menuitem:${string}` | `menu:${string}:${string}` | `toolbar:${string}:${string}`;
-  after?: `menuitem:${string}` | `menu:${string}:${string}` | `toolbar:${string}:${string}`;
+  before?: `menuitem:${string}` | `menu:${string}`;
+  after?: `menuitem:${string}` | `menu:${string}`;
   position?: 'start' | 'end';
 }>;
+export type WorkbenchToolbarContributionPosition = OneOf<{
+  before?: `menuitem:${string}` | `menu:${string}` | `toolbar:${string}`;
+  after?: `menuitem:${string}` | `menu:${string}` | `toolbar:${string}`;
+  position?: 'start' | 'end';
+}>;
+export type WorkbenchMenuContributionPositionLike = WorkbenchMenuContributionPosition | WorkbenchToolbarContributionPosition;
 
 export type WorkbenchMenuContributionLocation = {location: `menu:${string}`} & WorkbenchMenuContributionPosition;
 export type WorkbenchToolbarContributionLocation = {location: `toolbar:${string}`} & WorkbenchMenuContributionPosition;

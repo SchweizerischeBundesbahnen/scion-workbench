@@ -17,7 +17,7 @@ import {Objects} from '@scion/toolkit/util';
 import {ɵSciMenuFactory} from './menu/ɵmenu.factory';
 import {ɵSciToolbarFactory} from './toolbar/ɵtoolbar.factory';
 import {sortMenuItems} from './menu-item-sorter';
-import {NULL_MENU_CONTRIBUTIONS, SciMenuContribution, SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuContributionPosition, SciMenuFactoryFn, SciMenuFactoryFnLike, SciToolbarFactoryFn} from './menu-contribution.model';
+import {NULL_MENU_CONTRIBUTIONS, SciMenuContribution, SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuContributionPositionLike, SciMenuFactoryFn, SciMenuFactoryFnLike, SciToolbarFactoryFn} from './menu-contribution.model';
 import {createDestroyableInjector} from './common/injector.util';
 import {ɵassertInInjectionContext} from './common/common';
 import {prune} from './common/prune.util';
@@ -44,7 +44,7 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
     const contribution: SciMenuContribution = {
       scope: scope,
       factoryFn: factoryFn,
-      position: prune({before, after, position} as SciMenuContributionPosition, {pruneIfEmpty: true}),
+      position: prune({before, after, position} as SciMenuContributionPositionLike, {pruneIfEmpty: true}),
       requiredContext: options.requiredContext ?? new Map(),
       contributionInstant: options.contributionInstant ?? this._contributionInstantProvider.next(),
       metadata: options.metadata ?? {},

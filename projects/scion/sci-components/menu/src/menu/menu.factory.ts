@@ -60,7 +60,7 @@ export interface SciMenuDescriptor {
 }
 
 export interface SciMenuGroupDescriptor {
-  name?: `menu:${string}:${string}`;
+  name?: `menu:${string}`;
   label?: MaybeSignal<Translatable>;
   collapsible?: boolean | {collapsed: boolean};
   disabled?: MaybeSignal<boolean>;

@@ -7,7 +7,7 @@ export interface SciMenuContribution {
   scope: 'menu' | 'toolbar',
   factoryFn: SciMenuFactoryFnLike;
   requiredContext: Map<string, unknown>;
-  position?: SciMenuContributionPosition;
+  position?: SciMenuContributionPositionLike;
   contributionInstant: number;
   /**
    * Arbitrary metadata to be associated with the contribution.
@@ -16,7 +16,7 @@ export interface SciMenuContribution {
 }
 
 export type SciMenuContributionLocation = {location: `menu:${string}`} & SciMenuContributionPosition;
-export type SciToolbarContributionLocation = {location: `toolbar:${string}`} & SciMenuContributionPosition;
+export type SciToolbarContributionLocation = {location: `toolbar:${string}`} & SciToolbarContributionPosition;
 export type SciMenuContributionLocationLike = SciMenuContributionLocation | SciToolbarContributionLocation;
 
 export interface SciMenuContributionOptions {
@@ -39,10 +39,16 @@ export interface SciMenuContributionOptions {
 }
 
 export type SciMenuContributionPosition = OneOf<{
-  before?: `menuitem:${string}` | `menu:${string}:${string}` | `toolbar:${string}:${string}`;
-  after?: `menuitem:${string}` | `menu:${string}:${string}` | `toolbar:${string}:${string}`;
+  before?: `menuitem:${string}` | `menu:${string}`;
+  after?: `menuitem:${string}` | `menu:${string}`;
   position?: 'start' | 'end';
 }>;
+export type SciToolbarContributionPosition = OneOf<{
+  before?: `menuitem:${string}` | `menu:${string}` | `toolbar:${string}`;
+  after?: `menuitem:${string}` | `menu:${string}` | `toolbar:${string}`;
+  position?: 'start' | 'end';
+}>;
+export type SciMenuContributionPositionLike = SciMenuContributionPosition | SciToolbarContributionPosition;
 
 export type SciMenuFactoryFn = (menu: SciMenuFactory, context: Map<string, unknown>) => void;
 export type SciToolbarFactoryFn = (toolbar: SciToolbarFactory, context: Map<string, unknown>) => void;

@@ -72,7 +72,7 @@ export interface WorkbenchMenuDescriptor {
 }
 
 export interface WorkbenchMenuGroupDescriptor {
-  name?: `menu:${string}:${string}`;
+  name?: `menu:${string}`;
   label?: MaybeObservable<Translatable>;
   collapsible?: boolean | {collapsed: boolean};
   disabled?: MaybeObservable<boolean>;

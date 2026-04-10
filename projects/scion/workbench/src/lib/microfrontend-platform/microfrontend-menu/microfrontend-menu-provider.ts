@@ -194,7 +194,7 @@ function populateMenu(menu: SciMenuFactory, menuItemProxies: WorkbenchMenuItemPr
       }
       case 'group': {
         const groupDescriptor: SciMenuGroupDescriptor = {
-          name: menuItemProxy.name as `menu:${string}:${string}`,
+          name: menuItemProxy.name as `menu:${string}`,
           label: menuItemProxy.label && toSignal(menuItemProxy.label, {requireSync: true}),
           collapsible: menuItemProxy.collapsible,
           disabled: menuItemProxy.disabled && toSignal(menuItemProxy.disabled, {requireSync: true}),
@@ -253,7 +253,7 @@ function populateToolbar(toolbar: SciToolbarFactory, menuItemProxies: WorkbenchM
       }
       case 'group': {
         const groupDescriptor: SciToolbarGroupDescriptor = {
-          name: menuItemProxy.name as `toolbar:${string}:${string}`,
+          name: menuItemProxy.name as `toolbar:${string}`,
           disabled: menuItemProxy.disabled && toSignal(menuItemProxy.disabled, {requireSync: true}),
           cssClass: menuItemProxy.cssClass,
         };

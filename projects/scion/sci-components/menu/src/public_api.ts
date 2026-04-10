@@ -19,7 +19,7 @@ export {type SciMenuFactory, type SciMenuItemDescriptor, type SciMenuDescriptor,
 export {type SciToolbarFactory, type SciToolbarItemDescriptor, type SciToolbarControlDescriptor, type SciToolbarMenuDescriptor, type  SciToolbarGroupDescriptor} from './toolbar/toolbar.factory';
 export {SciMenuAdapter, type SciMenuAdapterChain} from './menu-adapter.model';
 export {contributeMenu} from './menu-contribution';
-export {type SciMenuContribution, type SciMenuContributionLocation, type SciMenuContributionPosition, type SciToolbarContributionLocation, type SciMenuContributionLocationLike, type SciMenuFactoryFn, type SciToolbarFactoryFn, type SciMenuFactoryFnLike, type SciMenuContributionOptions} from './menu-contribution.model';
+export {type SciMenuContribution, type SciMenuContributionLocation, type SciToolbarContributionLocation, type SciMenuContributionLocationLike, type SciMenuContributionPosition, type SciToolbarContributionPosition, type SciMenuContributionPositionLike, type SciMenuFactoryFn, type SciToolbarFactoryFn, type SciMenuFactoryFnLike, type SciMenuContributionOptions} from './menu-contribution.model';
 export {type Disposable} from './common/disposable';
 export {SciToolbarComponent} from './toolbar/toolbar.component';
 export {type SciMenuItem, type SciMenu, type SciMenuGroup, type SciMenuItemLike} from './menu.model';

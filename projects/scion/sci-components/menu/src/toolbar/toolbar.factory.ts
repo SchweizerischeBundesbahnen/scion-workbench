@@ -73,7 +73,7 @@ export interface SciToolbarMenuDescriptor {
 }
 
 export interface SciToolbarGroupDescriptor {
-  name?: `toolbar:${string}:${string}`;
+  name?: `toolbar:${string}`;
   disabled?: MaybeSignal<boolean>;
   cssClass?: string | string[];
 }

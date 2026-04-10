@@ -75,7 +75,7 @@ export interface WorkbenchToolbarMenuDescriptor {
 }
 
 export interface WorkbenchToolbarGroupDescriptor {
-  name?: `toolbar:${string}:${string}`;
+  name?: `toolbar:${string}`;
   disabled?: MaybeObservable<boolean>;
   cssClass?: string | string[];
 }

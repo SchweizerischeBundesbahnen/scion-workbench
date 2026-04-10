@@ -1,5 +1,5 @@
 import {Signal} from '@angular/core';
-import {SciMenuContributionPosition} from './menu-contribution.model';
+import {SciMenuContributionPositionLike} from './menu-contribution.model';
 import {Translatable} from '@scion/sci-components/text';
 import {SciComponentDescriptor} from '@scion/sci-components/common';
 
@@ -23,7 +23,7 @@ export interface SciMenuItem {
   matchesFilter?: (filter: string) => boolean;
   cssClass?: string[];
   attributes?: {[name: string]: string};
-  position?: SciMenuContributionPosition;
+  position?: SciMenuContributionPositionLike;
   onSelect: () => Promise<boolean>;
 }
 
@@ -38,7 +38,7 @@ export interface SciMenu {
   disabled?: Signal<boolean>; // Consider renaming to enabled; https://www.electronjs.org/docs/latest/api/menu-item
   // visible: Signal<boolean>; // Consider providing visible
   visualMenuHint?: boolean;
-  position?: SciMenuContributionPosition;
+  position?: SciMenuContributionPositionLike;
   menu: {
     width?: string;
     minWidth?: string;
@@ -52,10 +52,10 @@ export interface SciMenu {
 
 export interface SciMenuGroup {
   type: 'group'
-  name?: `menu:${string}:${string}` | `toolbar:${string}:${string}`;
+  name?: `menu:${string}` | `toolbar:${string}`;
   label?: Signal<string>;
   collapsible?: {collapsed: boolean};
-  position?: SciMenuContributionPosition;
+  position?: SciMenuContributionPositionLike;
   disabled?: Signal<boolean>; // Consider renaming to enabled; https://www.electronjs.org/docs/latest/api/menu-item
   // visible: Signal<boolean>; // Consider providing visible
   children: SciMenuItemLike[];
