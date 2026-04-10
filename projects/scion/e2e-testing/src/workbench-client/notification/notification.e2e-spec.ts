@@ -936,5 +936,39 @@ test.describe('Workbench Notification Microfrontend', () => {
       // Expect notification to be closed.
       await expectNotification(notificationPage).not.toBeAttached();
     });
+
+    test('should prevent scrolling but close notification on auxiliary mouse button click if notification overflows', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability<WorkbenchNotificationCapability>('app1', {
+        type: 'notification',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-notification',
+          size: {height: '400px'},
+        },
+      });
+
+      // Display the notification.
+      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+      await notificationOpenerPage.show({component: 'testee'}, {cssClass: 'testee', duration: 'infinite'});
+
+      const notification = appPO.notification({cssClass: 'testee'});
+      const notificationPage = new NotificationPagePO(notification);
+
+      await expectNotification(notificationPage).toBeVisible();
+
+      // Change the size of the content.
+      await notificationPage.enterContentSize({height: '800px'});
+
+      // Expect content to overflow.
+      await expect.poll(() => notification.hasVerticalOverflow()).toBe(true);
+
+      // Close notification by pressing the middle mouse button.
+      await notificationPage.locator.click({button: 'middle'});
+
+      // Expect notification to be closed.
+      await expectNotification(notificationPage).not.toBeAttached();
+    });
   });
 });
