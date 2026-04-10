@@ -204,7 +204,7 @@ export default class ViewPageComponent {
 
     const injector = inject(Injector);
 
-    this._workbenchMenuService.contributeMenu('toolbar:workbench.part', toolbar => toolbar,
+    this._workbenchMenuService.contributeMenu('toolbar:workbench.part.toolbar', toolbar => toolbar,
       // .addToolbarItem('favorite', onSelect)
       // .addToolbarItem('home', onSelect)
       // .addToolbarItem('train', onSelect)
@@ -253,8 +253,8 @@ export default class ViewPageComponent {
   }
 
   private contributeClientPartToolbar(): void {
-    // this._workbenchMenuService.contributeMenu('toolbar:workbench.part', toolbar => toolbar
-    this._workbenchMenuService.contributeMenu('menu:workbench.part.additions', menu => menu
+    // this._workbenchMenuService.contributeMenu('toolbar:workbench.part.toolbar', toolbar => toolbar
+    this._workbenchMenuService.contributeMenu('menu:workbench.part.toolbar', menu => menu
       .addMenu({icon: 'computer', label: 'Client', menu: {filter: {placeholder: 'hello', notFoundText: 'nüd found'}}}, menu => menu
         .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N'], onSelect: () => onSelect()})
         .addMenuItem({label: 'Open', icon: 'folder', onSelect: () => onSelect()})
@@ -305,12 +305,12 @@ export default class ViewPageComponent {
     if (1 + 1) {
       // return;
     }
-    contributeMenu('menu:workbench.part.additions', menu => menu
+    contributeMenu('menu:workbench.part.toolbar', menu => menu
       .addMenuItem({label: 'Home', icon: 'home', onSelect})
       .addMenuItem({label: 'Train', icon: 'train', onSelect}),
     );
 
-    contributeMenu('toolbar:workbench.part', toolbar => toolbar
+    contributeMenu('toolbar:workbench.part.toolbar', toolbar => toolbar
         .addToolbarItem('home', onSelect),
       // .addToolbarItem('train', onSelect),
     );
@@ -331,7 +331,7 @@ export default class ViewPageComponent {
     const viewMode = signal('dock_pinned');
     const moveTo = signal('left_top');
 
-    contributeMenu('menu:workbench.part.additions', menu => menu
+    contributeMenu('menu:workbench.part.toolbar', menu => menu
       .addMenu({label: 'File', menu: {filter: {placeholder: 'hello', notFoundText: 'nüd found'}}}, menu => menu
         .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N'], onSelect: () => onSelect()})
         .addMenuItem({label: 'Open', icon: 'folder', onSelect: () => onSelect()})

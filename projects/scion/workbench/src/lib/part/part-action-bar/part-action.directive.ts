@@ -51,7 +51,7 @@ import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
  *
  * Alternatively, actions can be added using a factory function and registered via {@link WorkbenchService.registerPartAction}.
  *
- * @deprecated since version 21.0.0-beta.6. Replaced by the new Workbench Menu API. Use `contributeMenu` function to contribute to the view context menu: `contributeMenu('toolbar:workbench.part'|'toolbar:workbench.part.secondary'|'menu:workbench.part.additions', (menu, context) => menu.addMenuItem('%label', () => doSomething()))`. You can get a reference to the menu's contextual view using the passed context object: `inject(WorkbenchService).getView(context.get('viewId') as ViewId)`. Marked for removal in version 23.
+ * @deprecated since version 21.0.0-beta.6. Replaced by the new Workbench Menu API. Use `contributeMenu` function to contribute to the view context menu: `contributeMenu('toolbar:workbench.part.toolbar' | 'toolbar:workbench.part.tabbar' | 'menu:workbench.part.toolbar', (menu, context) => menu.addMenuItem('%label', () => doSomething()))`. You can get a reference to the menu's contextual view using the passed context object: `inject(WorkbenchService).getView(context.get(WorkbenchMenuContextKeys.ViewId) as ViewId)`. Marked for removal in version 23.
  */
 @Directive({selector: 'ng-template[wbPartAction]'})
 export class WorkbenchPartActionDirective {

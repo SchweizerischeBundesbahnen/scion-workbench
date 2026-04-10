@@ -10,7 +10,7 @@ import {contributeMenu} from '@scion/sci-components/menu';
 export class ProjectsComponent {
 
   constructor() {
-    contributeMenu('toolbar:workbench.part', menu => menu
+    contributeMenu('toolbar:workbench.part.toolbar', menu => menu
       .addMenu({label: 'File'}, menu => menu
         .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N'], onSelect: () => this.onAction()})
         .addMenuItem({label: 'Open', icon: 'folder', onSelect: () => this.onAction()})

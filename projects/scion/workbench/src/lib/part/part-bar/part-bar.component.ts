@@ -53,9 +53,14 @@ export class PartBarComponent {
     this.maxViewTabBarWidth = this.calculateMaxViewTabBarWidth();
     this.installActivityMinimizer();
 
-    contributeMenu('toolbar:workbench.part.internal', toolbar => {
+    contributeMenu('toolbar:workbench.part.tabbar.internal', toolbar => {
+      this.contributeTabbarAdditionsGroup(toolbar);
+    });
+
+    contributeMenu('toolbar:workbench.part.toolbar.internal', toolbar => {
+      this.contributeToolbarAdditionsGroup(toolbar);
       this.contributeViewListMenu(toolbar);
-      this.contributeAdditionsMenu(toolbar);
+      this.contributeToolbarAdditionsMenu(toolbar);
       this.contributeMinimizeButton(toolbar);
     }, {requiredContext: new Map().set(WorkbenchMenuContextKeys.ViewId, undefined)}); // clear view constraint to contribute to parts with and without views
   }
@@ -105,8 +110,31 @@ export class PartBarComponent {
     });
   }
 
-  private contributeAdditionsMenu(toolbar: SciToolbarFactory): void {
-    toolbar.addMenu({icon: 'more_vert', visualMenuHint: false, name: 'menu:workbench.part.additions'}, menu => menu);
+  /**
+   * Contributes a group for the application to contribute to the toolbar.
+   *
+   * Public contribution point: 'toolbar:workbench.part.tabbar'
+   */
+  private contributeTabbarAdditionsGroup(toolbar: SciToolbarFactory): void {
+    toolbar.addGroup({name: 'toolbar:workbench.part.tabbar'});
+  }
+
+  /**
+   * Contributes a group for the application to contribute to the toolbar.
+   *
+   * Public contribution point: 'toolbar:workbench.part.toolbar'
+   */
+  private contributeToolbarAdditionsGroup(toolbar: SciToolbarFactory): void {
+    toolbar.addGroup({name: 'toolbar:workbench.part.toolbar'});
+  }
+
+  /**
+   * Contributes a menu for the application to contribute to the toolbar.
+   *
+   * Public contribution point: 'menu:workbench.part.toolbar'
+   */
+  private contributeToolbarAdditionsMenu(toolbar: SciToolbarFactory): void {
+    toolbar.addMenu({name: 'menu:workbench.part.toolbar', icon: 'more_vert', visualMenuHint: false}, menu => menu);
   }
 
   private contributeViewListMenu(toolbar: SciToolbarFactory): void {

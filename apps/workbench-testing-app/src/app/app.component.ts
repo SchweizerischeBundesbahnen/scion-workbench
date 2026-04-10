@@ -12,7 +12,7 @@ import {Component, computed, DoCheck, DOCUMENT, inject, NgZone, signal, Signal, 
 import {filter, map, scan} from 'rxjs/operators';
 import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} from '@angular/router';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
-import {PartId, ViewId, WORKBENCH_ID, WorkbenchDialogService, WorkbenchRouter, WorkbenchService, WorkbenchStartup} from '@scion/workbench';
+import {PartId, ViewId, WORKBENCH_ID, WorkbenchDialogService, WorkbenchMenuContextKeys, WorkbenchRouter, WorkbenchService, WorkbenchStartup} from '@scion/workbench';
 import {HeaderComponent} from './header/header.component';
 import {fromEvent} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
@@ -75,7 +75,7 @@ export class AppComponent implements DoCheck {
     const viewMode = signal('dock_pinned');
     const moveTo = signal('left_top');
 
-    contributeMenu({location: 'menu:workbench.part.additions', position: 'end'}, menu => menu
+    contributeMenu({location: 'menu:workbench.part.toolbar', position: 'end'}, menu => menu
       .addGroup(group => group
         .addMenu({label: 'View Mode'}, menu => menu
           .addMenuItem({label: 'Dock Pinned', checked: computed(() => viewMode() === 'dock_pinned'), onSelect: () => viewMode.set('dock_pinned')})
@@ -127,7 +127,7 @@ export class AppComponent implements DoCheck {
     const paragraphStyle = signal<string>('');
 
     if (1 + 1 === 2) {
-      contributeMenu('toolbar:workbench.part.secondary', toolbar => toolbar
+      contributeMenu('toolbar:workbench.part.tabbar', toolbar => toolbar
         .addMenu({label: 'File', menu: {filter: {placeholder: 'hello', notFoundText: 'nüd found'}}}, menu => menu
           .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N'], onSelect: () => this.onAction()})
           .addMenuItem({label: 'Open', icon: 'folder', onSelect: () => this.onAction()})
@@ -190,7 +190,7 @@ export class AppComponent implements DoCheck {
       ),
     );
 
-    contributeMenu('toolbar:workbench.part', toolbar => toolbar
+    contributeMenu('toolbar:workbench.part.toolbar', toolbar => toolbar
       .addToolbarItem({icon: 'expand_all', tooltip: 'Expand Selected', onSelect: () => this.onAction()})
       .addToolbarItem({icon: 'collapse_all', tooltip: 'Collapse All', onSelect: () => this.onAction()}),
     );
@@ -199,7 +199,7 @@ export class AppComponent implements DoCheck {
       .addMenuItem({label: 'Teams', icon: 'groups', onSelect: () => this.onAction()}),
     );
 
-    contributeMenu('toolbar:workbench.part.secondary', menu => menu
+    contributeMenu('toolbar:workbench.part.tabbar', menu => menu
       .addGroup(group => group
         .addToolbarItem('lens_blur', () => this.onAction()),
       )
@@ -317,7 +317,7 @@ export class AppComponent implements DoCheck {
       ),
     );
 
-    contributeMenu('toolbar:workbench.part.secondary', menu => menu
+    contributeMenu('toolbar:workbench.part.tabbar', menu => menu
       .addMenu({label: 'Database', icon: 'database', menu: {filter: {placeholder: 'Type to filter'}}}, menu => menu
         // .addMenuItem({icon: 'filter_alt', text: 'Filter', onSelect: () => this.onAction()})
         .addGroup({label: 'View in Groups', collapsible: true}, group => group
@@ -348,7 +348,7 @@ export class AppComponent implements DoCheck {
       ),
     );
 
-    contributeMenu('toolbar:workbench.part', menu => menu
+    contributeMenu('toolbar:workbench.part.toolbar', menu => menu
       .addMenu({icon: 'visibility'}, menu => menu
         .addGroup({label: 'Sort'}, group => group
           .addMenuItem({label: 'Alphabetically', checked: computed(() => flags().has('alphabetically')), onSelect: () => toggleMultiFlag(flags, 'alphabetically')}),
@@ -417,7 +417,7 @@ export class AppComponent implements DoCheck {
       ),
     )
 
-    contributeMenu('toolbar:workbench.part.secondary', menu => menu
+    contributeMenu('toolbar:workbench.part.tabbar', menu => menu
       .addMenu({label: computed(() => perspectiveLabels.get(perspective()) ?? perspective()), visualMenuHint: true}, menu => menu
         .addMenuItem({label: 'A', checked: true, actions: actions => actions.addGroup({name: 'toolbar:perspective.menuitem:actions'}), onSelect: () => this.onAction()})
         .addMenuItem({label: 'B', actions: actions => actions.addGroup({name: 'toolbar:perspective.menuitem:actions'}), onSelect: () => this.onAction()})
@@ -428,7 +428,7 @@ export class AppComponent implements DoCheck {
         .addMenuItem({label: 'G', actions: actions => actions.addGroup({name: 'toolbar:perspective.menuitem:actions'}), onSelect: () => this.onAction()}),
       ),
     );
-    contributeMenu('toolbar:workbench.part.secondary', menu => menu
+    contributeMenu('toolbar:workbench.part.tabbar', menu => menu
       .addMenu({label: computed(() => perspectiveLabels.get(perspective()) ?? perspective())}, menu => menu
         .addMenuItem({
           label: 'Default Layout',
@@ -587,8 +587,8 @@ export class AppComponent implements DoCheck {
   }
 
   private contributeNewTabToolbarItem(): void {
-    contributeMenu('toolbar:workbench.part.secondary', (toolbar, context) => {
-      const partId = context.get('partId') as PartId | undefined;
+    contributeMenu('toolbar:workbench.part.tabbar', (toolbar, context) => {
+      const partId = context.get(WorkbenchMenuContextKeys.PartId) as PartId | undefined;
       const peripheral = context.get('peripheral') as boolean | undefined;
       if (!partId || peripheral) {
         return;
@@ -600,8 +600,8 @@ export class AppComponent implements DoCheck {
 
   private contributeViewContextMenuAdditions(): void {
     // Contribute menu item to move view to new window.
-    contributeMenu({location: 'menu:workbench.view.contextmenu:move', position: 'end'}, (menu, context) => {
-      const view = inject(WorkbenchService).getView(context.get('viewId') as ViewId)!;
+    contributeMenu({location: 'menu:workbench.view.contextmenu.internal:move'}, (menu, context) => {
+      const view = inject(WorkbenchService).getView(context.get(WorkbenchMenuContextKeys.ViewId) as ViewId)!; // TODO [menu] Remove once in correct injection context
 
       menu.addMenuItem({
         label: 'Move View...',
@@ -614,8 +614,8 @@ export class AppComponent implements DoCheck {
     });
 
     // Contribute menu item to show view info.
-    contributeMenu('menu:workbench.view.contextmenu:additions', (menu, context) => {
-      const view = inject(WorkbenchService).getView(context.get('viewId') as ViewId);
+    contributeMenu('menu:workbench.view.contextmenu', (menu, context) => {
+      const view = inject(WorkbenchService).getView(context.get(WorkbenchMenuContextKeys.ViewId) as ViewId); // TODO [menu] Remove once in correct injection context
 
       menu.addMenuItem({
         label: 'Show View Info',

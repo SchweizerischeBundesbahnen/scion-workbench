@@ -28,7 +28,7 @@ export class WorkbenchMenuItem {
     actions: WorkbenchMenuItemLike[];
     cssClass?: string[];
     attributes?: {[name: string]: string};
-    position?: WorkbenchMenuContributionPosition;
+    position?: WorkbenchMenuContributionPositionLike;
     onSelect: () => Promise<boolean>;
   }) {
   }
@@ -92,7 +92,7 @@ export class WorkbenchMenuItemProxy {
   public readonly actions: WorkbenchMenuItemProxyLike[];
   public readonly cssClass?: string[];
   public readonly attributes?: {[name: string]: string};
-  public readonly position?: WorkbenchMenuContributionPosition;
+  public readonly position?: WorkbenchMenuContributionPositionLike;
 
   constructor(transferable: WorkbenchMenuItemTransferable) {
     this.id = transferable.id;
@@ -133,7 +133,7 @@ export interface WorkbenchMenuItemTransferable {
   actions: WorkbenchMenuItemTransferableLike[];
   cssClass?: string[];
   attributes?: {[name: string]: string};
-  position?: WorkbenchMenuContributionPosition;
+  position?: WorkbenchMenuContributionPositionLike;
 }
 
 /**
@@ -151,7 +151,7 @@ export class WorkbenchMenu {
     tooltip?: MaybeObservable<string>;
     disabled?: MaybeObservable<boolean>;
     visualMenuHint?: boolean;
-    position?: WorkbenchMenuContributionPosition;
+    position?: WorkbenchMenuContributionPositionLike;
     cssClass?: string[];
     children: WorkbenchMenuItemLike[];
     menu: {
@@ -216,7 +216,7 @@ export class WorkbenchMenuProxy {
   public readonly tooltip?: Observable<string>;
   public readonly disabled?: Observable<boolean>;
   public readonly visualMenuHint?: boolean;
-  public readonly position?: WorkbenchMenuContributionPosition;
+  public readonly position?: WorkbenchMenuContributionPositionLike;
   public readonly cssClass?: string[];
   public readonly children: WorkbenchMenuItemProxyLike[];
   public readonly menu: {
@@ -263,7 +263,7 @@ export interface WorkbenchMenuTransferable {
   tooltip?: string;
   disabled?: boolean;
   visualMenuHint?: boolean;
-  position?: WorkbenchMenuContributionPosition;
+  position?: WorkbenchMenuContributionPositionLike;
   menu: {
     width?: string;
     minWidth?: string;
@@ -288,7 +288,7 @@ export class WorkbenchMenuGroup {
     label?: MaybeObservable<string>;
     disabled?: MaybeObservable<boolean>;
     collapsible?: {collapsed: boolean};
-    position?: WorkbenchMenuContributionPosition;
+    position?: WorkbenchMenuContributionPositionLike;
     children: WorkbenchMenuItemLike[];
     cssClass?: string[];
   }) {
@@ -331,7 +331,7 @@ export class WorkbenchMenuGroupProxy {
   public readonly label?: Observable<string>;
   public readonly disabled?: Observable<boolean>;
   public readonly collapsible?: {collapsed: boolean};
-  public readonly position?: WorkbenchMenuContributionPosition;
+  public readonly position?: WorkbenchMenuContributionPositionLike;
   public readonly children: WorkbenchMenuItemProxyLike[];
   public readonly cssClass?: string[];
 
@@ -356,7 +356,7 @@ export interface WorkbenchMenuGroupTransferable {
   name?: `menu:${string}` | `toolbar:${string}`;
   label?: string;
   collapsible?: {collapsed: boolean};
-  position?: WorkbenchMenuContributionPosition;
+  position?: WorkbenchMenuContributionPositionLike;
   disabled?: boolean;
   children: WorkbenchMenuItemTransferableLike[];
   cssClass?: string[];
@@ -375,7 +375,7 @@ export type WorkbenchToolbarContributionPosition = OneOf<{
 export type WorkbenchMenuContributionPositionLike = WorkbenchMenuContributionPosition | WorkbenchToolbarContributionPosition;
 
 export type WorkbenchMenuContributionLocation = {location: `menu:${string}`} & WorkbenchMenuContributionPosition;
-export type WorkbenchToolbarContributionLocation = {location: `toolbar:${string}`} & WorkbenchMenuContributionPosition;
+export type WorkbenchToolbarContributionLocation = {location: `toolbar:${string}`} & WorkbenchToolbarContributionPosition;
 export type WorkbenchMenuContributionLocationLike = WorkbenchMenuContributionLocation | WorkbenchToolbarContributionLocation;
 
 export type WorkbenchMenuFactoryFn = (menu: WorkbenchMenuFactory, context: Map<string, unknown>) => void;

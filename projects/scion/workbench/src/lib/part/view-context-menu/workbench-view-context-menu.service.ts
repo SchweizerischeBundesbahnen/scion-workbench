@@ -21,6 +21,7 @@ import {createDestroyableInjector} from '../../common/injector.util';
 import {NgTemplateOutlet} from '@angular/common';
 import {WorkbenchMenuItem, WorkbenchViewMenuItemFn} from '../../workbench.model';
 import {WORKBENCH_VIEW_CONTEXT} from '../../view/workbench-view-context.provider';
+import {WorkbenchMenuContextKeys} from '../../menu/workbench-menu-context-provider';
 
 /**
  * Provides the contextmenu of a view.
@@ -37,7 +38,7 @@ export class WorkbenchViewContextMenuService {
    * Opens the context menu for the given view.
    */
   public open(event: MouseEvent, context: {viewId: ViewId}): void {
-    this._menuService.open('menu:workbench.view.contextmenu', {
+    this._menuService.open('menu:workbench.view.contextmenu.internal', {
       anchor: event,
       size: {width: 'var(--sci-workbench-contextmenu-width)'},
       context: this.createViewMenuContext(context.viewId), // Pass menu context to be independent of the invocation context.
@@ -54,11 +55,11 @@ export class WorkbenchViewContextMenuService {
     }
 
     // Contribute contextmenu.
-    contributeMenu({location: 'menu:workbench.view.contextmenu'}, (menu, context) => {
-      const view = inject(WorkbenchViewRegistry).get(context.get('viewId') as ViewId);
+    contributeMenu({location: 'menu:workbench.view.contextmenu.internal'}, (menu, context) => {
+      const view = inject(WorkbenchViewRegistry).get(context.get(WorkbenchMenuContextKeys.ViewId) as ViewId); // TODO [menu] Remove once in correct injection context
 
       // Add 'close' group.
-      menu.addGroup({name: 'menu:workbench.view.contextmenu:close'}, group => {
+      menu.addGroup({name: 'menu:workbench.view.contextmenu.internal:close'}, group => {
         this.registerCloseMenuItem(config.close ?? {}, group, view);
         this.registerCloseOtherTabsMenuItem(config.closeOthers ?? {}, group, view);
         this.registerCloseAllTabsMenuItem(config.closeAll ?? {}, group, view);
@@ -66,8 +67,11 @@ export class WorkbenchViewContextMenuService {
         this.registerCloseLeftTabsMenuItem(config.closeToTheLeft ?? {}, group, view);
       });
 
+      // Add group for the application to contribute to the contextmenu.
+      menu.addGroup({name: 'menu:workbench.view.contextmenu'});
+
       // Add 'move' group.
-      menu.addGroup({name: 'menu:workbench.view.contextmenu:move'}, group => {
+      menu.addGroup({name: 'menu:workbench.view.contextmenu.internal:move'}, group => {
         this.registerMoveRightMenuItem(config.moveRight ?? {}, group, view);
         this.registerMoveLeftMenuItem(config.moveLeft ?? {}, group, view);
         this.registerMoveUpMenuItem(config.moveUp ?? {}, group, view);
@@ -78,8 +82,6 @@ export class WorkbenchViewContextMenuService {
         this.registerMoveToNewWindowMenuItem(config.moveToNewWindow ?? {}, group, view);
       });
 
-      // Add 'additions' group.
-      menu.addGroup({name: 'menu:workbench.view.contextmenu:additions'});
     });
   }
 
@@ -87,8 +89,8 @@ export class WorkbenchViewContextMenuService {
    * Registers a legacy view menu contribution in the view context menu.
    */
   public registerLegacyMenuContribution(legacyViewMenuItemFn: WorkbenchViewMenuItemFn): Disposable {
-    const contribution = contributeMenu('menu:workbench.view.contextmenu:additions', ((group, context) => {
-      const view = this._viewRegistry.get(context.get('viewId') as ViewId); // TODO [menu] Remove once in correct injection context
+    const contribution = contributeMenu('menu:workbench.view.contextmenu', ((group, context) => {
+      const view = this._viewRegistry.get(context.get(WorkbenchMenuContextKeys.ViewId) as ViewId); // TODO [menu] Remove once in correct injection context
 
       const providers: Provider[] = [
         {provide: ɵWorkbenchView, useValue: view},
@@ -145,7 +147,7 @@ export class WorkbenchViewContextMenuService {
    * Installs view context menu keyboard shortcuts on the given element.
    */
   public installAccelerators(target: MaybeArray<Element | ElementRef<Element>> | undefined, context: {viewId: ViewId}): Disposable {
-    return installMenuAccelerators('menu:workbench.view.contextmenu', {
+    return installMenuAccelerators('menu:workbench.view.contextmenu.internal', {
       target,
       context: this.createViewMenuContext(context.viewId), // Specify menu context to be independent of the invocation context.
       injector: this._injector, // Specify root injector to be independent of the invocation context.

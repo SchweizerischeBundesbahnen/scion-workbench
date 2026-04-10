@@ -20,6 +20,7 @@ import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {WorkbenchPart} from '../workbench-part.model';
 import {WORKBENCH_PART_CONTEXT} from '../workbench-part-context.provider';
 import {ComponentType} from '@angular/cdk/portal';
+import {WorkbenchMenuContextKeys} from '../../menu/workbench-menu-context-provider';
 
 /**
  * Registers legacy part actions as toolbar items in the part toolbar.
@@ -41,22 +42,22 @@ export class WorkbenchPartActionRegistrationService {
     const injector = this._injector;
     const partRegistry = this._partRegistry;
 
-    const contributionStart = contributePartToolbar('toolbar:workbench.part.secondary');
-    const contributionEnd = contributePartToolbar('toolbar:workbench.part');
+    const tabbarContribution = contributePartToolbar('toolbar:workbench.part.tabbar');
+    const toolbarContribution = contributePartToolbar('toolbar:workbench.part.toolbar');
 
     return {
       dispose: () => {
-        contributionStart.dispose();
-        contributionEnd.dispose();
+        tabbarContribution.dispose();
+        toolbarContribution.dispose();
       },
     };
 
     /**
-     * Contributes the action to 'toolbar:workbench.part' or 'toolbar:workbench.part.secondary', depending on its alignment.
+     * Contributes the action to 'toolbar:workbench.part.toolbar' or 'toolbar:workbench.part.tabbar', depending on its alignment.
      */
-    function contributePartToolbar(location: 'toolbar:workbench.part' | 'toolbar:workbench.part.secondary'): Disposable {
+    function contributePartToolbar(location: 'toolbar:workbench.part.toolbar' | 'toolbar:workbench.part.tabbar'): Disposable {
       return contributeMenu(location, ((toolbar, context) => {
-        const part = partRegistry.get(context.get('partId') as PartId); // TODO [menu] Remove once in correct injection context
+        const part = partRegistry.get(context.get(WorkbenchMenuContextKeys.PartId) as PartId); // TODO [menu] Remove once in correct injection context
 
         const providers: Provider[] = [
           {provide: ɵWorkbenchPart, useValue: part},
@@ -72,10 +73,10 @@ export class WorkbenchPartActionRegistrationService {
 
         // Contribute to toolbar based on action alignment.
         const align = legacyPartAction.align ?? 'end';
-        if (align === 'start' && location !== 'toolbar:workbench.part.secondary') {
+        if (align === 'start' && location !== 'toolbar:workbench.part.tabbar') {
           return;
         }
-        if (align === 'end' && location !== 'toolbar:workbench.part') {
+        if (align === 'end' && location !== 'toolbar:workbench.part.toolbar') {
           return;
         }
 

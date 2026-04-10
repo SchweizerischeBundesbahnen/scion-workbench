@@ -9,7 +9,7 @@
  */
 
 import {Component, computed, inject, signal, Signal, WritableSignal} from '@angular/core';
-import {ActivatedMicrofrontend, CanCloseRef, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPartActionDirective, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
+import {ActivatedMicrofrontend, CanCloseRef, WorkbenchMenuContextKeys, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPartActionDirective, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
 import {startWith} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
@@ -77,7 +77,7 @@ export default class ViewPageComponent {
 
     }
 
-    contributeMenu('toolbar:view', toolbar => toolbar
+    contributeMenu('toolbar:workbench.part.toolbar', toolbar => toolbar
       .addGroup(group => group
         .addGroup(group => group
           .addToolbarItem('home', onSelect)
@@ -103,7 +103,7 @@ export default class ViewPageComponent {
     this.installCssClassUpdater();
     this.installCanCloseGuard();
 
-    contributeMenu('menu:workbench.part.additions', menu => menu
+    contributeMenu('menu:workbench.part.toolbar', menu => menu
       .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+'], onSelect: () => onAction()})
       .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-'], onSelect: () => onAction()})
       .addMenu({label: 'Additions', name: 'menu:additions'}, menu => menu)
@@ -117,7 +117,7 @@ export default class ViewPageComponent {
     );
 
     contributeMenu(`menu:contextmenu`, (menu, context) => menu
-      .addMenuItem({label: 'Expand All', disabled: context.get('partId') === 'part.d7b1190a', accelerator: ['Ctrl', 'NumPad', '+'], onSelect: onAction})
+      .addMenuItem({label: 'Expand All', disabled: context.get(WorkbenchMenuContextKeys.PartId) === 'part.d7b1190a', accelerator: ['Ctrl', 'NumPad', '+'], onSelect: onAction})
       .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-'], onSelect: onAction})
       .addGroup(group => group
         .addMenuItem({label: 'Navigate with Single Click', checked: computed(() => flags().has('navigate_with_single_click')), onSelect: () => toggleMultiFlag(flags, 'navigate_with_single_click')})
