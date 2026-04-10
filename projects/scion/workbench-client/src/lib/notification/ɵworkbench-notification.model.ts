@@ -71,6 +71,16 @@ export class ɵWorkbenchNotification implements WorkbenchNotification, PreDestro
         event.preventDefault(); // prevent user-agent default action
         this.close();
       });
+
+    // Prevent middle-click scrolling; necessary for aux click to work.
+    fromEvent<MouseEvent>(document.documentElement, 'mousedown')
+      .pipe(
+        filter(event => event.button === 1), // primary aux button
+        takeUntil(this._destroy$),
+      )
+      .subscribe(event => {
+        event.preventDefault();
+      });
   }
 
   public preDestroy(): void {
