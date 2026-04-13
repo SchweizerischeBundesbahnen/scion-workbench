@@ -53,12 +53,7 @@ export class PartBarComponent {
     this.maxViewTabBarWidth = this.calculateMaxViewTabBarWidth();
     this.installActivityMinimizer();
 
-    contributeMenu('toolbar:workbench.part.tabbar.internal', toolbar => {
-      this.contributeTabbarAdditionsGroup(toolbar);
-    }, {requiredContext: new Map().set(WorkbenchMenuContextKeys.ViewId, undefined)}); // clear view constraint to contribute to parts with and without views
-
-    contributeMenu('toolbar:workbench.part.toolbar.internal', toolbar => {
-      this.contributeToolbarAdditionsGroup(toolbar);
+    contributeMenu({location: 'toolbar:workbench.part.toolbar', position: 'end'}, toolbar => {
       this.contributeViewListMenu(toolbar);
       this.contributeToolbarAdditionsMenu(toolbar);
       this.contributeMinimizeButton(toolbar);
@@ -108,24 +103,6 @@ export class PartBarComponent {
         onCleanup(() => subscription.unsubscribe());
       });
     });
-  }
-
-  /**
-   * Contributes a group for the application to contribute to the toolbar.
-   *
-   * Public contribution point: 'toolbar:workbench.part.tabbar'
-   */
-  private contributeTabbarAdditionsGroup(toolbar: SciToolbarFactory): void {
-    toolbar.addGroup({name: 'toolbar:workbench.part.tabbar'});
-  }
-
-  /**
-   * Contributes a group for the application to contribute to the toolbar.
-   *
-   * Public contribution point: 'toolbar:workbench.part.toolbar'
-   */
-  private contributeToolbarAdditionsGroup(toolbar: SciToolbarFactory): void {
-    toolbar.addGroup({name: 'toolbar:workbench.part.toolbar'});
   }
 
   /**
