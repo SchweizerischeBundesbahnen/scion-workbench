@@ -9,10 +9,9 @@
  */
 
 import {Component, DOCUMENT, effect, ElementRef, inject, NgZone, Provider, signal, untracked, viewChild} from '@angular/core';
-import {fromEvent, NEVER, Observable, timer} from 'rxjs';
+import {fromEvent, NEVER, noop, Observable, timer} from 'rxjs';
 import {NgComponentOutlet} from '@angular/common';
 import {SciTextPipe} from '@scion/sci-components/text';
-import {IconComponent} from '../icon/icon.component';
 import {ɵWorkbenchNotification} from './ɵworkbench-notification.model';
 import {RemoveLegacyInputPipe} from './remove-legacy-input.pipe';
 import {trackFocus} from '../focus/workbench-focus-tracker.service';
@@ -20,7 +19,8 @@ import {SciViewportComponent} from '@scion/components/viewport';
 import {observeIn, subscribeIn} from '@scion/toolkit/operators';
 import {filter} from 'rxjs/operators';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
-import {contributeMenu, SciToolbarComponent} from '@scion/sci-components/menu';
+import {contributeMenu, SciToolbarComponent, SciToolbarFactory} from '@scion/sci-components/menu';
+import {WorkbenchMenuContextKeys} from '@scion/workbench';
 
 /**
  * Renders the content of a workbench notification.
@@ -31,7 +31,6 @@ import {contributeMenu, SciToolbarComponent} from '@scion/sci-components/menu';
   styleUrl: './workbench-notification.component.scss',
   imports: [
     SciTextPipe,
-    IconComponent,
     NgComponentOutlet,
     RemoveLegacyInputPipe,
     SciViewportComponent,
@@ -73,14 +72,35 @@ export class WorkbenchNotificationComponent {
 
     trackFocus(inject(ElementRef).nativeElement as HTMLElement, this.notification);
 
-    contributeMenu('toolbar:workbench.notification', toolbar => toolbar
-      .addMenu({icon: 'more_vert', visualMenuHint: false, name: 'menu:additions'}, menu => menu),
-    )
+    contributeMenu({location: 'toolbar:workbench.notification.toolbar', position: 'end'}, toolbar => {
+      this.contributeToolbarAdditionsMenu(toolbar);
+      this.contributeCloseButton(toolbar);
+    }, {requiredContext: new Map().set(WorkbenchMenuContextKeys.ViewId, undefined)}); // clear view constraint to contribute to parts with and without views
 
+    // TODO [menu] only for illustration purpose
+    contributeMenu('menu:workbench.notification.toolbar', menu => menu
+      .addMenuItem('Settings...', noop)
+      .addMenuItem('Don\'t Show Again For This Project', noop)
+      .addMenuItem('Don\'t Show Again', noop),
+    );
   }
 
-  protected onClose(): void {
-    this.notification.close();
+  /**
+   * Contributes a menu for the application to contribute to the notification toolbar menu.
+   *
+   * Public contribution point: 'menu:workbench.notification.toolbar'
+   */
+  private contributeToolbarAdditionsMenu(toolbar: SciToolbarFactory): void {
+    toolbar.addMenu({name: 'menu:workbench.notification.toolbar', icon: 'more_vert', visualMenuHint: false}, menu => menu);
+  }
+
+  private contributeCloseButton(toolbar: SciToolbarFactory): void {
+    toolbar.addToolbarItem({
+      icon: 'close', // TODO [menu] icon ligature: workbench.close
+      tooltip: '%scion.workbench.close.tooltip',
+      cssClass: 'e2e-close',
+      onSelect: () => this.notification.close(),
+    });
   }
 
   protected onEscape(event: Event): void {
@@ -101,6 +121,10 @@ export class WorkbenchNotificationComponent {
     if (event.button === 1) { // primary aux button
       event.preventDefault(); // prevent middle-click scrolling; necessary for aux click to work
     }
+  }
+
+  protected onToolbarEscape(event: Event): void {
+    event.stopPropagation(); // Prevent notification from closing.
   }
 
   /**
