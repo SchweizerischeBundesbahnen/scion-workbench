@@ -2,6 +2,7 @@
 
 :host {
   display: flex;
+  align-items: center;
   gap: var(--sci-workbench-dialog-padding);
   place-content: flex-end;
   padding-inline: var(--sci-workbench-dialog-padding);
@@ -28,12 +29,7 @@
     }
   }
 
-  > button.close:is(button, #sci-reset) {
-    @include workbench.icon-button-element-states() {
-      flex: none;
-      align-self: center;
-      border-radius: var(--sci-corner-small);
-      padding: .125em;
-    }
+  > sci-toolbar[name="toolbar:workbench.dialog.toolbar"] {
+    flex: none;
   }
 }

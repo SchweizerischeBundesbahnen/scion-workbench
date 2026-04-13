@@ -4,11 +4,6 @@
   </div>
 }
 
-@if (dialog.closable()) {
-  <button tabindex="-1" class="close e2e-close"
-          [title]="('%scion.workbench.close.tooltip' | sciText)()"
-          (mousedown)="onCloseMouseDown($event)"
-          (click)="onCloseClick()">
-    <wb-icon icon="workbench.close"/>
-  </button>
-}
+<sci-toolbar name="toolbar:workbench.dialog.toolbar"
+             (mousedown)="onToolbarMouseDown($event)"
+             (keydown.escape)="onEscape($event)"/>

@@ -25,6 +25,7 @@ import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneO
 import {filter, map, startWith, takeUntil} from 'rxjs/operators';
 import {fromMutation$} from '@scion/toolkit/observable';
 import {trackFocus} from '../focus/workbench-focus-tracker.service';
+import {setStyle} from '../common/dom.util';
 
 /**
  * Renders the content of a workbench dialog.
@@ -73,6 +74,7 @@ export class WorkbenchDialogComponent {
   private readonly _zone = inject(NgZone);
   private readonly _cdkTrapFocus = viewChild.required(CdkTrapFocus);
   private readonly _dialogElement = viewChild.required<ElementRef<HTMLElement>>('dialog_element');
+  private readonly _header = viewChild.required<ElementRef<HTMLElement>>('header');
 
   /** Element of the dialog that has or last had focus */
   private readonly _activeElement$ = new BehaviorSubject<HTMLElement | undefined>(undefined);
@@ -112,11 +114,19 @@ export class WorkbenchDialogComponent {
     const activeElement = this._activeElement$.getValue();
     if (activeElement) {
       activeElement.focus();
+      return;
     }
-    else if (!this._cdkTrapFocus().focusTrap.focusFirstTabbableElement()) {
-      // Focus dialog element so that it can be closed via Escape keystroke.
-      this._dialogElement().nativeElement.focus();
+
+    // Temporarily hide header to prevent dialog toolbar from receiving focus.
+    setStyle(this._header().nativeElement, {visibility: 'hidden'});
+    const focused = this._cdkTrapFocus().focusTrap.focusFirstTabbableElement();
+    setStyle(this._header().nativeElement, {visibility: null});
+    if (focused) {
+      return;
     }
+
+    // Focus dialog element so that it can be closed via Escape keystroke.
+    this._dialogElement().nativeElement.focus();
   }
 
   /**
