@@ -162,14 +162,15 @@ export class SciMenuOpener {
       setStyles(popoverElement, {
         'position-anchor': `--${popoverId}`,
         'position-try-fallbacks': 'flip-inline, flip-block',
-        'top': `calc(anchor(top) - var(--ɵsci-menu-padding))`,
+        'top': `calc(anchor(top) - var(--ɵsci-menu-padding-block))`,
         'left': 'calc(anchor(right) + 1px)',
       });
     }
     else {
       setStyles(popoverElement, {
         'position-anchor': `--${popoverId}`,
-        'position-try-fallbacks': 'flip-inline, flip-block',
+        'position-try-fallbacks': 'flip-block',
+        'position-area': 'bottom right', // to not push popover out of the page viewport
         'top': 'calc(anchor(bottom) + 1px)',
         'left': 'anchor(left)',
       });

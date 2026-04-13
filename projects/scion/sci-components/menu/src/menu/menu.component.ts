@@ -42,7 +42,6 @@ import {RequireOne, SciAttributesDirective, SciComponentOutletDirective} from '@
   ],
   host: {
     '[class.no-glyph-area]': '!hasGlyphArea()',
-    '[class.is-group]': '!!group()',
     '[style.width]': 'size()?.width',
     '[style.min-width]': 'size()?.minWidth',
     '[style.max-width]': 'size()?.maxWidth',

@@ -91,6 +91,7 @@ export class NotificationPO {
   }
 
   public async close(): Promise<void> {
+    await this.locator.hover();
     await this.locator.locator('button.e2e-close').click();
   }
 

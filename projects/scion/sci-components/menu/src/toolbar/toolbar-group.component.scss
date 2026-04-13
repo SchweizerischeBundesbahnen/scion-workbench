@@ -40,7 +40,7 @@ $icon-size: 18px;
 
     // Maintain 1:1 aspect ratio if no label
     &:not(:has(> span.label)) {
-      padding: 0;
+      padding: 1px; // minimal padding
       aspect-ratio: 1 / 1;
     }
 

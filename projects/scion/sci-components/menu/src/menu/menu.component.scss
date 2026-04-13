@@ -1,5 +1,7 @@
-$padding_menu: .3em;
-$padding_menu_item: 4px;
+$padding_menu_inline: .4em;
+$padding_menu_block: .3em;
+$padding_menu_item_inline: 5px;
+$padding_menu_item_block: 2px;
 $padding_label_left: 7.5px;
 $menu_item_gap: .25em;
 $font-size: 13px;
@@ -18,7 +20,7 @@ $icon-size: 18px;
 @mixin button {
   all: unset;
   text-wrap: nowrap;
-  padding: $padding_menu_item;
+  padding: $padding_menu_item_block $padding_menu_item_inline;
   border-radius: var(--sci-corner);
   user-select: none;
   overflow: hidden;
@@ -53,10 +55,9 @@ $icon-size: 18px;
 }
 
 :host {
-  --ɵsci-menu-padding: #{$padding_menu};
+  --ɵsci-menu-padding-block: #{$padding_menu_block};
   display: grid;
   gap: $menu_item_gap .5em;
-  overflow: hidden;
   align-items: center;
   font-size: $font-size;
   box-sizing: border-box;
@@ -64,10 +65,11 @@ $icon-size: 18px;
   border-radius: 0.5rem;
   color: var(--sci-color-text);
   background-color: var(--sci-color-background-elevation);
-  padding: var(--ɵsci-menu-padding);
+  padding: $padding_menu_block $padding_menu_inline;
   margin: unset; // unset native popover styling
   inset: unset; // unset native popover styling
   outline: none;
+  width: max-content; // required for initial width
   grid-template-columns:
     // === Menu subgrid ===
     auto // glyph area for icons and check marks
@@ -79,7 +81,12 @@ $icon-size: 18px;
       1fr; // label area
   }
 
-  &.is-group {
+  &[popover]:not(:popover-open) {
+    display: none; // prevent flickering while closing, e.g., menu in workbench dialog toolbar
+  }
+
+  // Styles if a group in a menu.
+  &:not([popover]) {
     grid-column: 1/-1; // consume all columns
     grid-template-columns: subgrid;
     border: unset;
@@ -109,7 +116,7 @@ $icon-size: 18px;
         // TODO [menu] add sci-color-scheme token, currently simply color-scheme, not a CSS variable
         font-weight: 600;
       }
-      padding: .75em $padding_menu_item .5em $padding_menu_item + $padding_label_left;
+      padding: .75em $padding_menu_item_inline .5em $padding_menu_item_inline + $padding_label_left;
       @include ellipsis-on-overflow();
     }
 
@@ -123,19 +130,19 @@ $icon-size: 18px;
   }
 
   &:has(> sci-viewport) {
-    padding: var(--ɵsci-menu-padding) 0;
+    padding: $padding_menu_block 0;
 
     // TODO [menu] find better solution
     > header.group-header {
-      margin: 0 var(--ɵsci-menu-padding);
+      margin: 0 $padding_menu_inline;
     }
 
     > button.group-header {
-      margin: 0 var(--ɵsci-menu-padding);
+      margin: 0 $padding_menu_inline;
     }
 
     > div.filter {
-      margin: 0 var(--ɵsci-menu-padding);
+      margin: 0 $padding_menu_inline;
     }
   }
 
@@ -151,7 +158,7 @@ $icon-size: 18px;
       // === Menu subgrid ===
         auto // glyph area for icons and check marks
         1fr; // label area
-      padding: 0 var(--ɵsci-menu-padding);
+      padding: 2px $padding_menu_inline; // 2px to not clip outline
     }
   }
 
@@ -166,7 +173,7 @@ $icon-size: 18px;
     display: inline-grid;
     grid-template-columns: subgrid;
     align-items: center;
-    padding: $padding_menu_item;
+    padding: $padding_menu_item_block $padding_menu_item_inline;
     user-select: none;
   }
 
@@ -175,16 +182,15 @@ $icon-size: 18px;
     grid-column: 1/-1; // consume all columns
     height: 1px;
     background-color: var(--sci-color-border);
-    margin-bottom: .5em;
+    margin: 0 $padding_menu_item_inline .5em $padding_menu_item_inline;
   }
-
   div.message.no-items {
     grid-column: 1/-1;
     justify-self: center;
     display: block;
     color: var(--sci-color-text-subtlest);
     font-size: $font-size-smaller;
-    padding: $padding_menu_item;
+    padding: $padding_menu_item_block $padding_menu_item_inline;
   }
 
   // Add before separator
@@ -212,7 +218,7 @@ $icon-size: 18px;
     align-items: center;
     position: relative; // positioning context for actions toolbar
     box-sizing: border-box;
-    min-height: calc($icon-size + 2 * $padding_menu_item + 2px); // 2px for checked toolbar item
+    min-height: calc($icon-size + 2 * $padding_menu_item_block + 4px); // 2px for checked toolbar item plus 2px for toolbar item padding
 
     > div.content {
       display: flex;
