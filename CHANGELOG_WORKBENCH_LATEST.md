@@ -1,12 +1,10 @@
-# [21.0.0-beta.5](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/21.0.0-beta.4...21.0.0-beta.5) (2026-02-26)
+# [21.0.0-beta.6](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/21.0.0-beta.5...21.0.0-beta.6) (2026-04-13)
 
 
-### Features
+### Bug Fixes
 
-* **workbench/notification:** support notification-modal dialog and notification-relative popup anchor ([e752bc2](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/e752bc206a415c5a7ac225b4a1016324b5c3ed75))
+* **workbench/notification:** prevent scrolling but close notification on auxiliary mouse button click if notification content overflows ([f09ff6f](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/f09ff6f0a7d8c1049ddaa747a3ec9ce573578c34))
+* **workbench/view:** prevent scrolling but close view tab on auxiliary mouse button click if tabbar overflows ([05bf2ff](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/05bf2ff40c349c2cf74732571288eda80626d186))
+* **workbench:** enable injection of workbench services in unit tests ([1c1bbdf](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/1c1bbdf259d63120c20ce5c2ac59cbb515a01371))
 
-
-### Dependencies
-
-* **workbench/notification:** SCION Workbench requires `@scion/workbench-client` `v1.0.0-beta.40` or higher.
 
