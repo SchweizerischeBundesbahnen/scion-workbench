@@ -97,5 +97,5 @@ export interface SciComponentDescriptor {
   /**
    * Specifies attributes to add to the component.
    */
-  attributes?: {[name: string]: MaybeSignal<string>};
+  attributes?: MaybeSignal<{[name: string]: string | undefined}>;
 }

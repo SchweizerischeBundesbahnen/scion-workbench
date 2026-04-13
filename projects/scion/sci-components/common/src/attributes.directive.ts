@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Directive, effect, ElementRef, inject, input, IterableDiffers, Renderer2} from '@angular/core';
+import {Directive, effect, ElementRef, inject, input, IterableDiffers, Renderer2, untracked} from '@angular/core';
 
 /**
  * Adds specified attributes to the host element.
@@ -16,7 +16,7 @@ import {Directive, effect, ElementRef, inject, input, IterableDiffers, Renderer2
 @Directive({selector: '[sciAttributes]'})
 export class SciAttributesDirective {
 
-  public readonly attributes = input<{[name: string]: string} | undefined>(undefined, {alias: 'sciAttributes'});
+  public readonly attributes = input<{[name: string]: string | undefined} | undefined>(undefined, {alias: 'sciAttributes'});
 
   constructor() {
     const host = inject(ElementRef).nativeElement as HTMLElement;
@@ -25,11 +25,24 @@ export class SciAttributesDirective {
 
     effect(() => {
       const attributes = this.attributes() ?? {};
-      const diff = attributeDiffer.diff(Object.keys(attributes));
-      if (diff) {
-        diff.forEachAddedItem(({item: name}) => renderer.setAttribute(host, name, attributes[name]!));
-        diff.forEachRemovedItem(({item: name}) => renderer.removeAttribute(host, name));
-      }
+
+      untracked(() => {
+        // Delete removed attributes.
+        const diff = attributeDiffer.diff(Object.keys(attributes));
+        if (diff) {
+          diff.forEachRemovedItem(({item: name}) => renderer.removeAttribute(host, name));
+        }
+
+        // Update added or changed attributes.
+        Object.entries(attributes).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            renderer.setAttribute(host, key, value);
+          }
+          else {
+            renderer.removeAttribute(host, key);
+          }
+        });
+      });
     });
   }
 }

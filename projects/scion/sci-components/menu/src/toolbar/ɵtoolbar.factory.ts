@@ -27,7 +27,7 @@ export class ɵSciToolbarFactory implements SciToolbarFactory {
       this.menuItems.push({
         type: 'menu-item',
         name: descriptor.name,
-        control: {...coerceControlComponent(descriptor.control), cssClass: descriptor.cssClass, attributes: descriptor.attributes},
+        control: coerceControlComponent(descriptor.control),
         tooltip: translate(descriptor.tooltip),
         actions: [],
         cssClass: Arrays.coerce(descriptor.cssClass),

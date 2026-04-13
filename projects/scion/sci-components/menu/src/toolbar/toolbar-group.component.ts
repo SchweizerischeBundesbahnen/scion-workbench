@@ -3,6 +3,7 @@ import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '../menu.model
 import {ɵSciMenuService} from '../ɵmenu.service';
 import {MaybeSignal, RequireOne, SciAttributesDirective, SciComponentOutletDirective} from '@scion/sci-components/common';
 import {Translatable} from '@scion/sci-components/text';
+import {SciToolbarControlPipe} from './toolbar-control.directive';
 
 @Component({
   selector: 'sci-toolbar-group',
@@ -12,6 +13,7 @@ import {Translatable} from '@scion/sci-components/text';
   imports: [
     SciComponentOutletDirective,
     SciAttributesDirective,
+    SciToolbarControlPipe,
   ],
 })
 export class SciToolGroupComponent {

@@ -4,7 +4,7 @@
   @switch (menuItem.type) {
     @case ('menu-item') {
       @if (menuItem.control) {
-        <ng-container *sciComponentOutlet="menuItem.control"/>
+        <ng-container *sciComponentOutlet="(menuItem.control | sciToolbarControl:menuItem)()"/>
       } @else {
         <button [attr.disabled]="disabled || null"
                 [attr.title]="menuItem.tooltip?.()"
