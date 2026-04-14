@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {computed, Pipe, PipeTransform, Signal} from '@angular/core';
+import {computed, Pipe, PipeTransform} from '@angular/core';
 import {SciComponentDescriptor} from '@scion/sci-components/common';
 import {SciMenuItem} from '@scion/sci-components/menu';
 
@@ -18,7 +18,7 @@ import {SciMenuItem} from '@scion/sci-components/menu';
 @Pipe({name: 'sciToolbarControl'})
 export class SciToolbarControlPipe implements PipeTransform {
 
-  public transform(componentDescriptor: SciComponentDescriptor, menuItem: SciMenuItem): Signal<SciComponentDescriptor> {
+  public transform(componentDescriptor: SciComponentDescriptor, menuItem: SciMenuItem): SciComponentDescriptor {
     const attributes = computed(() => {
       return {
         ...menuItem.attributes,
@@ -26,10 +26,10 @@ export class SciToolbarControlPipe implements PipeTransform {
       }
     });
 
-    return computed(() => ({
+    return {
       ...componentDescriptor,
       cssClass: menuItem.cssClass,
-      attributes: attributes,
-    }));
+      attributes,
+    };
   }
 }

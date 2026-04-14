@@ -124,7 +124,7 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
           const menuItems = this._menuItemsCaches.get(menuContribution)!.computeIfAbsent(context(), context => {
             const injector = createDestroyableInjector({
               parent: inject(Injector),
-              providers: this._menuContextProvider?.provideInjectionContext?.(context),
+              providers: this._menuContextProvider?.provideMenuInjectionContext?.(context),
             });
 
             return computed(() => {

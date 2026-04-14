@@ -45,7 +45,7 @@ export class WorkbenchClientAngularMenuAdapter implements SciMenuAdapter {
 
           const injector = createDestroyableInjector({
             parent: this._injector,
-            providers: this._menuContextProvider?.provideInjectionContext?.(context),
+            providers: this._menuContextProvider?.provideMenuInjectionContext?.(context),
           });
 
           return runInInjectionContext(injector, () => tracked(() => menuFactoryFn(new WorkbenchClientMenuFactoryDelegate(menu), context), menu));
@@ -57,7 +57,7 @@ export class WorkbenchClientAngularMenuAdapter implements SciMenuAdapter {
 
           const injector = createDestroyableInjector({
             parent: this._injector,
-            providers: this._menuContextProvider?.provideInjectionContext?.(context),
+            providers: this._menuContextProvider?.provideMenuInjectionContext?.(context),
           });
 
           return runInInjectionContext(injector, () => tracked(() => toolbarFactoryFn(new WorkbenchClientToolbarFactoryDelegate(toolbar), context), toolbar));

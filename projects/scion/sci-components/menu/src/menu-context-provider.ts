@@ -12,7 +12,7 @@ import {Injectable, Provider} from '@angular/core';
 import {MaybeSignal} from '@scion/sci-components/common';
 
 /**
- * Provides an environment context for contributions and locations such as toolbars and context menus.
+ * Provides a context for contributions and locations such as toolbars and context menus.
  *
  * The provided environment context is used as the "required" context for contributions and the "available" context for locations.
  *
@@ -22,14 +22,14 @@ import {MaybeSignal} from '@scion/sci-components/common';
 export abstract class SciMenuContextProvider {
 
   /**
-   * Injects the environment context from the calling injection context.
+   * Method invoked to provide the menu context from the calling injection context.
    */
-  public abstract injectEnvironmentContext(): MaybeSignal<Map<string, unknown>>;
+  public abstract provideMenuContext(): MaybeSignal<Map<string, unknown>>;
 
   /**
-   * Provides the injection context from given environment context.
+   * Method invoked to provide providers for dependency injection from given menu context.
    *
-   * This is the inverse of {@link injectEnvironmentContext}.
+   * Returned providers are available for dependency injection in the menu factory passed to {@link contributeMenu}.
    */
-  public abstract provideInjectionContext?(environmentContext: Map<string, unknown>): Provider[];
+  public abstract provideMenuInjectionContext?(menuContext: Map<string, unknown>): Provider[];
 }

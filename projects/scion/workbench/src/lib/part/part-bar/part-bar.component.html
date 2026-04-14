@@ -8,6 +8,7 @@
   <wb-view-tab-bar [maxWidth]="maxViewTabBarWidth()"/>
 }
 
+<!-- .tabbar suffix is suboptimal since also used in parts without view tabs. Find better suffix, e.g., actionbar -->
 <sci-toolbar name="toolbar:workbench.part.tabbar" [context]="toolbarActiveViewContext()" [acceleratorTarget]="part.portal.element()"/>
 <div class="filler e2e-filler" #filler (mousedown)="onPartBarMouseDown($event)"></div>
 <sci-toolbar name="toolbar:workbench.part.toolbar" [context]="toolbarActiveViewContext()" [acceleratorTarget]="part.portal.element()"/>

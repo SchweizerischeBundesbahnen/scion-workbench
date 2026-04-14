@@ -453,6 +453,19 @@ export interface WorkbenchMenuRef {
 }
 
 /**
+ * Workbench context keys used by workbench menus.
+ */
+export enum WorkbenchMenuContextKeys {
+  ViewId = 'viewId',
+  PartId = 'partId',
+  DialogId = 'dialogId',
+  PopupId = 'popupId',
+  NotificationId = 'notificationId',
+  Peripheral = 'peripheral',
+  MainArea = 'mainArea',
+}
+
+/**
  * Provides transformations between {@link WorkbenchMenuItemLike} and transferable {@link WorkbenchMenuItemTransferableLike} menu models.
  */
 export namespace WorkbenchMenuItems {

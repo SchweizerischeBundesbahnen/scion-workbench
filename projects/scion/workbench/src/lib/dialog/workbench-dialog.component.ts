@@ -129,14 +129,11 @@ export class WorkbenchDialogComponent {
 
   private contributeCloseButton(toolbar: SciToolbarFactory): void {
     if (this.dialog.closable()) {
-      // tabindex="-1"
       toolbar.addToolbarItem({
         icon: 'close', // TODO [menu] icon ligature: workbench.close
         tooltip: '%scion.workbench.close.tooltip',
         cssClass: 'e2e-close',
-        onSelect: () => {
-          this.dialog.close();
-        },
+        onSelect: () => this.dialog.close(),
       });
     }
   }

@@ -42,8 +42,14 @@ class WorkbenchMenuContextProvider implements SciMenuContextProvider {
   private readonly _popupRegistry = inject(WorkbenchPopupRegistry);
   private readonly _notificationRegistry = inject(WorkbenchNotificationRegistry);
 
+  private readonly _partContextProviders = inject(WORKBENCH_PART_CONTEXT, {optional: true}) ?? [];
+  private readonly _viewContextProviders = inject(WORKBENCH_VIEW_CONTEXT, {optional: true}) ?? [];
+  private readonly _dialogContextProviders = inject(WORKBENCH_DIALOG_CONTEXT, {optional: true}) ?? [];
+  private readonly _popupContextProviders = inject(WORKBENCH_POPUP_CONTEXT, {optional: true}) ?? [];
+  private readonly _notificationContextProviders = inject(WORKBENCH_NOTIFICATION_CONTEXT, {optional: true}) ?? [];
+
   /** @inheritDoc */
-  public injectEnvironmentContext(): MaybeSignal<Map<string, unknown>> {
+  public provideMenuContext(): MaybeSignal<Map<string, unknown>> {
     const view = inject(WorkbenchView, {optional: true});
     if (view) {
       return computed(() => new Map<string, unknown>()
@@ -76,7 +82,7 @@ class WorkbenchMenuContextProvider implements SciMenuContextProvider {
   }
 
   /** @inheritDoc */
-  public provideInjectionContext?(context: Map<string, unknown>): Provider[] {
+  public provideMenuInjectionContext?(context: Map<string, unknown>): Provider[] {
     const viewId = context.get(WorkbenchMenuContextKeys.ViewId) as ViewId | undefined;
     const partId = context.get(WorkbenchMenuContextKeys.PartId) as PartId | undefined;
     if (viewId && partId) {
@@ -89,7 +95,7 @@ class WorkbenchMenuContextProvider implements SciMenuContextProvider {
         {provide: ɵWorkbenchPart, useValue: part},
         {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
         {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchView},
-        inject(WORKBENCH_VIEW_CONTEXT, {optional: true}) ?? [],
+        ...this._viewContextProviders,
       ];
     }
 
@@ -99,18 +105,17 @@ class WorkbenchMenuContextProvider implements SciMenuContextProvider {
         {provide: ɵWorkbenchPart, useValue: part},
         {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
         {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchPart},
-        inject(WORKBENCH_PART_CONTEXT, {optional: true}) ?? [],
+        ...this._partContextProviders,
       ];
     }
 
     if (viewId) {
       const view = this._viewRegistry.get(viewId);
-
       return [
         {provide: ɵWorkbenchView, useValue: view},
         {provide: WorkbenchView, useExisting: ɵWorkbenchView},
         {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchView},
-        inject(WORKBENCH_VIEW_CONTEXT, {optional: true}) ?? [],
+        ...this._viewContextProviders,
       ];
     }
 
@@ -121,7 +126,7 @@ class WorkbenchMenuContextProvider implements SciMenuContextProvider {
         {provide: ɵWorkbenchDialog, useValue: dialog},
         {provide: WorkbenchDialog, useExisting: ɵWorkbenchDialog},
         {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchDialog},
-        inject(WORKBENCH_DIALOG_CONTEXT, {optional: true}) ?? [],
+        ...this._dialogContextProviders,
       ];
     }
 
@@ -132,7 +137,7 @@ class WorkbenchMenuContextProvider implements SciMenuContextProvider {
         {provide: ɵWorkbenchPopup, useValue: popup},
         {provide: WorkbenchPopup, useExisting: ɵWorkbenchPopup},
         {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchPopup},
-        inject(WORKBENCH_POPUP_CONTEXT, {optional: true}) ?? [],
+        ...this._popupContextProviders,
       ];
     }
 
@@ -143,7 +148,7 @@ class WorkbenchMenuContextProvider implements SciMenuContextProvider {
         {provide: ɵWorkbenchNotification, useValue: notification},
         {provide: WorkbenchNotification, useExisting: ɵWorkbenchNotification},
         {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchNotification},
-        inject(WORKBENCH_NOTIFICATION_CONTEXT, {optional: true}) ?? [],
+        ...this._notificationContextProviders,
       ];
     }
 

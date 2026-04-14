@@ -24,7 +24,7 @@ export function contributeMenu(locationLike: string | SciMenuContributionLocatio
 
   const menuService = injector.get(ɵSciMenuService);
   const menuContextProvider = injector.get(SciMenuContextProvider, null, {optional: true});
-  const environmentContext = coerceSignal(runInInjectionContext(injector, () => menuContextProvider?.injectEnvironmentContext()));
+  const environmentContext = coerceSignal(runInInjectionContext(injector, () => menuContextProvider?.provideMenuContext()));
 
   // Each contribution is assigned a unique contribution instant to keep its original order even if the reactive context changes.
   const contributionInstant = options?.contributionInstant ?? injector.get(SciMenuContributionInstantProvider).next();

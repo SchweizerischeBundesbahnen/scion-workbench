@@ -10,7 +10,7 @@
 
 import {Component, computed, inject, Injector, signal, WritableSignal} from '@angular/core';
 import {FormGroup, FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {CanCloseRef, WorkbenchMenuService, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
+import {CanCloseRef, WorkbenchMenuContextKeys, WorkbenchMenuService, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
 import {interval, map, MonoTypeOperatorFunction, NEVER} from 'rxjs';
@@ -26,7 +26,6 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {contributeMenu, Disposable, SciMenuService, SciToolbarComponent} from '@scion/sci-components/menu';
-import {WorkbenchMenuContextKeys} from '@scion/workbench';
 
 @Component({
   selector: 'app-view-page',
@@ -485,7 +484,7 @@ export default class ViewPageComponent {
 
   private contributeContextMenu(): void {
     contributeMenu('menu:contextmenu', (menu, context) => menu
-      .addMenuItem({label: 'Expand All', disabled: context.get('partId') === 'part.d7b1190a', accelerator: ['Ctrl', 'NumPad', '+'], onSelect: onSelect})
+      .addMenuItem({label: 'Expand All', disabled: context.get(WorkbenchMenuContextKeys.PartId) === 'part.d7b1190a', accelerator: ['Ctrl', 'NumPad', '+'], onSelect: onSelect})
       .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-'], onSelect: onSelect})
       .addGroup(group => group
         .addMenuItem({label: 'Navigate with Single Click', checked: computed(() => flags().has('navigate_with_single_click')), onSelect: () => toggleMultiFlag(flags, 'navigate_with_single_click')})

@@ -41,7 +41,7 @@ export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${
     const menuContextProvider = inject(SciMenuContextProvider, {optional: true});
     const zone = inject(NgZone);
 
-    const environmentContext = coerceSignal(menuContextProvider?.injectEnvironmentContext());
+    const environmentContext = coerceSignal(menuContextProvider?.provideMenuContext());
     const context = computed(() => new Map<string, unknown>([...environmentContext?.() ?? new Map(), ...options?.context ?? new Map()]), {equal: Objects.isEqual});
     const menuItems = menuService.menuItems(location, context, {metadata: options?.metadata});
     const acceleratorTargets = computeAcceleratorTargets(options);
