@@ -160,7 +160,7 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
       if (menuItem.type === 'menu-item') {
         return {
           ...menuItem,
-          actions: menuItem.actions
+          actions: menuItem.actions && menuItem.actions
             .map(action => federateMenu(action, context, options))
             .flatMap(filterEmpty),
         };

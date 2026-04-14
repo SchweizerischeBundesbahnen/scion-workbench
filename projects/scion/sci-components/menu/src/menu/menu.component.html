@@ -72,8 +72,8 @@
               }
 
               @let actions = menuItem.actions;
-              @if (!disabled && actions.length) {
-                <sci-toolbar-group [menuItems]="actions"
+              @if (!disabled && actions?.length) {
+                <sci-toolbar-group [menuItems]="actions!"
                                    [viewContainerRef]="popoverAnchor()"
                                    (menuOpen)="onActionToolbarMenuOpen($event)"
                                    (click)="$event.stopPropagation()"

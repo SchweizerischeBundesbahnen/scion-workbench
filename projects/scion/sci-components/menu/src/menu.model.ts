@@ -19,7 +19,7 @@ export interface SciMenuItem {
   disabled?: Signal<boolean>; // Consider renaming to enabled; https://www.electronjs.org/docs/latest/api/menu-item
   // visible: Signal<boolean>; // Consider providing visible
   checked?: Signal<boolean>;
-  actions: SciMenuItemLike[];
+  actions?: SciMenuItemLike[];
   matchesFilter?: (filter: string) => boolean;
   cssClass?: string[];
   attributes?: {[name: string]: string};

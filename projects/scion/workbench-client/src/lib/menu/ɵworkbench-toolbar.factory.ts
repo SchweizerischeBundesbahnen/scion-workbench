@@ -35,7 +35,6 @@ export class ɵWorkbenchToolbarFactory implements WorkbenchToolbarFactory {
       tooltip: translate(descriptor.tooltip),
       accelerator: descriptor.accelerator,
       disabled: descriptor.disabled,
-      actions: [],
       cssClass: Arrays.coerce(descriptor.cssClass),
       attributes: descriptor.attributes,
       onSelect: async () => await descriptor.onSelect() ?? descriptor.checked === undefined, // Close if the callback returns true. Defaults to closing non-checkable menu items.

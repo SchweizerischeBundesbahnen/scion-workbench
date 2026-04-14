@@ -25,7 +25,7 @@ export class WorkbenchMenuItem {
     accelerator?: string[];
     disabled?: MaybeObservable<boolean>;
     checked?: MaybeObservable<boolean>;
-    actions: WorkbenchMenuItemLike[];
+    actions?: WorkbenchMenuItemLike[];
     cssClass?: string[];
     attributes?: {[name: string]: string};
     position?: WorkbenchMenuContributionPositionLike;
@@ -46,7 +46,7 @@ export class WorkbenchMenuItem {
           checked: Observables.coerce(this._menuItem.checked),
           tooltip: Observables.coerce(this._menuItem.tooltip),
           disabled: Observables.coerce(this._menuItem.disabled),
-          actions: WorkbenchMenuItems.toTransferable$(this._menuItem.actions),
+          actions: WorkbenchMenuItems.toTransferable$(this._menuItem.actions ?? []),
         },
         mapTo: ({label, icon, checked, tooltip, disabled, actions}): WorkbenchMenuItemTransferable => prune({
           id: this._menuItem.id,
@@ -103,7 +103,7 @@ export class WorkbenchMenuItemProxy {
     this.accelerator = transferable.accelerator;
     this.disabled = remoteSubscriber$({relayId: this.id, property: 'disabled', initialValue: transferable.disabled});
     this.checked = remoteSubscriber$({relayId: this.id, property: 'checked', initialValue: transferable.checked});
-    this.actions = WorkbenchMenuItems.fromTransferable(transferable.actions);
+    this.actions = WorkbenchMenuItems.fromTransferable(transferable.actions ?? []);
     this.cssClass = transferable.cssClass;
     this.attributes = transferable.attributes;
     this.position = transferable.position;
@@ -130,7 +130,7 @@ export interface WorkbenchMenuItemTransferable {
   accelerator?: string[];
   disabled?: boolean;
   checked?: boolean;
-  actions: WorkbenchMenuItemTransferableLike[];
+  actions?: WorkbenchMenuItemTransferableLike[];
   cssClass?: string[];
   attributes?: {[name: string]: string};
   position?: WorkbenchMenuContributionPositionLike;

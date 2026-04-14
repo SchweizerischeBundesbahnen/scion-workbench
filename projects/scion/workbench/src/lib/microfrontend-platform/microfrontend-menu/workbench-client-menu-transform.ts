@@ -102,7 +102,7 @@ export namespace SciMenuItems {
             accelerator: menuItem.accelerator,
             disabled: toLazyObservable(menuItem.disabled, {injector}),
             checked: toLazyObservable(menuItem.checked, {injector}),
-            actions: SciMenuItems.toWorkbenchMenuItems(menuItem.actions, {injector}),
+            actions: SciMenuItems.toWorkbenchMenuItems(menuItem.actions ?? [], {injector}),
             cssClass: menuItem.cssClass,
             attributes: menuItem.attributes,
             position: menuItem.position,
