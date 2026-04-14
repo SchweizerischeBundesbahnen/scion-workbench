@@ -9,7 +9,7 @@
  */
 
 import {Component, effect, ElementRef, HostListener, inject, NgZone, Provider, signal, untracked, viewChild} from '@angular/core';
-import {BehaviorSubject, fromEvent} from 'rxjs';
+import {BehaviorSubject, fromEvent, noop} from 'rxjs';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {AsyncPipe, NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog.model';
@@ -26,6 +26,8 @@ import {filter, map, startWith, takeUntil} from 'rxjs/operators';
 import {fromMutation$} from '@scion/toolkit/observable';
 import {trackFocus} from '../focus/workbench-focus-tracker.service';
 import {setStyle} from '../common/dom.util';
+import {contributeMenu, SciToolbarFactory} from '@scion/sci-components/menu';
+import {WorkbenchMenuContextKeys} from '../menu/workbench-menu-context-provider';
 
 /**
  * Renders the content of a workbench dialog.
@@ -94,12 +96,49 @@ export class WorkbenchDialogComponent {
     this.autoFocus();
 
     trackFocus(this._host, this.dialog);
+
+    contributeMenu({location: 'toolbar:workbench.dialog.toolbar', position: 'end'}, toolbar => {
+      this.contributeToolbarAdditionsMenu(toolbar);
+      this.contributeCloseButton(toolbar);
+    }, {requiredContext: new Map().set(WorkbenchMenuContextKeys.ViewId, undefined)}); // clear view constraint to contribute to parts with and without views
+
+    // TODO [menu] only for illustration purpose
+    contributeMenu('menu:workbench.dialog.toolbar', menu => menu
+      .addMenuItem('Settings...', noop)
+      .addGroup(group => group
+        .addMenuItem({label: 'Auto Save', checked: true, onSelect: noop})
+        .addMenuItem({label: 'Reset', onSelect: noop}),
+      ),
+    );
   }
 
   private setDialogOffset(): void {
     const stackPosition = this.dialog.getPositionInDialogStack();
     this.transformTranslateX.set(stackPosition * 10);
     this.transformTranslateY.set(stackPosition * 10);
+  }
+
+  /**
+   * Contributes a menu for the application to contribute to the dialog toolbar m.
+   *
+   * Public contribution point: 'menu:workbench.dialog.toolbar'
+   */
+  private contributeToolbarAdditionsMenu(toolbar: SciToolbarFactory): void {
+    toolbar.addMenu({name: 'menu:workbench.dialog.toolbar', icon: 'more_vert', visualMenuHint: false}, menu => menu);
+  }
+
+  private contributeCloseButton(toolbar: SciToolbarFactory): void {
+    if (this.dialog.closable()) {
+      // tabindex="-1"
+      toolbar.addToolbarItem({
+        icon: 'close', // TODO [menu] icon ligature: workbench.close
+        tooltip: '%scion.workbench.close.tooltip',
+        cssClass: 'e2e-close',
+        onSelect: () => {
+          this.dialog.close();
+        },
+      });
+    }
   }
 
   /**

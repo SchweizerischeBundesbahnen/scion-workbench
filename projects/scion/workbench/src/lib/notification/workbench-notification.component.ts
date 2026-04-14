@@ -20,7 +20,7 @@ import {observeIn, subscribeIn} from '@scion/toolkit/operators';
 import {filter} from 'rxjs/operators';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
 import {contributeMenu, SciToolbarComponent, SciToolbarFactory} from '@scion/sci-components/menu';
-import {WorkbenchMenuContextKeys} from '@scion/workbench';
+import {WorkbenchMenuContextKeys} from '../menu/workbench-menu-context-provider';
 
 /**
  * Renders the content of a workbench notification.
