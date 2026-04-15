@@ -16,7 +16,7 @@ import {dimension} from '@scion/components/dimension';
 import {EMPTY, fromEvent, mergeMap, of, pairwise, withLatestFrom} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {SciTextPipe, text} from '@scion/sci-components/text';
-import {contributeMenu, SciMenuFactory, SciToolbarComponent, SciToolbarFactory} from '@scion/sci-components/menu';
+import {contributeMenu, SciMenuFactory, SciToolbarComponent, SciToolbarFactory, SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
 import {ViewListToolbarIconComponent} from '../view-list-toolbar-icon/view-list-toolbar-icon.component';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {PART_CONTEXT_VIEW_ID, WorkbenchMenuContextKeys} from '../../menu/workbench-menu-context-provider';
@@ -54,9 +54,15 @@ export class PartBarComponent {
     this.installActivityMinimizer();
 
     contributeMenu({location: 'toolbar:workbench.part.toolbar', position: 'end'}, toolbar => {
-      this.contributeViewListMenu(toolbar);
+      this.contributeViewListMenuButton(toolbar);
       this.contributeToolbarAdditionsMenu(toolbar);
       this.contributeMinimizeButton(toolbar);
+    }, {requiredContext: new Map().set(WorkbenchMenuContextKeys.ViewId, undefined)}); // clear view constraint to contribute to parts with and without views
+
+    // Contribute viewlist menu items via separate contribution to scope its reactive context, i.e., to not re-create other menu items when views are added, removed, or scrolled.
+    contributeMenu('menu:workbench.part.toolbar:viewlist', menu => {
+      menu.addGroup(group => this.contributeViewMenuItems(group, this.part.views().filter(view => !view.scrolledIntoView())));
+      menu.addGroup(group => this.contributeViewMenuItems(group, this.part.views().filter(view => view.scrolledIntoView())));
     }, {requiredContext: new Map().set(WorkbenchMenuContextKeys.ViewId, undefined)}); // clear view constraint to contribute to parts with and without views
   }
 
@@ -114,44 +120,38 @@ export class PartBarComponent {
     toolbar.addMenu({name: 'menu:workbench.part.toolbar', icon: 'more_vert', visualMenuHint: false}, menu => menu);
   }
 
-  private contributeViewListMenu(toolbar: SciToolbarFactory): void {
-    const viewListMenuDescriptor = {
+  private contributeViewListMenuButton(toolbar: SciToolbarFactory): void {
+    toolbar.addMenu({
+      name: 'menu:workbench.part.toolbar:viewlist',
       icon: ViewListToolbarIconComponent,
       tooltip: '%scion.workbench.show_open_tabs.tooltip',
       visualMenuHint: false,
-      menu: {
-        filter: {notFoundText: '%scion.workbench.no_views.message'}, maxHeight: '300px',
-      },
-    };
+      menu: {filter: {notFoundText: '%scion.workbench.no_views.message'}, maxHeight: '300px'},
+    } satisfies SciToolbarMenuDescriptor, menu => menu);
+  }
 
-    toolbar.addMenu(viewListMenuDescriptor, menu => menu
-      .addGroup(group => addViewMenuItems(group, this.part.views().filter(view => !view.scrolledIntoView())))
-      .addGroup(group => addViewMenuItems(group, this.part.views().filter(view => view.scrolledIntoView()))),
-    );
+  private contributeViewMenuItems(group: SciMenuFactory, views: WorkbenchView[]): void {
+    for (const view of views) {
+      const title = untracked(() => text(view.title));
+      const heading = untracked(() => text(view.heading));
 
-    function addViewMenuItems(group: SciMenuFactory, views: WorkbenchView[]): void {
-      for (const view of views) {
-        const title = untracked(() => text(view.title));
-        const heading = untracked(() => text(view.heading));
-
-        group.addMenuItem({
-          label: computed(() => title() || ''),
-          tooltip: computed(() => join([title(), heading()], {delimiter: '\n'})),
-          actions: actions => {
-            if (view.isClosable()) {
-              actions.addToolbarItem({
-                icon: 'scion.close',
-                tooltip: '%scion.workbench.close.tooltip',
-                cssClass: 'e2e-close',
-                onSelect: () => void view.close(),
-              });
-            }
-          },
-          checked: view.active,
-          disabled: view.active,
-          onSelect: () => void view.activate(),
-        });
-      }
+      group.addMenuItem({
+        label: computed(() => title() || ''),
+        tooltip: computed(() => join([title(), heading()], {delimiter: '\n'})),
+        actions: actions => {
+          if (view.isClosable()) {
+            actions.addToolbarItem({
+              icon: 'scion.close',
+              tooltip: '%scion.workbench.close.tooltip',
+              cssClass: 'e2e-close',
+              onSelect: () => void view.close(),
+            });
+          }
+        },
+        checked: view.active,
+        disabled: view.active,
+        onSelect: () => void view.activate(),
+      });
     }
   }
 
