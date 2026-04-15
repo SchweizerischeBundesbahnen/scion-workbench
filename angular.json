@@ -417,7 +417,7 @@
             "development": {
               "buildTarget": "workbench-testing-app:build:development",
               "headers": {
-                "Content-Security-Policy": "default-src 'self'; connect-src 'self' blob: localhost:* *.vercel.app; frame-src 'self' localhost:* *.vercel.app; font-src 'self' https://fonts.gstatic.com; style-src 'self' https://fonts.googleapis.com 'nonce-STATIC_NONCE'; script-src 'self' 'nonce-STATIC_NONCE';"
+                "Content-Security-Policy": "default-src 'self'; connect-src 'self' blob: localhost:* *.vercel.app; frame-src 'self' localhost:* *.vercel.app; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net/gh/SchweizerischeBundesbahnen/ https://dev.iconly.io/; style-src 'self' https://fonts.googleapis.com https://dev.iconly.io/ 'nonce-STATIC_NONCE'; script-src 'self' 'nonce-STATIC_NONCE';"
               }
             },
             "development-basehref": {
@@ -598,7 +598,7 @@
             "development": {
               "buildTarget": "workbench-client-testing-app:build:development",
               "headers": {
-                "Content-Security-Policy": "default-src 'self'; connect-src 'self' blob: localhost:*; frame-src 'self' localhost:*; font-src 'self' https://fonts.gstatic.com; style-src 'self' https://fonts.googleapis.com 'nonce-STATIC_NONCE'; script-src 'self' 'nonce-STATIC_NONCE'; frame-ancestors localhost:4200"
+                "Content-Security-Policy": "default-src 'self'; connect-src 'self' blob: localhost:*; frame-src 'self' localhost:*; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net/gh/SchweizerischeBundesbahnen/ https://dev.iconly.io/; style-src 'self' https://fonts.googleapis.com https://dev.iconly.io/ 'nonce-STATIC_NONCE'; script-src 'self' 'nonce-STATIC_NONCE'; frame-ancestors localhost:4200"
               }
             }
           },
