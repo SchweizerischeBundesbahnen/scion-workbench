@@ -21,6 +21,7 @@ import {createDestroyableInjector} from '../../common/injector.util';
 import {NgTemplateOutlet} from '@angular/common';
 import {WorkbenchMenuItem, WorkbenchViewMenuItemFn} from '../../workbench.model';
 import {WORKBENCH_VIEW_CONTEXT} from '../../view/workbench-view-context.provider';
+import {WorkbenchMenuContextKeys} from '../../menu/workbench-menu-context-provider';
 
 /**
  * Provides the contextmenu of a view.
@@ -191,6 +192,7 @@ export class WorkbenchViewContextMenuService {
     if (config) {
       group.addMenuItem({
         label: '%scion.workbench.close_tabs_to_the_right.action',
+        accelerator: config.accelerator,
         cssClass: config.cssClass ?? 'e2e-close-right-tabs',
         disabled: view.last,
         onSelect: () => void view.close('views-to-the-right'),
@@ -202,6 +204,7 @@ export class WorkbenchViewContextMenuService {
     if (config) {
       group.addMenuItem({
         label: '%scion.workbench.close_tabs_to_the_left.action',
+        accelerator: config.accelerator,
         cssClass: config.cssClass ?? 'e2e-close-left-tabs',
         disabled: view.first,
         onSelect: () => void view.close('views-to-the-left'),
@@ -225,6 +228,7 @@ export class WorkbenchViewContextMenuService {
     if (config) {
       group.addMenuItem({
         label: '%scion.workbench.move_tab_to_the_left.action',
+        accelerator: config.accelerator,
         cssClass: config.cssClass ?? 'e2e-move-left',
         disabled: computed(() => view.first() && view.last()),
         onSelect: () => view.move(view.part().id, {region: 'west'}),
@@ -236,6 +240,7 @@ export class WorkbenchViewContextMenuService {
     if (config) {
       group.addMenuItem({
         label: '%scion.workbench.move_tab_up.action',
+        accelerator: config.accelerator,
         cssClass: config.cssClass ?? 'e2e-move-up',
         disabled: computed(() => view.first() && view.last()),
         onSelect: () => view.move(view.part().id, {region: 'north'}),
@@ -247,6 +252,7 @@ export class WorkbenchViewContextMenuService {
     if (config) {
       group.addMenuItem({
         label: '%scion.workbench.move_tab_down.action',
+        accelerator: config.accelerator,
         cssClass: config.cssClass ?? 'e2e-move-down',
         disabled: computed(() => view.first() && view.last()),
         onSelect: () => view.move(view.part().id, {region: 'south'}),
@@ -261,6 +267,7 @@ export class WorkbenchViewContextMenuService {
 
     group.addMenuItem({
       label: '%scion.workbench.move_tab_to_new_window.action',
+      accelerator: config.accelerator,
       cssClass: config.cssClass ?? 'e2e-move-to-new-window',
       onSelect: () => view.move('new-window'),
     });
