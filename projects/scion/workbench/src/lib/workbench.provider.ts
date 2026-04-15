@@ -23,7 +23,7 @@ import {provideLocationPatch} from './routing/ɵlocation';
 import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
 import {ViewTabDragImageRenderer} from './view-dnd/view-tab-drag-image-renderer.service';
 import {provideTextProviders} from './text/text-providers';
-import {provideIconProviders} from './icon/icon-providers';
+import {provideIconProvider} from '@scion/sci-components/icon';
 import {provideWorkbenchViewContext} from './view/workbench-view-context.provider';
 import {provideWorkbenchPartContext} from './part/workbench-part-context.provider';
 import {provideWorkbenchDialogContext} from './dialog/workbench-dialog-context.provider';
@@ -138,7 +138,7 @@ export function provideWorkbench(config?: WorkbenchConfig): EnvironmentProviders
     provideEnvironmentInitializer(() => inject(WorkbenchUrlObserver)),
     provideEnvironmentInitializer(() => rejectIfNotRootEnvironment()),
     provideTextProviders(config),
-    provideIconProviders(config),
+    provideIconProvider(config.iconProvider),
     provideLogging(config),
     provideLocationPatch(),
     provideWorkbenchPartContext(),

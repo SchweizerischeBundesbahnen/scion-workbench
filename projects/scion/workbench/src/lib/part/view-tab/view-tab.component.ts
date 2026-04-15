@@ -20,7 +20,7 @@ import {WorkbenchView} from '../../view/workbench-view.model';
 import {boundingClientRect} from '@scion/components/dimension';
 import {UUID} from '@scion/toolkit/uuid';
 import {SciTextPipe} from '@scion/sci-components/text';
-import {IconComponent} from '../../icon/icon.component';
+import {SciIconComponent} from '@scion/sci-components/icon';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {WorkbenchViewContextMenuService} from '../view-context-menu/workbench-view-context-menu.service';
 
@@ -36,7 +36,7 @@ import {WorkbenchViewContextMenuService} from '../view-context-menu/workbench-vi
   imports: [
     CdkPortalOutlet,
     SciTextPipe,
-    IconComponent,
+    SciIconComponent,
   ],
   host: {
     '[attr.data-viewid]': 'view().id',

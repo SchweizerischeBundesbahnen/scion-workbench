@@ -615,12 +615,13 @@ export class AppComponent implements DoCheck {
     // Contribute menu item to show view info.
     contributeMenu('menu:workbench.view.contextmenu', menu => {
       const view = inject(WorkbenchView);
+      const workbenchDialogService = inject(WorkbenchDialogService);
 
       menu.addMenuItem({
         label: 'Show View Info',
         cssClass: 'e2e-show-view-info',
         accelerator: ['F1'],
-        onSelect: () => void inject(WorkbenchDialogService).open(ViewInfoDialogComponent, {
+        onSelect: () => void workbenchDialogService.open(ViewInfoDialogComponent, {
           inputs: {view},
           modality: 'application', // to open view info of inactive views
           cssClass: 'e2e-view-info',

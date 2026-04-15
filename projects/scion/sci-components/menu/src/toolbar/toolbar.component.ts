@@ -6,6 +6,9 @@ import {ɵSciMenuService} from '../ɵmenu.service';
 import {coerceSignal, MaybeArray} from '@scion/sci-components/common';
 import {Objects} from '@scion/toolkit/util';
 
+/**
+ * TODO [menu]: Explain how to size the toolbar. (height can be set; icon size by setting a CSS variable)
+ */
 @Component({
   selector: 'sci-toolbar',
   templateUrl: './toolbar.component.html',

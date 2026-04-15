@@ -2,7 +2,8 @@
 @if (group(); as group) {
   @if (group.collapsible) {
     <button class="group-header" (click)="onGroupToggle()" (mouseenter)="onMenuItemMouseEnter(null)">
-      <span class="icon material-symbols-rounded" translate="no">{{isGroupExpanded() ? 'keyboard_arrow_down' : 'chevron_right'}}</span>
+      <!-- TODO [menu] use SCION icon -->
+      <sci-icon [icon]="isGroupExpanded() ? 'keyboard_arrow_down' : 'chevron_right'"/>
       <span class="label">{{group.label}}</span>
     </button>
   } @else if (group.label) {
@@ -15,7 +16,7 @@
   <!-- Filter field -->
   @if (filter) {
     <div class="filter">
-      <span class="icon material-symbols-rounded filter" translate="no">search</span>
+      <sci-icon icon="scion.search"/>
       @let message = filter.placeholder?.() ?? '%scion.components.menu.type_to_filter.action';
       <sci-menu-filter (textChange)="onFilterChange($event)" [placeholder]="(message | sciText)()"/>
     </div>
@@ -46,9 +47,10 @@
                   (click)="onSelect(menuItem)">
             @if (hasGlyphArea()) {
               @if (menuItem.checked !== undefined) {
-                <span class="icon material-symbols-rounded checkmark" translate="no">{{menuItem.checked() ? 'check' : ''}}</span>
+                <!-- TODO [menu] use SCION icon -->
+                <sci-icon [icon]="menuItem.checked() ? 'check' : ''"/>
               } @else if (menuItem.iconLigature) {
-                <span class="icon material-symbols-rounded" translate="no">{{menuItem.iconLigature()}}</span>
+                <sci-icon [icon]="menuItem.iconLigature()"/>
               } @else if (menuItem.iconComponent) {
                 <span class="icon">
                   <ng-container *sciComponentOutlet="menuItem.iconComponent"/>
@@ -67,12 +69,15 @@
                 </span>
               }
 
-              @if (menuItem.accelerator?.length) {
+              @let actions = menuItem.actions;
+              @let hasActionToolbar = !disabled && actions?.length;
+
+              <!-- Display accelerator only if no actions toolbar. -->
+              @if (menuItem.accelerator?.length && !hasActionToolbar) {
                 <span class="accelerator">{{menuItem.accelerator | sciFormatAccelerator}}</span>
               }
 
-              @let actions = menuItem.actions;
-              @if (!disabled && actions?.length) {
+              @if (hasActionToolbar) {
                 <sci-toolbar-group [menuItems]="actions!"
                                    [viewContainerRef]="popoverAnchor()"
                                    (menuOpen)="onActionToolbarMenuOpen($event)"
@@ -92,7 +97,7 @@
                   #element>
             @if (hasGlyphArea()) {
               @if (menuItem.iconLigature) {
-                <span class="icon material-symbols-rounded" translate="no">{{menuItem.iconLigature()}}</span>
+                <sci-icon [icon]="menuItem.iconLigature()"/>
               } @else if (menuItem.iconComponent) {
                 <span class="icon">
                   <ng-container *sciComponentOutlet="menuItem.iconComponent"/>
@@ -109,7 +114,8 @@
                   <ng-container *sciComponentOutlet="menuItem.labelComponent"/>
                 </span>
               }
-              <span class="icon material-symbols-rounded sub-menu-chevron" translate="no">arrow_right</span>
+              <!-- TODO [menu] use SCION icon -->
+              <sci-icon icon="arrow_right"/>
             </div>
           </button>
         }

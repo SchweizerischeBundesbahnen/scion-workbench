@@ -68,6 +68,9 @@
           "@scion/sci-components/text": [
             "./projects/scion/sci-components/text/src/public_api",
           ],
+          "@scion/sci-components/icon": [
+            "./projects/scion/sci-components/icon/src/public_api",
+          ],
           "@scion/sci-components/common": [
             "./projects/scion/sci-components/common/src/public_api",
           ],

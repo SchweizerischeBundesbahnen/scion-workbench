@@ -5,9 +5,10 @@
   font-size: 14px;
   gap: .125em;
 
-  > wb-icon.menu-down {
+  > sci-icon.menu-down {
     flex: none;
     line-height: .75;
+    font-size: 1em;
   }
 
   > span.count {

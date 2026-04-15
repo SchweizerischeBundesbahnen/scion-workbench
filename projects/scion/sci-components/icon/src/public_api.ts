@@ -9,11 +9,10 @@
  */
 
 /*
- * Secondary entrypoint: '@scion/components/text'
+ * Secondary entrypoint: '@scion/components/icon'
  *
  * @see https://github.com/ng-packagr/ng-packagr/blob/master/docs/secondary-entrypoints.md
  */
-export {type SciTextProviderFn, type Translatable} from './text-provider.model';
-export {provideTextProvider} from './text.provider';
-export {SciTextPipe} from './text.pipe';
-export {text} from './text';
+export {type SciIconProviderFn} from './icon-provider.model';
+export {SciIconComponent} from './icon.component';
+export {provideIconProvider} from './icon.provider';

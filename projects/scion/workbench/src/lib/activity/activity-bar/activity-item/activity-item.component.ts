@@ -11,7 +11,7 @@
 import {Component, computed, inject, input, Signal, untracked} from '@angular/core';
 import {MActivity} from '../../workbench-activity.model';
 import {ɵWorkbenchRouter} from '../../../routing/ɵworkbench-router.service';
-import {IconComponent} from '../../../icon/icon.component';
+import {SciIconComponent} from '@scion/sci-components/icon';
 import {text} from '@scion/sci-components/text';
 import {WorkbenchLayoutService} from '../../../layout/workbench-layout.service';
 import {isPartId, isViewId} from '../../../workbench.identifiers';
@@ -25,7 +25,7 @@ import {WorkbenchFocusMonitor} from '../../../focus/workbench-focus-tracker.serv
   templateUrl: './activity-item.component.html',
   styleUrls: ['./activity-item.component.scss'],
   imports: [
-    IconComponent,
+    SciIconComponent,
   ],
   host: {
     '[attr.data-active]': `active() ? '' : null`,

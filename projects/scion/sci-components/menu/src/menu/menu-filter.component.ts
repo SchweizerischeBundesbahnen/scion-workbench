@@ -1,5 +1,7 @@
 import {ChangeDetectionStrategy, Component, ElementRef, input, model, viewChild} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {SciTextPipe} from '@scion/sci-components/text';
+import {SciIconComponent} from '@scion/sci-components/icon';
 
 @Component({
   selector: 'sci-menu-filter',
@@ -9,6 +11,8 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
   imports: [
     ReactiveFormsModule,
     FormsModule,
+    SciTextPipe,
+    SciIconComponent,
   ],
 })
 export class MenuFilterComponent {
@@ -23,4 +27,3 @@ export class MenuFilterComponent {
     this._inputField().nativeElement.focus();
   }
 }
-  

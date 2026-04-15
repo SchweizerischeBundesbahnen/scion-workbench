@@ -1,4 +1,4 @@
-import {afterRenderEffect, ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, inject, input, linkedSignal, signal, Signal, untracked, viewChild, ViewContainerRef} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, inject, input, linkedSignal, signal, Signal, untracked, viewChild, ViewContainerRef} from '@angular/core';
 import {FormatAcceleratorPipe} from './accelerator-format.pipe';
 import {MenuItemGroupComponent} from './menu-group.component';
 import {MenuFilterComponent} from './menu-filter.component';
@@ -10,10 +10,12 @@ import {ɵSciMenuService} from '../ɵmenu.service';
 import {SciToolGroupComponent} from '../toolbar/toolbar-group.component';
 import {NULL_MENU_CONTRIBUTIONS} from '../menu-contribution.model';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {concat, fromEvent, map, NEVER, of, switchMap, timer} from 'rxjs';
+import {concat, fromEvent, map, NEVER, of, switchMap, take, timer} from 'rxjs';
 import {toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {SciTextPipe, Translatable} from '@scion/sci-components/text';
 import {RequireOne, SciAttributesDirective, SciComponentOutletDirective} from '@scion/sci-components/common';
+import {SciIconComponent} from '@scion/sci-components/icon';
+import {fromResize$} from '@scion/toolkit/observable';
 
 /**
  * Represents a menu or a group of menu items.
@@ -36,6 +38,7 @@ import {RequireOne, SciAttributesDirective, SciComponentOutletDirective} from '@
     SciTextPipe,
     SciComponentOutletDirective,
     SciAttributesDirective,
+    SciIconComponent,
   ],
   providers: [
     MenuFilter,
@@ -53,6 +56,7 @@ import {RequireOne, SciAttributesDirective, SciComponentOutletDirective} from '@
 export class MenuComponent {
 
   public readonly type = input.required<'menu' | 'group'>();
+  // TODO [menu] Can menu items change? Before SciMenuOpener, this was possible. SciMenuOpener, however, always opens a new menu.
   public readonly menuItems = input.required<Array<SciMenuItem | SciMenu | SciMenuGroup>>();
   public readonly disabled = input<boolean>();
   public readonly filter = input<{placeholder?: Signal<Translatable>; notFoundText?: Signal<Translatable>}>();
@@ -105,12 +109,12 @@ export class MenuComponent {
   });
 
   constructor() {
-    // Maintain stable width when expanding/collapsing groups or hovering menu item when displaying the actions toolbar.
-    afterRenderEffect(() => {
-      if (this.menuItems().length) { // capture initial width only when having menu items.
+    // Maintain stable width when expanding/collapsing groups or hovering menu item with an actions toolbar.
+    fromResize$(inject(ElementRef).nativeElement, {box: 'border-box'})
+      .pipe(take(1))
+      .subscribe(() => {
         this.size.update(size => ({...size, width: `${this._host.getBoundingClientRect().width}px`}));
-      }
-    });
+      });
 
     // Close action menu when this component is re-used.
     effect(() => {

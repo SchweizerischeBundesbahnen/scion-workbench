@@ -4,6 +4,7 @@ import {ɵSciMenuService} from '../ɵmenu.service';
 import {MaybeSignal, RequireOne, SciAttributesDirective, SciComponentOutletDirective} from '@scion/sci-components/common';
 import {Translatable} from '@scion/sci-components/text';
 import {SciToolbarControlPipe} from './toolbar-control.directive';
+import {SciIconComponent} from '@scion/sci-components/icon';
 
 @Component({
   selector: 'sci-toolbar-group',
@@ -14,6 +15,7 @@ import {SciToolbarControlPipe} from './toolbar-control.directive';
     SciComponentOutletDirective,
     SciAttributesDirective,
     SciToolbarControlPipe,
+    SciIconComponent,
   ],
 })
 export class SciToolGroupComponent {

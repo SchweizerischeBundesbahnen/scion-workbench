@@ -140,7 +140,7 @@ export class PartBarComponent {
           actions: actions => {
             if (view.isClosable()) {
               actions.addToolbarItem({
-                icon: 'close', // TODO [menu] icon ligature: workbench.close
+                icon: 'scion.close',
                 tooltip: '%scion.workbench.close.tooltip',
                 cssClass: 'e2e-close',
                 onSelect: () => void view.close(),
@@ -158,7 +158,7 @@ export class PartBarComponent {
   private contributeMinimizeButton(toolbar: SciToolbarFactory): void {
     if (this.part.canMinimize()) {
       toolbar.addToolbarItem({
-        icon: 'remove', // TODO [menu] icon ligature: workbench.minimize
+        icon: 'scion.minimize',
         tooltip: '%scion.workbench.minimize.tooltip',
         cssClass: 'e2e-minimize',
         onSelect: () => void this._router.navigate(layout => layout.toggleActivity(this.part.activity()!.id)),

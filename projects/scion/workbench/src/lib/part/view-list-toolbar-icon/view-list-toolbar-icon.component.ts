@@ -10,7 +10,7 @@
 
 import {Component, computed, inject, Signal} from '@angular/core';
 import {WorkbenchPart} from '../workbench-part.model';
-import {IconComponent} from '../../icon/icon.component';
+import {SciIconComponent} from '@scion/sci-components/icon';
 
 /**
  * Renders a chevron with the hidden view tab count.
@@ -22,7 +22,7 @@ import {IconComponent} from '../../icon/icon.component';
   templateUrl: './view-list-toolbar-icon.component.html',
   styleUrls: ['./view-list-toolbar-icon.component.scss'],
   imports: [
-    IconComponent,
+    SciIconComponent,
   ],
 })
 export class ViewListToolbarIconComponent {

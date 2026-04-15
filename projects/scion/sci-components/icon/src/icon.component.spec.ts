@@ -11,13 +11,13 @@
 import {Component, DebugElement, DestroyRef, EnvironmentProviders, inject, InjectionToken, Injector, input, makeEnvironmentProviders, signal, Type} from '@angular/core';
 import {ComponentFixture, ComponentFixtureAutoDetect, TestBed} from '@angular/core/testing';
 import {WORKBENCH_ICON_PROVIDER, WorkbenchIconProviderFn} from './workbench-icon-provider.model';
-import {IconComponent, NullIconComponent} from './icon.component';
+import {SciIconComponent, NullIconComponent} from './icon.component';
 import {By} from '@angular/platform-browser';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {NgClass} from '@angular/common';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {ComponentType} from '@angular/cdk/portal';
-import {WorkbenchIconComponent} from './workbench-icon-provider';
+import {WorkbenchIconComponent} from './scion-icon-provider';
 import {MaterialIconComponent} from './material-icon-provider';
 
 describe('IconComponent', () => {
@@ -198,7 +198,7 @@ describe('IconComponent', () => {
 
     const fixture = TestBed.createComponent(SpecRootComponent);
 
-    // Set CSS class on <wb-icon> component.
+    // Set CSS class on <sci-icon> component.
     fixture.componentInstance.clazz.set('host-attr-class');
     fixture.componentInstance.ngClazz.set('host-ng-class');
 
@@ -354,7 +354,7 @@ describe('Workbench Icon Provider', () => {
 
     // Render icon.
     const fixture = TestBed.createComponent(SpecRootComponent);
-    fixture.componentInstance.icon.set('workbench.close');
+    fixture.componentInstance.icon.set('scion.close');
     await fixture.whenStable();
 
     // Expect Material icon to be rendered.
@@ -429,7 +429,7 @@ function provideIconProvider(...iconProviders: WorkbenchIconProviderFn[]): Envir
 function expectIcon(fixture: ComponentFixture<unknown> | DebugElement, expected: {innerText: string; component?: ComponentType<unknown>; cssClass?: string[]}): void {
   const debugElement = fixture instanceof ComponentFixture ? fixture.debugElement : fixture;
 
-  const iconDebugElement = debugElement.query(By.css('wb-icon'));
+  const iconDebugElement = debugElement.query(By.css('sci-icon'));
   const iconHTMLElement = iconDebugElement.nativeElement as HTMLElement;
 
   // Expect to render icon.
@@ -438,11 +438,11 @@ function expectIcon(fixture: ComponentFixture<unknown> | DebugElement, expected:
   }
   expect(iconHTMLElement.innerText).toEqual(expected.innerText);
 
-  // Expect <wb-icon> to be a leaf element.
+  // Expect <sci-icon> to be a leaf element.
   expect(iconDebugElement.children).toHaveSize(0);
 
   // Expect to render single icon.
-  expect(debugElement.queryAll(By.css('wb-icon'))).toHaveSize(1);
+  expect(debugElement.queryAll(By.css('sci-icon'))).toHaveSize(1);
 
   // Expect icon to have specified CSS classes.
   if (expected.cssClass) {
@@ -452,8 +452,8 @@ function expectIcon(fixture: ComponentFixture<unknown> | DebugElement, expected:
 
 @Component({
   selector: 'spec-root',
-  template: '<wb-icon [icon]="icon()" [attr.class]="clazz()" [ngClass]="ngClazz()"/>',
-  imports: [IconComponent, NgClass],
+  template: '<sci-icon [icon]="icon()" [attr.class]="clazz()" [ngClass]="ngClazz()"/>',
+  imports: [SciIconComponent, NgClass],
 })
 class SpecRootComponent {
   public icon = signal<string | undefined>(undefined);

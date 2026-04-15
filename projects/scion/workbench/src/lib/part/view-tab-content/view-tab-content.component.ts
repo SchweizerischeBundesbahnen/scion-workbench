@@ -11,7 +11,7 @@
 import {Component, inject} from '@angular/core';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {SciTextPipe} from '@scion/sci-components/text';
-import {IconComponent} from '../../icon/icon.component';
+import {SciIconComponent} from '@scion/sci-components/icon';
 
 @Component({
   selector: 'wb-view-tab-content',
@@ -19,7 +19,7 @@ import {IconComponent} from '../../icon/icon.component';
   styleUrls: ['./view-tab-content.component.scss'],
   imports: [
     SciTextPipe,
-    IconComponent,
+    SciIconComponent,
   ],
 })
 export class ViewTabContentComponent {

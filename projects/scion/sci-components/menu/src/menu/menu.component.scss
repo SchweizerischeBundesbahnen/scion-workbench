@@ -6,7 +6,6 @@ $padding_label_left: 7.5px;
 $menu_item_gap: .25em;
 $font-size: 13px;
 $font-size-smaller: $font-size - 1px;
-$icon-size: 18px;
 
 /**
  * Displays ellipsis when text overflows.
@@ -55,7 +54,9 @@ $icon-size: 18px;
 }
 
 :host {
+  --sci-icon-size: 18px;
   --ɵsci-menu-padding-block: #{$padding_menu_block};
+
   display: grid;
   gap: $menu_item_gap .5em;
   align-items: center;
@@ -184,6 +185,7 @@ $icon-size: 18px;
     background-color: var(--sci-color-border);
     margin: 0 $padding_menu_item_inline .5em $padding_menu_item_inline;
   }
+
   div.message.no-items {
     grid-column: 1/-1;
     justify-self: center;
@@ -218,12 +220,20 @@ $icon-size: 18px;
     align-items: center;
     position: relative; // positioning context for actions toolbar
     box-sizing: border-box;
-    min-height: calc($icon-size + 2 * $padding_menu_item_block + 4px); // 2px for checked toolbar item plus 2px for toolbar item padding
+    min-height: calc(var(--sci-icon-size) + (2 * $padding_menu_item_block + 4px)); // 2px for checked toolbar item plus 2px for toolbar item padding plus 18px icon size
+
+    // Make icon components to have the same size as icons.
+    > span.icon {
+      display: inline-grid;
+      place-content: center;
+      height: var(--sci-icon-size);
+      width: var(--sci-icon-size);
+    }
 
     > div.content {
       display: flex;
       align-items: center;
-      gap: 2.5em;
+      gap: 2em;
       overflow: hidden; // to support ellipsis on label
 
       // Add left padding if no glyph area.
@@ -241,11 +251,6 @@ $icon-size: 18px;
         font-size: $font-size-smaller;
       }
 
-      // Display accelerator only if no toolbar
-      > span.accelerator:has(+ sci-toolbar-group.actions) {
-        display: none;
-      }
-
       > sci-toolbar-group.actions {
         flex: none;
         align-self: stretch;
@@ -258,31 +263,23 @@ $icon-size: 18px;
 
         // Hide actions toolbar while scrolling.
         @container style(--ɵmenu-scrolling: true) {
-          display: none;
+          visibility: hidden;
         }
       }
     }
 
     // TODO Why do we need that? Describe! Fix display of ellipsis when not hovering
     // Add padding-right to label if no actions toolbar, or the actions toolbar is not visible because not hovered
-    > div.content > span.label:last-child, &:not(:hover) > div.content > span.label:has(+ sci-toolbar-group.actions) {
-      padding-right: 2em;
-    }
+    //> div.content > span.label:last-child, &:not(:hover) > div.content > span.label:has(+ sci-toolbar-group.actions) {
+    //  padding-right: .5em;
+    //}
 
     &:not(:hover):not(.checked) > div.content > sci-toolbar-group.actions:not(.open) {
-      display: none;
+      visibility: hidden;
     }
   }
 
   span.label {
     @include ellipsis-on-overflow();
-  }
-
-  span.icon {
-    display: inline-grid;
-    place-content: center;
-    font-size: $icon-size;
-    height: 1em;
-    width: 1em;
   }
 }

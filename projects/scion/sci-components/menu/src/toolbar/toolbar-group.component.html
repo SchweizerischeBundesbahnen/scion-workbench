@@ -13,7 +13,7 @@
                 [sciAttributes]="menuItem.attributes"
                 (click)="onSelect(menuItem)">
           @if (menuItem.iconLigature) {
-            <span class="icon material-symbols-rounded" translate="no">{{menuItem.iconLigature()}}</span>
+            <sci-icon [icon]="menuItem.iconLigature()"/>
           } @else if (menuItem.iconComponent) {
             <span class="icon">
               <ng-container *sciComponentOutlet="menuItem.iconComponent"/>
@@ -41,7 +41,7 @@
               (click)="onSubMenuClick({menu: menuItem, element: element})"
               #element>
         @if (menuItem.iconLigature) {
-          <span class="icon material-symbols-rounded" translate="no">{{menuItem.iconLigature()}}</span>
+          <sci-icon [icon]="menuItem.iconLigature()"/>
         } @else if (menuItem.iconComponent) {
           <span class="icon">
             <ng-container *sciComponentOutlet="menuItem.iconComponent"/>

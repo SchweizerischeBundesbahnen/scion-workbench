@@ -21,19 +21,19 @@ $-default-icon-font-config: (
   // To keep the workbench configuration minimal for Angular projects deployed in the context root, we reference font files by
   // their root relative path. Consequently, applications deployed in a subdirectory require additional configuration depending
   // on whether the application is built with esbuild or webpack.
-  directory: '/fonts',
+  directory: 'https://cdn.jsdelivr.net/gh/SchweizerischeBundesbahnen/scion-workbench@21.0.0-beta.6/resources/scion-workbench-icons/fonts',
   filename: 'scion-workbench-icons',
   version: $-version,
 );
 
 /**
- * Installs icons used by the SCION Workbench as icon font named 'scion-workbench-icons'.
+ * Installs icons used by the SCION Workbench as icon font named 'scion-icons'.
  *
- * Icons can be referenced by ligature in HTML elements associated with the CSS class 'scion-workbench-icons'.
+ * Icons can be referenced by ligature in HTML elements associated with the CSS class 'scion-icons'.
  *
  * Example:
  * ```css
- * <span class="scion-workbench-icons">close</span>
+ * <span class="scion-icons">close</span>
  * ```
  */
 @mixin install-icon-font($config) {
@@ -43,19 +43,19 @@ $-default-icon-font-config: (
   $version: map.get($config, version);
 
   @font-face {
-    font-family: 'scion-workbench-icons';
+    font-family: 'scion-icons';
     src: url($path + '.ttf?' + $version) format('truetype'),
     url($path + '.woff?' + $version) format('woff'),
-    url($path + '.svg?' + $version + '#scion-workbench-icons') format('svg');
+    url($path + '.svg?' + $version + '#scion-icons') format('svg');
     font-weight: normal;
     font-style: normal;
     font-display: block;
   }
 
-  .scion-workbench-icons {
+  .scion-icons {
     /* use !important to prevent issues with browser extensions that change fonts */
-    font-family: 'scion-workbench-icons' !important;
-    speak: none;
+    font-family: 'scion-icons' !important;
+    speak: never;
     font-style: normal;
     font-weight: normal;
     font-variant: normal;
@@ -64,10 +64,6 @@ $-default-icon-font-config: (
 
     /* Enable Ligatures ================ */
     letter-spacing: 0;
-    -webkit-font-feature-settings: "liga";
-    -moz-font-feature-settings: "liga=1";
-    -moz-font-feature-settings: "liga";
-    -ms-font-feature-settings: "liga" 1;
     font-feature-settings: "liga";
     -webkit-font-variant-ligatures: discretionary-ligatures;
     font-variant-ligatures: discretionary-ligatures;

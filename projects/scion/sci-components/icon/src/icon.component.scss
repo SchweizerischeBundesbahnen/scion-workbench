@@ -1,0 +1,5 @@
+:host {
+  display: inline-grid;
+  place-content: center;
+  font-size: var(--sci-icon-size, 1em); // Unset icon size, for example, Material sets the font size to 24px.
+}

@@ -1,2 +1,4 @@
 <input type="text" autocomplete="off" [attr.placeholder]="placeholder()" [(ngModel)]="text" #input>
-<button class="clear" (click)="onClear()"><span class="icon material-symbols-rounded">clear</span></button>
+<button class="clear" (click)="onClear()" [title]="('%scion.workbench.clear.tooltip' | sciText)()" tabindex="-1">
+  <sci-icon icon="scion.clear"/>
+</button>

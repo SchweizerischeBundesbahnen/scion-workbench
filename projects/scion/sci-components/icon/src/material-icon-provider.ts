@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2025 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,18 +8,19 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {WorkbenchIconDescriptor, WorkbenchIconProviderFn} from './workbench-icon-provider.model';
-import {Component, input} from '@angular/core';
+import {Component, input, inputBinding, signal} from '@angular/core';
+import {SciIconProviderFn} from './icon-provider.model';
+import {SciComponentDescriptor} from '@scion/sci-components/common';
 
 /**
- * Provides Material icons for non-workbench icons.
+ * Provides Material icons for non-scion icons.
  */
-export const materialIconProvider: WorkbenchIconProviderFn = (ligature: string): WorkbenchIconDescriptor | undefined => {
-  if (ligature.startsWith('workbench.')) {
-    return undefined; // use default workbench icon
+export const materialIconProvider: SciIconProviderFn = (ligature: string): SciComponentDescriptor | undefined => {
+  if (ligature.startsWith('scion.')) {
+    return undefined; // delegate to next provider
   }
 
-  return {component: MaterialIconComponent, inputs: {ligature}};
+  return {component: MaterialIconComponent, bindings: [inputBinding('ligature', signal(ligature))]};
 };
 
 /**
@@ -34,7 +35,7 @@ export const materialIconProvider: WorkbenchIconProviderFn = (ligature: string):
  * - https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Round|Material+Icons+Sharp
  */
 @Component({
-  selector: 'wb-material-icon',
+  selector: 'sci-material-icon',
   template: '{{ligature()}}',
   host: {
     '[class.material-icons]': 'true',

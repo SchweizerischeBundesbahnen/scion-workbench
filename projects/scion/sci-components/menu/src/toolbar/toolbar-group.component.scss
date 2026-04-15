@@ -1,7 +1,8 @@
 $padding_menu_item: .125em .75em;
-$icon-size: 18px;
 
 :host {
+  --sci-icon-size: 18px;
+
   display: flex;
   align-items: stretch;
   gap: 2px;
@@ -44,12 +45,12 @@ $icon-size: 18px;
       aspect-ratio: 1 / 1;
     }
 
+    // Make icon components to have the same size as icons.
     > span.icon {
       display: inline-grid;
       place-content: center;
-      font-size: $icon-size;
-      height: 1em;
-      width: 1em;
+      height: var(--sci-icon-size);
+      width: var(--sci-icon-size);
     }
 
     // Display visual marker to indicate menu.

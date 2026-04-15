@@ -5,6 +5,10 @@
     all: unset;
     flex: auto;
 
+    &::placeholder {
+      color: var(--sci-color-gray-400);
+    }
+
     &:placeholder-shown + button.clear {
       visibility: hidden;
     }
@@ -36,14 +40,6 @@
 
     &:focus-visible {
       outline: var(--sci-workbench-button-outline-width-focus) solid var(--sci-color-accent);
-    }
-
-    > span.icon {
-      display: inline-grid;
-      place-content: center;
-      font-size: 14px;
-      height: 1em;
-      width: 1em;
     }
   }
 }

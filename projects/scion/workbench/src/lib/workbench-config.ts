@@ -16,7 +16,7 @@ import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform/microf
 import {WorkbenchPerspectives} from './perspective/workbench-perspective.model';
 import {WorkbenchStorage} from './storage/workbench-storage';
 import {SciTextProviderFn} from '@scion/sci-components/text';
-import {WorkbenchIconProviderFn} from './icon/workbench-icon-provider.model';
+import {SciIconProviderFn} from '@scion/sci-components/icon';
 import {WorkbenchLayoutFn} from './layout/workbench-layout';
 
 /**
@@ -96,21 +96,21 @@ export abstract class WorkbenchConfig {
    * ```
    *
    * The SCION Workbench uses the following icons:
-   * - `workbench.clear`: Clear button in input fields
-   * - `workbench.close`: Close button in views, dialogs and notifications
-   * - `workbench.dirty`: Visual indicator for view with unsaved content
-   * - `workbench.menu_down`: Menu button of drop down menus
-   * - `workbench.minimize`: Minimize button in docked parts
-   * - `workbench.pin`: Visual indicator for a pinned view
-   * - `workbench.search`: Visual indicator in search or filter fields
+   * - `scion.clear`: Clear button in input fields
+   * - `scion.close`: Close button in views, dialogs and notifications
+   * - `scion.dirty`: Visual indicator for view with unsaved content
+   * - `scion.menu_down`: Menu button of drop down menus
+   * - `scion.minimize`: Minimize button in docked parts
+   * - `scion.pin`: Visual indicator for a pinned view
+   * - `scion.search`: Visual indicator in search or filter fields
    *
-   * To not replace built-in workbench icons, the icon provider can return `undefined` for icons starting with the `workbench.` prefix.
+   * To not replace built-in workbench icons, the icon provider can return `undefined` for icons starting with the `scion.` prefix.
    *
    * The function can call `inject` to get any required dependencies.
    *
    * @see WorkbenchIconProviderFn
    */
-  public abstract iconProvider?: WorkbenchIconProviderFn;
+  public abstract iconProvider?: SciIconProviderFn;
 
   /**
    * Specifies the component to display in `<wb-workbench>` while the workbench is starting.
