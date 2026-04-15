@@ -31,10 +31,10 @@ export function provideTextProviders(config: WorkbenchConfig): EnvironmentProvid
  *
  * Register this provider as the first text provider, enabling change or translation of built-in workbench texts.
  */
-function applicationTextProvider(config: WorkbenchConfig): SciTextProviderFn {
+function applicationTextProvider(config: WorkbenchConfig): SciTextProviderFn | undefined {
   const appTextProvider = config.textProvider;
   if (!appTextProvider) {
-    return () => undefined;
+    return undefined;
   }
 
   return (key: string, params: {[name: string]: string}): MaybeSignal<string> | undefined => {
