@@ -272,10 +272,10 @@ export class WorkbenchViewContextMenuService {
   private createViewMenuContext(viewId: ViewId): Map<string, unknown> {
     const view = this._viewRegistry.get(viewId);
     return new Map()
-      .set('viewId', view.id)
-      .set('partId', view.part().id)
-      .set('peripheral', view.part().peripheral())
-      .set('mainArea', view.part().isInMainArea);
+      .set(WorkbenchMenuContextKeys.ViewId, view.id)
+      .set(WorkbenchMenuContextKeys.PartId, view.part().id)
+      .set(WorkbenchMenuContextKeys.Peripheral, view.part().peripheral())
+      .set(WorkbenchMenuContextKeys.MainArea, view.part().isInMainArea);
   }
 }
 

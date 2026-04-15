@@ -1,5 +1,5 @@
 import {WorkbenchMenuService} from './workbench-menu.service';
-import {WorkbenchMenu, WorkbenchMenuContributionLocation, WorkbenchMenuContributionLocationLike, WorkbenchMenuContributionOptions, WorkbenchMenuContributionPosition, WorkbenchMenuFactoryFn, WorkbenchMenuFactoryFnLike, WorkbenchMenuItemLike, WorkbenchMenuItemProxyLike, WorkbenchMenuItems, WorkbenchMenuItemTransferableLike, WorkbenchMenuOptions, WorkbenchMenuOrigin, WorkbenchMenuRef, WorkbenchMenuTransferable, WorkbenchToolbarContributionLocation, WorkbenchToolbarFactoryFn} from './workbench-client-menu.model';
+import {WorkbenchMenu, WorkbenchMenuContextKeys, WorkbenchMenuContributionLocation, WorkbenchMenuContributionLocationLike, WorkbenchMenuContributionOptions, WorkbenchMenuContributionPosition, WorkbenchMenuFactoryFn, WorkbenchMenuFactoryFnLike, WorkbenchMenuItemLike, WorkbenchMenuItemProxyLike, WorkbenchMenuItems, WorkbenchMenuItemTransferableLike, WorkbenchMenuOptions, WorkbenchMenuOrigin, WorkbenchMenuRef, WorkbenchMenuTransferable, WorkbenchToolbarContributionLocation, WorkbenchToolbarFactoryFn} from './workbench-client-menu.model';
 import {Disposable} from '../common/disposable';
 import {UUID} from '@scion/toolkit/uuid';
 import {Beans} from '@scion/toolkit/bean-manager';
@@ -147,22 +147,22 @@ export class ɵWorkbenchMenuService implements WorkbenchMenuService {
 function createEnvironmentContext(): Map<string, unknown> {
   const view = Beans.opt(WorkbenchView);
   if (view) {
-    return new Map<string, unknown>().set('viewId', view.id);
+    return new Map<string, unknown>().set(WorkbenchMenuContextKeys.ViewId, view.id);
   }
 
   const part = Beans.opt(WorkbenchPart);
   if (part) {
-    return new Map<string, unknown>().set('partId', part.id);
+    return new Map<string, unknown>().set(WorkbenchMenuContextKeys.PartId, part.id);
   }
 
   const dialog = Beans.opt(WorkbenchDialog);
   if (dialog) {
-    return new Map<string, unknown>().set('dialogId', dialog.id);
+    return new Map<string, unknown>().set(WorkbenchMenuContextKeys.DialogId, dialog.id);
   }
 
   const notification = Beans.opt(WorkbenchNotification);
   if (notification) {
-    return new Map<string, unknown>().set('notificationId', notification.id);
+    return new Map<string, unknown>().set(WorkbenchMenuContextKeys.NotificationId, notification.id);
   }
 
   return new Map();
