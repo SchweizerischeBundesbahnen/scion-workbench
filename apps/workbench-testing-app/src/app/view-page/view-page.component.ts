@@ -77,13 +77,14 @@ export default class ViewPageComponent {
 
     }
 
-    contributeMenu('toolbar:workbench.part.toolbar', toolbar => toolbar
+    contributeMenu('toolbar:view', toolbar => toolbar
       .addGroup(group => group
         .addGroup(group => group
           .addToolbarItem('home', onSelect)
           .addToolbarItem('favorite', onSelect)
           .addToolbarItem('train', onSelect),
-        ),
+        )
+        .addMenu({icon: 'more_vert', visualMenuHint: false, name: 'menu:workbench.part.toolbar'}, menu => menu)
       )
       .addGroup(group => group
         .addGroup(group => group
