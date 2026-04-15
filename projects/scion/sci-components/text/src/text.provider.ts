@@ -9,12 +9,16 @@
  */
 
 import {EnvironmentProviders, makeEnvironmentProviders} from '@angular/core';
-import {ɵSCI_TEXT_PROVIDER, SciTextProviderFn} from './text-provider.model';
+import {SciTextProviderFn} from './text-provider.model';
+import {SCI_TEXT_PROVIDER} from './text-providers';
 
 /**
  * Enables localization of texts used in SCION.
  *
  * A text provider is a function that returns the text for a translation key.
+ *
+ * Multiple text providers can be registered. Providers are called in registration order. If a provider does not provide the text,
+ * the next provider is called, and so on.
  *
  * The translation keys of built-in SCION texts start with the `scion.` prefix. To not localize built-in SCION texts, the text provider can return `undefined` instead.
  *
@@ -25,12 +29,12 @@ import {ɵSCI_TEXT_PROVIDER, SciTextProviderFn} from './text-provider.model';
  * @see SciTextProviderFn
  * @see text
  */
-export function provideTextProvider(textProviderFn: SciTextProviderFn): EnvironmentProviders {
-  return makeEnvironmentProviders([
+export function provideTextProvider(textProviderFn: SciTextProviderFn | undefined): EnvironmentProviders {
+  return makeEnvironmentProviders(textProviderFn ? [
     {
-      provide: ɵSCI_TEXT_PROVIDER,
+      provide: SCI_TEXT_PROVIDER,
       useValue: textProviderFn,
       multi: true,
     },
-  ]);
+  ] : []);
 }

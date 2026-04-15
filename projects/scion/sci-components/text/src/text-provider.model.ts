@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {InjectionToken} from '@angular/core';
 import {MaybeSignal} from '@scion/sci-components/common';
 
 /**
@@ -48,11 +47,3 @@ export type SciTextProviderFn = (key: string, params: {[name: string]: string}) 
  * @see provideTextProvider
  */
 export type Translatable = string | `%${string}`;
-
-/**
- * DI token for injecting text providers.
- *
- * Multiple text providers can be registered. Providers are called in registration order.
- * If a provider does not provide the text, the next provider is called, and so on.
- */
-export const ɵSCI_TEXT_PROVIDER = new InjectionToken<SciTextProviderFn[]>('SCI_TEXT_PROVIDER');

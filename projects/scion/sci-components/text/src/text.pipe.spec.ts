@@ -13,7 +13,8 @@ import {ComponentFixtureAutoDetect, TestBed} from '@angular/core/testing';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {Observable, Subscriber} from 'rxjs';
 import {SciTextPipe} from './text.pipe';
-import {ɵSCI_TEXT_PROVIDER, SciTextProviderFn} from './text-provider.model';
+import {SciTextProviderFn} from './text-provider.model';
+import {SCI_TEXT_PROVIDER} from './text-providers';
 
 describe('Text Pipe', () => {
 
@@ -162,7 +163,7 @@ describe('Text Pipe', () => {
 
 function provideTextProvider(textProvider: SciTextProviderFn): EnvironmentProviders {
   return makeEnvironmentProviders([{
-    provide: ɵSCI_TEXT_PROVIDER,
+    provide: SCI_TEXT_PROVIDER,
     useValue: textProvider,
     multi: true,
   }]);

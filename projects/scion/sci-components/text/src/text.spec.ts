@@ -13,7 +13,8 @@ import {TestBed} from '@angular/core/testing';
 import {text} from './text';
 import {Observable, Subscriber} from 'rxjs';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {ɵSCI_TEXT_PROVIDER, SciTextProviderFn} from './text-provider.model';
+import {SciTextProviderFn} from './text-provider.model';
+import {SCI_TEXT_PROVIDER} from './text-providers';
 
 describe('Text Provider', () => {
 
@@ -505,7 +506,7 @@ describe('Built-in Text Provider', () => {
 
 function provideTextProvider(...textProviders: SciTextProviderFn[]): EnvironmentProviders {
   return makeEnvironmentProviders(textProviders.map(textProvider => ({
-    provide: ɵSCI_TEXT_PROVIDER,
+    provide: SCI_TEXT_PROVIDER,
     useValue: textProvider,
     multi: true,
   })));
