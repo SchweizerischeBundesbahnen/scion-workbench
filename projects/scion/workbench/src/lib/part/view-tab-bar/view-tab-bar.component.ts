@@ -553,11 +553,13 @@ export class ViewTabBarComponent implements OnDestroy {
     const viewportClientSize = dimension(computed(() => this._viewportComponent().viewportClientElement));
     const zone = inject(NgZone);
 
-    // Detect resizing.
+    // Detect tabbar or tab size changes and adding/removal of tabs.
     effect(() => {
-      // Track viewport and viewport client sizes.
+      // Track tabbar size.
       viewportSize();
+      // Track tab sizes.
       viewportClientSize();
+
       untracked(() => this._viewportChange$.next());
     });
 
