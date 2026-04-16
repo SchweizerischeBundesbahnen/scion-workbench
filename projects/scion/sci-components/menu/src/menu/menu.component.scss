@@ -24,6 +24,8 @@ $font-size-smaller: $font-size - 1px;
   user-select: none;
   overflow: hidden;
   cursor: var(--sci-workbench-button-cursor);
+  box-sizing: border-box;
+  min-height: calc(var(--sci-icon-size) + (2 * $padding_menu_item_block + 4px)); // 2px for checked toolbar item plus 2px for toolbar item padding plus 18px icon size
 
   // Do not hover menu items while scrolling.
   @container not style(--ɵmenu-scrolling: true) {
@@ -219,8 +221,6 @@ $font-size-smaller: $font-size - 1px;
     grid-template-columns: subgrid;
     align-items: center;
     position: relative; // positioning context for actions toolbar
-    box-sizing: border-box;
-    min-height: calc(var(--sci-icon-size) + (2 * $padding_menu_item_block + 4px)); // 2px for checked toolbar item plus 2px for toolbar item padding plus 18px icon size
 
     // Make icon components to have the same size as icons.
     > span.icon {
@@ -243,6 +243,7 @@ $font-size-smaller: $font-size - 1px;
 
       > span.label {
         flex: auto;
+        padding-right: .5em;
       }
 
       > span.accelerator {

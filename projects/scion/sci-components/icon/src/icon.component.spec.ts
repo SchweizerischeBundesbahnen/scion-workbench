@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2025 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,17 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DebugElement, DestroyRef, EnvironmentProviders, inject, InjectionToken, Injector, input, makeEnvironmentProviders, signal, Type} from '@angular/core';
+import {Component, DebugElement, DestroyRef, inject, InjectionToken, Injector, input, signal, Type} from '@angular/core';
 import {ComponentFixture, ComponentFixtureAutoDetect, TestBed} from '@angular/core/testing';
-import {WORKBENCH_ICON_PROVIDER, WorkbenchIconProviderFn} from './workbench-icon-provider.model';
-import {SciIconComponent, NullIconComponent} from './icon.component';
+import {NullIconComponent, SciIconComponent} from './icon.component';
 import {By} from '@angular/platform-browser';
-import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {NgClass} from '@angular/common';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {ComponentType} from '@angular/cdk/portal';
-import {WorkbenchIconComponent} from './scion-icon-provider';
 import {MaterialIconComponent} from './material-icon-provider';
+import {provideIconProvider} from '@scion/sci-components/icon';
 
 describe('IconComponent', () => {
 
@@ -265,10 +262,8 @@ describe('IconComponent', () => {
   it('should support multiple icon providers', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideIconProvider(
-          icon => provider1[icon] && {component: provider1[icon], inputs: {provider: '1'}},
-          icon => provider2[icon] && {component: provider2[icon], inputs: {provider: '2'}},
-        ),
+        provideIconProvider(icon => provider1[icon] && {component: provider1[icon], inputs: {provider: '1'}}),
+        provideIconProvider(icon => provider2[icon] && {component: provider2[icon], inputs: {provider: '2'}}),
         {provide: ComponentFixtureAutoDetect, useValue: true},
       ],
     });
@@ -343,12 +338,12 @@ describe('IconComponent', () => {
   });
 });
 
-describe('Workbench Icon Provider', () => {
+describe('Built-in Icon Providers', () => {
 
-  it('should render Workbench icon', async () => {
+  it('should render SCION icon', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest(),
+        {provide: ComponentFixtureAutoDetect, useValue: true},
       ],
     });
 
@@ -357,14 +352,14 @@ describe('Workbench Icon Provider', () => {
     fixture.componentInstance.icon.set('scion.close');
     await fixture.whenStable();
 
-    // Expect Material icon to be rendered.
-    expectIcon(fixture, {component: WorkbenchIconComponent, innerText: 'close', cssClass: ['scion-workbench-icons']});
+    // Expect SCION icon to be rendered.
+    expectIcon(fixture, {component: SciIconComponent, innerText: 'close', cssClass: ['scion-icons']});
   });
 
   it('should render Material icon', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest(),
+        {provide: ComponentFixtureAutoDetect, useValue: true},
       ],
     });
 
@@ -390,9 +385,7 @@ describe('Workbench Icon Provider', () => {
   it('should render custom icon', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({
-          iconProvider: icon => ({component: SpecCustomIconComponent, inputs: {icon}}),
-        }),
+        provideIconProvider(icon => ({component: SpecCustomIconComponent, inputs: {icon}})),
       ],
     });
 
@@ -414,14 +407,6 @@ describe('Workbench Icon Provider', () => {
     expectIcon(fixture, {component: SpecCustomIconComponent, innerText: 'Custom Icon for "icon"', cssClass: ['custom-icon']});
   });
 });
-
-function provideIconProvider(...iconProviders: WorkbenchIconProviderFn[]): EnvironmentProviders {
-  return makeEnvironmentProviders(iconProviders.map(iconProvider => ({
-    provide: WORKBENCH_ICON_PROVIDER,
-    useValue: iconProvider,
-    multi: true,
-  })));
-}
 
 /**
  * Expects the specified icon to display.

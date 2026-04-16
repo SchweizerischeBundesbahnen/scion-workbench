@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationRef, ChangeDetectionStrategy, Component, ComponentRef, createComponent, DestroyRef, Directive, effect, ElementRef, EnvironmentInjector, inject, Injector, input, inputBinding, Renderer2, untracked} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ComponentRef, createComponent, DestroyRef, Directive, effect, ElementRef, EnvironmentInjector, inject, Injector, input, inputBinding, Renderer2, untracked} from '@angular/core';
 import {coerceSignal, SciAttributesDirective, SciComponentDescriptor} from '@scion/sci-components/common';
 import {IconProviders} from './icon-providers';
 
@@ -42,7 +42,6 @@ export class SciIconComponent {
   private readonly _iconProviders = inject(IconProviders);
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _renderer = inject(Renderer2);
-  private readonly _applicationRef = inject(ApplicationRef);
   private readonly _injector = inject(Injector);
 
   constructor() {
@@ -64,9 +63,6 @@ export class SciIconComponent {
 
         // Construct the icon component.
         const componentRef = createIconComponent({icon, host: this._host, injector: this._injector});
-
-        // Bind component to Angular change detection.
-        this._applicationRef.attachView(componentRef.hostView);
         componentRef.changeDetectorRef.detectChanges();
 
         // Destroy the component when the icon is changed.
@@ -106,7 +102,7 @@ function createIconComponent(config: {icon: SciComponentDescriptor | undefined; 
     bindings: icon?.bindings,
     elementInjector: icon?.injector,
     environmentInjector: injector.get(EnvironmentInjector),
-    hostElement: host,
+    hostElement: host, // Replace host element by icon component.
   });
 }
 

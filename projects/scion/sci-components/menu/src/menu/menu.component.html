@@ -48,7 +48,7 @@
             @if (hasGlyphArea()) {
               @if (menuItem.checked !== undefined) {
                 <!-- TODO [menu] use SCION icon -->
-                <sci-icon [icon]="menuItem.checked() ? 'check' : ''"/>
+                <sci-icon [icon]="menuItem.checked() ? 'check' : undefined"/>
               } @else if (menuItem.iconLigature) {
                 <sci-icon [icon]="menuItem.iconLigature()"/>
               } @else if (menuItem.iconComponent) {
@@ -115,7 +115,7 @@
                 </span>
               }
               <!-- TODO [menu] use SCION icon -->
-              <sci-icon icon="arrow_right"/>
+              <sci-icon icon="chevron_right"/>
             </div>
           </button>
         }
