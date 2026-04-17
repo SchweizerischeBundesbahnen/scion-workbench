@@ -102,7 +102,7 @@ export class HeaderComponent {
         onSelect: () => {
           this._settings.showSkeletons.update(enabled => !enabled);
           // Perform navigation for Angular to evaluate `CanMatch` guards.
-          void inject(Router).navigate([{outlets: {}}], {skipLocationChange: true});
+          void this._router.navigate([{outlets: {}}], {skipLocationChange: true});
         },
       })
       .addMenuItem({
