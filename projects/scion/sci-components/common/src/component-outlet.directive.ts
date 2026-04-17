@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Binding, ComponentRef, Directive, effect, inject, Injector, input, inputBinding, Provider, untracked, ViewContainerRef} from '@angular/core';
+import {Binding, ComponentRef, Directive, effect, inject, Injector, input, inputBinding, Provider, Type, untracked, ViewContainerRef} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
 import {SciAttributesDirective} from './attributes.directive';
 import {MaybeSignal} from './types';
@@ -61,6 +61,7 @@ function createComponent(viewContainerRef: ViewContainerRef, descriptor: SciComp
       ProvidersDirective,
       CssClassDirective,
       {type: SciAttributesDirective, bindings: [inputBinding('sciAttributes', coerceSignal(descriptor.attributes ?? {}))]},
+      ...descriptor.directives ?? [],
     ],
     bindings: descriptor.bindings,
     injector: descriptor.injector,
@@ -85,6 +86,7 @@ export interface SciComponentDescriptor {
    * })
    * ```
    */
+  directives?: Array<Type<unknown> | {type: Type<unknown>, bindings: Binding[]}>;
   injector?: Injector;
   /**
    * Specifies providers available for injection in the component.
