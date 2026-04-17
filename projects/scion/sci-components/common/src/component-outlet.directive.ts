@@ -28,7 +28,7 @@ import {coerceSignal} from './coerce-signal.util';
 @Directive({selector: 'ng-template[sciComponentOutlet]'})
 export class SciComponentOutletDirective {
 
-  public readonly descriptor = input.required<SciComponentDescriptor>({alias: 'sciComponentOutlet'});
+  public readonly descriptor = input.required<SciComponentDescriptor | undefined | null>({alias: 'sciComponentOutlet'});
 
   constructor() {
     const viewContainerRef = inject(ViewContainerRef);
@@ -37,8 +37,8 @@ export class SciComponentOutletDirective {
       const descriptor = this.descriptor();
 
       untracked(() => {
-        const component = createComponent(viewContainerRef, descriptor);
-        onCleanup(() => component.destroy());
+        const component = descriptor && createComponent(viewContainerRef, descriptor);
+        onCleanup(() => component?.destroy());
       });
     });
   }
