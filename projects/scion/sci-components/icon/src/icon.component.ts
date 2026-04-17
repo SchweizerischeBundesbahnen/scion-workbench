@@ -8,107 +8,113 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, ComponentRef, createComponent, DestroyRef, Directive, effect, ElementRef, EnvironmentInjector, inject, Injector, input, inputBinding, Renderer2, untracked} from '@angular/core';
-import {coerceSignal, SciAttributesDirective, SciComponentDescriptor} from '@scion/sci-components/common';
+import {ChangeDetectionStrategy, Component, Directive, effect, inject, signal, Signal, TemplateRef, untracked, viewChild} from '@angular/core';
+import {SciComponentDescriptor, SciComponentOutletDirective} from '@scion/sci-components/common';
 import {IconProviders} from './icon-providers';
+import {fromMutation$} from '@scion/toolkit/observable';
+import {concatWith, map, MonoTypeOperatorFunction, of} from 'rxjs';
 
 /**
  * Renders an icon based on registered icon providers.
  *
- * Providers are called in registration order. If a provider does not provide the icon, the next provider is called, and so on.
+ * Specify the icon as slotted content of the `<sci-icon>` component.
  *
- * The icon size is relative to the current font size (1em); change it by setting an explicit font-size on the `<sci-icon>` element or by setting the CSS variable `--sci-icon-size`.
+ * Example:
+ * ```html
+ * <sci-icon>home</sci-icon>
+ * ```
+ *
+ * Providers are called in registration order. If a provider does not provide the icon, the next provider is called, and so on.
+ * If no icon provider is registered, defaults to a Material icon provider, interpreting the icon as a Material icon ligature.
+ *
+ * The icon size is relative to the current font size (1em). You can change it by setting an explicit font-size on the `<sci-icon>` element or by setting the `--sci-icon-size` CSS variable.
  *
  * @see provideIconProvider
  */
 @Component({
   selector: 'sci-icon',
-  template: '',
+  templateUrl: './icon.component.html',
   styleUrl: './icon.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: {
-    '[attr.translate]': '"no"',
-  },
+  imports: [
+    SciComponentOutletDirective,
+  ],
 })
 export class SciIconComponent {
 
-  /**
-   * Specifies the icon to display.
-   *
-   * Refer to the icon providers for a list of supported icons.
-   */
-  public readonly icon = input.required({transform: (icon: string | undefined): SciComponentDescriptor | undefined => this._iconProviders.provide(icon)});
+  private readonly _slottedContent = viewChild.required<TemplateRef<void>>('slotted_content');
 
-  private readonly _iconProviders = inject(IconProviders);
-  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
-  private readonly _renderer = inject(Renderer2);
-  private readonly _injector = inject(Injector);
-
-  constructor() {
-    // Render icon in an animation frame to capture CSS classes set on the host.
-    const animationFrame = requestAnimationFrame(() => this.renderIcon());
-    inject(DestroyRef).onDestroy(() => cancelAnimationFrame(animationFrame));
-  }
+  protected readonly icon = this.computeIcon();
 
   /**
-   * Renders the icon, using this element (`sci-icon`) as the host of the icon component.
+   * Reads the icon from slotted content and passes it to registered icon providers for resolution.
    */
-  private renderIcon(): void {
-    effect(onCleanup => {
-      const icon = this.icon();
+  private computeIcon(): Signal<SciComponentDescriptor | undefined> {
+    const icon = signal<SciComponentDescriptor | undefined>(undefined);
+    const iconProviders = inject(IconProviders);
+
+    effect((onCleanup) => {
+      const slottedContent = this._slottedContent();
 
       untracked(() => {
-        // Capture CSS classes of the host (before constructing the icon component).
-        const previousHostCssClasses = this._host.classList.value;
+        // Instantiate template to "read" slotted content.
+        const view = slottedContent.createEmbeddedView(undefined);
+        onCleanup(() => view.destroy());
 
-        // Construct the icon component.
-        const componentRef = createIconComponent({icon, host: this._host, injector: this._injector});
-        componentRef.changeDetectorRef.detectChanges();
+        // Return if empty, i.e., no icon to render.
+        if (!view.rootNodes.length) {
+          icon.set(undefined);
+          return;
+        }
 
-        // Destroy the component when the icon is changed.
-        onCleanup(() => {
-          componentRef.destroy();
-          // Destroying the component does not unset host bindings, e.g., CSS classes.
-          // Therefore, manually reset CSS classes to the previous CSS classes.
-          this._renderer.setAttribute(this._host, 'class', previousHostCssClasses);
-        });
+        // Ensure only text is provided as slotted content.
+        if (view.rootNodes.length > 1 || view.rootNodes[0].nodeType !== Node.TEXT_NODE) {
+          throw Error('[InvalidInputError] Only text (ligature) is allowed in slotted content of <sci-icon>.');
+        }
+
+        // Watch slotted content.
+        const textNode = view.rootNodes[0] as Text;
+        const subscription = of(textNode.textContent)
+          .pipe(
+            concatWith(fromMutation$(textNode, {characterData: true}).pipe(map(() => textNode.textContent))),
+            map(slottedContent => iconProviders.provide(slottedContent.trim() || undefined)),
+            augmentIconDescriptor(),
+          )
+          .subscribe(iconDescriptor => icon.set(iconDescriptor));
+
+        onCleanup(() => subscription.unsubscribe());
       });
-    }, {injector: this._injector});
+    });
+
+    return icon;
   }
-}
-
-function createIconComponent(config: {icon: SciComponentDescriptor | undefined; host: HTMLElement, injector: Injector}): ComponentRef<unknown> {
-  const {icon, host, injector} = config;
-
-  // Provide providers via host directive.
-  @Directive({providers: icon?.providers ?? []})
-  class ProvidersDirective {
-  }
-
-  // Provide CSS classes via host directive.
-  @Directive({host: {'[class]': 'cssClass?.()'}})
-  class CssClassDirective {
-    protected readonly cssClass = coerceSignal(icon?.cssClass);
-  }
-
-  // Create the icon component and attach it, rendering a placeholder component if no provider
-  // is found to effectively remove the previous component (if any) from the DOM.
-  return createComponent(icon?.component ?? NullIconComponent, {
-    directives: [
-      ProvidersDirective,
-      CssClassDirective,
-      {type: SciAttributesDirective, bindings: [inputBinding('sciAttributes', coerceSignal(icon?.attributes ?? {}))]},
-    ],
-    bindings: icon?.bindings,
-    elementInjector: icon?.injector,
-    environmentInjector: injector.get(EnvironmentInjector),
-    hostElement: host, // Replace host element by icon component.
-  });
 }
 
 /**
- * Acts as placeholder if no icon could be found.
+ * Augments the icon descriptor:
+ *
+ * - Prevents the browser from translating the icon.
+ * - Sets the font size to 'var(--sci-icon-size, 1em)' for the icon to adapt its size to the font size in the current location.
  */
-@Component({template: ''})
-export class NullIconComponent {
+function augmentIconDescriptor(): MonoTypeOperatorFunction<SciComponentDescriptor | undefined> {
+  return map((icon: SciComponentDescriptor | undefined) => icon && {
+    ...icon,
+    attributes: {
+      ...icon.attributes,
+      translate: 'no',
+    },
+    directives: [
+      ...icon.directives ?? [],
+      IconFontSizeDirective,
+    ],
+  } satisfies SciComponentDescriptor);
+}
+
+/**
+ * Sets the font size to 'var(--sci-icon-size, 1em)' for the icon to adapt its size to the font size in the current location.
+ *
+ * For example, Material sets a fixed font size of 24px.
+ */
+@Directive({host: {'[style.font-size]': '"var(--sci-icon-size, 1em)"'}})
+class IconFontSizeDirective {
 }

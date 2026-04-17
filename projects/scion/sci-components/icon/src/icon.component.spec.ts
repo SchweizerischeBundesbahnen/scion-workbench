@@ -437,7 +437,7 @@ function expectIcon(fixture: ComponentFixture<unknown> | DebugElement, expected:
 
 @Component({
   selector: 'spec-root',
-  template: '<sci-icon [icon]="icon()" [attr.class]="clazz()" [ngClass]="ngClazz()"/>',
+  template: '<sci-icon [attr.class]="clazz()" [ngClass]="ngClazz()">{{icon()}}</sci-icon>',
   imports: [SciIconComponent, NgClass],
 })
 class SpecRootComponent {

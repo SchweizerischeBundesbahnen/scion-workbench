@@ -3,7 +3,7 @@
   @if (group.collapsible) {
     <button class="group-header" (click)="onGroupToggle()" (mouseenter)="onMenuItemMouseEnter(null)">
       <!-- TODO [menu] use SCION icon -->
-      <sci-icon [icon]="isGroupExpanded() ? 'keyboard_arrow_down' : 'chevron_right'"/>
+      <sci-icon>{{isGroupExpanded() ? 'keyboard_arrow_down' : 'chevron_right'}}</sci-icon>
       <span class="label">{{group.label}}</span>
     </button>
   } @else if (group.label) {
@@ -16,7 +16,7 @@
   <!-- Filter field -->
   @if (filter) {
     <div class="filter">
-      <sci-icon icon="scion.search"/>
+      <sci-icon>scion.search</sci-icon>
       @let message = filter.placeholder?.() ?? '%scion.components.menu.type_to_filter.action';
       <sci-menu-filter (textChange)="onFilterChange($event)" [placeholder]="(message | sciText)()"/>
     </div>
@@ -48,9 +48,9 @@
             @if (hasGlyphArea()) {
               @if (menuItem.checked !== undefined) {
                 <!-- TODO [menu] use SCION icon -->
-                <sci-icon [icon]="menuItem.checked() ? 'check' : undefined"/>
+                <sci-icon>{{menuItem.checked() ? 'check' : undefined}}</sci-icon>
               } @else if (menuItem.iconLigature) {
-                <sci-icon [icon]="menuItem.iconLigature()"/>
+                <sci-icon>{{menuItem.iconLigature()}}</sci-icon>
               } @else if (menuItem.iconComponent) {
                 <span class="icon">
                   <ng-container *sciComponentOutlet="menuItem.iconComponent"/>
@@ -97,7 +97,7 @@
                   #element>
             @if (hasGlyphArea()) {
               @if (menuItem.iconLigature) {
-                <sci-icon [icon]="menuItem.iconLigature()"/>
+                <sci-icon>{{menuItem.iconLigature()}}</sci-icon>
               } @else if (menuItem.iconComponent) {
                 <span class="icon">
                   <ng-container *sciComponentOutlet="menuItem.iconComponent"/>
@@ -115,7 +115,7 @@
                 </span>
               }
               <!-- TODO [menu] use SCION icon -->
-              <sci-icon icon="chevron_right"/>
+              <sci-icon>chevron_right</sci-icon>
             </div>
           </button>
         }

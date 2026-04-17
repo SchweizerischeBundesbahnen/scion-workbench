@@ -68,6 +68,7 @@ export class MicrofrontendViewComponent {
   private readonly _changeDetectorRef = inject(ChangeDetectorRef);
 
   private readonly _routerOutletElement = viewChild.required<ElementRef<SciRouterOutletElement>>('router_outlet');
+  // TODO [menu] accelerators
   private readonly _universalKeystrokes = [
     ['escape'], // keystroke to close notifications
     ['ctrl', 'shift', 'F12'], // keystroke to minimize activities
