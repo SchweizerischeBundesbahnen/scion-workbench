@@ -17,7 +17,7 @@ import {concatWith, map, MonoTypeOperatorFunction, of} from 'rxjs';
 /**
  * Renders an icon based on registered icon providers.
  *
- * Specify the icon as slotted content of the `<sci-icon>` component.
+ * Use the icon name as slotted content of the `<sci-icon>` component.
  *
  * Example:
  * ```html
@@ -25,9 +25,10 @@ import {concatWith, map, MonoTypeOperatorFunction, of} from 'rxjs';
  * ```
  *
  * Providers are called in registration order. If a provider does not provide the icon, the next provider is called, and so on.
- * If no icon provider is registered, defaults to a Material icon provider, interpreting the icon as a Material icon ligature.
+ * If no provider provides the icon, defaults to a Material icon provider, interpreting the icon as a Material icon ligature.
  *
- * The icon size is relative to the current font size (1em). You can change it by setting an explicit font-size on the `<sci-icon>` element or by setting the `--sci-icon-size` CSS variable.
+ * The icon size depends on the font size at its position in the DOM.
+ * To change the size, set a font-size on the `<sci-icon>` element or set the `--sci-icon-size` CSS variable.
  *
  * @see provideIconProvider
  */
@@ -94,7 +95,8 @@ export class SciIconComponent {
  * Augments the icon descriptor:
  *
  * - Prevents the browser from translating the icon.
- * - Sets the font size to 'var(--sci-icon-size, 1em)' for the icon to adapt its size to the font size in the current location.
+ * - Sets the icon's font size to 'var(--sci-icon-size, 1em)', required to inherit the location's font size for icons with a fixed font size.
+ *   For example, Material sets a fixed font size of 24px.
  */
 function augmentIconDescriptor(): MonoTypeOperatorFunction<SciComponentDescriptor | undefined> {
   return map((icon: SciComponentDescriptor | undefined) => icon && {
@@ -111,10 +113,9 @@ function augmentIconDescriptor(): MonoTypeOperatorFunction<SciComponentDescripto
 }
 
 /**
- * Sets the font size to 'var(--sci-icon-size, 1em)' for the icon to adapt its size to the font size in the current location.
- *
+ * Sets the font size to 'var(--sci-icon-size, 1em)', required to inherit the location's font size for icons with a fixed font size.
  * For example, Material sets a fixed font size of 24px.
  */
-@Directive({host: {'[style.font-size]': '"var(--sci-icon-size, 1em)"'}})
+@Directive({host: {'[style.font-size]': `'var(--sci-icon-size, 1em)'`}})
 class IconFontSizeDirective {
 }
