@@ -1,5 +1,5 @@
 import {WorkbenchMenuService} from './workbench-menu.service';
-import {WorkbenchMenu, WorkbenchMenuContextKeys, WorkbenchMenuContributionLocation, WorkbenchMenuContributionLocationLike, WorkbenchMenuContributionOptions, WorkbenchMenuContributionPosition, WorkbenchMenuFactoryFn, WorkbenchMenuFactoryFnLike, WorkbenchMenuItemLike, WorkbenchMenuItemProxyLike, WorkbenchMenuItems, WorkbenchMenuItemTransferableLike, WorkbenchMenuOptions, WorkbenchMenuOrigin, WorkbenchMenuRef, WorkbenchMenuTransferable, WorkbenchToolbarContributionLocation, WorkbenchToolbarFactoryFn} from './workbench-client-menu.model';
+import {WorkbenchMenu, WorkbenchMenubarContributionLocation, WorkbenchMenubarFactoryFn, WorkbenchMenuContextKeys, WorkbenchMenuContributionLocation, WorkbenchMenuContributionLocationLike, WorkbenchMenuContributionOptions, WorkbenchMenuContributionPosition, WorkbenchMenuFactoryFn, WorkbenchMenuFactoryFnLike, WorkbenchMenuItemLike, WorkbenchMenuItemProxyLike, WorkbenchMenuItems, WorkbenchMenuItemTransferableLike, WorkbenchMenuOptions, WorkbenchMenuOrigin, WorkbenchMenuRef, WorkbenchMenuTransferable, WorkbenchToolbarContributionLocation, WorkbenchToolbarFactoryFn} from './workbench-client-menu.model';
 import {Disposable} from '../common/disposable';
 import {UUID} from '@scion/toolkit/uuid';
 import {Beans} from '@scion/toolkit/bean-manager';
@@ -17,6 +17,7 @@ import {MaybeObservable, WORKBENCH_ELEMENT, WorkbenchElement} from '@scion/workb
 import {finalize, map, switchMap, tap} from 'rxjs/operators';
 import {parseMenuLocation} from './workbench-menu-location-parser';
 import {translate} from './workbench-menu-translate.util';
+import {ɵWorkbenchMenubarFactory} from './ɵworkbench-menubar.factory';
 
 export class ɵWorkbenchMenuService implements WorkbenchMenuService {
 
@@ -25,6 +26,7 @@ export class ɵWorkbenchMenuService implements WorkbenchMenuService {
   /** @inheritDoc */
   public contributeMenu(location: `menu:${string}` | WorkbenchMenuContributionLocation, menuFactoryFn: WorkbenchMenuFactoryFn, options?: WorkbenchMenuContributionOptions): Disposable;
   public contributeMenu(location: `toolbar:${string}` | WorkbenchToolbarContributionLocation, toolbarFactoryFn: WorkbenchToolbarFactoryFn, options?: WorkbenchMenuContributionOptions): Disposable;
+  public contributeMenu(location: `menubar:${string}` | WorkbenchMenubarContributionLocation, menubarFactoryFn: WorkbenchMenubarFactoryFn, options?: WorkbenchMenuContributionOptions): Disposable;
   public contributeMenu(locationLike: string | WorkbenchMenuContributionLocationLike, factoryFn: WorkbenchMenuFactoryFnLike, options?: WorkbenchMenuContributionOptions): Disposable {
     const {location, before, after, position} = typeof locationLike === 'string' ? {location: locationLike} as WorkbenchMenuContributionLocationLike : locationLike;
 
@@ -53,7 +55,7 @@ export class ɵWorkbenchMenuService implements WorkbenchMenuService {
           switchMap(menu => WorkbenchMenuItems.toTransferable$(menu.menuItems)),
         );
 
-      function createMenu(): ɵWorkbenchMenuFactory | ɵWorkbenchToolbarFactory {
+      function createMenu(): ɵWorkbenchMenuFactory | ɵWorkbenchToolbarFactory | ɵWorkbenchMenubarFactory {
         switch (scope) {
           case 'menu': {
             const menuFactory = new ɵWorkbenchMenuFactory();
@@ -66,6 +68,12 @@ export class ɵWorkbenchMenuService implements WorkbenchMenuService {
             const toolbarFactoryFn = factoryFn as WorkbenchToolbarFactoryFn;
             toolbarFactoryFn(toolbarFactory, context);
             return toolbarFactory;
+          }
+          case 'menubar': {
+            const menubarFactory = new ɵWorkbenchMenubarFactory();
+            const menubarFactoryFn = factoryFn as WorkbenchMenubarFactoryFn;
+            menubarFactoryFn(menubarFactory, context);
+            return menubarFactory;
           }
         }
       }
@@ -133,7 +141,7 @@ export class ɵWorkbenchMenuService implements WorkbenchMenuService {
   /**
    * metadata: Arbitrary metadata to be associated with the operation.
    */
-  public menuItems$(location: `menu:${string}` | `toolbar:${string}`, context: Map<string, unknown>, options?: {metadata?: {[key: string]: unknown}}): Observable<WorkbenchMenuItemProxyLike[]> {
+  public menuItems$(location: `menu:${string}` | `toolbar:${string}` | `menubar:${string}`, context: Map<string, unknown>, options?: {metadata?: {[key: string]: unknown}}): Observable<WorkbenchMenuItemProxyLike[]> {
     const command: ɵWorkbenchMenuItemLookupCommand = {
       location,
       context: new Map([...createEnvironmentContext(), ...context]),

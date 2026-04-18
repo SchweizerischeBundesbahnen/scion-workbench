@@ -8,7 +8,17 @@
 
   > sci-toolbar {
     background-color: var(--sci-color-gray-100);
-    height: 35px;
+    height: 30px;
+    padding: .25em .5em;
+    border-top: 1px solid var(--sci-color-border);
+    border-bottom: 1px solid var(--sci-color-border);
+    box-sizing: content-box;
+    margin: 0 -1em;
+  }
+
+  > sci-menubar {
+    background-color: var(--sci-color-gray-100);
+    height: 25px;
     padding: .25em .5em;
     border-top: 1px solid var(--sci-color-border);
     border-bottom: 1px solid var(--sci-color-border);

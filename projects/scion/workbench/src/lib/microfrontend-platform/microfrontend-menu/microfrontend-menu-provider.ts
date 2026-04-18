@@ -2,7 +2,7 @@ import {DestroyRef, DOCUMENT, EnvironmentProviders, inject, Injector, makeEnviro
 import {mapToBody, MessageClient} from '@scion/microfrontend-platform';
 import {takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {WorkbenchMenuItemProxyLike, WorkbenchMenuItems, WorkbenchMenuItemTransferableLike, ɵWorkbenchMenuContributionConstructCommand, ɵWorkbenchMenuContributionRegisterCommand, ɵWorkbenchMenuItemLookupCommand, ɵWorkbenchMenuOpenCommand} from '@scion/workbench-client';
-import {SciMenu, SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuOptions, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarMenuDescriptor, ɵSciMenuService} from '@scion/sci-components/menu';
+import {SciMenu, SciMenubarFactory, SciMenubarMenuDescriptor, SciMenuContributionLocationLike, SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuOptions, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarMenuDescriptor, ɵSciMenuService} from '@scion/sci-components/menu';
 import {finalize, map} from 'rxjs/operators';
 import {Objects} from '@scion/toolkit/util';
 import {createDestroyableInjector} from '../../common/injector.util';
@@ -29,7 +29,7 @@ function installMenuContributionHandler(): void {
     const menuItemsCache = new WorkbenchClientMenuItemsCache();
 
     // Contribute menu.
-    const contributionRef = menuService.contributeMenu({location, ...position}, (factory: SciMenuFactory | SciToolbarFactory, context: Map<string, unknown>) => {
+    const contributionRef = menuService.contributeMenu({location, ...position} as SciMenuContributionLocationLike, (factory: SciMenuFactory | SciToolbarFactory | SciMenubarFactory, context: Map<string, unknown>) => {
       // Menu items are constructed asynchronously via messaging. Therefore, we create an initially empty signal and update it when receiving the menu items.
       // We must memoize the signal for therequest not to be performed anew.
       const menuItems = menuItemsCache.computeIfAbsent(context, () => untracked(() => {
@@ -50,6 +50,10 @@ function installMenuContributionHandler(): void {
           }
           case 'toolbar': {
             populateToolbar(factory as SciToolbarFactory, menuItems);
+            break;
+          }
+          case 'menubar': {
+            populateMenubar(factory as SciMenubarFactory, menuItems);
             break;
           }
         }
@@ -257,6 +261,35 @@ function populateToolbar(toolbar: SciToolbarFactory, menuItemProxies: WorkbenchM
           cssClass: menuItemProxy.cssClass,
         };
         toolbar.addGroup(groupDescriptor, group => populateToolbar(group, menuItemProxy.children));
+        break;
+      }
+    }
+  }
+}
+
+/**
+ * Populates given menubar with passed menu items.
+ */
+function populateMenubar(menubar: SciMenubarFactory, menuItemProxies: WorkbenchMenuItemProxyLike[]): void {
+  for (const menuItemProxy of menuItemProxies) {
+    switch (menuItemProxy.type) {
+      case 'menu': {
+        const menuDescriptor: SciMenubarMenuDescriptor = {
+          name: menuItemProxy.name,
+          label: toSignal(menuItemProxy.label!, {requireSync: true}),
+          menu: {
+            width: menuItemProxy.menu.width,
+            minWidth: menuItemProxy.menu.minWidth,
+            maxWidth: menuItemProxy.menu.maxWidth,
+            maxHeight: menuItemProxy.menu.maxHeight,
+            filter: menuItemProxy.menu.filter && {
+              placeholder: menuItemProxy.menu.filter.placeholder && toSignal(menuItemProxy.menu.filter.placeholder, {requireSync: true}),
+              notFoundText: menuItemProxy.menu.filter.notFoundText && toSignal(menuItemProxy.menu.filter.notFoundText, {requireSync: true}),
+            } as boolean | RequireOne<{placeholder?: MaybeSignal<Translatable>; notFoundText?: MaybeSignal<Translatable>}>,
+          },
+          cssClass: menuItemProxy.cssClass,
+        };
+        menubar.addMenu(menuDescriptor, menu => populateMenu(menu, menuItemProxy.children));
         break;
       }
     }

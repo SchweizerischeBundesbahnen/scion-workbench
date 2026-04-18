@@ -1,8 +1,8 @@
-@if (toolbarVisible) {
-  <sci-toolbar name="toolbar:testee"/>
-}
+<sci-menubar name="menubar:view"/>
 
-<sci-toolbar name="toolbar:client"/>
+@if (toolbarVisible) {
+  <sci-toolbar name="toolbar:view"/>
+}
 
 <div class="toolbar">
   <button (click)="toggleToolbar()">Toggle Toolbar ({{toolbarVisible ? 'visible' : 'not visible'}})</button>

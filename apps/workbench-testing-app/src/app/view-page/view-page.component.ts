@@ -9,7 +9,7 @@
  */
 
 import {Component, computed, inject, signal, Signal, WritableSignal} from '@angular/core';
-import {ActivatedMicrofrontend, CanCloseRef, WorkbenchMenuContextKeys, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPartActionDirective, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
+import {ActivatedMicrofrontend, CanCloseRef, WorkbenchMenuContextKeys, WorkbenchMessageBoxService, WorkbenchPartActionDirective, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
 import {startWith} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
@@ -25,8 +25,8 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {rootEffect} from '../common/root-effect';
 import ActivatedMicrofrontendComponent from '../activated-microfrontend/activated-microfrontend.component';
-import {contributeMenu, installMenuAccelerators, SciMenuService, SciToolbarComponent} from '@scion/sci-components/menu';
-import {Notification1Component} from '../notification-1/notification-1.component';
+import {contributeMenu, installMenuAccelerators, SciMenubarComponent, SciMenuService, SciToolbarComponent} from '@scion/sci-components/menu';
+import {renderingFlag} from '../rendering-flag';
 
 @Component({
   selector: 'app-view-page',
@@ -48,13 +48,13 @@ import {Notification1Component} from '../notification-1/notification-1.component
     MultiValueInputComponent,
     ActivatedMicrofrontendComponent,
     SciToolbarComponent,
+    SciMenubarComponent,
   ],
 })
 export default class ViewPageComponent {
 
   private readonly _formBuilder = inject(NonNullableFormBuilder);
   private readonly _menuService = inject(SciMenuService);
-  private readonly _notificationService = inject(WorkbenchNotificationService);
 
   protected readonly view = inject(WorkbenchView);
   protected readonly activatedMicrofrontend = inject(ActivatedMicrofrontend, {optional: true});
@@ -73,29 +73,60 @@ export default class ViewPageComponent {
       throw Error('[LifecycleError] Component constructed before the workbench startup completed!'); // Do not remove as required by `startup.e2e-spec.ts` in [#1]
     }
 
-    function onSelect(): void {
-
-    }
-
-    contributeMenu('toolbar:view', toolbar => toolbar
-      .addGroup(group => group
-        .addGroup(group => group
-          .addToolbarItem('home', onSelect)
-          .addToolbarItem('favorite', onSelect)
-          .addToolbarItem('train', onSelect),
-        )
-        .addMenu({icon: 'more_vert', visualMenuHint: false, name: 'menu:workbench.part.toolbar'}, menu => menu)
+    contributeMenu('menubar:view', menubar => menubar
+      .addMenu('Menu 1', menu => menu
+        .addMenuItem('Menu 1 - A', onSelect)
+        .addMenuItem('Menu 1 - B', onSelect)
+        .addMenuItem('Menu 1 - C', onSelect),
       )
-      .addGroup(group => group
-        .addGroup(group => group
-          .addGroup(group => group
-            .addGroup(group => group
-              .addToolbarItem('home', onSelect)
-              .addToolbarItem('favorite', onSelect)
-              .addToolbarItem('train', onSelect),
+      .addMenu({label: 'Menu 2', name: 'menu:2'}, menu => menu
+        .addMenuItem('Menu 2 - A', onSelect)
+        .addMenuItem('Menu 2 - B', onSelect)
+        .addMenuItem('Menu 2 - C', onSelect),
+      )
+      .addMenu('Menu 3', menu => menu
+        .addMenuItem('Menu 3 - A', onSelect)
+        .addMenuItem('Menu 3 - B', onSelect)
+        .addMenuItem('Menu 3 - C', onSelect),
+      ),
+    );
+
+    contributeMenu({location: 'menubar:view', position: 'start'}, menu => menu
+      .addMenu({label: 'File', menu: {filter: {placeholder: 'hello', notFoundText: 'nüd found'}}}, menu => menu
+        .addMenuItem({label: 'New', icon: 'article', accelerator: ['Ctrl', 'N'], onSelect: () => onSelect()})
+        .addMenuItem({label: 'Open', icon: 'folder', onSelect: () => onSelect()})
+        .addMenuItem({label: 'Make a Copy', icon: 'file_copy', onSelect: () => onSelect()})
+        .addMenu({label: 'Share', name: 'menu:share', icon: 'person_add'}, menu => menu
+          .addMenuItem({label: 'Share with others', icon: 'person_add', name: 'menuitem:share-with-others', onSelect: () => onSelect()})
+          .addMenuItem({label: 'Publish to web', icon: 'public', onSelect: () => onSelect()})
+          .addMenu({label: 'Text', icon: 'format_bold'}, menu => menu
+            .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], onSelect: () => onSelect()})
+            .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], onSelect: () => onSelect()})
+            .addMenuItem({label: 'Underline', icon: 'format_underlined', onSelect: () => onSelect()})
+            .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s', onSelect: () => onSelect()})
+            .addMenu({label: 'Size', icon: 'format_bold'}, menu => menu
+              .addMenuItem('Increase font size', () => onSelect())
+              .addMenuItem('Decrease font size', () => onSelect()),
             ),
           ),
         ),
+      ),
+    )
+
+    contributeMenu({location: 'menubar:view', position: 'end'}, menubar => menubar
+      .addMenu({label: 'Menu 4', name: 'menu:view.menubar:additions'}, menu => menu),
+    );
+
+    contributeMenu('menu:view.menubar:additions', menu => menu
+      .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+'], onSelect: () => onAction()})
+      .addMenuItem({label: 'Collapse All', accelerator: ['Ctrl', 'NumPad', '-'], onSelect: () => onAction()})
+      .addMenu({label: 'Additions', name: 'menu:additions'}, menu => menu)
+      .addGroup(group => group
+        .addMenuItem({label: 'Navigate with Single Click', checked: computed(() => flags().has('navigate_with_single_click')), onSelect: () => toggleMultiFlag(flags, 'navigate_with_single_click')})
+        .addMenuItem({label: 'Always Select Opened Element', checked: computed(() => flags().has('always_select_opened_element')), onSelect: () => toggleMultiFlag(flags, 'always_select_opened_element')}),
+      )
+      .addGroup(group => group
+        .addMenuItem({label: 'Speed Search', icon: 'search', accelerator: ['Ctrl', 'F'], onSelect: () => onAction()}),
       ),
     );
 
@@ -103,6 +134,8 @@ export default class ViewPageComponent {
     this.installViewActiveStateLogger();
     this.installCssClassUpdater();
     this.installCanCloseGuard();
+
+    this.contributeToolbar();
 
     contributeMenu('menu:workbench.part.toolbar', menu => menu
       .addMenuItem({label: 'Expand All', accelerator: ['Ctrl', 'NumPad', '+'], onSelect: () => onAction()})
@@ -155,6 +188,69 @@ export default class ViewPageComponent {
     );
 
     installMenuAccelerators('menu:contextmenu');
+  }
+
+  private contributeToolbar(): void {
+    const bold = renderingFlag<boolean>('toolbar.bold', false);
+    const italic = renderingFlag<boolean>('toolbar.italic', false);
+    const underlined = renderingFlag<boolean>('toolbar.underlined', false);
+    const strikethrough = renderingFlag<boolean>('toolbar.strikethrough', false);
+
+    contributeMenu('toolbar:view', toolbar => toolbar
+      .addGroup(group => group
+        .addToolbarItem({icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], checked: bold, onSelect: () => bold.update(bold => !bold)})
+        .addToolbarItem({icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], checked: italic, onSelect: () => italic.update(italic => !italic)})
+        .addToolbarItem({icon: 'format_underlined', checked: underlined, onSelect: () => underlined.update(underlined => !underlined)}),
+      )
+      .addMenu({icon: 'palette', menu: {filter: true}}, menu => menu
+        .addGroup(group => group
+          .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], checked: bold, onSelect: () => bold.update(bold => !bold)})
+          .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], checked: italic, onSelect: () => italic.update(italic => !italic)})
+          .addMenuItem({label: 'Underline', icon: 'format_underlined', accelerator: ['Ctrl', 'Shift', 'U'], checked: underlined, onSelect: () => underlined.update(underlined => !underlined)})
+          .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s', accelerator: ['Ctrl', 'Shift', 'S'], checked: strikethrough, onSelect: () => strikethrough.update(strikethrough => !strikethrough)}),
+        )
+        .addGroup({label: 'Heading', collapsible: {collapsed: true}}, menu => menu
+          .addMenuItem({icon: 'format_h1', label: 'H1', onSelect})
+          .addMenuItem({icon: 'format_h2', label: 'H2', onSelect})
+          .addMenuItem({icon: 'format_h3', label: 'H3', onSelect})
+          .addMenuItem({icon: 'format_h4', label: 'H4', onSelect}),
+        )
+        .addMenu({label: 'Size', icon: 'format_size'}, menu => menu
+          .addGroup(group => group
+            .addMenuItem({icon: 'text_increase', label: 'Increase font size', onSelect})
+            .addMenuItem({icon: 'text_decrease', label: 'Decrease font size', onSelect}),
+          )
+          .addMenuItem({icon: 'view_real_size', label: 'Reset font size', onSelect}),
+        )
+        .addMenu({label: 'Align', icon: 'format_align_center'}, menu => menu
+          .addMenuItem({icon: 'format_align_left', label: 'Align left', onSelect})
+          .addMenuItem({icon: 'format_align_center', label: 'Align center', onSelect})
+          .addMenuItem({icon: 'format_align_right', label: 'Align right', onSelect})
+          .addMenuItem({icon: 'format_align_justify', label: 'Align justify', onSelect}),
+        )
+        .addMenu({label: 'Style', icon: 'match_case'}, menu => menu
+          .addMenuItem({icon: 'uppercase', label: 'Uppercase', onSelect})
+          .addMenuItem({icon: 'lowercase', label: 'Lowercase', onSelect})
+          .addMenuItem({icon: 'titlecase', label: 'Titlecase', onSelect}),
+        )
+        .addMenu({label: 'Rotate', icon: 'text_rotation_angledown'}, menu => menu
+          .addMenuItem({icon: 'text_rotate_vertical', label: 'Rotate 90°', onSelect})
+          .addMenuItem({icon: 'text_rotation_angledown', label: 'Rotate 45°', onSelect})
+          .addMenuItem({icon: 'text_rotation_angleup', label: 'Rotate -45°', onSelect}),
+        )
+        .addMenu({icon: 'format_list_numbered', label: 'Enumeration'}, menu => menu
+          .addMenuItem({icon: 'format_list_bulleted', label: 'Bullet list', onSelect})
+          .addMenuItem({icon: 'format_list_numbered', label: 'Number list', onSelect}),
+        ),
+      )
+      .addGroup(group => group
+        .addToolbarItem({icon: 'undo', accelerator: ['Ctrl', 'Z'], onSelect: () => onSelect()})
+        .addToolbarItem({icon: 'redo', onSelect: () => onSelect()})
+        .addToolbarItem({icon: 'content_cut', accelerator: ['Ctrl', 'X'], onSelect: () => onSelect()})
+        .addToolbarItem({icon: 'content_copy', accelerator: ['Ctrl', 'C'], onSelect: () => onSelect()})
+        .addToolbarItem({icon: 'content_paste', accelerator: ['Ctrl', 'V'], onSelect: () => onSelect()}),
+      )
+    );
   }
 
   private async confirmClosing(): Promise<boolean> {
@@ -223,12 +319,6 @@ export default class ViewPageComponent {
       anchor: event,
     });
   }
-
-  protected onShowNotification(): void {
-    this._notificationService.show(Notification1Component, {
-      title: 'Workbench Notification',
-    });
-  }
 }
 
 interface WorkbenchPartActionDescriptor {
@@ -269,3 +359,7 @@ const flags = signal(new Set<string>()
 );
 const viewMode = signal('dock_pinned');
 const moveTo = signal('left_top');
+
+function onSelect(): void {
+
+}

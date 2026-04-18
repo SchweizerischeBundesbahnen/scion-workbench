@@ -26,9 +26,9 @@ export abstract class SciMenuAdapter {
 
   public abstract contributeMenu?(location: SciMenuContributionLocationLike, factoryFn: SciMenuFactoryFnLike, options: SciMenuContributionOptions, next: SciMenuAdapterChain): Disposable;
 
-  public abstract menuContributions?(location: Signal<`menu:${string}` | `toolbar:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}, next: SciMenuAdapterChain): Signal<SciMenuContribution[]>;
+  public abstract menuContributions?(location: Signal<`menu:${string}` | `toolbar:${string}` | `menubar:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}, next: SciMenuAdapterChain): Signal<SciMenuContribution[]>;
 
-  public abstract menuItems?(location: Signal<`menu:${string}` | `toolbar:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}, next: SciMenuAdapterChain): Signal<SciMenuItemLike[]>;
+  public abstract menuItems?(location: Signal<`menu:${string}` | `toolbar:${string}` | `menubar:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}, next: SciMenuAdapterChain): Signal<SciMenuItemLike[]>;
 
   public abstract openMenu?(menu: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions, next: SciMenuAdapterChain): SciMenuRef;
 }
@@ -40,9 +40,9 @@ export interface SciMenuAdapterChain {
 
   contributeMenu(location: SciMenuContributionLocationLike, factoryFn: SciMenuFactoryFnLike, options: SciMenuContributionOptions): Disposable;
 
-  menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuContribution[]>;
+  menuContributions(location: Signal<`menu:${string}` | `toolbar:${string}` | `menubar:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuContribution[]>;
 
-  menuItems(location: Signal<`menu:${string}` | `toolbar:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuItemLike[]>;
+  menuItems(location: Signal<`menu:${string}` | `toolbar:${string}` | `menubar:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuItemLike[]>;
 
   openMenu(menu: `menu:${string}` | SciMenuItemLike[], options: SciMenuOptions): SciMenuRef;
 }

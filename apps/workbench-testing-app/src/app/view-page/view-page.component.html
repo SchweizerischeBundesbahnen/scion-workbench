@@ -1,8 +1,7 @@
-<div class="context-menu" (contextmenu)="onContextMenuOpen($event)">Right-click to open a context menu</div>
-
-<button (click)="onShowNotification()">Show Notification</button>
-
+<sci-menubar name="menubar:view"/>
 <sci-toolbar name="toolbar:view"/>
+
+<div class="context-menu" (contextmenu)="onContextMenuOpen($event)">Right-click to open a context menu</div>
 
 <section>
   <sci-form-field label="View ID">

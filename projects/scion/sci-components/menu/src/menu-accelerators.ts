@@ -34,7 +34,7 @@ import {coerceElement} from '@angular/cdk/coercion';
  *
  * Unsubscribes from keyboard events when the injection context is destroyed.
  */
-export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${string}`, options?: SciMenuAcceleratorOptions): Disposable {
+export function installMenuAccelerators(location: `menu:${string}` | `toolbar:${string}` | `menubar:${string}`, options?: SciMenuAcceleratorOptions): Disposable {
   const injector = createDestroyableInjector({parent: options?.injector ?? inject(Injector)});
   return runInInjectionContext(injector, () => {
     const menuService = inject(ɵSciMenuService);

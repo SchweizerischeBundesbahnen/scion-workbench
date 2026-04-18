@@ -8,6 +8,7 @@ import {Observables} from '@scion/toolkit/util';
 import {WorkbenchMenuFactory} from './workbench-menu.factory';
 import {WorkbenchToolbarFactory} from './workbench-toolbar.factory';
 import {Translatable} from '../text/workbench-text-provider.model';
+import {WorkbenchMenubarFactory} from './workbench-menubar.factory';
 
 /**
  * Represents a {@link SciMenuItem} in @scion/workbench-client.
@@ -372,15 +373,22 @@ export type WorkbenchToolbarContributionPosition = OneOf<{
   after?: `menuitem:${string}` | `menu:${string}` | `toolbar:${string}`;
   position?: 'start' | 'end';
 }>;
+export type WorkbenchMenubarContributionPosition = OneOf<{
+  before?: `menu:${string}`;
+  after?: `menu:${string}`;
+  position?: 'start' | 'end';
+}>;
 export type WorkbenchMenuContributionPositionLike = WorkbenchMenuContributionPosition | WorkbenchToolbarContributionPosition;
 
 export type WorkbenchMenuContributionLocation = {location: `menu:${string}`} & WorkbenchMenuContributionPosition;
 export type WorkbenchToolbarContributionLocation = {location: `toolbar:${string}`} & WorkbenchToolbarContributionPosition;
-export type WorkbenchMenuContributionLocationLike = WorkbenchMenuContributionLocation | WorkbenchToolbarContributionLocation;
+export type WorkbenchMenubarContributionLocation = {location: `menubar:${string}`} & WorkbenchMenubarContributionPosition;
+export type WorkbenchMenuContributionLocationLike = WorkbenchMenuContributionLocation | WorkbenchToolbarContributionLocation | WorkbenchMenubarContributionLocation;
 
 export type WorkbenchMenuFactoryFn = (menu: WorkbenchMenuFactory, context: Map<string, unknown>) => void;
 export type WorkbenchToolbarFactoryFn = (toolbar: WorkbenchToolbarFactory, context: Map<string, unknown>) => void;
-export type WorkbenchMenuFactoryFnLike = WorkbenchMenuFactoryFn | WorkbenchToolbarFactoryFn;
+export type WorkbenchMenubarFactoryFn = (menubar: WorkbenchMenubarFactory, context: Map<string, unknown>) => void;
+export type WorkbenchMenuFactoryFnLike = WorkbenchMenuFactoryFn | WorkbenchToolbarFactoryFn | WorkbenchMenubarFactoryFn;
 
 export type WorkbenchMenuItemLike = WorkbenchMenuItem | WorkbenchMenu | WorkbenchMenuGroup;
 export type WorkbenchMenuItemProxyLike = WorkbenchMenuItemProxy | WorkbenchMenuProxy | WorkbenchMenuGroupProxy;

@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Disposable, SciMenuAdapter, SciMenuContextProvider, SciMenuContributionLocation, SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuFactoryFn, SciMenuFactoryFnLike, SciMenuItemLike, SciMenuOptions, SciMenuOrigin, SciMenuRef, SciToolbarContributionLocation, SciToolbarFactoryFn} from '@scion/sci-components/menu';
+import {Disposable, SciMenuAdapter, SciMenubarContributionLocation, SciMenubarFactoryFn, SciMenuContextProvider, SciMenuContributionLocation, SciMenuContributionLocationLike, SciMenuContributionOptions, SciMenuFactoryFn, SciMenuFactoryFnLike, SciMenuItemLike, SciMenuOptions, SciMenuOrigin, SciMenuRef, SciToolbarContributionLocation, SciToolbarFactoryFn} from '@scion/sci-components/menu';
 import {assertNotInReactiveContext, effect, ElementRef, EnvironmentProviders, inject, Injector, linkedSignal, makeEnvironmentProviders, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
-import {MaybeObservable, WorkbenchMenuFactory, WorkbenchMenuOrigin, WorkbenchMenuService, WorkbenchToolbarFactory, ɵWorkbenchMenuService} from '@scion/workbench-client';
+import {MaybeObservable, WorkbenchMenubarFactory, WorkbenchMenuFactory, WorkbenchMenuOrigin, WorkbenchMenuService, WorkbenchToolbarFactory, ɵWorkbenchMenuService} from '@scion/workbench-client';
 import {coerceElement} from '@angular/cdk/coercion';
 import {WorkbenchClientMenuFactoryDelegate} from './workbench-client-menu-factory-delegate';
 import {WorkbenchClientToolbarFactoryDelegate} from './workbench-client-toolbar-factory-delegate';
@@ -23,6 +23,7 @@ import {MaybeSignal, RequireOne} from '@scion/sci-components/common';
 import {Translatable} from '@scion/sci-components/text';
 import {toLazyObservable} from '../common/lazy-observable.util';
 import {parseMenuLocation} from './workbench-menu-location-parser';
+import {WorkbenchClientMenubarFactoryDelegate} from './workbench-client-menubar-factory-delegate';
 
 /**
  * Delegates menu contribution to `@scion/workbench`, enabling rendering of menu popover in the workbench host application and federation of menu items contributed by different micro apps.
@@ -63,12 +64,24 @@ export class WorkbenchClientAngularMenuAdapter implements SciMenuAdapter {
           return runInInjectionContext(injector, () => tracked(() => toolbarFactoryFn(new WorkbenchClientToolbarFactoryDelegate(toolbar), context), toolbar));
         }, {requiredContext: options.requiredContext, metadata: options.metadata, contributionInstant: options.contributionInstant});
       }
+      case 'menubar': {
+        return this._workbenchMenuService.contributeMenu(location as SciMenubarContributionLocation, (menubar, context) => {
+          const menubarFactoryFn = factoryFn as SciMenubarFactoryFn;
+
+          const injector = createDestroyableInjector({
+            parent: this._injector,
+            providers: this._menuContextProvider?.provideMenuInjectionContext?.(context),
+          });
+
+          return runInInjectionContext(injector, () => tracked(() => menubarFactoryFn(new WorkbenchClientMenubarFactoryDelegate(menubar), context), menubar));
+        }, {requiredContext: options.requiredContext, metadata: options.metadata, contributionInstant: options.contributionInstant});
+      }
     }
 
     /**
      * Runs given function in a reactive context.
      */
-    function tracked(fn: () => void, factory: WorkbenchMenuFactory | WorkbenchToolbarFactory): void {
+    function tracked(fn: () => void, factory: WorkbenchMenuFactory | WorkbenchToolbarFactory | WorkbenchMenubarFactory): void {
       const injector = createDestroyableInjector({parent: inject(Injector)});
 
       // The menu factory function must be called synchronously. Since an effect runs asynchronously, we wrap the function call in a signal that we invoke immediately.
@@ -101,7 +114,7 @@ export class WorkbenchClientAngularMenuAdapter implements SciMenuAdapter {
   }
 
   /** @inheritDoc */
-  public menuItems(location: Signal<`menu:${string}` | `toolbar:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuItemLike[]> {
+  public menuItems(location: Signal<`menu:${string}` | `toolbar:${string}` | `menubar:${string}`>, context: Signal<Map<string, unknown>>, options: {injector?: Injector; metadata?: {[key: string]: unknown}}): Signal<SciMenuItemLike[]> {
     assertNotInReactiveContext(this.menuItems, 'Call menuItems() in a non-reactive (non-tracking) context. Each invocation creates a new subscription, asynchronously setting the signal\'s value, leading to an infinite loop if called in a reactive context.');
     if (!options.injector) {
       ɵassertInInjectionContext(this.menuItems, 'Call menuItems() in an injection context, as it allocates resources that are not released until the injection context is destroyed.')

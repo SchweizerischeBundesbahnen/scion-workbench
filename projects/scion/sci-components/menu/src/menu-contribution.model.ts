@@ -2,9 +2,10 @@ import {SciMenuFactory} from './menu/menu.factory';
 import {SciToolbarFactory} from './toolbar/toolbar.factory';
 import {Injector} from '@angular/core';
 import {OneOf} from '@scion/sci-components/common';
+import {SciMenubarFactory} from './menubar/menubar.factory';
 
 export interface SciMenuContribution {
-  scope: 'menu' | 'toolbar',
+  scope: 'menu' | 'toolbar' | 'menubar',
   factoryFn: SciMenuFactoryFnLike;
   requiredContext: Map<string, unknown>;
   position?: SciMenuContributionPositionLike;
@@ -17,7 +18,8 @@ export interface SciMenuContribution {
 
 export type SciMenuContributionLocation = {location: `menu:${string}`} & SciMenuContributionPosition;
 export type SciToolbarContributionLocation = {location: `toolbar:${string}`} & SciToolbarContributionPosition;
-export type SciMenuContributionLocationLike = SciMenuContributionLocation | SciToolbarContributionLocation;
+export type SciMenubarContributionLocation = {location: `menubar:${string}`} & SciMenubarContributionPosition;
+export type SciMenuContributionLocationLike = SciMenuContributionLocation | SciToolbarContributionLocation | SciMenubarContributionLocation;
 
 export interface SciMenuContributionOptions {
   /**
@@ -48,11 +50,17 @@ export type SciToolbarContributionPosition = OneOf<{
   after?: `menuitem:${string}` | `menu:${string}` | `toolbar:${string}`;
   position?: 'start' | 'end';
 }>;
-export type SciMenuContributionPositionLike = SciMenuContributionPosition | SciToolbarContributionPosition;
+export type SciMenubarContributionPosition = OneOf<{
+  before?: `menu:${string}`;
+  after?: `menu:${string}`;
+  position?: 'start' | 'end';
+}>;
+export type SciMenuContributionPositionLike = SciMenuContributionPosition | SciToolbarContributionPosition | SciMenubarContributionPosition;
 
 export type SciMenuFactoryFn = (menu: SciMenuFactory, context: Map<string, unknown>) => void;
 export type SciToolbarFactoryFn = (toolbar: SciToolbarFactory, context: Map<string, unknown>) => void;
-export type SciMenuFactoryFnLike = SciMenuFactoryFn | SciToolbarFactoryFn;
+export type SciMenubarFactoryFn = (menubar: SciMenubarFactory, context: Map<string, unknown>) => void;
+export type SciMenuFactoryFnLike = SciMenuFactoryFn | SciToolbarFactoryFn | SciMenubarFactoryFn;
 
 /**
  * Indicates no contributions found.

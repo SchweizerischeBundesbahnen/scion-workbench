@@ -1,0 +1,9 @@
+@for (menu of menus(); track $index) {
+  <button [class.active]="activeMenu()?.menu === menu"
+          [class]="menu.cssClass"
+          (click)="onMenuClick({menu: menu, element})"
+          (mouseenter)="onMenuMouseEnter({menu: menu, element: element})"
+          #element>
+    {{menu.labelText!()}}
+  </button>
+}
