@@ -133,27 +133,28 @@ export class MenuComponent {
     effect((onCleanup) => {
       const activeSubMenuItem = this.activeSubMenuItem();
       untracked(() => {
-        if (activeSubMenuItem) {
-          const ref = this._menuService.open(activeSubMenuItem.menu.children, {
-            anchor: activeSubMenuItem.element,
-            viewContainerRef: this.popoverAnchor(),
-            cssClass: activeSubMenuItem.menu.cssClass,
-            filter: activeSubMenuItem.menu.menu.filter as RequireOne<{placeholder?: Signal<Translatable>; notFoundText?: Signal<Translatable>}> | undefined,
-            size: {
-              width: activeSubMenuItem.menu.menu.width,
-              minWidth: activeSubMenuItem.menu.menu.minWidth,
-              maxWidth: activeSubMenuItem.menu.menu.maxWidth,
-              maxHeight: activeSubMenuItem.menu.menu.maxHeight,
-            },
-            align: 'horizontal',
-            focus: false,
-          });
-          ref.onClose(() => {
-            // do not close other menu
-            this.activeSubMenuItem.update(it => it === activeSubMenuItem ? null : it);
-          });
-          onCleanup(() => ref.close());
+        if (!activeSubMenuItem) {
+          return;
         }
+        const ref = this._menuService.open(activeSubMenuItem.menu.children, {
+          anchor: activeSubMenuItem.element,
+          viewContainerRef: this.popoverAnchor(),
+          cssClass: activeSubMenuItem.menu.cssClass,
+          filter: activeSubMenuItem.menu.menu.filter as RequireOne<{placeholder?: Signal<Translatable>; notFoundText?: Signal<Translatable>}> | undefined,
+          size: {
+            width: activeSubMenuItem.menu.menu.width,
+            minWidth: activeSubMenuItem.menu.menu.minWidth,
+            maxWidth: activeSubMenuItem.menu.menu.maxWidth,
+            maxHeight: activeSubMenuItem.menu.menu.maxHeight,
+          },
+          align: 'horizontal',
+          focus: false,
+        });
+        ref.onClose(() => {
+          // do not close other menu
+          this.activeSubMenuItem.update(it => it === activeSubMenuItem ? null : it);
+        });
+        onCleanup(() => ref.close());
       });
     });
   }

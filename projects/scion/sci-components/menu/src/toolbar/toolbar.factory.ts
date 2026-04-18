@@ -22,7 +22,7 @@ export interface SciToolbarFactory {
 
   addToolbarItem(descriptor: SciToolbarControlDescriptor): this;
 
-  addMenu(icon: string | MaybeSignal<string>, menuFactoryFn: (menu: SciMenuFactory) => void): this;
+  addMenu(icon: MaybeSignal<string>, menuFactoryFn: (menu: SciMenuFactory) => void): this;
 
   addMenu(descriptor: SciToolbarMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this;
 

@@ -26,6 +26,7 @@ $padding_menu_item: .125em .75em;
   > button.menu-item {
     all: unset;
     display: inline-flex;
+    gap: .3em;
     place-content: center;
     align-items: center;
     text-wrap: nowrap;
@@ -36,7 +37,6 @@ $padding_menu_item: .125em .75em;
     user-select: none;
     overflow: hidden;
     cursor: var(--sci-workbench-button-cursor);
-    gap: .3em;
     border: 1px solid transparent; // unset to not flicker when toggling checkable menu item
 
     // Maintain 1:1 aspect ratio if no label

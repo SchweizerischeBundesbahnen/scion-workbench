@@ -1,10 +1,10 @@
-import {WorkbenchMenuContributionPosition, WorkbenchMenuTransferable} from './workbench-client-menu.model';
+import {WorkbenchMenuContributionPositionLike, WorkbenchMenuTransferable} from './workbench-client-menu.model';
 import {DialogId, NotificationId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 
 export interface ɵWorkbenchMenuContributionRegisterCommand {
   location: `menu:${string}` | `toolbar:${string}`,
   requiredContext: Map<string, unknown>;
-  position?: WorkbenchMenuContributionPosition;
+  position?: WorkbenchMenuContributionPositionLike;
   metadata?: {[key: string]: unknown};
   contributionInstant?: number;
 }

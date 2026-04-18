@@ -19,7 +19,7 @@ export interface WorkbenchToolbarFactory {
 
   addToolbarItem(descriptor: WorkbenchToolbarItemDescriptor): this;
 
-  addMenu(icon: string | MaybeObservable<string>, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this;
+  addMenu(icon: MaybeObservable<string>, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this;
 
   addMenu(descriptor: WorkbenchToolbarMenuDescriptor, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this;
 

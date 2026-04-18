@@ -29,7 +29,7 @@ export class SciToolGroupComponent {
   private readonly _childGroupMenuOpen = signal(false);
   private readonly _document = inject(DOCUMENT);
 
-  protected readonly activeSubMenuItem = linkedSignal<SciMenuItemLike[], {menu: SciMenu, element: HTMLElement} | null>({
+  protected readonly activeMenuItem = linkedSignal<SciMenuItemLike[], {menu: SciMenu, element: HTMLElement} | null>({
     source: this.menuItems,  // reset active sub menu item when this component is re-used
     computation: () => null,
   });
@@ -37,39 +37,41 @@ export class SciToolGroupComponent {
   constructor() {
     const injector = inject(Injector);
 
-    // Open popover when hovering over a submenu item, or hide it otherwise.
+    // Open popover when hovering over a menu item, or hide it otherwise.
     effect((onCleanup) => {
-      const activeSubMenuItem = this.activeSubMenuItem();
+      const activeMenuItem = this.activeMenuItem();
       // Attach popover to configured view ref. Defaults to this component's view ref.
       // Controls where to add the popup, e.g., required for toolbar in menu button to not be child of the menu item (hover state)
       const viewContainerRef = this.viewContainerRef() ?? injector.get(ViewContainerRef);
 
       untracked(() => {
-        if (activeSubMenuItem) {
-          const ref = this._menuService.open(activeSubMenuItem.menu.children, {
-            anchor: activeSubMenuItem.element,
-            viewContainerRef,
-            cssClass: activeSubMenuItem.menu.cssClass,
-            filter: activeSubMenuItem.menu.menu.filter as RequireOne<{placeholder?: MaybeSignal<Translatable>; notFoundText?: MaybeSignal<Translatable>}> | boolean | undefined,
-            size: {
-              width: activeSubMenuItem.menu.menu.width,
-              minWidth: activeSubMenuItem.menu.menu.minWidth,
-              maxWidth: activeSubMenuItem.menu.menu.maxWidth,
-              maxHeight: activeSubMenuItem.menu.menu.maxHeight,
-            },
-            align: 'vertical',
-          });
-          ref.onClose(() => {
-            // do not close other menu
-            this.activeSubMenuItem.update(it => it === activeSubMenuItem ? null : it);
-          });
-          onCleanup(() => ref.close());
+        if (!activeMenuItem) {
+          return;
         }
+
+        const ref = this._menuService.open(activeMenuItem.menu.children, {
+          anchor: activeMenuItem.element,
+          viewContainerRef,
+          cssClass: activeMenuItem.menu.cssClass,
+          filter: activeMenuItem.menu.menu.filter as RequireOne<{placeholder?: MaybeSignal<Translatable>; notFoundText?: MaybeSignal<Translatable>}> | boolean | undefined,
+          size: {
+            width: activeMenuItem.menu.menu.width,
+            minWidth: activeMenuItem.menu.menu.minWidth,
+            maxWidth: activeMenuItem.menu.menu.maxWidth,
+            maxHeight: activeMenuItem.menu.menu.maxHeight,
+          },
+          align: 'vertical',
+        });
+        ref.onClose(() => {
+          // do not close other menu
+          this.activeMenuItem.update(it => it === activeMenuItem ? null : it);
+        });
+        onCleanup(() => ref.close());
       });
     });
 
     effect(() => {
-      const open = this.activeSubMenuItem() !== null || this._childGroupMenuOpen();
+      const open = this.activeMenuItem() !== null || this._childGroupMenuOpen();
       untracked(() => this.menuOpen.emit(open));
     });
   }
@@ -84,8 +86,8 @@ export class SciToolGroupComponent {
     this._childGroupMenuOpen.set(open);
   }
 
-  protected onSubMenuClick(menuItem: {menu: SciMenu, element: HTMLElement} | null): void {
-    this.activeSubMenuItem.set(menuItem);
+  protected onMenuClick(menuItem: {menu: SciMenu, element: HTMLElement} | null): void {
+    this.activeMenuItem.set(menuItem);
   }
 
   private closeMenus(): void {

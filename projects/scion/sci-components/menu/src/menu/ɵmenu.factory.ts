@@ -7,7 +7,6 @@ import {ComponentType} from '@angular/cdk/portal';
 import {coerceSignal, MaybeSignal, SciComponentDescriptor} from '@scion/sci-components/common';
 import {Translatable} from '@scion/sci-components/text';
 import {translate} from '../menu-translate.util';
-import {SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
 
 /**
  * Translation note: Texts are translated when added (not lazily when rendered) to simplify filtering.
@@ -162,7 +161,7 @@ function coerceIconComponent(icon: MaybeSignal<string> | ComponentType<unknown> 
   return undefined;
 }
 
-function coerceFilterDescriptor(menuDescriptor: SciToolbarMenuDescriptor): {placeholder?: Signal<Translatable>; notFoundText?: Signal<Translatable>} | undefined {
+function coerceFilterDescriptor(menuDescriptor: SciMenuDescriptor): {placeholder?: Signal<Translatable>; notFoundText?: Signal<Translatable>} | undefined {
   const filter = menuDescriptor.menu?.filter;
 
   if (typeof filter === 'object') {

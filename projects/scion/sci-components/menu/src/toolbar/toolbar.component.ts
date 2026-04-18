@@ -34,7 +34,7 @@ export class SciToolbarComponent {
     this.installAccelerators();
   }
 
-  protected computeContext(): Signal<Map<string, unknown>> {
+  private computeContext(): Signal<Map<string, unknown>> {
     const environmentContext = coerceSignal(inject(SciMenuContextProvider, {optional: true})?.provideMenuContext());
     return computed(() => new Map([...environmentContext?.() ?? new Map(), ...this.context() ?? new Map()]), {equal: Objects.isEqual});
   }
