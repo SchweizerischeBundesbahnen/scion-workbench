@@ -171,7 +171,8 @@ export class MenuComponent {
   }
 
   protected onMenuItemMouseEnter(menuItem: {menu: SciMenu, element: HTMLElement} | null): void {
-    this.activeSubMenuItem.set(menuItem);
+    const disabled = this.disabled() || menuItem?.menu.disabled?.();
+    this.activeSubMenuItem.set(disabled ? null : menuItem);
 
     // Create and display "fake" popover to close popover when hovering menu items of other groups.
     if (!this.activeSubMenuItem() && !this._actionToolbarMenuOpen()) {
