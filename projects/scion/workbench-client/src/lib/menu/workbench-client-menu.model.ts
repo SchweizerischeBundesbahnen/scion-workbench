@@ -290,6 +290,7 @@ export class WorkbenchMenuGroup {
     disabled?: MaybeObservable<boolean>;
     collapsible?: {collapsed: boolean};
     position?: WorkbenchMenuContributionPositionLike;
+    actions?: WorkbenchMenuItemLike[];
     children: WorkbenchMenuItemLike[];
     cssClass?: string[];
   }) {
@@ -302,9 +303,10 @@ export class WorkbenchMenuGroup {
       resolve: {
         label: Observables.coerce(this._group.label),
         disabled: Observables.coerce(this._group.disabled),
+        actions: WorkbenchMenuItems.toTransferable$(this._group.actions ?? []),
         children: WorkbenchMenuItems.toTransferable$(this._group.children),
       },
-      mapTo: ({label, disabled, children}): WorkbenchMenuGroupTransferable => prune({
+      mapTo: ({label, disabled, actions, children}): WorkbenchMenuGroupTransferable => prune({
         id: this._group.id,
         type: 'group',
         name: this._group.name,
@@ -312,6 +314,7 @@ export class WorkbenchMenuGroup {
         collapsible: this._group.collapsible,
         position: this._group.position,
         disabled: disabled,
+        actions: actions,
         children: children,
         cssClass: this._group.cssClass,
       }),
@@ -333,6 +336,7 @@ export class WorkbenchMenuGroupProxy {
   public readonly disabled?: Observable<boolean>;
   public readonly collapsible?: {collapsed: boolean};
   public readonly position?: WorkbenchMenuContributionPositionLike;
+  public readonly actions: WorkbenchMenuItemProxyLike[];
   public readonly children: WorkbenchMenuItemProxyLike[];
   public readonly cssClass?: string[];
 
@@ -343,6 +347,7 @@ export class WorkbenchMenuGroupProxy {
     this.collapsible = transferable.collapsible;
     this.position = transferable.position;
     this.disabled = remoteSubscriber$({relayId: this.id, property: 'disabled', initialValue: transferable.disabled});
+    this.actions = WorkbenchMenuItems.fromTransferable(transferable.actions);
     this.children = WorkbenchMenuItems.fromTransferable(transferable.children);
     this.cssClass = transferable.cssClass;
   }
@@ -359,6 +364,7 @@ export interface WorkbenchMenuGroupTransferable {
   collapsible?: {collapsed: boolean};
   position?: WorkbenchMenuContributionPositionLike;
   disabled?: boolean;
+  actions: WorkbenchMenuItemTransferableLike[];
   children: WorkbenchMenuItemTransferableLike[];
   cssClass?: string[];
 }

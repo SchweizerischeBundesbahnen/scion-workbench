@@ -25,7 +25,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {rootEffect} from '../common/root-effect';
 import ActivatedMicrofrontendComponent from '../activated-microfrontend/activated-microfrontend.component';
-import {contributeMenu, installMenuAccelerators, SciMenubarComponent, SciMenuService, SciToolbarComponent} from '@scion/sci-components/menu';
+import {contributeMenu, installMenuAccelerators, SciMenubarComponent, SciMenuService, SciToolbarComponent, SciToolbarFactory} from '@scion/sci-components/menu';
 import {renderingFlag} from '../rendering-flag';
 
 @Component({
@@ -209,7 +209,7 @@ export default class ViewPageComponent {
           .addMenuItem({label: 'Underline', icon: 'format_underlined', accelerator: ['Ctrl', 'Shift', 'U'], checked: underlined, onSelect: () => underlined.update(underlined => !underlined)})
           .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s', accelerator: ['Ctrl', 'Shift', 'S'], checked: strikethrough, onSelect: () => strikethrough.update(strikethrough => !strikethrough)}),
         )
-        .addGroup({label: 'Heading', collapsible: {collapsed: true}}, menu => menu
+        .addGroup({label: 'Heading', collapsible: {collapsed: true}, actions: addHeadingGroupActions}, menu => menu
           .addMenuItem({icon: 'format_h1', label: 'H1', onSelect})
           .addMenuItem({icon: 'format_h2', label: 'H2', onSelect})
           .addMenuItem({icon: 'format_h3', label: 'H3', onSelect})
@@ -249,7 +249,7 @@ export default class ViewPageComponent {
         .addToolbarItem({icon: 'content_cut', accelerator: ['Ctrl', 'X'], onSelect: () => onSelect()})
         .addToolbarItem({icon: 'content_copy', accelerator: ['Ctrl', 'C'], onSelect: () => onSelect()})
         .addToolbarItem({icon: 'content_paste', accelerator: ['Ctrl', 'V'], onSelect: () => onSelect()}),
-      )
+      ),
     );
   }
 
@@ -362,4 +362,13 @@ const moveTo = signal('left_top');
 
 function onSelect(): void {
 
+}
+
+function addHeadingGroupActions(toolbar: SciToolbarFactory): void {
+  toolbar
+    .addToolbarItem('favorite', onSelect)
+    .addMenu({icon: 'more_vert', visualMenuHint: false}, menu => menu
+      .addMenuItem('Don\'t Show Again For This Project', onSelect)
+      .addMenuItem('Don\'t Show Again', onSelect),
+    );
 }

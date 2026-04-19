@@ -95,6 +95,10 @@ export class WorkbenchClientMenuFactoryDelegate implements SciMenuFactory {
       label: toLazyObservable(descriptor.label),
       collapsible: descriptor.collapsible,
       disabled: toLazyObservable(descriptor.disabled),
+      actions: (actions: WorkbenchToolbarFactory): void => {
+        const sciToolbar = new WorkbenchClientToolbarFactoryDelegate(actions);
+        descriptor.actions?.(sciToolbar);
+      },
       cssClass: descriptor.cssClass,
     }, (group: WorkbenchMenuFactory): void => {
       groupFactoryFn?.(new WorkbenchClientMenuFactoryDelegate(group));

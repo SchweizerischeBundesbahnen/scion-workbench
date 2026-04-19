@@ -88,7 +88,7 @@ $font-size-smaller: $font-size - 1px;
     display: none; // prevent flickering while closing, e.g., menu in workbench dialog toolbar
   }
 
-  // Styles if a group in a menu.
+  // Styles if a group (not top-level menu component)
   &:not([popover]) {
     grid-column: 1/-1; // consume all columns
     grid-template-columns: subgrid;
@@ -112,15 +112,36 @@ $font-size-smaller: $font-size - 1px;
     }
 
     > header.group-header {
+      display: flex;
+      gap: .75em;
+      justify-content: space-between;
+      align-items: center;
+      padding-left: $padding_menu_item_inline + $padding_label_left;
+      padding-right: $padding_menu_item_inline;
+      overflow: hidden; // to support ellipsis on label
       user-select: none;
       color: var(--sci-color-text);
-      font-weight: 500;
-      @container style(--sci-color-scheme: dark) {
-        // TODO [menu] add sci-color-scheme token, currently simply color-scheme, not a CSS variable
-        font-weight: 600;
+
+      > span.label {
+        flex: auto;
+
+        font-weight: 500;
+        @container style(--sci-color-scheme: dark) {
+          // TODO [menu] add sci-color-scheme token, currently simply color-scheme, not a CSS variable
+          font-weight: 600;
+        }
       }
-      padding: .75em $padding_menu_item_inline .5em $padding_menu_item_inline + $padding_label_left;
-      @include ellipsis-on-overflow();
+
+      > sci-toolbar-group.actions {
+        flex: none;
+        align-self: stretch;
+        --sci-toolbar-toolbar-item-background-color-hover: color-mix(in srgb, var(--sci-workbench-button-background-color-hover) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+        --sci-toolbar-toolbar-item-border-radius: var(--sci-corner-small);
+
+        &:hover {
+          --sci-toolbar-toolbar-item-background-color-active: color-mix(in srgb, var(--sci-workbench-button-background-color-active) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+        }
+      }
     }
 
     > button.group-header {
@@ -129,6 +150,29 @@ $font-size-smaller: $font-size - 1px;
       display: inline-grid;
       grid-template-columns: subgrid;
       align-items: center;
+
+      > div.content {
+        display: flex;
+        gap: .75em;
+        justify-content: space-between;
+        align-items: center;
+        overflow: hidden; // to support ellipsis on label
+
+        > span.label {
+          flex: auto;
+        }
+
+        > sci-toolbar-group.actions {
+          flex: none;
+          align-self: stretch;
+          --sci-toolbar-toolbar-item-background-color-hover: color-mix(in srgb, var(--sci-workbench-button-background-color-hover) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+          --sci-toolbar-toolbar-item-border-radius: var(--sci-corner-small);
+
+          &:hover {
+            --sci-toolbar-toolbar-item-background-color-active: color-mix(in srgb, var(--sci-workbench-button-background-color-active) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+          }
+        }
+      }
     }
   }
 

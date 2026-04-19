@@ -10,7 +10,7 @@
 
 import {Component, computed, inject, Injector, signal, WritableSignal} from '@angular/core';
 import {FormGroup, FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {CanCloseRef, WorkbenchMenuContextKeys, WorkbenchMenuService, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
+import {CanCloseRef, WorkbenchMenuContextKeys, WorkbenchMenuService, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchToolbarFactory, WorkbenchView} from '@scion/workbench-client';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
 import {BehaviorSubject, MonoTypeOperatorFunction, NEVER} from 'rxjs';
@@ -25,7 +25,7 @@ import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
-import {contributeMenu, Disposable, SciMenubarComponent, SciMenuService, SciToolbarComponent} from '@scion/sci-components/menu';
+import {contributeMenu, Disposable, SciMenubarComponent, SciMenuService, SciToolbarComponent, SciToolbarFactory} from '@scion/sci-components/menu';
 
 @Component({
   selector: 'app-view-page',
@@ -258,7 +258,7 @@ export default class ViewPageComponent {
           .addMenuItem({label: 'Underline', icon: 'format_underlined', accelerator: ['Ctrl', 'Shift', 'U'], checked: underlined, onSelect: () => underlined.update(underlined => !underlined)})
           .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s', accelerator: ['Ctrl', 'Shift', 'S'], checked: strikethrough, onSelect: () => strikethrough.update(strikethrough => !strikethrough)}),
         )
-        .addGroup({label: 'Heading', collapsible: {collapsed: true}}, menu => menu
+        .addGroup({label: 'Heading', collapsible: true, actions: addHeadingGroupActions}, menu => menu
           .addMenuItem({icon: 'format_h1', label: 'H1', onSelect})
           .addMenuItem({icon: 'format_h2', label: 'H2', onSelect})
           .addMenuItem({icon: 'format_h3', label: 'H3', onSelect})
@@ -321,7 +321,7 @@ export default class ViewPageComponent {
           .addMenuItem({label: 'Underline', icon: 'format_underlined', accelerator: ['Ctrl', 'Shift', 'U'], checked: underlined, onSelect: () => underlined.next(!underlined.value)})
           .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s', accelerator: ['Ctrl', 'Shift', 'S'], checked: strikethrough, onSelect: () => strikethrough.next(!strikethrough.value)}),
         )
-        .addGroup({label: 'Heading', collapsible: {collapsed: true}}, menu => menu
+        .addGroup({label: 'Heading', collapsible: {collapsed: true}, actions: addHeadingGroupClientActions}, menu => menu
           .addMenuItem({icon: 'format_h1', label: 'H1', onSelect})
           .addMenuItem({icon: 'format_h2', label: 'H2', onSelect})
           .addMenuItem({icon: 'format_h3', label: 'H3', onSelect})
@@ -619,3 +619,21 @@ const flags = signal(new Set<string>()
 
 const viewMode = signal('dock_pinned');
 const moveTo = signal('left_top');
+
+function addHeadingGroupActions(toolbar: SciToolbarFactory): void {
+  toolbar
+    .addToolbarItem('favorite', onSelect)
+    .addMenu({icon: 'more_vert', visualMenuHint: false}, menu => menu
+      .addMenuItem('Don\'t Show Again For This Project', onSelect)
+      .addMenuItem('Don\'t Show Again', onSelect),
+    );
+}
+
+function addHeadingGroupClientActions(toolbar: WorkbenchToolbarFactory): void {
+  toolbar
+    .addToolbarItem('favorite', onSelect)
+    .addMenu({icon: 'more_vert', visualMenuHint: false}, menu => menu
+      .addMenuItem('Don\'t Show Again For This Project', onSelect)
+      .addMenuItem('Don\'t Show Again', onSelect),
+    );
+}

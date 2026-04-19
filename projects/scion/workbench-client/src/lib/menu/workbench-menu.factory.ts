@@ -75,5 +75,6 @@ export interface WorkbenchMenuGroupDescriptor {
   label?: MaybeObservable<Translatable>;
   collapsible?: boolean | {collapsed: boolean};
   disabled?: MaybeObservable<boolean>;
+  actions?: (actions: WorkbenchToolbarFactory) => void;
   cssClass?: string | string[];
 }

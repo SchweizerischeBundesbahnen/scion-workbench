@@ -37,6 +37,7 @@ export class MenuItemGroupComponent {
               label: this.group().label?.(),
               collapsible: !!collapsible,
               collapsed: collapsible?.collapsed ?? false,
+              actions: this.group().actions,
             })),
           ),
           inputBinding('glyphArea', this.glyphArea),

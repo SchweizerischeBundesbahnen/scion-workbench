@@ -60,7 +60,7 @@ export class MenuComponent {
   public readonly menuItems = input.required<Array<SciMenuItem | SciMenu | SciMenuGroup>>();
   public readonly disabled = input<boolean>();
   public readonly filter = input<{placeholder?: Signal<Translatable>; notFoundText?: Signal<Translatable>}>();
-  public readonly group = input<{label?: string, collapsible: boolean, collapsed: boolean}>();
+  public readonly group = input<{label?: string, collapsible: boolean, collapsed: boolean; actions: SciMenuItemLike[]}>();
   public readonly sizeInput = input<{width?: string; minWidth?: string; maxWidth?: string; maxHeight?: string}>();
   public readonly glyphArea = input<boolean>();
   public readonly anchorWidth = input(undefined, {transform: (width: number | undefined): string | undefined => width ? `${width}px` : undefined});

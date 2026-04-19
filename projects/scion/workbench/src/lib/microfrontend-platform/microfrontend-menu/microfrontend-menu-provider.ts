@@ -201,6 +201,7 @@ function populateMenu(menu: SciMenuFactory, menuItemProxies: WorkbenchMenuItemPr
           label: menuItemProxy.label && toSignal(menuItemProxy.label, {requireSync: true}),
           collapsible: menuItemProxy.collapsible,
           disabled: menuItemProxy.disabled && toSignal(menuItemProxy.disabled, {requireSync: true}),
+          actions: actions => populateToolbar(actions, menuItemProxy.actions),
           cssClass: menuItemProxy.cssClass,
         };
         menu.addGroup(groupDescriptor, group => populateMenu(group, menuItemProxy.children));

@@ -91,6 +91,10 @@ export class ɵSciMenuFactory implements SciMenuFactory {
     const groupFactory = new ɵSciMenuFactory();
     groupFactoryFn?.(groupFactory);
 
+    // Construct actions toolbar.
+    const actionsFactory = new ɵSciToolbarFactory();
+    descriptor.actions?.(actionsFactory);
+
     // Add group.
     this.menuItems.push({
       type: 'group',
@@ -98,6 +102,7 @@ export class ɵSciMenuFactory implements SciMenuFactory {
       label: translate(descriptor.label),
       collapsible: coerceCollapsibleDescriptor(descriptor),
       disabled: coerceSignal(descriptor.disabled),
+      actions: actionsFactory.menuItems,
       children: groupFactory.menuItems,
       cssClass: Arrays.coerce(descriptor.cssClass),
     } satisfies SciMenuGroup);

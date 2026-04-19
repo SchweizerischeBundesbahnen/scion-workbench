@@ -78,6 +78,7 @@ export namespace SciMenuItems {
             position: menuItemProxy.position,
             disabled: menuItemProxy.disabled && toSignal(menuItemProxy.disabled, {injector, requireSync: true}),
             cssClass: menuItemProxy.cssClass,
+            actions: SciMenuItems.fromWorkbenchMenuItemProxies(menuItemProxy.actions, {injector}),
             children: SciMenuItems.fromWorkbenchMenuItemProxies(menuItemProxy.children, {injector}),
           } satisfies SciMenuGroup;
         }
@@ -160,6 +161,7 @@ export namespace SciMenuItems {
             collapsible: menuItem.collapsible,
             position: menuItem.position,
             cssClass: menuItem.cssClass,
+            actions: SciMenuItems.toWorkbenchMenuItems(menuItem.actions ?? [], {injector}),
             children: SciMenuItems.toWorkbenchMenuItems(menuItem.children, {injector}),
           });
         }

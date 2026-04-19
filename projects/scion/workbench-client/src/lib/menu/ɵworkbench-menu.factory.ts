@@ -94,6 +94,10 @@ export class ɵWorkbenchMenuFactory implements WorkbenchMenuFactory {
     const groupFactory = new ɵWorkbenchMenuFactory();
     groupFactoryFn?.(groupFactory);
 
+    // Construct actions toolbar.
+    const actionsFactory = new ɵWorkbenchToolbarFactory();
+    descriptor.actions?.(actionsFactory);
+
     // Add group.
     this.menuItems.push(new WorkbenchMenuGroup({
       id: UUID.randomUUID(),
@@ -101,6 +105,7 @@ export class ɵWorkbenchMenuFactory implements WorkbenchMenuFactory {
       label: translate(descriptor.label),
       collapsible: coerceCollapsibleDescriptor(descriptor),
       disabled: descriptor.disabled,
+      actions: actionsFactory.menuItems,
       children: groupFactory.menuItems,
       cssClass: Arrays.coerce(descriptor.cssClass),
     }));

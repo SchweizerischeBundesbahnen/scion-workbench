@@ -57,6 +57,7 @@ export interface SciMenuGroup {
   collapsible?: {collapsed: boolean};
   position?: SciMenuContributionPositionLike;
   disabled?: Signal<boolean>; // Consider renaming to enabled; https://www.electronjs.org/docs/latest/api/menu-item
+  actions?: SciMenuItemLike[];
   // visible: Signal<boolean>; // Consider providing visible
   children: SciMenuItemLike[];
   cssClass?: string[];
