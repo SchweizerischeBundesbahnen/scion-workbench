@@ -1,9 +1,10 @@
-$padding_menu_inline: .4em;
-$padding_menu_block: .3em;
-$padding_menu_item_inline: 5px;
-$padding_menu_item_block: 2px;
-$padding_label_left: 7.5px;
+$menu_padding_inline: .4em;
+$menu_padding_block: .3em;
+$menu_item_padding_inline: 5px;
+$menu_item_padding_block: 2px;
 $menu_item_gap: .25em;
+$menu_item_min_height: calc(var(--sci-icon-size) + (2 * $menu_item_padding_block + 4px)); // 2px for checked toolbar item plus 2px for toolbar item padding plus 18px icon size;
+$label_padding_left: 7.5px;
 $font-size: 13px;
 $font-size-smaller: $font-size - 1px;
 
@@ -19,13 +20,11 @@ $font-size-smaller: $font-size - 1px;
 @mixin button {
   all: unset;
   text-wrap: nowrap;
-  padding: $padding_menu_item_block $padding_menu_item_inline;
+  padding: $menu_item_padding_block $menu_item_padding_inline;
   border-radius: var(--sci-corner);
   user-select: none;
   overflow: hidden;
   cursor: var(--sci-workbench-button-cursor);
-  box-sizing: border-box;
-  min-height: calc(var(--sci-icon-size) + (2 * $padding_menu_item_block + 4px)); // 2px for checked toolbar item plus 2px for toolbar item padding plus 18px icon size
 
   // Do not hover menu items while scrolling.
   @container not style(--ɵmenu-scrolling: true) {
@@ -57,7 +56,7 @@ $font-size-smaller: $font-size - 1px;
 
 :host {
   --sci-icon-size: 18px;
-  --ɵsci-menu-padding-block: #{$padding_menu_block};
+  --ɵsci-menu-padding-block: #{$menu_padding_block};
 
   display: grid;
   gap: $menu_item_gap .5em;
@@ -68,7 +67,7 @@ $font-size-smaller: $font-size - 1px;
   border-radius: 0.5rem;
   color: var(--sci-color-text);
   background-color: var(--sci-color-background-elevation);
-  padding: $padding_menu_block $padding_menu_inline;
+  padding: $menu_padding_block $menu_padding_inline;
   margin: unset; // unset native popover styling
   inset: unset; // unset native popover styling
   outline: none;
@@ -116,11 +115,13 @@ $font-size-smaller: $font-size - 1px;
       gap: .75em;
       justify-content: space-between;
       align-items: center;
-      padding-left: $padding_menu_item_inline + $padding_label_left;
-      padding-right: $padding_menu_item_inline;
+      padding-left: $menu_item_padding_inline + $label_padding_left;
+      padding-right: $menu_item_padding_inline;
       overflow: hidden; // to support ellipsis on label
       user-select: none;
       color: var(--sci-color-text);
+      box-sizing: border-box;
+      min-height: $menu_item_min_height;
 
       > span.label {
         flex: auto;
@@ -150,6 +151,8 @@ $font-size-smaller: $font-size - 1px;
       display: inline-grid;
       grid-template-columns: subgrid;
       align-items: center;
+      box-sizing: border-box;
+      min-height: $menu_item_min_height;
 
       > div.content {
         display: flex;
@@ -177,19 +180,19 @@ $font-size-smaller: $font-size - 1px;
   }
 
   &:has(> sci-viewport) {
-    padding: $padding_menu_block 0;
+    padding: $menu_padding_block 0;
 
     // TODO [menu] find better solution
     > header.group-header {
-      margin: 0 $padding_menu_inline;
+      margin: 0 $menu_padding_inline;
     }
 
     > button.group-header {
-      margin: 0 $padding_menu_inline;
+      margin: 0 $menu_padding_inline;
     }
 
     > div.filter {
-      margin: 0 $padding_menu_inline;
+      margin: 0 $menu_padding_inline;
     }
   }
 
@@ -205,7 +208,7 @@ $font-size-smaller: $font-size - 1px;
       // === Menu subgrid ===
         auto // glyph area for icons and check marks
         1fr; // label area
-      padding: 2px $padding_menu_inline; // 2px to not clip outline
+      padding: 2px $menu_padding_inline; // 2px to not clip outline
     }
   }
 
@@ -220,7 +223,7 @@ $font-size-smaller: $font-size - 1px;
     display: inline-grid;
     grid-template-columns: subgrid;
     align-items: center;
-    padding: $padding_menu_item_block $padding_menu_item_inline;
+    padding: $menu_item_padding_block $menu_item_padding_inline;
     user-select: none;
   }
 
@@ -229,7 +232,7 @@ $font-size-smaller: $font-size - 1px;
     grid-column: 1/-1; // consume all columns
     height: 1px;
     background-color: var(--sci-color-border);
-    margin: 0 $padding_menu_item_inline .5em $padding_menu_item_inline;
+    margin: 0 $menu_item_padding_inline .5em $menu_item_padding_inline;
   }
 
   div.message.no-items {
@@ -238,7 +241,7 @@ $font-size-smaller: $font-size - 1px;
     display: block;
     color: var(--sci-color-text-subtlest);
     font-size: $font-size-smaller;
-    padding: $padding_menu_item_block $padding_menu_item_inline;
+    padding: $menu_item_padding_block $menu_item_padding_inline;
   }
 
   // Add before separator
@@ -265,6 +268,8 @@ $font-size-smaller: $font-size - 1px;
     grid-template-columns: subgrid;
     align-items: center;
     position: relative; // positioning context for actions toolbar
+    box-sizing: border-box;
+    min-height: $menu_item_min_height;
 
     // Make icon components to have the same size as icons.
     > span.icon {
@@ -282,7 +287,7 @@ $font-size-smaller: $font-size - 1px;
 
       // Add left padding if no glyph area.
       &:first-child > span.label {
-        padding-left: $padding_label_left;
+        padding-left: $label_padding_left;
       }
 
       > span.label {
