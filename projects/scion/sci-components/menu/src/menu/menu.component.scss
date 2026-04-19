@@ -48,10 +48,6 @@ $font-size-smaller: $font-size - 1px;
   &:disabled {
     color: var(--sci-color-gray-500);
   }
-
-  &.active {
-    background-color: var(--sci-workbench-menu-background-color-hover);
-  }
 }
 
 :host {
@@ -272,16 +268,30 @@ $font-size-smaller: $font-size - 1px;
     background-color: var(--sci-color-border);
   }
 
-  button.menu-item {
+  button:is(.menu-item, .menu) {
     @include button();
 
     grid-column: 1/-1; // consume all columns
     display: inline-grid;
     grid-template-columns: subgrid;
     align-items: center;
-    position: relative; // positioning context for actions toolbar
+    position: relative; // positioning context for active marker
     box-sizing: border-box;
     min-height: $menu_item_min_height;
+
+    &.menu-item.active::before {
+      position: absolute;
+      content: '';
+      box-sizing: border-box;
+      height: calc(100% - var(--sci-corner));
+      width: 4px;
+      border-radius: var(--sci-corner-small);
+      background-color: var(--sci-color-accent);
+    }
+
+    &.menu.open {
+      background-color: var(--sci-workbench-menu-background-color-hover);
+    }
 
     // Make icon components to have the same size as icons.
     > span.icon {
@@ -336,7 +346,7 @@ $font-size-smaller: $font-size - 1px;
     //  padding-right: .5em;
     //}
 
-    &:not(:hover):not(.checked) > div.content > sci-toolbar-group.actions:not(.open) {
+    &:not(:hover):not(.checked):not(.active) > div.content > sci-toolbar-group.actions:not(.open) {
       visibility: hidden;
     }
   }

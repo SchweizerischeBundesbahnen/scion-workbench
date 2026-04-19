@@ -33,6 +33,7 @@ export interface SciMenuItemDescriptor {
   label: MaybeSignal<Translatable> | ComponentType<unknown> | SciComponentDescriptor;
   icon?: MaybeSignal<string> | ComponentType<unknown> | SciComponentDescriptor;
   checked?: MaybeSignal<boolean>;
+  active?: MaybeSignal<boolean>;
   tooltip?: MaybeSignal<Translatable>;
   accelerator?: string[];
   disabled?: MaybeSignal<boolean>;

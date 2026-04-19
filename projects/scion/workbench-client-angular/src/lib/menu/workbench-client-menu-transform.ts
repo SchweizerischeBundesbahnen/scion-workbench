@@ -37,6 +37,7 @@ export namespace SciMenuItems {
             accelerator: menuItemProxy.accelerator,
             disabled: menuItemProxy.disabled && toSignal(menuItemProxy.disabled, {injector, requireSync: true}),
             checked: menuItemProxy.checked && toSignal(menuItemProxy.checked, {injector, requireSync: true}),
+            active: menuItemProxy.active && toSignal(menuItemProxy.active, {injector, requireSync: true}),
             actions: SciMenuItems.fromWorkbenchMenuItemProxies(menuItemProxy.actions, {injector}),
             // matchesFilter: (filter: string) => true; // TODO [menu]
             cssClass: menuItemProxy.cssClass,
@@ -113,6 +114,7 @@ export namespace SciMenuItems {
             accelerator: menuItem.accelerator,
             disabled: toLazyObservable(menuItem.disabled, {injector}),
             checked: toLazyObservable(menuItem.checked, {injector}),
+            active: toLazyObservable(menuItem.active, {injector}),
             actions: SciMenuItems.toWorkbenchMenuItems(menuItem.actions ?? [], {injector}),
             cssClass: menuItem.cssClass,
             attributes: menuItem.attributes,

@@ -26,6 +26,7 @@ export class WorkbenchMenuItem {
     accelerator?: string[];
     disabled?: MaybeObservable<boolean>;
     checked?: MaybeObservable<boolean>;
+    active?: MaybeObservable<boolean>;
     actions?: WorkbenchMenuItemLike[];
     cssClass?: string[];
     attributes?: {[name: string]: string};
@@ -45,17 +46,19 @@ export class WorkbenchMenuItem {
           label: Observables.coerce(this._menuItem.label),
           icon: Observables.coerce(this._menuItem.icon),
           checked: Observables.coerce(this._menuItem.checked),
+          active: Observables.coerce(this._menuItem.active),
           tooltip: Observables.coerce(this._menuItem.tooltip),
           disabled: Observables.coerce(this._menuItem.disabled),
           actions: WorkbenchMenuItems.toTransferable$(this._menuItem.actions ?? []),
         },
-        mapTo: ({label, icon, checked, tooltip, disabled, actions}): WorkbenchMenuItemTransferable => prune({
+        mapTo: ({label, icon, checked, active, tooltip, disabled, actions}): WorkbenchMenuItemTransferable => prune({
           id: this._menuItem.id,
           type: 'menu-item',
           name: this._menuItem.name,
           label: label,
           icon: icon,
           checked: checked,
+          active: active,
           tooltip: tooltip,
           accelerator: this._menuItem.accelerator,
           disabled: disabled,
@@ -90,6 +93,7 @@ export class WorkbenchMenuItemProxy {
   public readonly accelerator?: string[];
   public readonly disabled?: Observable<boolean>;
   public readonly checked?: Observable<boolean>;
+  public readonly active?: Observable<boolean>;
   public readonly actions: WorkbenchMenuItemProxyLike[];
   public readonly cssClass?: string[];
   public readonly attributes?: {[name: string]: string};
@@ -104,6 +108,7 @@ export class WorkbenchMenuItemProxy {
     this.accelerator = transferable.accelerator;
     this.disabled = remoteSubscriber$({relayId: this.id, property: 'disabled', initialValue: transferable.disabled});
     this.checked = remoteSubscriber$({relayId: this.id, property: 'checked', initialValue: transferable.checked});
+    this.active = remoteSubscriber$({relayId: this.id, property: 'active', initialValue: transferable.active});
     this.actions = WorkbenchMenuItems.fromTransferable(transferable.actions ?? []);
     this.cssClass = transferable.cssClass;
     this.attributes = transferable.attributes;
@@ -131,6 +136,7 @@ export interface WorkbenchMenuItemTransferable {
   accelerator?: string[];
   disabled?: boolean;
   checked?: boolean;
+  active?: boolean;
   actions?: WorkbenchMenuItemTransferableLike[];
   cssClass?: string[];
   attributes?: {[name: string]: string};

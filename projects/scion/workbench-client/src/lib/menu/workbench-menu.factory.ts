@@ -45,6 +45,7 @@ export interface WorkbenchMenuItemDescriptor {
   label: MaybeObservable<Translatable>;
   icon?: MaybeObservable<string>;
   checked?: MaybeObservable<boolean>;
+  active?: MaybeObservable<boolean>;
   tooltip?: MaybeObservable<Translatable>;
   accelerator?: string[];
   disabled?: MaybeObservable<boolean>;

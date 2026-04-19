@@ -38,6 +38,7 @@ export class WorkbenchClientMenuFactoryDelegate implements SciMenuFactory {
       label: toLazyObservable(coerceLabel(descriptor.label)),
       icon: toLazyObservable(coerceIcon(descriptor.icon)),
       checked: toLazyObservable(descriptor.checked),
+      active: toLazyObservable(descriptor.active),
       tooltip: toLazyObservable(descriptor.tooltip),
       accelerator: descriptor.accelerator,
       disabled: toLazyObservable(descriptor.disabled),

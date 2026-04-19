@@ -36,6 +36,7 @@ export class ɵWorkbenchMenuFactory implements WorkbenchMenuFactory {
       label: translate(descriptor.label),
       icon: descriptor.icon,
       checked: descriptor.checked,
+      active: descriptor.active,
       tooltip: translate(descriptor.tooltip),
       accelerator: descriptor.accelerator,
       disabled: descriptor.disabled,

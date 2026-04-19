@@ -34,6 +34,7 @@ export class ɵSciMenuFactory implements SciMenuFactory {
       iconLigature: coerceSignal(coerceIconLigature(descriptor.icon)),
       iconComponent: coerceIconComponent(descriptor.icon),
       checked: coerceSignal(descriptor.checked),
+      active: coerceSignal(descriptor.active),
       tooltip: translate(descriptor.tooltip),
       accelerator: descriptor.accelerator,
       disabled: coerceSignal(descriptor.disabled),
