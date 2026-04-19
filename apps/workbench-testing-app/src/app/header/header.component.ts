@@ -268,7 +268,7 @@ export class HeaderComponent {
       for (const perspective of perspectives) {
         group.addMenuItem({
           label: perspective.data[PerspectiveData.menuItemLabel] as string | undefined ?? perspective.id,
-          checked: perspective.active,
+          active: perspective.active,
           attributes: {'data-perspectiveid': perspective.id},
           actions: actions => perspective.active() && actions.addToolbarItem({
             icon: 'undo',

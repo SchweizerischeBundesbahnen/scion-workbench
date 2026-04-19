@@ -148,9 +148,9 @@ export class PartBarComponent {
             });
           }
         },
-        checked: view.active,
-        disabled: view.active,
-        onSelect: () => void view.activate(),
+        active: view.active,
+        // Perform navigation to update activation instant, required to scroll currently active view into view.
+        onSelect: () => void this._router.navigate(layout => layout.activateView(view.id), {skipLocationChange: true}),
       });
     }
   }
