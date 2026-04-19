@@ -72,7 +72,7 @@ export class MenuComponent {
   private readonly _document = inject(DOCUMENT);
   private readonly _actionToolbarMenuOpen = signal(false);
 
-  protected readonly hasGlyphArea = computed(() => this.glyphArea() ?? (!!this.filter() || requiresGlyphArea(this.menuItems())));
+  protected readonly hasGlyphArea = computed(() => this.glyphArea() ?? requiresGlyphArea(this.menuItems()));
   protected readonly menuItemsFiltered = computed(() => this.menuItems().filter(menuItem => this.matchesFilter(menuItem)()));
   protected readonly popoverAnchor = viewChild.required('popover_anchor', {read: ViewContainerRef});
   protected readonly viewport = viewChild(SciViewportComponent);

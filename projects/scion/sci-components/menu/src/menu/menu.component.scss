@@ -227,6 +227,19 @@ $font-size-smaller: $font-size - 1px;
     user-select: none;
   }
 
+  &.no-glyph-area > div.filter {
+    display: flex;
+    gap: .5em;
+
+    > sci-icon {
+      flex: none;
+    }
+
+    > sci-menu-filter {
+      flex: auto;
+    }
+  }
+
   > hr {
     all: unset;
     grid-column: 1/-1; // consume all columns
