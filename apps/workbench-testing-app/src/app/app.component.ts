@@ -20,7 +20,7 @@ import {Settings} from './settings.service';
 import {installFocusHighlighter} from './focus-highlight/focus-highlighter';
 import {installGlasspaneHighlighter} from './glasspane-highlight/glasspane-highlighter';
 import {installMicrofrontendApplicationLabels} from './microfrontend-application-labels/microfrontend-application-labels';
-import {contributeMenu} from '@scion/sci-components/menu';
+import {contributeMenu, SciToolbarFactory} from '@scion/sci-components/menu';
 import {UserMenuItemComponent} from './user-menu-item/user-menu-item.component';
 import {ViewMoveDialogTestPageComponent} from './test-pages/view-move-dialog-test-page/view-move-dialog-test-page.component';
 import {ViewInfoDialogComponent} from './view-info-dialog/view-info-dialog.component';
@@ -63,6 +63,8 @@ export class AppComponent implements DoCheck {
     installFocusHighlighter();
     installGlasspaneHighlighter();
     installMicrofrontendApplicationLabels();
+    this.contributeSampleActivityBarMenu();
+    // this.contributeSampleActivityBar();
 
     if (1 + 1) {
       return;
@@ -548,6 +550,77 @@ export class AppComponent implements DoCheck {
     );
   }
 
+  private contributeSampleActivityBarMenu(): void {
+    contributeMenu('menu:workbench.activitybar.left', menu => menu
+      .addMenuItem({icon: 'bookmark', label: 'Bookmarks', onSelect})
+      .addMenuItem({icon: 'play_circle', label: 'Run', onSelect})
+      .addMenuItem({icon: 'play_circle', label: 'Debug', onSelect})
+      .addMenuItem({icon: 'earthquake', label: 'Profiler', onSelect}),
+    );
+  }
+
+  private contributeSampleActivityBar(): void {
+    const bold = signal(false);
+    const italic = signal(false);
+    const underlined = signal(false);
+    const strikethrough = signal(false);
+    contributeMenu('toolbar:workbench.activitybar.left', toolbar => toolbar
+      .addGroup(group => group
+        .addToolbarItem({icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], checked: bold, onSelect: () => bold.update(bold => !bold)})
+        .addToolbarItem({icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], checked: italic, onSelect: () => italic.update(italic => !italic)})
+        .addToolbarItem({icon: 'format_underlined', checked: underlined, onSelect: () => underlined.update(underlined => !underlined)}),
+      )
+      .addMenu({icon: 'palette', menu: {filter: true}}, menu => menu
+        .addGroup(group => group
+          .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], checked: bold, onSelect: () => bold.update(bold => !bold)})
+          .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], checked: italic, onSelect: () => italic.update(italic => !italic)})
+          .addMenuItem({label: 'Underline', icon: 'format_underlined', accelerator: ['Ctrl', 'Shift', 'U'], checked: underlined, onSelect: () => underlined.update(underlined => !underlined)})
+          .addMenuItem({label: 'Strikethrough', icon: 'strikethrough_s', accelerator: ['Ctrl', 'Shift', 'S'], checked: strikethrough, onSelect: () => strikethrough.update(strikethrough => !strikethrough)}),
+        )
+        .addGroup({label: 'Heading', collapsible: true, actions: addHeadingGroupActions}, menu => menu
+          .addMenuItem({icon: 'format_h1', label: 'H1', onSelect})
+          .addMenuItem({icon: 'format_h2', label: 'H2', onSelect})
+          .addMenuItem({icon: 'format_h3', label: 'H3', onSelect})
+          .addMenuItem({icon: 'format_h4', label: 'H4', onSelect}),
+        )
+        .addMenu({label: 'Size', icon: 'format_size'}, menu => menu
+          .addGroup(group => group
+            .addMenuItem({icon: 'text_increase', label: 'Increase font size', onSelect})
+            .addMenuItem({icon: 'text_decrease', label: 'Decrease font size', onSelect}),
+          )
+          .addMenuItem({icon: 'view_real_size', label: 'Reset font size', onSelect}),
+        )
+        .addMenu({label: 'Align', icon: 'format_align_center'}, menu => menu
+          .addMenuItem({icon: 'format_align_left', label: 'Align left', onSelect})
+          .addMenuItem({icon: 'format_align_center', label: 'Align center', onSelect})
+          .addMenuItem({icon: 'format_align_right', label: 'Align right', onSelect})
+          .addMenuItem({icon: 'format_align_justify', label: 'Align justify', onSelect}),
+        )
+        .addMenu({label: 'Style', icon: 'match_case'}, menu => menu
+          .addMenuItem({icon: 'uppercase', label: 'Uppercase', onSelect})
+          .addMenuItem({icon: 'lowercase', label: 'Lowercase', onSelect})
+          .addMenuItem({icon: 'titlecase', label: 'Titlecase', onSelect}),
+        )
+        .addMenu({label: 'Rotate', icon: 'text_rotation_angledown'}, menu => menu
+          .addMenuItem({icon: 'text_rotate_vertical', label: 'Rotate 90°', onSelect})
+          .addMenuItem({icon: 'text_rotation_angledown', label: 'Rotate 45°', onSelect})
+          .addMenuItem({icon: 'text_rotation_angleup', label: 'Rotate -45°', onSelect}),
+        )
+        .addMenu({icon: 'format_list_numbered', label: 'Enumeration'}, menu => menu
+          .addMenuItem({icon: 'format_list_bulleted', label: 'Bullet list', onSelect})
+          .addMenuItem({icon: 'format_list_numbered', label: 'Number list', onSelect}),
+        ),
+      )
+      .addGroup(group => group
+        .addToolbarItem({icon: 'undo', accelerator: ['Ctrl', 'Z'], onSelect: () => onSelect()})
+        .addToolbarItem({icon: 'redo', onSelect: () => onSelect()})
+        .addToolbarItem({icon: 'content_cut', accelerator: ['Ctrl', 'X'], onSelect: () => onSelect()})
+        .addToolbarItem({icon: 'content_copy', accelerator: ['Ctrl', 'C'], onSelect: () => onSelect()})
+        .addToolbarItem({icon: 'content_paste', accelerator: ['Ctrl', 'V'], onSelect: () => onSelect()}),
+      ),
+    );
+  }
+
   private onAction(): void {
     console.log('>>> click');
   }
@@ -649,4 +722,17 @@ function toggleMultiFlag(flags: WritableSignal<Set<string>>, flag: string): void
     }
     return newFlags;
   });
+}
+
+function addHeadingGroupActions(toolbar: SciToolbarFactory): void {
+  toolbar
+    .addToolbarItem('favorite', onSelect)
+    .addMenu({icon: 'more_vert', visualMenuHint: false}, menu => menu
+      .addMenuItem('Don\'t Show Again For This Project', onSelect)
+      .addMenuItem('Don\'t Show Again', onSelect),
+    );
+}
+
+function onSelect(): void {
+
 }
