@@ -13,6 +13,7 @@
 
         @if (hasActionToolbar) {
           <sci-toolbar-group [menuItems]="actions!"
+                             [orientation]="'horizontal'"
                              [viewContainerRef]="popoverAnchor()"
                              (menuOpen)="onActionToolbarMenuOpen($event)"
                              (click)="$event.stopPropagation()"
@@ -26,6 +27,7 @@
 
       @if (hasActionToolbar) {
         <sci-toolbar-group [menuItems]="actions!"
+                           [orientation]="'horizontal'"
                            [viewContainerRef]="popoverAnchor()"
                            (menuOpen)="onActionToolbarMenuOpen($event)"
                            (click)="$event.stopPropagation()"
@@ -104,6 +106,7 @@
 
               @if (hasActionToolbar) {
                 <sci-toolbar-group [menuItems]="actions!"
+                                   [orientation]="'horizontal'"
                                    [viewContainerRef]="popoverAnchor()"
                                    (menuOpen)="onActionToolbarMenuOpen($event)"
                                    (click)="$event.stopPropagation()"

@@ -64,6 +64,7 @@
     }
     @case ('group') {
       <sci-toolbar-group [menuItems]="menuItem.children"
+                         [orientation]="orientation()"
                          [disabled]="disabled"
                          [viewContainerRef]="viewContainerRef()"
                          (menuOpen)="onChildGroupMenuOpen($event)"

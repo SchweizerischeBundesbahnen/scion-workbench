@@ -17,10 +17,14 @@ import {SciIconComponent} from '@scion/sci-components/icon';
     SciToolbarControlPipe,
     SciIconComponent,
   ],
+  host: {
+    '[attr.data-orientation]': 'orientation()',
+  },
 })
 export class SciToolGroupComponent {
 
   public readonly menuItems = input.required<Array<SciMenuItem | SciMenu | SciMenuGroup>>();
+  public readonly orientation = input.required<'horizontal' | 'vertical'>();
   public readonly disabled = input<boolean>();
   public readonly viewContainerRef = input<ViewContainerRef | undefined>();
   public readonly menuOpen = output<boolean>();
@@ -60,7 +64,7 @@ export class SciToolGroupComponent {
             maxWidth: activeMenuItem.menu.menu.maxWidth,
             maxHeight: activeMenuItem.menu.menu.maxHeight,
           },
-          align: 'vertical',
+          align: this.orientation() === 'horizontal' ? 'vertical' : 'horizontal',
         });
         ref.onClose(() => {
           // do not close other menu

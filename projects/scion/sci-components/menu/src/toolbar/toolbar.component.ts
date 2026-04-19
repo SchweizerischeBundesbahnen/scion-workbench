@@ -21,6 +21,7 @@ import {Objects} from '@scion/toolkit/util';
 export class SciToolbarComponent {
 
   public readonly name = input.required<`toolbar:${string}`>();
+  public readonly orientation = input<'horizontal' | 'vertical'>('horizontal');
   public readonly context = input<Map<string, unknown>>();
   public readonly acceleratorTarget = input<MaybeArray<Element | ElementRef<Element>> | undefined>();
   public readonly viewContainerRef = input<ViewContainerRef | undefined>();

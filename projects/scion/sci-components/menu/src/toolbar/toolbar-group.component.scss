@@ -7,20 +7,42 @@ $padding_menu_item: .125em .75em;
   align-items: stretch;
   gap: 2px;
 
+  &[data-orientation="vertical"] {
+    flex-direction: column;
+  }
+
   // Add before separator
-  > sci-toolbar-group:not(:first-child):has(:not(:scope > sci-toolbar-group:first-child))::before {
-    content: '';
-    width: 1px;
-    background-color: var(--sci-color-border);
-    margin: 2px;
+  > sci-toolbar-group:not(:first-child):has(:not(:scope > sci-toolbar-group:first-child)) {
+    &::before {
+      content: '';
+      background-color: var(--sci-color-border);
+      margin: 2px;
+    }
+
+    &[data-orientation="horizontal"]::before {
+      width: 1px;
+    }
+
+    &[data-orientation="vertical"]::before {
+      height: 1px;
+    }
   }
 
   // Add after separator
-  > sci-toolbar-group:not(:last-child):not(:has(+ sci-toolbar-group, + sci-menu))::after { // + sci-menu to exclude opened submenu, which is rendered as the last child
-    content: '';
-    width: 1px;
-    background-color: var(--sci-color-border);
-    margin: 2px;
+  > sci-toolbar-group:not(:last-child):not(:has(+ sci-toolbar-group, + sci-menu)) { // + sci-menu to exclude opened submenu, which is rendered as the last child
+    &::after {
+      content: '';
+      background-color: var(--sci-color-border);
+      margin: 2px;
+    }
+
+    &[data-orientation="horizontal"]::before {
+      width: 1px;
+    }
+
+    &[data-orientation="vertical"]::before {
+      height: 1px;
+    }
   }
 
   > button.menu-item {
