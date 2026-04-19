@@ -72,6 +72,11 @@ $padding_menu_item: .125em .75em;
       }
     }
 
+    &:disabled.submenu-item.visual-menu-hint::after {
+      border-right-color: var(--sci-color-gray-500);
+      border-bottom-color: var(--sci-color-gray-500);
+    }
+
     &.checked:where(:not(:disabled)) {
       background-color: var(--sci-toolbar-toolbar-item-background-color-checked);
     }
