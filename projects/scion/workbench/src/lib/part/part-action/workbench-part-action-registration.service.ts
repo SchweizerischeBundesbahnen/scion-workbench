@@ -121,6 +121,10 @@ export class WorkbenchPartActionRegistrationService {
 
 @Component({
   selector: 'wb-part-action',
+  styles: `:host {
+    display: grid;
+    place-content: center
+  }`,
   template: '<ng-container *ngTemplateOutlet="template(); context: context()"/>',
   imports: [NgTemplateOutlet],
 })
