@@ -232,7 +232,6 @@ $font-size-smaller: $font-size - 1px;
     grid-column: 1/-1; // consume all columns
     height: 1px;
     background-color: var(--sci-color-border);
-    margin: 0 $menu_item_padding_inline .5em $menu_item_padding_inline;
   }
 
   div.message.no-items {
