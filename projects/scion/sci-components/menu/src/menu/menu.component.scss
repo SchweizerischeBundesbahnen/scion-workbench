@@ -95,14 +95,8 @@ $font-size-smaller: $font-size - 1px;
 
     &:not(.no-glyph-area) {
       > header.group-header {
-        grid-column: 2;
-        padding-left: 0;
-      }
-    }
-
-    &.no-glyph-area {
-      > header.group-header {
         grid-column: 1/-1; // consume all columns
+        padding-left: $menu_item_padding_inline;
       }
     }
 
@@ -121,12 +115,9 @@ $font-size-smaller: $font-size - 1px;
 
       > span.label {
         flex: auto;
-
+        color: var(--sci-color-text-subtlest);
         font-weight: 500;
-        @container style(--sci-color-scheme: dark) {
-          // TODO [menu] add sci-color-scheme token, currently simply color-scheme, not a CSS variable
-          font-weight: 600;
-        }
+        font-size: .95em;
       }
 
       > sci-toolbar-group.actions {
