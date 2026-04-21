@@ -5,6 +5,7 @@ $padding_menu_item: .3em .6em;
 
   display: flex;
   align-items: stretch;
+  padding: var(--sci-menubar-padding, .125em .25em);
 
   > button {
     all: unset;

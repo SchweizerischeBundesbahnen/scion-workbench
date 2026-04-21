@@ -40,8 +40,7 @@
 
   > sci-toolbar {
     flex: initial; // allow to shrink
-    padding-top: .2em;
-    padding-bottom: .2em;
+    padding: .2em 0;
   }
 
   > div.filler {
