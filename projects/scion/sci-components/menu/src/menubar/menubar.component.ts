@@ -73,7 +73,7 @@ export class SciMenubarComponent {
   }
 
   protected onMenuClick(menu: {menu: SciMenu, element: HTMLElement} | null): void {
-    this.activeMenu.set(menu);
+    this.activeMenu.update(activeMenu => activeMenu?.menu === menu?.menu ? null : menu);
   }
 
   protected onMenuMouseEnter(menuItem: {menu: SciMenu, element: HTMLElement} | null): void {
