@@ -35,7 +35,7 @@
       @let hasIcon = menuItem.iconLigature || menuItem.iconComponent;
       <button [attr.disabled]="disabled || null"
               [attr.title]="menuItem.tooltip?.()"
-              [class.active]="activeMenuItem()?.menu === menuItem"
+              [class.active]="activeMenu()?.menu === menuItem"
               [class.visual-menu-hint]="hasIcon && !hasLabel && menuItem.visualMenuHint"
               [class]="menuItem.cssClass" class="menu-item submenu-item"
               (click)="onMenuClick({menu: menuItem, element})"

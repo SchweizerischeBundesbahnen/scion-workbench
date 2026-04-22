@@ -33,7 +33,7 @@ export class SciToolGroupComponent {
   private readonly _childGroupMenuOpen = signal(false);
   private readonly _document = inject(DOCUMENT);
 
-  protected readonly activeMenuItem = linkedSignal<SciMenuItemLike[], {menu: SciMenu, element: HTMLElement} | null>({
+  protected readonly activeMenu = linkedSignal<SciMenuItemLike[], {menu: SciMenu, element: HTMLElement} | null>({
     source: this.menuItems,  // reset active sub menu item when this component is re-used
     computation: () => null,
   });
@@ -43,7 +43,7 @@ export class SciToolGroupComponent {
 
     // Open popover when hovering over a menu item, or hide it otherwise.
     effect((onCleanup) => {
-      const activeMenuItem = this.activeMenuItem();
+      const activeMenuItem = this.activeMenu();
       // Attach popover to configured view ref. Defaults to this component's view ref.
       // Controls where to add the popup, e.g., required for toolbar in menu button to not be child of the menu item (hover state)
       const viewContainerRef = this.viewContainerRef() ?? injector.get(ViewContainerRef);
@@ -68,14 +68,14 @@ export class SciToolGroupComponent {
         });
         ref.onClose(() => {
           // do not close other menu
-          this.activeMenuItem.update(it => it === activeMenuItem ? null : it);
+          this.activeMenu.update(it => it === activeMenuItem ? null : it);
         });
         onCleanup(() => ref.close());
       });
     });
 
     effect(() => {
-      const open = this.activeMenuItem() !== null || this._childGroupMenuOpen();
+      const open = this.activeMenu() !== null || this._childGroupMenuOpen();
       untracked(() => this.menuOpen.emit(open));
     });
   }
@@ -90,8 +90,8 @@ export class SciToolGroupComponent {
     this._childGroupMenuOpen.set(open);
   }
 
-  protected onMenuClick(menuItem: {menu: SciMenu, element: HTMLElement} | null): void {
-    this.activeMenuItem.set(menuItem);
+  protected onMenuClick(menu: {menu: SciMenu, element: HTMLElement} | null): void {
+    this.activeMenu.update(activeMenu => activeMenu?.menu === menu?.menu ? null : menu);
   }
 
   private closeMenus(): void {
