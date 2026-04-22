@@ -161,7 +161,7 @@ export class SciMenuOpener {
     if (align === 'horizontal') {
       setStyles(popoverElement, {
         'position-anchor': `--${popoverId}`,
-        'position-try-fallbacks': 'flip-inline, flip-block',
+        'position-try-fallbacks': 'flip-inline, flip-block, flip-inline flip-block',
         'top': `calc(anchor(top) - var(--ɵsci-menu-padding-block))`,
         'left': 'calc(anchor(right) + 1px)',
       });
