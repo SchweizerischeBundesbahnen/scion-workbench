@@ -170,7 +170,7 @@ export class MenuComponent {
     this.isGroupExpanded.update(expanded => !expanded);
   }
 
-  protected onMenuItemMouseEnter(menuItem: {menu: SciMenu, element: HTMLElement} | null): void {
+  protected onMenuOpen(menuItem: {menu: SciMenu, element: HTMLElement} | null): void {
     const disabled = this.disabled() || menuItem?.menu.disabled?.();
     this.activeSubMenuItem.set(disabled ? null : menuItem);
 

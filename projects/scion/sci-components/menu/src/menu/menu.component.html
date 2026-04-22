@@ -4,7 +4,7 @@
   @let hasActionToolbar = !this.disabled() && actions.length;
 
   @if (group.collapsible) {
-    <button class="group-header" (click)="onGroupToggle()" (mouseenter)="onMenuItemMouseEnter(null)">
+    <button class="group-header" (click)="onGroupToggle()" (mouseenter)="onMenuOpen(null)">
       <!-- TODO [menu] use SCION icon -->
       <sci-icon>{{isGroupExpanded() ? 'keyboard_arrow_down' : 'chevron_right'}}</sci-icon>
 
@@ -64,7 +64,7 @@
 
       @switch (menuItem.type) {
         @case ('menu-item') {
-          <button (mouseenter)="onMenuItemMouseEnter(null)"
+          <button (mouseenter)="onMenuOpen(null)"
                   [attr.disabled]="disabled || null"
                   [attr.title]="menuItem.tooltip?.()"
                   [class.checked]="menuItem.checked?.()"
@@ -121,7 +121,8 @@
                   [attr.title]="menuItem.tooltip?.()"
                   [class.open]="activeSubMenuItem()?.menu === menuItem"
                   [class]="menuItem.cssClass" class="menu"
-                  (mouseenter)="onMenuItemMouseEnter({menu: menuItem, element: element})"
+                  (mouseenter)="onMenuOpen({menu: menuItem, element: element})"
+                  (click)="onMenuOpen({menu: menuItem, element: element})"
                   #element>
             @if (hasGlyphArea()) {
               @if (menuItem.iconLigature) {
