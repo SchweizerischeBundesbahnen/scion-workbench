@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, inject, input, linkedSignal, signal, Signal, untracked, viewChild, ViewContainerRef} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, inject, input, linkedSignal, OnInit, signal, Signal, untracked, viewChild, ViewContainerRef} from '@angular/core';
 import {FormatAcceleratorPipe} from './accelerator-format.pipe';
 import {MenuItemGroupComponent} from './menu-group.component';
 import {MenuFilterComponent} from './menu-filter.component';
@@ -53,7 +53,7 @@ import {fromResize$} from '@scion/toolkit/observable';
     '[class]': 'cssClass()',
   },
 })
-export class MenuComponent {
+export class MenuComponent implements OnInit {
 
   public readonly type = input.required<'menu' | 'group'>();
   // TODO [menu] Can menu items change? Before SciMenuOpener, this was possible. SciMenuOpener, however, always opens a new menu.
@@ -108,14 +108,13 @@ export class MenuComponent {
     };
   });
 
-  constructor() {
-    // Maintain stable width when expanding/collapsing groups or hovering menu item with an actions toolbar.
-    fromResize$(inject(ElementRef).nativeElement, {box: 'border-box'})
-      .pipe(take(1))
-      .subscribe(() => {
-        this.size.update(size => ({...size, width: `${this._host.getBoundingClientRect().width}px`}));
-      });
+  public ngOnInit(): void {
+    if (this.type() === 'menu') {
+      this.freezeCurrentWidth();
+    }
+  }
 
+  constructor() {
     // Close action menu when this component is re-used.
     effect(() => {
       this.menuItems();
@@ -190,6 +189,17 @@ export class MenuComponent {
 
   protected onActionToolbarMenuOpen(open: boolean): void {
     this._actionToolbarMenuOpen.set(open);
+  }
+
+  /**
+   * Maintain stable width when expanding/collapsing groups or hovering menu item with an actions toolbar.
+   */
+  private freezeCurrentWidth(): void {
+    fromResize$(this._host, {box: 'border-box'})
+      .pipe(take(1))
+      .subscribe(() => {
+        this.size.update(size => ({...size, width: `${this._host.getBoundingClientRect().width}px`}));
+      });
   }
 
   private computeScrolling(): Signal<boolean> {

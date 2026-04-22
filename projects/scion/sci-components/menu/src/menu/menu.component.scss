@@ -71,12 +71,12 @@ $font-size-smaller: $font-size - 1px;
   grid-template-columns:
     // === Menu subgrid ===
     auto // glyph area for icons and check marks
-    1fr; // label area
+    minmax(0, 1fr); // label area, not 1fr but minmax(0, 1fr) to display ellipsis for menu item labels
 
   &.no-glyph-area {
     grid-template-columns:
       // === Menu subgrid ===
-      1fr; // label area
+      minmax(0, 1fr); // label area
   }
 
   &[popover]:not(:popover-open) {
@@ -107,11 +107,11 @@ $font-size-smaller: $font-size - 1px;
       align-items: center;
       padding-left: $menu_item_padding_inline + $label_padding_left;
       padding-right: $menu_item_padding_inline;
-      overflow: hidden; // to support ellipsis on label
       user-select: none;
       color: var(--sci-color-text);
       box-sizing: border-box;
       min-height: $menu_item_min_height;
+      // Do not set overflow: hidden to not crop outline of toolbar items.
 
       > span.label {
         flex: auto;
@@ -194,7 +194,7 @@ $font-size-smaller: $font-size - 1px;
       grid-template-columns:
       // === Menu subgrid ===
         auto // glyph area for icons and check marks
-        1fr; // label area
+        minmax(0, 1fr); // label area
       padding: 2px $menu_padding_inline; // 2px to not clip outline
     }
   }
@@ -202,7 +202,7 @@ $font-size-smaller: $font-size - 1px;
   &.no-glyph-area > sci-viewport::part(content) {
     grid-template-columns:
       // === Menu subgrid ===
-      1fr; // label area
+      minmax(0, 1fr); // label area
   }
 
   > div.filter {
@@ -296,7 +296,7 @@ $font-size-smaller: $font-size - 1px;
       display: flex;
       align-items: center;
       gap: 2em;
-      overflow: hidden; // to support ellipsis on label
+      // Do not set overflow: hidden to not crop outline of toolbar items.
 
       // Add left padding if no glyph area.
       &:first-child > span.label {

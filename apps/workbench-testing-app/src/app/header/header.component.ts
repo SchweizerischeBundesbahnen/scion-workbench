@@ -16,7 +16,7 @@ import {Logger, LogLevel, WorkbenchPerspective, WorkbenchRouter, WorkbenchServic
 import {Settings} from '../settings.service';
 import {Maps} from '@scion/toolkit/util';
 import {comparePerspectives} from './perspective-comparator.util';
-import {contributeMenu, SciMenuFactory, SciToolbarComponent, SciToolbarFactory} from '@scion/sci-components/menu';
+import {contributeMenu, SciMenuFactory, SciToolbarComponent, SciToolbarFactory, SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
 import {ThemeSwitcherComponent} from '../theme-switch-button/theme-switcher.component';
 
 @Component({
@@ -240,7 +240,7 @@ export class HeaderComponent {
   }
 
   private contributePerspectiveSwitcherMenu(toolbar: SciToolbarFactory): void {
-    const menuDescriptor = {
+    const menuDescriptor: SciToolbarMenuDescriptor = {
       label: computed(() => this._workbenchService.activePerspective()?.data?.[PerspectiveData.label] as string | undefined ?? this._workbenchService.activePerspective()?.id ?? 'unkown'),
       tooltip: 'Switch Perspective',
       cssClass: ['perspective-switcher', 'e2e-perspective-switcher-menu'],
