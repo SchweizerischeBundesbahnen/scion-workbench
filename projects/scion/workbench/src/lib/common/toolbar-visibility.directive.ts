@@ -41,7 +41,7 @@ import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 @Directive({
   selector: 'sci-toolbar[wbToolbarVisibility]',
   host: {
-    '[attr.data-visibility]': 'workbenchLayoutService.toolbarVisibility() === \'always\' ? \'always\' : null',
+    '[attr.data-visibility]': `workbenchLayoutService.toolbarVisibility() === 'always' ? 'always' : null`,
   },
 })
 export class ToolbarVisibilityDirective {

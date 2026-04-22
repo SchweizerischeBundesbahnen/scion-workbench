@@ -146,7 +146,7 @@ $font-size-smaller: $font-size - 1px;
         gap: .75em;
         justify-content: space-between;
         align-items: center;
-        overflow: hidden; // to support ellipsis on label
+        // Do not set overflow: hidden to not crop outline of toolbar items.
 
         > span.label {
           flex: auto;

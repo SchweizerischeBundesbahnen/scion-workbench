@@ -20,7 +20,7 @@
     right: var(--ɵdialog-toolbar-width);
 
     // Add filler element if the title is center-aligned, preventing misalignment since the toolbar also occupies space.
-    // When the toolbar is hidden (e.g, not focused nor hovered), the filler size also drops to zero to keep the title centered.
+    // When the toolbar is hidden (e.g, neither focused nor hovered), the filler size also drops to zero to keep the title centered.
     @container style(--sci-workbench-dialog-title-align: center) {
       &::before {
         content: '';
