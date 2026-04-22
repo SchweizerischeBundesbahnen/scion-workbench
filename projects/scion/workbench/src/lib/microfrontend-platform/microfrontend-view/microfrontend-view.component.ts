@@ -14,7 +14,7 @@ import {filter, first, map, take} from 'rxjs/operators';
 import {ManifestService, mapToBody, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {WorkbenchViewCapability, ɵVIEW_CAPABILITY_ID_PARAM_NAME, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
-import {Dictionaries, Maps, Objects} from '@scion/toolkit/util';
+import {Arrays, Dictionaries, Maps, Objects} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
 import {CanCloseRef} from '../../workbench.model';
 import {IFRAME_OVERLAY_HOST} from '../../workbench-element-references';
@@ -100,6 +100,7 @@ export class MicrofrontendViewComponent {
     this.propagateViewContext();
     this.installNavigator();
     this.installParamsUpdater();
+    this.propagateHoverState();
 
     inject(DestroyRef).onDestroy(() => this.unload());
   }
@@ -115,6 +116,23 @@ export class MicrofrontendViewComponent {
         takeUntilDestroyed(),
       )
       .subscribe();
+  }
+
+  /**
+   * Propagates the hover state from projected microfrontend content (sci-router-outlet) to the part.
+   *
+   * The microfrontend sits on top of the part but is not its child, preventing the part from receiving native hover events.
+   * This method manually sets `--ɵsci-workbench-part-hover` on the part when the microfrontend is hovered.
+   */
+  private propagateHoverState(): void {
+    const styleSheet = new CSSStyleSheet({});
+    styleSheet.insertRule(`
+      wb-workbench:has(sci-router-outlet[name="${this.view.id}"]:hover) wb-part[data-partid="${this.view.part().id}"] {
+        --ɵsci-workbench-part-hover: true;
+      }`,
+    );
+    document.adoptedStyleSheets.push(styleSheet);
+    inject(DestroyRef).onDestroy(() => Arrays.remove(document.adoptedStyleSheets, styleSheet));
   }
 
   /**

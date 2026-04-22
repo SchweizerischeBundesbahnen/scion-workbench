@@ -21,6 +21,7 @@ import {filter} from 'rxjs/operators';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
 import {contributeMenu, SciToolbarComponent, SciToolbarFactory} from '@scion/sci-components/menu';
 import {WorkbenchMenuContextKeys} from '../menu/workbench-menu-context-provider';
+import {ToolbarVisibilityDirective} from '../common/toolbar-visibility.directive';
 
 /**
  * Renders the content of a workbench notification.
@@ -35,6 +36,7 @@ import {WorkbenchMenuContextKeys} from '../menu/workbench-menu-context-provider'
     RemoveLegacyInputPipe,
     SciViewportComponent,
     SciToolbarComponent,
+    ToolbarVisibilityDirective,
   ],
   hostDirectives: [
     GlassPaneDirective,
@@ -45,6 +47,7 @@ import {WorkbenchMenuContextKeys} from '../menu/workbench-menu-context-provider'
   host: {
     '[attr.data-notificationid]': 'notification.id',
     '[attr.data-severity]': 'notification.severity()',
+    '[attr.data-focus]': `notification.focused() ? '' : null`,
     '[style.min-height]': 'notification.size.minHeight()',
     '[style.height]': 'notification.size.height()',
     '[style.max-height]': 'notification.size.maxHeight()',

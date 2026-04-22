@@ -12,7 +12,7 @@ import {Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inj
 import {ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {WorkbenchPartCapability, ɵWORKBENCH_PART_CONTEXT, ɵWorkbenchCommands, ɵWorkbenchPartContext} from '@scion/workbench-client';
-import {Maps} from '@scion/toolkit/util';
+import {Arrays, Maps} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
 import {IFRAME_OVERLAY_HOST} from '../../workbench-element-references';
 import {serializeExecution} from '../../common/operators';
@@ -41,6 +41,10 @@ import {Routing} from '../../routing/routing.util';
     NgComponentOutlet,
     GlassPaneDirective,
   ],
+  host: {
+    '[attr.data-partid]': 'part.id',
+    '[attr.data-peripheral]': `part.peripheral() ? '' : null`,
+  },
   viewProviders: [
     configureMicrofrontendGlassPane(),
   ],
@@ -76,6 +80,7 @@ export class MicrofrontendPartComponent {
     this.propagateWorkbenchTheme();
     this.propagatePartContext();
     this.installNavigator();
+    this.propagateHoverState();
 
     inject(DestroyRef).onDestroy(() => this.unload());
   }
@@ -88,6 +93,23 @@ export class MicrofrontendPartComponent {
         takeUntilDestroyed(),
       )
       .subscribe();
+  }
+
+  /**
+   * Propagates the hover state from projected microfrontend content (sci-router-outlet) to the part.
+   *
+   * The microfrontend sits on top of the part but is not its child, preventing the part from receiving native hover events.
+   * This method manually sets `--ɵsci-workbench-part-hover` on the part when the microfrontend is hovered.
+   */
+  private propagateHoverState(): void {
+    const styleSheet = new CSSStyleSheet({});
+    styleSheet.insertRule(`
+      wb-workbench:has(sci-router-outlet[name="${this.part.id}"]:hover) wb-part[data-partid="${this.part.id}"] {
+        --ɵsci-workbench-part-hover: true;
+      }`,
+    );
+    document.adoptedStyleSheets.push(styleSheet);
+    inject(DestroyRef).onDestroy(() => Arrays.remove(document.adoptedStyleSheets, styleSheet));
   }
 
   private async onNavigate(context: NavigationContext): Promise<void> {

@@ -23,7 +23,7 @@
   }
 
   > span.title {
-    flex: none;
+    flex: 0 1 auto; // enables display of elllipsis on overflow
     align-self: center;
     user-select: none;
     margin-right: .5em;
@@ -39,8 +39,14 @@
   }
 
   > sci-toolbar {
-    flex: initial; // allow to shrink
-    padding: .2em 0;
+    flex: none;
+    --sci-toolbar-padding: .2em 0;
+    --sci-toolbar-min-size: auto;
+  }
+
+  // Show/hide toolbar based on the `scion.workbench.appearance.toolbar.visibility` workbench setting.
+  wb-part[data-peripheral] & > sci-toolbar {
+    @include workbench.toolbar-visibility(--ɵsci-workbench-part-hover, --ɵsci-workbench-part-focus);
   }
 
   > div.filler {

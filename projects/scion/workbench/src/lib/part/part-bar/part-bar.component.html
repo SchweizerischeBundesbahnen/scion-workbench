@@ -9,6 +9,16 @@
 }
 
 <!-- .tabbar suffix is suboptimal since also used in parts without view tabs. Find better suffix, e.g., actionbar -->
-<sci-toolbar name="toolbar:workbench.part.tabbar" [context]="toolbarActiveViewContext()" [acceleratorTarget]="part.portal.element()"/>
+<sci-toolbar name="toolbar:workbench.part.tabbar"
+             [context]="toolbarActiveViewContext()"
+             [acceleratorTarget]="part.portal.element()"
+             (mousedown)="onPartBarMouseDown($event)"
+             wbToolbarVisibility/>
+
 <div class="filler e2e-filler" #filler (mousedown)="onPartBarMouseDown($event)"></div>
-<sci-toolbar name="toolbar:workbench.part.toolbar" [context]="toolbarActiveViewContext()" [acceleratorTarget]="part.portal.element()"/>
+
+<sci-toolbar name="toolbar:workbench.part.toolbar"
+             [context]="toolbarActiveViewContext()"
+             [acceleratorTarget]="part.portal.element()"
+             (mousedown)="onPartBarMouseDown($event)"
+             wbToolbarVisibility/>

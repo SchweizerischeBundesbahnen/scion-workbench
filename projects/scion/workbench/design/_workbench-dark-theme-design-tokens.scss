@@ -2,11 +2,6 @@
  * Design tokens specific to the SCION Workbench.
  */
 $tokens: (
-  --sci-workbench-layout-panel-left-width: 300,
-  --sci-workbench-layout-panel-right-width: 300,
-  --sci-workbench-layout-panel-bottom-height: 250,
-  --sci-workbench-layout-panel-align: justify,
-  --sci-workbench-layout-panel-animate: true,
   --sci-workbench-view-background-color: var(--sci-workbench-part-background-color),
   --sci-workbench-view-peripheral-background-color: var(--sci-workbench-part-peripheral-background-color),
   --sci-workbench-part-background-color: var(--sci-color-background-primary),
@@ -59,6 +54,11 @@ $tokens: (
   --sci-workbench-tab-drag-text-color-disabled: var(--sci-color-gray-600),
   --sci-workbench-activity-bar-background-color: var(--sci-workbench-part-peripheral-background-color),
   --sci-workbench-activity-bar-padding: .35em,
+  --sci-workbench-activity-panel-animate: true,
+  --sci-workbench-activity-panel-left-width: 300,
+  --sci-workbench-activity-panel-right-width: 300,
+  --sci-workbench-activity-panel-bottom-height: 250,
+  --sci-workbench-activity-panel-bottom-align: justify,
   --sci-workbench-activity-item-cursor: default,
   --sci-workbench-activity-item-background-color: transparent,
   --sci-workbench-activity-item-background-color-hover: var(--sci-workbench-button-background-color-hover),
@@ -96,6 +96,7 @@ $tokens: (
   --sci-workbench-dialog-title-font-weight: normal,
   --sci-workbench-dialog-title-font-size: 1.1rem,
   --sci-workbench-dialog-title-align: center,
+  --sci-workbench-toolbar-visibility: on-hover-or-focus,
   --sci-workbench-button-cursor: default,
   --sci-workbench-button-background-color-hover: var(--sci-color-gray-200),
   --sci-workbench-button-background-color-active: var(--sci-color-gray-300),

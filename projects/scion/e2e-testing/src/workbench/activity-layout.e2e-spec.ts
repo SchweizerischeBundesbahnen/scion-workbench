@@ -2518,9 +2518,9 @@ test.describe('Activity Layout', () => {
   test('should size activity panels based on design tokens', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({
       microfrontendSupport: false, designTokens: {
-        '--sci-workbench-layout-panel-left-width': '150',
-        '--sci-workbench-layout-panel-right-width': '200',
-        '--sci-workbench-layout-panel-bottom-height': '250',
+        '--sci-workbench-activity-panel-left-width': '150',
+        '--sci-workbench-activity-panel-right-width': '200',
+        '--sci-workbench-activity-panel-bottom-height': '250',
       },
     });
 

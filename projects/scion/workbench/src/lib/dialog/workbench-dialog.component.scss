@@ -13,6 +13,14 @@
     --ɵdialog-padding: 0;
   }
 
+  &:hover {
+    --ɵsci-workbench-dialog-hover: true;
+  }
+
+  &[data-focus] {
+    --ɵsci-workbench-dialog-focus: true;
+  }
+
   display: flex;
   flex-direction: column;
   align-items: center;

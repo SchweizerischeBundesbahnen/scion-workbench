@@ -51,8 +51,8 @@ export class HeaderComponent {
     contributeMenu('toolbar:settings', toolbar => toolbar
       .addToolbarItem({control: ThemeSwitcherComponent})
       .addMenu({icon: 'more_vert', visualMenuHint: false, menu: {filter: true}, cssClass: 'e2e-settings-menu'}, menu => {
-        this.contributePanelAlignmentGroup(menu);
-        this.contributeRenderingFlagGroup(menu);
+        this.contributeWorkbenchSettingsGroup(menu);
+        this.contributeApplicationSettingsGroup(menu);
         this.contributeOpenGroup(menu);
         this.contributeNavigateGroup(menu);
         this.contributeLoggingGroup(menu)
@@ -60,42 +60,49 @@ export class HeaderComponent {
     );
   }
 
-  private contributePanelAlignmentGroup(menu: SciMenuFactory): void {
-    menu.addMenu('Panel Alignment', menu => menu
+  private contributeWorkbenchSettingsGroup(menu: SciMenuFactory): void {
+    menu.addGroup({label: 'Workbench Settings'}, group => group
+      .addMenu('Panel Alignment', menu => menu
+        .addMenuItem({
+          label: 'Left',
+          checked: computed(() => this._workbenchService.settings.panelAlignment() === 'left'),
+          cssClass: 'e2e-change-panel-alignment-left',
+          onSelect: () => this._workbenchService.settings.panelAlignment.set('left'),
+        })
+        .addMenuItem({
+          label: 'Right',
+          checked: computed(() => this._workbenchService.settings.panelAlignment() === 'right'),
+          cssClass: 'e2e-change-panel-alignment-right',
+          onSelect: () => this._workbenchService.settings.panelAlignment.set('right'),
+        })
+        .addMenuItem({
+          label: 'Center',
+          checked: computed(() => this._workbenchService.settings.panelAlignment() === 'center'),
+          cssClass: 'e2e-change-panel-alignment-center',
+          onSelect: () => this._workbenchService.settings.panelAlignment.set('center'),
+        })
+        .addMenuItem({
+          label: 'Justify',
+          checked: computed(() => this._workbenchService.settings.panelAlignment() === 'justify'),
+          cssClass: 'e2e-change-panel-alignment-justify',
+          onSelect: () => this._workbenchService.settings.panelAlignment.set('justify'),
+        }),
+      )
       .addMenuItem({
-        label: 'Left',
-        checked: computed(() => this._workbenchService.settings.panelAlignment() === 'left'),
-        cssClass: 'e2e-change-panel-alignment-left',
-        onSelect: () => this._workbenchService.settings.panelAlignment.set('left'),
+        label: 'Show Toolbars Only on Hover or Focus',
+        checked: computed(() => this._workbenchService.settings.toolbarVisibility() === 'on-hover-or-focus'),
+        onSelect: () => this._workbenchService.settings.toolbarVisibility.update(visibility => visibility === 'always' ? 'on-hover-or-focus' : 'always'),
       })
-      .addMenuItem({
-        label: 'Right',
-        checked: computed(() => this._workbenchService.settings.panelAlignment() === 'right'),
-        cssClass: 'e2e-change-panel-alignment-right',
-        onSelect: () => this._workbenchService.settings.panelAlignment.set('right'),
-      })
-      .addMenuItem({
-        label: 'Center',
-        checked: computed(() => this._workbenchService.settings.panelAlignment() === 'center'),
-        cssClass: 'e2e-change-panel-alignment-center',
-        onSelect: () => this._workbenchService.settings.panelAlignment.set('center'),
-      })
-      .addMenuItem({
-        label: 'Justify',
-        checked: computed(() => this._workbenchService.settings.panelAlignment() === 'justify'),
-        cssClass: 'e2e-change-panel-alignment-justify',
-        onSelect: () => this._workbenchService.settings.panelAlignment.set('justify'),
-      }),
-    );
-  }
-
-  private contributeRenderingFlagGroup(menu: SciMenuFactory): void {
-    menu.addGroup(group => group
       .addMenuItem({
         label: 'Enable Panel Animation',
         checked: this._workbenchService.settings.panelAnimation,
         onSelect: () => this._workbenchService.settings.panelAnimation.update(enabled => !enabled),
       })
+    );
+  }
+
+  private contributeApplicationSettingsGroup(menu: SciMenuFactory): void {
+    menu.addGroup({label: 'Application Settings'}, group => group
       .addMenuItem({
         label: 'Show Skeletons',
         checked: this._settings.showSkeletons,
@@ -106,16 +113,6 @@ export class HeaderComponent {
         },
       })
       .addMenuItem({
-        label: 'Highlight Focus',
-        checked: this._settings.highlightFocus,
-        onSelect: () => this._settings.highlightFocus.update(enabled => !enabled),
-      })
-      .addMenuItem({
-        label: 'Highlight Glasspane',
-        checked: this._settings.highlightGlasspane,
-        onSelect: () => this._settings.highlightGlasspane.update(enabled => !enabled),
-      })
-      .addMenuItem({
         label: 'Show Microfrontend Application Labels',
         checked: this._settings.showMicrofrontendApplicationLabels,
         onSelect: () => this._settings.showMicrofrontendApplicationLabels.update(enabled => !enabled),
@@ -124,6 +121,16 @@ export class HeaderComponent {
         label: 'Show Test Perspectives',
         checked: this._settings.showTestPerspectives,
         onSelect: () => this._settings.showTestPerspectives.update(enabled => !enabled),
+      })
+      .addMenuItem({
+        label: 'Highlight Focus',
+        checked: this._settings.highlightFocus,
+        onSelect: () => this._settings.highlightFocus.update(enabled => !enabled),
+      })
+      .addMenuItem({
+        label: 'Highlight Glasspane',
+        checked: this._settings.highlightGlasspane,
+        onSelect: () => this._settings.highlightGlasspane.update(enabled => !enabled),
       })
       .addMenuItem({
         label: 'Reset Forms on Submit',

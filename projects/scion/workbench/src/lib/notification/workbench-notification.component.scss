@@ -94,17 +94,27 @@ $padding-right: calc(var(--sci-workbench-notification-padding) - var(--sci-workb
     }
   }
 
-  // Hide toolbar if not hovering or focusing the notification
-  &:not(:hover):not(:focus-within) sci-toolbar[name="toolbar:workbench.notification.toolbar"] {
-    width: 0; // free space if hidden
-    visibility: hidden; // hide toolbar
-  }
-
-  // Make toolbar floating if located outside the header element.
+  // Use floating toolbar if located outside the header element.
   > sci-toolbar[name="toolbar:workbench.notification.toolbar"] {
     position: absolute;
     top: $padding-block;
     right: .5em;
     background-color: var(--sci-color-background-elevation); // cover underlying text when floating
+  }
+
+  &:hover {
+    --ɵsci-workbench-notification-hover: true;
+  }
+
+  &[data-focus] {
+    --ɵsci-workbench-notification-focus: true;
+  }
+
+  sci-toolbar[name="toolbar:workbench.notification.toolbar"] {
+    --sci-toolbar-padding: 0;
+    --sci-toolbar-min-size: auto;
+
+    // Show/hide toolbar based on the `scion.workbench.appearance.toolbar.visibility` workbench setting.
+    @include workbench.toolbar-visibility(--ɵsci-workbench-notification-hover, --ɵsci-workbench-notification-focus);
   }
 }

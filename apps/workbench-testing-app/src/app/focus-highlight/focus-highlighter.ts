@@ -42,8 +42,8 @@ export function installFocusHighlighter(): void {
     untracked(() => {
       const element = activeWorkbenchElement ? querySelector(activeWorkbenchElement) : null;
       if (element) {
-        element.setAttribute('data-focus', '');
-        onCleanup(() => element.removeAttribute('data-focus'));
+        element.setAttribute('data-highlight-focus', '');
+        onCleanup(() => element.removeAttribute('data-highlight-focus'));
       }
     });
   });

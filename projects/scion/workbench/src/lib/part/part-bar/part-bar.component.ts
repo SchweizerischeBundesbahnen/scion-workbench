@@ -20,6 +20,7 @@ import {contributeMenu, SciMenuFactory, SciToolbarComponent, SciToolbarFactory, 
 import {ViewListToolbarIconComponent} from '../view-list-toolbar-icon/view-list-toolbar-icon.component';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {PART_CONTEXT_VIEW_ID, WorkbenchMenuContextKeys} from '../../menu/workbench-menu-context-provider';
+import {ToolbarVisibilityDirective} from '../../common/toolbar-visibility.directive';
 
 /**
  * DI token to inject the HTML element of the {@link PartBarComponent}.
@@ -34,6 +35,7 @@ export const PART_BAR_ELEMENT = new InjectionToken<HTMLElement>('PART_BAR_ELEMEN
     ViewTabBarComponent,
     SciTextPipe,
     SciToolbarComponent,
+    ToolbarVisibilityDirective,
   ],
   providers: [
     {provide: PART_BAR_ELEMENT, useFactory: () => inject(ElementRef).nativeElement as HTMLElement},

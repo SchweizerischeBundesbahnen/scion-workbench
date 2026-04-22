@@ -221,15 +221,23 @@ export abstract class WorkbenchService {
     /**
      * Controls the alignment of the bottom docked panel.
      *
-     * Defaults to the `--sci-workbench-layout-panel-align` design token, or `justify` if not set.
+     * Defaults to the `--sci-workbench-activity-panel-bottom-align` design token, or `justify` if not set.
      */
     panelAlignment: WritableSignal<'left' | 'right' | 'center' | 'justify'>;
     /**
      * Controls animation of docked panels.
      *
-     * Defaults to the `--sci-workbench-layout-panel-animate` design token, or `true` if not set.
+     * Defaults to the `--sci-workbench-activity-panel-animate` design token, or `true` if not set.
      */
     panelAnimation: WritableSignal<boolean>;
+    /**
+     * Controls when to display toolbars of the SCION Workbench.
+     *
+     * Set to `always` to always show workbench toolbars, or `on-hover-or-focus` to only show workbench toolbars when hovered or focused.
+     *
+     * Defaults to the `--sci-workbench-toolbar-visibility` design token, or `on-hover-or-focus` if not set.
+     */
+    toolbarVisibility: WritableSignal<'always' | 'on-hover-or-focus'>;
   };
 
   /**

@@ -57,6 +57,7 @@ export class ɵWorkbenchService implements WorkbenchService {
     theme: inject(WorkbenchThemeSwitcher).theme,
     panelAlignment: inject(WorkbenchLayoutService).panelAlignment,
     panelAnimation: inject(WorkbenchLayoutService).panelAnimation,
+    toolbarVisibility: inject(WorkbenchLayoutService).toolbarVisibility,
   };
 
   /** @inheritDoc */

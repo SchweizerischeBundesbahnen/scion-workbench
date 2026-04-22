@@ -57,6 +57,7 @@ import {WorkbenchMenuContextKeys} from '../menu/workbench-menu-context-provider'
   ],
   host: {
     '[attr.data-dialogid]': 'dialog.id',
+    '[attr.data-focus]': `dialog.focused() ? '' : null`,
     '[class.justified]': '!dialog.padding()',
     '[style.--ɵdialog-transform-translate-x]': 'transformTranslateX()',
     '[style.--ɵdialog-transform-translate-y]': 'transformTranslateY()',

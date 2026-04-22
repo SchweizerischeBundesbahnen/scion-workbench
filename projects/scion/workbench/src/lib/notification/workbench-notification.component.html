@@ -2,12 +2,11 @@
 @let hasSlot = notification.slot.text?.length || notification.slot.component;
 @let toolbarFloating = !hasTitle && hasSlot;
 
-
 <!-- Use non-floatable toolbar if having a title, displaying ellipsis to not overlap the toolbar. -->
 @if (!toolbarFloating) {
   <header>
     <span class="title e2e-title">{{(notification.title() | sciText)()}}</span>
-    <sci-toolbar name="toolbar:workbench.notification.toolbar" (keydown.escape)="onToolbarEscape($event)"/>
+    <sci-toolbar name="toolbar:workbench.notification.toolbar" (keydown.escape)="onToolbarEscape($event)" wbToolbarVisibility/>
   </header>
 }
 
@@ -29,5 +28,5 @@
 
 <!-- Use floatable toolbar if having no title -->
 @if (toolbarFloating) {
-  <sci-toolbar name="toolbar:workbench.notification.toolbar" (keydown.escape)="onToolbarEscape($event)"/>/>
+  <sci-toolbar name="toolbar:workbench.notification.toolbar" (keydown.escape)="onToolbarEscape($event)" wbToolbarVisibility/>
 }

@@ -5,21 +5,32 @@
   align-items: center;
   gap: var(--sci-workbench-dialog-padding);
   place-content: flex-end;
-  padding-inline: var(--sci-workbench-dialog-padding);
+  margin-inline: var(--sci-workbench-dialog-padding); // set margin instead of padding to prevent title from overlapping this component when shrinking the dialog
   background-color: var(--sci-workbench-dialog-header-background-color);
   user-select: none;
   height: var(--sci-workbench-dialog-header-height);
+  position: relative; // positioning context for the title div
 
   > div.title {
     flex: auto;
     display: flex;
     align-items: center;
-    position: relative; // positioning context for the title span
+    position: absolute; // out of document flow to not contribute to the dialog width
+    left: 0;
+    right: var(--ɵdialog-toolbar-width);
+
+    // Add filler element if the title is center-aligned, preventing misalignment since the toolbar also occupies space.
+    // When the toolbar is hidden (e.g, not focused nor hovered), the filler size also drops to zero to keep the title centered.
+    @container style(--sci-workbench-dialog-title-align: center) {
+      &::before {
+        content: '';
+        flex: 1 1 0;
+        max-width: var(--ɵdialog-toolbar-width);
+      }
+    }
 
     > span {
-      position: absolute; // out of document flow to not contribute to the dialog width
-      left: 0;
-      right: 0;
+      flex: auto;
       line-height: 1.5;
       @include workbench.ellipsis-on-overflow();
       font-family: var(--sci-workbench-dialog-title-font-family), sans-serif;
@@ -31,5 +42,10 @@
 
   > sci-toolbar[name="toolbar:workbench.dialog.toolbar"] {
     flex: none;
+    --sci-toolbar-min-size: auto;
+    --sci-toolbar-padding: 0;
+
+    // Show/hide toolbar based on the `scion.workbench.appearance.toolbar.visibility` workbench setting.
+    @include workbench.toolbar-visibility(--ɵsci-workbench-dialog-hover, --ɵsci-workbench-dialog-focus);
   }
 }

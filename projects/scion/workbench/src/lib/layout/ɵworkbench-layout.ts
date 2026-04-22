@@ -1496,15 +1496,15 @@ function createDefaultActivityLayout(): MActivityLayout {
     },
     panels: {
       left: {
-        width: Number.parseInt(readCssVariable(documentRoot, '--sci-workbench-layout-panel-left-width', `${ACTIVITY_PANEL_WIDTH}px`)),
+        width: Number.parseInt(readCssVariable(documentRoot, '--sci-workbench-activity-panel-left-width', `${ACTIVITY_PANEL_WIDTH}px`)),
         ratio: ACTIVITY_PANEL_RATIO,
       },
       right: {
-        width: Number.parseInt(readCssVariable(documentRoot, '--sci-workbench-layout-panel-right-width', `${ACTIVITY_PANEL_WIDTH}px`)),
+        width: Number.parseInt(readCssVariable(documentRoot, '--sci-workbench-activity-panel-right-width', `${ACTIVITY_PANEL_WIDTH}px`)),
         ratio: ACTIVITY_PANEL_RATIO,
       },
       bottom: {
-        height: Number.parseInt(readCssVariable(documentRoot, '--sci-workbench-layout-panel-bottom-height', `${ACTIVITY_PANEL_HEIGHT}px`)),
+        height: Number.parseInt(readCssVariable(documentRoot, '--sci-workbench-activity-panel-bottom-height', `${ACTIVITY_PANEL_HEIGHT}px`)),
         ratio: ACTIVITY_PANEL_RATIO,
       },
     },
