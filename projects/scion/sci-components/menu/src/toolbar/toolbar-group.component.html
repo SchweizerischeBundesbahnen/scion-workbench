@@ -66,7 +66,7 @@
       <sci-toolbar-group [menuItems]="menuItem.children"
                          [orientation]="orientation()"
                          [disabled]="disabled"
-                         [viewContainerRef]="viewContainerRef()"
+                         [popoverViewContainerRef]="popoverViewContainerRef()"
                          (menuOpen)="onChildGroupMenuOpen($event)"
                          [class]="menuItem.cssClass"/>
     }

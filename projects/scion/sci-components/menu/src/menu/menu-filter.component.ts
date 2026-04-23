@@ -14,6 +14,10 @@ import {SciIconComponent} from '@scion/sci-components/icon';
     SciTextPipe,
     SciIconComponent,
   ],
+  host: {
+    '[attr.tabindex]': '-1', // enable delegation of programmatic focus requests
+    '(focus)': 'onFocus()',
+  },
 })
 export class MenuFilterComponent {
 
@@ -24,6 +28,10 @@ export class MenuFilterComponent {
 
   protected onClear(): void {
     this.text.set('');
+    this._inputField().nativeElement.focus();
+  }
+
+  protected onFocus(): void {
     this._inputField().nativeElement.focus();
   }
 }

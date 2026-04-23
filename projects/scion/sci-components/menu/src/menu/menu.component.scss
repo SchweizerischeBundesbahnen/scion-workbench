@@ -212,6 +212,11 @@ $font-size-smaller: $font-size - 1px;
     align-items: center;
     padding: $menu_item_padding_block $menu_item_padding_inline;
     user-select: none;
+    border-radius: var(--sci-corner-small);
+
+    &:focus-within {
+      outline: var(--sci-workbench-button-outline-width-focus) solid var(--sci-color-accent);
+    }
   }
 
   &.no-glyph-area > div.filter {

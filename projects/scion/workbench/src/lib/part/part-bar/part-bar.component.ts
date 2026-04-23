@@ -70,15 +70,20 @@ export class PartBarComponent {
 
   protected onPartBarMouseDown(event: Event): void {
     // Activate the part or its active view, if any.
-    if (this.part.activeView()) {
-      void this.part.activeView()!.activate();
-    }
-    else {
-      void this.part.activate();
-    }
+    this.part.activeView() ? void this.part.activeView()!.activate() : void this.part.activate();
 
     // Prevent default to maintain focus on part and view content.
     event.preventDefault();
+  }
+
+  protected onToolbarMouseDown(): void {
+    // Activate the part or its active view, if any.
+    // Otherwise, if the toolbar is configured to display on hover or focus only, a menu opened from the toolbar would close when the pointer leaves the menu popover or the part.
+    this.part.activeView() ? void this.part.activeView()!.activate() : void this.part.activate();
+
+    // TODO [menu] write test, then, this comment can be removed
+    // Do not `preventDefault` on mousedown, unlike on the part bar. Otherwise, since the toolbar (or its menus) is a child of the part bar,
+    // `preventDefault` would break toolbar/menu interaction, like clicking the menu filter field to gain focus.
   }
 
   /**

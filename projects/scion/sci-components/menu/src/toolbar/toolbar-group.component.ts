@@ -26,7 +26,7 @@ export class SciToolGroupComponent {
   public readonly menuItems = input.required<Array<SciMenuItem | SciMenu | SciMenuGroup>>();
   public readonly orientation = input.required<'horizontal' | 'vertical'>();
   public readonly disabled = input<boolean>();
-  public readonly viewContainerRef = input<ViewContainerRef | undefined>();
+  public readonly popoverViewContainerRef = input<ViewContainerRef | undefined>();
   public readonly menuOpen = output<boolean>();
 
   private readonly _menuService = inject(ɵSciMenuService);
@@ -46,7 +46,7 @@ export class SciToolGroupComponent {
       const activeMenuItem = this.activeMenu();
       // Attach popover to configured view ref. Defaults to this component's view ref.
       // Controls where to add the popup, e.g., required for toolbar in menu button to not be child of the menu item (hover state)
-      const viewContainerRef = this.viewContainerRef() ?? injector.get(ViewContainerRef);
+      const popoverViewContainerRef = this.popoverViewContainerRef() ?? injector.get(ViewContainerRef);
 
       untracked(() => {
         if (!activeMenuItem) {
@@ -55,7 +55,7 @@ export class SciToolGroupComponent {
 
         const ref = this._menuService.open(activeMenuItem.menu.children, {
           anchor: activeMenuItem.element,
-          viewContainerRef,
+          viewContainerRef: popoverViewContainerRef,
           cssClass: activeMenuItem.menu.cssClass,
           filter: activeMenuItem.menu.menu.filter as RequireOne<{placeholder?: MaybeSignal<Translatable>; notFoundText?: MaybeSignal<Translatable>}> | boolean | undefined,
           size: {

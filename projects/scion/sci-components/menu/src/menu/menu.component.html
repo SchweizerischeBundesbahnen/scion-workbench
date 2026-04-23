@@ -14,7 +14,7 @@
         @if (hasActionToolbar) {
           <sci-toolbar-group [menuItems]="actions!"
                              [orientation]="'horizontal'"
-                             [viewContainerRef]="popoverAnchor()"
+                             [popoverViewContainerRef]="popoverAnchor()"
                              (menuOpen)="onActionToolbarMenuOpen($event)"
                              (click)="$event.stopPropagation()"
                              class="actions"/>
@@ -28,7 +28,7 @@
       @if (hasActionToolbar) {
         <sci-toolbar-group [menuItems]="actions!"
                            [orientation]="'horizontal'"
-                           [viewContainerRef]="popoverAnchor()"
+                           [popoverViewContainerRef]="popoverAnchor()"
                            (menuOpen)="onActionToolbarMenuOpen($event)"
                            class="actions"/>
       }
@@ -106,7 +106,7 @@
               @if (hasActionToolbar) {
                 <sci-toolbar-group [menuItems]="actions!"
                                    [orientation]="'horizontal'"
-                                   [viewContainerRef]="popoverAnchor()"
+                                   [popoverViewContainerRef]="popoverAnchor()"
                                    (menuOpen)="onActionToolbarMenuOpen($event)"
                                    (click)="$event.stopPropagation()"
                                    sciToolbarState

@@ -24,7 +24,7 @@ export class SciToolbarComponent {
   public readonly orientation = input<'horizontal' | 'vertical'>('horizontal');
   public readonly context = input<Map<string, unknown>>();
   public readonly acceleratorTarget = input<MaybeArray<Element | ElementRef<Element>> | undefined>();
-  public readonly viewContainerRef = input<ViewContainerRef | undefined>();
+  public readonly popoverViewContainerRef = input<ViewContainerRef | undefined>();
 
   private readonly _menuService = inject(ɵSciMenuService);
   private readonly _context = this.computeContext();
