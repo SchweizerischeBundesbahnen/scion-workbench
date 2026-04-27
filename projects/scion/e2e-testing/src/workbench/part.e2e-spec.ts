@@ -20,6 +20,7 @@ import {LayoutPagePO} from './page-object/layout-page/layout-page.po';
 import {canMatchWorkbenchPart} from './page-object/layout-page/register-route-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {WorkbenchHandleBoundsTestPagePO} from './page-object/test-pages/workbench-handle-bounds-test-page.po';
+import {expectPopup} from '../matcher/popup-matcher';
 
 test.describe('Workbench Part', () => {
 
@@ -60,6 +61,7 @@ test.describe('Workbench Part', () => {
 
     const popup = appPO.popup({cssClass: 'testee'});
     const testPage = new InputFieldTestPagePO(popup);
+    await expectPopup(testPage).toBeVisible();
 
     // Open view list menu.
     const viewListMenu = await viewPage.view.part.bar.openViewListMenu();

@@ -14,6 +14,7 @@ import {ViewPagePO} from './page-object/view-page.po';
 import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
+import {expectPopup} from '../matcher/popup-matcher';
 
 test.describe('Workbench View Tab', () => {
 
@@ -75,6 +76,7 @@ test.describe('Workbench View Tab', () => {
     });
 
     const testPage = new InputFieldTestPagePO(appPO.popup({cssClass: 'testee'}));
+    await expectPopup(testPage).toBeVisible();
 
     // Open context menu.
     const contextMenu = await viewPage.view.tab.openContextMenu();

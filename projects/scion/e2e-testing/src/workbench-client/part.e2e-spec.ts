@@ -21,6 +21,7 @@ import {UnregisterWorkbenchCapabilityPagePO} from './page-object/unregister-work
 import {PageNotFoundPagePO} from '../workbench/page-object/page-not-found-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
+import {expectPopup} from '../matcher/popup-matcher';
 
 test.describe('Workbench Part', () => {
 
@@ -133,6 +134,7 @@ test.describe('Workbench Part', () => {
     });
 
     const popupPage = new InputFieldTestPagePO(appPO.popup({cssClass: 'testee'}));
+    await expectPopup(popupPage).toBeVisible();
 
     // Open view list menu.
     const viewListMenu = await popupOpenerPage.view.part.bar.openViewListMenu();
