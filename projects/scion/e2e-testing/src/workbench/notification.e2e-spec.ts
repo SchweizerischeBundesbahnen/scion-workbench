@@ -1441,6 +1441,8 @@ test.describe('Workbench Notification', () => {
     const notification = appPO.notification({cssClass: 'testee'});
     const testPage = new WorkbenchHandleBoundsTestPagePO(notification);
 
+    await expectNotification(testPage).toBeVisible();
+
     // Overflow viewport.
     await testPage.enterContentSize({height: '800px', width: '800px'});
     await testPage.enterNotificationSize({height: '500px'});

@@ -9,7 +9,6 @@
  */
 
 import {Locator} from '@playwright/test';
-import {waitUntilStable} from '../../../helper/testing.util';
 
 /**
  * Page object for {@link SciKeyValueComponent}.
@@ -33,8 +32,8 @@ export class SciKeyValuePO {
     const entryCount = await keysLocator.count();
     const entries: Record<string, string> = {};
     for (let i = 0; i < entryCount; i++) {
-      const key = await waitUntilStable(() => keysLocator.nth(i).innerText());
-      entries[key] = await waitUntilStable(() => valuesLocator.nth(i).innerText());
+      const key = await keysLocator.nth(i).innerText();
+      entries[key] = await valuesLocator.nth(i).innerText();
     }
 
     return entries;
