@@ -14,6 +14,7 @@ import {DialogPO} from '../../dialog.po';
 import {WorkbenchDialogPagePO} from './workbench-dialog-page.po';
 import {NavigationData, NavigationState, PartId, Translatable, ViewId} from '@scion/workbench';
 import {Data, Params} from '@angular/router';
+import {waitUntilStable} from '../../helper/testing.util';
 
 /**
  * Page object to interact with {@link ViewInfoDialogComponent}.
@@ -33,7 +34,7 @@ export class ViewInfoDialogPO implements WorkbenchDialogPagePO {
     const navigationState = this.locator.locator('sci-key-value.e2e-navigation-state');
 
     return {
-      viewId: await this.locator.locator('span.e2e-view-id').innerText() as ViewId,
+      viewId: await waitUntilStable(() => this.locator.locator('span.e2e-view-id').innerText()) as ViewId, // only wait for first span to be stable, subsequent spans will be stable.
       alternativeViewId: await this.locator.locator('span.e2e-alternative-view-id').innerText(),
       partId: await this.locator.locator('span.e2e-part-id').innerText() as PartId,
       alternativePartId: await this.locator.locator('span.e2e-alternative-part-id').innerText(),

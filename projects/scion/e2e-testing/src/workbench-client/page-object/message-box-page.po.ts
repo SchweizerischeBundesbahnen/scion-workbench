@@ -17,6 +17,7 @@ import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendMessageBoxPagePO} from '../../workbench/page-object/workbench-message-box-page.po';
 import {MessageBoxPO} from '../../message-box.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
+import {waitUntilStable} from '../../helper/testing.util';
 
 /**
  * Page object to interact with {@link MessageBoxPageComponent}.
@@ -32,7 +33,7 @@ export class MessageBoxPagePO implements MicrofrontendMessageBoxPagePO {
   }
 
   public getComponentInstanceId(): Promise<string> {
-    return this.locator.locator('input.e2e-component-instance-id').innerText();
+    return waitUntilStable(() => this.locator.locator('input.e2e-component-instance-id').innerText());
   }
 
   public async getMessageBoxCapability(): Promise<WorkbenchMessageBoxCapability> {

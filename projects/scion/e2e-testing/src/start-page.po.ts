@@ -16,6 +16,7 @@ import {SciRouterOutletPO} from './workbench-client/page-object/sci-router-outle
 import {WorkbenchViewPagePO} from './workbench/page-object/workbench-view-page.po';
 import {PartId, ViewId} from '@scion/workbench';
 import {RequireOne} from './helper/utility-types';
+import {waitUntilStable} from './helper/testing.util';
 
 /**
  * Page object to interact with {@link StartPageComponent}.
@@ -53,7 +54,7 @@ export class StartPagePO implements WorkbenchViewPagePO {
    * Returns the part in which this page is displayed.
    */
   public async getPartId(): Promise<PartId | null> {
-    return (await this.locator.getAttribute('data-partid')) as PartId | null;
+    return (await waitUntilStable(() => this.locator.getAttribute('data-partid'))) as PartId | null;
   }
 
   /**

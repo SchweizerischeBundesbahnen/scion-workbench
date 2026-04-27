@@ -9,7 +9,7 @@
  */
 
 import {Locator} from '@playwright/test';
-import {DomRect, fromRect} from './helper/testing.util';
+import {DomRect, fromRect, waitUntilBoundingBoxStable, waitUntilStable} from './helper/testing.util';
 
 /**
  * Handle for interacting with an activity panel.
@@ -20,7 +20,7 @@ export class ActivityPanelPO {
   }
 
   public async getPanel(): Promise<'left' | 'right' | 'bottom'> {
-    return (await this.locator.getAttribute('data-panel')) as 'left' | 'right' | 'bottom';
+    return (await waitUntilStable(() => this.locator.getAttribute('data-panel'))) as 'left' | 'right' | 'bottom';
   }
 
   /**
@@ -86,8 +86,8 @@ export class ActivityPanelPO {
   /**
    * Gets the bounding box of this panel.
    */
-  public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.boundingBox());
+  public getBoundingBox(): Promise<DomRect> {
+    return waitUntilBoundingBoxStable(this.locator);
   }
 
   /**
@@ -97,7 +97,7 @@ export class ActivityPanelPO {
     const boundingBoxes = new Array<DomRect>();
     const locators = await this.locator.locator('wb-grid').all();
     for (const locator of locators) {
-      boundingBoxes.push(fromRect(await locator.boundingBox()));
+      boundingBoxes.push(await waitUntilBoundingBoxStable(locator));
     }
     return boundingBoxes;
   }

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, DomRect, fromRect, waitForCondition, waitUntilStable} from './helper/testing.util';
+import {coerceArray, DomRect, fromRect, waitForCondition, waitUntilBoundingBoxStable, waitUntilStable} from './helper/testing.util';
 import {StartPagePO} from './start-page.po';
 import {expect, Locator, Page} from '@playwright/test';
 import {PartPO} from './part.po';
@@ -356,8 +356,8 @@ export class AppPO {
   /**
    * Returns bounding box of the 'wb-workbench' element.
    */
-  public async workbenchBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.workbenchRoot.boundingBox());
+  public workbenchBoundingBox(): Promise<DomRect> {
+    return waitUntilBoundingBoxStable(this.workbenchRoot);
   }
 
   /**
@@ -441,8 +441,8 @@ export class AppPO {
    *
    * This flag is set in `app.component.ts` in the 'workbench-testing-app'.
    */
-  public getCurrentNavigationId(): Promise<number> {
-    return this.page.locator('app-root').getAttribute('data-navigationid').then(value => value ? Number.parseInt(value) : 0);
+  public async getCurrentNavigationId(): Promise<number> {
+    return waitUntilStable(() => this.page.locator('app-root').getAttribute('data-navigationid').then(value => value ? Number.parseInt(value) : 0));
   }
 
   /**
@@ -450,15 +450,15 @@ export class AppPO {
    *
    * @see WORKBENCH_ID
    */
-  public getWorkbenchId(): Promise<string> {
-    return this.page.locator('app-root').getAttribute('data-workbench-id').then(id => id!);
+  public async getWorkbenchId(): Promise<string> {
+    return waitUntilStable(() => this.page.locator('app-root').getAttribute('data-workbench-id').then(id => id!));
   }
 
   /**
    * Returns the id of the currently active perspective.
    */
-  public getActivePerspectiveId(): Promise<string> {
-    return this.page.locator('app-root').getAttribute('data-perspective-id').then(id => id!);
+  public async getActivePerspectiveId(): Promise<string> {
+    return waitUntilStable(() => this.page.locator('app-root').getAttribute('data-perspective-id').then(id => id!));
   }
 
   /**

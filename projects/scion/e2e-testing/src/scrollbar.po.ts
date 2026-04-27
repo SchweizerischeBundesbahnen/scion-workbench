@@ -9,7 +9,7 @@
  */
 
 import {Locator} from '@playwright/test';
-import {fromRect, hasCssClass, waitUntilStable} from './helper/testing.util';
+import {hasCssClass, waitUntilBoundingBoxStable, waitUntilStable} from './helper/testing.util';
 
 export class ScrollbarPO {
 
@@ -20,7 +20,7 @@ export class ScrollbarPO {
   }
 
   public async scroll(distance: number): Promise<void> {
-    const thumbBoundingBox = fromRect(await this._thumbHandle.boundingBox());
+    const thumbBoundingBox = await waitUntilBoundingBoxStable(this._thumbHandle);
     const mouse = this.locator.page().mouse;
 
     // Move mouse to thumb.

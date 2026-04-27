@@ -10,7 +10,7 @@
 
 import {Locator} from '@playwright/test';
 import {ActivityId} from '@scion/workbench';
-import {DomRect, fromRect} from './helper/testing.util';
+import {DomRect, waitUntilBoundingBoxStable, waitUntilStable} from './helper/testing.util';
 
 /**
  * Handle for interacting with a workbench grid.
@@ -21,7 +21,7 @@ export class GridPO {
   }
 
   public async getGridName(): Promise<'main' | 'mainArea' | ActivityId> {
-    return (await this.locator.getAttribute('data-grid')) as 'main' | 'mainArea' | ActivityId;
+    return (await waitUntilStable(() => this.locator.getAttribute('data-grid'))) as 'main' | 'mainArea' | ActivityId;
   }
 
   /**
@@ -47,6 +47,6 @@ export class GridPO {
    * Gets the bounding box of this grid.
    */
   public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.boundingBox());
+    return waitUntilBoundingBoxStable(this.locator);
   }
 }

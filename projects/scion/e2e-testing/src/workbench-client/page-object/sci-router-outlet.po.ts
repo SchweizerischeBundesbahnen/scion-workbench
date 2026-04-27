@@ -9,7 +9,7 @@
  */
 
 import {FrameLocator, Locator, Page} from '@playwright/test';
-import {selectBy, DomRect, fromRect, getCssClasses} from '../../helper/testing.util';
+import {selectBy, DomRect, fromRect, getCssClasses, waitUntilStable} from '../../helper/testing.util';
 
 /**
  * Page object to interact with {@link SciRouterOutletElement}.
@@ -39,15 +39,15 @@ export class SciRouterOutletPO {
   }
 
   public async getName(): Promise<string> {
-    return (await this.locator.getAttribute('name'))!;
+    return (await waitUntilStable(() => this.locator.getAttribute('name')))!;
   }
 
   public async getCapabilityId(): Promise<string> {
-    return (await this.locator.getAttribute('data-capabilityid'))!;
+    return (await waitUntilStable(() => this.locator.getAttribute('data-capabilityid')))!;
   }
 
   public async getAppSymbolicName(): Promise<string> {
-    return (await this.locator.getAttribute('data-app'))!;
+    return (await waitUntilStable(() => this.locator.getAttribute('data-app')))!;
   }
 
   public async getBoundingBox(): Promise<DomRect> {

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {fromRect} from './helper/testing.util';
+import {waitUntilBoundingBoxStable} from './helper/testing.util';
 import {Locator} from '@playwright/test';
 
 /**
@@ -26,7 +26,7 @@ export class PartSashPO {
     const mouse = this._locator.page().mouse;
     const steps = Math.ceil(Math.abs(distance) / 5);
 
-    const sashBounds = fromRect(await this._locator.boundingBox());
+    const sashBounds = await waitUntilBoundingBoxStable(this._locator);
     switch (handle) {
       case 'top': {
         await mouse.move(sashBounds.hcenter, sashBounds.top);

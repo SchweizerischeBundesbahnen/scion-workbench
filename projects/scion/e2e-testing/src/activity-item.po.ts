@@ -9,6 +9,7 @@
  */
 
 import {Locator} from '@playwright/test';
+import {waitUntilStable} from './helper/testing.util';
 
 /**
  * Handle for interacting with an activity item in the activity bar.
@@ -23,7 +24,7 @@ export class ActivityItemPO {
   }
 
   public getTooltip(): Promise<string | null> {
-    return this.locator.getAttribute('title');
+    return waitUntilStable(() => this.locator.getAttribute('title'));
   }
 
   /**

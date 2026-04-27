@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DomRect, fromRect, getCssClasses, getPerspectiveId} from './helper/testing.util';
+import {DomRect, getCssClasses, getPerspectiveId, waitUntilBoundingBoxStable, waitUntilStable} from './helper/testing.util';
 import {Locator, Page} from '@playwright/test';
 import {PartPO} from './part.po';
 import {ViewTabContextMenuPO} from './view-tab-context-menu.po';
@@ -63,7 +63,7 @@ export class ViewTabPO {
   }
 
   public async getViewId(): Promise<ViewId> {
-    return (await this.locator.getAttribute('data-viewid')) as ViewId;
+    return (await waitUntilStable(() => this.locator.getAttribute('data-viewid'))) as ViewId;
   }
 
   public async click(): Promise<void> {
@@ -239,7 +239,7 @@ export class ViewTabPO {
   /**
    * Gets the boundings box of the tab.
    */
-  public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.boundingBox());
+  public getBoundingBox(): Promise<DomRect> {
+    return waitUntilBoundingBoxStable(this.locator);
   }
 }

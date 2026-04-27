@@ -14,6 +14,7 @@ import {Locator} from '@playwright/test';
 import {WorkbenchPopupPagePO} from './workbench-popup-page.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {ActivatedMicrofrontendPO} from './activated-microfrontend.po';
+import {waitUntilStable} from '../../helper/testing.util';
 
 /**
  * Page object to interact with {@link PopupPageComponent}.
@@ -31,7 +32,7 @@ export class PopupPagePO implements WorkbenchPopupPagePO {
   }
 
   public getComponentInstanceId(): Promise<string> {
-    return this.locator.locator('span.e2e-component-instance-id').innerText();
+    return waitUntilStable(() => this.locator.locator('span.e2e-component-instance-id').innerText());
   }
 
   public async enterComponentSize(size: WorkbenchPopupSize): Promise<void> {

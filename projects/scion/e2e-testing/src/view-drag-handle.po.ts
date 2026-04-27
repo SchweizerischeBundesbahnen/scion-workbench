@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DomRect, fromRect, throwError} from './helper/testing.util';
+import {DomRect, fromRect, throwError, waitUntilBoundingBoxStable} from './helper/testing.util';
 import {Locator, Mouse, Page} from '@playwright/test';
 import {ActivityId, PartId} from '@scion/workbench';
 import {MAIN_AREA} from './workbench.model';
@@ -90,7 +90,7 @@ export class ViewDrageHandlePO {
    */
   public async dragToPart(partId: PartId, options: {region: 'north' | 'east' | 'south' | 'west' | 'center'; dragFromCenter?: false; orElse?: false}): Promise<boolean> {
     if (options.dragFromCenter ?? true) {
-      const partBounds = fromRect(await this._page.locator(`wb-part[data-partid="${partId}"]`).boundingBox());
+      const partBounds = await waitUntilBoundingBoxStable(this._page.locator(`wb-part[data-partid="${partId}"]`));
       await this.dragTo({x: partBounds.hcenter, y: partBounds.vcenter});
 
       // If the main area part, shift pointer by 1 pixel to not hover the part splitters.
@@ -135,7 +135,7 @@ export class ViewDrageHandlePO {
     const dropZoneLocator = options.dropZoneLocator;
 
     // Move the drag handle over the specified region.
-    const {top, right, bottom, left} = fromRect(await dropZoneLocator.boundingBox());
+    const {top, right, bottom, left} = await waitUntilBoundingBoxStable(dropZoneLocator);
     switch (region) {
       case 'north':
         while ((await dropZoneLocator.getAttribute('data-region')) !== 'north' && this._y > top) {
@@ -198,7 +198,7 @@ export class ViewDrageHandlePO {
    * Gets the bounding box of the drag image.
    */
   public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.boundingBox());
+    return await waitUntilBoundingBoxStable(this.locator);
   }
 
   /**

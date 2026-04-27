@@ -9,7 +9,7 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {coerceArray, DomRect, fromRect, getCssClasses, hasCssClass, selectBy} from './helper/testing.util';
+import {coerceArray, DomRect, fromRect, getCssClasses, hasCssClass, selectBy, waitUntilBoundingBoxStable, waitUntilStable} from './helper/testing.util';
 import {RequireOne} from './helper/utility-types';
 import {NotificationId} from '../../workbench/src/lib/workbench.identifiers';
 
@@ -33,7 +33,7 @@ export class NotificationPO {
   }
 
   public async getNotificationId(): Promise<NotificationId> {
-    return (await this.locator.getAttribute('data-notificationid')) as NotificationId;
+    return (await waitUntilStable(() => this.locator.getAttribute('data-notificationid'))) as NotificationId;
   }
 
   /**
@@ -47,10 +47,10 @@ export class NotificationPO {
   public async getBoundingBox(selector: 'notification' | 'notification-inset' | 'slot' = 'notification'): Promise<DomRect> {
     switch (selector) {
       case 'notification': {
-        return fromRect(await this.locator.boundingBox());
+        return waitUntilBoundingBoxStable(this.locator);
       }
       case 'notification-inset': {
-        const {x, y, width, height} = fromRect(await this.locator.boundingBox());
+        const {x, y, width, height} = await waitUntilBoundingBoxStable(this.locator);
         const {borderTopWidth, borderRightWidth, borderBottomWidth, borderLeftWidth} = await this.locator.evaluate((notification: HTMLElement) => getComputedStyle(notification));
         return fromRect({
           x: x + parseInt(borderLeftWidth),
@@ -62,7 +62,7 @@ export class NotificationPO {
       case 'slot': {
         // Do not read bounds from 'div.e2e-notification-slot-bounds' to test actual slot bounds.
         const {paddingTop, paddingRight, paddingBottom, paddingLeft} = await this.viewport.locator('div.viewport-client[part="content"]').evaluate((slot: HTMLElement) => getComputedStyle(slot));
-        const viewportBounds = (await this.viewport.boundingBox())!;
+        const viewportBounds = await waitUntilBoundingBoxStable(this.viewport);
         return fromRect({
           x: viewportBounds.x + parseFloat(paddingLeft),
           y: viewportBounds.y + parseFloat(paddingTop),
@@ -83,6 +83,7 @@ export class NotificationPO {
   }
 
   public async getSeverity(): Promise<'info' | 'warn' | 'error' | null> {
+    await this.locator.waitFor({state: 'visible'});
     return await this.locator.getAttribute('data-severity') as 'info' | 'warn' | 'error' | null;
   }
 

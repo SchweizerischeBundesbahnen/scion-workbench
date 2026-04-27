@@ -17,7 +17,7 @@ import {DialogPO} from '../../../dialog.po';
 import {Translatable} from '@scion/workbench-client';
 import {MicrofrontendPopupPagePO} from '../../../workbench/page-object/workbench-popup-page.po';
 import {PopupPO} from '../../../popup.po';
-import {toMatrixNotation} from '../../../helper/testing.util';
+import {toMatrixNotation, waitUntilStable} from '../../../helper/testing.util';
 import {PartPO} from '../../../part.po';
 
 export class TextTestPagePO implements MicrofrontendViewPagePO, MicrofrontendDialogPagePO, MicrofrontendPopupPagePO {
@@ -102,7 +102,7 @@ export class TextObservePO {
   }
 
   public async state(): Promise<undefined | 'completed' | 'errored'> {
-    return (await this.locator.getAttribute('data-state') as null | 'completed' | 'errored') ?? undefined;
+    return (await waitUntilStable(() => this.locator.getAttribute('data-state')) as null | 'completed' | 'errored') ?? undefined;
   }
 
   public async cancel(): Promise<void> {

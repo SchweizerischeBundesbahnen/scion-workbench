@@ -15,6 +15,7 @@ import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {PartPO} from '../../part.po';
+import {waitUntilStable} from '../../helper/testing.util';
 
 /**
  * Page object to interact with {@link PartPageComponent} of workbench-client testing app.
@@ -35,7 +36,7 @@ export class PartPagePO {
   }
 
   public getComponentInstanceId(): Promise<string> {
-    return this.locator.locator('span.e2e-component-instance-id').innerText();
+    return waitUntilStable(() => this.locator.locator('span.e2e-component-instance-id').innerText());
   }
 
   public async getPartCapability(): Promise<WorkbenchPartCapability> {

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, selectBy, DomRect, fromRect, getCssClasses} from './helper/testing.util';
+import {coerceArray, DomRect, getCssClasses, selectBy, waitUntilBoundingBoxStable} from './helper/testing.util';
 import {Locator, Page} from '@playwright/test';
 import {PartPO} from './part.po';
 import {ViewTabPO} from './view-tab.po';
@@ -94,8 +94,8 @@ export class ViewPO {
     return getCssClasses(this.locator);
   }
 
-  public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.boundingBox());
+  public getBoundingBox(): Promise<DomRect> {
+    return waitUntilBoundingBoxStable(this.locator);
   }
 
   /**

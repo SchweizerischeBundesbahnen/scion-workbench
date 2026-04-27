@@ -10,7 +10,7 @@
 
 import {Locator} from '@playwright/test';
 import {DialogPO} from './dialog.po';
-import {DomRect, fromRect} from './helper/testing.util';
+import {DomRect, waitUntilBoundingBoxStable, waitUntilStable} from './helper/testing.util';
 
 /**
  * PO for interacting with a workbench message box.
@@ -39,7 +39,7 @@ export class MessageBoxPO {
   public async getActions(): Promise<{[key: string]: string}> {
     const actions = new Map<string, string>();
     for (const locator of await this.actions.all()) {
-      const action = await locator.getAttribute('data-action') ?? '?';
+      const action = await waitUntilStable(() => locator.getAttribute('data-action')) ?? '?';
       const label = await locator.innerText();
       actions.set(action, label);
     }
@@ -57,13 +57,13 @@ export class MessageBoxPO {
    * - `messagebox`: messagebox bounds.
    * - `slot`: bounds for slotted content; may differ from the actual content size if content overflows or does not fill the slot.
    */
-  public async getBoundingBox(selector: 'messagebox' | 'slot' = 'messagebox'): Promise<DomRect> {
+  public getBoundingBox(selector: 'messagebox' | 'slot' = 'messagebox'): Promise<DomRect> {
     switch (selector) {
       case 'messagebox': {
-        return fromRect(await this.locator.boundingBox());
+        return waitUntilBoundingBoxStable(this.locator);
       }
       case 'slot': {
-        return fromRect(await this.locator.locator('> div.e2e-slot').boundingBox());
+        return waitUntilBoundingBoxStable(this.locator.locator('> div.e2e-slot'));
       }
     }
   }

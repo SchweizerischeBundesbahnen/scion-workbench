@@ -13,7 +13,7 @@ import {PartPO} from '../../part.po';
 import {NavigationData, NavigationState, Translatable} from '@scion/workbench';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
-import {coerceArray} from '../../helper/testing.util';
+import {coerceArray, waitUntilStable} from '../../helper/testing.util';
 import {Params} from '@angular/router';
 import {ActivatedMicrofrontendPO} from './activated-microfrontend.po';
 
@@ -33,7 +33,7 @@ export class PartPagePO {
   }
 
   public getComponentInstanceId(): Promise<string> {
-    return this.locator.locator('span.e2e-component-instance-id').innerText();
+    return waitUntilStable(() => this.locator.locator('span.e2e-component-instance-id').innerText());
   }
 
   public async getParams(): Promise<Params> {

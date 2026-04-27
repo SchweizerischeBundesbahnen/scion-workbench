@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray} from '../../helper/testing.util';
+import {coerceArray, waitUntilStable} from '../../helper/testing.util';
 import {ViewPO} from '../../view.po';
 import {Locator} from '@playwright/test';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
@@ -35,7 +35,7 @@ export class ViewPagePO implements WorkbenchViewPagePO {
   }
 
   public getComponentInstanceId(): Promise<string> {
-    return this.locator.locator('span.e2e-component-instance-id').innerText();
+    return waitUntilStable(() => this.locator.locator('span.e2e-component-instance-id').innerText());
   }
 
   public async getRouteParams(): Promise<Params> {

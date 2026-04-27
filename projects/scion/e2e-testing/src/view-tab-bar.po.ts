@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DomRect, fromRect} from './helper/testing.util';
+import {DomRect, waitUntilBoundingBoxStable} from './helper/testing.util';
 import {Locator} from '@playwright/test';
 
 /**
@@ -37,8 +37,8 @@ export class ViewTabBarPO {
   /**
    * Gets the bounding box of this view tab bar.
    */
-  public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.boundingBox());
+  public getBoundingBox(): Promise<DomRect> {
+    return waitUntilBoundingBoxStable(this.locator);
   }
 
   /**

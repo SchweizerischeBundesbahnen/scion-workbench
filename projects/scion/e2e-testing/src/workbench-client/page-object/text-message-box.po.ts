@@ -11,7 +11,7 @@
 import {Locator} from '@playwright/test';
 import {WorkbenchMessageBoxPagePO} from '../../workbench/page-object/workbench-message-box-page.po';
 import {MessageBoxPO} from '../../message-box.po';
-import {DomRect, fromRect} from '../../helper/testing.util';
+import {DomRect, fromRect, waitUntilStable} from '../../helper/testing.util';
 
 /**
  * Page object to interact with the built-in workbench messagebox capability to display text.
@@ -29,7 +29,7 @@ export class TextMessageBoxPO implements WorkbenchMessageBoxPagePO {
   }
 
   public async isTextSelectable(): Promise<boolean> {
-    const text = await this.text.innerText();
+    const text = await waitUntilStable(() => this.text.innerText());
 
     await this.text.dblclick();
     const selection: string | undefined = await this.locator.page().evaluate(() => window.getSelection()?.toString());

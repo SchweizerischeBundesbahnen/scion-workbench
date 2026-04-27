@@ -9,7 +9,7 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {coerceArray, DomRect, fromRect, hasCssClass, selectBy} from './helper/testing.util';
+import {coerceArray, DomRect, fromRect, hasCssClass, selectBy, waitUntilBoundingBoxStable, waitUntilStable} from './helper/testing.util';
 import {AppPO} from './app.po';
 import {DialogId} from '@scion/workbench';
 import {RequireOne} from './helper/utility-types';
@@ -50,7 +50,7 @@ export class DialogPO {
   }
 
   public async getDialogId(): Promise<DialogId> {
-    return (await this.locator.getAttribute('data-dialogid')) as DialogId;
+    return (await waitUntilStable(() => this.locator.getAttribute('data-dialogid'))) as DialogId;
   }
 
   /**
@@ -65,12 +65,12 @@ export class DialogPO {
   public async getBoundingBox(selector: 'dialog' | 'slot' | 'header' | 'footer' = 'dialog'): Promise<DomRect> {
     switch (selector) {
       case 'dialog': {
-        return fromRect(await this.dialog.boundingBox());
+        return waitUntilBoundingBoxStable(this.dialog);
       }
       case 'slot': {
         // Do not read bounds from 'div.e2e-dialog-slot-bounds' to test actual slot bounds.
         const {paddingTop, paddingRight, paddingBottom, paddingLeft} = await this.viewport.locator('div.viewport-client[part="content"]').evaluate((slot: HTMLElement) => getComputedStyle(slot));
-        const viewportBounds = (await this.viewport.boundingBox())!;
+        const viewportBounds = await waitUntilBoundingBoxStable(this.viewport);
         return fromRect({
           x: viewportBounds.x + parseFloat(paddingLeft),
           y: viewportBounds.y + parseFloat(paddingTop),
@@ -79,10 +79,10 @@ export class DialogPO {
         });
       }
       case 'header': {
-        return fromRect(await this.header.boundingBox());
+        return waitUntilBoundingBoxStable(this.header);
       }
       case 'footer': {
-        return fromRect(await this.footer.boundingBox());
+        return waitUntilBoundingBoxStable(this.footer);
       }
     }
   }
@@ -104,7 +104,7 @@ export class DialogPO {
 
     const boundingBoxes = new Set<DomRect>();
     for (const glassPaneLocator of glassPaneLocators) {
-      boundingBoxes.add(fromRect(await glassPaneLocator.boundingBox()));
+      boundingBoxes.add(fromRect(await waitUntilBoundingBoxStable(glassPaneLocator)));
     }
     return boundingBoxes;
   }
@@ -143,7 +143,7 @@ export class DialogPO {
         break;
       }
       default: {
-        const {hcenter: x, vcenter: y} = fromRect(await this.header.boundingBox());
+        const {hcenter: x, vcenter: y} = await waitUntilBoundingBoxStable(this.header);
 
         const mouse = this.locator.page().mouse;
         await mouse.move(x, y);

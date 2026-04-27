@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DomRect, fromRect} from '../../helper/testing.util';
+import {DomRect, fromRect, waitUntilStable} from '../../helper/testing.util';
 import {ViewPO} from '../../view.po';
 import {Params} from '@angular/router';
 import {Translatable, WorkbenchViewCapability} from '@scion/workbench-client';
@@ -40,11 +40,11 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
   }
 
   public getComponentInstanceId(): Promise<string> {
-    return this.locator.locator('span.e2e-component-instance-id').innerText();
+    return waitUntilStable(() => this.locator.locator('span.e2e-component-instance-id').innerText());
   }
 
   public getAppInstanceId(): Promise<string> {
-    return this.locator.locator('span.e2e-app-instance-id').innerText();
+    return waitUntilStable(() => this.locator.locator('span.e2e-app-instance-id').innerText());
   }
 
   public async getViewCapability(): Promise<WorkbenchViewCapability> {

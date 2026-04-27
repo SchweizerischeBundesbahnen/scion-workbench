@@ -14,7 +14,7 @@ import {ViewTabPO} from './view-tab.po';
 import {PartSashPO} from './part-sash.po';
 import {PartBarPO} from './part-bar.po';
 import {PartId} from '@scion/workbench';
-import {coerceArray, DomRect, fromRect, getCssClasses, selectBy} from './helper/testing.util';
+import {coerceArray, DomRect, getCssClasses, selectBy, waitUntilBoundingBoxStable, waitUntilStable} from './helper/testing.util';
 import {PartSlotPO} from './part-slot.po';
 import {WorkbenchAccessor, WorkbenchPartNavigationE2E} from './workbench-accessor';
 import {RequireOne} from './helper/utility-types';
@@ -70,14 +70,14 @@ export class PartPO {
   }
 
   public async getPartId(): Promise<PartId> {
-    return (await this.locator.getAttribute('data-partid')) as PartId;
+    return (await waitUntilStable(() => this.locator.getAttribute('data-partid'))) as PartId;
   }
 
   /**
    * Indicates if this part is contained in the peripheral area.
    */
   public async isPeripheral(): Promise<boolean> {
-    return (await this.locator.getAttribute('data-peripheral')) !== null;
+    return (await waitUntilStable(() => this.locator.getAttribute('data-peripheral'))) !== null;
   }
 
   /**
@@ -122,8 +122,8 @@ export class PartPO {
    * - `part`: part bounds, including part bar.
    * - `slot`: bounds for slotted content; may differ from the actual content size if content overflows or does not fill the slot.
    */
-  public async getBoundingBox(selector: 'part' | 'slot' = 'part'): Promise<DomRect> {
-    return fromRect(await this.locator.locator(selector === 'part' ? ':scope' : ':scope > .e2e-slot').boundingBox());
+  public getBoundingBox(selector: 'part' | 'slot' = 'part'): Promise<DomRect> {
+    return waitUntilBoundingBoxStable(this.locator.locator(selector === 'part' ? ':scope' : ':scope > .e2e-slot'));
   }
 
   /**

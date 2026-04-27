@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DomRect, fromRect} from './helper/testing.util';
+import {DomRect, waitUntilBoundingBoxStable} from './helper/testing.util';
 import {Locator} from '@playwright/test';
 import {PartActionPO} from './part-action.po';
 import {ViewListMenuPO} from './view-list-menu.po';
@@ -63,7 +63,7 @@ export class PartBarPO {
   /**
    * Gets the bounding box of this part bar.
    */
-  public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.boundingBox());
+  public getBoundingBox(): Promise<DomRect> {
+    return waitUntilBoundingBoxStable(this.locator);
   }
 }

@@ -9,7 +9,7 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {coerceArray, DomRect, fromRect, getCssClasses, hasCssClass, selectBy} from './helper/testing.util';
+import {coerceArray, DomRect, getCssClasses, hasCssClass, selectBy, waitUntilBoundingBoxStable, waitUntilStable} from './helper/testing.util';
 import {POPUP_DIAMOND_ANCHOR_SIZE} from './workbench/workbench-layout-constants';
 import {PopupId} from '@scion/workbench';
 import {RequireOne} from './helper/utility-types';
@@ -30,7 +30,7 @@ export class PopupPO {
   }
 
   public async getPopupId(): Promise<PopupId> {
-    return (await this.locator.getAttribute('data-popupid')) as PopupId;
+    return (await waitUntilStable(() => this.locator.getAttribute('data-popupid'))) as PopupId;
   }
 
   /**
@@ -40,9 +40,9 @@ export class PopupPO {
    * - `part`: popup bounds.
    * - `slot`: bounds for slotted content; may differ from the actual content size if content overflows or does not fill the slot.
    */
-  public async getBoundingBox(selector: 'popup' | 'slot' = 'popup'): Promise<DomRect> {
+  public getBoundingBox(selector: 'popup' | 'slot' = 'popup'): Promise<DomRect> {
     const locator = selector === 'popup' ? this.overlay : this.locator;
-    return fromRect(await locator.boundingBox());
+    return waitUntilBoundingBoxStable(locator);
   }
 
   /**
