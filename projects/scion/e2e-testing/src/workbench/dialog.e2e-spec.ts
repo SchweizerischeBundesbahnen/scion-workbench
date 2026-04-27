@@ -21,7 +21,7 @@ import {expectDialog} from '../matcher/dialog-matcher';
 import {expectView} from '../matcher/view-matcher';
 import {SizeTestPagePO} from './page-object/test-pages/size-test-page.po';
 import {MAIN_AREA} from '../workbench.model';
-import {fromRect} from '../helper/testing.util';
+import {waitUntilBoundingBoxStable} from '../helper/testing.util';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 import {expectPopup} from '../matcher/popup-matcher';
 import {LargeTestPagePO} from './page-object/test-pages/large-test-page.po';
@@ -249,7 +249,7 @@ test.describe('Workbench Dialog', () => {
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.view.getBoundingBox()]));
 
       // Expect dialog to be positioned in the center of the workbench.
-      const workbenchBounds = fromRect(await appPO.workbenchRoot.boundingBox());
+      const workbenchBounds = await waitUntilBoundingBoxStable(appPO.workbenchRoot);
       const dialogBounds = await dialog.getBoundingBox('dialog');
 
       const left = workbenchBounds.hcenter - (dialogBounds.width / 2);
@@ -519,7 +519,7 @@ test.describe('Workbench Dialog', () => {
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.part.getBoundingBox('slot')]));
 
       // Expect dialog to be positioned in the center of the workbench.
-      const workbenchBounds = fromRect(await appPO.workbenchRoot.boundingBox());
+      const workbenchBounds = await waitUntilBoundingBoxStable(appPO.workbenchRoot);
       const dialogBounds = await dialog.getBoundingBox('dialog');
 
       const left = workbenchBounds.hcenter - (dialogBounds.width / 2);
@@ -1109,7 +1109,7 @@ test.describe('Workbench Dialog', () => {
       await expect.poll(() => appPO.isNotificationBlocked(notificationPage.notification.getNotificationId())).toBe(true);
 
       // Expect dialog to be positioned in the center of the workbench.
-      const workbenchBounds = fromRect(await appPO.workbenchRoot.boundingBox());
+      const workbenchBounds = await waitUntilBoundingBoxStable(appPO.workbenchRoot);
       const dialogBounds = await dialogPage.getBoundingBox();
 
       const left = workbenchBounds.hcenter - (dialogBounds.width / 2);

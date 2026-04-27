@@ -10,7 +10,7 @@
 
 import {Locator} from '@playwright/test';
 import {ViewPO} from '../../../view.po';
-import {DomRect, fromRect} from '../../../helper/testing.util';
+import {DomRect, waitUntilBoundingBoxStable} from '../../../helper/testing.util';
 import {DialogPO} from '../../../dialog.po';
 import {WorkbenchDialogPagePO} from '../workbench-dialog-page.po';
 import {WorkbenchViewPagePO} from '../workbench-view-page.po';
@@ -60,7 +60,7 @@ export class SizeTestPagePO implements WorkbenchViewPagePO, WorkbenchDialogPageP
     return sizes;
   }
 
-  public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.boundingBox());
+  public getBoundingBox(): Promise<DomRect> {
+    return waitUntilBoundingBoxStable(this.locator);
   }
 }

@@ -14,7 +14,7 @@ import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {DialogPO} from '../../dialog.po';
 import {WorkbenchDialogPagePO} from './workbench-dialog-page.po';
 import {Translatable} from '@scion/workbench';
-import {DomRect, fromRect} from '../../helper/testing.util';
+import {DomRect, waitUntilBoundingBoxStable} from '../../helper/testing.util';
 import {ActivatedMicrofrontendPO} from './activated-microfrontend.po';
 
 /**
@@ -93,8 +93,8 @@ export class DialogPagePO implements WorkbenchDialogPagePO {
     await this.dialog.footer.locator('button.e2e-close').click();
   }
 
-  public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.boundingBox());
+  public getBoundingBox(): Promise<DomRect> {
+    return waitUntilBoundingBoxStable(this.locator);
   }
 
   private async enterReturnValue(returnValue: string): Promise<void> {

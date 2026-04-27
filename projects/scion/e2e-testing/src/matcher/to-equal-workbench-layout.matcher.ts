@@ -11,7 +11,7 @@
 import {Locator} from '@playwright/test';
 import {MatcherReturnType} from 'playwright/types/test';
 import {MAIN_AREA} from '../workbench.model';
-import {prune, retryOnError} from '../helper/testing.util';
+import {prune, retryOnError, waitUntilBoundingBoxStable} from '../helper/testing.util';
 import {ActivityId, PartId, Translatable, ViewId} from '@scion/workbench';
 import {SASHBOX_SPLITTER_SIZE} from '../workbench/workbench-layout-constants';
 import {Objects} from '../helper/objects.util';
@@ -137,7 +137,7 @@ async function assertLeftActivityPanel(expectedPanel: Required<MActivityLayout['
   }
 
   // Assert left activity panel width.
-  const panelBoundingBox = (await panelLocator.boundingBox())!;
+  const panelBoundingBox = await waitUntilBoundingBoxStable(panelLocator);
   await throwIfBoundingBoxNotCloseTo({
     actual: panelBoundingBox,
     expected: {
@@ -153,7 +153,7 @@ async function assertLeftActivityPanel(expectedPanel: Required<MActivityLayout['
   if (expectedPanel.ratio) {
     // Assert top activity bounds.
     const topGridLocator = panelLocator.locator('wb-grid').nth(0);
-    const topGridBoundingBox = (await topGridLocator.boundingBox())!;
+    const topGridBoundingBox = await waitUntilBoundingBoxStable(topGridLocator);
     await throwIfBoundingBoxNotCloseTo({
       actual: topGridBoundingBox,
       expected: {
@@ -167,7 +167,7 @@ async function assertLeftActivityPanel(expectedPanel: Required<MActivityLayout['
 
     // Assert bottom activity bounds.
     const bottomGridLocator = panelLocator.locator('wb-grid').nth(1);
-    const bottomGridBoundingBox = (await bottomGridLocator.boundingBox())!;
+    const bottomGridBoundingBox = await waitUntilBoundingBoxStable(bottomGridLocator);
     await throwIfBoundingBoxNotCloseTo({
       actual: bottomGridBoundingBox,
       expected: {
@@ -193,7 +193,7 @@ async function assertRightActivityPanel(expectedPanel: Required<MActivityLayout[
   }
 
   // Assert right activity panel width.
-  const panelBoundingBox = (await panelLocator.boundingBox())!;
+  const panelBoundingBox = await waitUntilBoundingBoxStable(panelLocator);
   await throwIfBoundingBoxNotCloseTo({
     actual: panelBoundingBox,
     expected: {
@@ -209,7 +209,7 @@ async function assertRightActivityPanel(expectedPanel: Required<MActivityLayout[
   if (expectedPanel.ratio) {
     // Assert top activity bounds.
     const topGridLocator = panelLocator.locator('wb-grid').nth(0);
-    const topGridBoundingBox = (await topGridLocator.boundingBox())!;
+    const topGridBoundingBox = await waitUntilBoundingBoxStable(topGridLocator);
     await throwIfBoundingBoxNotCloseTo({
       actual: topGridBoundingBox,
       expected: {
@@ -223,7 +223,7 @@ async function assertRightActivityPanel(expectedPanel: Required<MActivityLayout[
 
     // Assert bottom activity bounds.
     const bottomGridLocator = panelLocator.locator('wb-grid').nth(1);
-    const bottomGridBoundingBox = (await bottomGridLocator.boundingBox())!;
+    const bottomGridBoundingBox = await waitUntilBoundingBoxStable(bottomGridLocator);
     await throwIfBoundingBoxNotCloseTo({
       actual: bottomGridBoundingBox,
       expected: {
@@ -249,7 +249,7 @@ async function assertBottomActivityPanel(expectedPanel: Required<MActivityLayout
   }
 
   // Assert bottom activity panel height.
-  const panelBoundingBox = (await panelLocator.boundingBox())!;
+  const panelBoundingBox = await waitUntilBoundingBoxStable(panelLocator);
   await throwIfBoundingBoxNotCloseTo({
     actual: panelBoundingBox,
     expected: {
@@ -265,7 +265,7 @@ async function assertBottomActivityPanel(expectedPanel: Required<MActivityLayout
   if (expectedPanel.ratio) {
     // Assert left activity bounds.
     const leftGridLocator = panelLocator.locator('wb-grid').nth(0);
-    const leftGridBoundingBox = (await leftGridLocator.boundingBox())!;
+    const leftGridBoundingBox = await waitUntilBoundingBoxStable(leftGridLocator);
     await throwIfBoundingBoxNotCloseTo({
       actual: leftGridBoundingBox,
       expected: {
@@ -279,7 +279,7 @@ async function assertBottomActivityPanel(expectedPanel: Required<MActivityLayout
 
     // Assert right activity bounds.
     const rightGridLocator = panelLocator.locator('wb-grid').nth(1);
-    const rightGridBoundingBox = (await rightGridLocator.boundingBox())!;
+    const rightGridBoundingBox = await waitUntilBoundingBoxStable(rightGridLocator);
     await throwIfBoundingBoxNotCloseTo({
       actual: rightGridBoundingBox,
       expected: {
@@ -419,13 +419,13 @@ async function assertSashBoundingBox(expectedTreeNode: MTreeNode & {nodeId: stri
   const child1Locator = gridElementLocator.locator(`wb-grid-element[data-parentnodeid="${expectedTreeNode.nodeId}"].sash-1`);
   const child2Locator = gridElementLocator.locator(`wb-grid-element[data-parentnodeid="${expectedTreeNode.nodeId}"].sash-2`);
 
-  const gridElementBoundingBox = (await gridElementLocator.boundingBox())!;
+  const gridElementBoundingBox = await waitUntilBoundingBoxStable(gridElementLocator);
   if (expectedTreeNode.child1 && expectedTreeNode.child2) {
     switch (expectedTreeNode.direction) {
       case 'row': {
         // Expect bounding box of sash 1.
         await throwIfBoundingBoxNotCloseTo({
-          actual: await child1Locator.boundingBox(),
+          actual: await waitUntilBoundingBoxStable(child1Locator),
           expected: {
             x: gridElementBoundingBox.x,
             y: gridElementBoundingBox.y,
@@ -436,7 +436,7 @@ async function assertSashBoundingBox(expectedTreeNode: MTreeNode & {nodeId: stri
         });
         // Expect bounding box of sash 2.
         await throwIfBoundingBoxNotCloseTo({
-          actual: await child2Locator.boundingBox(),
+          actual: await waitUntilBoundingBoxStable(child2Locator),
           expected: {
             x: gridElementBoundingBox.x + (gridElementBoundingBox.width * expectedTreeNode.ratio),
             y: gridElementBoundingBox.y,
@@ -450,7 +450,7 @@ async function assertSashBoundingBox(expectedTreeNode: MTreeNode & {nodeId: stri
       case 'column': {
         // Expect bounding box of sash 1.
         await throwIfBoundingBoxNotCloseTo({
-          actual: await child1Locator.boundingBox(),
+          actual: await waitUntilBoundingBoxStable(child1Locator),
           expected: {
             x: gridElementBoundingBox.x,
             y: gridElementBoundingBox.y,
@@ -461,7 +461,7 @@ async function assertSashBoundingBox(expectedTreeNode: MTreeNode & {nodeId: stri
         });
         // Expect bounding box of sash 2.
         await throwIfBoundingBoxNotCloseTo({
-          actual: await child2Locator.boundingBox(),
+          actual: await waitUntilBoundingBoxStable(child2Locator),
           expected: {
             x: gridElementBoundingBox.x,
             y: gridElementBoundingBox.y + (gridElementBoundingBox.height * expectedTreeNode.ratio),
@@ -477,7 +477,7 @@ async function assertSashBoundingBox(expectedTreeNode: MTreeNode & {nodeId: stri
   else if (expectedTreeNode.child1) {
     // Expect bounding box of child 1.
     await throwIfBoundingBoxNotCloseTo({
-      actual: await child1Locator.boundingBox(),
+      actual: await waitUntilBoundingBoxStable(child1Locator),
       expected: {
         x: gridElementBoundingBox.x,
         y: gridElementBoundingBox.y,
@@ -490,7 +490,7 @@ async function assertSashBoundingBox(expectedTreeNode: MTreeNode & {nodeId: stri
   else if (expectedTreeNode.child2) {
     // Expect bounding box of child 2.
     await throwIfBoundingBoxNotCloseTo({
-      actual: await child2Locator.boundingBox(),
+      actual: await waitUntilBoundingBoxStable(child2Locator),
       expected: {
         x: gridElementBoundingBox.x,
         y: gridElementBoundingBox.y,

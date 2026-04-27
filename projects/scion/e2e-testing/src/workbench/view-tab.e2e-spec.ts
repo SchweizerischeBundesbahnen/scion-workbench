@@ -12,7 +12,7 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {ViewPagePO} from './page-object/view-page.po';
 import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
-import {fromRect} from '../helper/testing.util';
+import {fromRect, waitUntilBoundingBoxStable} from '../helper/testing.util';
 import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
@@ -190,8 +190,8 @@ test.describe('Workbench View Tab', () => {
 
     // Expect the title to fully fill the tab, i.e., has no space reserved for the close button.
     await expect(async () => {
-      const contentBounds = fromRect(await viewTab.content.boundingBox());
-      const titleBounds = fromRect(await viewTab.title.boundingBox());
+      const contentBounds = await waitUntilBoundingBoxStable(viewTab.content);
+      const titleBounds = await waitUntilBoundingBoxStable(viewTab.title);
       expect(contentBounds.width).toEqual(titleBounds.width);
     }).toPass();
 
@@ -205,8 +205,8 @@ test.describe('Workbench View Tab', () => {
 
       // Expect the title to fully fill the drag image, i.e., has no space reserved for the close button.
       await expect(async () => {
-        const contentBounds = fromRect(await dragHandle.dragImage.content.boundingBox());
-        const titleBounds = fromRect(await dragHandle.dragImage.title.boundingBox());
+        const contentBounds = await waitUntilBoundingBoxStable(dragHandle.dragImage.content);
+        const titleBounds = await waitUntilBoundingBoxStable(dragHandle.dragImage.title);
         expect(contentBounds.width).toEqual(titleBounds.width);
       }).toPass();
     });
@@ -266,8 +266,8 @@ test.describe('Workbench View Tab', () => {
 
     // Expect title not to overlap the close button.
     await expect(async () => {
-      const titleBounds = fromRect(await viewTab.title.boundingBox());
-      const closeButtonBounds = fromRect(await viewTab.closeButton.boundingBox());
+      const titleBounds = await waitUntilBoundingBoxStable(viewTab.title);
+      const closeButtonBounds = await waitUntilBoundingBoxStable(viewTab.closeButton);
       expect(titleBounds.right).toBeLessThanOrEqual(closeButtonBounds.left);
     }).toPass();
 
@@ -278,8 +278,8 @@ test.describe('Workbench View Tab', () => {
 
       // Expect title not to overlap the close button.
       await expect(async () => {
-        const titleBounds = fromRect(await dragHandle.dragImage.title.boundingBox());
-        const closeButtonBounds = fromRect(await dragHandle.dragImage.closeButton.boundingBox());
+        const titleBounds = await waitUntilBoundingBoxStable(dragHandle.dragImage.title);
+        const closeButtonBounds = await waitUntilBoundingBoxStable(dragHandle.dragImage.closeButton);
         expect(titleBounds.right).toBeLessThanOrEqual(closeButtonBounds.left);
       }).toPass();
     });
@@ -330,8 +330,8 @@ test.describe('Workbench View Tab', () => {
 
     // Expect heading to render below close button to the end.
     await expect(async () => {
-      const headingBounds = fromRect(await viewTab.heading.boundingBox());
-      const closeButtonBounds = fromRect(await viewTab.closeButton.boundingBox());
+      const headingBounds = await waitUntilBoundingBoxStable(viewTab.heading);
+      const closeButtonBounds = await waitUntilBoundingBoxStable(viewTab.closeButton);
       expect(headingBounds.top).toBeGreaterThan(closeButtonBounds.bottom);
       expect(headingBounds.right).toBeGreaterThan(closeButtonBounds.left);
     }).toPass();
@@ -343,8 +343,8 @@ test.describe('Workbench View Tab', () => {
 
       // Expect heading to render below close button to the end.
       await expect(async () => {
-        const headingBounds = fromRect(await dragHandle.dragImage.heading.boundingBox());
-        const closeButtonBounds = fromRect(await dragHandle.dragImage.closeButton.boundingBox());
+        const headingBounds = await waitUntilBoundingBoxStable(dragHandle.dragImage.heading);
+        const closeButtonBounds = await waitUntilBoundingBoxStable(dragHandle.dragImage.closeButton);
         expect(headingBounds.top).toBeGreaterThan(closeButtonBounds.bottom);
         expect(headingBounds.right).toBeGreaterThan(closeButtonBounds.left);
       }).toPass();
@@ -362,7 +362,7 @@ test.describe('Workbench View Tab', () => {
     await viewPage.enterTitle('View Title');
 
     // Capture title bounds.
-    const titleBounds = fromRect(await viewTab.title.boundingBox());
+    const titleBounds = await waitUntilBoundingBoxStable(viewTab.title);
 
     // Mark view dirty.
     await viewPage.markDirty(true);
@@ -384,7 +384,7 @@ test.describe('Workbench View Tab', () => {
     await viewPage.markDirty(true);
 
     // Capture dirty marker bounds;
-    const dirtyMarkerBounds = fromRect(await viewTab.dirty.boundingBox());
+    const dirtyMarkerBounds = await waitUntilBoundingBoxStable(viewTab.dirty);
 
     // Clear title
     await viewPage.enterTitle('');
@@ -414,7 +414,7 @@ test.describe('Workbench View Tab', () => {
     await viewPage.enterHeading('View Heading');
 
     // Capture heading bounds.
-    const headingBounds = fromRect(await viewTab.heading.boundingBox());
+    const headingBounds = await waitUntilBoundingBoxStable(viewTab.heading);
 
     // Mark view dirty.
     await viewPage.markDirty(true);
@@ -438,7 +438,7 @@ test.describe('Workbench View Tab', () => {
     await viewPage.markDirty(true);
 
     // Capture heading bounds.
-    const headingBounds = fromRect(await viewTab.heading.boundingBox());
+    const headingBounds = await waitUntilBoundingBoxStable(viewTab.heading);
 
     // Clear title
     await viewPage.enterTitle('');

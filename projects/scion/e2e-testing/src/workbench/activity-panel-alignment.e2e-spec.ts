@@ -12,6 +12,7 @@ import {test} from '../fixtures';
 import {MAIN_AREA} from '../workbench.model';
 import {expect} from '@playwright/test';
 import {ACTIVITY_PANEL_HEIGHT, ACTIVITY_PANEL_WIDTH, SASHBOX_SPLITTER_SIZE} from './workbench-layout-constants';
+import {waitUntilBoundingBoxStable} from '../helper/testing.util';
 
 test.describe('Activity Panel Alignment', () => {
 
@@ -51,7 +52,7 @@ test.describe('Activity Panel Alignment', () => {
       });
 
       const mainGridBounds = await mainGrid.getBoundingBox();
-      const workbenchBounds = (await appPO.workbenchRoot.boundingBox())!;
+      const workbenchBounds = await waitUntilBoundingBoxStable(appPO.workbenchRoot);
 
       await expect(bottomPanel.locator).toHaveBoundingBox({
         x: mainGridBounds.x,
@@ -82,7 +83,7 @@ test.describe('Activity Panel Alignment', () => {
       });
 
       const mainGridBounds = await mainGrid.getBoundingBox();
-      const workbenchBounds = (await appPO.workbenchRoot.boundingBox())!;
+      const workbenchBounds = await waitUntilBoundingBoxStable(appPO.workbenchRoot);
       const leftPanelBounds = await leftPanel.getBoundingBox();
 
       await expect(bottomPanel.locator).toHaveBoundingBox({
@@ -117,7 +118,7 @@ test.describe('Activity Panel Alignment', () => {
       });
 
       const mainGridBounds = await mainGrid.getBoundingBox();
-      const workbenchBounds = (await appPO.workbenchRoot.boundingBox())!;
+      const workbenchBounds = await waitUntilBoundingBoxStable(appPO.workbenchRoot);
 
       await expect(bottomPanel.locator).toHaveBoundingBox({
         x: mainGridBounds.x,
@@ -152,7 +153,7 @@ test.describe('Activity Panel Alignment', () => {
       });
 
       const mainGridBounds = await mainGrid.getBoundingBox();
-      const workbenchBounds = (await appPO.workbenchRoot.boundingBox())!;
+      const workbenchBounds = await waitUntilBoundingBoxStable(appPO.workbenchRoot);
       const leftPanelBounds = await leftPanel.getBoundingBox();
 
       await expect(bottomPanel.locator).toHaveBoundingBox({
@@ -198,7 +199,7 @@ test.describe('Activity Panel Alignment', () => {
           },
         },
       });
-      const workbenchBounds = (await appPO.workbenchRoot.boundingBox())!;
+      const workbenchBounds = await waitUntilBoundingBoxStable(appPO.workbenchRoot);
       const mainGridBounds = await mainGrid.getBoundingBox();
 
       await expect(bottomPanel.locator).toHaveBoundingBox({
@@ -229,7 +230,7 @@ test.describe('Activity Panel Alignment', () => {
         },
       });
 
-      const workbenchBounds = (await appPO.workbenchRoot.boundingBox())!;
+      const workbenchBounds = await waitUntilBoundingBoxStable(appPO.workbenchRoot);
       const mainGridBounds = await mainGrid.getBoundingBox();
 
       await expect(bottomPanel.locator).toHaveBoundingBox({
@@ -263,7 +264,7 @@ test.describe('Activity Panel Alignment', () => {
         },
       });
 
-      const workbenchBounds = (await appPO.workbenchRoot.boundingBox())!;
+      const workbenchBounds = await waitUntilBoundingBoxStable(appPO.workbenchRoot);
       const mainGridBounds = await mainGrid.getBoundingBox();
       const rightPanelBounds = await rightPanel.getBoundingBox();
 
@@ -299,7 +300,7 @@ test.describe('Activity Panel Alignment', () => {
         },
       });
 
-      const workbenchBounds = (await appPO.workbenchRoot.boundingBox())!;
+      const workbenchBounds = await waitUntilBoundingBoxStable(appPO.workbenchRoot);
       const mainGridBounds = await mainGrid.getBoundingBox();
       const rightPanelBounds = await rightPanel.getBoundingBox();
 
@@ -346,7 +347,7 @@ test.describe('Activity Panel Alignment', () => {
         },
       });
 
-      const workbenchBounds = (await appPO.workbenchRoot.boundingBox())!;
+      const workbenchBounds = await waitUntilBoundingBoxStable(appPO.workbenchRoot);
       const mainGridBounds = await mainGrid.getBoundingBox();
 
       await expect(bottomPanel.locator).toHaveBoundingBox({
@@ -377,7 +378,7 @@ test.describe('Activity Panel Alignment', () => {
         },
       });
 
-      const workbenchBounds = (await appPO.workbenchRoot.boundingBox())!;
+      const workbenchBounds = await waitUntilBoundingBoxStable(appPO.workbenchRoot);
       const mainGridBounds = await mainGrid.getBoundingBox();
 
       await expect(bottomPanel.locator).toHaveBoundingBox({
@@ -411,7 +412,7 @@ test.describe('Activity Panel Alignment', () => {
         },
       });
 
-      const workbenchBounds = (await appPO.workbenchRoot.boundingBox())!;
+      const workbenchBounds = await waitUntilBoundingBoxStable(appPO.workbenchRoot);
       const mainGridBounds = await mainGrid.getBoundingBox();
 
       await expect(bottomPanel.locator).toHaveBoundingBox({
@@ -446,7 +447,7 @@ test.describe('Activity Panel Alignment', () => {
         },
       });
 
-      const workbenchBounds = (await appPO.workbenchRoot.boundingBox())!;
+      const workbenchBounds = await waitUntilBoundingBoxStable(appPO.workbenchRoot);
       const mainGridBounds = await mainGrid.getBoundingBox();
 
       await expect(bottomPanel.locator).toHaveBoundingBox({
@@ -493,7 +494,7 @@ test.describe('Activity Panel Alignment', () => {
           },
         },
       });
-      const workbenchBounds = (await appPO.workbenchRoot.boundingBox())!;
+      const workbenchBounds = await waitUntilBoundingBoxStable(appPO.workbenchRoot);
       const mainGridBounds = await mainGrid.getBoundingBox();
 
       await expect(bottomPanel.locator).toHaveBoundingBox({
@@ -524,7 +525,7 @@ test.describe('Activity Panel Alignment', () => {
         },
       });
 
-      const workbenchBounds = (await appPO.workbenchRoot.boundingBox())!;
+      const workbenchBounds = await waitUntilBoundingBoxStable(appPO.workbenchRoot);
       const mainGridBounds = await mainGrid.getBoundingBox();
       const leftPanelBounds = await leftPanel.getBoundingBox();
 
@@ -559,7 +560,7 @@ test.describe('Activity Panel Alignment', () => {
         },
       });
 
-      const workbenchBounds = (await appPO.workbenchRoot.boundingBox())!;
+      const workbenchBounds = await waitUntilBoundingBoxStable(appPO.workbenchRoot);
       const mainGridBounds = await mainGrid.getBoundingBox();
       const rightPanelBounds = await rightPanel.getBoundingBox();
 
@@ -595,7 +596,7 @@ test.describe('Activity Panel Alignment', () => {
         },
       });
 
-      const workbenchBounds = (await appPO.workbenchRoot.boundingBox())!;
+      const workbenchBounds = await waitUntilBoundingBoxStable(appPO.workbenchRoot);
       const mainGridBounds = await mainGrid.getBoundingBox();
       const leftPanelBounds = await leftPanel.getBoundingBox();
       const rightPanelBounds = await rightPanel.getBoundingBox();

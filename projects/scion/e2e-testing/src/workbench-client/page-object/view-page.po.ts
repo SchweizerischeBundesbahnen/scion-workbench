@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DomRect, fromRect, waitUntilStable} from '../../helper/testing.util';
+import {DomRect, waitUntilBoundingBoxStable, waitUntilStable} from '../../helper/testing.util';
 import {ViewPO} from '../../view.po';
 import {Params} from '@angular/router';
 import {Translatable, WorkbenchViewCapability} from '@scion/workbench-client';
@@ -143,8 +143,8 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
     // do not close the accordion as this action removes the iframe from the DOM.
   }
 
-  public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.boundingBox());
+  public getBoundingBox(): Promise<DomRect> {
+    return waitUntilBoundingBoxStable(this.locator);
   }
 
   public async navigateSelf(params: Params, options?: {paramsHandling?: 'merge' | 'replace'; navigatePerParam?: boolean}): Promise<void> {

@@ -17,7 +17,7 @@ import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendDialogPagePO} from '../../workbench/page-object/workbench-dialog-page.po';
 import {DialogPO} from '../../dialog.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
-import {DomRect, fromRect, waitUntilStable} from '../../helper/testing.util';
+import {DomRect, waitUntilBoundingBoxStable, waitUntilStable} from '../../helper/testing.util';
 
 /**
  * Page object to interact with {@link DialogPageComponent}.
@@ -44,7 +44,7 @@ export class DialogPagePO implements MicrofrontendDialogPagePO {
   }
 
   public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.boundingBox());
+    return waitUntilBoundingBoxStable(this.locator);
   }
 
   public async getDialogCapability(): Promise<WorkbenchDialogCapability> {

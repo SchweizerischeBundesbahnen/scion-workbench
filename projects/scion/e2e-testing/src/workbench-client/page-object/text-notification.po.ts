@@ -11,7 +11,7 @@
 import {Locator} from '@playwright/test';
 import {WorkbenchNotificationPagePO} from '../../workbench/page-object/workbench-notification-page.po';
 import {NotificationPO} from '../../notification.po';
-import {DomRect, fromRect} from '../../helper/testing.util';
+import {DomRect, waitUntilBoundingBoxStable} from '../../helper/testing.util';
 
 /**
  * Page object to interact with the built-in workbench notification capability to display text.
@@ -29,6 +29,6 @@ export class TextNotificationPO implements WorkbenchNotificationPagePO {
   }
 
   public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.boundingBox());
+    return waitUntilBoundingBoxStable(this.locator);
   }
 }

@@ -12,7 +12,7 @@ import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../../view.po';
-import {DomRect, fromRect} from '../../../helper/testing.util';
+import {DomRect, waitUntilBoundingBoxStable} from '../../../helper/testing.util';
 import {MicrofrontendDialogPagePO} from '../../../workbench/page-object/workbench-dialog-page.po';
 import {DialogPO} from '../../../dialog.po';
 import {PopupPO} from '../../../popup.po';
@@ -48,7 +48,7 @@ export class SizeTestPagePO implements MicrofrontendViewPagePO, MicrofrontendDia
     return sizes;
   }
 
-  public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.boundingBox());
+  public getBoundingBox(): Promise<DomRect> {
+    return waitUntilBoundingBoxStable(this.locator);
   }
 }

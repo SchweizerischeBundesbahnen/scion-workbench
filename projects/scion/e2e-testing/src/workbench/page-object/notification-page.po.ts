@@ -9,7 +9,7 @@
  */
 
 import {NotificationPO} from '../../notification.po';
-import {coerceArray, DomRect, fromRect} from '../../helper/testing.util';
+import {coerceArray, DomRect, waitUntilBoundingBoxStable} from '../../helper/testing.util';
 import {Locator} from '@playwright/test';
 import {WorkbenchNotificationPagePO} from './workbench-notification-page.po';
 import {Translatable} from '@scion/workbench';
@@ -64,7 +64,7 @@ export class NotificationPagePO implements WorkbenchNotificationPagePO {
   }
 
   public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.boundingBox());
+    return waitUntilBoundingBoxStable(this.locator);
   }
 
   public async close(): Promise<void> {

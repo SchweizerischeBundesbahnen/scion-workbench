@@ -9,7 +9,7 @@
  */
 
 import {Locator} from '@playwright/test';
-import {DomRect, fromRect, waitUntilBoundingBoxStable, waitUntilStable} from './helper/testing.util';
+import {DomRect, waitUntilBoundingBoxStable, waitUntilStable} from './helper/testing.util';
 
 /**
  * Handle for interacting with an activity panel.
@@ -30,7 +30,7 @@ export class ActivityPanelPO {
     const mouse = this.locator.page().mouse;
     const steps = Math.ceil(Math.abs(distance) / 5);
 
-    const panelBounds = fromRect(await this.locator.boundingBox());
+    const panelBounds = await waitUntilBoundingBoxStable(this.locator);
     switch (await this.getPanel()) {
       case 'left': {
         await mouse.move(panelBounds.right + 1, panelBounds.vcenter); // Move mouse slightly to the right of the panel to not target splitter separating this panel.

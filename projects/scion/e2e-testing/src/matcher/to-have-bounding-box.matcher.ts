@@ -9,7 +9,7 @@
  */
 
 import {Locator} from '@playwright/test';
-import {retryOnError} from '../helper/testing.util';
+import {retryOnError, waitUntilBoundingBoxStable} from '../helper/testing.util';
 import {MatcherReturnType} from 'playwright/types/test';
 
 /**
@@ -30,7 +30,7 @@ export async function toHaveBoundingBox(locator: Locator, expected: ExpectedBoun
  * Asserts expected bounding box.
  */
 async function assertBoundingBox(expected: ExpectedBoundingBox, locator: Locator): Promise<void> {
-  const {x, y, width, height} = (await locator.boundingBox())!;
+  const {x, y, width, height} = await waitUntilBoundingBoxStable(locator);
   if (x !== expected.x) {
     throw Error(`[DOMAssertError] Expected element x to be ${expected.x}, but was '${x}'.`);
   }

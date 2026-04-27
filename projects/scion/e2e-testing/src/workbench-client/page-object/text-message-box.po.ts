@@ -11,7 +11,7 @@
 import {Locator} from '@playwright/test';
 import {WorkbenchMessageBoxPagePO} from '../../workbench/page-object/workbench-message-box-page.po';
 import {MessageBoxPO} from '../../message-box.po';
-import {DomRect, fromRect, waitUntilStable} from '../../helper/testing.util';
+import {DomRect, waitUntilBoundingBoxStable, waitUntilStable} from '../../helper/testing.util';
 
 /**
  * Page object to interact with the built-in workbench messagebox capability to display text.
@@ -37,7 +37,7 @@ export class TextMessageBoxPO implements WorkbenchMessageBoxPagePO {
     return !!selection?.length && text.includes(selection);
   }
 
-  public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.boundingBox());
+  public getBoundingBox(): Promise<DomRect> {
+    return waitUntilBoundingBoxStable(this.locator);
   }
 }

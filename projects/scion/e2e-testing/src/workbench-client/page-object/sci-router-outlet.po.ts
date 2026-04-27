@@ -9,7 +9,7 @@
  */
 
 import {FrameLocator, Locator, Page} from '@playwright/test';
-import {selectBy, DomRect, fromRect, getCssClasses, waitUntilStable} from '../../helper/testing.util';
+import {DomRect, getCssClasses, selectBy, waitUntilBoundingBoxStable, waitUntilStable} from '../../helper/testing.util';
 
 /**
  * Page object to interact with {@link SciRouterOutletElement}.
@@ -51,7 +51,7 @@ export class SciRouterOutletPO {
   }
 
   public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.boundingBox());
+    return waitUntilBoundingBoxStable(this.locator);
   }
 
   public getCssClasses(): Promise<string[]> {
