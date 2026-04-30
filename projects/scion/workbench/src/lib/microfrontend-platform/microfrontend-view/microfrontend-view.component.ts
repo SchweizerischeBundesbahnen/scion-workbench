@@ -251,32 +251,34 @@ export class MicrofrontendViewComponent {
       .pipe(takeUntilDestroyed())
       .subscribe((request: TopicMessage<ɵViewParamsUpdateCommand>) => {
         const replyTo = request.headers.get(MessageHeaders.ReplyTo) as string;
-        const context = this.navigationContext();
+        const {capabilityId, referrer, capability} = this.navigationContext();
 
         // Ignore request if not target of this capability.
-        if (request.params!.get('capabilityId') !== context.capabilityId) {
+        if (request.params!.get('capabilityId') !== capabilityId) {
           return;
         }
 
         // Perform navigation to update view params.
         void this._workbenchRouter.navigate(layout => {
-          // Cancel navigation if closed or navigated the view.
-          if (this.view.destroyed() || this.navigationContext() !== context) {
+          const currentNavigationContext = this.navigationContext();
+
+          // Cancel navigation if closed or navigated the view to another capability.
+          if (this.view.destroyed() || currentNavigationContext.capabilityId !== capabilityId) {
             return null;
           }
 
           const paramsHandling = request.body!.paramsHandling;
-          const currentParams = Dictionaries.coerce(context.params);
+          const currentParams = Dictionaries.coerce(currentNavigationContext.params);
           const newParams = Dictionaries.coerce(request.body!.params);
           const mergedParams = prune(paramsHandling === 'merge' ? {...currentParams, ...newParams} : newParams);
-          const {params, transientParams} = splitMicrofrontendViewParams(mergedParams, context.capability!);
+          const {params, transientParams} = splitMicrofrontendViewParams(mergedParams, capability!);
 
           return layout.navigateView(this.view.id, [], {
             hint: MICROFRONTEND_VIEW_NAVIGATION_HINT,
             data: {
-              capabilityId: context.capabilityId,
+              capabilityId,
               params,
-              referrer: context.referrer,
+              referrer,
             } satisfies MicrofrontendViewNavigationData,
             state: prune({
               [MICROFRONTEND_VIEW_STATE_TRANSIENT_PARAMS]: Object.keys(transientParams).length ? transientParams : undefined,
