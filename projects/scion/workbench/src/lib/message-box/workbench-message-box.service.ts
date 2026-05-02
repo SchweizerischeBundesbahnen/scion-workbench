@@ -11,7 +11,7 @@ import {WorkbenchMessageBoxOptions} from './workbench-message-box.options';
 import {ComponentType} from '@angular/cdk/portal';
 import {Injectable} from '@angular/core';
 import {ɵWorkbenchMessageBoxService} from './ɵworkbench-message-box.service';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 /**
  * Provides a standardized dialog for presenting a message to the user, such as an info, warning or alert,

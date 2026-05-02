@@ -9,7 +9,7 @@
  */
 
 import {Component, inject, isDevMode} from '@angular/core';
-import {SciTextPipe} from '@scion/sci-components/text';
+import {SciTextPipe} from '@scion/components/text';
 import {WorkbenchView} from '../view/workbench-view.model';
 
 /**

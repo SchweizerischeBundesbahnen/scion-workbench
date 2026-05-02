@@ -1,4 +1,4 @@
-import {MaybeObservable} from '../common/utility-types';
+import {MaybeObservable} from '@scion/toolkit/types';
 import {WorkbenchToolbarFactory, WorkbenchToolbarGroupDescriptor, WorkbenchToolbarItemDescriptor, WorkbenchToolbarMenuDescriptor} from './workbench-toolbar.factory';
 import {WorkbenchMenu, WorkbenchMenuGroup, WorkbenchMenuItem, WorkbenchMenuItemLike} from './workbench-client-menu.model';
 import {Arrays} from '@scion/toolkit/util';
@@ -37,7 +37,7 @@ export class ɵWorkbenchToolbarFactory implements WorkbenchToolbarFactory {
       disabled: descriptor.disabled,
       cssClass: Arrays.coerce(descriptor.cssClass),
       attributes: descriptor.attributes,
-      onSelect: async () => await descriptor.onSelect() ?? descriptor.checked === undefined, // Close if the callback returns true. Defaults to closing non-checkable menu items.
+      onSelect: async () => await descriptor.onSelect() as boolean | undefined ?? descriptor.checked === undefined, // Close if the callback returns true. Defaults to closing non-checkable menu items.
     }));
 
     return this;

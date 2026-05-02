@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {SciTextProviderFn} from '@scion/sci-components/text';
+import {SciTextProviderFn} from '@scion/components/text';
 
 /**
  * Texts used in the SCION Workbench.

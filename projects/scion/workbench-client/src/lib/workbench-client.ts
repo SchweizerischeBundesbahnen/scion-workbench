@@ -26,7 +26,7 @@ import {ɵWorkbenchMessageBoxService} from './message-box/ɵworkbench-message-bo
 import {StyleSheetInstaller} from './style-sheet-installer';
 import {ɵWorkbenchTextProviderCapabilityInstaller} from './text/ɵworkbench-text-provider-capability-installer';
 import {registerLegacyTextProvider} from './text/workbench-legacy-text-provider';
-import {Disposable} from './common/disposable';
+import {Disposable} from '@scion/toolkit/types';
 import {WorkbenchTextProviderFn, ɵWORKBNCH_CLIENT_TEXT_PROVIDER} from './text/workbench-text-provider.model';
 import {WorkbenchTextService} from './text/workbench-text.service';
 import {ɵWorkbenchTextService} from './text/ɵworkbench-text.service';

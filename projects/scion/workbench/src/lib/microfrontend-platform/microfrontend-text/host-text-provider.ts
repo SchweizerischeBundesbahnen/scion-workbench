@@ -12,9 +12,9 @@ import {DestroyRef, EnvironmentProviders, inject, Injector, makeEnvironmentProvi
 import {map, Observable} from 'rxjs';
 import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
 import {WorkbenchTextProviderFn, ɵWorkbenchTextProviderCapabilityInstaller, ɵWORKBNCH_CLIENT_TEXT_PROVIDER} from '@scion/workbench-client';
-import {text} from '@scion/sci-components/text';
+import {text} from '@scion/components/text';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {createDestroyableInjector} from '../../common/injector.util';
+import {createDestroyableInjector} from '@scion/components/common';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 
 /**

@@ -32,7 +32,7 @@ import {PartId, ViewId} from '../workbench.identifiers';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 import {MPartGrid} from '../layout/workbench-grid.model';
-import {createDestroyableInjector} from '../common/injector.util';
+import {createDestroyableInjector} from '@scion/components/common';
 
 /**
  * Tracks the browser URL for workbench layout changes.

@@ -1,10 +1,9 @@
-import {MaybeObservable, OneOf, RequireOne} from '../common/utility-types';
+import {MaybeObservable, OneOf, RequireOne} from '@scion/toolkit/types';
 import {combineLatest, concatWith, firstValueFrom, NEVER, Observable, of, Subscription} from 'rxjs';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {mapToBody, MessageClient} from '@scion/microfrontend-platform';
-import {prune} from '../common/prune.util';
+import {Observables, prune} from '@scion/toolkit/util';
 import {createRemoteObservable$, remoteSubscriber$} from './remote-observable';
-import {Observables} from '@scion/toolkit/util';
 import {WorkbenchMenuFactory} from './workbench-menu.factory';
 import {WorkbenchToolbarFactory} from './workbench-toolbar.factory';
 import {Translatable} from '../text/workbench-text-provider.model';
@@ -129,7 +128,7 @@ export class WorkbenchMenuItemProxy {
  */
 export interface WorkbenchMenuItemTransferable {
   id: string;
-  type: 'menu-item'
+  type: 'menu-item';
   name?: `menuitem:${string}`;
   label?: string;
   icon?: string;
@@ -257,7 +256,7 @@ export class WorkbenchMenuProxy {
  */
 export interface WorkbenchMenuTransferable {
   id: string;
-  type: 'menu'
+  type: 'menu';
   name?: `menu:${string}`;
   label?: string;
   icon?: string;
@@ -356,7 +355,7 @@ export class WorkbenchMenuGroupProxy {
  */
 export interface WorkbenchMenuGroupTransferable {
   id: string;
-  type: 'group'
+  type: 'group';
   name?: `menu:${string}` | `toolbar:${string}`;
   label?: string;
   collapsible?: {collapsed: boolean};
@@ -429,7 +428,7 @@ export interface WorkbenchMenuOptions {
    */
   align?: 'vertical' | 'horizontal';
   size?: {
-    width?: string
+    width?: string;
     minWidth?: string;
     maxWidth?: string;
     maxHeight?: string;
@@ -442,12 +441,12 @@ export interface WorkbenchMenuOptions {
   metadata?: {[key: string]: unknown};
 }
 
-export type WorkbenchMenuOrigin = {
+export interface WorkbenchMenuOrigin {
   x: number;
   y: number;
   width?: number;
   height?: number;
-};
+}
 
 export interface WorkbenchMenuRef {
   close(): void;
@@ -461,9 +460,9 @@ export interface WorkbenchMenuRef {
 }
 
 /**
- * Workbench context keys used by workbench menus.
+ * Keys for defining the context of workbench menus.
  */
-export enum WorkbenchMenuContextKeys {
+export enum WorkbenchMenuContexts {
   ViewId = 'viewId',
   PartId = 'partId',
   DialogId = 'dialogId',

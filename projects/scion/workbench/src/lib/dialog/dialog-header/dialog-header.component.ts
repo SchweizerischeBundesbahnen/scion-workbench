@@ -10,8 +10,8 @@
 
 import {Component, ElementRef, inject, viewChild} from '@angular/core';
 import {ɵWorkbenchDialog} from '../ɵworkbench-dialog.model';
-import {SciTextPipe} from '@scion/sci-components/text';
-import {SciToolbarComponent} from '@scion/sci-components/menu';
+import {SciTextPipe} from '@scion/components/text';
+import {SciToolbarComponent} from '@scion/components/menu';
 import {dimension} from '@scion/components/dimension';
 
 /**

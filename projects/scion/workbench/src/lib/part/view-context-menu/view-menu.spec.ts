@@ -8,13 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ComponentFixture} from '@angular/core/testing';
-import {waitUntilStable} from '../../testing/testing.util';
-import {By} from '@angular/platform-browser';
-import {Component, DebugElement} from '@angular/core';
-import {ViewId} from '../../workbench.identifiers';
-import {ComponentType} from '@angular/cdk/portal';
-
 // TODO [menu] Use for new menu specs; move injection context tests to new spec for workbench view context menu, e.g., that view is available for injection
 describe('View Menu', () => {
 
@@ -1114,34 +1107,34 @@ describe('View Menu', () => {
   // });
 });
 
-@Component({
-  selector: 'spec-menu-item',
-  template: 'Menu Item',
-})
-class SpecMenuItemComponent {
-}
-
-async function openViewContextMenu(fixture: ComponentFixture<unknown>, locator: {viewId: ViewId}): Promise<DebugElement> {
-  const viewTabElement = fixture.debugElement.query(By.css(`wb-view-tab[data-viewid="${locator.viewId}"]`));
-  viewTabElement.nativeElement.dispatchEvent(new MouseEvent('contextmenu'));
-  await waitUntilStable();
-  return fixture.debugElement.parent!.query(By.css('div.cdk-overlay-pane wb-view-menu'));
-}
-
-function getMenuItem(contextMenu: DebugElement, locator: {cssClass: string}): DebugElement | null {
-  return contextMenu.query(By.css(`button.menu-item.${locator.cssClass}`));
-}
-
-function getMenuItemText(contextMenu: DebugElement, locator: {cssClass: string}): string | null {
-  return getMenuItem(contextMenu, locator)?.query(By.css('wb-menu-item')).nativeElement.innerText as string | undefined ?? null;
-}
-
-function getMenuItemComponent<T>(contextMenu: DebugElement, locator: {cssClass: string; component: ComponentType<T>}): T | null {
-  return getMenuItem(contextMenu, locator)?.query(By.css('wb-menu-item')).query(By.directive(locator.component)).componentInstance as T | undefined ?? null;
-}
-
-async function clickMenuItem(contextMenu: DebugElement, locator: {cssClass: string}): Promise<void> {
-  const menuItem = getMenuItem(contextMenu, locator)!;
-  menuItem.nativeElement.dispatchEvent(new MouseEvent('click'));
-  await waitUntilStable();
-}
+// @Component({
+//   selector: 'spec-menu-item',
+//   template: 'Menu Item',
+// })
+// class SpecMenuItemComponent {
+// }
+//
+// async function openViewContextMenu(fixture: ComponentFixture<unknown>, locator: {viewId: ViewId}): Promise<DebugElement> {
+//   const viewTabElement = fixture.debugElement.query(By.css(`wb-view-tab[data-viewid="${locator.viewId}"]`));
+//   viewTabElement.nativeElement.dispatchEvent(new MouseEvent('contextmenu'));
+//   await waitUntilStable();
+//   return fixture.debugElement.parent!.query(By.css('div.cdk-overlay-pane wb-view-menu'));
+// }
+//
+// function getMenuItem(contextMenu: DebugElement, locator: {cssClass: string}): DebugElement | null {
+//   return contextMenu.query(By.css(`button.menu-item.${locator.cssClass}`));
+// }
+//
+// function getMenuItemText(contextMenu: DebugElement, locator: {cssClass: string}): string | null {
+//   return getMenuItem(contextMenu, locator)?.query(By.css('wb-menu-item')).nativeElement.innerText as string | undefined ?? null;
+// }
+//
+// function getMenuItemComponent<T>(contextMenu: DebugElement, locator: {cssClass: string; component: ComponentType<T>}): T | null {
+//   return getMenuItem(contextMenu, locator)?.query(By.css('wb-menu-item')).query(By.directive(locator.component)).componentInstance as T | undefined ?? null;
+// }
+//
+// async function clickMenuItem(contextMenu: DebugElement, locator: {cssClass: string}): Promise<void> {
+//   const menuItem = getMenuItem(contextMenu, locator)!;
+//   menuItem.nativeElement.dispatchEvent(new MouseEvent('click'));
+//   await waitUntilStable();
+// }

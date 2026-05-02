@@ -19,7 +19,7 @@ import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfronten
 import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog.model';
 import {Microfrontends} from '../common/microfrontend.util';
 import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provider';
-import {ɵSciMenuService} from '@scion/sci-components/menu';
+import {ɵSciMenuService} from '@scion/components/menu';
 import {workbenchKeyboardAccelerators} from '../workbench-keyboard-accelerators';
 
 /**

@@ -8,8 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Disposable} from '../common/disposable';
-import {MaybeArray} from '@scion/sci-components/common';
+import {Disposable, MaybeArray} from '@scion/toolkit/types';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {ɵWorkbenchMenuService} from './ɵworkbench-menu.service';
 import {Arrays} from '@scion/toolkit/util';
@@ -20,7 +19,7 @@ import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {provideMenuEnvironmentContext} from './workbench-menu-environment-provider';
 
 export function installMenuAccelerators(location: `menu:${string}`, options?: WorkbenchMenuAcceleratorOptions): Disposable {
-  const context = new Map([...provideMenuEnvironmentContext(), ...options?.context ?? new Map()]);
+  const context = new Map<string, unknown>([...provideMenuEnvironmentContext(), ...options?.context ?? new Map()]);
   const acceleratorTargets = Arrays.coerce(options?.target ?? document);
 
   const subscription = Beans.get(ɵWorkbenchMenuService).menuItems$(location, context, {metadata: options?.metadata})
@@ -36,7 +35,10 @@ export function installMenuAccelerators(location: `menu:${string}`, options?: Wo
         case 'Shift':
         case 'Alt':
         case 'AltGraph':
-        case undefined: // UNDOCUMENTED: `event.key` can be `undefined`, for example, when selecting an option from an input element's datalist.
+          return;
+        // UNDOCUMENTED: `event.key` can be `undefined`, for example, when selecting an option from an input element's datalist.
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        case undefined:
           return;
       }
 
@@ -54,7 +56,7 @@ export function installMenuAccelerators(location: `menu:${string}`, options?: Wo
       event.stopPropagation();
 
       // Execute action.
-      matchingMenuItems.forEach(menuItem => menuItem.select());
+      matchingMenuItems.forEach(menuItem => void menuItem.select());
     });
 
   return {
@@ -80,12 +82,12 @@ function collectAccelerators(menuItemLikes: WorkbenchMenuItemProxyLike[]): Workb
   return menuItemLikes.reduce((menuItems, menuItemLike) => {
     switch (menuItemLike.type) {
       case 'menu-item': {
-        return menuItems.concat(collectAccelerators(menuItemLike.actions ?? [])).concat(menuItemLike.accelerator ? menuItemLike : []);
+        return menuItems.concat(collectAccelerators(menuItemLike.actions)).concat(menuItemLike.accelerator ? menuItemLike : []);
       }
       case 'menu':
         return menuItems.concat(collectAccelerators(menuItemLike.children));
       case 'group': {
-        return menuItems.concat(collectAccelerators(menuItemLike.children)).concat(collectAccelerators(menuItemLike.actions ?? []));
+        return menuItems.concat(collectAccelerators(menuItemLike.children)).concat(collectAccelerators(menuItemLike.actions));
       }
     }
   }, new Array<WorkbenchMenuItemProxy>());
@@ -111,13 +113,13 @@ function matchesAccelerator(accelerator: WorkbenchKeyboardAccelerator, event: Ke
     return false;
   }
   if (accelerator.location === 'left' && event.location !== 1) {
-    return false
+    return false;
   }
   if (accelerator.location === 'right' && event.location !== 2) {
-    return false
+    return false;
   }
   if (accelerator.location === 'numpad' && event.location !== 3) {
-    return false
+    return false;
   }
   return true;
 }

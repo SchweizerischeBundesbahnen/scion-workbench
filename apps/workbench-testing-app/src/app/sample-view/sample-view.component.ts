@@ -20,7 +20,7 @@ import {ListSkeletonComponent} from '../skeletons/list-sekeleton/list-skeleton.c
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {Objects} from '@scion/toolkit/util';
 import {ActivatedRoute} from '@angular/router';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 /**
  * Skeleton view for showcasing the SCION Workbench.

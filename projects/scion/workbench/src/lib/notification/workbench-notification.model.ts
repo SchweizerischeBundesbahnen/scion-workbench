@@ -1,6 +1,6 @@
 import {Signal} from '@angular/core';
 import {NotificationId} from '../workbench.identifiers';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 /**
  * A notification is a closable message displayed in the upper-right corner that disappears after a few seconds unless hovered or focused.

@@ -22,7 +22,7 @@ import {ActivatedRoute} from '@angular/router';
 import {Arrays} from '@scion/toolkit/util';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import ActivatedMicrofrontendComponent from '../activated-microfrontend/activated-microfrontend.component';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 @Component({
   selector: 'app-part-page',

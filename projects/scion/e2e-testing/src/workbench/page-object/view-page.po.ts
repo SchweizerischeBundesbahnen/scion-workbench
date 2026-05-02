@@ -18,7 +18,7 @@ import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
 import {NavigationData, NavigationState} from '@scion/workbench';
 import {ActivatedMicrofrontendPO} from './activated-microfrontend.po';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 /**
  * Page object to interact with {@link ViewPageComponent}.

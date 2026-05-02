@@ -10,7 +10,7 @@
 
 import {Component, computed, inject, Signal} from '@angular/core';
 import {WorkbenchPart} from '../workbench-part.model';
-import {SciIconComponent} from '@scion/sci-components/icon';
+import {SciIconComponent} from '@scion/components/icon';
 
 /**
  * Renders a chevron with the hidden view tab count.

@@ -22,7 +22,7 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
-import {contributeMenu} from '@scion/sci-components/menu';
+import {contributeMenu} from '@scion/components/menu';
 
 @Component({
   selector: 'app-dialog-page',

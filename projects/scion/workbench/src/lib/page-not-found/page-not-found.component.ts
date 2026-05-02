@@ -9,7 +9,7 @@
  */
 
 import {ChangeDetectionStrategy, Component, computed, inject, isDevMode} from '@angular/core';
-import {SciTextPipe} from '@scion/sci-components/text';
+import {SciTextPipe} from '@scion/components/text';
 import {WorkbenchService} from '../workbench.service';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';

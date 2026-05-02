@@ -59,7 +59,7 @@ async function startMicrofrontendPlatform(): Promise<void> {
 
   // Disable scope check for the workbench to read private capabilities.
   microfrontendPlatformConfig.host = {
-    ...microfrontendPlatformConfig.host, // eslint-disable-line @typescript-eslint/no-misused-spread
+    ...microfrontendPlatformConfig.host,
     scopeCheckDisabled: true,
   };
 

@@ -9,7 +9,7 @@
  */
 
 import {Component, effect, ElementRef, HostListener, inject, NgZone, Provider, signal, untracked, viewChild} from '@angular/core';
-import {BehaviorSubject, fromEvent, noop} from 'rxjs';
+import {BehaviorSubject, fromEvent} from 'rxjs';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {AsyncPipe, NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog.model';
@@ -26,8 +26,8 @@ import {filter, map, startWith, takeUntil} from 'rxjs/operators';
 import {fromMutation$} from '@scion/toolkit/observable';
 import {trackFocus} from '../focus/workbench-focus-tracker.service';
 import {setStyle} from '../common/dom.util';
-import {contributeMenu, SciToolbarFactory} from '@scion/sci-components/menu';
-import {WorkbenchMenuContextKeys} from '../menu/workbench-menu-environment-provider';
+import {contributeMenu, SciToolbarFactory} from '@scion/components/menu';
+import {WorkbenchMenuContexts} from '../menu/workbench-menu-environment-provider';
 
 /**
  * Renders the content of a workbench dialog.
@@ -100,16 +100,7 @@ export class WorkbenchDialogComponent {
     contributeMenu({location: 'toolbar:workbench.dialog.toolbar', position: 'end'}, toolbar => {
       this.contributeToolbarAdditionsMenu(toolbar);
       this.contributeCloseButton(toolbar);
-    }, {requiredContext: new Map().set(WorkbenchMenuContextKeys.ViewId, undefined)}); // clear view constraint to contribute to parts with and without views
-
-    // TODO [menu] only for illustration purpose
-    contributeMenu('menu:workbench.dialog.toolbar', menu => menu
-      .addMenuItem('Settings...', noop)
-      .addGroup(group => group
-        .addMenuItem({label: 'Auto Save', checked: true, onSelect: noop})
-        .addMenuItem({label: 'Reset', onSelect: noop}),
-      ),
-    );
+    }, {requiredContext: new Map().set(WorkbenchMenuContexts.ViewId, undefined)}); // clear view constraint to contribute to parts with and without views
   }
 
   private setDialogOffset(): void {

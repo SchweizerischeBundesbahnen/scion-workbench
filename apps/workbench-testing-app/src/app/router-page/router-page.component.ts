@@ -16,7 +16,8 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {Settings} from '../settings.service';
-import {MultiValueInputComponent, parseTypedObject, prune, RouterCommandsComponent, stringifyError} from 'workbench-testing-app-common';
+import {MultiValueInputComponent, parseTypedObject, RouterCommandsComponent, stringifyError} from 'workbench-testing-app-common';
+import {prune} from '@scion/toolkit/util';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {UUID} from '@scion/toolkit/uuid';
 

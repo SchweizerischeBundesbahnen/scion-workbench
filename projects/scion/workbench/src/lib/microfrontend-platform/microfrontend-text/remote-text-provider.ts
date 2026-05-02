@@ -16,7 +16,7 @@ import {mapToBody, MessageClient} from '@scion/microfrontend-platform';
 import {Translatable, WorkbenchTextService} from '@scion/workbench-client';
 import {Dictionaries} from '@scion/toolkit/util';
 import {finalize} from 'rxjs/operators';
-import {provideTextProvider} from '@scion/sci-components/text';
+import {provideTextProvider} from '@scion/components/text';
 
 /**
  * Registers a text provider for the SCION Workbench to get texts from micro apps.

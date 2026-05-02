@@ -152,36 +152,6 @@ export function toMatrixNotation(object: Record<string, unknown> | null | undefi
 }
 
 /**
- * Mutates the passed object by recursively deleting `undefined` properties, optionally also pruning empty objects.
- *
- * By default, empty objects are retained.
- *
- * @returns Pruned object or `undefined` depending on options.
- */
-export function prune<T>(object: T): T;
-export function prune<T>(object: T, options: {pruneIfEmpty: true}): T | undefined;
-export function prune<T>(object: T, options?: {pruneIfEmpty: boolean}): T | undefined;
-export function prune<T>(object: T, options?: {pruneIfEmpty: boolean}): T | undefined {
-  const pruneIfEmpty = options?.pruneIfEmpty ?? false;
-
-  if (object === null || object instanceof Map || object instanceof Set || Array.isArray(object)) {
-    return object;
-  }
-
-  if (typeof object === 'object') {
-    Object.entries(object).forEach(([key, value]) => {
-      if (prune(value, {pruneIfEmpty}) === undefined) {
-        delete (object as Record<string, unknown>)[key]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
-      }
-    });
-    if (!Object.keys(object).length && pruneIfEmpty) {
-      return undefined;
-    }
-  }
-  return object;
-}
-
-/**
  * Resolves to the identity of the perspective active in the given {@link Page}, or rejects if no perspective is active.
  */
 export async function getPerspectiveId(page: Page): Promise<string> {

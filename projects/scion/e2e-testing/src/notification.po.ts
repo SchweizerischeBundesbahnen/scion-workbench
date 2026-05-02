@@ -10,7 +10,7 @@
 
 import {Locator, Page} from '@playwright/test';
 import {coerceArray, DomRect, fromRect, getCssClasses, hasCssClass, selectBy} from './helper/testing.util';
-import {RequireOne} from './helper/utility-types';
+import {RequireOne} from '@scion/toolkit/types';
 import {NotificationId} from '../../workbench/src/lib/workbench.identifiers';
 
 /**

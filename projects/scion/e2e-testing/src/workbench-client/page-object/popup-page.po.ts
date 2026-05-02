@@ -17,7 +17,7 @@ import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendPopupPagePO} from '../../workbench/page-object/workbench-popup-page.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
-import {prune} from '../../helper/testing.util';
+import {prune} from '@scion/toolkit/util';
 import {parseTypedString} from '../../helper/typed-value.util';
 
 /**

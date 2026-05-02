@@ -10,14 +10,15 @@
 
 import {Component, ElementRef, inject, Type, viewChild} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {DialogId, PartId, PopupId, NotificationId, PopupOrigin, PopupService, ViewId, WorkbenchPopupService} from '@scion/workbench';
+import {DialogId, NotificationId, PartId, PopupId, PopupOrigin, PopupService, ViewId, WorkbenchPopupService} from '@scion/workbench';
 import PopupPageComponent from '../popup-page/popup-page.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import {map, startWith, switchMap} from 'rxjs/operators';
 import {Observable, of, timer} from 'rxjs';
 import BlankTestPageComponent from '../test-pages/blank-test-page/blank-test-page.component';
 import {PopupPositionLabelPipe, Position} from './popup-position-label.pipe';
-import {MultiValueInputComponent, parseTypedString, prune, stringifyError} from 'workbench-testing-app-common';
+import {MultiValueInputComponent, parseTypedString, stringifyError} from 'workbench-testing-app-common';
+import {prune} from '@scion/toolkit/util';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';

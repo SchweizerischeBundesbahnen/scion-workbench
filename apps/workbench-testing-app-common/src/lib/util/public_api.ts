@@ -11,7 +11,6 @@
 export {AppendDataTypePipe} from './append-data-type.pipe';
 export {NullIfEmptyPipe} from './null-if-empty.pipe';
 export {parseTypedString, parseTypedObject, toTypedString} from './typed-value.util';
-export {prune} from './prune.util';
 export {stringifyError} from './stringify-error.util';
 export {undefinedIfEmpty} from './undefined-if-empty.util';
 export {FieldValidationDirective} from './field-validation.directive';

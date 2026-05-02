@@ -12,7 +12,7 @@ import {Directive, effect, ElementRef, inject, input, output, untracked} from '@
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {getCssTranslation} from '../common/dom.util';
 import {fromMoveHandle$, HandleMoveEvent} from '../common/observables';
-import {Disposable} from '../common/disposable';
+import {Disposable} from '@scion/toolkit/types';
 
 /**
  * Enables moving the host element via mouse or touch gesture.

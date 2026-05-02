@@ -13,7 +13,7 @@ import {Signal} from '@angular/core';
 import {NavigationData, NavigationState} from '../routing/routing.model';
 import {UrlSegment} from '@angular/router';
 import {PartId, ViewId} from '../workbench.identifiers';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 /**
  * A part is a visual element of the workbench layout. Parts can be docked to the side or

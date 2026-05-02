@@ -17,7 +17,7 @@ import {MultiValueInputComponent, parseTypedString} from 'workbench-testing-app-
 import {ActivityId} from '@scion/workbench';
 import {UUID} from '@scion/toolkit/uuid';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 @Component({
   selector: 'app-add-docked-parts',

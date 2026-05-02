@@ -12,8 +12,8 @@ import {inject, Injectable} from '@angular/core';
 import {NotificationConfig} from './notification.config';
 import {LEGACY_NOTIFICATION_INPUT} from './ɵnotification';
 import {ɵWorkbenchNotificationService} from './ɵworkbench-notification.service';
-import {prune} from '../common/prune.util';
-import {Translatable} from '@scion/sci-components/text';
+import {prune} from '@scion/toolkit/util';
+import {Translatable} from '@scion/components/text';
 
 /**
  * Shows a notification.

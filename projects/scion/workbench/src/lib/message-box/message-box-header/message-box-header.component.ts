@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {Component, input} from '@angular/core';
-import {SciTextPipe, Translatable} from '@scion/sci-components/text';
+import {SciTextPipe, Translatable} from '@scion/components/text';
 
 @Component({
   selector: 'wb-message-box-header',

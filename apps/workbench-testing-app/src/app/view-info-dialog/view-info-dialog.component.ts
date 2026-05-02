@@ -17,7 +17,7 @@ import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {NullIfEmptyPipe, parseTypedString} from 'workbench-testing-app-common';
 import {FormsModule} from '@angular/forms';
 import {UUID} from '@scion/toolkit/uuid';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 @Component({
   selector: 'app-view-info-dialog',

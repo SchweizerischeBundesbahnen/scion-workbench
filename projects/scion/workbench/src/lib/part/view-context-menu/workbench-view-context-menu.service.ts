@@ -13,15 +13,15 @@ import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {LegacyMenuItemConfig, MenuItemConfig, WorkbenchConfig} from '../../workbench-config';
 import {ViewId} from '../../workbench.identifiers';
 import {WorkbenchView} from '../../view/workbench-view.model';
-import {contributeMenu, Disposable, installMenuAccelerators, SciKeyboardAccelerator, SciMenuFactory, SciMenuService} from '@scion/sci-components/menu';
+import {contributeMenu, installMenuAccelerators, SciKeyboardAccelerator, SciMenuFactory, SciMenuService} from '@scion/components/menu';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {WORKBENCH_ELEMENT} from '../../workbench-element-references';
-import {MaybeArray, SciComponentDescriptor} from '@scion/sci-components/common';
-import {createDestroyableInjector} from '../../common/injector.util';
+import {createDestroyableInjector, SciComponentDescriptor} from '@scion/components/common';
+import {Disposable, MaybeArray} from '@scion/toolkit/types';
 import {NgTemplateOutlet} from '@angular/common';
 import {WorkbenchMenuItem, WorkbenchViewMenuItemFn} from '../../workbench.model';
 import {WORKBENCH_VIEW_CONTEXT} from '../../view/workbench-view-context.provider';
-import {WorkbenchMenuContextKeys} from '../../menu/workbench-menu-environment-provider';
+import {WorkbenchMenuContexts} from '../../menu/workbench-menu-environment-provider';
 
 /**
  * Provides the contextmenu of a view.
@@ -110,14 +110,14 @@ export class WorkbenchViewContextMenuService {
         accelerator: parseLegacyMenuAccelerator(legacyViewMenuItem.accelerator),
         disabled: legacyViewMenuItem.disabled,
         cssClass: legacyViewMenuItem.cssClass,
-      })
+      });
     }, {injector: this._injector}); // Pass root injector to be independent of the invocation context.
 
     return {
       dispose: () => contribution.dispose(),
     };
 
-    function coerceComponent(legacyViewMenuItem: WorkbenchMenuItem, options: {view: WorkbenchView, providers: Provider[]}): SciComponentDescriptor {
+    function coerceComponent(legacyViewMenuItem: WorkbenchMenuItem, options: {view: WorkbenchView; providers: Provider[]}): SciComponentDescriptor {
       if (legacyViewMenuItem.content instanceof TemplateRef) {
         return {
           component: MenuItemComponent,
@@ -278,11 +278,11 @@ export class WorkbenchViewContextMenuService {
    */
   private createViewMenuContext(viewId: ViewId): Map<string, unknown> {
     const view = this._viewRegistry.get(viewId);
-    return new Map()
-      .set(WorkbenchMenuContextKeys.ViewId, view.id)
-      .set(WorkbenchMenuContextKeys.PartId, view.part().id)
-      .set(WorkbenchMenuContextKeys.Peripheral, view.part().peripheral())
-      .set(WorkbenchMenuContextKeys.MainArea, view.part().isInMainArea);
+    return new Map<string, unknown>()
+      .set(WorkbenchMenuContexts.ViewId, view.id)
+      .set(WorkbenchMenuContexts.PartId, view.part().id)
+      .set(WorkbenchMenuContexts.Peripheral, view.part().peripheral())
+      .set(WorkbenchMenuContexts.MainArea, view.part().isInMainArea);
   }
 }
 
@@ -305,7 +305,7 @@ function parseLegacyMenuAccelerator(accelerator: SciKeyboardAccelerator | string
     return accelerator;
   }
 
-  if (!accelerator?.length) {
+  if (!accelerator.length) {
     return undefined;
   }
 

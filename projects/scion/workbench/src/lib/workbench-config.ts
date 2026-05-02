@@ -15,10 +15,10 @@ import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
 import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform/microfrontend-platform-config-loader';
 import {WorkbenchPerspectives} from './perspective/workbench-perspective.model';
 import {WorkbenchStorage} from './storage/workbench-storage';
-import {SciTextProviderFn} from '@scion/sci-components/text';
-import {SciIconProviderFn} from '@scion/sci-components/icon';
+import {SciTextProviderFn} from '@scion/components/text';
+import {SciIconProviderFn} from '@scion/components/icon';
 import {WorkbenchLayoutFn} from './layout/workbench-layout';
-import {SciKeyboardAccelerator} from '@scion/sci-components/menu';
+import {SciKeyboardAccelerator} from '@scion/components/menu';
 
 /**
  * Configuration of the SCION Workbench.

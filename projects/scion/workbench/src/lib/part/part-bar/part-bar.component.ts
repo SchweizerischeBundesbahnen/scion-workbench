@@ -15,11 +15,11 @@ import {ViewTabBarComponent} from '../view-tab-bar/view-tab-bar.component';
 import {dimension} from '@scion/components/dimension';
 import {EMPTY, fromEvent, mergeMap, of, pairwise, withLatestFrom} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
-import {SciTextPipe, text} from '@scion/sci-components/text';
-import {contributeMenu, SciMenuFactory, SciToolbarComponent, SciToolbarFactory, SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
+import {SciTextPipe, text} from '@scion/components/text';
+import {contributeMenu, SciMenuFactory, SciToolbarComponent, SciToolbarFactory, SciToolbarMenuDescriptor} from '@scion/components/menu';
 import {ViewListToolbarIconComponent} from '../view-list-toolbar-icon/view-list-toolbar-icon.component';
 import {WorkbenchView} from '../../view/workbench-view.model';
-import {PART_CONTEXT_VIEW_ID, WorkbenchMenuContextKeys} from '../../menu/workbench-menu-environment-provider';
+import {PART_CONTEXT_VIEW_ID, WorkbenchMenuContexts} from '../../menu/workbench-menu-environment-provider';
 import {ToolbarVisibilityDirective} from '../../common/toolbar-visibility.directive';
 
 /**
@@ -49,7 +49,7 @@ export class PartBarComponent {
 
   protected readonly part = inject(ɵWorkbenchPart);
   protected readonly maxViewTabBarWidth: Signal<number>;
-  protected readonly toolbarActiveViewContext = computed(() => new Map().set(WorkbenchMenuContextKeys.ViewId, this.part.activeView()?.id ?? PART_CONTEXT_VIEW_ID));
+  protected readonly toolbarActiveViewContext = computed(() => new Map().set(WorkbenchMenuContexts.ViewId, this.part.activeView()?.id ?? PART_CONTEXT_VIEW_ID));
 
   constructor() {
     this.maxViewTabBarWidth = this.calculateMaxViewTabBarWidth();
@@ -59,13 +59,13 @@ export class PartBarComponent {
       this.contributeViewListMenuButton(toolbar);
       this.contributeToolbarAdditionsMenu(toolbar);
       this.contributeMinimizeButton(toolbar);
-    }, {requiredContext: new Map().set(WorkbenchMenuContextKeys.ViewId, undefined)}); // clear view constraint to contribute to parts with and without views
+    }, {requiredContext: new Map().set(WorkbenchMenuContexts.ViewId, undefined)}); // clear view constraint to contribute to parts with and without views
 
     // Contribute viewlist menu items via separate contribution to scope its reactive context, i.e., to not re-create other menu items when views are added, removed, or scrolled.
     contributeMenu('menu:workbench.part.toolbar:viewlist', menu => {
       menu.addGroup(group => this.contributeViewMenuItems(group, this.part.views().filter(view => !view.scrolledIntoView())));
       menu.addGroup(group => this.contributeViewMenuItems(group, this.part.views().filter(view => view.scrolledIntoView())));
-    }, {requiredContext: new Map().set(WorkbenchMenuContextKeys.ViewId, undefined)}); // clear view constraint to contribute to parts with and without views
+    }, {requiredContext: new Map().set(WorkbenchMenuContexts.ViewId, undefined)}); // clear view constraint to contribute to parts with and without views
   }
 
   protected onPartBarMouseDown(event: Event): void {

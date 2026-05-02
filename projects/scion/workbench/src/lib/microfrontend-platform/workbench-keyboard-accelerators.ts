@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {SciKeyboardAccelerator} from '@scion/sci-components/menu';
+import {SciKeyboardAccelerator} from '@scion/components/menu';
 
 /**
  * Global accelerators used by the SCION Workbench.

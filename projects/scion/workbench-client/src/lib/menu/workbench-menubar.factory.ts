@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {MaybeObservable, RequireOne} from '../common/utility-types';
+import {MaybeObservable, RequireOne} from '@scion/toolkit/types';
 import {WorkbenchMenuFactory} from './workbench-menu.factory';
 import {Translatable} from '../text/workbench-text-provider.model';
 

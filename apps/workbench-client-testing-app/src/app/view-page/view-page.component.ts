@@ -10,7 +10,7 @@
 
 import {Component, computed, inject, Injector, signal, WritableSignal} from '@angular/core';
 import {FormGroup, FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {CanCloseRef, WorkbenchMenuContextKeys, WorkbenchMenuService, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchToolbarFactory, WorkbenchView} from '@scion/workbench-client';
+import {CanCloseRef, WorkbenchMenuContexts, WorkbenchMenuService, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchToolbarFactory, WorkbenchView} from '@scion/workbench-client';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
 import {BehaviorSubject, MonoTypeOperatorFunction, NEVER} from 'rxjs';
@@ -25,7 +25,8 @@ import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
-import {contributeMenu, Disposable, installMenuAccelerators, SciMenubarComponent, SciMenuService, SciToolbarComponent, SciToolbarFactory} from '@scion/sci-components/menu';
+import {contributeMenu, installMenuAccelerators, SciMenubarComponent, SciMenuService, SciToolbarComponent, SciToolbarFactory} from '@scion/components/menu';
+import {Disposable} from '@scion/toolkit/types';
 
 @Component({
   selector: 'app-view-page',
@@ -77,6 +78,10 @@ export default class ViewPageComponent {
     }),
   });
 
+  protected contributionRef1: Disposable | undefined;
+  protected contributionRef2: Disposable | undefined;
+  protected toolbarVisible = true;
+
   constructor() {
     this.view.markDirty(NEVER.pipe(this.logCompletion('DirtyObservableComplete')));
     this.view.setClosable(this.form.controls.closable.valueChanges.pipe(this.logCompletion('ClosableObservableComplete')));
@@ -117,10 +122,6 @@ export default class ViewPageComponent {
       });
   }
 
-  protected contributionRef1: Disposable | undefined;
-  protected contributionRef2: Disposable | undefined;
-  protected toolbarVisible = true;
-
   private contributeMenubar(): void {
     contributeMenu('menubar:view', menubar => menubar
       .addMenu('Menu 1', menu => menu
@@ -160,14 +161,14 @@ export default class ViewPageComponent {
           ),
         ),
       ),
-    )
+    );
 
     contributeMenu({location: 'menubar:view', position: 'end'}, menubar => menubar
       .addMenu({label: 'Menu 4', name: 'menu:view.menubar:additions'}, menu => menu),
     );
   }
 
-  private contributeClientMenubar(): void {
+  public contributeClientMenubar(): void {
     this._workbenchMenuService.contributeMenu('menubar:view', menubar => menubar
       .addMenu('Menu 1', menu => menu
         .addMenuItem('Menu 1 - A', onSelect)
@@ -206,7 +207,7 @@ export default class ViewPageComponent {
           ),
         ),
       ),
-    )
+    );
 
     this._workbenchMenuService.contributeMenu({location: 'menubar:view', position: 'end'}, menubar => menubar
       .addMenu({label: 'Menu 4', name: 'menu:view.menubar:additions'}, menu => menu),
@@ -289,7 +290,7 @@ export default class ViewPageComponent {
     );
   }
 
-  private contributeClientToolbar(): void {
+  public contributeClientToolbar(): void {
     const bold = new BehaviorSubject(false);
     const italic = new BehaviorSubject(true);
     const underlined = new BehaviorSubject(false);
@@ -363,11 +364,9 @@ export default class ViewPageComponent {
     }
     else {
       this.contributionRef1 = contributeMenu('toolbar:router-page', menu => {
-          console.log('>>> factory contribute menu 1');
-          menu
-            .addToolbarItem('favorite', onSelect);
-        }
-        , {requiredContext: new Map().set(WorkbenchMenuContextKeys.ViewId, undefined), injector: this._injector});
+        console.log('>>> factory contribute menu 1');
+        menu.addToolbarItem('favorite', onSelect);
+      }, {requiredContext: new Map().set(WorkbenchMenuContexts.ViewId, undefined), injector: this._injector});
     }
   }
 
@@ -378,16 +377,13 @@ export default class ViewPageComponent {
     }
     else {
       this.contributionRef2 = contributeMenu('toolbar:router-page', menu => {
-          console.log('>>> factory contribute menu 2');
-
-          menu
-            .addToolbarItem('train', onSelect);
-        }
-        , {requiredContext: new Map().set(WorkbenchMenuContextKeys.ViewId, undefined), injector: this._injector});
+        console.log('>>> factory contribute menu 2');
+        menu.addToolbarItem('train', onSelect);
+      }, {requiredContext: new Map().set(WorkbenchMenuContexts.ViewId, undefined), injector: this._injector});
     }
   }
 
-  private contributeClientPartToolbar(): void {
+  public contributeClientPartToolbar(): void {
     this._workbenchMenuService.contributeMenu('toolbar:workbench.part.toolbar', menu => menu
       .addMenu({icon: 'computer', label: 'Client', filter: {placeholder: 'hello', notFoundText: 'nüd found'}}, menu => menu
         .addMenuItem({label: 'New', icon: 'article', onSelect: () => onSelect()})
@@ -408,7 +404,7 @@ export default class ViewPageComponent {
           ),
         ),
       ),
-    )
+    );
   }
 
   private contributePartToolbar(): void {
@@ -571,10 +567,10 @@ export default class ViewPageComponent {
         )
         .addMenuItem('Remove from Sidebar', onSelect),
       ),
-    )
+    );
   }
 
-  private contributeClientContextMenu(): void {
+  public contributeClientContextMenu(): void {
     const injector = inject(Injector);
 
     this._workbenchMenuService.installMenuAccelerators('menu:contextmenu');
@@ -618,7 +614,7 @@ export default class ViewPageComponent {
         )
         .addMenuItem('Remove from Sidebar', onSelect),
       ),
-    )
+    );
   }
 
   protected onContextMenuWorkbenchClientOpen(event: PointerEvent): void {

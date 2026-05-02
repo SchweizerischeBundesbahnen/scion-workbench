@@ -1,7 +1,7 @@
-import {WorkbenchThemeMonitor} from '@scion/workbench-client';
 import {Beans, PreDestroy} from '@scion/toolkit/bean-manager';
 import {Subscription} from 'rxjs';
 import {finalize} from 'rxjs/operators';
+import {WorkbenchThemeMonitor} from './workbench-theme-monitor';
 
 /**
  * Switches the theme when changed in the workbench.

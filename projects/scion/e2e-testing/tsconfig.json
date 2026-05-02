@@ -28,12 +28,6 @@
       "@scion/workbench-client": [
         "projects/scion/workbench-client/src/public-api"
       ],
-      "@scion/sci-components/text": [
-        "projects/scion/sci-components/text/src/public_api"
-      ],
-      "@scion/sci-components/common": [
-        "projects/scion/sci-components/common/src/public_api",
-      ],
       "workbench-testing-app-common": [
         "apps/workbench-testing-app-common/src/public-api.ts"
       ]

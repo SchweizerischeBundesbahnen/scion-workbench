@@ -8,13 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {MaybeObservable, Translatable, WorkbenchMenuFactory, WorkbenchToolbarFactory} from '@scion/workbench-client';
+import {Translatable, WorkbenchMenuFactory, WorkbenchToolbarFactory} from '@scion/workbench-client';
+import {MaybeObservable, RequireOne} from '@scion/toolkit/types';
 import {inject, Injector, isSignal, runInInjectionContext} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
-import {SciMenuFactory, SciToolbarControlDescriptor, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarItemDescriptor, SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
+import {SciMenuFactory, SciToolbarControlDescriptor, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarItemDescriptor, SciToolbarMenuDescriptor} from '@scion/components/menu';
 import {WorkbenchClientMenuFactoryDelegate} from './workbench-client-menu-factory-delegate';
 import {toLazyObservable} from '../common/lazy-observable.util';
-import {MaybeSignal, RequireOne, SciComponentDescriptor} from '@scion/sci-components/common';
+import {MaybeSignal, SciComponentDescriptor} from '@scion/components/common';
+
+/* eslint-disable @typescript-eslint/unified-signatures */
 
 /**
  * Represents a {@link SciToolbarFactory} that delegates to {@link WorkbenchToolbarFactory} of `@scion/workbench-client`.

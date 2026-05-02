@@ -1,6 +1,6 @@
 import {effect, inject, Injector, isSignal, untracked} from '@angular/core';
 import {Observable, of} from 'rxjs';
-import {MaybeSignal} from '@scion/sci-components/common';
+import {MaybeSignal} from '@scion/components/common';
 
 /**
  * Like {@link toSignal}, but lazily creates the effect upon subscription, binding it to the subscription lifecycle instead of the injection context, plus, emits the signal's initial value synchronously.

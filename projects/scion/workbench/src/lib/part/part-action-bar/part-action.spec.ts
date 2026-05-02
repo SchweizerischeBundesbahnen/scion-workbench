@@ -8,8 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
-
 // TODO [menu] Use for new menu specs; move injection context tests to new spec for workbench view context menu, e.g., that view is available for injection
 describe('PartAction', () => {
   //
@@ -955,9 +953,9 @@ describe('PartAction', () => {
   // });
 });
 
-@Component({
-  selector: 'spec-action',
-  template: 'Action',
-})
-class SpecActionComponent {
-}
+// @Component({
+//   selector: 'spec-action',
+//   template: 'Action',
+// })
+// class SpecActionComponent {
+// }

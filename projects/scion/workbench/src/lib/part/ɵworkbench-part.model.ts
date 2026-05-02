@@ -35,7 +35,7 @@ import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog.model';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
 import {WORKBENCH_PART_CONTEXT} from './workbench-part-context.provider';
 import {Objects} from '@scion/toolkit/util';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 /** @inheritDoc */
 export class ɵWorkbenchPart implements WorkbenchPart, Blockable {

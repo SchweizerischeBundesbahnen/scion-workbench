@@ -16,7 +16,7 @@ import {boundingClientRect} from '@scion/components/dimension';
 import {WorkbenchNotificationComponent} from './workbench-notification.component';
 import {WbComponentPortal} from '../portal/wb-component-portal';
 import {WORKBENCH_NOTIFICATION_CONTEXT} from './workbench-notification-context.provider';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 /** @inheritDoc */
 export class ɵWorkbenchNotification implements WorkbenchNotification, Blockable {

@@ -18,7 +18,7 @@ import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
 import {Microfrontends} from '../common/microfrontend.util';
 import {ɵWorkbenchPopup} from '../../popup/ɵworkbench-popup.model';
-import {ɵSciMenuService} from '@scion/sci-components/menu';
+import {ɵSciMenuService} from '@scion/components/menu';
 import {workbenchKeyboardAccelerators} from '../workbench-keyboard-accelerators';
 
 /**

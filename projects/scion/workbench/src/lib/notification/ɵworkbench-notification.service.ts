@@ -16,7 +16,7 @@ import {WorkbenchNotificationOptions} from './workbench-notification.options';
 import {ɵWorkbenchNotification} from './ɵworkbench-notification.model';
 import {WorkbenchNotificationRegistry} from './workbench-notification.registry';
 import {SingleTaskExecutor} from '../executor/single-task-executor';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})

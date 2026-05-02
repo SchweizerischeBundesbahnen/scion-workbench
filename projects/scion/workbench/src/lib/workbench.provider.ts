@@ -23,14 +23,14 @@ import {provideLocationPatch} from './routing/ɵlocation';
 import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
 import {ViewTabDragImageRenderer} from './view-dnd/view-tab-drag-image-renderer.service';
 import {provideTextProviders} from './text/text-providers';
-import {provideIconProvider} from '@scion/sci-components/icon';
+import {provideIconProvider} from '@scion/components/icon';
 import {provideWorkbenchViewContext} from './view/workbench-view-context.provider';
 import {provideWorkbenchPartContext} from './part/workbench-part-context.provider';
 import {provideWorkbenchDialogContext} from './dialog/workbench-dialog-context.provider';
 import {provideWorkbenchPopupContext} from './popup/workbench-popup-context.provider';
 import {provideWorkbenchNotificationContext} from './notification/workbench-notification-context.provider';
 import {WorkbenchMenuEnvironmentProvider} from './menu/workbench-menu-environment-provider';
-import {provideMenuEnvironmentProvider} from '@scion/sci-components/menu';
+import {provideMenuEnvironmentProvider} from '@scion/components/menu';
 
 /**
  * Enables and configures the SCION Workbench, returning a set of dependency-injection providers to be registered in Angular.
@@ -131,7 +131,7 @@ export function provideWorkbench(config?: WorkbenchConfig): EnvironmentProviders
       useClass: config.storage ?? DefaultWorkbenchStorage,
     },
     provideWorkbenchInitializer(() => void inject(WorkbenchThemeSwitcher), {phase: WorkbenchStartupPhase.PreStartup}),
-    provideWorkbenchInitializer(() => void inject(WorkbenchViewContextMenuService).registerBuiltInMenuItems()),
+    provideWorkbenchInitializer(() => inject(WorkbenchViewContextMenuService).registerBuiltInMenuItems()),
     provideWorkbenchInitializer(() => void inject(ViewMoveHandler)),
     provideWorkbenchInitializer(() => void inject(ViewTabDragImageRenderer)),
     provideWorkbenchInitializer(() => inject(WorkbenchPerspectiveService).init(), {phase: WorkbenchStartupPhase.PostStartup}),

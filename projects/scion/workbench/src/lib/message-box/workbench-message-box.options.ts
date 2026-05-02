@@ -9,7 +9,7 @@
  */
 import {Injector, Provider} from '@angular/core';
 import {DialogId, NotificationId, PartId, PopupId, ViewId} from '../workbench.identifiers';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 /**
  * Controls the appearance and behavior of a message box.

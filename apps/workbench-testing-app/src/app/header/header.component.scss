@@ -2,4 +2,12 @@
   display: flex;
   justify-content: space-between;
   padding: .25em .5em;
+
+  // We have to use ::ng-deep since the button is not part of our component.
+  > sci-toolbar[name="toolbar:main"] ::ng-deep button.perspective-switcher {
+    --ɵsci-toolbar-item-background-color: var(--sci-color-accent);
+    --ɵsci-toolbar-item-text-color: var(--sci-color-accent-inverse);
+    --ɵsci-toolbar-item-background-color-hover: color-mix(in srgb, var(--sci-color-accent) 95%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+    --ɵsci-toolbar-item-background-color-active: color-mix(in srgb, var(--ɵsci-toolbar-item-background-color-hover) 95%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+  }
 }

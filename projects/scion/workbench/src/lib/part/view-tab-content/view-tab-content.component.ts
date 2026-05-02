@@ -10,8 +10,8 @@
 
 import {Component, inject} from '@angular/core';
 import {WorkbenchView} from '../../view/workbench-view.model';
-import {SciTextPipe} from '@scion/sci-components/text';
-import {SciIconComponent} from '@scion/sci-components/icon';
+import {SciTextPipe} from '@scion/components/text';
+import {SciIconComponent} from '@scion/components/icon';
 
 @Component({
   selector: 'wb-view-tab-content',

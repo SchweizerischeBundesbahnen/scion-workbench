@@ -17,7 +17,7 @@ import {coerceElement} from '@angular/cdk/coercion';
 import {first} from 'rxjs/operators';
 import {rootEffect} from '../../common/rxjs-interop.util';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {SciKeyboardAccelerator} from '@scion/sci-components/menu';
+import {SciKeyboardAccelerator} from '@scion/components/menu';
 
 /**
  * Provides functions related to workbench themes.
@@ -63,7 +63,7 @@ export const Microfrontends = {
 
       untracked(() => {
         routerOutlet.keystrokes = routerOutletAccelerators;
-      })
+      });
     });
 
     /**

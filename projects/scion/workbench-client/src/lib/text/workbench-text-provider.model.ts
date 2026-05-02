@@ -10,7 +10,7 @@
 
 import {Capability, ParamDefinition} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
-import {MaybeObservable} from '../common/utility-types';
+import {MaybeObservable} from '@scion/toolkit/types';
 
 /**
  * Symbol to inject {@link WorkbenchTextProviderFn} of @scion/workbench-client, if any.

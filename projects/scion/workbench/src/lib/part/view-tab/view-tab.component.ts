@@ -19,8 +19,8 @@ import {ViewId, WORKBENCH_ID} from '../../workbench.identifiers';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {boundingClientRect} from '@scion/components/dimension';
 import {UUID} from '@scion/toolkit/uuid';
-import {SciTextPipe} from '@scion/sci-components/text';
-import {SciIconComponent} from '@scion/sci-components/icon';
+import {SciTextPipe} from '@scion/components/text';
+import {SciIconComponent} from '@scion/components/icon';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {WorkbenchViewContextMenuService} from '../view-context-menu/workbench-view-context-menu.service';
 

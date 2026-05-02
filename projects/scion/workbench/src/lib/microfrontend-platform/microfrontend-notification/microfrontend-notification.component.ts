@@ -18,7 +18,7 @@ import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfronten
 import {Microfrontends} from '../common/microfrontend.util';
 import {ɵWorkbenchNotification} from '../../notification/ɵworkbench-notification.model';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {ɵSciMenuService} from '@scion/sci-components/menu';
+import {ɵSciMenuService} from '@scion/components/menu';
 import {workbenchKeyboardAccelerators} from '../workbench-keyboard-accelerators';
 
 /**

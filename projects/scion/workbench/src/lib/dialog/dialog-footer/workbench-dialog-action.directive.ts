@@ -10,7 +10,7 @@
 
 import {DestroyRef, Directive, inject, input, TemplateRef} from '@angular/core';
 import {ɵWorkbenchDialog} from '../ɵworkbench-dialog.model';
-import {Disposable} from '../../common/disposable';
+import {Disposable} from '@scion/toolkit/types';
 import {asapScheduler} from 'rxjs';
 
 /**

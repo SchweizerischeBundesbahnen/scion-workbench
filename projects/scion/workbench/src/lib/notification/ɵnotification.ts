@@ -12,7 +12,7 @@ import {Notification} from './notification';
 import {ɵWorkbenchNotification} from './ɵworkbench-notification.model';
 import {inject} from '@angular/core';
 import {UID} from '../common/uid.util';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 /**
  * @inheritDoc

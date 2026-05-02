@@ -1,9 +1,11 @@
-import {MaybeObservable, Translatable, WorkbenchTextService} from '@scion/workbench-client';
+import {MaybeObservable} from '@scion/toolkit/types';
 import {MonoTypeOperatorFunction, Observable} from 'rxjs';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {APP_IDENTITY} from '@scion/microfrontend-platform';
 import {Observables} from '@scion/toolkit/util';
 import {map, switchMap} from 'rxjs/operators';
+import {Translatable} from '../text/workbench-text-provider.model';
+import {WorkbenchTextService} from '../text/workbench-text.service';
 
 /**
  * Translates the given {@link Translatable}, passed as string or observable.

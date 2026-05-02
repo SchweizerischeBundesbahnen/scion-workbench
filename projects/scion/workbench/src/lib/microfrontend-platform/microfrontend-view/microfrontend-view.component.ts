@@ -14,7 +14,7 @@ import {filter, first, map, take} from 'rxjs/operators';
 import {ManifestService, mapToBody, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {WorkbenchViewCapability, ɵVIEW_CAPABILITY_ID_PARAM_NAME, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
-import {Arrays, Dictionaries, Maps, Objects} from '@scion/toolkit/util';
+import {Arrays, Dictionaries, Maps, Objects, prune} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
 import {CanCloseRef} from '../../workbench.model';
 import {IFRAME_OVERLAY_HOST} from '../../workbench-element-references';
@@ -33,10 +33,9 @@ import {Microfrontends} from '../common/microfrontend.util';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {rootEffect, toRootObservable} from '../../common/rxjs-interop.util';
 import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provider';
-import {prune} from '../../common/prune.util';
 import {MicrofrontendViewNavigationData} from './microfrontend-view-navigation-data';
 import {Routing} from '../../routing/routing.util';
-import {ɵSciMenuService} from '@scion/sci-components/menu';
+import {ɵSciMenuService} from '@scion/components/menu';
 import {workbenchKeyboardAccelerators} from '../workbench-keyboard-accelerators';
 
 /**

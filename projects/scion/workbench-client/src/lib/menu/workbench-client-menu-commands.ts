@@ -2,7 +2,7 @@ import {WorkbenchMenuContributionPositionLike, WorkbenchMenuTransferable} from '
 import {DialogId, NotificationId, PartId, PopupId, ViewId} from '../workbench.identifiers';
 
 export interface ɵWorkbenchMenuContributionRegisterCommand {
-  location: `menu:${string}` | `toolbar:${string}` | `menubar:${string}`,
+  location: `menu:${string}` | `toolbar:${string}` | `menubar:${string}`;
   requiredContext: Map<string, unknown>;
   position?: WorkbenchMenuContributionPositionLike;
   metadata?: {[key: string]: unknown};
@@ -14,19 +14,19 @@ export interface ɵWorkbenchMenuContributionConstructCommand {
 }
 
 export interface ɵWorkbenchMenuItemLookupCommand {
-  location: `menu:${string}` | `toolbar:${string}` | `menubar:${string}`,
+  location: `menu:${string}` | `toolbar:${string}` | `menubar:${string}`;
   context: Map<string, unknown>;
   metadata?: {[key: string]: unknown};
 }
 
 export interface ɵWorkbenchMenuOpenCommand {
-  menu: WorkbenchMenuTransferable,
+  menu: WorkbenchMenuTransferable;
   anchor: {
     x: number;
     y: number;
     width?: number;
     height?: number;
-  },
+  };
   align?: 'vertical' | 'horizontal';
   focus?: boolean;
   workbenchElementId: ViewId | PartId | DialogId | PopupId | NotificationId;

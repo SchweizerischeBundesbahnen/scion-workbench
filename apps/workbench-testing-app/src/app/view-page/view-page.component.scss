@@ -8,16 +8,12 @@
 
   > sci-toolbar {
     background-color: var(--sci-color-gray-100);
-    border-top: 1px solid var(--sci-color-border);
-    border-bottom: 1px solid var(--sci-color-border);
-    margin: 0 -1em;
+    border: 1px solid var(--sci-color-border);
   }
 
   > sci-menubar {
     background-color: var(--sci-color-gray-100);
-    border-top: 1px solid var(--sci-color-border);
-    border-bottom: 1px solid var(--sci-color-border);
-    margin: 0 -1em;
+    border: 1px solid var(--sci-color-border);
   }
 
   > div.context-menu {
@@ -28,45 +24,27 @@
     cursor: default;
   }
 
-  > main {
+  > section {
     display: flex;
-    gap: 1em;
+    flex-direction: column;
+    gap: .5em;
+    border: 1px solid var(--sci-color-border);
+    border-radius: var(--sci-corner);
+    padding: 1em;
 
-    > sci-toolbar {
-      flex: none;
-      border-top: 1px solid var(--sci-color-border);
-      border-bottom: 1px solid var(--sci-color-border);
-      border-right: 1px solid var(--sci-color-border);
-      background-color: var(--sci-color-gray-100);
-      margin-left: -1em;
+    > header {
+      margin-bottom: 1em;
+      font-weight: bold;
+    }
+  }
+
+  > sci-accordion {
+    header {
+      font-weight: bold;
     }
 
-    > div.view-content {
-      flex: auto;
-
-      > section {
-        display: flex;
-        flex-direction: column;
-        gap: .5em;
-        border: 1px solid var(--sci-color-border);
-        border-radius: var(--sci-corner);
-        padding: 1em;
-
-        > header {
-          margin-bottom: 1em;
-          font-weight: bold;
-        }
-      }
-
-      > sci-accordion {
-        header {
-          font-weight: bold;
-        }
-
-        &.part-actions input {
-          @include sci-design.style-input-field();
-        }
-      }
+    &.part-actions input {
+      @include sci-design.style-input-field();
     }
   }
 }

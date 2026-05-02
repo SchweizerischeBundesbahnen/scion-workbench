@@ -15,7 +15,7 @@ import {environment} from '../environments/environment';
 import {provideAnimations, provideNoopAnimations} from '@angular/platform-browser/animations';
 import {provideWorkbenchClientAngular} from '@scion/workbench-client-angular';
 import {provideValueFromStorage, storageTextProvider} from './text/storage-text-provider';
-import {provideTextProvider} from '@scion/sci-components/text';
+import {provideTextProvider} from '@scion/components/text';
 
 /**
  * Central place to configure the workbench-client-testing-app.

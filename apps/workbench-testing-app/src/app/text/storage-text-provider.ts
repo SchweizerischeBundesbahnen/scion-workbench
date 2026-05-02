@@ -16,8 +16,8 @@ import {provideMicrofrontendPlatformInitializer} from '@scion/workbench';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {APP_IDENTITY, MessageClient} from '@scion/microfrontend-platform';
 import {MonoTypeOperatorFunction} from 'rxjs';
-import {MaybeSignal} from '@scion/sci-components/common';
-import {SciTextProviderFn} from '@scion/sci-components/text';
+import {MaybeSignal} from '@scion/components/common';
+import {SciTextProviderFn} from '@scion/components/text';
 
 /**
  * Provides texts from session storage.

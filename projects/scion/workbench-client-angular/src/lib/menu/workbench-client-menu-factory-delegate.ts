@@ -8,14 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {MaybeObservable, WorkbenchMenuFactory, WorkbenchToolbarFactory} from '@scion/workbench-client';
+import {WorkbenchMenuFactory, WorkbenchToolbarFactory} from '@scion/workbench-client';
+import {MaybeObservable, RequireOne} from '@scion/toolkit/types';
 import {inject, Injector, isSignal, runInInjectionContext} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
-import {SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuItemDescriptor} from '@scion/sci-components/menu';
+import {SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuItemDescriptor} from '@scion/components/menu';
 import {WorkbenchClientToolbarFactoryDelegate} from './workbench-client-toolbar-factory-delegate';
 import {toLazyObservable} from '../common/lazy-observable.util';
-import {MaybeSignal, RequireOne, SciComponentDescriptor} from '@scion/sci-components/common';
-import {Translatable} from '@scion/sci-components/text';
+import {MaybeSignal, SciComponentDescriptor} from '@scion/components/common';
+import {Translatable} from '@scion/components/text';
 
 /**
  * Represents a {@link SciMenuFactory} that delegates to {@link WorkbenchMenuFactory} of `@scion/workbench-client`.
@@ -56,8 +57,8 @@ export class WorkbenchClientMenuFactoryDelegate implements SciMenuFactory {
   }
 
   /** @inheritDoc */
-  public addMenu(label: MaybeSignal<Translatable>, menuFactoryFn: (menu: SciMenuFactory) => void): this ;
-  public addMenu(descriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this ;
+  public addMenu(label: MaybeSignal<Translatable>, menuFactoryFn: (menu: SciMenuFactory) => void): this;
+  public addMenu(descriptor: SciMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this;
   public addMenu(labelOrDescriptor: MaybeSignal<Translatable> | SciMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this {
     const descriptor = coerceMenuDescriptor(labelOrDescriptor);
     const filter = coerceFilterDescriptor(descriptor);

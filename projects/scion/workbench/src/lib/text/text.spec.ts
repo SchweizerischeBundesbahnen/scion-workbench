@@ -11,7 +11,7 @@
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {Injector} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
-import {SciTextProviderFn, text} from '@scion/sci-components/text';
+import {SciTextProviderFn, text} from '@scion/components/text';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 
 describe('Workbench Text Provider', () => {

@@ -26,10 +26,6 @@
     "copy-src:scion-components.internal": "cpx --clean --watch --verbose ../scion-toolkit/projects/scion/components.internal/** ./src-lib/@scion/components.internal",
     "copy-src:scion-microfrontend-platform": "cpx --clean --watch --verbose ../scion-microfrontend-platform/projects/scion/microfrontend-platform/** ./src-lib/@scion/microfrontend-platform",
 
-    "sci-components:lint": "ng lint @scion/sci-components",
-    "sci-components:test": "ng test @scion/sci-components",
-    "sci-components:build": "ng build --configuration production @scion/sci-components",
-
     "workbench-client:build": "ng build --configuration production @scion/workbench-client",
     "workbench-client:lint": "ng lint @scion/workbench-client",
     "workbench-client:test": "ng test @scion/workbench-client",
@@ -121,7 +117,6 @@
     "cross-env": "10.1.0",
     "eslint": "9.39.1",
     "jasmine-core": "5.12.1",
-    "jsdom": "^27.1.0",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.2.0",
     "karma-coverage": "2.2.1",
@@ -134,8 +129,7 @@
     "typedoc": "0.28.14",
     "typescript": "5.9.3",
     "typescript-eslint": "8.48.0",
-    "vercel": "48.11.1",
-    "vitest": "^4.0.8"
+    "vercel": "48.11.1"
   },
   "repository": {
     "type": "git",

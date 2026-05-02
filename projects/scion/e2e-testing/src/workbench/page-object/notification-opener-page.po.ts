@@ -21,7 +21,7 @@ import {DialogPO} from '../../dialog.po';
 import {WorkbenchDialogPagePO} from './workbench-dialog-page.po';
 import {WorkbenchPopupPagePO} from './workbench-popup-page.po';
 import {AppPO} from '../../app.po';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 /**
  * Page object to interact with {@link NotificationPageComponent}.

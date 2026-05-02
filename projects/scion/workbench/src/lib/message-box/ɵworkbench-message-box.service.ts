@@ -15,7 +15,7 @@ import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchMessageBoxService} from './workbench-message-box.service';
 import {Logger, LoggerNames} from '../logging';
 import {WORKBENCH_ELEMENT} from '../workbench-element-references';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})

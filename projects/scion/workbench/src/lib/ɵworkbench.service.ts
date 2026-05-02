@@ -10,7 +10,7 @@
 
 import {assertNotInReactiveContext, inject, Injectable} from '@angular/core';
 import {WorkbenchPartActionFn, WorkbenchViewMenuItemFn} from './workbench.model';
-import {Disposable} from './common/disposable';
+import {Disposable} from '@scion/toolkit/types';
 import {WorkbenchService} from './workbench.service';
 import {WorkbenchRouter} from './routing/workbench-router.service';
 import {WorkbenchViewRegistry} from './view/workbench-view.registry';

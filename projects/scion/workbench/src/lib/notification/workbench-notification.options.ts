@@ -9,7 +9,7 @@
  */
 
 import {Injector, Provider} from '@angular/core';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 /**
  * Controls the appearance and behavior of a notification.

@@ -28,7 +28,7 @@ import {MicrofrontendPartNavigationData} from './microfrontend-part-navigation-d
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../../glass-pane/glass-pane.directive';
 import {WorkbenchPart} from '../../part/workbench-part.model';
 import {Routing} from '../../routing/routing.util';
-import {ɵSciMenuService} from '@scion/sci-components/menu';
+import {ɵSciMenuService} from '@scion/components/menu';
 import {workbenchKeyboardAccelerators} from '../workbench-keyboard-accelerators';
 import {fromEvent} from 'rxjs';
 

@@ -24,5 +24,6 @@ export class Settings {
   public readonly showMicrofrontendApplicationLabels = renderingFlag<boolean>('scion.workbench.testing-app.settings.show-microfrontend-application-labels', environment.showMicrofrontendApplicationLabels);
   public readonly logAngularChangeDetectionCycles = renderingFlag<boolean>('scion.workbench.testing-app.settings.log-angular-change-detection-cycles', environment.logAngularChangeDetectionCycles);
   public readonly showSkeletons = renderingFlag<boolean>('scion.workbench.testing-app.settings.show-skeletons', !isDevMode());
+  public readonly showSampleMenus = renderingFlag<boolean>('scion.workbench.testing-app.settings.show-sample-menu', false);
   public readonly showTestPerspectives = renderingFlag<boolean>('scion.workbench.testing-app.settings.show-test-perspectives', isDevMode());
 }

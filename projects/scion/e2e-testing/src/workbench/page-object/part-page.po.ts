@@ -16,7 +16,7 @@ import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {coerceArray} from '../../helper/testing.util';
 import {Params} from '@angular/router';
 import {ActivatedMicrofrontendPO} from './activated-microfrontend.po';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 /**
  * Page object to interact with {@link PartPageComponent}.

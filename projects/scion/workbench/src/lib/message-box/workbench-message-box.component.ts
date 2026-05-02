@@ -18,7 +18,7 @@ import {MessageBoxHeaderComponent} from './message-box-header/message-box-header
 import {ComponentType} from '@angular/cdk/portal';
 import {TypeofPipe} from '../common/typeof.pipe';
 import {SciDimension, SciDimensionDirective} from '@scion/components/dimension';
-import {SciTextPipe, Translatable} from '@scion/sci-components/text';
+import {SciTextPipe, Translatable} from '@scion/components/text';
 
 /**
  * Renders the workbench message box.

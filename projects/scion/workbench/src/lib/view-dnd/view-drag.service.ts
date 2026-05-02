@@ -23,7 +23,7 @@ import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {ActivityId, isActivityId, PartId, ViewId, WORKBENCH_ID} from '../workbench.identifiers';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 /**
  * Coordinates cross application drag and drop of views.

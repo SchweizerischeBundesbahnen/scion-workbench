@@ -13,9 +13,7 @@
     @if (activityLayout.toolbars.leftBottom.activities.length) {
       <wb-activity-stack [stack]="activityLayout.toolbars.leftBottom" data-docking-area="left-bottom"/>
     }
-
-    <sci-toolbar name="toolbar:workbench.activitybar.left" orientation="vertical"/>
-
+    <sci-toolbar name="toolbar:workbench.activitybar" orientation="vertical"/>
     @if (activityLayout.toolbars.bottomLeft.activities.length) {
       <wb-activity-stack [stack]="activityLayout.toolbars.bottomLeft" data-docking-area="bottom-left"/>
     }
@@ -32,9 +30,7 @@
     @if (activityLayout.toolbars.rightBottom.activities.length) {
       <wb-activity-stack [stack]="activityLayout.toolbars.rightBottom" data-docking-area="right-bottom"/>
     }
-
-    <sci-toolbar name="toolbar:workbench.activitybar.right" orientation="vertical"/>
-
+    <div class="filler"></div>
     @if (activityLayout.toolbars.bottomRight.activities.length) {
       <wb-activity-stack [stack]="activityLayout.toolbars.bottomRight" data-docking-area="bottom-right"/>
     }

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Disposable} from './common/disposable';
+import {Disposable} from '@scion/toolkit/types';
 import {WorkbenchElement, WorkbenchPartActionFn, WorkbenchViewMenuItemFn} from './workbench.model';
 import {WorkbenchView} from './view/workbench-view.model';
 import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';

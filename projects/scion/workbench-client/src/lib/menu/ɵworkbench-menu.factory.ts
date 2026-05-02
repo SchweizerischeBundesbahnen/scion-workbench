@@ -1,7 +1,7 @@
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchMenuDescriptor, WorkbenchMenuFactory, WorkbenchMenuGroupDescriptor, WorkbenchMenuItemDescriptor} from './workbench-menu.factory';
 import {WorkbenchMenu, WorkbenchMenuGroup, WorkbenchMenuItem, WorkbenchMenuItemLike} from './workbench-client-menu.model';
-import {MaybeObservable} from '../common/utility-types';
+import {MaybeObservable} from '@scion/toolkit/types';
 import {isObservable, Subject} from 'rxjs';
 import {UUID} from '@scion/toolkit/uuid';
 import {ɵWorkbenchToolbarFactory} from './ɵworkbench-toolbar.factory';
@@ -43,7 +43,7 @@ export class ɵWorkbenchMenuFactory implements WorkbenchMenuFactory {
       actions: actionsFactory.menuItems,
       cssClass: Arrays.coerce(descriptor.cssClass),
       attributes: descriptor.attributes,
-      onSelect: async () => await descriptor.onSelect() ?? descriptor.checked === undefined, // Close if the callback returns true. Defaults to closing non-checkable menu items.
+      onSelect: async () => await descriptor.onSelect() as boolean | undefined ?? descriptor.checked === undefined, // Close if the callback returns true. Defaults to closing non-checkable menu items.
     }));
 
     // TODO [menu] throw error if icon and checked
@@ -51,8 +51,8 @@ export class ɵWorkbenchMenuFactory implements WorkbenchMenuFactory {
   }
 
   /** @inheritDoc */
-  public addMenu(label: MaybeObservable<Translatable>, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this ;
-  public addMenu(descriptor: WorkbenchMenuDescriptor, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this ;
+  public addMenu(label: MaybeObservable<Translatable>, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this;
+  public addMenu(descriptor: WorkbenchMenuDescriptor, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this;
   public addMenu(labelOrDescriptor: MaybeObservable<Translatable> | WorkbenchMenuDescriptor, menuFactoryFn: (menu: WorkbenchMenuFactory) => void): this {
     const descriptor = coerceMenuDescriptor(labelOrDescriptor);
     const filter = coerceFilterDescriptor(descriptor);

@@ -14,14 +14,13 @@ import {WorkbenchCapabilities, WorkbenchDialogCapability, ɵWorkbenchDialogComma
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {stringifyError} from '../../common/stringify-error.util';
-import {Arrays} from '@scion/toolkit/util';
+import {Arrays, prune} from '@scion/toolkit/util';
 import {WorkbenchDialogService} from '../../dialog/workbench-dialog.service';
 import {MicrofrontendDialogComponent} from './microfrontend-dialog.component';
 import {ActivatedMicrofrontend} from '../microfrontend-host/microfrontend-host.model';
 import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog.model';
 import {MicrofrontendHostDialog} from '../microfrontend-host-dialog/microfrontend-host-dialog.model';
 import {MicrofrontendHostComponent} from '../microfrontend-host/microfrontend-host.component';
-import {prune} from '../../common/prune.util';
 import {Microfrontends} from '../common/microfrontend.util';
 
 /**

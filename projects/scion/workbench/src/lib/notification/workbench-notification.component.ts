@@ -9,9 +9,9 @@
  */
 
 import {Component, DOCUMENT, effect, ElementRef, inject, NgZone, Provider, signal, untracked, viewChild} from '@angular/core';
-import {fromEvent, NEVER, noop, Observable, timer} from 'rxjs';
+import {fromEvent, NEVER, Observable, timer} from 'rxjs';
 import {NgComponentOutlet} from '@angular/common';
-import {SciTextPipe} from '@scion/sci-components/text';
+import {SciTextPipe} from '@scion/components/text';
 import {ɵWorkbenchNotification} from './ɵworkbench-notification.model';
 import {RemoveLegacyInputPipe} from './remove-legacy-input.pipe';
 import {trackFocus} from '../focus/workbench-focus-tracker.service';
@@ -19,8 +19,8 @@ import {SciViewportComponent} from '@scion/components/viewport';
 import {observeIn, subscribeIn} from '@scion/toolkit/operators';
 import {filter} from 'rxjs/operators';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
-import {contributeMenu, SciToolbarComponent, SciToolbarFactory} from '@scion/sci-components/menu';
-import {WorkbenchMenuContextKeys} from '../menu/workbench-menu-environment-provider';
+import {contributeMenu, SciToolbarComponent, SciToolbarFactory} from '@scion/components/menu';
+import {WorkbenchMenuContexts} from '../menu/workbench-menu-environment-provider';
 import {ToolbarVisibilityDirective} from '../common/toolbar-visibility.directive';
 
 /**
@@ -78,14 +78,7 @@ export class WorkbenchNotificationComponent {
     contributeMenu({location: 'toolbar:workbench.notification.toolbar', position: 'end'}, toolbar => {
       this.contributeToolbarAdditionsMenu(toolbar);
       this.contributeCloseButton(toolbar);
-    }, {requiredContext: new Map().set(WorkbenchMenuContextKeys.ViewId, undefined)}); // clear view constraint to contribute to parts with and without views
-
-    // TODO [menu] only for illustration purpose
-    contributeMenu('menu:workbench.notification.toolbar', menu => menu
-      .addMenuItem('Settings...', noop)
-      .addMenuItem('Don\'t Show Again For This Project', noop)
-      .addMenuItem('Don\'t Show Again', noop),
-    );
+    }, {requiredContext: new Map().set(WorkbenchMenuContexts.ViewId, undefined)}); // clear view constraint to contribute to parts with and without views
   }
 
   /**

@@ -9,12 +9,12 @@
  */
 
 import {computed, inject, Provider} from '@angular/core';
-import {SciMenuEnvironmentProvider} from '@scion/sci-components/menu';
+import {SciMenuEnvironmentProvider} from '@scion/components/menu';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {WorkbenchDialog} from '../dialog/workbench-dialog.model';
 import {WorkbenchNotification} from '../notification/workbench-notification.model';
-import {MaybeSignal} from '@scion/sci-components/common';
+import {MaybeSignal} from '@scion/components/common';
 import {WORKBENCH_PART_CONTEXT} from '../part/workbench-part-context.provider';
 import {WORKBENCH_ELEMENT} from '../workbench-element-references';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
@@ -53,29 +53,29 @@ export class WorkbenchMenuEnvironmentProvider implements SciMenuEnvironmentProvi
     const view = inject(WorkbenchView, {optional: true});
     if (view) {
       return computed(() => new Map()
-        .set(WorkbenchMenuContextKeys.ViewId, view.id)
-        .set(WorkbenchMenuContextKeys.PartId, view.part().id)
-        .set(WorkbenchMenuContextKeys.Peripheral, view.part().peripheral())
-        .set(WorkbenchMenuContextKeys.MainArea, view.part().isInMainArea));
+        .set(WorkbenchMenuContexts.ViewId, view.id)
+        .set(WorkbenchMenuContexts.PartId, view.part().id)
+        .set(WorkbenchMenuContexts.Peripheral, view.part().peripheral())
+        .set(WorkbenchMenuContexts.MainArea, view.part().isInMainArea));
     }
 
     const part = inject(WorkbenchPart, {optional: true});
     if (part) {
       return computed(() => new Map()
-        .set(WorkbenchMenuContextKeys.PartId, part.id)
-        .set(WorkbenchMenuContextKeys.ViewId, PART_CONTEXT_VIEW_ID)
-        .set(WorkbenchMenuContextKeys.Peripheral, part.peripheral())
-        .set(WorkbenchMenuContextKeys.MainArea, part.isInMainArea));
+        .set(WorkbenchMenuContexts.PartId, part.id)
+        .set(WorkbenchMenuContexts.ViewId, PART_CONTEXT_VIEW_ID)
+        .set(WorkbenchMenuContexts.Peripheral, part.peripheral())
+        .set(WorkbenchMenuContexts.MainArea, part.isInMainArea));
     }
 
     const dialog = inject(WorkbenchDialog, {optional: true});
     if (dialog) {
-      return new Map().set(WorkbenchMenuContextKeys.DialogId, dialog.id);
+      return new Map().set(WorkbenchMenuContexts.DialogId, dialog.id);
     }
 
     const notification = inject(WorkbenchNotification, {optional: true});
     if (notification) {
-      return new Map().set(WorkbenchMenuContextKeys.NotificationId, notification.id);
+      return new Map().set(WorkbenchMenuContexts.NotificationId, notification.id);
     }
 
     return new Map();
@@ -83,8 +83,8 @@ export class WorkbenchMenuEnvironmentProvider implements SciMenuEnvironmentProvi
 
   /** @inheritDoc */
   public provideInjectionContext?(context: Map<string, unknown>): Provider[] {
-    const viewId = context.get(WorkbenchMenuContextKeys.ViewId) as ViewId | undefined;
-    const partId = context.get(WorkbenchMenuContextKeys.PartId) as PartId | undefined;
+    const viewId = context.get(WorkbenchMenuContexts.ViewId) as ViewId | undefined;
+    const partId = context.get(WorkbenchMenuContexts.PartId) as PartId | undefined;
     if (viewId && partId) {
       const view = this._viewRegistry.get(viewId);
       const part = this._partRegistry.get(partId);
@@ -119,7 +119,7 @@ export class WorkbenchMenuEnvironmentProvider implements SciMenuEnvironmentProvi
       ];
     }
 
-    const dialogId = context.get(WorkbenchMenuContextKeys.DialogId) as DialogId | undefined;
+    const dialogId = context.get(WorkbenchMenuContexts.DialogId) as DialogId | undefined;
     if (dialogId) {
       const dialog = this._dialogRegistry.get(dialogId);
       return [
@@ -130,7 +130,7 @@ export class WorkbenchMenuEnvironmentProvider implements SciMenuEnvironmentProvi
       ];
     }
 
-    const popupId = context.get(WorkbenchMenuContextKeys.PopupId) as PopupId | undefined;
+    const popupId = context.get(WorkbenchMenuContexts.PopupId) as PopupId | undefined;
     if (popupId) {
       const popup = this._popupRegistry.get(popupId);
       return [
@@ -141,7 +141,7 @@ export class WorkbenchMenuEnvironmentProvider implements SciMenuEnvironmentProvi
       ];
     }
 
-    const notificationId = context.get(WorkbenchMenuContextKeys.NotificationId) as NotificationId | undefined;
+    const notificationId = context.get(WorkbenchMenuContexts.NotificationId) as NotificationId | undefined;
     if (notificationId) {
       const notification = this._notificationRegistry.get(notificationId);
       return [
@@ -192,9 +192,9 @@ export class WorkbenchMenuEnvironmentProvider implements SciMenuEnvironmentProvi
 export const PART_CONTEXT_VIEW_ID = null;
 
 /**
- * Workbench context keys used by workbench menus.
+ * Keys for defining the context of workbench menus.
  */
-export enum WorkbenchMenuContextKeys {
+export enum WorkbenchMenuContexts {
   ViewId = 'viewId',
   PartId = 'partId',
   DialogId = 'dialogId',

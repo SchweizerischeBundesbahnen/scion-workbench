@@ -9,9 +9,10 @@
  */
 
 import {Component, inject, Injectable, Injector, input, inputBinding, Provider, runInInjectionContext, signal, TemplateRef} from '@angular/core';
-import {contributeMenu, Disposable} from '@scion/sci-components/menu';
+import {contributeMenu} from '@scion/components/menu';
+import {Disposable} from '@scion/toolkit/types';
 import {WORKBENCH_ELEMENT} from '../../workbench-element-references';
-import {SciComponentDescriptor} from '@scion/sci-components/common';
+import {SciComponentDescriptor} from '@scion/components/common';
 import {NgTemplateOutlet} from '@angular/common';
 import {WorkbenchPartAction, WorkbenchPartActionFn} from '../../workbench.model';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
@@ -78,7 +79,7 @@ export class WorkbenchPartActionRegistrationService {
         toolbar.addToolbarItem({
           control: {...coerceComponent(legacyPartAction, {providers, part}), cssClass: legacyPartAction.cssClass},
           cssClass: legacyPartAction.cssClass,
-        })
+        });
       });
     }
 
@@ -87,15 +88,15 @@ export class WorkbenchPartActionRegistrationService {
         return null;
       }
       if (partActionLike instanceof TemplateRef) {
-        return {content: partActionLike}
+        return {content: partActionLike};
       }
       if (typeof partActionLike === 'function') {
-        return {content: partActionLike}
+        return {content: partActionLike};
       }
       return partActionLike;
     }
 
-    function coerceComponent(partAction: WorkbenchPartAction, options: {part: WorkbenchPart, providers: Provider[]}): SciComponentDescriptor {
+    function coerceComponent(partAction: WorkbenchPartAction, options: {part: WorkbenchPart; providers: Provider[]}): SciComponentDescriptor {
       if (partAction.content instanceof TemplateRef) {
         return {
           component: PartActionComponent,

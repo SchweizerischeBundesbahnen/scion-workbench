@@ -25,7 +25,6 @@ export * from './message-box/public_api';
 export * from './dialog/public_api';
 export * from './notification/public_api';
 export * from './popup/public_api';
-export * from './common/public_api';
 export * from './microfrontend-platform/public_api';
 export * from './startup/public_api';
 export * from './logging/public_api';

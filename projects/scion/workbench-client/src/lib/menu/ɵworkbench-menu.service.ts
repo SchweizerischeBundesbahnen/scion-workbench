@@ -10,13 +10,13 @@
 
 import {WorkbenchMenuService} from './workbench-menu.service';
 import {WorkbenchMenu, WorkbenchMenubarContributionLocation, WorkbenchMenubarFactoryFn, WorkbenchMenuContributionLocation, WorkbenchMenuContributionLocationLike, WorkbenchMenuContributionOptions, WorkbenchMenuContributionPosition, WorkbenchMenuFactoryFn, WorkbenchMenuFactoryFnLike, WorkbenchMenuItemLike, WorkbenchMenuItemProxyLike, WorkbenchMenuItems, WorkbenchMenuItemTransferableLike, WorkbenchMenuOptions, WorkbenchMenuOrigin, WorkbenchMenuRef, WorkbenchMenuTransferable, WorkbenchToolbarContributionLocation, WorkbenchToolbarFactoryFn} from './workbench-client-menu.model';
-import {Disposable} from '../common/disposable';
+import {Disposable, MaybeObservable} from '@scion/toolkit/types';
 import {UUID} from '@scion/toolkit/uuid';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {MessageClient, MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
 import {ɵWorkbenchMenuFactory} from './ɵworkbench-menu.factory';
 import {ɵWorkbenchToolbarFactory} from './ɵworkbench-toolbar.factory';
-import {prune} from '../common/prune.util';
+import {prune} from '@scion/toolkit/util';
 import {ɵWorkbenchMenuContributionConstructCommand, ɵWorkbenchMenuContributionRegisterCommand, ɵWorkbenchMenuItemLookupCommand, ɵWorkbenchMenuOpenCommand} from './workbench-client-menu-commands';
 import {expand, Observable, of, take} from 'rxjs';
 import {finalize, map, switchMap, tap} from 'rxjs/operators';
@@ -25,7 +25,6 @@ import {translate} from './workbench-menu-translate.util';
 import {ɵWorkbenchMenubarFactory} from './ɵworkbench-menubar.factory';
 import {WORKBENCH_ELEMENT, WorkbenchElement} from '../workbench.model';
 import {installMenuAccelerators, WorkbenchMenuAcceleratorOptions} from './workbench-menu-accelerators';
-import {MaybeObservable} from '../common/utility-types';
 import {provideMenuEnvironmentContext} from './workbench-menu-environment-provider';
 
 export class ɵWorkbenchMenuService implements WorkbenchMenuService {
@@ -45,7 +44,7 @@ export class ɵWorkbenchMenuService implements WorkbenchMenuService {
     // Register contribution.
     void this._messageClient.publish<ɵWorkbenchMenuContributionRegisterCommand>(`workbench/menu/contribution/${contributionId}/register`, {
       location: location,
-      requiredContext: new Map([...provideMenuEnvironmentContext(), ...options?.requiredContext ?? new Map()]),
+      requiredContext: new Map<string, unknown>([...provideMenuEnvironmentContext(), ...options?.requiredContext ?? new Map()]),
       position: prune({before, after, position} as WorkbenchMenuContributionPosition, {pruneIfEmpty: true}),
       metadata: options?.metadata,
       contributionInstant: options?.contributionInstant,
@@ -132,17 +131,17 @@ export class ɵWorkbenchMenuService implements WorkbenchMenuService {
           anchor: coerceAnchor(options.anchor),
           align: options.align,
           workbenchElementId: Beans.get<WorkbenchElement>(WORKBENCH_ELEMENT).id,
-          context: new Map([...provideMenuEnvironmentContext(), ...options.context ?? new Map()]),
+          context: new Map<string, unknown>([...provideMenuEnvironmentContext(), ...options.context ?? new Map()]),
           metadata: options.metadata,
         })),
-        switchMap(command => Beans.get(MessageClient).request$<void>('workbench/menu/open', command).pipe(tap({complete: () => void subscription.unsubscribe()}))), // cancel subscription when closing the menu.
+        switchMap(command => Beans.get(MessageClient).request$<void>('workbench/menu/open', command).pipe(tap({complete: (): void => subscription.unsubscribe()}))), // cancel subscription when closing the menu.
       )
       .subscribe();
 
     return {
       close: () => subscription.unsubscribe(),
       onClose: onClose => subscription.add(onClose),
-    }
+    };
   }
 
   /** @inheritDoc */

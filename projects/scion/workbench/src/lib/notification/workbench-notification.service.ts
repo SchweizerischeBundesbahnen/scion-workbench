@@ -12,7 +12,7 @@ import {Injectable} from '@angular/core';
 import {WorkbenchNotificationOptions} from './workbench-notification.options';
 import {ComponentType} from '@angular/cdk/portal';
 import {ɵWorkbenchNotificationService} from './ɵworkbench-notification.service';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 /**
  * Shows a notification.

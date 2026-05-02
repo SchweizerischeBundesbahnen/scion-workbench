@@ -17,7 +17,7 @@ import {WorkbenchConfig} from '../workbench-config';
 import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
 import {WorkbenchPerspectiveRegistry} from './workbench-perspective.registry';
 import {Logger} from '../logging';
-import {createDestroyableInjector} from '../common/injector.util';
+import {createDestroyableInjector} from '@scion/components/common';
 
 /**
  * Enables registration and activation of perspectives.

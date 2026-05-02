@@ -2,19 +2,17 @@ import {DestroyRef, DOCUMENT, EnvironmentProviders, inject, Injector, makeEnviro
 import {mapToBody, MessageClient} from '@scion/microfrontend-platform';
 import {takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {WorkbenchMenuItemProxyLike, WorkbenchMenuItems, WorkbenchMenuItemTransferableLike, ɵWorkbenchMenuContributionConstructCommand, ɵWorkbenchMenuContributionRegisterCommand, ɵWorkbenchMenuItemLookupCommand, ɵWorkbenchMenuOpenCommand} from '@scion/workbench-client';
-import {SciMenu, SciMenubarFactory, SciMenubarMenuDescriptor, SciMenuContributionLocationLike, SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuOptions, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarMenuDescriptor, ɵSciMenuService} from '@scion/sci-components/menu';
+import {SciMenu, SciMenubarFactory, SciMenubarMenuDescriptor, SciMenuContributionLocationLike, SciMenuDescriptor, SciMenuFactory, SciMenuGroupDescriptor, SciMenuOptions, SciToolbarFactory, SciToolbarGroupDescriptor, SciToolbarMenuDescriptor, ɵSciMenuService} from '@scion/components/menu';
 import {finalize, map} from 'rxjs/operators';
-import {Objects} from '@scion/toolkit/util';
-import {createDestroyableInjector} from '../../common/injector.util';
-import {prune} from '../../common/prune.util';
+import {Objects, prune} from '@scion/toolkit/util';
+import {createDestroyableInjector, MaybeSignal} from '@scion/components/common';
 import {fromEvent, Observable, switchMap} from 'rxjs';
 import {createInvocationContext} from '../../invocation-context/invocation-context';
 import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
 import {SciMenuItems} from './workbench-client-menu-transform';
 import {parseMenuLocation} from './workbench-menu-location-parser';
-import {RequireOne} from '../../common/utility-types';
-import {MaybeSignal} from '@scion/sci-components/common';
-import {Translatable} from '@scion/sci-components/text';
+import {RequireOne} from '@scion/toolkit/types';
+import {Translatable} from '@scion/components/text';
 
 function installMenuContributionHandler(): void {
   const menuService = inject(ɵSciMenuService);
@@ -22,7 +20,7 @@ function installMenuContributionHandler(): void {
   const injector = inject(Injector);
 
   messageClient.onMessage<ɵWorkbenchMenuContributionRegisterCommand>('workbench/menu/contribution/:contributionId/register', message => {
-    const contributionId = message.params!.get('contributionId') as string;
+    const contributionId = message.params!.get('contributionId')!;
     const {location, position, requiredContext, metadata, contributionInstant} = message.body!;
     const {scope} = parseMenuLocation(location);
 
@@ -127,9 +125,9 @@ function installMenuOpenHandler(): void {
     return new Observable<never>(observer => {
       menuRef.onClose(() => observer.complete());
       return () => {
-        injector.destroy()
+        injector.destroy();
         menuRef.close();
-      }
+      };
     });
   });
 }
@@ -311,7 +309,7 @@ export function provideMicrofrontendMenu(): EnvironmentProviders {
 
 class WorkbenchClientMenuItemsCache {
 
-  private readonly _cache = new Array<{context: Map<string, unknown>, menuItems: Signal<WorkbenchMenuItemProxyLike[]>}>;
+  private readonly _cache = new Array<{context: Map<string, unknown>; menuItems: Signal<WorkbenchMenuItemProxyLike[]>}>();
 
   public computeIfAbsent(context: Map<string, unknown>, computeFn: () => Signal<WorkbenchMenuItemProxyLike[]>): Signal<WorkbenchMenuItemProxyLike[]> {
     const cachedMenuItems = this._cache.find(cacheEntry => Objects.isEqual(cacheEntry.context, context))?.menuItems;

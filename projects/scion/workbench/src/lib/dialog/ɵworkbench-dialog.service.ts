@@ -21,7 +21,7 @@ import {createInvocationContext, WorkbenchInvocationContext} from '../invocation
 import {WORKBENCH_ELEMENT} from '../workbench-element-references';
 import {Logger, LoggerNames} from '../logging';
 import {toObservable} from '@angular/core/rxjs-interop';
-import {createDestroyableInjector} from '../common/injector.util';
+import {createDestroyableInjector} from '@scion/components/common';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})

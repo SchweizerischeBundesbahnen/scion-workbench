@@ -17,7 +17,7 @@ import {AppPO} from './app.po';
 import {PartId, ViewId} from '@scion/workbench';
 import {ViewInfo, ViewInfoDialogPO} from './workbench/page-object/view-info-dialog.po';
 import {ViewDrageHandlePO} from './view-drag-handle.po';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 /**
  * Handle for interacting with a workbench view tab.

@@ -12,17 +12,6 @@
       }
     },
     {
-      "type": "view",
-      "qualifier": {
-        "a": "b"
-      },
-      "private": false,
-      "properties": {
-        "path": "test-pages/text-test-page",
-        "title": "Text"
-      }
-    },
-    {
       "type": "perspective",
       "qualifier": {
         "perspective": "sample-perspective-1",

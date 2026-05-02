@@ -38,7 +38,7 @@ import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
 import {WorkbenchPopupRegistry} from '../popup/workbench-popup.registry';
 import {boundingClientRect} from '@scion/components/dimension';
 import {WORKBENCH_VIEW_CONTEXT} from './workbench-view-context.provider';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 /** @inheritDoc */
 export class ɵWorkbenchView implements WorkbenchView, Blockable {

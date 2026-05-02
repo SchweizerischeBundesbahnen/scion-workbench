@@ -22,7 +22,7 @@ import {ActivityId, DialogId, PartId, PopupId, ViewId} from '@scion/workbench';
 import {WorkbenchAccessor} from './workbench-accessor';
 import {ActivityItemPO} from './activity-item.po';
 import {ActivityPanelPO} from './activity-panel.po';
-import {RequireOne} from './helper/utility-types';
+import {RequireOne} from '@scion/toolkit/types';
 import {dasherize} from './helper/dasherize.util';
 import {GridPO} from './grid.po';
 import {DesktopPO} from './desktop.po';

@@ -16,15 +16,14 @@ import {Routing} from '../routing/routing.util';
 import {Commands, NavigationData, NavigationState, NavigationStates, Outlets} from '../routing/routing.model';
 import {ActivatedRoute, UrlSegment} from '@angular/router';
 import {ACTIVITY_ID_PREFIX, ActivityId, computeActivityId, computePartId, computeViewId, isPartId, isViewId, PART_ID_PREFIX, PartId, VIEW_ID_PREFIX, ViewId, WorkbenchOutlet} from '../workbench.identifiers';
-import {Arrays, Objects} from '@scion/toolkit/util';
+import {Arrays, Objects, prune} from '@scion/toolkit/util';
 import {UrlSegmentMatcher} from '../routing/url-segment-matcher';
 import {WorkbenchLayouts} from './workbench-layouts.util';
 import {Logger} from '../logging';
 import {ACTIVITY_PANEL_HEIGHT, ACTIVITY_PANEL_RATIO, ACTIVITY_PANEL_WIDTH, MActivity, MActivityLayout, MActivityStack} from '../activity/workbench-activity.model';
-import {RequireOne} from '../common/utility-types';
+import {RequireOne} from '@scion/toolkit/types';
 import {readCssVariable} from '../common/dom.util';
 import {ActivationInstantProvider} from '../activation-instant.provider';
-import {prune} from '../common/prune.util';
 
 /**
  * @inheritDoc

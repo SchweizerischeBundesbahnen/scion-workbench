@@ -12,7 +12,7 @@ import {KeyValuePipe} from '@angular/common';
 import {observeOn} from 'rxjs/operators';
 import {animationFrameScheduler, firstValueFrom} from 'rxjs';
 import {fromResize$} from '@scion/toolkit/observable';
-import {SciTextPipe} from '@scion/sci-components/text';
+import {SciTextPipe} from '@scion/components/text';
 
 @Component({
   selector: 'wb-message-box-footer',

@@ -15,9 +15,8 @@ import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {MICROFRONTEND_VIEW_NAVIGATION_HINT, MICROFRONTEND_VIEW_STATE_TRANSIENT_PARAMS, splitMicrofrontendViewParams} from './microfrontend-view-routes';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {Dictionaries} from '@scion/toolkit/util';
+import {Dictionaries, prune} from '@scion/toolkit/util';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
-import {prune} from '../../common/prune.util';
 import {MicrofrontendViewNavigationData} from './microfrontend-view-navigation-data';
 
 /**

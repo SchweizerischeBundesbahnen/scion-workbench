@@ -12,7 +12,7 @@ import {Commands, NavigationData, NavigationState} from '../routing/routing.mode
 import {ActivatedRoute} from '@angular/router';
 import {ActivityId} from '../workbench.identifiers';
 import {WorkbenchLayoutFactory} from './workbench-layout.factory';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 /**
  * The workbench layout is an arrangement of parts and views. Parts can be docked to the side or positioned relative to each other.

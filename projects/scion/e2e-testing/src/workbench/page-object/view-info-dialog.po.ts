@@ -14,7 +14,7 @@ import {DialogPO} from '../../dialog.po';
 import {WorkbenchDialogPagePO} from './workbench-dialog-page.po';
 import {NavigationData, NavigationState, PartId, ViewId} from '@scion/workbench';
 import {Data, Params} from '@angular/router';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 /**
  * Page object to interact with {@link ViewInfoDialogComponent}.

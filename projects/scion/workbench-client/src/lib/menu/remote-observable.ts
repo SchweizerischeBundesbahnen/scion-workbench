@@ -10,7 +10,7 @@ import {mapToBody, MessageClient} from '@scion/microfrontend-platform';
  *
  *  @see remoteSubscriber$
  */
-export function createRemoteObservable$<T, R extends {[key: string]: Observable<unknown>}>(config: {relayId: string; resolve: R, mapTo: (data: ResolvedData<R>) => T}): Observable<T> {
+export function createRemoteObservable$<T, R extends {[key: string]: Observable<unknown>}>(config: {relayId: string; resolve: R; mapTo: (data: ResolvedData<R>) => T}): Observable<T> {
   return new Observable(observer => {
     const subscription = combineLatest(config.resolve)
       .pipe(
@@ -35,7 +35,7 @@ export function createRemoteObservable$<T, R extends {[key: string]: Observable<
         }
       });
 
-    return () => subscription.unsubscribe()
+    return () => subscription.unsubscribe();
   });
 }
 

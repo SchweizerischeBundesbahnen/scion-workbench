@@ -1,4 +1,4 @@
-import {MaybeObservable} from '../common/utility-types';
+import {MaybeObservable} from '@scion/toolkit/types';
 import {WorkbenchMenu} from './workbench-client-menu.model';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchMenuFactory} from './workbench-menu.factory';

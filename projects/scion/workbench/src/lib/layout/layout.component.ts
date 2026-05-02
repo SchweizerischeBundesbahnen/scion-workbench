@@ -26,7 +26,7 @@ import {WorkbenchPerspectiveService} from '../perspective/workbench-perspective.
 import {MAIN_AREA} from './workbench-layout';
 import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';
 import {WorkbenchDesktop} from '../desktop/workbench-desktop.model';
-import {contributeMenu} from '@scion/sci-components/menu';
+import {contributeMenu} from '@scion/components/menu';
 
 @Component({
   selector: 'wb-layout',
@@ -86,12 +86,7 @@ export class LayoutComponent {
   });
 
   constructor() {
-    contributeMenu({location: 'toolbar:workbench.activitybar.left', position: 'end'}, toolbar => {
-      toolbar.addMenu({name: 'menu:workbench.activitybar.left', icon: 'more_horiz', visualMenuHint: false}, menu => menu);
-    });
-    contributeMenu({location: 'toolbar:workbench.activitybar.right', position: 'end'}, toolbar => {
-      toolbar.addMenu({name: 'menu:workbench.activitybar.right', icon: 'more_horiz', visualMenuHint: false}, menu => menu);
-    });
+    this.contributeActivitybarMenu();
   }
 
   protected onSashStart(): void {
@@ -127,6 +122,17 @@ export class LayoutComponent {
         dropRegion: event.dropRegion,
       }),
       dragData: event.dragData,
+    });
+  }
+
+  /**
+   * Contributes a menu for the workbench to contribute hidden activities to the activity bar.
+   *
+   * Public contribution point: 'menu:workbench.activitybar:activities'
+   */
+  private contributeActivitybarMenu(): void {
+    contributeMenu('toolbar:workbench.activitybar', toolbar => {
+      toolbar.addMenu({name: 'menu:workbench.activitybar:activities', icon: 'more_horiz', visualMenuHint: false}, menu => menu);
     });
   }
 }

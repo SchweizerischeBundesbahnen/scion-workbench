@@ -42,7 +42,7 @@ export class ɵWorkbenchTextProviderCapabilityInstaller implements Initializer {
 
     // Install intent handler to reply to text requests.
     const intentHandler = installTextIntentHandler(capability, (key, params) => {
-      return textProviderFn(key, params)
+      return textProviderFn(key, params);
     });
 
     // Release resources when stopping the platform, e.g., during hot code replacement.

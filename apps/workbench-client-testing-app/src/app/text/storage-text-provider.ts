@@ -14,10 +14,10 @@ import {computed, EnvironmentProviders, inject, makeEnvironmentProviders} from '
 import {APP_SYMBOLIC_NAME, provideWorkbenchClientInitializer} from '@scion/workbench-client-angular';
 import {SESSION_STORAGE} from '../session.storage';
 import {take} from 'rxjs/operators';
-import {MaybeSignal} from '@scion/sci-components/common';
+import {MaybeSignal} from '@scion/components/common';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {SciTextProviderFn} from '@scion/sci-components/text';
+import {SciTextProviderFn} from '@scion/components/text';
 
 /**
  * Provides texts from session storage.

@@ -10,7 +10,7 @@
 
 import {Beans} from '@scion/toolkit/bean-manager';
 import {WorkbenchView} from '../view/workbench-view.model';
-import {WorkbenchMenuContextKeys} from './workbench-client-menu.model';
+import {WorkbenchMenuContexts} from './workbench-client-menu.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {WorkbenchDialog} from '../dialog/workbench-dialog.model';
 import {WorkbenchNotification} from '../notification/workbench-notification.model';
@@ -19,27 +19,27 @@ import {WorkbenchPopup} from '../popup/workbench-popup.model';
 export function provideMenuEnvironmentContext(): Map<string, unknown> {
   const view = Beans.opt(WorkbenchView);
   if (view) {
-    return new Map<string, unknown>().set(WorkbenchMenuContextKeys.ViewId, view.id);
+    return new Map<string, unknown>().set(WorkbenchMenuContexts.ViewId, view.id);
   }
 
   const part = Beans.opt(WorkbenchPart);
   if (part) {
-    return new Map<string, unknown>().set(WorkbenchMenuContextKeys.PartId, part.id);
+    return new Map<string, unknown>().set(WorkbenchMenuContexts.PartId, part.id);
   }
 
   const dialog = Beans.opt(WorkbenchDialog);
   if (dialog) {
-    return new Map<string, unknown>().set(WorkbenchMenuContextKeys.DialogId, dialog.id);
+    return new Map<string, unknown>().set(WorkbenchMenuContexts.DialogId, dialog.id);
   }
 
   const popup = Beans.opt(WorkbenchPopup);
   if (popup) {
-    return new Map<string, unknown>().set(WorkbenchMenuContextKeys.PopupId, popup.id);
+    return new Map<string, unknown>().set(WorkbenchMenuContexts.PopupId, popup.id);
   }
 
   const notification = Beans.opt(WorkbenchNotification);
   if (notification) {
-    return new Map<string, unknown>().set(WorkbenchMenuContextKeys.NotificationId, notification.id);
+    return new Map<string, unknown>().set(WorkbenchMenuContexts.NotificationId, notification.id);
   }
 
   return new Map();

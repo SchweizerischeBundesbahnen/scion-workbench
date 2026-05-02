@@ -21,12 +21,11 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {NavigationStates, Outlets} from '../../../routing/routing.model';
 import {WorkbenchLayoutService} from '../../../layout/workbench-layout.service';
-import {Objects} from '@scion/toolkit/util';
+import {Objects, prune} from '@scion/toolkit/util';
 import {WorkbenchComponent} from '../../../workbench.component';
 import {MActivity as _MActivity, MActivityLayout as _MActivityLayout, MActivityStack as _MActivityStack} from '../../../activity/workbench-activity.model';
 import {throwError} from '../../../common/throw-error.util';
 import {ActivityId} from '../../../workbench.identifiers';
-import {prune} from '../../../common/prune.util';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.

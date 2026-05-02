@@ -10,15 +10,16 @@
 
 import {DestroyRef, EnvironmentProviders, inject, InjectionToken, Injector, makeEnvironmentProviders, NgZone, provideAppInitializer} from '@angular/core';
 import {provideWorkbenchMenuAdapter} from './menu/workbench-client-angular-menu-adapter';
-import {MaybeObservable, WorkbenchClient, WorkbenchClientConfiguration, WorkbenchDialog, WorkbenchDialogService, WorkbenchMessageBox, WorkbenchMessageBoxService, WorkbenchNotification, WorkbenchNotificationService, WorkbenchPart, WorkbenchPopup, WorkbenchPopupService, WorkbenchRouter, WorkbenchTextProviderFn, WorkbenchTextService, WorkbenchThemeMonitor, WorkbenchView} from '@scion/workbench-client';
-import {text} from '@scion/sci-components/text';
+import {WorkbenchClient, WorkbenchClientConfiguration, WorkbenchDialog, WorkbenchDialogService, WorkbenchMessageBox, WorkbenchMessageBoxService, WorkbenchNotification, WorkbenchNotificationService, WorkbenchPart, WorkbenchPopup, WorkbenchPopupService, WorkbenchRouter, WorkbenchTextProviderFn, WorkbenchTextService, WorkbenchThemeMonitor, WorkbenchView} from '@scion/workbench-client';
+import {MaybeObservable} from '@scion/toolkit/types';
+import {text} from '@scion/components/text';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {APP_IDENTITY, ConnectOptions, ContextService, FocusMonitor, IntentClient, ManifestService, MessageClient, ObservableDecorator, OutletRouter, PlatformPropertyService, PreferredSizeService} from '@scion/microfrontend-platform';
 import {NgZoneObservableDecorator} from './connector/ng-zone-observable-decorator';
 import {runWorkbenchClientInitializers, WorkbenchClientStartupPhase} from './connector/workbench-client-initializer';
 import {map, Observable} from 'rxjs';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
-import {createDestroyableInjector} from './common/injector.util';
+import {createDestroyableInjector} from '@scion/components/common';
 
 /**
  * Enables an Angular application to connect to the SCION Workbench.

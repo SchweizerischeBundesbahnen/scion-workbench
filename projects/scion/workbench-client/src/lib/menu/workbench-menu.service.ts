@@ -1,5 +1,5 @@
 import {WorkbenchMenubarContributionLocation, WorkbenchMenubarFactoryFn, WorkbenchMenuContributionLocation, WorkbenchMenuContributionOptions, WorkbenchMenuFactoryFn, WorkbenchMenuOptions, WorkbenchMenuRef, WorkbenchToolbarContributionLocation, WorkbenchToolbarFactoryFn} from './workbench-client-menu.model';
-import {Disposable} from '../common/disposable';
+import {Disposable} from '@scion/toolkit/types';
 import {WorkbenchMenuAcceleratorOptions} from './workbench-menu-accelerators';
 
 export abstract class WorkbenchMenuService {

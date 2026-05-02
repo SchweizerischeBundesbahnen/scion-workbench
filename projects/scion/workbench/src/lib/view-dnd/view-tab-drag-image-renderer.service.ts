@@ -20,10 +20,10 @@ import {CanCloseFn, CanCloseRef, WorkbenchMenuItem} from '../workbench.model';
 import {ViewId} from '../workbench.identifiers';
 import {WorkbenchView, WorkbenchViewNavigation} from '../view/workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
-import {Disposable} from '../common/disposable';
+import {Disposable} from '@scion/toolkit/types';
 import {throwError} from '../common/throw-error.util';
 import {UUID} from '@scion/toolkit/uuid';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 export type ConstrainFn = (rect: DOMRect) => DOMRect;
 

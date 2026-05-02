@@ -22,7 +22,7 @@ import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {PreferredSizeService} from '@scion/microfrontend-platform';
 import {startWith} from 'rxjs/operators';
-import {contributeMenu} from '@scion/sci-components/menu';
+import {contributeMenu} from '@scion/components/menu';
 
 @Component({
   selector: 'app-notification-page',

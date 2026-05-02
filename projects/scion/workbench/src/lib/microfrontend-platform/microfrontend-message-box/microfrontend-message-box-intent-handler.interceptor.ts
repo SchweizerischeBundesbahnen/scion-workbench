@@ -15,14 +15,13 @@ import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {stringifyError} from '../../common/stringify-error.util';
 import {WorkbenchMessageBoxService} from '../../message-box/workbench-message-box.service';
-import {Arrays} from '@scion/toolkit/util';
+import {Arrays, prune} from '@scion/toolkit/util';
 import {MicrofrontendMessageBoxComponent} from './microfrontend-message-box.component';
 import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provider';
 import {MicrofrontendHostComponent} from '../microfrontend-host/microfrontend-host.component';
 import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog.model';
 import {MicrofrontendHostMessageBox} from '../microfrontend-host-message-box/microfrontend-host-message-box.model';
 import {ActivatedMicrofrontend} from '../microfrontend-host/microfrontend-host.model';
-import {prune} from '../../common/prune.util';
 import {Microfrontends} from '../common/microfrontend.util';
 
 /**

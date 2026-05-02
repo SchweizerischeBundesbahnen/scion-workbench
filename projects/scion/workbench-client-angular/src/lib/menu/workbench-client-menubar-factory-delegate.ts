@@ -8,12 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {MaybeObservable, Translatable, WorkbenchMenubarFactory, WorkbenchMenuFactory} from '@scion/workbench-client';
+import {Translatable, WorkbenchMenubarFactory, WorkbenchMenuFactory} from '@scion/workbench-client';
+import {MaybeObservable, RequireOne} from '@scion/toolkit/types';
 import {isSignal} from '@angular/core';
-import {SciMenubarFactory, SciMenubarMenuDescriptor, SciMenuFactory} from '@scion/sci-components/menu';
+import {SciMenubarFactory, SciMenubarMenuDescriptor, SciMenuFactory} from '@scion/components/menu';
 import {WorkbenchClientMenuFactoryDelegate} from './workbench-client-menu-factory-delegate';
 import {toLazyObservable} from '../common/lazy-observable.util';
-import {MaybeSignal, RequireOne} from '@scion/sci-components/common';
+import {MaybeSignal} from '@scion/components/common';
 
 /**
  * Represents a {@link SciMenubarFactory} that delegates to {@link WorkbenchMenubarFactory} of `@scion/workbench-client`.
@@ -24,8 +25,8 @@ export class WorkbenchClientMenubarFactoryDelegate implements SciMenubarFactory 
   }
 
   /** @inheritDoc */
-  public addMenu(label: MaybeSignal<Translatable>, menuFactoryFn: (menu: SciMenuFactory) => void): this ;
-  public addMenu(descriptor: SciMenubarMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this ;
+  public addMenu(label: MaybeSignal<Translatable>, menuFactoryFn: (menu: SciMenuFactory) => void): this;
+  public addMenu(descriptor: SciMenubarMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this;
   public addMenu(labelOrDescriptor: MaybeSignal<Translatable> | SciMenubarMenuDescriptor, menuFactoryFn: (menu: SciMenuFactory) => void): this {
     const descriptor = coerceMenuDescriptor(labelOrDescriptor);
     const filter = coerceFilterDescriptor(descriptor);

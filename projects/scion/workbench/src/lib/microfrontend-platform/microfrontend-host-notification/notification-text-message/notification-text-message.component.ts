@@ -11,7 +11,7 @@
 import {Component, inject} from '@angular/core';
 import {eNOTIFICATION_MESSAGE_PARAM} from '@scion/workbench-client';
 import {UUID} from '@scion/toolkit/uuid';
-import {SciTextPipe, Translatable} from '@scion/sci-components/text';
+import {SciTextPipe, Translatable} from '@scion/components/text';
 import {createRemoteTranslatable} from '../../microfrontend-text/remote-text-provider';
 import {ActivatedMicrofrontend} from '../../microfrontend-host/microfrontend-host.model';
 

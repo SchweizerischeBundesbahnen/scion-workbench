@@ -10,7 +10,7 @@
 
 import {Signal} from '@angular/core';
 import {DialogId} from '../workbench.identifiers';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 /**
  * Handle to interact with a dialog opened via {@link WorkbenchDialogService}.

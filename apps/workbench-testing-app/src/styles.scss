@@ -42,13 +42,3 @@ button:not([class*="material-icons"]):not([class*="material-symbols"]) {
   --workbench-client-testing-app2-color: rgb(3, 80, 133);
   --devtools-app-color: rgb(72, 72, 72);
 }
-
-/**
- * Styles perspective switcher in the main toolbar.
- */
-sci-toolbar[name="toolbar:main"] button.perspective-switcher {
-  --sci-toolbar-toolbar-item-background-color: var(--sci-color-accent);
-  --sci-toolbar-toolbar-item-text-color: var(--sci-color-accent-inverse);
-  --sci-toolbar-toolbar-item-background-color-hover: color-mix(in srgb, var(--sci-color-accent) 95%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
-  --sci-toolbar-toolbar-item-background-color-active: color-mix(in srgb, var(--sci-toolbar-toolbar-item-background-color-hover) 95%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
-}

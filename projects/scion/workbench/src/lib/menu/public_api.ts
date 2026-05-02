@@ -8,4 +8,4 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {WorkbenchMenuContextKeys} from './workbench-menu-environment-provider';
+export {WorkbenchMenuContexts} from './workbench-menu-environment-provider';

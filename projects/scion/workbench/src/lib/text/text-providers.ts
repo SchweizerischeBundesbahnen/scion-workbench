@@ -9,10 +9,10 @@
  */
 
 import {EnvironmentProviders, makeEnvironmentProviders} from '@angular/core';
-import {provideTextProvider, SciTextProviderFn} from '@scion/sci-components/text';
+import {provideTextProvider, SciTextProviderFn} from '@scion/components/text';
 import {WorkbenchConfig} from '../workbench-config';
 import {workbenchTextProvider} from './workbench-text-provider';
-import {MaybeSignal} from '@scion/sci-components/common';
+import {MaybeSignal} from '@scion/components/common';
 
 /**
  * Provides a set of DI providers to register text providers.

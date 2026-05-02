@@ -16,7 +16,7 @@ import {Logger, LogLevel, WorkbenchPerspective, WorkbenchRouter, WorkbenchServic
 import {Settings} from '../settings.service';
 import {Maps} from '@scion/toolkit/util';
 import {comparePerspectives} from './perspective-comparator.util';
-import {contributeMenu, SciMenuFactory, SciToolbarComponent, SciToolbarFactory, SciToolbarMenuDescriptor} from '@scion/sci-components/menu';
+import {contributeMenu, SciMenuFactory, SciToolbarComponent, SciToolbarFactory, SciToolbarMenuDescriptor} from '@scion/components/menu';
 import {ThemeSwitcherComponent} from '../theme-switch-button/theme-switcher.component';
 
 @Component({
@@ -55,7 +55,7 @@ export class HeaderComponent {
         this.contributeApplicationSettingsGroup(menu);
         this.contributeOpenGroup(menu);
         this.contributeNavigateGroup(menu);
-        this.contributeLoggingGroup(menu)
+        this.contributeLoggingGroup(menu);
       }),
     );
   }
@@ -112,6 +112,12 @@ export class HeaderComponent {
           // Perform navigation for Angular to evaluate `CanMatch` guards.
           void this._router.navigate([{outlets: {}}], {skipLocationChange: true});
         },
+      })
+      .addMenuItem({
+        label: 'Show Sample Toolbars and Menus',
+        checked: this._settings.showSampleMenus,
+        accelerator: {ctrl: true, shift: true, key: 'M'},
+        onSelect: () => this._settings.showSampleMenus.update(enabled => !enabled),
       })
       .addMenuItem({
         label: 'Show Microfrontend Application Labels',
@@ -242,12 +248,12 @@ export class HeaderComponent {
 
   private contributePerspectiveSwitcherMenu(toolbar: SciToolbarFactory): void {
     const menuDescriptor: SciToolbarMenuDescriptor = {
-      label: computed(() => this._workbenchService.activePerspective()?.data?.[PerspectiveData.label] as string | undefined ?? this._workbenchService.activePerspective()?.id ?? 'unkown'),
+      label: computed(() => this._workbenchService.activePerspective()?.data[PerspectiveData.label] as string | undefined ?? this._workbenchService.activePerspective()?.id ?? 'unkown'),
       tooltip: 'Switch Perspective',
       cssClass: ['perspective-switcher', 'e2e-perspective-switcher-menu'],
     };
     toolbar.addMenu(menuDescriptor, menu => {
-      const groupLabels = new Map()
+      const groupLabels = new Map<string, string>()
         .set('docked-part-layout', 'Layout with Docked Parts')
         .set('aligned-part-layout', 'Layout with Aligned Parts')
         .set('test-perspectives', 'Test Perspectives');

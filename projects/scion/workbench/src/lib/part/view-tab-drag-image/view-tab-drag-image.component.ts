@@ -18,8 +18,8 @@ import {WorkbenchView} from '../../view/workbench-view.model';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {distinctUntilChanged, map} from 'rxjs/operators';
 import {WorkbenchPartRegistry} from '../workbench-part.registry';
-import {SciIconComponent} from '@scion/sci-components/icon';
-import {SciTextPipe} from '@scion/sci-components/text';
+import {SciIconComponent} from '@scion/components/icon';
+import {SciTextPipe} from '@scion/components/text';
 import {PartId} from '../../workbench.identifiers';
 
 /**

@@ -17,7 +17,7 @@ import {MAIN_AREA} from '@scion/workbench';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {UUID} from '@scion/toolkit/uuid';
 import {MultiValueInputComponent} from 'workbench-testing-app-common';
-import {Translatable} from '@scion/sci-components/text';
+import {Translatable} from '@scion/components/text';
 
 @Component({
   selector: 'app-add-parts',

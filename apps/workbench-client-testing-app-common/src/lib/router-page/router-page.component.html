@@ -1,16 +1,3 @@
-<div class="toolbar">
-  <button (click)="toggleToolbar1()">Toolbar 1 ({{toolbar1 ? 'active' : 'inactive'}})</button>
-  <button (click)="toggleToolbar2()">Toolbar 2 ({{toolbar2 ? 'active' : 'inactive'}})</button>
-  <button (click)="toggleRegistratoin()">Toggle Registration ({{registration ? 'registered' : 'not registered'}})</button>
-
-  @if (toolbar1) {
-    <sci-toolbar name="toolbar:router-page"/>
-  }
-  @if (toolbar2) {
-    <sci-toolbar name="toolbar:router-page"/>
-  }
-</div>
-
 <form autocomplete="off" [formGroup]="form">
   <section>
     <header>View Intent</header>

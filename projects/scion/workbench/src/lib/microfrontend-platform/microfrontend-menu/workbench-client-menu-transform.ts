@@ -1,6 +1,6 @@
 import {inject, Injector} from '@angular/core';
 import {WorkbenchMenu, WorkbenchMenuGroup, WorkbenchMenuItem, WorkbenchMenuItemLike, WorkbenchMenuItemProxyLike} from '@scion/workbench-client';
-import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '@scion/sci-components/menu';
+import {SciMenu, SciMenuGroup, SciMenuItem, SciMenuItemLike} from '@scion/components/menu';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {UUID} from '@scion/toolkit/uuid';
 import {toLazyObservable} from '../common/lazy-observable.util';
