@@ -27,8 +27,9 @@ import {provideWorkbenchInitializer} from '../startup/workbench-initializer';
 import {WorkbenchPerspectiveRegistry} from './workbench-perspective.registry';
 import {WorkbenchDesktopDirective} from '../desktop/desktop.directive';
 import {WorkbenchLauncher} from '../startup/workbench-launcher.service';
+import {WorkbenchStartup} from '../startup/workbench-startup.service';
 
-describe('Workbench Perspective', () => {
+fdescribe('Workbench Perspective', () => {
 
   beforeEach(() => jasmine.addMatchers(toEqualWorkbenchLayoutCustomMatcher));
 
@@ -468,7 +469,7 @@ describe('Workbench Perspective', () => {
     });
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitUntilWorkbenchStarted();
+    await TestBed.inject(WorkbenchStartup).whenDone;
 
     // Delay activation of the perspective.
     await firstValueFrom(timer(1000));

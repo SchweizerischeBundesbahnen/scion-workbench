@@ -16,6 +16,7 @@ import {TestComponent} from '../testing/test.component';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {effect} from '@angular/core';
+import {waitUntilIdle} from '../testing/testing.util';
 
 describe('WorkbenchViewRegistry', () => {
 
@@ -34,7 +35,7 @@ describe('WorkbenchViewRegistry', () => {
     TestBed.runInInjectionContext(() => effect(() => {
       captor.push(TestBed.inject(WorkbenchViewRegistry).elements().map(view => view.part().id));
     }));
-    TestBed.tick(); // flush effects
+    await waitUntilIdle(); // flush effects
     expect(captor).toEqual([[]]);
 
     // Open view in the right part.

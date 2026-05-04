@@ -13,7 +13,7 @@ import {Component} from '@angular/core';
 import {provideRouter} from '@angular/router';
 import {firstValueFrom, Subject} from 'rxjs';
 import {toShowCustomMatcher} from '../../testing/jasmine/matcher/to-show.matcher';
-import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../../testing/testing.util';
+import {waitUntilIdle, styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../../testing/testing.util';
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
 import {WorkbenchComponent} from '../../workbench.component';
 import {expect} from '../../testing/jasmine/matcher/custom-matchers.definition';
@@ -28,7 +28,8 @@ describe('Microfrontend Host Dialog', () => {
   });
 
   it('should allow opening multiple host dialogs in parallel', async () => {
-    const canActivateDialog1 = new Subject<true>();
+    const canActivateDialog1$ = new Subject<true>();
+    const onCanActivateDialog1$ = new Subject<true>();
 
     TestBed.configureTestingModule({
       providers: [
@@ -59,7 +60,15 @@ describe('Microfrontend Host Dialog', () => {
           },
         }),
         provideRouter([
-          {path: '', canMatch: [canMatchWorkbenchDialogCapability({component: 'dialog-1'})], canActivate: [() => firstValueFrom(canActivateDialog1)], component: SpecDialog1Component},
+          {
+            path: '',
+            canMatch: [canMatchWorkbenchDialogCapability({component: 'dialog-1'})],
+            canActivate: [async () => {
+              onCanActivateDialog1$.next(true);
+              return firstValueFrom(canActivateDialog1$);
+            }],
+            component: SpecDialog1Component,
+          },
           {path: '', canMatch: [canMatchWorkbenchDialogCapability({component: 'dialog-2'})], component: SpecDialog2Component},
         ]),
       ],
@@ -70,11 +79,12 @@ describe('Microfrontend Host Dialog', () => {
 
     // Start navigation in host dialog 1.
     void TestBed.inject(WorkbenchDialogService).open({component: 'dialog-1'});
-    await waitUntilStable();
+    await firstValueFrom(onCanActivateDialog1$);
 
     // Start paralell navigation in host dialog 2.
     void TestBed.inject(WorkbenchDialogService).open({component: 'dialog-2'});
-    await waitUntilStable();
+    // Application will not become stable because navigation is blocked.
+    await waitUntilIdle();
 
     // First navigation should be blocked by the canActivate guard.
     expect(fixture.debugElement.parent).not.toShow(SpecDialog1Component);
@@ -82,7 +92,7 @@ describe('Microfrontend Host Dialog', () => {
     expect(fixture.debugElement.parent).not.toShow(SpecDialog2Component);
 
     // Unblock first navigation.
-    canActivateDialog1.next(true);
+    canActivateDialog1$.next(true);
     await waitUntilStable();
 
     // Both dialogs should be visible.
@@ -91,7 +101,8 @@ describe('Microfrontend Host Dialog', () => {
   });
 
   it('should allow opening a host dialog and a view in parallel', async () => {
-    const canActivateDialog = new Subject<true>();
+    const canActivateDialog$ = new Subject<true>();
+    const onCanActivateDialog$ = new Subject<true>();
 
     TestBed.configureTestingModule({
       providers: [
@@ -115,7 +126,15 @@ describe('Microfrontend Host Dialog', () => {
           },
         }),
         provideRouter([
-          {path: '', canMatch: [canMatchWorkbenchDialogCapability({component: 'dialog'})], canActivate: [() => firstValueFrom(canActivateDialog)], component: SpecDialog1Component},
+          {
+            path: '',
+            canMatch: [canMatchWorkbenchDialogCapability({component: 'dialog'})],
+            canActivate: [async () => {
+              onCanActivateDialog$.next(true);
+              return firstValueFrom(canActivateDialog$);
+            }],
+            component: SpecDialog1Component,
+          },
           {path: 'path/to/view', component: SpecViewComponent},
         ]),
       ],
@@ -126,11 +145,12 @@ describe('Microfrontend Host Dialog', () => {
 
     // Start navigation in a host dialog.
     void TestBed.inject(WorkbenchDialogService).open({component: 'dialog'});
-    await waitUntilStable();
+    await firstValueFrom(onCanActivateDialog$);
 
     // Start parallel navigation in a view.
     void TestBed.inject(WorkbenchRouter).navigate(['path/to/view']);
-    await waitUntilStable();
+    // Application will not become stable because navigation is blocked.
+    await waitUntilIdle();
 
     // First navigation should be blocked by the canActivate guard.
     expect(fixture.debugElement.parent).not.toShow(SpecDialog1Component);
@@ -138,7 +158,7 @@ describe('Microfrontend Host Dialog', () => {
     expect(fixture.debugElement.parent).not.toShow(SpecViewComponent);
 
     // Unblock first navigation.
-    canActivateDialog.next(true);
+    canActivateDialog$.next(true);
     await waitUntilStable();
 
     // Dialog and view components should be visible.
@@ -147,7 +167,8 @@ describe('Microfrontend Host Dialog', () => {
   });
 
   it('should allow opening a view and a host dialog in parallel', async () => {
-    const canActivateView = new Subject<true>();
+    const canActivateView$ = new Subject<true>();
+    const onCanActivateView$ = new Subject<true>();
 
     TestBed.configureTestingModule({
       providers: [
@@ -171,7 +192,14 @@ describe('Microfrontend Host Dialog', () => {
           },
         }),
         provideRouter([
-          {path: 'path/to/view', canActivate: [() => firstValueFrom(canActivateView)], component: SpecViewComponent},
+          {
+            path: 'path/to/view',
+            canActivate: [() => {
+              onCanActivateView$.next(true);
+              return firstValueFrom(canActivateView$);
+            }],
+            component: SpecViewComponent,
+          },
           {path: '', canMatch: [canMatchWorkbenchDialogCapability({component: 'dialog'})], component: SpecDialog1Component},
         ]),
       ],
@@ -182,11 +210,12 @@ describe('Microfrontend Host Dialog', () => {
 
     // Start navigation in a view.
     void TestBed.inject(WorkbenchRouter).navigate(['path/to/view']);
-    await waitUntilStable();
+    await firstValueFrom(onCanActivateView$);
 
     // Start parallel navigation in a host dialog.
     void TestBed.inject(WorkbenchDialogService).open({component: 'dialog'});
-    await waitUntilStable();
+    // Application will not become stable because navigation is blocked.
+    await waitUntilIdle();
 
     // First navigation should be blocked by the canActivate guard.
     expect(fixture.debugElement.parent).not.toShow(SpecViewComponent);
@@ -194,7 +223,7 @@ describe('Microfrontend Host Dialog', () => {
     expect(fixture.debugElement.parent).not.toShow(SpecDialog1Component);
 
     // Unblock first navigation.
-    canActivateView.next(true);
+    canActivateView$.next(true);
     await waitUntilStable();
 
     // Dialog and view components should be visible.

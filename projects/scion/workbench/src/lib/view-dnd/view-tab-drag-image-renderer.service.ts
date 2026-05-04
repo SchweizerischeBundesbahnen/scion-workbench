@@ -9,7 +9,7 @@
  */
 
 import {ApplicationRef, computed, inject, Injectable, Injector, NgZone, signal, Signal} from '@angular/core';
-import {take} from 'rxjs/operators';
+import {filter, take} from 'rxjs/operators';
 import {createElement, setStyle} from '../common/dom.util';
 import {ViewDragData, ViewDragService} from './view-drag.service';
 import {ComponentPortal, DomPortalOutlet} from '@angular/cdk/portal';
@@ -111,8 +111,8 @@ export class ViewTabDragImageRenderer {
   private onWindowDrop(): void {
     // Wait for the zone to stabilize before disposing the tab drag image. Otherwise, the tabbar would flicker
     // because the tab has not yet been rendered at its new position.
-    this._zone.onStable
-      .pipe(take(1))
+    this._applicationRef.isStable
+      .pipe(filter(Boolean), take(1))
       .subscribe(() => {
         this.disposeDragImage();
       });

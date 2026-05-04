@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, effect, ElementRef, HostListener, inject, NgZone, Provider, signal, untracked, viewChild} from '@angular/core';
+import {afterRenderEffect, Component, effect, ElementRef, HostListener, inject, NgZone, Provider, signal, untracked, viewChild} from '@angular/core';
 import {BehaviorSubject, fromEvent} from 'rxjs';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {AsyncPipe, NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
@@ -25,6 +25,7 @@ import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneO
 import {filter, map, startWith, takeUntil} from 'rxjs/operators';
 import {fromMutation$} from '@scion/toolkit/observable';
 import {trackFocus} from '../focus/workbench-focus-tracker.service';
+import {ɵZoneless} from '../ɵzoneless.service';
 
 /**
  * Renders the content of a workbench dialog.
@@ -78,6 +79,7 @@ export class WorkbenchDialogComponent {
   private readonly _activeElement$ = new BehaviorSubject<HTMLElement | undefined>(undefined);
 
   protected readonly dialog = inject(ɵWorkbenchDialog);
+  protected readonly zonelessEnabled = inject(ɵZoneless).enabled;
 
   protected readonly headerHeight = signal<string | undefined>(undefined);
   protected readonly transformTranslateX = signal(0);
@@ -151,7 +153,7 @@ export class WorkbenchDialogComponent {
    * focus, allowing delayed content to get focus.
    */
   private autoFocus(): void {
-    effect(onCleanup => {
+    afterRenderEffect(onCleanup => {
       const dialogElement = this._dialogElement().nativeElement;
 
       untracked(() => {

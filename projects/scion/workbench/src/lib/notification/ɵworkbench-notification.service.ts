@@ -17,6 +17,7 @@ import {ɵWorkbenchNotification} from './ɵworkbench-notification.model';
 import {WorkbenchNotificationRegistry} from './workbench-notification.registry';
 import {Translatable} from '../text/workbench-text-provider.model';
 import {SingleTaskExecutor} from '../executor/single-task-executor';
+import {ɵZoneless} from '../ɵzoneless.service';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})
@@ -26,13 +27,14 @@ export class ɵWorkbenchNotificationService implements WorkbenchNotificationServ
   private readonly _notificationRegistry = inject(WorkbenchNotificationRegistry);
   private readonly _mutex = new SingleTaskExecutor();
   private readonly _zone = inject(NgZone);
+  private readonly _zonelessEnabled = inject(ɵZoneless).enabled;
 
   /** @inheritDoc */
   public show(message: Translatable | null | ComponentType<unknown>, options?: WorkbenchNotificationOptions): void {
     assertNotInReactiveContext(this.show, 'Call WorkbenchNotificationService.show() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
     // Ensure to run in Angular zone to show the notification even when called from outside the Angular zone.
-    if (!NgZone.isInAngularZone()) {
+    if (!this._zonelessEnabled && !NgZone.isInAngularZone()) {
       this._zone.run(() => this.show(message, options));
       return;
     }

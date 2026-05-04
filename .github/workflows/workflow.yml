@@ -143,6 +143,8 @@ jobs:
             cmd: npm run workbench-client-testing-app:vercel-release:build
           - name: workbench-client-testing-app-ci
             cmd: npm run workbench-client-testing-app:ci:build
+          - name: workbench-client-testing-app-zone
+            cmd: npm run workbench-client-testing-app:zone:build
           - name: workbench-getting-started-app
             cmd: npm run workbench-getting-started-app:build
     steps:
@@ -250,6 +252,11 @@ jobs:
         with:
           name: workbench-client-testing-app-ci
           path: dist/workbench-client-testing-app-ci
+      - name: 'Downloading app: workbench-client-testing-app-zone (dist)'
+        uses: actions/download-artifact@v4
+        with:
+          name: workbench-client-testing-app-zone
+          path: dist/workbench-client-testing-app-zone
       - name: 'Restoring NPM modules from cache'
         uses: actions/cache@v4
         with:

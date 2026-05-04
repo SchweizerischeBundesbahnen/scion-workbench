@@ -4,7 +4,9 @@
 </ng-template>
 
 @let message = this.message();
-<div class="slot e2e-slot" [class.text]="message | wbTypeof:'string'" sciDimension (sciDimensionChange)="onContentDimensionChange($event)">
+<!-- TODO review-zoneless: Remove assertion for emitOutsideAngular in scion-toolkit?  -->
+<div class="slot e2e-slot" [class.text]="message | wbTypeof:'string'"
+     sciDimension (sciDimensionChange)="onContentDimensionChange($event)" [emitOutsideAngular]="zonelessEnabled">
   @if (message | wbTypeof:'string') {
     {{($any(message) | wbText)()}}
   } @else {

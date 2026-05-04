@@ -19,7 +19,7 @@ import {ViewDragService} from '../../view-dnd/view-drag.service';
 import {MAIN_AREA} from '../workbench-layout';
 import {toHaveComponentStateCustomMatcher} from '../../testing/jasmine/matcher/to-have-component-state.matcher';
 import {enterComponentState, TestComponent, withComponentContent, withComponentStateInputElement} from '../../testing/test.component';
-import {segments, styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../../testing/testing.util';
+import {waitUntilIdle, segments, styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../../testing/testing.util';
 import {WorkbenchPartRegistry} from '../../part/workbench-part.registry';
 import {WORKBENCH_ID} from '../../workbench.identifiers';
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
@@ -3285,7 +3285,9 @@ describe('WorkbenchLayout Component', () => {
 
     // Wait until entering 'CanActivate' guard.
     await firstValueFrom(onCanActivate$);
-    await waitUntilStable();
+    // Application will not become stable because navigation is blocked.
+    // Ensure that microtask queue is empty.
+    await waitUntilIdle();
 
     // Expect part handle to still have previous state.
     expect(TestBed.inject(WorkbenchService).getPart('part.initial')!.activeView()!.id).toEqual('view.101');

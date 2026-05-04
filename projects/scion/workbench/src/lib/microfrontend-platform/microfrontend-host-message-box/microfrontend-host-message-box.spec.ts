@@ -13,7 +13,7 @@ import {Component} from '@angular/core';
 import {provideRouter} from '@angular/router';
 import {firstValueFrom, Subject} from 'rxjs';
 import {toShowCustomMatcher} from '../../testing/jasmine/matcher/to-show.matcher';
-import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../../testing/testing.util';
+import {styleFixture, waitUntilIdle, waitUntilStable, waitUntilWorkbenchStarted} from '../../testing/testing.util';
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
 import {WorkbenchComponent} from '../../workbench.component';
 import {expect} from '../../testing/jasmine/matcher/custom-matchers.definition';
@@ -28,7 +28,8 @@ describe('Microfrontend Host Message Box', () => {
   });
 
   it('should allow opening multiple host message boxes in parallel', async () => {
-    const canActivateMessageBox1 = new Subject<true>();
+    const canActivateMessageBox1$ = new Subject<true>();
+    const onCanActivateMessageBox1$ = new Subject<true>();
 
     TestBed.configureTestingModule({
       providers: [
@@ -59,7 +60,14 @@ describe('Microfrontend Host Message Box', () => {
           },
         }),
         provideRouter([
-          {path: '', canMatch: [canMatchWorkbenchMessageBoxCapability({component: 'message-box-1'})], canActivate: [() => firstValueFrom(canActivateMessageBox1)], component: SpecMessageBox1Component},
+          {
+            path: '',
+            canMatch: [canMatchWorkbenchMessageBoxCapability({component: 'message-box-1'})],
+            canActivate: [() => {
+              onCanActivateMessageBox1$.next(true);
+              return firstValueFrom(canActivateMessageBox1$);
+            }],
+            component: SpecMessageBox1Component},
           {path: '', canMatch: [canMatchWorkbenchMessageBoxCapability({component: 'message-box-2'})], component: SpecMessageBox2Component},
         ]),
       ],
@@ -70,11 +78,13 @@ describe('Microfrontend Host Message Box', () => {
 
     // Start navigation in host message box 1.
     void TestBed.inject(WorkbenchMessageBoxService).open({component: 'message-box-1'});
-    await waitUntilStable();
+
+    // Wait until the canActivate guard is actually entered.
+    await firstValueFrom(onCanActivateMessageBox1$);
 
     // Start parallel navigation in host message box 2.
     void TestBed.inject(WorkbenchMessageBoxService).open({component: 'message-box-2'});
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // First navigation should be blocked by the canActivate guard.
     expect(fixture.debugElement.parent).not.toShow(SpecMessageBox1Component);
@@ -82,8 +92,8 @@ describe('Microfrontend Host Message Box', () => {
     expect(fixture.debugElement.parent).not.toShow(SpecMessageBox2Component);
 
     // Unblock first navigation.
-    canActivateMessageBox1.next(true);
-    await waitUntilStable();
+    canActivateMessageBox1$.next(true);
+    await waitUntilIdle();
 
     // Both message boxes should be visible.
     expect(fixture.debugElement.parent).toShow(SpecMessageBox1Component);
@@ -91,7 +101,8 @@ describe('Microfrontend Host Message Box', () => {
   });
 
   it('should allow opening a host message box and a view in parallel', async () => {
-    const canActivateMessageBox = new Subject<true>();
+    const canActivateMessageBox$ = new Subject<true>();
+    const onCanActivateMessageBox$ = new Subject<true>();
 
     TestBed.configureTestingModule({
       providers: [
@@ -115,7 +126,15 @@ describe('Microfrontend Host Message Box', () => {
           },
         }),
         provideRouter([
-          {path: '', canMatch: [canMatchWorkbenchMessageBoxCapability({component: 'messagebox'})], canActivate: [() => firstValueFrom(canActivateMessageBox)], component: SpecMessageBox1Component},
+          {
+            path: '',
+            canMatch: [canMatchWorkbenchMessageBoxCapability({component: 'messagebox'})],
+            canActivate: [() => {
+              onCanActivateMessageBox$.next(true);
+              return firstValueFrom(canActivateMessageBox$);
+            }],
+            component: SpecMessageBox1Component,
+          },
           {path: 'path/to/view', component: SpecViewComponent},
         ]),
       ],
@@ -126,11 +145,13 @@ describe('Microfrontend Host Message Box', () => {
 
     // Start navigation in a host message-box.
     void TestBed.inject(WorkbenchMessageBoxService).open({component: 'messagebox'});
-    await waitUntilStable();
+
+    // Wait until the canActivate guard is entered.
+    await firstValueFrom(onCanActivateMessageBox$);
 
     // Start parallel navigation in a view.
     void TestBed.inject(WorkbenchRouter).navigate(['path/to/view']);
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // First navigation should be blocked by the canActivate guard.
     expect(fixture.debugElement.parent).not.toShow(SpecMessageBox1Component);
@@ -138,7 +159,7 @@ describe('Microfrontend Host Message Box', () => {
     expect(fixture.debugElement.parent).not.toShow(SpecViewComponent);
 
     // Unblock first navigation.
-    canActivateMessageBox.next(true);
+    canActivateMessageBox$.next(true);
     await waitUntilStable();
 
     // Message box and view components should be visible.
@@ -147,7 +168,8 @@ describe('Microfrontend Host Message Box', () => {
   });
 
   it('should allow opening a view and a host message box in parallel', async () => {
-    const canActivateView = new Subject<true>();
+    const canActivateView$ = new Subject<true>();
+    const onCanActivateView$ = new Subject<true>();
 
     TestBed.configureTestingModule({
       providers: [
@@ -171,7 +193,14 @@ describe('Microfrontend Host Message Box', () => {
           },
         }),
         provideRouter([
-          {path: 'path/to/view', canActivate: [() => firstValueFrom(canActivateView)], component: SpecViewComponent},
+          {
+            path: 'path/to/view',
+            canActivate: [() => {
+              onCanActivateView$.next(true);
+              return firstValueFrom(canActivateView$);
+            }],
+            component: SpecViewComponent,
+          },
           {path: '', canMatch: [canMatchWorkbenchMessageBoxCapability({component: 'messagebox'})], component: SpecMessageBox1Component},
         ]),
       ],
@@ -182,11 +211,11 @@ describe('Microfrontend Host Message Box', () => {
 
     // Start navigation in a view.
     void TestBed.inject(WorkbenchRouter).navigate(['path/to/view']);
-    await waitUntilStable();
+    await firstValueFrom(onCanActivateView$);
 
     // Start parallel navigation in a host message-box.
     void TestBed.inject(WorkbenchMessageBoxService).open({component: 'messagebox'});
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // First navigation should be blocked by the canActivate guard.
     expect(fixture.debugElement.parent).not.toShow(SpecViewComponent);
@@ -194,8 +223,8 @@ describe('Microfrontend Host Message Box', () => {
     expect(fixture.debugElement.parent).not.toShow(SpecMessageBox1Component);
 
     // Unblock first navigation.
-    canActivateView.next(true);
-    await waitUntilStable();
+    canActivateView$.next(true);
+    await waitUntilIdle();
 
     // Message box and view components should be visible.
     expect(fixture.debugElement.parent).toShow(SpecViewComponent);

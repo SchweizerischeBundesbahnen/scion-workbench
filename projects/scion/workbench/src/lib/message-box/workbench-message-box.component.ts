@@ -20,6 +20,7 @@ import {TypeofPipe} from '../common/typeof.pipe';
 import {SciDimension, SciDimensionDirective} from '@scion/components/dimension';
 import {TextPipe} from '../text/text.pipe';
 import {Translatable} from '../text/workbench-text-provider.model';
+import {ɵZoneless} from '../ɵzoneless.service';
 
 /**
  * Renders the workbench message box.
@@ -56,6 +57,7 @@ export class WorkbenchMessageBoxComponent {
 
   private readonly _dialog = inject(ɵWorkbenchDialog);
 
+  protected readonly zonelessEnabled = inject(ɵZoneless).enabled;
   protected readonly empty = signal(false);
 
   constructor() {
