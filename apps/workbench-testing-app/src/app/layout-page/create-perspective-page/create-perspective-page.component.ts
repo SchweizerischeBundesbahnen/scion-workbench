@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject, Signal} from '@angular/core';
+import {Component, computed, inject, signal, Signal} from '@angular/core';
 import {AddPartsComponent, PartDescriptor} from '../tables/add-parts/add-parts.component';
 import {AddViewsComponent, ViewDescriptor} from '../tables/add-views/add-views.component';
 import {NavigateViewsComponent, NavigationDescriptor} from '../tables/navigate-views/navigate-views.component';
@@ -62,7 +62,7 @@ export default class CreatePerspectivePageComponent {
   protected readonly partProposals = this.computePartProposals();
   protected readonly viewProposals = this.computeViewProposals();
 
-  protected registerError: string | false | undefined;
+  protected registerError = signal<string | false | undefined>(undefined);
 
   private computePartProposals(): Signal<string[]> {
     const parts = toSignal(this.form.controls.parts.valueChanges, {initialValue: []});
@@ -87,7 +87,7 @@ export default class CreatePerspectivePageComponent {
   }
 
   protected async onRegister(): Promise<void> {
-    this.registerError = undefined;
+    this.registerError.set(undefined);
     try {
       await this._workbenchService.registerPerspective({
         id: this.form.controls.id.value,
@@ -95,11 +95,11 @@ export default class CreatePerspectivePageComponent {
         data: SciKeyValueFieldComponent.toDictionary(this.form.controls.data) ?? undefined,
         layout: this.createLayout(),
       });
-      this.registerError = false;
+      this.registerError.set(false);
       this.resetForm();
     }
     catch (error) {
-      this.registerError = stringifyError(error);
+      this.registerError.set(stringifyError(error));
     }
   }
 

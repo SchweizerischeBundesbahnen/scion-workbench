@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WorkbenchRouter} from '@scion/workbench';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
@@ -24,6 +24,7 @@ import {Objects} from '@scion/toolkit/util';
   selector: 'app-microfrontend-part-opener-page',
   templateUrl: './microfrontend-part-opener-page.component.html',
   styleUrl: './microfrontend-part-opener-page.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,

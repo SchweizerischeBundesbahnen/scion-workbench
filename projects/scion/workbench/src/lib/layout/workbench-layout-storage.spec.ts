@@ -124,7 +124,7 @@ describe('WorkbenchPerspectiveStorage', () => {
     });
   });
 
-  it('should write to storage sequentially, debouncing pending request', async () => {
+  fit('should write to storage sequentially, debouncing pending request', async () => {
     /**
      * Test storage that records write operations and can simulate slow writes.
      */

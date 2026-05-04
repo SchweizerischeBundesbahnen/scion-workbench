@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject, signal, Signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, signal, Signal} from '@angular/core';
 import {WorkbenchDialog, WorkbenchNotification, WorkbenchPart, WorkbenchPopup, WorkbenchView} from '@scion/workbench';
 import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {FormsModule} from '@angular/forms';
@@ -18,6 +18,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
   selector: 'app-workbench-handle-bounds-test-page',
   templateUrl: './workbench-handle-bounds-test-page.component.html',
   styleUrl: './workbench-handle-bounds-test-page.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     SciKeyValueComponent,
     FormsModule,

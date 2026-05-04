@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -26,6 +26,7 @@ import {RouterCommandsComponent} from 'workbench-testing-app-common';
     SciKeyValueFieldComponent,
     RouterCommandsComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class AngularRouterTestPageComponent {
 

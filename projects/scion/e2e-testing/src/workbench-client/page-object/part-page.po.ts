@@ -35,7 +35,8 @@ export class PartPagePO {
   }
 
   public getComponentInstanceId(): Promise<string> {
-    return this.locator.locator('span.e2e-component-instance-id').innerText();
+    // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+    return this.locator.locator('span.e2e-component-instance-id', {hasText: /.+/}).innerText();
   }
 
   public async getPartCapability(): Promise<WorkbenchPartCapability> {
@@ -43,7 +44,8 @@ export class PartPagePO {
     const accordion = new SciAccordionPO(capabilityAccordionLocator);
     await accordion.expand();
     try {
-      return JSON.parse(await this.locator.locator('div.e2e-part-capability').innerText()) as WorkbenchPartCapability;
+      // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+      return JSON.parse(await this.locator.locator('div.e2e-part-capability', {hasText: /.+/}).innerText()) as WorkbenchPartCapability;
     }
     finally {
       await accordion.collapse();
@@ -87,7 +89,8 @@ export class PartPagePO {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-route-fragment'));
     await accordion.expand();
     try {
-      return await this.locator.locator('span.e2e-route-fragment').innerText();
+      // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+      return await this.locator.locator('span.e2e-route-fragment', {hasText: /.+/}).innerText();
     }
     finally {
       await accordion.collapse();

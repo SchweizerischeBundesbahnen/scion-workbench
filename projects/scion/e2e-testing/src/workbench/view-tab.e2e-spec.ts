@@ -384,6 +384,7 @@ test.describe('Workbench View Tab', () => {
     await viewPage.markDirty(true);
 
     // Capture dirty marker bounds;
+    await expect(viewTab.dirty).toBeVisible();
     const dirtyMarkerBounds = fromRect(await viewTab.dirty.boundingBox());
 
     // Clear title

@@ -73,6 +73,8 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
 
     // Serialize navigation requests to avoid race conditions when modifying the active workbench layout, ensuring layout operations are performed on the most-recent layout.
     const newLayout = await this._workbenchRouterMutex.submit(async () => {
+      console.log('mutex');
+
       // Wait until Angular has performed the initial navigation to avoid overriding the layout as specified in the URL.
       if (!this._workbenchLayoutService.hasLayout()) {
         await this._workbenchLayoutService.whenLayoutAvailable;

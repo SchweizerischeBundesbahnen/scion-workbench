@@ -37,14 +37,16 @@ export class PopupPagePO implements MicrofrontendPopupPagePO {
   }
 
   public getComponentInstanceId(): Promise<string> {
-    return this.locator.locator('span.e2e-component-instance-id').innerText();
+    // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+    return this.locator.locator('span.e2e-component-instance-id', {hasText: /.+/}).innerText();
   }
 
   public async getPopupCapability(): Promise<WorkbenchPopupCapability> {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-popup-capability'));
     await accordion.expand();
     try {
-      return JSON.parse(await accordion.itemLocator().locator('div.e2e-popup-capability').innerText()) as WorkbenchPopupCapability;
+      // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+      return JSON.parse(await accordion.itemLocator().locator('div.e2e-popup-capability', {hasText: /.+/}).innerText()) as WorkbenchPopupCapability;
     }
     finally {
       await accordion.collapse();
@@ -88,7 +90,8 @@ export class PopupPagePO implements MicrofrontendPopupPagePO {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-route-fragment'));
     await accordion.expand();
     try {
-      return await accordion.itemLocator().locator('span.e2e-route-fragment').innerText();
+      // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+      return await accordion.itemLocator().locator('span.e2e-route-fragment', {hasText: /.+/}).innerText();
     }
     finally {
       await accordion.collapse();

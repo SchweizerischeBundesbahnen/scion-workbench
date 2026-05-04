@@ -67,6 +67,7 @@ export class StartPagePO implements WorkbenchViewPagePO {
     await this._appPO.view({viewId, cssClass}).waitUntilAttached();
     // Wait until completed navigation.
     await this._appPO.waitForLayoutChange({navigationId});
+    await this._appPO.waitUntilIdle();
   }
 
   /**
@@ -85,6 +86,7 @@ export class StartPagePO implements WorkbenchViewPagePO {
     }
     // Wait until completed navigation.
     await this._appPO.waitForLayoutChange({navigationId});
+    await this._appPO.waitUntilIdle();
   }
 }
 

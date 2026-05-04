@@ -44,6 +44,7 @@ export class PartBarPO {
 
   /**
    * Gets the number of currently hidden tabs.
+   * Should be used with .poll() expects, to avoid flakiness.
    */
   public async getHiddenTabCount(): Promise<number> {
     const hiddenTabCount = this.viewListButton.locator('span.e2e-hidden-tab-count');

@@ -17,6 +17,7 @@ import {expect} from '@playwright/test';
 import {FocusTestPagePO} from '../page-object/test-pages/focus-test-page.po';
 import {MAIN_AREA} from '../../workbench.model';
 import {RouterPagePO} from '../page-object/router-page.po';
+import {Params} from '@angular/router';
 
 test.describe('Workbench Notification Microfrontend', () => {
 
@@ -331,9 +332,9 @@ test.describe('Workbench Notification Microfrontend', () => {
     const notificationPage = new NotificationPagePO(appPO.notification({cssClass: 'testee'}));
     await expectNotification(notificationPage).toBeVisible();
     await expect(appPO.notifications).toHaveCount(1);
+    await expect(notificationPage.notification.locator).toContainClass('notification-4');
 
-    // Use `toPass` together with `poll` to have a stable assertion, required because the notification page may be replaced during assertion, prevening interaction with the accordion otherwise.
-    await expect(() => expect.poll(() => notificationPage.getNotificationParams(), {timeout: 3_000}).toEqual({param: 'value, value, value, value, value'})).toPass();
+    await expect.poll((): Promise<Params> => notificationPage.getNotificationParams()).toEqual({param: 'value, value, value, value, value'});
   });
 
   test('should reduce the params of notifications in the same group', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {

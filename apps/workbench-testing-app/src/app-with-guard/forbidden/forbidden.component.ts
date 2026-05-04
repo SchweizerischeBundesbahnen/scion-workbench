@@ -8,11 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 
 @Component({
   selector: 'app-forbidden',
   template: '403 Forbidden',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class ForbiddenComponent {
 }

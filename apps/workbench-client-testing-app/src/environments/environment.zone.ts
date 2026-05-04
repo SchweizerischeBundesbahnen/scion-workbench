@@ -18,15 +18,15 @@
 // import 'zone.js/plugins/zone-error';  // Included with Angular CLI.
 
 /**
- * Environment used if starting the app locally.
+ * Environment used if starting the app with zone enabled.
  */
 export const environment = {
   animationEnabled: false,
-  zoneEnabled: false,
+  zoneEnabled: true,
   apps: {
     app1: {
       symbolicName: 'workbench-client-testing-app1',
-      url: 'http://localhost:4201',
+      url: 'http://localhost:4203',
     },
     app2: {
       symbolicName: 'workbench-client-testing-app2',

@@ -108,6 +108,9 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO, WorkbenchDialogPa
       waitUntilAttached(this._appPO.popups.nth(popupCount)),
       rejectWhenAttached(this.error),
     ]);
+
+    // Wait for popup to finish rendering.
+    await this._appPO.waitUntilIdle();
   }
 
   public async enterPosition(position: PopupOrigin): Promise<void> {

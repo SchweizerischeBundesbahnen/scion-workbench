@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, forwardRef, inject, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, forwardRef, inject, input} from '@angular/core';
 import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator, Validators} from '@angular/forms';
 import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -22,6 +22,7 @@ import {MultiValueInputComponent} from 'workbench-testing-app-common';
   selector: 'app-add-parts',
   templateUrl: './add-parts.component.html',
   styleUrls: ['./add-parts.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     SciCheckboxComponent,

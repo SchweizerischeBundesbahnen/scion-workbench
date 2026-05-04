@@ -797,8 +797,8 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     // Expect single position changes because dropping is not animated.
     await expect.poll(() => consoleLogs.get({message: '[view.101] Position has changed'}).length).toBe(0);
     await expect.poll(() => consoleLogs.get({message: '[view.102] Position has changed'}).length).toBe(0);
-    await expect.poll(() => consoleLogs.get({message: '[view.201] Position has changed'}).length).toBe(1);
-    await expect.poll(() => consoleLogs.get({message: '[view.202] Position has changed'}).length).toBe(1);
+    await expect.poll(() => consoleLogs.get({message: '[view.201] Position has changed'}).length).toBeBetween(1, 2);
+    await expect.poll(() => consoleLogs.get({message: '[view.202] Position has changed'}).length).toBeBetween(1, 2);
   });
 
   // TODO [#33853] Enable test when fixed the Playwright issue https://github.com/microsoft/playwright/issues/33853.

@@ -155,7 +155,9 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
         filter(() => this.active()),
         takeUntilDestroyed(),
       )
-      .subscribe(layout => executor.submit(() => this.storeLayout(layout)));
+      .subscribe(layout => {
+        executor.submit(() => this.storeLayout(layout));
+      });
   }
 
   /**

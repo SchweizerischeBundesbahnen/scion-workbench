@@ -49,6 +49,9 @@ export class RouterPagePO implements MicrofrontendViewPagePO {
       this._appPO.waitForLayoutChange({navigationId}),
       rejectWhenAttached(this.locator.locator('output.e2e-navigate-error')),
     ]);
+
+    // Wait for the new route to finish rendering and stabilize
+    await this._appPO.waitUntilIdle();
   }
 
   private async enterQualifier(qualifier: Qualifier): Promise<void> {

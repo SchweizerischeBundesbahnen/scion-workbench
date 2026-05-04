@@ -669,7 +669,7 @@ test.describe('Activity Layout Maximize', () => {
     // Double click view close button.
     const tab = appPO.view({viewId: 'view.102'}).tab;
     await tab.hover();
-    await tab.closeButton.dblclick();
+    await tab.closeButton.dblclick({delay: 10});
 
     // Expect activities not to be minimized.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -737,7 +737,7 @@ test.describe('Activity Layout Maximize', () => {
     });
 
     // Double click close button of tab 1.
-    await tab1.closeButton.dblclick();
+    await tab1.closeButton.dblclick({delay: 10});
 
     // Expect activities not to be minimized.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({

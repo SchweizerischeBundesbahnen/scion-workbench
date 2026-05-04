@@ -390,7 +390,8 @@ test.describe('Workbench Message Box Built-in Capability', () => {
         const messageBox = appPO.messagebox({cssClass: 'testee'});
         const textMessagePage = new TextMessageBoxPO(messageBox);
 
-        await expectMessageBox(textMessagePage).toBeVisible();
+        // Make sure text is rendered, before continuing.
+        await expect(textMessagePage.text).toHaveText('message');
 
         await page.keyboard.press('Escape');
         // Expect message box to be closed

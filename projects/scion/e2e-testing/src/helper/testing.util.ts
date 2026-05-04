@@ -103,7 +103,8 @@ export async function retryOnError<T>(fn: () => Promise<T>, options?: {timeout?:
  * or rejects with a TimeoutError if not attached within the global timeout.
  */
 export function rejectWhenAttached(locator: Locator): Promise<never> {
-  return locator.waitFor({state: 'attached'}).then(() => locator.innerText()).then(error => Promise.reject(Error(error)));
+  // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+  return locator.waitFor({state: 'attached'}).then(() => locator.filter({hasText: /.+/}).innerText()).then(error => Promise.reject(Error(error)));
 }
 
 /**

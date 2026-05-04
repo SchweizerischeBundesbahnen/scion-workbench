@@ -29,7 +29,7 @@ import {WorkbenchDesktopDirective} from '../desktop/desktop.directive';
 import {WorkbenchLauncher} from '../startup/workbench-launcher.service';
 import {WorkbenchStartup} from '../startup/workbench-startup.service';
 
-fdescribe('Workbench Perspective', () => {
+describe('Workbench Perspective', () => {
 
   beforeEach(() => jasmine.addMatchers(toEqualWorkbenchLayoutCustomMatcher));
 

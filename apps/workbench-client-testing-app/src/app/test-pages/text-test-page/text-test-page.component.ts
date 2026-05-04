@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {UUID} from '@scion/toolkit/uuid';
@@ -28,6 +28,7 @@ import {Translatable, WorkbenchDialog, WorkbenchView} from '@scion/workbench-cli
     SciFormFieldComponent,
     ObserveTextComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class TextTestPageComponent {
 

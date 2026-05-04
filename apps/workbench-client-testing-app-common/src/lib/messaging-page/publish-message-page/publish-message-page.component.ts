@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {MessageClient} from '@scion/microfrontend-platform';
@@ -22,6 +22,7 @@ import {stringifyError} from 'workbench-testing-app-common';
     ReactiveFormsModule,
     SciFormFieldComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PublishMessagePageComponent {
 
@@ -32,16 +33,16 @@ export class PublishMessagePageComponent {
     topic: this._formBuilder.control('', Validators.required),
   });
 
-  protected publishError: string | false | undefined;
+  protected publishError = signal<string | false | undefined>(undefined);
 
   protected onPublish(): void {
-    this.publishError = undefined;
+    this.publishError.set(undefined);
     this._messageClient
       .publish(this.form.controls.topic.value)
       .then(() => {
-        this.publishError = false;
+        this.publishError.set(false);
         this.form.reset();
       })
-      .catch((error: unknown) => this.publishError = stringifyError(error));
+      .catch((error: unknown) => this.publishError.set(stringifyError(error)));
   }
 }

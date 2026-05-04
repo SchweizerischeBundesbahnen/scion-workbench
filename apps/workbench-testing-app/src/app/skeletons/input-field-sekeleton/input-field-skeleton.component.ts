@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 
 /**
  * Represents a skeleton for an input field.
@@ -17,6 +17,7 @@ import {Component} from '@angular/core';
   selector: 'app-input-field-skeleton',
   templateUrl: './input-field-skeleton.component.html',
   styleUrls: ['./input-field-skeleton.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputFieldSkeletonComponent {
 }

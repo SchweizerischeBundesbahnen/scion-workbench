@@ -28,6 +28,10 @@ export class TextMessageBoxPO implements WorkbenchMessageBoxPagePO {
     this.text = this.locator;
   }
 
+  /**
+   * Checks if text is selectable.
+   * Should be used with .poll() expects, to avoid flakiness.
+   */
   public async isTextSelectable(): Promise<boolean> {
     const text = await this.text.innerText();
 

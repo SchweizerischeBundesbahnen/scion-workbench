@@ -61,6 +61,9 @@ test.describe('Workbench Part', () => {
     const popup = appPO.popup({cssClass: 'testee'});
     const testPage = new InputFieldTestPagePO(popup);
 
+    // Wait for focus to settle
+    await expect(testPage.popup.locator).toContainFocus();
+
     // Open view list menu.
     const viewListMenu = await viewPage.view.part.bar.openViewListMenu();
     await expect(viewListMenu.locator).toBeAttached();

@@ -11,7 +11,6 @@
 import {DestroyRef, Directive, inject, input, TemplateRef} from '@angular/core';
 import {ɵWorkbenchDialog} from '../ɵworkbench-dialog.model';
 import {Disposable} from '../../common/disposable';
-import {asapScheduler} from 'rxjs';
 
 /**
  * Use this directive to contribute an action to the dialog footer (only applicable if not using a custom dialog footer).
@@ -42,9 +41,9 @@ export class WorkbenchDialogActionDirective {
     const dialog = inject(ɵWorkbenchDialog);
 
     // Defer registering action to avoid `ExpressionChangedAfterItHasBeenCheckedError`.
-    asapScheduler.schedule(() => this._action = dialog.registerAction(this));
+    this._action = dialog.registerAction(this);
 
     // Defer disposing action to avoid `ExpressionChangedAfterItHasBeenCheckedError`.
-    inject(DestroyRef).onDestroy(() => asapScheduler.schedule(() => this._action?.dispose()));
+    inject(DestroyRef).onDestroy(() => this._action?.dispose());
   }
 }

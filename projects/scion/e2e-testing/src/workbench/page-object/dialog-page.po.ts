@@ -33,7 +33,8 @@ export class DialogPagePO implements WorkbenchDialogPagePO {
   }
 
   public getComponentInstanceId(): Promise<string> {
-    return this.locator.locator('input.e2e-component-instance-id').inputValue();
+    // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+    return this.locator.locator('span.e2e-component-instance-id', {hasText: /.+/}).innerText();
   }
 
   public async enterTitle(title: Translatable): Promise<void> {

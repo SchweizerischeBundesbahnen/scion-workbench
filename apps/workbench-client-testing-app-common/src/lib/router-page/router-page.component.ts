@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, numberAttribute} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, numberAttribute, signal} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WORKBENCH_ELEMENT, WorkbenchElement, WorkbenchNavigationExtras, WorkbenchRouter} from '@scion/workbench-client';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
@@ -29,6 +29,7 @@ import {Beans} from '@scion/toolkit/bean-manager';
     SciCheckboxComponent,
     MultiValueInputComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RouterPageComponent {
 
@@ -49,14 +50,14 @@ export class RouterPageComponent {
   protected readonly targetList = `target-list-${UUID.randomUUID()}`;
   protected readonly positionList = `position-list-${UUID.randomUUID()}`;
 
-  protected navigateError: string | undefined;
+  protected navigateError = signal<string | undefined>(undefined);
 
   constructor() {
     Beans.opt<WorkbenchElement>(WORKBENCH_ELEMENT)?.signalReady();
   }
 
   protected async onNavigate(): Promise<void> {
-    this.navigateError = undefined;
+    this.navigateError.set(undefined);
 
     const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!;
     const params = parseTypedObject(SciKeyValueFieldComponent.toDictionary(this.form.controls.params));
@@ -73,7 +74,7 @@ export class RouterPageComponent {
     await this._router.navigate(qualifier, extras)
       .then(success => success ? Promise.resolve() : Promise.reject(Error('Navigation failed')))
       .then(() => this.resetForm())
-      .catch((error: unknown) => this.navigateError = stringifyError(error));
+      .catch((error: unknown) => this.navigateError.set(stringifyError(error)));
   }
 
   private resetForm(): void {

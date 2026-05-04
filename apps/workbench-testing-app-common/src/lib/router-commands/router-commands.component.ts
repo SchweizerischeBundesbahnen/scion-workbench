@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, forwardRef, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, forwardRef, inject} from '@angular/core';
 import {PRIMARY_OUTLET, Router, UrlSegmentGroup} from '@angular/router';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {UUID} from '@scion/toolkit/uuid';
@@ -20,6 +20,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
   selector: 'app-router-commands',
   templateUrl: './router-commands.component.html',
   styleUrls: ['./router-commands.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
   ],

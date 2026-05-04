@@ -316,8 +316,10 @@ test.describe('Workbench Part Action', () => {
     // Drag the view
     const dragHandle = await viewPage.view.tab.startDrag();
     await dragHandle.dragTo({deltaX: 0, deltaY: 500});
-
     await dragHandle.drop();
+
+    await appPO.waitUntilIdle();
+
     const newPartId = await viewPage.view.part.getPartId();
 
     // Expect action to display
@@ -339,6 +341,9 @@ test.describe('Workbench Part Action', () => {
     const dragHandle = await viewPage.view.tab.startDrag();
     await dragHandle.dragTo({deltaX: 0, deltaY: 500}, {steps: 1});
     await dragHandle.drop();
+
+    await appPO.waitUntilIdle();
+
     const newPartId = await viewPage.view.part.getPartId();
 
     // Expect action to display

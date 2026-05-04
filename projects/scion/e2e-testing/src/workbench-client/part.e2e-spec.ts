@@ -134,6 +134,9 @@ test.describe('Workbench Part', () => {
 
     const popupPage = new InputFieldTestPagePO(appPO.popup({cssClass: 'testee'}));
 
+    // Wait for focus to settle
+    await expect(popupPage.popup.locator).toContainFocus();
+
     // Open view list menu.
     const viewListMenu = await popupOpenerPage.view.part.bar.openViewListMenu();
     await expect(viewListMenu.locator).toBeAttached();
@@ -206,6 +209,7 @@ test.describe('Workbench Part', () => {
     const partPage = new PartPagePO(appPO.part({partId: 'part.testee'}));
 
     // Capture the part's component instance id.
+    await expect.poll(() => partPage.getComponentInstanceId()).not.toEqual('');
     const componentInstanceId = await partPage.getComponentInstanceId();
 
     // Close activity.

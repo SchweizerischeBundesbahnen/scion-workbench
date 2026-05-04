@@ -436,7 +436,7 @@ export class ViewTabBarComponent implements OnDestroy {
    * Scrolls the tab of the active view into view.
    */
   private installActiveViewScroller(): void {
-    afterRenderEffect(() => {
+    afterRenderEffect(onCleanup => {
       // Track the active view.
       const activeView = this.part.activeView();
 
@@ -455,11 +455,14 @@ export class ViewTabBarComponent implements OnDestroy {
       const activeViewTab = untracked(() => this._viewTabs().find(viewTab => viewTab.view() === activeView))!;
 
       // Scroll the tab into view if scrolled out of view.
-      untracked(() => requestAnimationFrame(() => {
+      // Two nested animation frames are used to ensure the browser has completed layout before scrolling.
+      // A single frame is not sufficient since the icon is rendered in a `requestAnimationFrame` as well.
+      // TODO: Revisit this once the `icon.component` is moved to sci-toolkit.
+      untracked(() => requestAnimationFrame(() => requestAnimationFrame(() => {
         if (!this._viewportComponent().isElementInView(activeViewTab.host, 'full')) {
           this._viewportComponent().scrollIntoView(activeViewTab.host);
         }
-      }));
+      })));
     });
   }
 

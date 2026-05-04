@@ -36,7 +36,9 @@ export class LatestTaskExecutor {
    */
   public submit(task: () => Promise<void>): void {
     this._latestTask = task;
-    this.executeLatestTask();
+    queueMicrotask(() => {
+      this.executeLatestTask();
+    });
   }
 
   /**
@@ -54,7 +56,9 @@ export class LatestTaskExecutor {
     this._executing = true;
     void task().finally(() => {
       this._executing = false;
-      this.executeLatestTask();
+      queueMicrotask(() => {
+        this.executeLatestTask();
+      });
     });
   }
 

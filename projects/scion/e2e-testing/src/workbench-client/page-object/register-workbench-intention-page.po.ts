@@ -45,7 +45,7 @@ export class RegisterWorkbenchIntentionPagePO implements MicrofrontendViewPagePO
     const responseLocator = this.locator.locator('output.e2e-register-response');
     const errorLocator = this.locator.locator('output.e2e-register-error');
     return Promise.race([
-      responseLocator.waitFor({state: 'attached'}).then(() => responseLocator.locator('span.e2e-intention-id').innerText()),
+      responseLocator.waitFor({state: 'attached'}).then(() => responseLocator.locator('span.e2e-intention-id', {hasText: /.+/}).innerText()),
       rejectWhenAttached(errorLocator),
     ]);
   }

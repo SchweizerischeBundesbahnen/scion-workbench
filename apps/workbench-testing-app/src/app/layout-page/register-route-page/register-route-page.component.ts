@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
 import {FieldValidationDirective, SciKeyValueFieldComponent} from 'workbench-testing-app-common';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
@@ -21,6 +21,7 @@ import {RouteRegistrationService} from '../../route-registration.service';
   selector: 'app-register-route-page',
   templateUrl: './register-route-page.component.html',
   styleUrls: ['./register-route-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,

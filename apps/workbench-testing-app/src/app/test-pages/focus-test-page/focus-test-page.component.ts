@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {PopupSizeDirective} from '../../popup-opener-page/popup-size.directive';
 
@@ -17,6 +17,7 @@ import {PopupSizeDirective} from '../../popup-opener-page/popup-size.directive';
   templateUrl: './focus-test-page.component.html',
   styleUrl: './focus-test-page.component.scss',
   imports: [SciFormFieldComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [{directive: PopupSizeDirective, inputs: ['size']}],
 })
 export default class FocusTestPageComponent {

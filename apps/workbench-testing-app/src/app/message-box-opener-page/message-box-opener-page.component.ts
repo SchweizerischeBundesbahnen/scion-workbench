@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, Type} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, signal, Type} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {DialogId, PartId, PopupId, Translatable, ViewId, NotificationId, WorkbenchMessageBoxOptions, WorkbenchMessageBoxService} from '@scion/workbench';
 import {MultiValueInputComponent, parseTypedString, prune, stringifyError} from 'workbench-testing-app-common';
@@ -30,6 +30,7 @@ import {UUID} from '@scion/toolkit/uuid';
     SciCheckboxComponent,
     MultiValueInputComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class MessageBoxOpenerPageComponent {
 
@@ -52,16 +53,16 @@ export default class MessageBoxOpenerPageComponent {
     }),
   });
 
-  protected messageBoxError: string | undefined;
-  protected closeAction: string | undefined;
+  protected readonly openError = signal<string | undefined>(undefined);
+  protected readonly closeAction = signal<string | undefined>(undefined);
 
   protected async onMessageBoxOpen(): Promise<void> {
-    this.messageBoxError = undefined;
-    this.closeAction = undefined;
+    this.openError.set(undefined);
+    this.closeAction.set(undefined);
 
     await this.openMessageBox()
-      .then(closeAction => this.closeAction = closeAction)
-      .catch((error: unknown) => this.messageBoxError = stringifyError(error));
+      .then(closeAction => this.closeAction.set(closeAction))
+      .catch((error: unknown) => this.openError.set(stringifyError(error)));
   }
 
   private openMessageBox(): Promise<string> {

@@ -31,7 +31,8 @@ export class ActivatedMicrofrontendPO {
   public async getCapability(): Promise<Capability> {
     await this.accordion.expand();
     try {
-      return JSON.parse(await this.accordion.itemLocator().locator('div.e2e-capability').innerText()) as Capability;
+      // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+      return JSON.parse(await this.accordion.itemLocator().locator('div.e2e-capability', {hasText: /.+/}).innerText()) as Capability;
     }
     finally {
       await this.accordion.collapse();
@@ -53,7 +54,8 @@ export class ActivatedMicrofrontendPO {
   public async getReferrer(): Promise<string> {
     await this.accordion.expand();
     try {
-      return parseTypedString<string>(await this.accordion.itemLocator().locator('output.e2e-referrer').innerText())!;
+      // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+      return parseTypedString<string>(await this.accordion.itemLocator().locator('output.e2e-referrer', {hasText: /.+/}).innerText())!;
     }
     finally {
       await this.accordion.collapse();

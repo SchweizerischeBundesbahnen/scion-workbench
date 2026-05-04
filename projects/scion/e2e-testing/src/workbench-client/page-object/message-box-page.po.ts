@@ -31,15 +31,12 @@ export class MessageBoxPagePO implements MicrofrontendMessageBoxPagePO {
     this.locator = this.outlet.frameLocator.locator('app-message-box-page');
   }
 
-  public getComponentInstanceId(): Promise<string> {
-    return this.locator.locator('input.e2e-component-instance-id').innerText();
-  }
-
   public async getMessageBoxCapability(): Promise<WorkbenchMessageBoxCapability> {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-message-box-capability'));
     await accordion.expand();
     try {
-      return JSON.parse(await accordion.itemLocator().locator('div.e2e-message-box-capability').innerText()) as WorkbenchMessageBoxCapability;
+      // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+      return JSON.parse(await accordion.itemLocator().locator('div.e2e-message-box-capability', {hasText: /.+/}).innerText()) as WorkbenchMessageBoxCapability;
     }
     finally {
       await accordion.collapse();
@@ -83,7 +80,8 @@ export class MessageBoxPagePO implements MicrofrontendMessageBoxPagePO {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-route-fragment'));
     await accordion.expand();
     try {
-      return await accordion.itemLocator().locator('span.e2e-route-fragment').innerText();
+      // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+      return await accordion.itemLocator().locator('span.e2e-route-fragment', {hasText: /.+/}).innerText();
     }
     finally {
       await accordion.collapse();

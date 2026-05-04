@@ -50,12 +50,14 @@ export class TextTestPagePO implements MicrofrontendViewPagePO, MicrofrontendDia
   }
 
   public async provideText(key: string, text: string | '<undefined>'): Promise<void> {
+    await this.locator.locator('section.e2e-provide-text input.e2e-key').click(); // make sure input is scrolled into view. otherwise fill does not work properly in dialogs.
     await this.locator.locator('section.e2e-provide-text input.e2e-key').fill(key);
     await this.locator.locator('section.e2e-provide-text input.e2e-text').fill(text);
     await this.locator.locator('section.e2e-provide-text button.e2e-save').click();
   }
 
   public async provideValue(key: string, value: string | '<undefined>'): Promise<void> {
+    await this.locator.locator('section.e2e-provide-value input.e2e-key').click(); // make sure input is scrolled into view. otherwise fill does not work properly in dialogs.
     await this.locator.locator('section.e2e-provide-value input.e2e-key').fill(key);
     await this.locator.locator('section.e2e-provide-value input.e2e-value').fill(value);
     await this.locator.locator('section.e2e-provide-value button.e2e-save').click();

@@ -38,5 +38,8 @@ export class AngularRouterTestPagePO implements WorkbenchViewPagePO {
       this._appPO.waitForLayoutChange({navigationId}),
       rejectWhenAttached(this.locator.locator('output.e2e-navigate-error')),
     ]);
+
+    // Wait for page to finish rendering.
+    await this._appPO.waitUntilIdle();
   }
 }

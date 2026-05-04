@@ -19,6 +19,7 @@ import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-fie
 import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
+import {AppPO} from '../../app.po';
 
 /**
  * Page object to interact with {@link ViewPageComponent} of workbench-client testing app.
@@ -30,6 +31,7 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
   public readonly partId: Locator;
   public readonly outlet: SciRouterOutletPO;
   public readonly path: Locator;
+  private readonly _appPO: AppPO;
 
   constructor(public view: ViewPO) {
     this.outlet = new SciRouterOutletPO(view.locator.page(), {name: view.locateBy?.id, cssClass: view.locateBy?.cssClass});
@@ -37,14 +39,17 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
     this.viewId = this.locator.locator('span.e2e-view-id');
     this.partId = this.locator.locator('span.e2e-part-id');
     this.path = this.locator.locator('span.e2e-path');
+    this._appPO = new AppPO(this.locator.page());
   }
 
   public getComponentInstanceId(): Promise<string> {
-    return this.locator.locator('span.e2e-component-instance-id').innerText();
+    // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+    return this.locator.locator('span.e2e-component-instance-id', {hasText: /.+/}).innerText();
   }
 
   public getAppInstanceId(): Promise<string> {
-    return this.locator.locator('span.e2e-app-instance-id').innerText();
+    // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+    return this.locator.locator('span.e2e-app-instance-id', {hasText: /.+/}).innerText();
   }
 
   public async getViewCapability(): Promise<WorkbenchViewCapability> {
@@ -52,7 +57,8 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
     const accordion = new SciAccordionPO(capabilityAccordionLocator);
     await accordion.expand();
     try {
-      return JSON.parse(await this.locator.locator('div.e2e-view-capability').innerText()) as WorkbenchViewCapability;
+      // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+      return JSON.parse(await this.locator.locator('div.e2e-view-capability', {hasText: /.+/}).innerText()) as WorkbenchViewCapability;
     }
     finally {
       await accordion.collapse();
@@ -96,7 +102,8 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-route-fragment'));
     await accordion.expand();
     try {
-      return await this.locator.locator('span.e2e-route-fragment').innerText();
+      // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+      return await this.locator.locator('span.e2e-route-fragment', {hasText: /.+/}).innerText();
     }
     finally {
       await accordion.collapse();
@@ -157,6 +164,7 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
       await this.locator.locator('sci-accordion.e2e-self-navigation').locator('select.e2e-param-handling').selectOption(options?.paramsHandling ?? '');
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-navigate-per-param')).toggle(options?.navigatePerParam ?? false);
       await this.locator.locator('sci-accordion.e2e-self-navigation').locator('button.e2e-navigate-self').click();
+      await this._appPO.waitUntilIdle();
     }
     finally {
       await accordion.collapse();

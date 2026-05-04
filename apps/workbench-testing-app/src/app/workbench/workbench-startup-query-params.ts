@@ -91,6 +91,11 @@ export const WorkbenchStartupQueryParams = {
   PRELOAD_INACTIVE_MICROFRONTEND_VIEWS: 'preloadInactiveMicrofrontendViews',
 
   /**
+   * Query param to set enable zone change detection for app1.
+   */
+  ZONE_ENABLED: 'zoneEnabled',
+
+  /**
    * Reads the query param to bootstrap the app with a specific app config.
    *
    * Params can be passed in the form of matrix params: "app-with-guard;forbidden=true"
@@ -162,5 +167,12 @@ export const WorkbenchStartupQueryParams = {
    */
   preloadInactiveMicrofrontendViews: (): true | undefined => {
     return booleanAttribute(new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.PRELOAD_INACTIVE_MICROFRONTEND_VIEWS)) || undefined;
+  },
+
+  /**
+   * Reads the query param to control whether to preload inactive microfrontend views not defining the `lazy` property.
+   */
+  zoneEnabled: (): boolean => {
+    return booleanAttribute(new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.ZONE_ENABLED)) || false;
   },
 } as const;

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, inject, NgZone, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, inject, NgZone, signal} from '@angular/core';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {map, Observable, Subject} from 'rxjs';
 import {distinctUntilChanged, startWith} from 'rxjs/operators';
@@ -22,6 +22,7 @@ import {observeIn} from '@scion/toolkit/operators';
   imports: [
     SciViewportComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class SizeTestPageComponent {
 

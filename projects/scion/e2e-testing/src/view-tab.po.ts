@@ -176,6 +176,7 @@ export class ViewTabPO {
     await dialogPage.enterPartId(partId);
     await dialogPage.enterRegion(options?.region ?? '');
     await dialogPage.pressOK();
+    await dialogPage.locator.waitFor({state: 'detached'});
   }
 
   /**

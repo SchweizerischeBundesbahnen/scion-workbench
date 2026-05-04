@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 
 @Component({
@@ -16,6 +16,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
   templateUrl: './input-field-test-page.component.html',
   styleUrls: ['./input-field-test-page.component.scss'],
   imports: [SciFormFieldComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class InputFieldTestPageComponent {
 }

@@ -113,9 +113,12 @@ export class MessageBoxOpenerPagePO implements MicrofrontendViewPagePO, Microfro
     await this.openButton.click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
-    return Promise.race([
+    await Promise.race([
       waitUntilAttached(this._appPO.dialogs.nth(dialogCount)),
       rejectWhenAttached(this.locator.locator('output.e2e-open-error')),
     ]);
+
+    // Wait for message box to finish rendering.
+    await this._appPO.waitUntilIdle();
   }
 }

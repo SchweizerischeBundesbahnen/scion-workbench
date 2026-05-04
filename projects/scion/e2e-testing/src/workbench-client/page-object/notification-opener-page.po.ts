@@ -91,10 +91,13 @@ export class NotificationOpenerPagePO implements MicrofrontendViewPagePO {
     await this.locator.locator('button.e2e-show').click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
-    return Promise.race([
+    await Promise.race([
       options?.group ? this._appPO.waitUntilIdle() : waitUntilAttached(this._appPO.notifications.nth(notificationCount)),
       rejectWhenAttached(this.error),
     ]);
+
+    // Wait for notification to finish rendering.
+    await this._appPO.waitUntilIdle();
   }
 }
 

@@ -103,6 +103,9 @@ export class PopupOpenerPagePO implements MicrofrontendViewPagePO, Microfrontend
       waitUntilAttached(this._appPO.popups.nth(popupCount)).then(() => this._appPO.waitUntilIdle()), // Wait until idle to have stable bounding box and focus owner
       rejectWhenAttached(this.error),
     ]);
+
+    // Wait for popup to finish rendering.
+    await this._appPO.waitUntilIdle();
   }
 
   public async enterPosition(position: PopupOrigin): Promise<void> {

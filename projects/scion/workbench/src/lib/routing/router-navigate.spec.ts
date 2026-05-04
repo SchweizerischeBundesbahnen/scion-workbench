@@ -8,13 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {discardPeriodicTasks, fakeAsync, TestBed} from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 import {Component} from '@angular/core';
 import {provideRouter, Routes} from '@angular/router';
 import {WorkbenchRouter} from './workbench-router.service';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';
-import {advance, clickElement, styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
+import {clickElement, styleFixture, waitUntilIdle, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchRouterLinkDirective} from '../routing/workbench-router-link.directive';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
@@ -61,7 +61,7 @@ describe('Router', () => {
     jasmine.addMatchers(toShowCustomMatcher);
   });
 
-  it('allows for relative and absolute navigation', fakeAsync(() => {
+  it('allows for relative and absolute navigation', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest(),
@@ -71,177 +71,176 @@ describe('Router', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
 
     // Navigate to entry component of feature A
     void workbenchRouter.navigate(['feature-a']);
-    advance(fixture);
+    await waitUntilStable();
     expect(fixture).toShow(FeatureA_EntryComponent, '1');
 
     // Open '/feature-a/view-1' (relative navigation)
-    clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="view-1"]', '2a');
+    await clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="view-1"]', '2a');
     expect(fixture).toShow(FeatureA_View1Component, '2b');
 
     // Go back one level '/feature-a' (relative navigation)
-    clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink=".."]', '3a');
+    await clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink=".."]', '3a');
     expect(fixture).toShow(FeatureA_EntryComponent, '3b');
 
     // Open '/feature-a/view-2' (relative navigation)
-    clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="./view-2"]', '4a');
+    await clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="./view-2"]', '4a');
     expect(fixture).toShow(FeatureA_View2Component, '4b');
 
     // Go back one level to '/feature-a' (relative navigation)
-    clickElement(fixture, FeatureA_View2Component, 'a[wbRouterLink=".."]', '5a');
+    await clickElement(fixture, FeatureA_View2Component, 'a[wbRouterLink=".."]', '5a');
     expect(fixture).toShow(FeatureA_EntryComponent, '5b');
 
     // Open '/feature-a/view-1' (absolute navigation)
-    clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="/feature-a/view-1"]', '6a');
+    await clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="/feature-a/view-1"]', '6a');
     expect(fixture).toShow(FeatureA_View1Component, '6b');
 
     // Go back one level to '/feature-a' (relative navigation)
-    clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink=".."]', '7a');
+    await clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink=".."]', '7a');
     expect(fixture).toShow(FeatureA_EntryComponent, '7b');
 
     // Open '/feature-a/view-2' (absolute navigation)
-    clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="/feature-a/view-2"]', '8a');
+    await clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="/feature-a/view-2"]', '8a');
     expect(fixture).toShow(FeatureA_View2Component, '8b');
 
     // Go back one level to '/feature-a' (relative navigation)
-    clickElement(fixture, FeatureA_View2Component, 'a[wbRouterLink=".."]', '9a');
+    await clickElement(fixture, FeatureA_View2Component, 'a[wbRouterLink=".."]', '9a');
     expect(fixture).toShow(FeatureA_EntryComponent, '9b');
 
     // Open '/feature-a/feature-b' (relative navigation)
-    clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="feature-b"]', '10a');
+    await clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="feature-b"]', '10a');
     expect(fixture).toShow(FeatureB_EntryComponent, '10b');
 
     // Go back one level to '/feature-a' (relative navigation)
-    clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink=".."]', '11a');
+    await clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink=".."]', '11a');
     expect(fixture).toShow(FeatureA_EntryComponent, '11b');
 
     // Open '/feature-a/feature-b/view-1' (relative navigation)
-    clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="feature-b/view-1"]', '12a');
+    await clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="feature-b/view-1"]', '12a');
     expect(fixture).toShow(FeatureB_View1Component, '12b');
 
     // Go back two levels to '/feature-a' (relative navigation)
-    clickElement(fixture, FeatureB_View1Component, 'a[wbRouterLink="../.."]', '13a');
+    await clickElement(fixture, FeatureB_View1Component, 'a[wbRouterLink="../.."]', '13a');
     expect(fixture).toShow(FeatureA_EntryComponent, '13b');
 
     // Open '/feature-a/feature-b/view-2' (relative navigation)
-    clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="./feature-b/view-2"]', '14a');
+    await clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="./feature-b/view-2"]', '14a');
     expect(fixture).toShow(FeatureB_View2Component, '14b');
 
     // Go back two levels to '/feature-a' (relative navigation)
-    clickElement(fixture, FeatureB_View2Component, 'a[wbRouterLink="../.."]', '15a');
+    await clickElement(fixture, FeatureB_View2Component, 'a[wbRouterLink="../.."]', '15a');
     expect(fixture).toShow(FeatureA_EntryComponent, '15b');
 
     // Open '/feature-a/feature-b' (absolute navigation)
-    clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="/feature-a/feature-b"]', '16a');
+    await clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="/feature-a/feature-b"]', '16a');
     expect(fixture).toShow(FeatureB_EntryComponent, '16b');
 
     // Go back one level to '/feature-a' (relative navigation)
-    clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink=".."]', '17a');
+    await clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink=".."]', '17a');
     expect(fixture).toShow(FeatureA_EntryComponent, '17b');
 
     // Open '/feature-a/feature-b/view-1' (absolute navigation)
-    clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="/feature-a/feature-b/view-1"]', '18a');
+    await clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="/feature-a/feature-b/view-1"]', '18a');
     expect(fixture).toShow(FeatureB_View1Component, '18b');
 
     // Go back two levels to '/feature-a' (relative navigation)
-    clickElement(fixture, FeatureB_View1Component, 'a[wbRouterLink="../.."]', '19a');
+    await clickElement(fixture, FeatureB_View1Component, 'a[wbRouterLink="../.."]', '19a');
     expect(fixture).toShow(FeatureA_EntryComponent, '19b');
 
     // Open '/feature-a/feature-b/view-2' (absolute navigation)
-    clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="/feature-a/feature-b/view-2"]', '20a');
+    await clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="/feature-a/feature-b/view-2"]', '20a');
     expect(fixture).toShow(FeatureB_View2Component, '20b');
 
     // Go back two levels to '/feature-a' (relative navigation)
-    clickElement(fixture, FeatureB_View2Component, 'a[wbRouterLink="../.."]', '21a');
+    await clickElement(fixture, FeatureB_View2Component, 'a[wbRouterLink="../.."]', '21a');
     expect(fixture).toShow(FeatureA_EntryComponent, '21b');
 
     // Open '/feature-a/view-1' (relative navigation)
-    clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="view-1"]', '21a');
+    await clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="view-1"]', '21a');
     expect(fixture).toShow(FeatureA_View1Component, '21b');
 
     // Open '/feature-a/view-2' (relative navigation)
-    clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink="../view-2"]', '22a');
+    await clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink="../view-2"]', '22a');
     expect(fixture).toShow(FeatureA_View2Component, '22b');
 
     // Open '/feature-a/view-1' (relative navigation)
-    clickElement(fixture, FeatureA_View2Component, 'a[wbRouterLink="../view-1"]', '23a');
+    await clickElement(fixture, FeatureA_View2Component, 'a[wbRouterLink="../view-1"]', '23a');
     expect(fixture).toShow(FeatureA_View1Component, '23b');
 
     // Open '/feature-a/feature-b' (relative navigation)
-    clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink="../feature-b"]', '24a');
+    await clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink="../feature-b"]', '24a');
     expect(fixture).toShow(FeatureB_EntryComponent, '24b');
 
     // Open '/feature-a/view-1' (relative navigation)
-    clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="../view-1"]', '25a');
+    await clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="../view-1"]', '25a');
     expect(fixture).toShow(FeatureA_View1Component, '25b');
 
     // Open '/feature-a/feature-b/view-1' (relative navigation)
-    clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink="../feature-b/view-1"]', '26a');
+    await clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink="../feature-b/view-1"]', '26a');
     expect(fixture).toShow(FeatureB_View1Component, '26b');
 
     // Open '/feature-a/view-1' (relative navigation)
-    clickElement(fixture, FeatureB_View1Component, 'a[wbRouterLink="../../view-1"]', '27a');
+    await clickElement(fixture, FeatureB_View1Component, 'a[wbRouterLink="../../view-1"]', '27a');
     expect(fixture).toShow(FeatureA_View1Component, '27b');
 
     // Open '/feature-a/feature-b/view-2' (relative navigation)
-    clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink="../feature-b/view-2"]', '28a');
+    await clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink="../feature-b/view-2"]', '28a');
     expect(fixture).toShow(FeatureB_View2Component, '28b');
 
     // Open '/feature-a/view-1' (relative navigation)
-    clickElement(fixture, FeatureB_View2Component, 'a[wbRouterLink="../../view-1"]', '29a');
+    await clickElement(fixture, FeatureB_View2Component, 'a[wbRouterLink="../../view-1"]', '29a');
     expect(fixture).toShow(FeatureA_View1Component, '29b');
 
     // Open '/feature-a/feature-b' (absolute navigation)
-    clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink="/feature-a/feature-b"]', '30a');
+    await clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink="/feature-a/feature-b"]', '30a');
     expect(fixture).toShow(FeatureB_EntryComponent, '30b');
 
     // Open '/feature-a/feature-b/view-1' (relative navigation)
-    clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="view-1"]', '31a');
+    await clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="view-1"]', '31a');
     expect(fixture).toShow(FeatureB_View1Component, '31b');
 
     // Go back one level to '/feature-a/feature-b' (relative navigation)
-    clickElement(fixture, FeatureB_View1Component, 'a[wbRouterLink=".."]', '32a');
+    await clickElement(fixture, FeatureB_View1Component, 'a[wbRouterLink=".."]', '32a');
     expect(fixture).toShow(FeatureB_EntryComponent, '32b');
 
     // Open '/feature-a/feature-b/view-2' (relative navigation)
-    clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="./view-2"]', '33a');
+    await clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="./view-2"]', '33a');
     expect(fixture).toShow(FeatureB_View2Component, '33b');
 
     // Go back one level to '/feature-a/feature-b' (relative navigation)
-    clickElement(fixture, FeatureB_View2Component, 'a[wbRouterLink=".."]', '34a');
+    await clickElement(fixture, FeatureB_View2Component, 'a[wbRouterLink=".."]', '34a');
     expect(fixture).toShow(FeatureB_EntryComponent, '34b');
 
     // Open '/feature-a/feature-b/view-1' (absolute navigation)
-    clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="/feature-a/feature-b/view-1"]', '35a');
+    await clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="/feature-a/feature-b/view-1"]', '35a');
     expect(fixture).toShow(FeatureB_View1Component, '35b');
 
     // Go back one level to '/feature-a/feature-b' (relative navigation)
-    clickElement(fixture, FeatureB_View1Component, 'a[wbRouterLink=".."]', '36a');
+    await clickElement(fixture, FeatureB_View1Component, 'a[wbRouterLink=".."]', '36a');
     expect(fixture).toShow(FeatureB_EntryComponent, '36b');
 
     // Open '/feature-a/feature-b/view-2' (absolute navigation)
-    clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="/feature-a/feature-b/view-2"]', '37a');
+    await clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="/feature-a/feature-b/view-2"]', '37a');
     expect(fixture).toShow(FeatureB_View2Component, '37b');
 
     // Go back one level to '/feature-a/feature-b' (relative navigation)
-    clickElement(fixture, FeatureB_View2Component, 'a[wbRouterLink=".."]', '38a');
+    await clickElement(fixture, FeatureB_View2Component, 'a[wbRouterLink=".."]', '38a');
     expect(fixture).toShow(FeatureB_EntryComponent, '38b');
 
     // Open '/feature-a/view-1' (absolute navigation)
-    clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="/feature-a/view-1"]', '39a');
+    await clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="/feature-a/view-1"]', '39a');
     expect(fixture).toShow(FeatureA_View1Component, '39b');
 
     // Go back to '/feature-a/feature-b' (relative navigation)
-    clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink="../feature-b"]', '40a');
+    await clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink="../feature-b"]', '40a');
     expect(fixture).toShow(FeatureB_EntryComponent, '40b');
+  });
 
-    discardPeriodicTasks();
-  }));
-
-  it('allows to close views', fakeAsync(() => {
+  it('allows to close views', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest(),
@@ -251,43 +250,42 @@ describe('Router', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
 
-    // Open /feature-a/view-1
+    // Open /feature-a
     void workbenchRouter.navigate(['feature-a']);
-    advance(fixture);
+    await waitUntilStable();
     expect(fixture).toShow(FeatureA_EntryComponent, '1a');
 
-    // Close /feature-a/view-1
+    // Close /feature-a
     void workbenchRouter.navigate(['feature-a'], {close: true});
-    advance(fixture);
-    expect(fixture).not.toShow(FeatureA_View1Component, '1b');
+    await waitUntilStable();
+    expect(fixture).not.toShow(FeatureA_EntryComponent, '1b');
 
     // Open /feature-a/view-1
     void workbenchRouter.navigate(['feature-a/view-1']);
-    advance(fixture);
+    await waitUntilStable();
     expect(fixture).toShow(FeatureA_View1Component, '2a');
 
     // Close /feature-a/view-1
     void workbenchRouter.navigate(['feature-a/view-1'], {close: true});
-    advance(fixture);
+    await waitUntilStable();
     expect(fixture).not.toShow(FeatureA_View1Component, '2b');
 
     // Open /feature-a/feature-b/view-1
     void workbenchRouter.navigate(['feature-a/feature-b/view-1']);
-    advance(fixture);
+    await waitUntilStable();
     expect(fixture).toShow(FeatureB_View1Component, '3a');
 
     // Close /feature-a/feature-b/view-1
     void workbenchRouter.navigate(['feature-a/feature-b/view-1'], {close: true});
-    advance(fixture);
+    await waitUntilStable();
     expect(fixture).not.toShow(FeatureB_View1Component, '3b');
 
     // Close not present view
     void workbenchRouter.navigate(['a/b/c'], {close: true});
-
-    discardPeriodicTasks();
-  }));
+  });
 
   it('should allow parallel navigation to views', async () => {
     const canActivateView1 = new Subject<true>();
@@ -315,11 +313,11 @@ describe('Router', () => {
 
     // Start navigation in view 1.
     void workbenchRouter.navigate(['path/to/view/1'], {target: 'view.1'});
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // Start parallel navigation in view 2.
     void workbenchRouter.navigate(['path/to/view/2'], {target: 'view.2'});
-    await waitUntilStable();
+    await waitUntilIdle();
 
     // First navigation should be blocked by the canActivate guard.
     expect(fixture).not.toShow(SpecView1Component);

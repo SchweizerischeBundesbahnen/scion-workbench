@@ -107,7 +107,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
       rejectWhenAttached(errorLocator),
     ]);
 
-    return JSON.parse(await responseLocator.locator('div.e2e-capability').innerText()) as T & Capability;
+    return JSON.parse(await responseLocator.locator('div.e2e-capability', {hasText: /.+/}).innerText()) as T & Capability;
   }
 
   private async enterParams(capability: Capability): Promise<void> {
@@ -115,6 +115,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     for (const [paramIndex, param] of (capability.params ?? []).entries()) {
       await paramsLocator.locator('button.e2e-add-param').click();
 
+      await paramsLocator.locator('input.e2e-name').nth(paramIndex).waitFor({state: 'attached'});
       await paramsLocator.locator('input.e2e-name').nth(paramIndex).fill(param.name);
       await new SciCheckboxPO(paramsLocator.locator('sci-checkbox.e2e-required').nth(paramIndex)).toggle(param.required);
       await paramsLocator.locator('input.e2e-default').nth(paramIndex).fill(toTypedString(param.default, {emptyIfUndefined: true}));
@@ -150,6 +151,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     for (const [partIndex, part] of parts.entries()) {
       await this.locator.locator('button.e2e-add-part').click();
 
+      await partsLocator.locator('input.e2e-part-id').nth(partIndex).waitFor({state: 'attached'});
       await partsLocator.locator('input.e2e-part-id').nth(partIndex).fill(part.id);
       await partsLocator.locator('input.e2e-qualifier').nth(partIndex).fill(toMatrixNotation(part.qualifier));
       await partsLocator.locator('input.e2e-params').nth(partIndex).fill(toMatrixNotation(part.params));
@@ -173,6 +175,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     for (const [partIndex, part] of parts.entries()) {
       await this.locator.locator('button.e2e-add-docked-part').click();
 
+      await partsLocator.locator('input.e2e-part-id').nth(partIndex).waitFor({state: 'attached'});
       await partsLocator.locator('input.e2e-part-id').nth(partIndex).fill(part.id);
       await partsLocator.locator('input.e2e-qualifier').nth(partIndex).fill(toMatrixNotation(part.qualifier));
       await partsLocator.locator('input.e2e-params').nth(partIndex).fill(toMatrixNotation(part.params));
@@ -204,6 +207,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
       await this.locator.locator('button.e2e-add-view').click();
 
       const viewsLocator = this.locator.locator('section.e2e-views');
+      await viewsLocator.locator('input.e2e-qualifier').nth(viewIndex).waitFor({state: 'attached'});
       await viewsLocator.locator('input.e2e-qualifier').nth(viewIndex).fill(toMatrixNotation(view.qualifier));
       await viewsLocator.locator('input.e2e-params').nth(viewIndex).fill(toMatrixNotation(view.params));
       await viewsLocator.locator('input.e2e-class').nth(viewIndex).fill(coerceArray(view.cssClass).join(' '));

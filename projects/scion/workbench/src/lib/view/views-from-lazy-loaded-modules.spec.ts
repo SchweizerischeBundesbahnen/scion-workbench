@@ -8,13 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {discardPeriodicTasks, fakeAsync, TestBed} from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 import {Component, NgModule} from '@angular/core';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {provideRouter, RouterModule} from '@angular/router';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';
-import {advance, styleFixture} from '../testing/testing.util';
+import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 
@@ -47,7 +47,7 @@ describe('Views', () => {
     jasmine.addMatchers(toShowCustomMatcher);
   });
 
-  it('can be loaded from lazy feature modules', fakeAsync(() => {
+  it('can be loaded from lazy feature modules', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest(),
@@ -58,29 +58,28 @@ describe('Views', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
 
     // Navigate to view 'feature-a/view-1'
-    void TestBed.inject(WorkbenchRouter).navigate(['feature-a', 'view-1']);
-    advance(fixture);
+    await TestBed.inject(WorkbenchRouter).navigate(['feature-a', 'view-1']);
+    await waitUntilStable();
     expect(fixture).toShow(FeatureA_View1_Component, '(1)');
 
     // Navigate to view 'feature-a/view-2'
-    void TestBed.inject(WorkbenchRouter).navigate(['feature-a', 'view-2']);
-    advance(fixture);
+    await TestBed.inject(WorkbenchRouter).navigate(['feature-a', 'view-2']);
+    await waitUntilStable();
     expect(fixture).toShow(FeatureA_View2_Component, '(2)');
 
     // Navigate to view 'feature-b/view-1'
-    void TestBed.inject(WorkbenchRouter).navigate(['feature-b', 'view-1']);
-    advance(fixture);
+    await TestBed.inject(WorkbenchRouter).navigate(['feature-b', 'view-1']);
+    await waitUntilStable();
     expect(fixture).toShow(FeatureB_View1_Component, '(3)');
 
     // Navigate to view 'feature-b/view-2'
-    void TestBed.inject(WorkbenchRouter).navigate(['feature-b', 'view-2']);
-    advance(fixture);
+    await TestBed.inject(WorkbenchRouter).navigate(['feature-b', 'view-2']);
+    await waitUntilStable();
     expect(fixture).toShow(FeatureB_View2_Component, '(4)');
-
-    discardPeriodicTasks();
-  }));
+  });
 });
 
 /****************************************************************************************************

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DestroyRef, HostListener, inject, InjectionToken, Injector, OnInit, runInInjectionContext} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, HostListener, inject, InjectionToken, Injector, OnInit, runInInjectionContext} from '@angular/core';
 import {OverlayRef} from '@angular/cdk/overlay';
 import {fromEvent} from 'rxjs';
 import {MenuAction, MenuItem, MenuItemSeparator} from './menu-item';
@@ -26,6 +26,7 @@ export const MENU_ITEMS = new InjectionToken<Array<MenuItem | MenuItemSeparator>
   selector: 'app-menu',
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     InstanceofPipe,
     SciMaterialIconDirective,

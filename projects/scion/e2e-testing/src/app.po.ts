@@ -152,6 +152,9 @@ export class AppPO {
     if (options?.logLevel) {
       this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.LOG_LEVEL, options.logLevel);
     }
+    if (options?.zoneEnabled) {
+      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.ZONE_ENABLED, String(true));
+    }
 
     const featureQueryParams = new URLSearchParams();
     if (options?.stickyViewTab) {
@@ -392,7 +395,8 @@ export class AppPO {
     const navigationId = await this.getCurrentNavigationId();
     await this.header.clickSettingMenuItem({cssClass: 'e2e-open-start-page'});
     // Wait until opened the start page to get its view id.
-    await waitForCondition(async () => (await this.getCurrentNavigationId()) !== navigationId);
+    await this.waitForLayoutChange({navigationId});
+    await this.waitUntilIdle();
     const focusOwner = await waitUntilStable(() => this.focusOwner());
     if (!focusOwner?.startsWith('view.')) {
       throw Error(`[PageObjectError] Expected view to have focus, but was ${focusOwner}.`);
@@ -407,7 +411,8 @@ export class AppPO {
     if (perspectiveId !== await this.getActivePerspectiveId()) {
       const navigationId = await this.getCurrentNavigationId();
       await this.header.switchPerspective(perspectiveId);
-      await waitForCondition(async () => (await this.getCurrentNavigationId()) !== navigationId);
+      await this.waitForLayoutChange({navigationId});
+      await this.waitUntilIdle();
     }
   }
 
@@ -421,7 +426,7 @@ export class AppPO {
   /**
    * Waits for the browser to become idle.
    */
-  public async waitUntilIdle(timeout?: number): Promise<void> {
+  public async waitUntilIdle(timeout: number = 5_000): Promise<void> {
     return this.page.evaluate((timeout: number | undefined) => new Promise<void>(resolve => requestIdleCallback(() => resolve(), {timeout})), timeout);
   }
 
@@ -614,6 +619,10 @@ export interface Options {
    * @deprecated since version 20.0.0-beta.6. Introduced in 20.0.0-beta.6 to maintain compatibility with applications setting view titles and headings in view microfrontends. API will be removed in version 22.
    */
   preloadInactiveMicrofrontendViews?: true;
+  /**
+   * Enables zone change detection in client app 1 if true. Defaults to `false`.
+   */
+  zoneEnabled?: boolean;
 }
 
 /**
@@ -683,6 +692,11 @@ export enum WorkbenchStartupQueryParams {
    * Query param to control whether to preload inactive microfrontend views not defining the `lazy` property.
    */
   PRELOAD_INACTIVE_MICROFRONTEND_VIEWS = 'preloadInactiveMicrofrontendViews',
+
+  /**
+   * Query param to set enable zone change detection for app1.
+   */
+  ZONE_ENABLED = 'zoneEnabled',
 }
 
 /**

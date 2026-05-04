@@ -20,6 +20,7 @@ export class SciKeyValuePO {
 
   /**
    * Reads the entries as dictionary.
+   * Should be used with .poll() expects, to avoid flakiness.
    */
   public async readEntries(): Promise<Record<string, string>> {
     if (!await this._sciKeyValueLocator.isVisible()) {

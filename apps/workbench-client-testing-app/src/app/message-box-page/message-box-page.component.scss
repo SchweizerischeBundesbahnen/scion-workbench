@@ -4,6 +4,10 @@
   gap: 1em;
   padding-top: 2em; // add empty space at the top to display the metadata chips contributed by the app component
 
+  > sci-form-field.instance-id span {
+    font-family: monospace;
+  }
+
   > sci-accordion {
     header {
       font-weight: bold;

@@ -21,6 +21,8 @@ export const LayoutPages = {
   enterDockedParts: async (locator: Locator, dockedParts: DockedPartDescriptor[]): Promise<void> => {
     for (const [i, dockedPart] of dockedParts.entries()) {
       await locator.locator('button.e2e-add').click();
+      // Wait for the new row to appear in the DOM before filling it.
+      await locator.locator('input.e2e-part-id').nth(i).waitFor({state: 'attached'});
       await locator.locator('input.e2e-part-id').nth(i).fill(dockedPart.id);
       await locator.locator('select.e2e-dock-to').nth(i).selectOption(dockedPart.dockTo);
       await locator.locator('input.e2e-icon').nth(i).fill(dockedPart.icon);
@@ -38,6 +40,8 @@ export const LayoutPages = {
   enterParts: async (locator: Locator, parts: PartDescriptor[]): Promise<void> => {
     for (const [i, part] of parts.entries()) {
       await locator.locator('button.e2e-add').click();
+      // Wait for the new row to appear in the DOM before filling it.
+      await locator.locator('input.e2e-part-id').nth(i).waitFor({state: 'attached'});
       await locator.locator('input.e2e-part-id').nth(i).fill(part.id);
       await new SciCheckboxPO(locator.locator('sci-checkbox.e2e-activate-part').nth(i)).toggle(part.activate === true);
       if (part.relativeTo !== undefined) {
@@ -60,6 +64,8 @@ export const LayoutPages = {
   enterViews: async (locator: Locator, views: ViewDescriptor[] = []): Promise<void> => {
     for (const [i, view] of views.entries()) {
       await locator.locator('button.e2e-add').click();
+      // Wait for the new row to appear in the DOM before filling it.
+      await locator.locator('input.e2e-view-id').nth(i).waitFor({state: 'attached'});
       await locator.locator('input.e2e-view-id').nth(i).fill(view.id);
       await locator.locator('input.e2e-part-id').nth(i).fill(view.partId);
       await locator.locator('input.e2e-position').nth(i).fill(view.position?.toString() ?? '');
@@ -75,6 +81,8 @@ export const LayoutPages = {
   enterPartNavigations: async (locator: Locator, partNavigations: PartNavigationDescriptor[] = []): Promise<void> => {
     for (const [i, partNavigation] of partNavigations.entries()) {
       await locator.locator('button.e2e-add').click();
+      // Wait for the new row to appear in the DOM before filling it.
+      await locator.locator('input.e2e-part-id').nth(i).waitFor({state: 'attached'});
       await locator.locator('input.e2e-part-id').nth(i).fill(partNavigation.id);
       await locator.locator('input.e2e-commands').nth(i).fill(commandsToPath(partNavigation.commands));
       await locator.locator('input.e2e-hint').nth(i).fill(partNavigation.hint ?? '');
@@ -90,6 +98,8 @@ export const LayoutPages = {
   enterViewNavigations: async (locator: Locator, viewNavigations: ViewNavigationDescriptor[] = []): Promise<void> => {
     for (const [i, viewNavigation] of viewNavigations.entries()) {
       await locator.locator('button.e2e-add').click();
+      // Wait for the new row to appear in the DOM before filling it.
+      await locator.locator('input.e2e-view-id').nth(i).waitFor({state: 'attached'});
       await locator.locator('input.e2e-view-id').nth(i).fill(viewNavigation.id);
       await locator.locator('input.e2e-commands').nth(i).fill(commandsToPath(viewNavigation.commands));
       await locator.locator('input.e2e-hint').nth(i).fill(viewNavigation.hint ?? '');

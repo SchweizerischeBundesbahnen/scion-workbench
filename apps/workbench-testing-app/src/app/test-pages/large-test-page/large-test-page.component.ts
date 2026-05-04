@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 
 /**
  * Component with a size of 1000x1000 pixels.
@@ -16,6 +16,7 @@ import {Component} from '@angular/core';
 @Component({
   selector: 'app-large-test-page',
   template: '',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `:host {
     width: 1000px;
     height: 1000px;

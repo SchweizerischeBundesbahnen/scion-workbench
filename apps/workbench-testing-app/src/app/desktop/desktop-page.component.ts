@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {UUID} from '@scion/toolkit/uuid';
@@ -17,6 +17,7 @@ import {UUID} from '@scion/toolkit/uuid';
   selector: 'app-desktop-page',
   templateUrl: './desktop-page.component.html',
   styleUrl: './desktop-page.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     FormsModule,
     ReactiveFormsModule,

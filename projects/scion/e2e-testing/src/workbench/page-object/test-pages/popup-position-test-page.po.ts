@@ -16,6 +16,7 @@ import {PartPO} from '../../../part.po';
 import {DialogPO} from '../../../dialog.po';
 import {WorkbenchDialogPagePO} from '../workbench-dialog-page.po';
 import {WorkbenchPopupPagePO} from '../workbench-popup-page.po';
+import {AppPO} from '../../../app.po';
 
 export class PopupPositionTestPagePO implements WorkbenchViewPagePO, WorkbenchDialogPagePO, WorkbenchPopupPagePO {
 
@@ -45,6 +46,7 @@ export class PopupPositionTestPagePO implements WorkbenchViewPagePO, WorkbenchDi
     await this.locator.locator('button.e2e-open').click();
     const popup = new PopupPO(this.locator.page(), {cssClass: []}, {nth: 0});
     await popup.locator.waitFor({state: 'attached'});
+    await new AppPO(this.locator.page()).waitUntilIdle();
     return popup;
   }
 

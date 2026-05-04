@@ -27,14 +27,18 @@ export class MicrofrontendHostPart implements ActivatedMicrofrontend {
 
   constructor(part: ɵWorkbenchPart) {
     const navigationData = computed(() => part.navigation()!.data as unknown as MicrofrontendPartNavigationData);
-    this.capability = this.trackPartCapability(navigationData);
+    const optionalNavigationData = computed(() => part.navigation()?.data as MicrofrontendPartNavigationData | undefined);
+
+    this.capability = this.trackPartCapability(optionalNavigationData);
     this.params = computed(() => Maps.coerce(navigationData().params));
     this.referrer = computed(() => navigationData().referrer);
-    this.runCanMatchGuardsIfCapabilityNotFound(navigationData);
+
+    // The effect inside `runCanMatchGuardsIfCapabilityNotFound` is run eagerly, and we can't rely on navigation() being set yet
+    this.runCanMatchGuardsIfCapabilityNotFound(computed(() => part.navigation()?.data as MicrofrontendPartNavigationData | undefined));
   }
 
-  private trackPartCapability(navigationData: Signal<MicrofrontendPartNavigationData>): Signal<WorkbenchPartCapability> {
-    const capability = inject(ManifestObjectCache).capability<WorkbenchPartCapability>(computed(() => navigationData().capabilityId));
+  private trackPartCapability(navigationData: Signal<MicrofrontendPartNavigationData | undefined>): Signal<WorkbenchPartCapability> {
+    const capability = inject(ManifestObjectCache).capability<WorkbenchPartCapability>(computed(() => navigationData()?.capabilityId ?? ''));
 
     return linkedSignal({
       source: capability,
@@ -44,7 +48,7 @@ export class MicrofrontendHostPart implements ActivatedMicrofrontend {
         }
 
         // Fallback to previous capability, e.g., when unregistering the part capability while the part is open. See `runCanMatchGuardsIfCapabilityNotFound`.
-        return previous?.value ?? throwError(`[NullCapabilityError] Part capability '${navigationData().capabilityId}' not found.`);
+        return previous?.value ?? throwError(`[NullCapabilityError] Part capability '${navigationData()?.capabilityId}' not found.`);
       },
     });
   }
@@ -52,11 +56,15 @@ export class MicrofrontendHostPart implements ActivatedMicrofrontend {
   /**
    * Instructs Angular to evaluate `CanMatch` route guards to display the "Not Found" page when unregistering the part capability while the part is open.
    */
-  private runCanMatchGuardsIfCapabilityNotFound(navigationData: Signal<MicrofrontendPartNavigationData>): void {
+  private runCanMatchGuardsIfCapabilityNotFound(navigationData: Signal<MicrofrontendPartNavigationData | undefined>): void {
     const injector = inject(Injector);
-    const capability = inject(ManifestObjectCache).capability<WorkbenchPartCapability>(computed(() => navigationData().capabilityId));
+    const capability = inject(ManifestObjectCache).capability<WorkbenchPartCapability>(computed(() => navigationData()?.capabilityId ?? ''));
 
     effect(() => {
+      if (!navigationData()) {
+        return;
+      }
+
       if (!capability()) {
         untracked(() => void Routing.runCanMatchGuards({injector}));
       }

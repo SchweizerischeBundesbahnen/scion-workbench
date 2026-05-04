@@ -33,7 +33,8 @@ export class ViewInfoDialogPO implements WorkbenchDialogPagePO {
     const navigationState = this.locator.locator('sci-key-value.e2e-navigation-state');
 
     return {
-      viewId: await this.locator.locator('span.e2e-view-id').innerText() as ViewId,
+      // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+      viewId: await this.locator.locator('span.e2e-view-id', {hasText: /.+/}).innerText() as ViewId,
       alternativeViewId: await this.locator.locator('span.e2e-alternative-view-id').innerText(),
       partId: await this.locator.locator('span.e2e-part-id').innerText() as PartId,
       alternativePartId: await this.locator.locator('span.e2e-alternative-part-id').innerText(),

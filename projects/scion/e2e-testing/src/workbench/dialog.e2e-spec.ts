@@ -21,7 +21,7 @@ import {expectDialog} from '../matcher/dialog-matcher';
 import {expectView} from '../matcher/view-matcher';
 import {SizeTestPagePO} from './page-object/test-pages/size-test-page.po';
 import {MAIN_AREA} from '../workbench.model';
-import {fromRect} from '../helper/testing.util';
+import {DomRect, fromRect} from '../helper/testing.util';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 import {expectPopup} from '../matcher/popup-matcher';
 import {LargeTestPagePO} from './page-object/test-pages/large-test-page.po';
@@ -1712,25 +1712,26 @@ test.describe('Workbench Dialog', () => {
 
       const dialog1 = appPO.dialog({cssClass: 'testee'}, {nth: 0});
       const dialogPage1 = new DialogPagePO(dialog1);
-      const dialogBounds1 = await dialog1.getBoundingBox('dialog');
 
       const dialog2 = appPO.dialog({cssClass: 'testee'}, {nth: 1});
       const dialogPage2 = new DialogPagePO(dialog2);
-      const dialogBounds2 = await dialog2.getBoundingBox('dialog');
 
       const dialog3 = appPO.dialog({cssClass: 'testee'}, {nth: 2});
       const dialogPage3 = new DialogPagePO(dialog3);
-      const dialogBounds3 = await dialog3.getBoundingBox('dialog');
 
       await expectDialog(dialogPage1).toBeVisible();
       await expectDialog(dialogPage2).toBeVisible();
       await expectDialog(dialogPage3).toBeVisible();
 
+      const dialogBounds1 = (): Promise<DomRect> => dialog1.getBoundingBox('dialog');
+      const dialogBounds2 = (): Promise<DomRect> => dialog2.getBoundingBox('dialog');
+      const dialogBounds3 = (): Promise<DomRect> => dialog3.getBoundingBox('dialog');
+
       // Expect the dialogs to be displayed offset.
-      expect(dialogBounds2.left - dialogBounds1.left).toEqual(10);
-      expect(dialogBounds2.top - dialogBounds1.top).toEqual(10);
-      expect(dialogBounds3.left - dialogBounds2.left).toEqual(10);
-      expect(dialogBounds3.top - dialogBounds2.top).toEqual(10);
+      await expect.poll(async () => (await dialogBounds2()).left - (await dialogBounds1()).left).toEqual(10);
+      await expect.poll(async () => (await dialogBounds2()).top - (await dialogBounds1()).top).toEqual(10);
+      await expect.poll(async () => (await dialogBounds3()).left - (await dialogBounds2()).left).toEqual(10);
+      await expect.poll(async () => (await dialogBounds3()).top - (await dialogBounds2()).top).toEqual(10);
     });
 
     test('should allow interaction only with top dialog from the stack [animate=false]', async ({appPO, workbenchNavigator}) => {

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, effect, inject, input, numberAttribute, untracked} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject, input, numberAttribute, untracked} from '@angular/core';
 import {MessageClient} from '@scion/microfrontend-platform';
 import {firstValueFrom, timer} from 'rxjs';
 
@@ -19,6 +19,7 @@ import {firstValueFrom, timer} from 'rxjs';
 @Component({
   selector: 'app-notification-param-reducer-test-page',
   template: 'Installed notification param reducer on topic {{topic()}}.',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationParamReducerTestPageComponent {
 

@@ -17,13 +17,13 @@
     Publish
   </button>
 
-  @if (publishError === false) {
+  @if (publishError() === false) {
     <output class="publish-success e2e-publish-success">
       Success
     </output>
-  } @else if (publishError) {
+  } @else if (publishError()) {
     <output class="publish-error e2e-publish-error">
-      {{publishError}}
+      {{publishError()}}
     </output>
   }
 </form>

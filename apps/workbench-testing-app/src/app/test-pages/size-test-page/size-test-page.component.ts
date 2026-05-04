@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, inject, input, NgZone, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, inject, input, NgZone, signal} from '@angular/core';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {WorkbenchDialog} from '@scion/workbench';
 import {map, Observable, Subject} from 'rxjs';
@@ -22,6 +22,7 @@ import {PopupSizeDirective} from '../../popup-opener-page/popup-size.directive';
   templateUrl: './size-test-page.component.html',
   styleUrl: './size-test-page.component.scss',
   imports: [SciViewportComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [{directive: PopupSizeDirective, inputs: ['size']}],
 })
 export default class SizeTestPageComponent {

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, inject} from '@angular/core';
 import {WorkbenchNotification} from '@scion/workbench-client';
 import {ActivatedRoute} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
@@ -43,6 +43,7 @@ import {startWith} from 'rxjs/operators';
   host: {
     '[style.height]': 'form.controls.componentSize.controls.height.value',
   },
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class NotificationPageComponent {
 

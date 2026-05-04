@@ -102,6 +102,9 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO, WorkbenchD
       options?.group ? this._appPO.waitUntilIdle() : waitUntilAttached(this._appPO.notifications.nth(notificationCount)),
       rejectWhenAttached(this.error),
     ]);
+
+    // Wait for notification to finish rendering.
+    await this._appPO.waitUntilIdle();
   }
 
   public get view(): ViewPO {

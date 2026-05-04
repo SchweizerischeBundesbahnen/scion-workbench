@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {WorkbenchDialog, WorkbenchMessageBox, WorkbenchNotification, WorkbenchPart, WorkbenchPopup, WorkbenchView} from '@scion/workbench-client';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {MessageClient} from '@scion/microfrontend-platform';
@@ -22,6 +22,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 @Component({
   selector: 'app-signal-ready-test-page',
   template: '',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class SignalReadyTestPageComponent {
 

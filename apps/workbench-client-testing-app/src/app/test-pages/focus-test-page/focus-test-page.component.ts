@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, signal, Signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, signal, Signal} from '@angular/core';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {WorkbenchDialog, WorkbenchMessageBox, WorkbenchNotification, WorkbenchPart, WorkbenchPopup, WorkbenchView} from '@scion/workbench-client';
@@ -19,6 +19,7 @@ import {FormsModule} from '@angular/forms';
   templateUrl: './focus-test-page.component.html',
   styleUrls: ['./focus-test-page.component.scss'],
   imports: [SciFormFieldComponent, FormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class FocusTestPageComponent {
 

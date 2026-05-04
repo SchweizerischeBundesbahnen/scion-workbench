@@ -34,7 +34,8 @@ export class NotificationPagePO {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-notification-capability'));
     await accordion.expand();
     try {
-      return JSON.parse(await accordion.itemLocator().locator('div.e2e-notification-capability').innerText()) as WorkbenchNotificationCapability;
+      // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+      return JSON.parse(await accordion.itemLocator().locator('div.e2e-notification-capability', {hasText: /.+/}).innerText()) as WorkbenchNotificationCapability;
     }
     finally {
       await accordion.collapse();
@@ -78,7 +79,8 @@ export class NotificationPagePO {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-route-fragment'));
     await accordion.expand();
     try {
-      return await accordion.itemLocator().locator('span.e2e-route-fragment').innerText();
+      // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+      return await accordion.itemLocator().locator('span.e2e-route-fragment', {hasText: /.+/}).innerText();
     }
     finally {
       await accordion.collapse();

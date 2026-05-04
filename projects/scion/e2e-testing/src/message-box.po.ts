@@ -36,6 +36,10 @@ export class MessageBoxPO {
     return await this._header.getAttribute('data-severity') as 'info' | 'warn' | 'error';
   }
 
+  /**
+   * Returns message box actions as dictionary.
+   * Should be used with .poll() expects, to avoid flakiness.
+   */
   public async getActions(): Promise<{[key: string]: string}> {
     const actions = new Map<string, string>();
     for (const locator of await this.actions.all()) {

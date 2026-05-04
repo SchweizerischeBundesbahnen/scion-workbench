@@ -1,6 +1,6 @@
 <section>
-  <sci-form-field label="Instance ID" title="Unique identifier of this component instance" direction="column">
-    <input class="e2e-component-instance-id" [value]="uuid" disabled>
+  <sci-form-field class="instance-id" label="Instance ID" title="Unique identifier of this component instance" direction="column">
+    <span class="e2e-component-instance-id">{{uuid}}</span>
   </sci-form-field>
 
   @if (input()) {

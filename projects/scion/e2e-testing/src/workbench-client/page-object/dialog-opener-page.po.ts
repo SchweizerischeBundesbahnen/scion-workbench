@@ -94,5 +94,8 @@ export class DialogOpenerPagePO implements MicrofrontendViewPagePO, Microfronten
       waitUntilAttached(this._appPO.dialogs.nth(dialogCount)),
       rejectWhenAttached(this.error),
     ]);
+
+    // Wait for dialog to finish rendering.
+    await this._appPO.waitUntilIdle();
   }
 }

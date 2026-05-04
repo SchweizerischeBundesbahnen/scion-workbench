@@ -2606,6 +2606,7 @@ test.describe('Workbench Popup', () => {
       });
 
       const popup1 = appPO.popup({cssClass: 'popup-1'});
+      await expect(popup1.locator).toContainFocus();
 
       // Open popup 2 in popup 1.
       const popupOpenerPage2 = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');

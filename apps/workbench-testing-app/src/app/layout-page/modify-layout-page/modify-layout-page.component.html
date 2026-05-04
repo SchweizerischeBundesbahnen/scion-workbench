@@ -42,6 +42,6 @@
   <button (click)="onModify()" [disabled]="form.invalid" class="e2e-modify" sci-primary>Modify</button>
 </form>
 
-@if (modifyError) {
-  <output class="modify-error e2e-modify-error">{{modifyError}}</output>
+@if (modifyError()) {
+  <output class="modify-error e2e-modify-error">{{modifyError()}}</output>
 }

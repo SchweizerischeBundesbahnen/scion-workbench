@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {Notification} from '@scion/workbench';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {StringifyPipe} from '../common/stringify.pipe';
@@ -25,6 +25,7 @@ import {UUID} from '@scion/toolkit/uuid';
   selector: 'app-notification-page',
   templateUrl: './legacy-notification-page.component.html',
   styleUrl: './legacy-notification-page.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     StringifyPipe,

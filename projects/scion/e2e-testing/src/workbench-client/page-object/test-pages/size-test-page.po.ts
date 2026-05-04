@@ -43,7 +43,8 @@ export class SizeTestPagePO implements MicrofrontendViewPagePO, MicrofrontendDia
   public async getRecordedSizeChanges(): Promise<string[]> {
     const sizes = new Array<string>();
     for (const size of await this.locator.locator('span.e2e-size').all()) {
-      sizes.push(await size.innerText());
+      // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+      sizes.push(await size.filter({hasText: /.+/}).innerText());
     }
     return sizes;
   }

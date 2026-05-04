@@ -8,13 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {WorkbenchView} from '@scion/workbench';
 
 @Component({
   selector: 'app-standalone-view-test-page',
   templateUrl: './standalone-view-test-page.component.html',
   styleUrls: ['./standalone-view-test-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class StandaloneViewTestPageComponent {
 

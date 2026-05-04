@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, effect, ElementRef, inject, linkedSignal, model, Signal, untracked, WritableSignal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, ElementRef, inject, linkedSignal, model, Signal, untracked, WritableSignal} from '@angular/core';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {applyEach, Field, form, FormValueControl, required} from '@angular/forms/signals';
 
@@ -19,6 +19,7 @@ import {applyEach, Field, form, FormValueControl, required} from '@angular/forms
   selector: 'app-key-value-field',
   templateUrl: './key-value-field.component.html',
   styleUrls: ['./key-value-field.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     SciMaterialIconDirective,
     Field,

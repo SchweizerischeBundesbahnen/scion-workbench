@@ -40,7 +40,8 @@ export class DialogPagePO implements MicrofrontendDialogPagePO {
   }
 
   public getComponentInstanceId(): Promise<string> {
-    return this.locator.locator('input.e2e-component-instance-id').innerText();
+    // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+    return this.locator.locator('span.e2e-component-instance-id', {hasText: /.+/}).innerText();
   }
 
   public async getBoundingBox(): Promise<DomRect> {
@@ -51,7 +52,8 @@ export class DialogPagePO implements MicrofrontendDialogPagePO {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-dialog-capability'));
     await accordion.expand();
     try {
-      return JSON.parse(await accordion.itemLocator().locator('div.e2e-dialog-capability').innerText()) as WorkbenchDialogCapability;
+      // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+      return JSON.parse(await accordion.itemLocator().locator('div.e2e-dialog-capability', {hasText: /.+/}).innerText()) as WorkbenchDialogCapability;
     }
     finally {
       await accordion.collapse();
@@ -62,7 +64,8 @@ export class DialogPagePO implements MicrofrontendDialogPagePO {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-dialog-params'));
     await accordion.expand();
     try {
-      return await new SciKeyValuePO(accordion.itemLocator().locator('sci-key-value.e2e-dialog-params')).readEntries();
+      // hasText ensures Playwright waits for the zoneless update phase, avoiding empty string race conditions.
+      return await new SciKeyValuePO(accordion.itemLocator().locator('sci-key-value.e2e-dialog-params', {hasText: /.+/})).readEntries();
     }
     finally {
       await accordion.collapse();

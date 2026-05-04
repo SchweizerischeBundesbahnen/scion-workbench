@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, forwardRef, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, forwardRef, inject} from '@angular/core';
 import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator, ValidatorFn, Validators} from '@angular/forms';
 import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -22,6 +22,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
   selector: 'app-add-docked-parts',
   templateUrl: './add-docked-parts.component.html',
   styleUrls: ['./add-docked-parts.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     SciMaterialIconDirective,
