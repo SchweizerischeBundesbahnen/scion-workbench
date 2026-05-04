@@ -4,7 +4,7 @@
   @let hasActionToolbar = !this.disabled() && actions.length;
 
   @if (group.collapsible) {
-    <button class="group-header" (click)="onGroupToggle()" (mouseenter)="onMenuOpen(null)">
+    <button class="group-header e2e-group-header" (click)="onGroupToggle()" (mouseenter)="onMenuOpen(null)">
       <!-- TODO [menu] use SCION icon -->
       <sci-icon>{{isGroupExpanded() ? 'keyboard_arrow_down' : 'chevron_right'}}</sci-icon>
 
@@ -40,7 +40,7 @@
 @if (isGroupExpanded()) {
   <!-- Filter field -->
   @if (filter) {
-    <div class="filter">
+    <div class="filter e2e-filter">
       <sci-icon>scion.search</sci-icon>
       @let message = filter.placeholder?.() ?? '%scion.components.menu.type_to_filter.action';
       <sci-menu-filter (textChange)="onFilterChange($event)" [placeholder]="(message | sciText)()"/>
@@ -68,7 +68,7 @@
                   [attr.title]="menuItem.tooltip?.()"
                   [class.checked]="menuItem.checked?.()"
                   [class.active]="menuItem.active?.()"
-                  [class]="menuItem.cssClass" class="menu-item"
+                  [class]="menuItem.cssClass" class="menu-item e2e-menu-item"
                   [sciAttributes]="menuItem.attributes"
                   (click)="onSelect(menuItem)">
             @if (hasGlyphArea()) {
@@ -119,7 +119,7 @@
           <button [attr.disabled]="disabled || null"
                   [attr.title]="menuItem.tooltip?.()"
                   [class.open]="activeSubMenuItem()?.menu === menuItem"
-                  [class]="menuItem.cssClass" class="menu"
+                  [class]="menuItem.cssClass" class="menu e2e-menu-item"
                   (mouseenter)="onMenuOpen({menu: menuItem, element: element})"
                   (click)="onMenuOpen({menu: menuItem, element: element})"
                   #element>
@@ -151,13 +151,14 @@
           <sci-menu-group [group]="menuItem"
                           [glyphArea]="hasGlyphArea()"
                           [disabled]="disabled"
-                          [class]="menuItem.cssClass"/>
+                          [class]="menuItem.cssClass"
+                          class="e2e-menu-item e2e-menu-group"/>
         }
       }
     } @empty {
       @if (filter || menuItems() === NULL_MENU_CONTRIBUTION) {
         @let message = filter?.notFoundText?.() ?? '%scion.components.menu.no_items.message';
-        <div class="message no-items">{{(message | sciText)()}}</div>
+        <div class="message no-items e2e-no-items">{{(message | sciText)()}}</div>
       }
     }
   </ng-template>

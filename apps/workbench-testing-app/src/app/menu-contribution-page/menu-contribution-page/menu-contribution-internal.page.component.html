@@ -1,0 +1,11 @@
+<div class="context-menu" (contextmenu)="onContextMenuOpen($event)">Right-click to open a context menu</div>
+
+<section>
+  <sci-form-field label="Location">
+    <input [formControl]="form.controls.location" class="e2e-location">
+  </sci-form-field>
+
+  <app-menu-contribution [formControl]="form.controls.menuItems"/>
+
+  <button (click)="onContributeMenu()" [disabled]="form.invalid" class="e2e-contribute-menu" sci-primary>Contribute Menu</button>
+</section>

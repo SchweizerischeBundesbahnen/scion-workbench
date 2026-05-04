@@ -1,4 +1,4 @@
-<input type="text" autocomplete="off" [attr.placeholder]="placeholder()" [(ngModel)]="text" #input>
+<input type="text" autocomplete="off" class="e2e-menu-filter-input" [attr.placeholder]="placeholder()" [(ngModel)]="text" #input>
 <button class="clear" (click)="onClear()" [title]="('%scion.workbench.clear.tooltip' | sciText)()" tabindex="-1">
   <sci-icon>scion.clear</sci-icon>
 </button>

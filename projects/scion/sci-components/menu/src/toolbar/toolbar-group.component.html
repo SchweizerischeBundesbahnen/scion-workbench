@@ -9,7 +9,7 @@
         <button [attr.disabled]="disabled || null"
                 [attr.title]="menuItem.tooltip?.()"
                 [class.checked]="menuItem.checked?.()"
-                [class]="menuItem.cssClass" class="menu-item"
+                [class]="menuItem.cssClass" class="menu-item e2e-menu-item"
                 [sciAttributes]="menuItem.attributes"
                 (click)="onSelect(menuItem)">
           @if (menuItem.iconLigature) {
@@ -37,7 +37,7 @@
               [attr.title]="menuItem.tooltip?.()"
               [class.active]="activeMenu()?.menu === menuItem"
               [class.visual-menu-hint]="hasIcon && !hasLabel && menuItem.visualMenuHint"
-              [class]="menuItem.cssClass" class="menu-item submenu-item"
+              [class]="menuItem.cssClass" class="menu-item submenu-item e2e-menu-item"
               (click)="onMenuClick({menu: menuItem, element})"
               #element>
         @if (menuItem.iconLigature) {
@@ -68,7 +68,8 @@
                          [disabled]="disabled"
                          [popoverViewContainerRef]="popoverViewContainerRef()"
                          (menuOpen)="onChildGroupMenuOpen($event)"
-                         [class]="menuItem.cssClass"/>
+                         [class]="menuItem.cssClass"
+                         class="e2e-menu-item e2e-toolbar-group"/>
     }
   }
 }

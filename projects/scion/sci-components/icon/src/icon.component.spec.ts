@@ -35,6 +35,7 @@ describe('IconComponent', () => {
         }),
         {provide: ComponentFixtureAutoDetect, useValue: true},
       ],
+      teardown: {destroyAfterEach: false},
     });
 
     @Component({selector: 'spec-icon-1', template: 'icon 1'})
@@ -379,12 +380,11 @@ describe('IconComponent', () => {
       ],
     });
 
-    @Component({
+    @Component({ // fixed font size
       selector: 'spec-icon',
       template: '{{icon()}}',
       styles: `:host {
         font-size: 48px;
-      / / fixed font size
       }`,
     })
     class SpecIconComponent {
@@ -417,12 +417,11 @@ describe('IconComponent', () => {
       ],
     });
 
-    @Component({
+    @Component({ // fixed font size
       selector: 'spec-icon',
       template: '{{icon()}}',
       styles: `:host {
         font-size: 48px;
-      / / fixed font size
       }`,
     })
     class SpecIconComponent {

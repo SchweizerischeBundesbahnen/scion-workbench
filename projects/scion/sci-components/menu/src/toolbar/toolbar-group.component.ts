@@ -5,6 +5,7 @@ import {MaybeSignal, RequireOne, SciAttributesDirective, SciComponentOutletDirec
 import {Translatable} from '@scion/sci-components/text';
 import {SciToolbarControlPipe} from './toolbar-control.directive';
 import {SciIconComponent} from '@scion/sci-components/icon';
+import {MenuItemGroupComponent} from '../menu/menu-group.component';
 
 @Component({
   selector: 'sci-toolbar-group',
@@ -16,6 +17,7 @@ import {SciIconComponent} from '@scion/sci-components/icon';
     SciAttributesDirective,
     SciToolbarControlPipe,
     SciIconComponent,
+    MenuItemGroupComponent,
   ],
   host: {
     '[attr.data-orientation]': 'orientation()',

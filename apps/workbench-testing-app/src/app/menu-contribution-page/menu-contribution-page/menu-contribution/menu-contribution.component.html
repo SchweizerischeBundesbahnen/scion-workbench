@@ -1,0 +1,98 @@
+<!--<sci-toolbar name="toolbar:test-page" [context]="context"/>-->
+
+<section class="actions">
+  <button (click)="onAddMenuItem()" class="e2e-add-menu-item">Add Menu Item</button>
+  <button (click)="onAddMenu()" class="e2e-add-menu">Add Menu</button>
+  <button (click)="onAddGroup()" class="e2e-add-group">Add Group</button>
+</section>
+
+@for (menuItemFormGroup of form.controls.menuItems.controls; track $index) {
+  @switch (menuItemFormGroup.controls.type.value) {
+    @case ('menuitem') {
+      @let formGroup = asMenuItemFormGroup(menuItemFormGroup);
+
+      <section class="menu-item">
+        <label>Name</label>
+        <label>Label</label>
+        <label>Icon</label>
+        <label>Tooltip</label>
+        <label>Accelerator</label>
+        <span>CSS Class(es)</span>
+        <span class="checkbox">Checked</span>
+        <span class="checkbox">Disabled</span>
+        <label></label>
+
+        <!-- Name -->
+        <input [formControl]="formGroup.controls.name" class="e2e-name">
+        <!-- Label -->
+        <input [formControl]="formGroup.controls.label" class="e2e-label">
+        <!-- Icon -->
+        <input [formControl]="formGroup.controls.icon" class="e2e-icon">
+        <!-- Tooltip -->
+        <input [formControl]="formGroup.controls.tooltip" class="e2e-tooltip">
+        <!-- Accelerator -->
+        <app-multi-value-input [formControl]="formGroup.controls.accelerator" [placeholder]="'alt-1 alt-2'" class="e2e-accelerator"/>
+        <!-- CSS class -->
+        <app-multi-value-input [formControl]="formGroup.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
+        <!-- Checked -->
+        <sci-checkbox [formControl]="formGroup.controls.checked" class="e2e-checked"/>
+        <!-- Disabled -->
+        <sci-checkbox [formControl]="formGroup.controls.disabled" class="e2e-disabled"/>
+        <!-- Remove button -->
+        <button class="e2e-remove" (click)="onRemoveMenuItem($index)" title="Remove Menu item" sciMaterialIcon>remove</button>
+      </section>
+    }
+    @case ('menu') {
+      @let formGroup = asMenuFormGroup(menuItemFormGroup);
+
+      <section class="menu">
+        <div>
+          <label>Name</label>
+          <label>Label</label>
+          <label>Icon</label>
+          <label>Tooltip</label>
+          <span class="checkbox">Disabled</span>
+          <label></label>
+
+          <!-- Name -->
+          <input [formControl]="formGroup.controls.name" class="e2e-name">
+          <!-- Label -->
+          <input [formControl]="formGroup.controls.label" class="e2e-label">
+          <!-- Icon -->
+          <input [formControl]="formGroup.controls.icon" class="e2e-icon">
+          <!-- Tooltip -->
+          <input [formControl]="formGroup.controls.tooltip" class="e2e-tooltip">
+          <!-- Disabled -->
+          <sci-checkbox [formControl]="formGroup.controls.disabled" class="e2e-disabled"/>
+          <!-- Remove button -->
+          <button class="e2e-remove" (click)="onRemoveMenuItem($index)" title="Remove Menu" sciMaterialIcon>remove</button>
+        </div>
+
+        <app-menu-contribution [formControl]="formGroup.controls.children"/>
+      </section>
+    }
+    @case ('group') {
+      @let formGroup = asMenuGroupFormGroup(menuItemFormGroup);
+
+      <section class="group">
+        <div>
+          <label>Name</label>
+          <label>Label</label>
+          <span class="checkbox">Disabled</span>
+          <label></label>
+
+          <!-- Name -->
+          <input [formControl]="formGroup.controls.name" class="e2e-name">
+          <!-- Label -->
+          <input [formControl]="formGroup.controls.label" class="e2e-label">
+          <!-- Disabled -->
+          <sci-checkbox [formControl]="formGroup.controls.disabled" class="e2e-disabled"/>
+          <!-- Remove button -->
+          <button class="e2e-remove" (click)="onRemoveMenuItem($index)" title="Remove Group" sciMaterialIcon>remove</button>
+        </div>
+
+        <app-menu-contribution [formControl]="formGroup.controls.children"/>
+      </section>
+    }
+  }
+}

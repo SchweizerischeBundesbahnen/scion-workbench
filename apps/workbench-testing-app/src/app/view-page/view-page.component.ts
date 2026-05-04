@@ -73,6 +73,8 @@ export default class ViewPageComponent {
       throw Error('[LifecycleError] Component constructed before the workbench startup completed!'); // Do not remove as required by `startup.e2e-spec.ts` in [#1]
     }
 
+    this.contributeMenubar();
+
     contributeMenu('menubar:view', menubar => menubar
       .addMenu('Menu 1', menu => menu
         .addMenuItem('Menu 1 - A', onSelect)
@@ -190,6 +192,26 @@ export default class ViewPageComponent {
     installMenuAccelerators('menu:contextmenu');
   }
 
+  private contributeMenubar(): void {
+
+    contributeMenu({location: 'menubar:demo', position: 'start'}, menu => menu
+
+      .addMenu({label: 'File', name: 'menu:file'}, menu => menu,
+      ),
+    );
+
+    contributeMenu({location: 'menu:file'}, menu => menu
+
+      .addMenu({label: 'Share', name: 'menu:share', icon: 'person_add'}, menu => menu,
+      ),
+    );
+
+    contributeMenu({location: 'menu:share'}, menu => menu
+
+      .addMenuItem({label: 'Publish to web', icon: 'public', onSelect})
+    );
+  }
+
   private contributeToolbar(): void {
     const bold = renderingFlag<boolean>('toolbar.bold', false);
     const italic = renderingFlag<boolean>('toolbar.italic', false);
@@ -202,7 +224,7 @@ export default class ViewPageComponent {
         .addToolbarItem({icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], checked: italic, onSelect: () => italic.update(italic => !italic)})
         .addToolbarItem({icon: 'format_underlined', checked: underlined, onSelect: () => underlined.update(underlined => !underlined)}),
       )
-      .addMenu({icon: 'palette', menu: {filter: true}}, menu => menu
+      .addMenu({icon: 'palette', menu: {filter: true, maxHeight: '200px'}}, menu => menu
         .addGroup(group => group
           .addMenuItem({label: 'Bold', icon: 'format_bold', accelerator: ['Ctrl', 'Shift', 'B'], checked: bold, onSelect: () => bold.update(bold => !bold)})
           .addMenuItem({label: 'Italic', icon: 'format_italic', accelerator: ['Ctrl', 'Shift', 'I'], checked: italic, onSelect: () => italic.update(italic => !italic)})
@@ -241,6 +263,24 @@ export default class ViewPageComponent {
         .addMenu({icon: 'format_list_numbered', label: 'Enumeration'}, menu => menu
           .addMenuItem({icon: 'format_list_bulleted', label: 'Bullet list', onSelect})
           .addMenuItem({icon: 'format_list_numbered', label: 'Number list', onSelect}),
+        )
+        .addMenu({label: 'Align', icon: 'format_align_center'}, menu => menu
+          .addMenuItem({icon: 'format_align_left', label: 'Align left', onSelect})
+          .addMenuItem({icon: 'format_align_center', label: 'Align center', onSelect})
+          .addMenuItem({icon: 'format_align_right', label: 'Align right', onSelect})
+          .addMenuItem({icon: 'format_align_left', label: 'Align left', onSelect})
+          .addMenuItem({icon: 'format_align_center', label: 'Align center', onSelect})
+          .addMenuItem({icon: 'format_align_right', label: 'Align right', onSelect})
+          .addMenuItem({icon: 'format_align_left', label: 'Align left', onSelect})
+          .addMenuItem({icon: 'format_align_center', label: 'Align center', onSelect})
+          .addMenuItem({icon: 'format_align_right', label: 'Align right', onSelect})
+          .addMenuItem({icon: 'format_align_left', label: 'Align left', onSelect})
+          .addMenuItem({icon: 'format_align_center', label: 'Align center', onSelect})
+          .addMenuItem({icon: 'format_align_right', label: 'Align right', onSelect})
+          .addMenuItem({icon: 'format_align_left', label: 'Align left', onSelect})
+          .addMenuItem({icon: 'format_align_center', label: 'Align center', onSelect})
+          .addMenuItem({icon: 'format_align_right', label: 'Align right', onSelect})
+          .addMenuItem({icon: 'format_align_justify', label: 'Align justify', onSelect}),
         ),
       )
       .addGroup(group => group

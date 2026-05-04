@@ -93,6 +93,7 @@ export class SciMenuOpener {
 
     // Bind popover to anchor.
     const popoverElement = componentRef.location.nativeElement as HTMLElement;
+    setStyles(popoverElement, {padding: '0'});
     this.bindPopoverToAnchor({popoverElement, anchorElement, align: options.align ?? 'vertical'});
 
     // Destroy component when closing the popover.

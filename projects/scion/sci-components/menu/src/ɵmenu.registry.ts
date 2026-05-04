@@ -176,7 +176,7 @@ export class ɵSciMenuRegistry implements SciMenuRegistry, SciMenuAdapter {
       const contributions = menuItem.name ? untracked(() => menuService.menuItems(menuItem.name!, context, {injector: options?.injector, metadata: options?.metadata}))() : [];
       return {
         ...menuItem,
-        children: sortMenuItems(menuItem.children.concat(contributions).map(child => federateMenu(child, context, options))),
+        children: sortMenuItems(menuItem.children.map(child => federateMenu(child, context, options)).concat(contributions)),
       };
     }
   }
