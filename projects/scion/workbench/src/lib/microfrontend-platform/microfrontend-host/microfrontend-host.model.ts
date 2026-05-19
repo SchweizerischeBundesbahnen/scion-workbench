@@ -9,7 +9,7 @@
  */
 
 import {Capability} from '@scion/microfrontend-platform';
-import {Signal} from '@angular/core';
+import {InjectionToken, Signal} from '@angular/core';
 
 /**
  * Provides capability and parameters of a host microfrontend.
@@ -30,3 +30,14 @@ export abstract class ActivatedMicrofrontend {
    */
   public abstract readonly referrer: Signal<string>;
 }
+
+/**
+ * DI token for a factory that provides {@link ActivatedMicrofrontend} to host microfrontends.
+ *
+ * Providing {@link ActivatedMicrofrontend} via a factory function gives control over the injection context in which {@link ActivatedMicrofrontend} is constructed.
+ * The injection context will be destroyed when the host microfrontend is destroyed, releasing allocated resources and unregistering effects.
+ *
+ * Without the factory, {@link ActivatedMicrofrontend} would not be destroyed if it were provided at the route level, because Angular does not destroy route providers
+ * when destroying the routed component. Route providers are used, for example, for part and view host microfrontends.
+ */
+export const ACTIVATED_MICROFRONTEND_FACTORY = new InjectionToken<() => ActivatedMicrofrontend>('ACTIVATED_MICROFRONTEND_FACTORY');

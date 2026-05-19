@@ -9,9 +9,10 @@
  */
 
 import {ActivatedMicrofrontend} from '../microfrontend-host/microfrontend-host.model';
-import {signal, Signal} from '@angular/core';
+import {DestroyRef, inject, signal, Signal} from '@angular/core';
 import {WorkbenchPopupCapability} from '@scion/workbench-client';
 import {WorkbenchPopup} from '../../popup/workbench-popup.model';
+import {Logger, LoggerNames} from '../../logging';
 
 /** @inheritDoc */
 export class MicrofrontendHostPopup implements ActivatedMicrofrontend {
@@ -25,6 +26,7 @@ export class MicrofrontendHostPopup implements ActivatedMicrofrontend {
     this.params = signal(params).asReadonly();
     this.referrer = signal(referrer).asReadonly();
     this.setPopupProperties();
+    this.installLifecycleLogger();
   }
 
   private setPopupProperties(): void {
@@ -36,5 +38,11 @@ export class MicrofrontendHostPopup implements ActivatedMicrofrontend {
     this._popup.size.maxWidth = properties.size?.maxWidth;
     this._popup.size.minHeight = properties.size?.minHeight;
     this._popup.size.maxHeight = properties.size?.maxHeight;
+  }
+
+  private installLifecycleLogger(): void {
+    const logger = inject(Logger);
+    logger.debug(() => `Constructing MicrofrontendHostPopup [popupId=${this._popup.id}]`, LoggerNames.LIFECYCLE);
+    inject(DestroyRef).onDestroy(() => logger.debug(() => `Destroying MicrofrontendHostPopup [popupId=${this._popup.id}]`, LoggerNames.LIFECYCLE));
   }
 }

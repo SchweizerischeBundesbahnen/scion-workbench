@@ -9,10 +9,11 @@
  */
 
 import {ActivatedMicrofrontend} from '../microfrontend-host/microfrontend-host.model';
-import {signal, Signal} from '@angular/core';
+import {DestroyRef, inject, signal, Signal} from '@angular/core';
 import {WorkbenchDialogCapability} from '@scion/workbench-client';
 import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provider';
 import {WorkbenchDialog} from '../../dialog/workbench-dialog.model';
+import {Logger, LoggerNames} from '../../logging';
 
 /** @inheritDoc */
 export class MicrofrontendHostDialog implements ActivatedMicrofrontend {
@@ -26,6 +27,7 @@ export class MicrofrontendHostDialog implements ActivatedMicrofrontend {
     this.params = signal(params).asReadonly();
     this.referrer = signal(referrer).asReadonly();
     this.setDialogProperties();
+    this.installLifecycleLogger();
   }
 
   private setDialogProperties(): void {
@@ -44,5 +46,11 @@ export class MicrofrontendHostDialog implements ActivatedMicrofrontend {
     this._dialog.closable = properties.closable ?? true;
     this._dialog.resizable = properties.resizable ?? true;
     this._dialog.padding = properties.padding ?? true;
+  }
+
+  private installLifecycleLogger(): void {
+    const logger = inject(Logger);
+    logger.debug(() => `Constructing MicrofrontendHostDialog [dialogId=${this._dialog.id}]`, LoggerNames.LIFECYCLE);
+    inject(DestroyRef).onDestroy(() => logger.debug(() => `Destroying MicrofrontendHostDialog [dialogId=${this._dialog.id}]`, LoggerNames.LIFECYCLE));
   }
 }

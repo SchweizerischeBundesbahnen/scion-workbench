@@ -10,7 +10,7 @@
 
 import {CanMatchFn, Params, Route} from '@angular/router';
 import {WorkbenchViewCapability} from '@scion/workbench-client';
-import {EnvironmentProviders, inject, makeEnvironmentProviders, runInInjectionContext, StaticProvider} from '@angular/core';
+import {EnvironmentProviders, inject, makeEnvironmentProviders, Provider} from '@angular/core';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {ViewId} from '../../workbench.identifiers';
 import {MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
@@ -23,7 +23,7 @@ import {WORKBENCH_OUTLET} from '../../routing/workbench-auxiliary-route-installe
 import {MicrofrontendHostComponent} from '../microfrontend-host/microfrontend-host.component';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {MicrofrontendHostView} from '../microfrontend-host-view/microfrontend-host-view.model';
-import {ActivatedMicrofrontend} from '../microfrontend-host/microfrontend-host.model';
+import {ACTIVATED_MICROFRONTEND_FACTORY} from '../microfrontend-host/microfrontend-host.model';
 import {Microfrontends} from '../common/microfrontend.util';
 
 /**
@@ -114,13 +114,9 @@ function canMatchMicrofrontendView(matcher: {host: boolean}): CanMatchFn {
 /**
  * Provides {@link ActivatedMicrofrontend} for injection in the host microfrontend.
  */
-function provideActivatedMicrofrontend(): StaticProvider {
+function provideActivatedMicrofrontend(): Provider {
   return {
-    provide: ActivatedMicrofrontend,
-    useFactory: () => {
-      const view = inject(WorkbenchViewRegistry).get(inject(WORKBENCH_OUTLET) as ViewId);
-      // Create in view's injection context to bind 'MicrofrontendView' to the view's lifecycle.
-      return runInInjectionContext(view.injector, () => new MicrofrontendHostView(view));
-    },
+    provide: ACTIVATED_MICROFRONTEND_FACTORY,
+    useValue: () => new MicrofrontendHostView(inject(WorkbenchViewRegistry).get(inject(WORKBENCH_OUTLET) as ViewId)),
   };
 }

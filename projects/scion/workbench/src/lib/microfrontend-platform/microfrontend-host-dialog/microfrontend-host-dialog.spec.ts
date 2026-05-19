@@ -20,6 +20,10 @@ import {expect} from '../../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchDialogService} from '@scion/workbench-client';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {canMatchWorkbenchDialogCapability} from '../microfrontend-host/microfrontend-host-routes';
+import {WorkbenchDialogRegistry} from '../../dialog/workbench-dialog.registry';
+import {LogLevel} from '../../logging/logging.model';
+import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog.model';
+import {throwError} from '../../common/throw-error.util';
 
 describe('Microfrontend Host Dialog', () => {
 
@@ -201,7 +205,55 @@ describe('Microfrontend Host Dialog', () => {
     expect(fixture.debugElement.parent).toShow(SpecViewComponent);
     expect(fixture.debugElement.parent).toShow(SpecDialog1Component);
   });
+
+  it('should destroy host dialog when closing dialog', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          logging: {logLevel: LogLevel.DEBUG},
+          microfrontendPlatform: {
+            host: {
+              manifest: {
+                name: 'Host',
+                capabilities: [
+                  {
+                    type: WorkbenchCapabilities.Dialog,
+                    qualifier: {component: 'dialog'},
+                    properties: {
+                      path: '',
+                    },
+                  } satisfies WorkbenchDialogCapability,
+                ],
+              },
+            },
+            applications: [],
+          },
+        }),
+        provideRouter([
+          {path: '', canMatch: [canMatchWorkbenchDialogCapability({component: 'dialog'})], component: SpecDialog1Component},
+        ]),
+      ],
+    });
+
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+    spyOn(console, 'debug').and.callThrough();
+
+    void TestBed.inject(WorkbenchDialogService).open({component: 'dialog'}, {cssClass: 'testee'});
+    await waitUntilStable();
+
+    const dialog = getDialog({cssClass: 'testee'});
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining(`Constructing MicrofrontendHostDialog [dialogId=${dialog.id}]`));
+
+    dialog.close();
+    await waitUntilStable();
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining(`Destroying MicrofrontendHostDialog [dialogId=${dialog.id}]`));
+  });
 });
+
+function getDialog(locator: {cssClass: string}): ɵWorkbenchDialog {
+  return TestBed.inject(WorkbenchDialogRegistry).elements().find(dialog => dialog.cssClass().includes(locator.cssClass)) ?? throwError('[NullDialogError]');
+}
 
 @Component({
   selector: 'spec-dialog-1',

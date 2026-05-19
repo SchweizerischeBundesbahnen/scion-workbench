@@ -20,6 +20,10 @@ import {expect} from '../../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchCapabilities, WorkbenchMessageBoxCapability, WorkbenchMessageBoxService} from '@scion/workbench-client';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {canMatchWorkbenchMessageBoxCapability} from '../microfrontend-host/microfrontend-host-routes';
+import {WorkbenchDialogRegistry} from '../../dialog/workbench-dialog.registry';
+import {LogLevel} from '../../logging/logging.model';
+import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog.model';
+import {throwError} from '../../common/throw-error.util';
 
 describe('Microfrontend Host Message Box', () => {
 
@@ -201,7 +205,55 @@ describe('Microfrontend Host Message Box', () => {
     expect(fixture.debugElement.parent).toShow(SpecViewComponent);
     expect(fixture.debugElement.parent).toShow(SpecMessageBox1Component);
   });
+
+  it('should destroy host message box when closing', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          logging: {logLevel: LogLevel.DEBUG},
+          microfrontendPlatform: {
+            host: {
+              manifest: {
+                name: 'Host',
+                capabilities: [
+                  {
+                    type: WorkbenchCapabilities.MessageBox,
+                    qualifier: {component: 'message-box'},
+                    properties: {
+                      path: '',
+                    },
+                  } satisfies WorkbenchMessageBoxCapability,
+                ],
+              },
+            },
+            applications: [],
+          },
+        }),
+        provideRouter([
+          {path: '', canMatch: [canMatchWorkbenchMessageBoxCapability({component: 'message-box'})], component: SpecMessageBox1Component},
+        ]),
+      ],
+    });
+
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+    spyOn(console, 'debug').and.callThrough();
+
+    void TestBed.inject(WorkbenchMessageBoxService).open({component: 'message-box'}, {cssClass: 'testee'});
+    await waitUntilStable();
+
+    const dialog = getDialog({cssClass: 'testee'});
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining(`Constructing MicrofrontendHostMessageBox [dialogId=${dialog.id}]`));
+
+    dialog.close('ok');
+    await waitUntilStable();
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining(`Destroying MicrofrontendHostMessageBox [dialogId=${dialog.id}]`));
+  });
 });
+
+function getDialog(locator: {cssClass: string}): ɵWorkbenchDialog {
+  return TestBed.inject(WorkbenchDialogRegistry).elements().find(dialog => dialog.cssClass().includes(locator.cssClass)) ?? throwError('[NullDialogError]');
+}
 
 @Component({
   selector: 'spec-message-box-1',

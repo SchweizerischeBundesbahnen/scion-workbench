@@ -9,7 +9,7 @@
  */
 
 import {ActivatedMicrofrontend} from '../microfrontend-host/microfrontend-host.model';
-import {computed, effect, inject, Injector, linkedSignal, Signal, untracked} from '@angular/core';
+import {computed, DestroyRef, effect, inject, Injector, linkedSignal, Signal, untracked} from '@angular/core';
 import {WorkbenchViewCapability} from '@scion/workbench-client';
 import {MicrofrontendViewNavigationData} from '../microfrontend-view/microfrontend-view-navigation-data';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
@@ -18,6 +18,7 @@ import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provid
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {throwError} from '../../common/throw-error.util';
 import {Routing} from '../../routing/routing.util';
+import {Logger, LoggerNames} from '../../logging';
 
 /** @inheritDoc */
 export class MicrofrontendHostView implements ActivatedMicrofrontend {
@@ -26,26 +27,27 @@ export class MicrofrontendHostView implements ActivatedMicrofrontend {
   public readonly params: Signal<Map<string, unknown>>;
   public readonly referrer: Signal<string>;
 
-  constructor(view: ɵWorkbenchView) {
-    const navigationData = computed(() => view.navigation()!.data as unknown as MicrofrontendViewNavigationData);
+  constructor(private _view: ɵWorkbenchView) {
+    const navigationData = computed(() => this._view.navigation()!.data as unknown as MicrofrontendViewNavigationData);
     this.capability = this.trackViewCapability(navigationData);
     this.params = computed(() => Maps.coerce(navigationData().params));
     this.referrer = computed(() => navigationData().referrer);
-    this.setViewProperties(view);
+    this.setViewProperties();
     this.runCanMatchGuardsIfCapabilityNotFound(navigationData);
+    this.installLifecycleLogger();
   }
 
-  private setViewProperties(view: ɵWorkbenchView): void {
+  private setViewProperties(): void {
     // Unset view state on capability change.
     effect(() => {
       const capability = this.capability();
 
       untracked(() => {
-        view.title = null;
-        view.heading = null;
-        view.classList.application = capability.properties.cssClass;
-        view.closable = capability.properties.closable ?? true;
-        view.dirty = false;
+        this._view.title = null;
+        this._view.heading = null;
+        this._view.classList.application = capability.properties.cssClass;
+        this._view.closable = capability.properties.closable ?? true;
+        this._view.dirty = false;
       });
     });
 
@@ -57,11 +59,11 @@ export class MicrofrontendHostView implements ActivatedMicrofrontend {
       untracked(() => {
         // Compute title, if configured.
         if (capability.properties.title) {
-          view.title = createRemoteTranslatable(capability.properties.title, {appSymbolicName: capability.metadata!.appSymbolicName, valueParams: params, topicParams: capability.properties.resolve});
+          this._view.title = createRemoteTranslatable(capability.properties.title, {appSymbolicName: capability.metadata!.appSymbolicName, valueParams: params, topicParams: capability.properties.resolve});
         }
         // Compute heading, if configured.
         if (capability.properties.heading) {
-          view.heading = createRemoteTranslatable(capability.properties.heading, {appSymbolicName: capability.metadata!.appSymbolicName, valueParams: params, topicParams: capability.properties.resolve});
+          this._view.heading = createRemoteTranslatable(capability.properties.heading, {appSymbolicName: capability.metadata!.appSymbolicName, valueParams: params, topicParams: capability.properties.resolve});
         }
       });
     });
@@ -95,5 +97,11 @@ export class MicrofrontendHostView implements ActivatedMicrofrontend {
         untracked(() => void Routing.runCanMatchGuards({injector}));
       }
     });
+  }
+
+  private installLifecycleLogger(): void {
+    const logger = inject(Logger);
+    logger.debug(() => `Constructing MicrofrontendHostView [viewId=${this._view.id}, capabilityId=${this.capability().metadata!.id}]`, LoggerNames.LIFECYCLE);
+    inject(DestroyRef).onDestroy(() => logger.debug(() => `Destroying MicrofrontendHostView [viewId=${this._view.id}, capabilityId=${this.capability().metadata!.id}]`, LoggerNames.LIFECYCLE));
   }
 }

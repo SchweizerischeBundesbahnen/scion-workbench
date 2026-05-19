@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, Injectable, runInInjectionContext, StaticProvider} from '@angular/core';
+import {inject, Injectable, Provider} from '@angular/core';
 import {Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchMessageBoxCapability, ɵWorkbenchMessageBoxCommand} from '@scion/workbench-client';
 import {Logger, LoggerNames} from '../../logging';
@@ -21,7 +21,7 @@ import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provid
 import {MicrofrontendHostComponent} from '../microfrontend-host/microfrontend-host.component';
 import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog.model';
 import {MicrofrontendHostMessageBox} from '../microfrontend-host-message-box/microfrontend-host-message-box.model';
-import {ActivatedMicrofrontend} from '../microfrontend-host/microfrontend-host.model';
+import {ACTIVATED_MICROFRONTEND_FACTORY} from '../microfrontend-host/microfrontend-host.model';
 import {prune} from '../../common/prune.util';
 import {Microfrontends} from '../common/microfrontend.util';
 
@@ -97,13 +97,9 @@ export class MicrofrontendMessageBoxIntentHandler implements IntentInterceptor {
 /**
  * Provides {@link ActivatedMicrofrontend} for injection in the host microfrontend.
  */
-function provideActivatedMicrofrontend(capability: WorkbenchMessageBoxCapability, params: Map<string, unknown>, referrer: string): StaticProvider {
+function provideActivatedMicrofrontend(capability: WorkbenchMessageBoxCapability, params: Map<string, unknown>, referrer: string): Provider {
   return {
-    provide: ActivatedMicrofrontend,
-    useFactory: () => {
-      const dialog = inject(ɵWorkbenchDialog);
-      // Create in dialog's injection context to bind 'MicrofrontendMessageBox' to the dialog's lifecycle.
-      return runInInjectionContext(dialog.injector, () => new MicrofrontendHostMessageBox(dialog, capability, params, referrer));
-    },
+    provide: ACTIVATED_MICROFRONTEND_FACTORY,
+    useValue: () => new MicrofrontendHostMessageBox(inject(ɵWorkbenchDialog), capability, params, referrer),
   };
 }

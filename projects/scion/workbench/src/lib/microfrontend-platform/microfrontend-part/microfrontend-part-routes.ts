@@ -9,7 +9,7 @@
  */
 
 import {CanMatchFn, Route} from '@angular/router';
-import {EnvironmentProviders, inject, makeEnvironmentProviders, runInInjectionContext, StaticProvider} from '@angular/core';
+import {EnvironmentProviders, inject, makeEnvironmentProviders, Provider} from '@angular/core';
 import {MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
 import {MicrofrontendPartNavigationData} from './microfrontend-part-navigation-data';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
@@ -22,7 +22,7 @@ import {PartId} from '../../workbench.identifiers';
 import {WorkbenchPartRegistry} from '../../part/workbench-part.registry';
 import {MicrofrontendHostComponent} from '../microfrontend-host/microfrontend-host.component';
 import {MicrofrontendHostPart} from '../microfrontend-host-part/microfrontend-host-part.model';
-import {ActivatedMicrofrontend} from '../microfrontend-host/microfrontend-host.model';
+import {ACTIVATED_MICROFRONTEND_FACTORY} from '../microfrontend-host/microfrontend-host.model';
 import {Microfrontends} from '../common/microfrontend.util';
 
 /**
@@ -91,13 +91,9 @@ function canMatchMicrofrontendPart(matcher: {host: boolean}): CanMatchFn {
 /**
  * Provides {@link ActivatedMicrofrontend} for injection in the host microfrontend.
  */
-function provideActivatedMicrofrontend(): StaticProvider {
+function provideActivatedMicrofrontend(): Provider {
   return {
-    provide: ActivatedMicrofrontend,
-    useFactory: () => {
-      const part = inject(WorkbenchPartRegistry).get(inject(WORKBENCH_OUTLET) as PartId);
-      // Create in part's injection context to bind 'MicrofrontendPart' to the part's lifecycle.
-      return runInInjectionContext(part.injector, () => new MicrofrontendHostPart(part));
-    },
+    provide: ACTIVATED_MICROFRONTEND_FACTORY,
+    useValue: () => new MicrofrontendHostPart(inject(WorkbenchPartRegistry).get(inject(WORKBENCH_OUTLET) as PartId)),
   };
 }
