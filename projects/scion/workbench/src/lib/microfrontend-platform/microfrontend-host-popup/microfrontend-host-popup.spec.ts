@@ -20,6 +20,10 @@ import {WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchPopupService} 
 import {toShowCustomMatcher} from '../../testing/jasmine/matcher/to-show.matcher';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {canMatchWorkbenchPopupCapability} from '../microfrontend-host/microfrontend-host-routes';
+import {LogLevel} from '../../logging/logging.model';
+import {WorkbenchPopupRegistry} from '../../popup/workbench-popup.registry';
+import {WorkbenchPopup} from '../../popup/workbench-popup.model';
+import {throwError} from '../../common/throw-error.util';
 
 describe('Microfrontend Host Popup', () => {
 
@@ -201,7 +205,60 @@ describe('Microfrontend Host Popup', () => {
     expect(fixture.debugElement.parent).toShow(SpecViewComponent);
     expect(fixture.debugElement.parent).toShow(SpecPopup1Component);
   });
+
+  it('should destroy host popup when closing popup', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          logging: {logLevel: LogLevel.DEBUG},
+          microfrontendPlatform: {
+            host: {
+              manifest: {
+                name: 'Host',
+                capabilities: [
+                  {
+                    type: WorkbenchCapabilities.Popup,
+                    qualifier: {component: 'popup'},
+                    properties: {
+                      path: '',
+                    },
+                  } satisfies WorkbenchPopupCapability,
+                ],
+              },
+            },
+            applications: [],
+          },
+        }),
+        provideRouter([
+          {
+            path: '',
+            canMatch: [canMatchWorkbenchPopupCapability({component: 'popup'})],
+            component: SpecPopup1Component,
+          },
+          {path: 'path/to/view', component: SpecViewComponent},
+        ]),
+      ],
+    });
+
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+    spyOn(console, 'debug').and.callThrough();
+
+    void TestBed.inject(WorkbenchPopupService).open({component: 'popup'}, {anchor: {top: 0, left: 0}, cssClass: 'testee'});
+    await waitUntilStable();
+
+    const popup = getPopup({cssClass: 'testee'});
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining(`Constructing MicrofrontendHostPopup [popupId=${popup.id}]`));
+
+    popup.close();
+    await waitUntilStable();
+    expect(console.debug).toHaveBeenCalledWith(jasmine.stringContaining(`Destroying MicrofrontendHostPopup [popupId=${popup.id}]`));
+  });
 });
+
+function getPopup(locator: {cssClass: string}): WorkbenchPopup {
+  return TestBed.inject(WorkbenchPopupRegistry).elements().find(popup => popup.cssClass().includes(locator.cssClass)) ?? throwError('[NullPopupError]');
+}
 
 @Component({
   selector: 'spec-popup-1',

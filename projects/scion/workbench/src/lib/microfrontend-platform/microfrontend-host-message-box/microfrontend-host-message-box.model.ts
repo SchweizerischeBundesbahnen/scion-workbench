@@ -9,9 +9,10 @@
  */
 
 import {ActivatedMicrofrontend} from '../microfrontend-host/microfrontend-host.model';
-import {signal, Signal} from '@angular/core';
+import {DestroyRef, inject, signal, Signal} from '@angular/core';
 import {WorkbenchMessageBoxCapability} from '@scion/workbench-client';
 import {WorkbenchDialog} from '../../dialog/workbench-dialog.model';
+import {Logger, LoggerNames} from '../../logging';
 
 /** @inheritDoc */
 export class MicrofrontendHostMessageBox implements ActivatedMicrofrontend {
@@ -25,6 +26,7 @@ export class MicrofrontendHostMessageBox implements ActivatedMicrofrontend {
     this.params = signal(params).asReadonly();
     this.referrer = signal(referrer).asReadonly();
     this.setMessageBoxProperties();
+    this.installLifecycleLogger();
   }
 
   private setMessageBoxProperties(): void {
@@ -36,5 +38,11 @@ export class MicrofrontendHostMessageBox implements ActivatedMicrofrontend {
     this._dialog.size.maxWidth = properties.size?.maxWidth;
     this._dialog.size.minHeight = properties.size?.minHeight;
     this._dialog.size.maxHeight = properties.size?.maxHeight;
+  }
+
+  private installLifecycleLogger(): void {
+    const logger = inject(Logger);
+    logger.debug(() => `Constructing MicrofrontendHostMessageBox [dialogId=${this._dialog.id}]`, LoggerNames.LIFECYCLE);
+    inject(DestroyRef).onDestroy(() => logger.debug(() => `Destroying MicrofrontendHostMessageBox [dialogId=${this._dialog.id}]`, LoggerNames.LIFECYCLE));
   }
 }

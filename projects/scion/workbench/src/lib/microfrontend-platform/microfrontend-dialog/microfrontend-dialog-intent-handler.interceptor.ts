@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, Injectable, runInInjectionContext, StaticProvider} from '@angular/core';
+import {inject, Injectable, Provider} from '@angular/core';
 import {Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchDialogCapability, ɵWorkbenchDialogCommand} from '@scion/workbench-client';
 import {Logger, LoggerNames} from '../../logging';
@@ -17,7 +17,7 @@ import {stringifyError} from '../../common/stringify-error.util';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchDialogService} from '../../dialog/workbench-dialog.service';
 import {MicrofrontendDialogComponent} from './microfrontend-dialog.component';
-import {ActivatedMicrofrontend} from '../microfrontend-host/microfrontend-host.model';
+import {ACTIVATED_MICROFRONTEND_FACTORY} from '../microfrontend-host/microfrontend-host.model';
 import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog.model';
 import {MicrofrontendHostDialog} from '../microfrontend-host-dialog/microfrontend-host-dialog.model';
 import {MicrofrontendHostComponent} from '../microfrontend-host/microfrontend-host.component';
@@ -93,13 +93,9 @@ export class MicrofrontendDialogIntentHandler implements IntentInterceptor {
 /**
  * Provides {@link ActivatedMicrofrontend} for injection in the host microfrontend.
  */
-function provideActivatedMicrofrontend(capability: WorkbenchDialogCapability, params: Map<string, unknown>, referrer: string): StaticProvider {
+function provideActivatedMicrofrontend(capability: WorkbenchDialogCapability, params: Map<string, unknown>, referrer: string): Provider {
   return {
-    provide: ActivatedMicrofrontend,
-    useFactory: () => {
-      const dialog = inject(ɵWorkbenchDialog);
-      // Create in dialog's injection context to bind 'MicrofrontendDialog' to the dialog's lifecycle.
-      return runInInjectionContext(dialog.injector, () => new MicrofrontendHostDialog(dialog, capability, params, referrer));
-    },
+    provide: ACTIVATED_MICROFRONTEND_FACTORY,
+    useValue: () => new MicrofrontendHostDialog(inject(ɵWorkbenchDialog), capability, params, referrer),
   };
 }

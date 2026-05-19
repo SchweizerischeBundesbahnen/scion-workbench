@@ -9,9 +9,10 @@
  */
 
 import {ActivatedMicrofrontend} from '../microfrontend-host/microfrontend-host.model';
-import {signal, Signal} from '@angular/core';
+import {DestroyRef, inject, signal, Signal} from '@angular/core';
 import {WorkbenchNotificationCapability} from '@scion/workbench-client';
 import {WorkbenchNotification} from '../../notification/workbench-notification.model';
+import {Logger, LoggerNames} from '../../logging';
 
 /** @inheritDoc */
 export class MicrofrontendHostNotification implements ActivatedMicrofrontend {
@@ -25,6 +26,7 @@ export class MicrofrontendHostNotification implements ActivatedMicrofrontend {
     this.params = signal(params).asReadonly();
     this.referrer = signal(referrer).asReadonly();
     this.setNotificationProperties();
+    this.installLifecycleLogger();
   }
 
   private setNotificationProperties(): void {
@@ -32,5 +34,11 @@ export class MicrofrontendHostNotification implements ActivatedMicrofrontend {
     this._notification.size.height = properties.size?.height;
     this._notification.size.minHeight = properties.size?.minHeight;
     this._notification.size.maxHeight = properties.size?.maxHeight;
+  }
+
+  private installLifecycleLogger(): void {
+    const logger = inject(Logger);
+    logger.debug(() => `Constructing MicrofrontendHostNotification [notificationId=${this._notification.id}]`, LoggerNames.LIFECYCLE);
+    inject(DestroyRef).onDestroy(() => logger.debug(() => `Destroying MicrofrontendHostNotification [notificationId=${this._notification.id}]`, LoggerNames.LIFECYCLE));
   }
 }

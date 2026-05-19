@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, Injectable, InjectionToken, runInInjectionContext, StaticProvider} from '@angular/core';
+import {inject, Injectable, InjectionToken, Provider} from '@angular/core';
 import {Handler, IntentInterceptor, IntentMessage, mapToBody, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchPopupReferrer, ɵWorkbenchCommands, ɵWorkbenchPopupCommand} from '@scion/workbench-client';
 import {MicrofrontendPopupComponent} from './microfrontend-popup.component';
@@ -27,7 +27,7 @@ import {MicrofrontendViewNavigationData} from '../microfrontend-view/microfronte
 import {MicrofrontendHostComponent} from '../microfrontend-host/microfrontend-host.component';
 import {ɵWorkbenchPopup} from '../../popup/ɵworkbench-popup.model';
 import {MicrofrontendHostPopup} from '../microfrontend-host-popup/microfrontend-host-popup.model';
-import {ActivatedMicrofrontend} from '../microfrontend-host/microfrontend-host.model';
+import {ACTIVATED_MICROFRONTEND_FACTORY} from '../microfrontend-host/microfrontend-host.model';
 import {Microfrontends} from '../common/microfrontend.util';
 
 /**
@@ -149,14 +149,10 @@ export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
 /**
  * Provides {@link ActivatedMicrofrontend} for injection in the host microfrontend.
  */
-function provideActivatedMicrofrontend(capability: WorkbenchPopupCapability, params: Map<string, unknown>, referrer: string): StaticProvider {
+function provideActivatedMicrofrontend(capability: WorkbenchPopupCapability, params: Map<string, unknown>, referrer: string): Provider {
   return {
-    provide: ActivatedMicrofrontend,
-    useFactory: () => {
-      const popup = inject(ɵWorkbenchPopup);
-      // Create in popup's injection context to bind 'MicrofrontendPopup' to the popup's lifecycle.
-      return runInInjectionContext(popup.injector, () => new MicrofrontendHostPopup(popup, capability, params, referrer));
-    },
+    provide: ACTIVATED_MICROFRONTEND_FACTORY,
+    useValue: () => new MicrofrontendHostPopup(inject(ɵWorkbenchPopup), capability, params, referrer),
   };
 }
 

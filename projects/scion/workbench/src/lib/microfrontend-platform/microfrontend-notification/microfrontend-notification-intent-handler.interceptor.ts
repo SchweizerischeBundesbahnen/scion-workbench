@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, Injectable, runInInjectionContext, StaticProvider} from '@angular/core';
+import {inject, Injectable, Provider} from '@angular/core';
 import {Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {eNOTIFICATION_MESSAGE_PARAM, WorkbenchCapabilities, WorkbenchNotificationCapability, WorkbenchNotificationConfig, ɵWorkbenchNotificationCommand} from '@scion/workbench-client';
 import {Logger, LoggerNames} from '../../logging';
@@ -17,7 +17,7 @@ import {Arrays} from '@scion/toolkit/util';
 import {MicrofrontendNotificationComponent} from './microfrontend-notification.component';
 import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provider';
 import {MicrofrontendHostComponent} from '../microfrontend-host/microfrontend-host.component';
-import {ActivatedMicrofrontend} from '../microfrontend-host/microfrontend-host.model';
+import {ACTIVATED_MICROFRONTEND_FACTORY} from '../microfrontend-host/microfrontend-host.model';
 import {prune} from '../../common/prune.util';
 import {Microfrontends} from '../common/microfrontend.util';
 import {WorkbenchNotificationService} from '../../notification/workbench-notification.service';
@@ -112,14 +112,13 @@ function isLegacyTextNotification(capability: WorkbenchNotificationCapability, i
 /**
  * Provides {@link ActivatedMicrofrontend} for injection in the host microfrontend.
  */
-function provideActivatedMicrofrontend(capability: WorkbenchNotificationCapability, params: Map<string, unknown>, referrer: string): StaticProvider {
+function provideActivatedMicrofrontend(capability: WorkbenchNotificationCapability, params: Map<string, unknown>, referrer: string): Provider {
   return {
-    provide: ActivatedMicrofrontend,
-    useFactory: () => {
+    provide: ACTIVATED_MICROFRONTEND_FACTORY,
+    useValue: () => {
       const notification = inject(ɵWorkbenchNotification);
       const reducedParams = notification.inputs?.['params'] as Map<string, unknown> | undefined;
-      // Create in notification's injection context to bind 'MicrofrontendNotification' to the notification's lifecycle.
-      return runInInjectionContext(notification.injector, () => new MicrofrontendHostNotification(notification, capability, reducedParams ?? params, referrer));
+      return new MicrofrontendHostNotification(notification, capability, reducedParams ?? params, referrer);
     },
   };
 }

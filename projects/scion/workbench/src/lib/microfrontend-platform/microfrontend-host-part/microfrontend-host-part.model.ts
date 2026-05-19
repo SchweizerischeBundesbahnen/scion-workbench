@@ -9,7 +9,7 @@
  */
 
 import {ActivatedMicrofrontend} from '../microfrontend-host/microfrontend-host.model';
-import {computed, effect, inject, Injector, linkedSignal, Signal, untracked} from '@angular/core';
+import {computed, DestroyRef, effect, inject, Injector, linkedSignal, Signal, untracked} from '@angular/core';
 import {WorkbenchPartCapability} from '@scion/workbench-client';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {throwError} from '../../common/throw-error.util';
@@ -17,6 +17,7 @@ import {Maps} from '@scion/toolkit/util';
 import {ɵWorkbenchPart} from '../../part/ɵworkbench-part.model';
 import {MicrofrontendPartNavigationData} from '../microfrontend-part/microfrontend-part-navigation-data';
 import {Routing} from '../../routing/routing.util';
+import {Logger, LoggerNames} from '../../logging';
 
 /** @inheritDoc */
 export class MicrofrontendHostPart implements ActivatedMicrofrontend {
@@ -25,12 +26,13 @@ export class MicrofrontendHostPart implements ActivatedMicrofrontend {
   public readonly params: Signal<Map<string, unknown>>;
   public readonly referrer: Signal<string>;
 
-  constructor(part: ɵWorkbenchPart) {
-    const navigationData = computed(() => part.navigation()!.data as unknown as MicrofrontendPartNavigationData);
+  constructor(private _part: ɵWorkbenchPart) {
+    const navigationData = computed(() => this._part.navigation()!.data as unknown as MicrofrontendPartNavigationData);
     this.capability = this.trackPartCapability(navigationData);
     this.params = computed(() => Maps.coerce(navigationData().params));
     this.referrer = computed(() => navigationData().referrer);
     this.runCanMatchGuardsIfCapabilityNotFound(navigationData);
+    this.installLifecycleLogger();
   }
 
   private trackPartCapability(navigationData: Signal<MicrofrontendPartNavigationData>): Signal<WorkbenchPartCapability> {
@@ -61,5 +63,11 @@ export class MicrofrontendHostPart implements ActivatedMicrofrontend {
         untracked(() => void Routing.runCanMatchGuards({injector}));
       }
     });
+  }
+
+  private installLifecycleLogger(): void {
+    const logger = inject(Logger);
+    logger.debug(() => `Constructing MicrofrontendHostPart [partId=${this._part.id}, capabilityId=${this.capability().metadata!.id}]`, LoggerNames.LIFECYCLE);
+    inject(DestroyRef).onDestroy(() => logger.debug(() => `Destroying MicrofrontendHostPart [partId=${this._part.id}, capabilityId=${this.capability().metadata!.id}]`, LoggerNames.LIFECYCLE));
   }
 }

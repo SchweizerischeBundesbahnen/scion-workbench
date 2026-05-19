@@ -14,7 +14,7 @@ import {rootEffect} from '../../common/rxjs-interop.util';
 import {RouterOutlet} from '@angular/router';
 import {RouterOutletRootContextDirective} from '../../routing/router-outlet-root-context.directive';
 import {WorkbenchAuxiliaryRouteInstaller} from '../../routing/workbench-auxiliary-route-installer.service';
-import {ActivatedMicrofrontend} from './microfrontend-host.model';
+import {ACTIVATED_MICROFRONTEND_FACTORY, ActivatedMicrofrontend} from './microfrontend-host.model';
 import {Routing} from '../../routing/routing.util';
 import {WORKBENCH_ELEMENT} from '../../workbench-element-references';
 import {MicrofrontendHostOutlet} from './microfrontend-host-routes';
@@ -36,9 +36,10 @@ import {MicrofrontendHostOutlet} from './microfrontend-host-routes';
     '[attr.data-focus]': `workbenchElement.focused() ? '' : null`,
   },
   providers: [
-    // Provide `ActivatedMicrofrontend` for DI in router outlet. Otherwise, `ActivatedMicrofrontend` would not be available, most likely because provided on the route level.
-    // TODO [Angular 22] Check if still required. If not, remove this TODO.
-    {provide: ActivatedMicrofrontend, useFactory: () => inject(ActivatedMicrofrontend, {skipSelf: true})},
+    {
+      provide: ActivatedMicrofrontend,
+      useFactory: () => inject(ACTIVATED_MICROFRONTEND_FACTORY)(),
+    },
   ],
 })
 export class MicrofrontendHostComponent {
