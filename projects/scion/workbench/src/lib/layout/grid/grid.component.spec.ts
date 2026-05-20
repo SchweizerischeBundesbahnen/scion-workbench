@@ -3285,7 +3285,6 @@ describe('WorkbenchLayout Component', () => {
 
     // Wait until entering 'CanActivate' guard.
     await firstValueFrom(onCanActivate$);
-    await waitUntilStable();
 
     // Expect part handle to still have previous state.
     expect(TestBed.inject(WorkbenchService).getPart('part.initial')!.activeView()!.id).toEqual('view.101');

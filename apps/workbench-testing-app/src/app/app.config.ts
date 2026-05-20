@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationConfig, EnvironmentProviders, inject, makeEnvironmentProviders, provideZoneChangeDetection} from '@angular/core';
+import {ApplicationConfig, EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
 import {PreloadAllModules, provideRouter, withComponentInputBinding, withHashLocation, withPreloading} from '@angular/router';
 import {routes} from './app.routes';
 import {workbenchConfig} from './workbench.config';
@@ -48,7 +48,6 @@ export const appConfig: ApplicationConfig = {
     provideWorkbenchInitializer(() => void inject(ActiveWorkbenchElementCollector)),
     provideAnimationsIfEnabled(),
     provideValueFromStorage(),
-    provideZoneChangeDetection(),
   ],
 };
 

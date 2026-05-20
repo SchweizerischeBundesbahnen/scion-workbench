@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {WorkbenchPart} from '@scion/workbench-client';
 import {JsonPipe, Location} from '@angular/common';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -38,6 +38,11 @@ import {ActivatedRoute} from '@angular/router';
     NullIfEmptyPipe,
     FormsModule,
   ],
+  host: {
+    '[attr.data-component-instance-id]': `uuid`,
+    '[attr.data-app-instance-id]': `appInstanceId`,
+  },
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class PartPageComponent {
 

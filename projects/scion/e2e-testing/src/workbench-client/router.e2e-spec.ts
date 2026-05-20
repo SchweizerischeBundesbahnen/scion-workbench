@@ -2681,9 +2681,6 @@ test.describe('Workbench Router', () => {
     await routerPage.view.tab.click();
     await routerPage.navigate({component: 'testee'});
 
-    // Wait for navigation to complete.
-    await appPO.waitUntilIdle();
-
     // Expect path not to change.
     await expect(testPage.location).toHaveText('/test-pages/angular-router-test-page?queryParam=testee');
   });
@@ -2726,9 +2723,6 @@ test.describe('Workbench Router', () => {
     // Navigate to test view from app2.
     const routerPage2 = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app2');
     await routerPage2.navigate({component: 'testee'});
-
-    // Wait for navigation to complete.
-    await appPO.waitUntilIdle();
 
     // Expect path not to change.
     await expect(testPage.location).toHaveText('/test-pages/angular-router-test-page?queryParam=testee');

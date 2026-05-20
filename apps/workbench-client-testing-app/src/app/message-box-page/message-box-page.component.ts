@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, inject} from '@angular/core';
 import {WorkbenchMessageBox} from '@scion/workbench-client';
 import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
@@ -48,7 +48,9 @@ import {startWith} from 'rxjs/operators';
     // If positioned absolutely (out of document flow) it can always be rendered at its preferred size
     // thus allowing it to shrink when an accordion is collapsed.
     '[style.position]': `form.controls.componentSize.controls.positionAbsolute.value ? 'absolute' : 'static'`,
+    '[attr.data-component-instance-id]': `uuid`,
   },
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class MessageBoxPageComponent {
 

@@ -66,7 +66,11 @@ export class ViewTabDragImageComponent {
    */
   protected readonly canDrop = this.computeCanDrop();
 
-  protected onClose(..._: unknown[]): void {
+  protected onClose(event: MouseEvent): void {
+    throw Error('[UnsupportedOperationError]');
+  }
+
+  protected onCloseDblClick(event: MouseEvent): void {
     throw Error('[UnsupportedOperationError]');
   }
 

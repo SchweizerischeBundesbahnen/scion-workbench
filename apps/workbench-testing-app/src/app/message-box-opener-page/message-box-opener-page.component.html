@@ -67,15 +67,15 @@
   Open message box
 </button>
 
-@if (closeAction) {
+@if (closeAction()) {
   <output class="close-action e2e-close-action">
-    {{closeAction}}
+    {{closeAction()}}
   </output>
 }
 
-@if (messageBoxError) {
-  <output class="open-error e2e-message-box-error">
-    {{messageBoxError}}
+@if (openError()) {
+  <output class="open-error e2e-open-error">
+    {{openError()}}
   </output>
 }
 

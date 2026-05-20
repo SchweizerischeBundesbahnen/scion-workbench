@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {PopupSizeDirective} from '../../popup-opener-page/popup-size.directive';
 
 /**
@@ -17,6 +17,7 @@ import {PopupSizeDirective} from '../../popup-opener-page/popup-size.directive';
 @Component({
   selector: 'app-blank-test-page',
   template: 'Blank',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [{directive: PopupSizeDirective, inputs: ['size']}],
 })
 export default class BlankTestPageComponent {

@@ -455,11 +455,14 @@ export class ViewTabBarComponent implements OnDestroy {
       const activeViewTab = untracked(() => this._viewTabs().find(viewTab => viewTab.view() === activeView))!;
 
       // Scroll the tab into view if scrolled out of view.
-      untracked(() => requestAnimationFrame(() => {
+      // Two nested animation frames are used to ensure the browser has completed layout before scrolling.
+      // A single frame is not sufficient since the icon is rendered in a `requestAnimationFrame` as well.
+      // TODO [menu]: Revisit this once the `icon.component` is moved to sci-toolkit.
+      untracked(() => requestAnimationFrame(() => requestAnimationFrame(() => {
         if (!this._viewportComponent().isElementInView(activeViewTab.host, 'full')) {
           this._viewportComponent().scrollIntoView(activeViewTab.host);
         }
-      }));
+      })));
     });
   }
 

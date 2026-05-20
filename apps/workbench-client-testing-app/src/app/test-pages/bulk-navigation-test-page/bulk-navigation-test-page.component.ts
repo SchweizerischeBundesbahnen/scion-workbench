@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {WorkbenchRouter} from '@scion/workbench-client';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
@@ -25,6 +25,7 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
     MultiValueInputComponent,
     SciKeyValueFieldComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class BulkNavigationTestPageComponent {
 

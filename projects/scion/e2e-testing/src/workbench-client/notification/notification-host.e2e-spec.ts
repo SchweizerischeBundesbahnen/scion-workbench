@@ -208,9 +208,9 @@ test.describe('Workbench Notification Host', () => {
     const notificationPage = new NotificationPagePO(appPO.notification({cssClass: 'testee'}));
     await expectNotification(notificationPage).toBeVisible();
     await expect(appPO.notifications).toHaveCount(1);
+    await expect(notificationPage.notification.locator).toContainClass('notification-4');
 
-    // Use `toPass` together with `poll` to have a stable assertion, required because the notification page may be replaced during assertion, prevening interaction with the accordion otherwise.
-    await expect(() => expect.poll(() => notificationPage.activatedMicrofrontend.getParams(), {timeout: 3_000}).toEqual({param: 'value, value, value, value, value'})).toPass();
+    await expect.poll(() => notificationPage.activatedMicrofrontend.getParams()).toEqual({param: 'value, value, value, value, value'});
   });
 
   test('should reduce the params of notifications in the same group', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
@@ -482,7 +482,7 @@ test.describe('Workbench Notification Host', () => {
     await notificationOpenerPage.show({component: 'testee'}, {cssClass: 'testee'});
 
     const notification = appPO.notification({cssClass: 'testee'});
-    await expect(notification.getSeverity()).resolves.toBe('info');
+    await expect.poll(() => notification.getSeverity()).toBe('info');
   });
 
   test('should show notification with info severity', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
@@ -507,7 +507,7 @@ test.describe('Workbench Notification Host', () => {
     await notificationOpenerPage.show({component: 'testee'}, {cssClass: 'testee', severity: 'info'});
 
     const notification = appPO.notification({cssClass: 'testee'});
-    await expect(notification.getSeverity()).resolves.toBe('info');
+    await expect.poll(() => notification.getSeverity()).toBe('info');
   });
 
   test('should show notification with warn severity', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
@@ -532,7 +532,7 @@ test.describe('Workbench Notification Host', () => {
     await notificationOpenerPage.show({component: 'testee'}, {cssClass: 'testee', severity: 'warn'});
 
     const notification = appPO.notification({cssClass: 'testee'});
-    await expect(notification.getSeverity()).resolves.toBe('warn');
+    await expect.poll(() => notification.getSeverity()).toBe('warn');
   });
 
   test('should show notification with error severity', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
@@ -557,6 +557,6 @@ test.describe('Workbench Notification Host', () => {
     await notificationOpenerPage.show({component: 'testee'}, {cssClass: 'testee', severity: 'error'});
 
     const notification = appPO.notification({cssClass: 'testee'});
-    await expect(notification.getSeverity()).resolves.toBe('error');
+    await expect.poll(() => notification.getSeverity()).toBe('error');
   });
 });

@@ -314,10 +314,11 @@ test.describe('Workbench Part Action', () => {
     await layoutPage.registerPartAction('Action', {viewId: await viewPage.view.getViewId(), cssClass: 'e2e-action'});
 
     // Drag the view
+    const navigationId = await appPO.getCurrentNavigationId();
     const dragHandle = await viewPage.view.tab.startDrag();
     await dragHandle.dragTo({deltaX: 0, deltaY: 500});
-
     await dragHandle.drop();
+    await appPO.waitForLayoutChange({navigationId});
     const newPartId = await viewPage.view.part.getPartId();
 
     // Expect action to display
@@ -336,9 +337,11 @@ test.describe('Workbench Part Action', () => {
     await layoutPage.registerPartAction('Action', {viewId: await viewPage.view.getViewId(), cssClass: 'e2e-action'});
 
     // Drag the view
+    const navigationId = await appPO.getCurrentNavigationId();
     const dragHandle = await viewPage.view.tab.startDrag();
     await dragHandle.dragTo({deltaX: 0, deltaY: 500}, {steps: 1});
     await dragHandle.drop();
+    await appPO.waitForLayoutChange({navigationId});
     const newPartId = await viewPage.view.part.getPartId();
 
     // Expect action to display

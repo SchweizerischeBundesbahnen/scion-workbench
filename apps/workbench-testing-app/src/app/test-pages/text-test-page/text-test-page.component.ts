@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {UUID} from '@scion/toolkit/uuid';
@@ -21,6 +21,7 @@ import {SESSION_STORAGE} from '../../session.storage';
   selector: 'app-text-test-page',
   templateUrl: './text-test-page.component.html',
   styleUrl: './text-test-page.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,

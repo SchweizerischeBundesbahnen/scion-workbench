@@ -10,8 +10,6 @@
 
 import {booleanAttribute, DestroyRef, Directive, inject, input, TemplateRef} from '@angular/core';
 import {ɵWorkbenchDialog} from '../ɵworkbench-dialog.model';
-import {Disposable} from '../../common/disposable';
-import {asapScheduler} from 'rxjs';
 
 /**
  * Use this directive to replace the default dialog footer that renders actions contributed via the {@link WorkbenchDialogActionDirective} directive.
@@ -35,15 +33,8 @@ export class WorkbenchDialogFooterDirective {
   public readonly divider = input(undefined, {transform: booleanAttribute});
   public readonly template = inject(TemplateRef) as TemplateRef<void>;
 
-  private _footer: Disposable | undefined;
-
   constructor() {
-    const dialog = inject(ɵWorkbenchDialog);
-
-    // Defer registering footer to avoid `ExpressionChangedAfterItHasBeenCheckedError`.
-    asapScheduler.schedule(() => this._footer = dialog.registerFooter(this));
-
-    // Defer disposing footer to avoid `ExpressionChangedAfterItHasBeenCheckedError`.
-    inject(DestroyRef).onDestroy(() => asapScheduler.schedule(() => this._footer?.dispose()));
+    const footer = inject(ɵWorkbenchDialog).registerFooter(this);
+    inject(DestroyRef).onDestroy(() => footer.dispose());
   }
 }

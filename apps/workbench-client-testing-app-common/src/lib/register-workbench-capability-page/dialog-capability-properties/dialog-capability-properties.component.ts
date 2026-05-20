@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, forwardRef, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, forwardRef, inject} from '@angular/core';
 import {AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator} from '@angular/forms';
 import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -32,6 +32,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
     {provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => DialogCapabilityPropertiesComponent)},
     {provide: NG_VALIDATORS, multi: true, useExisting: forwardRef(() => DialogCapabilityPropertiesComponent)},
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DialogCapabilityPropertiesComponent implements ControlValueAccessor, Validator {
 

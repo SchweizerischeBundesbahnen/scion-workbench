@@ -13,6 +13,7 @@ import {Locator} from '@playwright/test';
 import {WorkbenchMessageBoxPagePO} from './workbench-message-box-page.po';
 import {ActivatedMicrofrontendPO} from './activated-microfrontend.po';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
+import {waitForAttribute} from '../../helper/testing.util';
 
 /**
  * Page object to interact with {@link MessageBoxPageComponent}.
@@ -30,7 +31,7 @@ export class MessageBoxPagePO implements WorkbenchMessageBoxPagePO {
   }
 
   public getComponentInstanceId(): Promise<string> {
-    return this.locator.locator('input.e2e-component-instance-id').inputValue();
+    return waitForAttribute(this.locator, 'data-component-instance-id');
   }
 
   public async enterContentSize(size: {width?: string; height?: string}): Promise<void> {

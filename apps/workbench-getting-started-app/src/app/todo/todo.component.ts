@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input} from '@angular/core';
 import {WorkbenchView} from '@scion/workbench';
 import {TodoService} from '../todo.service';
 import {DatePipe} from '@angular/common';
@@ -10,6 +10,7 @@ import {DatePipe} from '@angular/common';
   imports: [
     DatePipe,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class TodoComponent {
 

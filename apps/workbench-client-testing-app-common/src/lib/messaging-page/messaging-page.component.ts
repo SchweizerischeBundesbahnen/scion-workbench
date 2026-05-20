@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {SciTabbarComponent, SciTabDirective} from '@scion/components.internal/tabbar';
 import {WORKBENCH_ELEMENT, WorkbenchElement} from '@scion/workbench-client';
 import {PublishMessagePageComponent} from './publish-message-page/publish-message-page.component';
@@ -25,6 +25,7 @@ import {Beans} from '@scion/toolkit/bean-manager';
     PublishMessagePageComponent,
     PublishIntentPageComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MessagingPageComponent {
 

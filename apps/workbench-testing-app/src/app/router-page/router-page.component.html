@@ -74,7 +74,7 @@
     </sci-form-field>
   </section>
 
-  <button (click)="onRouterNavigate()" class="e2e-router-navigate" [disabled]="form.invalid" sci-primary>
+  <button (click)="onRouterNavigate()" type="button" class="e2e-router-navigate" [disabled]="form.invalid" sci-primary>
     Navigate via Router
   </button>
 
@@ -91,9 +91,9 @@
     <!-- eslint-enable -->
   </ng-template>
 
-  @if (navigateError) {
+  @if (navigateError()) {
     <output class="navigate-error e2e-navigate-error">
-      {{navigateError}}
+      {{navigateError()}}
     </output>
   }
 </form>

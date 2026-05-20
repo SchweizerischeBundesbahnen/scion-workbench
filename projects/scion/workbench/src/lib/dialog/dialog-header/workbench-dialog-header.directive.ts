@@ -10,8 +10,6 @@
 
 import {booleanAttribute, DestroyRef, Directive, inject, input, TemplateRef} from '@angular/core';
 import {ɵWorkbenchDialog} from '../ɵworkbench-dialog.model';
-import {Disposable} from '../../common/disposable';
-import {asapScheduler} from 'rxjs';
 
 /**
  * Use this directive to replace the default dialog header that displays the title and a close button.
@@ -35,15 +33,8 @@ export class WorkbenchDialogHeaderDirective {
   public readonly divider = input(undefined, {transform: booleanAttribute});
   public readonly template = inject(TemplateRef) as TemplateRef<void>;
 
-  private _header: Disposable | undefined;
-
   constructor() {
-    const dialog = inject(ɵWorkbenchDialog);
-
-    // Defer registering header to avoid `ExpressionChangedAfterItHasBeenCheckedError`.
-    asapScheduler.schedule(() => this._header = dialog.registerHeader(this));
-
-    // Defer disposing header to avoid `ExpressionChangedAfterItHasBeenCheckedError`.
-    inject(DestroyRef).onDestroy(() => asapScheduler.schedule(() => this._header?.dispose()));
+    const header = inject(ɵWorkbenchDialog).registerHeader(this);
+    inject(DestroyRef).onDestroy(() => () => header.dispose());
   }
 }

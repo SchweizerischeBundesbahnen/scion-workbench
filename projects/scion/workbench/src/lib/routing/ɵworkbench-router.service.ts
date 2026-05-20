@@ -11,11 +11,10 @@
 import {NavigationExtras, Router, UrlSegment, UrlTree} from '@angular/router';
 import {WorkbenchRouter} from './workbench-router.service';
 import {Defined, Objects} from '@scion/toolkit/util';
-import {assertNotInReactiveContext, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
+import {afterNextRender, assertNotInReactiveContext, inject, Injectable, Injector, NgZone, runInInjectionContext, ɵZONELESS_ENABLED} from '@angular/core';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {MAIN_AREA_LAYOUT_QUERY_PARAM} from '../workbench.constants';
 import {ANGULAR_ROUTER_MUTEX, SingleTaskExecutor} from '../executor/single-task-executor';
-import {firstValueFrom} from 'rxjs';
 import {WorkbenchNavigationalStates} from './workbench-navigational-states';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {Routing} from './routing.util';
@@ -36,6 +35,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
   private readonly _workbenchViewRegistry = inject(WorkbenchViewRegistry);
   private readonly _injector = inject(Injector);
   private readonly _zone = inject(NgZone);
+  private readonly _zonelessEnabled = inject(ɵZONELESS_ENABLED);
   /** Mutex to serialize Workbench Router navigation requests, preventing race conditions when modifying the active workbench layout to operate on the most-recent layout. */
   private readonly _workbenchRouterMutex = new SingleTaskExecutor();
   /** Mutex to serialize Angular Router navigation requests, preventing the cancellation of previously initiated asynchronous navigations. */
@@ -61,7 +61,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
     assertNotInReactiveContext(this.navigate, 'Call WorkbenchRouter.navigate() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
     // Ensure to run in Angular zone.
-    if (!NgZone.isInAngularZone()) {
+    if (!this._zonelessEnabled && !NgZone.isInAngularZone()) {
       return this._zone.run(() => this.navigate(commandsOrNavigateFn, extras));
     }
 
@@ -103,7 +103,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
       }
 
       // Block subsequent navigation(s) until Angular has flushed the changed layout to the DOM.
-      await firstValueFrom(this._zone.onStable);
+      await new Promise<void>(resolve => afterNextRender(resolve, {injector: this._injector}));
       return newLayout;
     });
 
@@ -141,7 +141,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
     assertNotInReactiveContext(this.createUrlTree, 'Call WorkbenchRouter.createUrlTree() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
     // Ensure to run in Angular zone.
-    if (!NgZone.isInAngularZone()) {
+    if (!this._zonelessEnabled && !NgZone.isInAngularZone()) {
       return this._zone.run(() => this.createUrlTree(onNavigate, extras));
     }
 

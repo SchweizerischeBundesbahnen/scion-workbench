@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DomRect, fromRect} from '../../helper/testing.util';
+import {DomRect, fromRect, waitForAttribute} from '../../helper/testing.util';
 import {ViewPO} from '../../view.po';
 import {Params} from '@angular/router';
 import {Translatable, WorkbenchViewCapability} from '@scion/workbench-client';
@@ -19,6 +19,7 @@ import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-fie
 import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
+import {AppPO} from '../../app.po';
 
 /**
  * Page object to interact with {@link ViewPageComponent} of workbench-client testing app.
@@ -30,6 +31,7 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
   public readonly partId: Locator;
   public readonly outlet: SciRouterOutletPO;
   public readonly path: Locator;
+  private readonly _appPO: AppPO;
 
   constructor(public view: ViewPO) {
     this.outlet = new SciRouterOutletPO(view.locator.page(), {name: view.locateBy?.id, cssClass: view.locateBy?.cssClass});
@@ -37,14 +39,15 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
     this.viewId = this.locator.locator('span.e2e-view-id');
     this.partId = this.locator.locator('span.e2e-part-id');
     this.path = this.locator.locator('span.e2e-path');
+    this._appPO = new AppPO(this.locator.page());
   }
 
   public getComponentInstanceId(): Promise<string> {
-    return this.locator.locator('span.e2e-component-instance-id').innerText();
+    return waitForAttribute(this.locator, 'data-component-instance-id');
   }
 
   public getAppInstanceId(): Promise<string> {
-    return this.locator.locator('span.e2e-app-instance-id').innerText();
+    return waitForAttribute(this.locator, 'data-app-instance-id');
   }
 
   public async getViewCapability(): Promise<WorkbenchViewCapability> {
@@ -157,6 +160,7 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
       await this.locator.locator('sci-accordion.e2e-self-navigation').locator('select.e2e-param-handling').selectOption(options?.paramsHandling ?? '');
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-navigate-per-param')).toggle(options?.navigatePerParam ?? false);
       await this.locator.locator('sci-accordion.e2e-self-navigation').locator('button.e2e-navigate-self').click();
+      await this._appPO.waitUntilAngularStable();
     }
     finally {
       await accordion.collapse();

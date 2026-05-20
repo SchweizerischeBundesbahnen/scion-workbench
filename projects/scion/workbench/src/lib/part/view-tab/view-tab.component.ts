@@ -88,6 +88,13 @@ export class ViewTabComponent {
     this.closeView(event);
   }
 
+  /**
+   * Stops propagation of double click to prevent minimizing/maximizing the layout.
+   */
+  protected onCloseDblClick(event: MouseEvent): void {
+    event.stopPropagation();
+  }
+
   protected onAuxClick(event: MouseEvent): void {
     if (event.button === 1) { // primary aux button
       event.preventDefault(); // prevent user-agent default action

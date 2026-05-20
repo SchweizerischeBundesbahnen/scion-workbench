@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, forwardRef, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, forwardRef, inject} from '@angular/core';
 import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {noop} from 'rxjs';
@@ -35,6 +35,7 @@ import {UUID} from '@scion/toolkit/uuid';
     {provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => PartCapabilityPropertiesComponent)},
     {provide: NG_VALIDATORS, multi: true, useExisting: forwardRef(() => PartCapabilityPropertiesComponent)},
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PartCapabilityPropertiesComponent implements ControlValueAccessor, Validator {
 

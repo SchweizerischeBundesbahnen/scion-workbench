@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationRef, assertNotInReactiveContext, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
+import {ApplicationRef, assertNotInReactiveContext, inject, Injectable, Injector, NgZone, runInInjectionContext, ɵZONELESS_ENABLED} from '@angular/core';
 import {WorkbenchPopupRegistry} from './workbench-popup.registry';
 import {computePopupId} from '../workbench.identifiers';
 import {ɵWorkbenchPopup} from './ɵworkbench-popup.model';
@@ -25,13 +25,14 @@ export class ɵWorkbenchPopupService implements WorkbenchPopupService {
   private readonly _rootInjector = inject(ApplicationRef).injector;
   private readonly _popupRegistry = inject(WorkbenchPopupRegistry);
   private readonly _zone = inject(NgZone);
+  private readonly _zonelessEnabled = inject(ɵZONELESS_ENABLED);
 
   /** @inheritDoc */
   public async open<R>(component: ComponentType<unknown>, options: WorkbenchPopupOptions): Promise<R | undefined> {
     assertNotInReactiveContext(this.open, 'Call WorkbenchPopupService.open() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
     // Ensure to run in Angular zone to display the popup even when called from outside the Angular zone.
-    if (!NgZone.isInAngularZone()) {
+    if (!this._zonelessEnabled && !NgZone.isInAngularZone()) {
       return this._zone.run(() => this.open(component, options));
     }
 

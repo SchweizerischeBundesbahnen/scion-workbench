@@ -31,10 +31,6 @@ export class MessageBoxPagePO implements MicrofrontendMessageBoxPagePO {
     this.locator = this.outlet.frameLocator.locator('app-message-box-page');
   }
 
-  public getComponentInstanceId(): Promise<string> {
-    return this.locator.locator('input.e2e-component-instance-id').innerText();
-  }
-
   public async getMessageBoxCapability(): Promise<WorkbenchMessageBoxCapability> {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-message-box-capability'));
     await accordion.expand();

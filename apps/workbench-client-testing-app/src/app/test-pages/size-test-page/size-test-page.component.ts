@@ -8,12 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, inject, NgZone, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, inject, signal} from '@angular/core';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {map, Observable, Subject} from 'rxjs';
-import {distinctUntilChanged, startWith} from 'rxjs/operators';
+import {animationFrameScheduler, interval, map, Observable} from 'rxjs';
+import {distinctUntilChanged} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {observeIn} from '@scion/toolkit/operators';
 
 @Component({
   selector: 'app-size-test-page',
@@ -22,6 +21,7 @@ import {observeIn} from '@scion/toolkit/operators';
   imports: [
     SciViewportComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class SizeTestPageComponent {
 
@@ -45,37 +45,9 @@ export default class SizeTestPageComponent {
  * NOTE: Do not use in production code as not performant.
  */
 function boundingClientRect$(element: ElementRef<HTMLElement>): Observable<DOMRect> {
-  return onEveryAnimationFrame$()
+  return interval(0, animationFrameScheduler)
     .pipe(
       map(() => element.nativeElement.getBoundingClientRect()),
       distinctUntilChanged((a, b) => a.top === b.top && a.right === b.right && a.bottom === b.bottom && a.left === b.left),
     );
-}
-
-/**
- * Creates an observable that emits on every animation frame.
- *
- * Unlike {@link `interval(0, animationFrameScheduler)`}, the observable always emits outside the Angular zone.
- *
- * The RxJS `animationFrameScheduler` does not necessarily execute in the current execution context, such as inside or outside Angular.
- * The scheduler always executes tasks in the zone where the scheduler was first used in the application.
- */
-function onEveryAnimationFrame$(): Observable<void> {
-  const zone = inject(NgZone);
-  return new Observable<void>(observer => {
-    const animationFrame$ = new Subject<void>();
-    const subscription = animationFrame$
-      .pipe(
-        startWith(undefined as void),
-        observeIn(fn => zone.runOutsideAngular(fn)),
-      )
-      .subscribe(() => {
-        requestAnimationFrame(() => {
-          observer.next();
-          animationFrame$.next();
-        });
-      });
-
-    return () => subscription.unsubscribe();
-  });
 }

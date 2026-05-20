@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationRef, assertNotInReactiveContext, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
+import {ApplicationRef, assertNotInReactiveContext, inject, Injectable, Injector, NgZone, runInInjectionContext, ɵZONELESS_ENABLED} from '@angular/core';
 import {computeNotificationId} from '../workbench.identifiers';
 import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchNotificationService} from './workbench-notification.service';
@@ -26,13 +26,14 @@ export class ɵWorkbenchNotificationService implements WorkbenchNotificationServ
   private readonly _notificationRegistry = inject(WorkbenchNotificationRegistry);
   private readonly _mutex = new SingleTaskExecutor();
   private readonly _zone = inject(NgZone);
+  private readonly _zonelessEnabled = inject(ɵZONELESS_ENABLED);
 
   /** @inheritDoc */
   public show(message: Translatable | null | ComponentType<unknown>, options?: WorkbenchNotificationOptions): void {
     assertNotInReactiveContext(this.show, 'Call WorkbenchNotificationService.show() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
     // Ensure to run in Angular zone to show the notification even when called from outside the Angular zone.
-    if (!NgZone.isInAngularZone()) {
+    if (!this._zonelessEnabled && !NgZone.isInAngularZone()) {
       this._zone.run(() => this.show(message, options));
       return;
     }

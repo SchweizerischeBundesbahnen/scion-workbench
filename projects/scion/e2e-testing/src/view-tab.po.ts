@@ -169,13 +169,15 @@ export class ViewTabPO {
     const contextMenu = await this.openContextMenu();
     await contextMenu.menuItems.moveView.click();
 
-    const dialog = new AppPO(this.locator.page()).dialog({cssClass: 'e2e-move-view'});
+    const appPO = new AppPO(this.locator.page());
+    const dialog = appPO.dialog({cssClass: 'e2e-move-view'});
 
     const dialogPage = new ViewMoveDialogTestPagePO(dialog);
     await dialogPage.enterWorkbenchId(options?.workbenchId ?? '');
     await dialogPage.enterPartId(partId);
     await dialogPage.enterRegion(options?.region ?? '');
     await dialogPage.pressOK();
+    await appPO.waitUntilAngularStable();
   }
 
   /**
