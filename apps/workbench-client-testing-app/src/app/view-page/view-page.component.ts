@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {FormGroup, FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {CanCloseRef, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {ActivatedRoute} from '@angular/router';
@@ -45,6 +45,11 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
     SciViewportComponent,
     FormsModule,
   ],
+  host: {
+    '[attr.data-component-instance-id]': `uuid`,
+    '[attr.data-app-instance-id]': `appInstanceId`,
+  },
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class ViewPageComponent {
 

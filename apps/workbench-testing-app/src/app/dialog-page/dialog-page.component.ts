@@ -34,6 +34,7 @@ import ActivatedMicrofrontendComponent from '../activated-microfrontend/activate
   host: {
     '[style.height]': 'form.controls.componentSize.controls.height.value',
     '[style.width]': 'form.controls.componentSize.controls.width.value',
+    '[attr.data-component-instance-id]': `uuid`,
   },
 })
 export default class DialogPageComponent {

@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationRef, Component, inject, Type} from '@angular/core';
+import {ApplicationRef, ChangeDetectionStrategy, Component, inject, signal, Type} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {DialogId, PartId, PopupId, ViewId, NotificationId, WorkbenchDialogService} from '@scion/workbench';
+import {DialogId, NotificationId, PartId, PopupId, ViewId, WorkbenchDialogService} from '@scion/workbench';
 import {MultiValueInputComponent, parseTypedString, stringifyError} from 'workbench-testing-app-common';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
@@ -37,6 +37,7 @@ import WorkbenchHandleBoundsTestPageComponent from '../test-pages/workbench-hand
     MultiValueInputComponent,
   ],
   hostDirectives: [{directive: PopupSizeDirective, inputs: ['size']}],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class DialogOpenerPageComponent {
 
@@ -57,14 +58,14 @@ export default class DialogOpenerPageComponent {
     rootContext: this._formBuilder.control(false),
   });
 
-  protected dialogError: string | undefined;
-  protected returnValue: string | undefined;
+  protected readonly dialogError = signal<string | undefined>(undefined);
+  protected readonly returnValue = signal<string | undefined>(undefined);
 
   protected readonly nullList = `autocomplete-null-${UUID.randomUUID()}`;
 
   protected async onDialogOpen(): Promise<void> {
-    this.dialogError = undefined;
-    this.returnValue = undefined;
+    this.dialogError.set(undefined);
+    this.returnValue.set(undefined);
 
     const rootContext = this.form.controls.rootContext.value;
     const dialogService = rootContext ? this._appRef.injector.get(WorkbenchDialogService) : this._dialogService;
@@ -76,7 +77,7 @@ export default class DialogOpenerPageComponent {
     await Promise.all(dialogs);
   }
 
-  private openDialog(dialogService: WorkbenchDialogService, index: number): Promise<string | undefined> {
+  private openDialog(dialogService: WorkbenchDialogService, index: number): Promise<void | undefined> {
     const component = this.readComponentFromUI();
     return dialogService.open<string | undefined>(component, {
       inputs: SciKeyValueFieldComponent.toDictionary(this.form.controls.options.controls.inputs) ?? undefined,
@@ -85,8 +86,8 @@ export default class DialogOpenerPageComponent {
       animate: this.form.controls.options.controls.animate.value,
       context: parseTypedString(this.form.controls.options.controls.context.value, {undefinedIfEmpty: true}),
     })
-      .then(result => this.returnValue = result)
-      .catch((error: unknown) => this.dialogError = stringifyError(error) || 'Workbench Dialog was closed with an error');
+      .then(result => this.returnValue.set(result))
+      .catch((error: unknown) => this.dialogError.set(stringifyError(error)));
   }
 
   private readComponentFromUI(): Type<unknown> {

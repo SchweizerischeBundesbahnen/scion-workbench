@@ -46,5 +46,7 @@ export class ModifyLayoutPagePO {
       waitForCondition(async () => (await appPO.getCurrentNavigationId()) !== navigationId),
       rejectWhenAttached(this.locator.locator('output.e2e-modify-error')),
     ]);
+
+    await appPO.waitUntilAngularStable();
   }
 }

@@ -18,6 +18,7 @@ import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO, WorkbenchViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../view.po';
 import {toTypedString} from '../../helper/typed-value.util';
+import {AppPO} from '../../app.po';
 
 /**
  * Playwright's test runner fails to compile when importing runtime types from `@scion/workbench` or `@scion/microfrontend-platform`, because
@@ -115,6 +116,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     for (const [paramIndex, param] of (capability.params ?? []).entries()) {
       await paramsLocator.locator('button.e2e-add-param').click();
 
+      await new AppPO(this.locator.page()).waitUntilAngularStable();
       await paramsLocator.locator('input.e2e-name').nth(paramIndex).fill(param.name);
       await new SciCheckboxPO(paramsLocator.locator('sci-checkbox.e2e-required').nth(paramIndex)).toggle(param.required);
       await paramsLocator.locator('input.e2e-default').nth(paramIndex).fill(toTypedString(param.default, {emptyIfUndefined: true}));
@@ -150,6 +152,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     for (const [partIndex, part] of parts.entries()) {
       await this.locator.locator('button.e2e-add-part').click();
 
+      await new AppPO(this.locator.page()).waitUntilAngularStable();
       await partsLocator.locator('input.e2e-part-id').nth(partIndex).fill(part.id);
       await partsLocator.locator('input.e2e-qualifier').nth(partIndex).fill(toMatrixNotation(part.qualifier));
       await partsLocator.locator('input.e2e-params').nth(partIndex).fill(toMatrixNotation(part.params));
@@ -173,6 +176,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     for (const [partIndex, part] of parts.entries()) {
       await this.locator.locator('button.e2e-add-docked-part').click();
 
+      await new AppPO(this.locator.page()).waitUntilAngularStable();
       await partsLocator.locator('input.e2e-part-id').nth(partIndex).fill(part.id);
       await partsLocator.locator('input.e2e-qualifier').nth(partIndex).fill(toMatrixNotation(part.qualifier));
       await partsLocator.locator('input.e2e-params').nth(partIndex).fill(toMatrixNotation(part.params));
@@ -204,6 +208,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
       await this.locator.locator('button.e2e-add-view').click();
 
       const viewsLocator = this.locator.locator('section.e2e-views');
+      await new AppPO(this.locator.page()).waitUntilAngularStable();
       await viewsLocator.locator('input.e2e-qualifier').nth(viewIndex).fill(toMatrixNotation(view.qualifier));
       await viewsLocator.locator('input.e2e-params').nth(viewIndex).fill(toMatrixNotation(view.params));
       await viewsLocator.locator('input.e2e-class').nth(viewIndex).fill(coerceArray(view.cssClass).join(' '));

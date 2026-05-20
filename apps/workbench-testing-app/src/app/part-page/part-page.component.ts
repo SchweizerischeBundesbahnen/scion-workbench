@@ -42,6 +42,9 @@ import ActivatedMicrofrontendComponent from '../activated-microfrontend/activate
     MultiValueInputComponent,
     ActivatedMicrofrontendComponent,
   ],
+  host: {
+    '[attr.data-component-instance-id]': `uuid`,
+  },
 })
 export default class PartPageComponent {
 

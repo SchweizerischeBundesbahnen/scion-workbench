@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject, Signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, Signal} from '@angular/core';
 import {ActivatedMicrofrontend, CanCloseRef, WorkbenchMessageBoxService, WorkbenchPartActionDirective, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
 import {startWith} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
@@ -46,6 +46,10 @@ import ActivatedMicrofrontendComponent from '../activated-microfrontend/activate
     MultiValueInputComponent,
     ActivatedMicrofrontendComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[attr.data-component-instance-id]': `uuid`,
+  },
 })
 export default class ViewPageComponent {
 

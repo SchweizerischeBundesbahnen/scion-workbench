@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, DOCUMENT, inject, Signal, untracked} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, DOCUMENT, inject, Signal, untracked} from '@angular/core';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {WorkbenchService} from '@scion/workbench';
 
@@ -16,6 +16,7 @@ import {WorkbenchService} from '@scion/workbench';
   selector: 'app-workbench-theme-test-page',
   templateUrl: './workbench-theme-test-page.component.html',
   styleUrls: ['./workbench-theme-test-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     SciFormFieldComponent,
   ],

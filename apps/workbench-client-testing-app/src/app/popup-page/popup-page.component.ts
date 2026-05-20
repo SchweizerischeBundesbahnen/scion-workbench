@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, inject} from '@angular/core';
 import {WorkbenchPopup} from '@scion/workbench-client';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {PreferredSizeService} from '@scion/microfrontend-platform';
@@ -53,7 +53,9 @@ import {toSignal} from '@angular/core/rxjs-interop';
     '[style.max-height]': 'form.controls.componentSize.controls.maxHeight.value',
     '[style.min-width]': 'form.controls.componentSize.controls.minWidth.value',
     '[style.max-width]': 'form.controls.componentSize.controls.maxWidth.value',
+    '[attr.data-component-instance-id]': `uuid`,
   },
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class PopupPageComponent {
 

@@ -8,14 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DoCheck, DOCUMENT, inject, NgZone, Signal} from '@angular/core';
+import {afterEveryRender, Component, DoCheck, DOCUMENT, ElementRef, inject, Signal} from '@angular/core';
 import {filter, map, scan} from 'rxjs/operators';
 import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} from '@angular/router';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {WORKBENCH_ID, WorkbenchService, WorkbenchStartup} from '@scion/workbench';
 import {HeaderComponent} from './header/header.component';
 import {fromEvent} from 'rxjs';
-import {subscribeIn} from '@scion/toolkit/operators';
 import {SettingsService} from './settings.service';
 import {installFocusHighlighter} from './focus-highlight/focus-highlighter';
 import {installGlasspaneHighlighter} from './glasspane-highlight/glasspane-highlighter';
@@ -37,8 +36,8 @@ import {installMicrofrontendApplicationLabels} from './microfrontend-application
 })
 export class AppComponent implements DoCheck {
 
-  private readonly _zone = inject(NgZone);
   private readonly _logAngularChangeDetectionCycles = toSignal(inject(SettingsService).observe$('logAngularChangeDetectionCycles'));
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
 
   protected readonly workbenchStartup = inject(WorkbenchStartup);
   protected readonly activePerspective = inject(WorkbenchService).activePerspective;
@@ -56,6 +55,10 @@ export class AppComponent implements DoCheck {
     installFocusHighlighter();
     installGlasspaneHighlighter();
     installMicrofrontendApplicationLabels();
+
+    afterEveryRender(() => {
+      this._host.setAttribute('data-last-render', Date.now().toString());
+    });
   }
 
   public ngDoCheck(): void {
@@ -81,10 +84,7 @@ export class AppComponent implements DoCheck {
    */
   private installPropagatedKeyboardEventLogger(): void {
     fromEvent<KeyboardEvent>(inject(DOCUMENT), 'keydown')
-      .pipe(
-        subscribeIn(fn => this._zone.runOutsideAngular(fn)),
-        takeUntilDestroyed(),
-      )
+      .pipe(takeUntilDestroyed())
       .subscribe((event: KeyboardEvent) => {
         if (!event.isTrusted && (event.target as Element).tagName === 'SCI-ROUTER-OUTLET') {
           console.debug(`[AppComponent][synth-event][event=${event.type}][key=${event.key}][key.control=${event.ctrlKey}][key.shift=${event.shiftKey}][key.alt=${event.altKey}][key.meta=${event.metaKey}]`);

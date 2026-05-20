@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {WorkbenchRouter} from '@scion/workbench';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
@@ -18,6 +18,7 @@ import {MultiValueInputComponent} from 'workbench-testing-app-common';
   selector: 'app-bulk-navigation-test-page',
   templateUrl: './bulk-navigation-test-page.component.html',
   styleUrls: ['./bulk-navigation-test-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     SciFormFieldComponent,
     ReactiveFormsModule,

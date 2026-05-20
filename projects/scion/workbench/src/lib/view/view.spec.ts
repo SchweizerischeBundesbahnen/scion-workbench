@@ -1207,7 +1207,7 @@ describe('View', () => {
     @Component({
       selector: 'spec-view',
       template: `
-        @if (showAction) {
+        @if (showAction()) {
           <ng-template wbPartAction>
             <button class="spec-action">click</button>
           </ng-template>
@@ -1216,7 +1216,7 @@ describe('View', () => {
       imports: [WorkbenchPartActionDirective],
     })
     class SpecViewComponent {
-      public showAction = false;
+      public showAction = signal(false);
     }
 
     TestBed.configureTestingModule({
@@ -1248,8 +1248,7 @@ describe('View', () => {
 
     // Show action.
     const componentInstance = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecViewComponent>()!;
-    componentInstance.showAction = true;
-    fixture.detectChanges(); // Only trigger one change detection cycle.
+    componentInstance.showAction.set(true);
     await waitUntilStable();
 
     // Expect action to show.

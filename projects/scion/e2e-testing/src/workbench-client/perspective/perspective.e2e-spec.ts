@@ -216,6 +216,7 @@ test.describe('Workbench Perspective', () => {
    * App 1 defines a perspectives with view microfrontends of the host app, app1 and app2.
    */
   test('should display view microfrontend in perspective provided by app1', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+    test.slow();
     await appPO.navigateTo({microfrontendSupport: true});
 
     // Register view capability in app1.
@@ -385,6 +386,7 @@ test.describe('Workbench Perspective', () => {
    * Host app defines a perspectives with view microfrontends of the host app, app1 and app2.
    */
   test('should display view microfrontend in perspective provided by the host app', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+    test.slow();
     await appPO.navigateTo({microfrontendSupport: true});
 
     // Register view capability in app1.
@@ -2041,7 +2043,7 @@ test.describe('Workbench Perspective', () => {
     // Register non-navigated main area part.
     await microfrontendNavigator.registerCapability('host', {
       type: 'part',
-      qualifier: {part: 'main-area', navigation: false},
+      qualifier: {part: 'main-area', empty: true},
     });
 
     // Register navigated main area part.

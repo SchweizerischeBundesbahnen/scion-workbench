@@ -7,12 +7,12 @@
 
   <button (click)="onUnregister()" class="e2e-unregister" [disabled]="form.invalid">Unregister</button>
 
-  @if (unregisterError) {
+  @if (unregisterError()) {
     <output class="unregister-error e2e-unregister-error">
-      {{unregisterError}}
+      {{unregisterError()}}
     </output>
   }
-  @if (unregistered) {
+  @if (unregistered()) {
     <output class="unregistered e2e-unregistered"></output>
   }
 </form>

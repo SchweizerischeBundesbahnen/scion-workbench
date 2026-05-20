@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, inject, Type, viewChild} from '@angular/core';
+import {Component, ElementRef, inject, signal, Type, viewChild} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {DialogId, PartId, PopupId, NotificationId, PopupOrigin, PopupService, ViewId, WorkbenchPopupService} from '@scion/workbench';
+import {DialogId, NotificationId, PartId, PopupId, PopupOrigin, PopupService, ViewId, WorkbenchPopupService} from '@scion/workbench';
 import PopupPageComponent from '../popup-page/popup-page.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import {map, startWith, switchMap} from 'rxjs/operators';
@@ -85,14 +85,14 @@ export default class PopupOpenerPageComponent {
     legacyAPI: this._formBuilder.control(false),
   });
 
-  protected popupError: string | undefined;
-  protected returnValue: string | undefined;
+  protected popupError = signal<string | undefined>(undefined);
+  protected returnValue = signal<string | undefined>(undefined);
 
   protected readonly nullList = `autocomplete-null-${UUID.randomUUID()}`;
 
   protected async onOpen(): Promise<void> {
-    this.popupError = undefined;
-    this.returnValue = undefined;
+    this.popupError.set(undefined);
+    this.returnValue.set(undefined);
 
     if (this.form.controls.legacyAPI.value) {
       const options = this.form.controls.options.controls;
@@ -116,8 +116,8 @@ export default class PopupOpenerPageComponent {
         },
         context: parseTypedString(options.context.value, {undefinedIfEmpty: true}),
       }, {pruneIfEmpty: true})!)
-        .then(result => this.returnValue = result)
-        .catch((error: unknown) => this.popupError = stringifyError(error) || 'Workbench Popup was closed with an error');
+        .then(result => this.returnValue.set(result))
+        .catch((error: unknown) => this.popupError.set(stringifyError(error)));
     }
     else {
       const component = this.readComponentFromUI();
@@ -143,8 +143,8 @@ export default class PopupOpenerPageComponent {
         },
         context: parseTypedString(options.context.value, {undefinedIfEmpty: true}),
       }, {pruneIfEmpty: true})!)
-        .then(result => this.returnValue = result)
-        .catch((error: unknown) => this.popupError = stringifyError(error) || 'Workbench Popup was closed with an error');
+        .then(result => this.returnValue.set(result))
+        .catch((error: unknown) => this.popupError.set(stringifyError(error)));
     }
   }
 

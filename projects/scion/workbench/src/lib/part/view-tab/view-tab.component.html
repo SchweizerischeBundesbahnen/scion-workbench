@@ -18,6 +18,7 @@
 
 @if (view().closable()) {
   <button (click)="onClose($event)"
+          (dblclick)="onCloseDblClick($event)"
           [title]="('%workbench.close_tab.tooltip;close_others_modifier=Alt' | wbText)()"
           [disabled]="!view().isClosable()"
           class="close e2e-close">

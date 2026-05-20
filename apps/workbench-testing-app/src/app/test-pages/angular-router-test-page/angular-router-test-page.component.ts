@@ -8,12 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {Router} from '@angular/router';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {RouterCommandsComponent} from 'workbench-testing-app-common';
-import {stringifyError} from 'workbench-testing-app-common';
+import {RouterCommandsComponent, stringifyError} from 'workbench-testing-app-common';
 import {SettingsService} from '../../settings.service';
 import {Commands} from '@scion/workbench';
 
@@ -21,6 +20,7 @@ import {Commands} from '@scion/workbench';
   selector: 'app-angular-router-test-page',
   templateUrl: './angular-router-test-page.component.html',
   styleUrls: ['./angular-router-test-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     SciFormFieldComponent,
     RouterCommandsComponent,
@@ -38,7 +38,7 @@ export default class AngularRouterTestPageComponent {
     outlet: this._formBuilder.control('', Validators.required),
   });
 
-  protected navigateError: string | undefined;
+  protected navigateError = signal<string | undefined>(undefined);
 
   protected onNavigate(): void {
     const commands: Commands = [{
@@ -47,11 +47,11 @@ export default class AngularRouterTestPageComponent {
       },
     }];
 
-    this.navigateError = undefined;
+    this.navigateError.set(undefined);
     this._router.navigate(commands)
       .then(success => success ? Promise.resolve() : Promise.reject(Error('Navigation failed')))
       .then(() => this.resetForm())
-      .catch((error: unknown) => this.navigateError = stringifyError(error));
+      .catch((error: unknown) => this.navigateError.set(stringifyError(error)));
   }
 
   private resetForm(): void {

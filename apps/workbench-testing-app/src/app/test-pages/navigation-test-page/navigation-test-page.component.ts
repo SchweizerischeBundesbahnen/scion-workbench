@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {WorkbenchView} from '@scion/workbench';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -16,6 +16,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 @Component({
   selector: 'app-navigation-test-page',
   template: 'NavigationTestPageComponent',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavigationTestPageComponent {
 

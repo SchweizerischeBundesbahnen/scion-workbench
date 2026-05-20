@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {afterRenderEffect, Component, computed, ElementRef, inject, signal, untracked, viewChild} from '@angular/core';
+import {afterRenderEffect, ChangeDetectionStrategy, Component, computed, ElementRef, inject, signal, untracked, viewChild} from '@angular/core';
 import {WorkbenchPartActionDirective} from '@scion/workbench';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {ActiveWorkbenchElementCollector} from './active-workbench-element-collector.service';
@@ -18,6 +18,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
   selector: 'app-active-workbench-element-log-page',
   templateUrl: './active-workbench-element-log-page.component.html',
   styleUrl: './active-workbench-element-log-page.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     SciMaterialIconDirective,
     WorkbenchPartActionDirective,

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject, Signal} from '@angular/core';
+import {Component, computed, inject, signal, Signal} from '@angular/core';
 import {AddPartsComponent, PartDescriptor} from '../tables/add-parts/add-parts.component';
 import {AddViewsComponent, ViewDescriptor} from '../tables/add-views/add-views.component';
 import {NavigateViewsComponent, NavigationDescriptor} from '../tables/navigate-views/navigate-views.component';
@@ -54,7 +54,7 @@ export default class ModifyLayoutPageComponent {
   protected readonly partProposals = this.computePartProposals();
   protected readonly viewProposals = this.computeViewProposals();
 
-  protected modifyError: string | false | undefined;
+  protected modifyError = signal<string | false | undefined>(undefined);
 
   private computePartProposals(): Signal<string[]> {
     const parts = toSignal(this.form.controls.parts.valueChanges, {initialValue: []});
@@ -83,11 +83,11 @@ export default class ModifyLayoutPageComponent {
   }
 
   protected async onModify(): Promise<void> {
-    this.modifyError = undefined;
+    this.modifyError.set(undefined);
     this.navigate()
       .then(success => success ? Promise.resolve() : Promise.reject(Error('Modification failed')))
       .then(() => this.resetForm())
-      .catch((error: unknown) => this.modifyError = stringifyError(error));
+      .catch((error: unknown) => this.modifyError.set(stringifyError(error)));
   }
 
   private navigate(): Promise<boolean> {

@@ -19,6 +19,7 @@ import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchIconComponent} from './workbench-icon-provider';
 import {MaterialIconComponent} from './material-icon-provider';
+import {waitUntilStable} from '../testing/testing.util';
 
 describe('IconComponent', () => {
 
@@ -51,12 +52,12 @@ describe('IconComponent', () => {
 
     // Render icon-1.
     fixture.componentInstance.icon.set('icon-1');
-    await fixture.whenStable();
+    await waitUntilStable();
     expectIcon(fixture, {component: SpecIcon1Component, innerText: 'icon 1'});
 
     // Render icon-2.
     fixture.componentInstance.icon.set('icon-2');
-    await fixture.whenStable();
+    await waitUntilStable();
     expectIcon(fixture, {component: SpecIcon2Component, innerText: 'icon 2'});
   });
 
@@ -77,12 +78,12 @@ describe('IconComponent', () => {
 
     // Render icon-1.
     fixture.componentInstance.icon.set('icon-1');
-    await fixture.whenStable();
+    await waitUntilStable();
     expectIcon(fixture, {component: SpecIconComponent, innerText: 'icon-1'});
 
     // Render icon-2.
     fixture.componentInstance.icon.set('icon-2');
-    await fixture.whenStable();
+    await waitUntilStable();
     expectIcon(fixture, {component: SpecIconComponent, innerText: 'icon-2'});
   });
 
@@ -108,12 +109,12 @@ describe('IconComponent', () => {
 
     // Render icon-1.
     fixture.componentInstance.icon.set('icon-1');
-    await fixture.whenStable();
+    await waitUntilStable();
     expectIcon(fixture, {component: SpecIconComponent, innerText: 'icon-1'});
 
     // Render icon-2.
     fixture.componentInstance.icon.set('icon-2');
-    await fixture.whenStable();
+    await waitUntilStable();
     expectIcon(fixture, {component: SpecIconComponent, innerText: 'icon-2'});
   });
 
@@ -129,7 +130,7 @@ describe('IconComponent', () => {
 
     // Render icon (not provided).
     fixture.componentInstance.icon.set('icon');
-    await fixture.whenStable();
+    await waitUntilStable();
     expectIcon(fixture, {component: NullIconComponent, innerText: ''});
   });
 
@@ -144,7 +145,7 @@ describe('IconComponent', () => {
 
     // Render icon (not provided).
     fixture.componentInstance.icon.set('icon');
-    await fixture.whenStable();
+    await waitUntilStable();
     expectIcon(fixture, {component: NullIconComponent, innerText: ''});
   });
 
@@ -204,20 +205,20 @@ describe('IconComponent', () => {
 
     // Render icon-1.
     fixture.componentInstance.icon.set('icon-1');
-    await fixture.whenStable();
+    await waitUntilStable();
     const iconComponent1 = fixture.debugElement.query(By.directive(SpecIcon1Component)).componentInstance as SpecIcon1Component;
     expectIcon(fixture, {component: SpecIcon1Component, innerText: 'icon 1', cssClass: ['host-attr-class', 'host-ng-class', 'a', 'b']});
 
     // Render icon-2.
     fixture.componentInstance.icon.set('icon-2');
-    await fixture.whenStable();
+    await waitUntilStable();
     const iconComponent2 = fixture.debugElement.query(By.directive(SpecIcon2Component)).componentInstance as SpecIcon1Component;
     expectIcon(fixture, {component: SpecIcon2Component, innerText: 'icon 2', cssClass: ['host-attr-class', 'host-ng-class', 'b', 'c']});
     expect(iconComponent1.destroyed).toBeTrue();
 
     // Render icon-3.
     fixture.componentInstance.icon.set('icon-3');
-    await fixture.whenStable();
+    await waitUntilStable();
     expectIcon(fixture, {component: NullIconComponent, innerText: '', cssClass: ['host-attr-class', 'host-ng-class']});
     expect(iconComponent2.destroyed).toBeTrue();
   });
@@ -251,13 +252,13 @@ describe('IconComponent', () => {
 
     // Render icon-1 (provided).
     fixture.componentInstance.icon.set('icon-1');
-    await fixture.whenStable();
+    await waitUntilStable();
     const iconComponent1 = fixture.debugElement.query(By.directive(SpecIconComponent)).componentInstance as SpecIconComponent;
     expectIcon(fixture, {component: SpecIconComponent, innerText: 'icon'});
 
     // Render icon-2 (not provided).
     fixture.componentInstance.icon.set('icon-2');
-    await fixture.whenStable();
+    await waitUntilStable();
     expectIcon(fixture, {component: NullIconComponent, innerText: ''});
     expect(iconComponent1.destroyed).toBeTrue();
   });
@@ -307,17 +308,17 @@ describe('IconComponent', () => {
 
     // Render icon-a (provider 1).
     fixture.componentInstance.icon.set('icon-a');
-    await fixture.whenStable();
+    await waitUntilStable();
     expectIcon(fixture, {component: SpecIcon1Component, innerText: 'icon 1 [provider=1]'});
 
     // Render icon-b (provider 1 and provider 2).
     fixture.componentInstance.icon.set('icon-b');
-    await fixture.whenStable();
+    await waitUntilStable();
     expectIcon(fixture, {component: SpecIcon2Component, innerText: 'icon 2 [provider=1]'});
 
     // Render icon-c (provider 2).
     fixture.componentInstance.icon.set('icon-c');
-    await fixture.whenStable();
+    await waitUntilStable();
     expectIcon(fixture, {component: SpecIcon4Component, innerText: 'icon 4 [provider=2]'});
   });
 
@@ -338,7 +339,7 @@ describe('IconComponent', () => {
 
     // Render icon.
     fixture.componentInstance.icon.set('icon');
-    await fixture.whenStable();
+    await waitUntilStable();
     expect(injector).toBeDefined();
   });
 });
@@ -355,7 +356,7 @@ describe('Workbench Icon Provider', () => {
     // Render icon.
     const fixture = TestBed.createComponent(SpecRootComponent);
     fixture.componentInstance.icon.set('workbench.close');
-    await fixture.whenStable();
+    await waitUntilStable();
 
     // Expect Material icon to be rendered.
     expectIcon(fixture, {component: WorkbenchIconComponent, innerText: 'close', cssClass: ['scion-workbench-icons']});
@@ -371,7 +372,7 @@ describe('Workbench Icon Provider', () => {
     // Render icon.
     const fixture = TestBed.createComponent(SpecRootComponent);
     fixture.componentInstance.icon.set('icon');
-    await fixture.whenStable();
+    await waitUntilStable();
 
     // Expect Material icon to be rendered.
     expectIcon(fixture, {
@@ -408,7 +409,7 @@ describe('Workbench Icon Provider', () => {
     // Render icon.
     const fixture = TestBed.createComponent(SpecRootComponent);
     fixture.componentInstance.icon.set('icon');
-    await fixture.whenStable();
+    await waitUntilStable();
 
     // Expect Material icon to be rendered.
     expectIcon(fixture, {component: SpecCustomIconComponent, innerText: 'Custom Icon for "icon"', cssClass: ['custom-icon']});

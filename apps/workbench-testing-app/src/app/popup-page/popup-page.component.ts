@@ -41,6 +41,7 @@ import ActivatedMicrofrontendComponent from '../activated-microfrontend/activate
     '[style.max-height]': 'form.controls.componentSize.controls.maxHeight.value',
     '[style.min-width]': 'form.controls.componentSize.controls.minWidth.value',
     '[style.max-width]': 'form.controls.componentSize.controls.maxWidth.value',
+    '[attr.data-component-instance-id]': `uuid`,
   },
   hostDirectives: [{directive: PopupSizeDirective, inputs: ['size']}],
 })

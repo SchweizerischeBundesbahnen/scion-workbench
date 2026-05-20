@@ -20,15 +20,15 @@
 
   <button (click)="onRegister()" class="e2e-register" [disabled]="form.invalid" sci-primary>Register</button>
 
-  @if (intentionId) {
+  @if (intentionId()) {
     <output class="intention-id e2e-register-response">
-      Intention ID: <span class="e2e-intention-id">{{intentionId}}</span>
+      Intention ID: <span class="e2e-intention-id">{{intentionId()}}</span>
     </output>
   }
 
-  @if (registerError) {
+  @if (registerError()) {
     <output class="register-error e2e-register-error">
-      {{registerError}}
+      {{registerError()}}
     </output>
   }
 </form>

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject, signal, Signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, signal, Signal} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {Translatable, WORKBENCH_ELEMENT, WorkbenchElement, WorkbenchNotificationConfig, WorkbenchNotificationOptions, WorkbenchNotificationService} from '@scion/workbench-client';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
@@ -30,6 +30,7 @@ import {Beans} from '@scion/toolkit/bean-manager';
     MultiValueInputComponent,
     SciCheckboxComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationOpenerPageComponent {
 
@@ -77,18 +78,18 @@ export class NotificationOpenerPageComponent {
   protected onNotificationShow(): void {
     const count = this.form.controls.count.value || 1;
     for (let i = 0; i < count; i++) {
-      void this.showNotification(); // do not block to simulate opening notifications in quick succession
+      void this.showNotification({index: i}); // do not block to simulate opening notifications in quick succession
     }
   }
 
-  private async showNotification(): Promise<void> {
+  private async showNotification(options?: {index?: number}): Promise<void> {
     this.notificationOpenError.set(undefined);
 
     const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier) ?? undefined;
     try {
       if (this.form.controls.legacyAPI.controls.enabled.value) {
         if (this.form.controls.legacyAPI.controls.textAsConfig.value) {
-          await this._notificationService.show(this.readConfig(), qualifier);
+          await this._notificationService.show(this.readConfig(options), qualifier);
         }
         else {
           await this._notificationService.show(restoreLineBreaks(this.form.controls.text.value) || '', qualifier);
@@ -96,11 +97,11 @@ export class NotificationOpenerPageComponent {
       }
       else {
         if (qualifier) {
-          await this._notificationService.show(qualifier, this.readOptions());
+          await this._notificationService.show(qualifier, this.readOptions(options));
         }
         else {
           const message = parseTypedString<Translatable>(restoreLineBreaks(this.form.controls.text.value)) ?? null;
-          await this._notificationService.show(message, this.readOptions());
+          await this._notificationService.show(message, this.readOptions(options));
         }
       }
     }
@@ -112,31 +113,33 @@ export class NotificationOpenerPageComponent {
   /**
    * Reads options from the UI.
    */
-  private readOptions(): WorkbenchNotificationOptions {
-    const options = this.form.controls.options.controls;
+  private readOptions(options?: {index?: number}): WorkbenchNotificationOptions {
+    const formOptions = this.form.controls.options.controls;
+    const cssClass = Array.isArray(formOptions.cssClass.value) ? formOptions.cssClass.value : [formOptions.cssClass.value ?? ''];
     return prune({
-      title: restoreLineBreaks(options.title.value) || undefined,
-      params: SciKeyValueFieldComponent.toDictionary(options.params) ?? undefined,
-      severity: options.severity.value || undefined,
+      title: restoreLineBreaks(formOptions.title.value) || undefined,
+      params: SciKeyValueFieldComponent.toDictionary(formOptions.params) ?? undefined,
+      severity: formOptions.severity.value || undefined,
       duration: this.readDurationFromUI(),
-      group: options.group.value || undefined,
-      cssClass: options.cssClass.value ?? undefined,
+      group: formOptions.group.value || undefined,
+      cssClass: cssClass.concat(options?.index !== undefined ? `notification-${options.index}` : ''),
     });
   }
 
   /**
    * Reads config from the UI.
    */
-  private readConfig(): WorkbenchNotificationConfig {
-    const options = this.form.controls.options.controls;
+  private readConfig(options?: {index?: number}): WorkbenchNotificationConfig {
+    const formOptions = this.form.controls.options.controls;
+    const cssClass = Array.isArray(formOptions.cssClass.value) ? formOptions.cssClass.value : [formOptions.cssClass.value ?? ''];
     return prune({
-      title: restoreLineBreaks(options.title.value) || undefined,
+      title: restoreLineBreaks(formOptions.title.value) || undefined,
       content: restoreLineBreaks(this.form.controls.text.value) || undefined,
-      params: SciKeyValueFieldComponent.toDictionary(options.params) ?? undefined,
-      severity: options.severity.value || undefined,
+      params: SciKeyValueFieldComponent.toDictionary(formOptions.params) ?? undefined,
+      severity: formOptions.severity.value || undefined,
       duration: this.readDurationFromUI(),
-      group: options.group.value || undefined,
-      cssClass: options.cssClass.value ?? undefined,
+      group: formOptions.group.value || undefined,
+      cssClass: cssClass.concat(options?.index !== undefined ? `notification-${options.index}` : ''),
     });
   }
 

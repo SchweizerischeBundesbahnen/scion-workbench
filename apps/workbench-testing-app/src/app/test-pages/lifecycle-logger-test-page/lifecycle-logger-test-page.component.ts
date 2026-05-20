@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {WorkbenchView} from '@scion/workbench';
 
 /**
@@ -17,6 +17,7 @@ import {WorkbenchView} from '@scion/workbench';
 @Component({
   selector: 'app-lifecycle-logger-test-page',
   template: 'Lifecycle Logger Test Page',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class LifecycleLoggerTestPageComponent {
 

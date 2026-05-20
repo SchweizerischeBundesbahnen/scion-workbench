@@ -14,7 +14,7 @@ import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {DialogPO} from '../../dialog.po';
 import {WorkbenchDialogPagePO} from './workbench-dialog-page.po';
 import {Translatable} from '@scion/workbench';
-import {DomRect, fromRect} from '../../helper/testing.util';
+import {DomRect, fromRect, waitForAttribute} from '../../helper/testing.util';
 import {ActivatedMicrofrontendPO} from './activated-microfrontend.po';
 
 /**
@@ -33,7 +33,7 @@ export class DialogPagePO implements WorkbenchDialogPagePO {
   }
 
   public getComponentInstanceId(): Promise<string> {
-    return this.locator.locator('input.e2e-component-instance-id').inputValue();
+    return waitForAttribute(this.locator, 'data-component-instance-id');
   }
 
   public async enterTitle(title: Translatable): Promise<void> {

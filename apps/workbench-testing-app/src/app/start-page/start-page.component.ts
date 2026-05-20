@@ -83,16 +83,16 @@ export default class StartPageComponent {
   protected onViewOpen(path: string, event: MouseEvent): void {
     event.preventDefault(); // Prevent href navigation imposed by accessibility rules
     void this._workbenchRouter.navigate([path], {
-      target: event.ctrlKey ? 'blank' : this._view?.id ?? 'blank',
-      activate: !event.ctrlKey,
+      target: event.ctrlKey || event.metaKey ? 'blank' : this._view?.id ?? 'blank',
+      activate: !event.ctrlKey && !event.metaKey,
     });
   }
 
   protected onMicrofrontendViewOpen(viewCapability: WorkbenchViewCapability, event: MouseEvent): void {
     event.preventDefault(); // Prevent href navigation imposed by accessibility rules
     void this._workbenchClientRouter!.navigate(viewCapability.qualifier, {
-      target: event.ctrlKey ? 'blank' : this._view?.id ?? 'blank',
-      activate: !event.ctrlKey,
+      target: event.ctrlKey || event.metaKey ? 'blank' : this._view?.id ?? 'blank',
+      activate: !event.ctrlKey && !event.metaKey,
     });
   }
 

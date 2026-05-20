@@ -9,7 +9,7 @@
  */
 
 import {Component, effect, ElementRef, HostListener, inject, NgZone, Provider, signal, untracked, viewChild} from '@angular/core';
-import {BehaviorSubject, fromEvent} from 'rxjs';
+import {animationFrames, BehaviorSubject, debounce, fromEvent} from 'rxjs';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {AsyncPipe, NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog.model';
@@ -158,6 +158,9 @@ export class WorkbenchDialogComponent {
         const subscription = fromMutation$(dialogElement, {subtree: true, childList: true})
           .pipe(
             startWith(undefined as void),
+            // Dialog contains multiple child components.
+            // Ensure they are all rendered before computing focus.
+            debounce(() => animationFrames()),
             takeUntil(this._activeElement$.pipe(filter(Boolean))),
           )
           .subscribe(() => {

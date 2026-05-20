@@ -19,8 +19,9 @@ import {PartPO} from '../../../part.po';
 import {SciKeyValuePO} from '../../../@scion/components.internal/key-value.po';
 import {DomRect, fromRect} from '../../../helper/testing.util';
 import {NotificationPO} from '../../../notification.po';
+import {WorkbenchNotificationPagePO} from '../workbench-notification-page.po';
 
-export class WorkbenchHandleBoundsTestPagePO implements WorkbenchViewPagePO, WorkbenchDialogPagePO, WorkbenchPopupPagePO {
+export class WorkbenchHandleBoundsTestPagePO implements WorkbenchViewPagePO, WorkbenchDialogPagePO, WorkbenchPopupPagePO, WorkbenchNotificationPagePO {
 
   public readonly locator: Locator;
 
@@ -76,6 +77,15 @@ export class WorkbenchHandleBoundsTestPagePO implements WorkbenchViewPagePO, Wor
     }
     else {
       throw Error('[PageObjectError] Test page not opened in a popup.');
+    }
+  }
+
+  public get notification(): NotificationPO {
+    if (this._locateBy instanceof NotificationPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a notification.');
     }
   }
 }

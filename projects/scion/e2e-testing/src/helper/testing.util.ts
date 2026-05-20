@@ -69,6 +69,16 @@ export async function waitForCondition(predicate: () => Promise<boolean>): Promi
 }
 
 /**
+ * Wait until given attribute is set (not null) on a locator.
+ *
+ * @returns The attribute value.
+ */
+export async function waitForAttribute(locator: Locator, attribute: string): Promise<string> {
+  await waitForCondition(async () => (await locator.getAttribute(attribute)) !== null);
+  return locator.getAttribute(attribute).then(value => value!);
+}
+
+/**
  * Waits until given locators are attached to the DOM.
  */
 export async function waitUntilAttached(...locators: Locator[]): Promise<void> {

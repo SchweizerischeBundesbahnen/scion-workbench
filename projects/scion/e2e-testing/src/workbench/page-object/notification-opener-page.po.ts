@@ -99,9 +99,12 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO, WorkbenchD
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([
       // Opening a popup in a group may not open a new popup. Therefore, wait for the browser to become idle.
-      options?.group ? this._appPO.waitUntilIdle() : waitUntilAttached(this._appPO.notifications.nth(notificationCount)),
+      options?.group ? this._appPO.waitUntilAngularStable() : waitUntilAttached(this._appPO.notifications.nth(notificationCount)),
       rejectWhenAttached(this.error),
     ]);
+
+    // Wait for notification to finish rendering.
+    await this._appPO.waitUntilAngularStable();
   }
 
   public get view(): ViewPO {

@@ -60,9 +60,11 @@ test.describe('View Drag & Drop', () => {
       const view2 = appPO.view({viewId: 'view.2'});
 
       // Move view 2 to the center.
+      const navigationId = await appPO.getCurrentNavigationId();
       const dragHandle = await view2.tab.startDrag();
       await dragHandle.dragToPart(await view2.part.getPartId(), {region: 'center'});
       await dragHandle.drop();
+      await appPO.waitForLayoutChange({navigationId});
 
       // Expect view 2 not to be moved.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -96,10 +98,13 @@ test.describe('View Drag & Drop', () => {
       const view1 = appPO.view({viewId: 'view.1'});
       const view2 = appPO.view({viewId: 'view.2'});
 
+      const navigationId = await appPO.getCurrentNavigationId();
+
       // Move view 2 to a new part in the west.
       const dragHandle = await view2.tab.startDrag();
       await dragHandle.dragToPart(await view2.part.getPartId(), {region: 'west'});
       await dragHandle.drop();
+      await appPO.waitForLayoutChange({navigationId});
 
       // Expect view 2 to be moved to a new part in the west.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -143,9 +148,11 @@ test.describe('View Drag & Drop', () => {
       const view2 = appPO.view({viewId: 'view.2'});
 
       // Move view 2 to a new part in the east.
+      const navigationId = await appPO.getCurrentNavigationId();
       const dragHandle = await view2.tab.startDrag();
       await dragHandle.dragToPart(await view2.part.getPartId(), {region: 'east'});
       await dragHandle.drop();
+      await appPO.waitForLayoutChange({navigationId});
 
       // Expect view 2 to be moved to a new part in the east.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -192,9 +199,11 @@ test.describe('View Drag & Drop', () => {
       const view2 = appPO.view({viewId: 'view.2'});
 
       // Move view 2 to a new part in the north.
+      const navigationId = await appPO.getCurrentNavigationId();
       const dragHandle = await view2.tab.startDrag();
       await dragHandle.dragToPart(await view2.part.getPartId(), {region: 'north'});
       await dragHandle.drop();
+      await appPO.waitForLayoutChange({navigationId});
 
       // Expect view 2 to be moved to a new part in the north.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -241,9 +250,11 @@ test.describe('View Drag & Drop', () => {
       const view2 = appPO.view({viewId: 'view.2'});
 
       // Move view 2 to a new part in the south.
+      const navigationId = await appPO.getCurrentNavigationId();
       const dragHandle = await view2.tab.startDrag();
       await dragHandle.dragToPart(await view2.part.getPartId(), {region: 'south'});
       await dragHandle.drop();
+      await appPO.waitForLayoutChange({navigationId});
 
       // Expect view 2 to be moved to a new part in the south.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -338,9 +349,11 @@ test.describe('View Drag & Drop', () => {
 
       // Move view to a new part in the west of the initial part.
       const testView = appPO.view({viewId: 'view.101'});
+      const navigationId = await appPO.getCurrentNavigationId();
       const dragHandle = await testView.tab.startDrag();
       await dragHandle.dragToPart('part.initial', {region: 'west'});
       await dragHandle.drop();
+      await appPO.waitForLayoutChange({navigationId});
       const testViewInfo = await testView.getInfo();
 
       // Expect view to be moved to a new part in the west of the initial part.
@@ -395,9 +408,11 @@ test.describe('View Drag & Drop', () => {
 
       // Move view to a new part in the east of the initial part.
       const testView = appPO.view({viewId: 'view.101'});
+      const navigationId = await appPO.getCurrentNavigationId();
       const dragHandle = await testView.tab.startDrag();
       await dragHandle.dragToPart('part.initial', {region: 'east'});
       await dragHandle.drop();
+      await appPO.waitForLayoutChange({navigationId});
       const testViewInfo = await testView.getInfo();
 
       // Expect view to be moved to a new part in the east of the initial part.
@@ -455,9 +470,11 @@ test.describe('View Drag & Drop', () => {
 
       // Move view to a new part in the north of the initial part.
       const testView = appPO.view({viewId: 'view.101'});
+      const navigationId = await appPO.getCurrentNavigationId();
       const dragHandle = await testView.tab.startDrag();
       await dragHandle.dragToPart('part.initial', {region: 'north'});
       await dragHandle.drop();
+      await appPO.waitForLayoutChange({navigationId});
       const testViewInfo = await testView.getInfo();
 
       // Expect view to be moved to a new part in the north of the initial part.
@@ -515,9 +532,11 @@ test.describe('View Drag & Drop', () => {
 
       // Move view to a new part in the south of the initial part.
       const testView = appPO.view({viewId: 'view.101'});
+      const navigationId = await appPO.getCurrentNavigationId();
       const dragHandle = await testView.tab.startDrag();
       await dragHandle.dragToPart('part.initial', {region: 'south'});
       await dragHandle.drop();
+      await appPO.waitForLayoutChange({navigationId});
       const testViewInfo = await testView.getInfo();
 
       // Expect view to be moved to a new part in the south of the initial part.

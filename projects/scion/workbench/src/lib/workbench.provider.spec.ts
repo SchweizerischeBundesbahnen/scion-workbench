@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {fakeAsync, TestBed, tick} from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 import {Component} from '@angular/core';
 import {provideRouter, Router} from '@angular/router';
 import {provideWorkbenchForTest} from './testing/workbench.provider';
@@ -16,7 +16,8 @@ import {provideWorkbench} from './workbench.provider';
 
 describe('WorkbenchProvider', () => {
 
-  it('should error if installed in child environment', fakeAsync(() => {
+  it('should error if installed in child environment', async () => {
+
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest(),
@@ -24,7 +25,7 @@ describe('WorkbenchProvider', () => {
           {
             path: 'lazy',
             providers: [
-              provideWorkbench(), // Provide workbench from root environment.
+              provideWorkbench(), // Provide workbench from child environment.
             ],
             component: TestComponent,
           },
@@ -32,12 +33,8 @@ describe('WorkbenchProvider', () => {
       ],
     });
 
-    // Load lazy route to provide workbench from child environment.
-    expect(() => {
-      void TestBed.inject(Router).navigate(['lazy']);
-      tick();
-    }).toThrowError(/ProvideWorkbenchError/);
-  }));
+    await expectAsync(TestBed.inject(Router).navigate(['lazy'])).toBeRejectedWithError(/ProvideWorkbenchError/);
+  });
 });
 
 @Component({template: ''})

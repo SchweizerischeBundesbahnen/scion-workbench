@@ -9,7 +9,7 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {inject, Injector, NgZone} from '@angular/core';
+import {inject, Injector} from '@angular/core';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {MicrofrontendPlatformInitializerFn, MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from './microfrontend-platform-initializer';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
@@ -180,34 +180,6 @@ describe('Microfrontend Platform Initializer', () => {
 
     await TestBed.inject(WorkbenchLauncher).launch();
     expect(injector).toBeDefined();
-  });
-
-  it('should run function in MicrofrontendPlatformStartupPhase.PreStartup phase in Angular zone', async () => {
-    let insideZone: boolean | undefined;
-
-    TestBed.configureTestingModule({
-      providers: [
-        provideWorkbenchForTest({microfrontendPlatform: {applications: []}}),
-        provideMicrofrontendPlatformInitializer(() => void (insideZone = NgZone.isInAngularZone()), {phase: MicrofrontendPlatformStartupPhase.PreStartup}),
-      ],
-    });
-
-    await TestBed.inject(WorkbenchLauncher).launch();
-    expect(insideZone).toBeTrue();
-  });
-
-  it('should run function in MicrofrontendPlatformStartupPhase.PostStartup phase in Angular zone', async () => {
-    let insideZone: boolean | undefined;
-
-    TestBed.configureTestingModule({
-      providers: [
-        provideWorkbenchForTest({microfrontendPlatform: {applications: []}}),
-        provideMicrofrontendPlatformInitializer(() => void (insideZone = NgZone.isInAngularZone()), {phase: MicrofrontendPlatformStartupPhase.PostStartup}),
-      ],
-    });
-
-    await TestBed.inject(WorkbenchLauncher).launch();
-    expect(insideZone).toBeTrue();
   });
 });
 

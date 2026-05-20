@@ -32,7 +32,8 @@ describe('Microfrontend Host Popup', () => {
   });
 
   it('should allow opening multiple host popups in parallel', async () => {
-    const canActivatePopup1 = new Subject<true>();
+    const canActivatePopup1$ = new Subject<true>();
+    const onCanActivatePopup1$ = new Subject<true>();
 
     TestBed.configureTestingModule({
       providers: [
@@ -63,7 +64,15 @@ describe('Microfrontend Host Popup', () => {
           },
         }),
         provideRouter([
-          {path: '', canMatch: [canMatchWorkbenchPopupCapability({component: 'popup-1'})], canActivate: [() => firstValueFrom(canActivatePopup1)], component: SpecPopup1Component},
+          {
+            path: '',
+            canMatch: [canMatchWorkbenchPopupCapability({component: 'popup-1'})],
+            canActivate: [() => {
+              onCanActivatePopup1$.next(true);
+              return firstValueFrom(canActivatePopup1$);
+            }],
+            component: SpecPopup1Component,
+          },
           {path: '', canMatch: [canMatchWorkbenchPopupCapability({component: 'popup-2'})], component: SpecPopup2Component},
         ]),
       ],
@@ -74,7 +83,7 @@ describe('Microfrontend Host Popup', () => {
 
     // Start navigation in host popup 1.
     void TestBed.inject(WorkbenchPopupService).open({component: 'popup-1'}, {anchor: {top: 0, left: 0}, closeStrategy: {onFocusLost: false}});
-    await waitUntilStable();
+    await firstValueFrom(onCanActivatePopup1$);
 
     // Start parallel navigation in host popup 2.
     void TestBed.inject(WorkbenchPopupService).open({component: 'popup-2'}, {anchor: {top: 0, left: 0}, closeStrategy: {onFocusLost: false}});
@@ -86,7 +95,7 @@ describe('Microfrontend Host Popup', () => {
     expect(fixture.debugElement.parent).not.toShow(SpecPopup2Component);
 
     // Unblock first navigation.
-    canActivatePopup1.next(true);
+    canActivatePopup1$.next(true);
     await waitUntilStable();
 
     // Both popups should be visible.
@@ -95,7 +104,8 @@ describe('Microfrontend Host Popup', () => {
   });
 
   it('should allow opening a host dialog and a view in parallel', async () => {
-    const canActivatePopup = new Subject<true>();
+    const canActivatePopup$ = new Subject<true>();
+    const onCanActivatePopup$ = new Subject<true>();
 
     TestBed.configureTestingModule({
       providers: [
@@ -119,7 +129,15 @@ describe('Microfrontend Host Popup', () => {
           },
         }),
         provideRouter([
-          {path: '', canMatch: [canMatchWorkbenchPopupCapability({component: 'popup'})], canActivate: [() => firstValueFrom(canActivatePopup)], component: SpecPopup1Component},
+          {
+            path: '',
+            canMatch: [canMatchWorkbenchPopupCapability({component: 'popup'})],
+            canActivate: [() => {
+              onCanActivatePopup$.next(true);
+              return firstValueFrom(canActivatePopup$);
+            }],
+            component: SpecPopup1Component,
+          },
           {path: 'path/to/view', component: SpecViewComponent},
         ]),
       ],
@@ -130,7 +148,7 @@ describe('Microfrontend Host Popup', () => {
 
     // Start navigation in a host popup.
     void TestBed.inject(WorkbenchPopupService).open({component: 'popup'}, {anchor: {top: 0, left: 0}, closeStrategy: {onFocusLost: false}});
-    await waitUntilStable();
+    await firstValueFrom(onCanActivatePopup$);
 
     // Start parallel navigation in a view.
     void TestBed.inject(WorkbenchRouter).navigate(['path/to/view']);
@@ -142,7 +160,7 @@ describe('Microfrontend Host Popup', () => {
     expect(fixture.debugElement.parent).not.toShow(SpecViewComponent);
 
     // Unblock first navigation.
-    canActivatePopup.next(true);
+    canActivatePopup$.next(true);
     await waitUntilStable();
 
     // Popup and view components should be visible.
@@ -151,7 +169,8 @@ describe('Microfrontend Host Popup', () => {
   });
 
   it('should allow opening a view and a host dialog in parallel', async () => {
-    const canActivateView = new Subject<true>();
+    const canActivateView$ = new Subject<true>();
+    const onCanActivateView$ = new Subject<true>();
 
     TestBed.configureTestingModule({
       providers: [
@@ -175,7 +194,14 @@ describe('Microfrontend Host Popup', () => {
           },
         }),
         provideRouter([
-          {path: 'path/to/view', canActivate: [() => firstValueFrom(canActivateView)], component: SpecViewComponent},
+          {
+            path: 'path/to/view',
+            canActivate: [() => {
+              onCanActivateView$.next(true);
+              return firstValueFrom(canActivateView$);
+            }],
+            component: SpecViewComponent,
+          },
           {path: '', canMatch: [canMatchWorkbenchPopupCapability({component: 'popup'})], component: SpecPopup1Component},
         ]),
       ],
@@ -186,7 +212,7 @@ describe('Microfrontend Host Popup', () => {
 
     // Start navigation in a view.
     void TestBed.inject(WorkbenchRouter).navigate(['path/to/view']);
-    await waitUntilStable();
+    await firstValueFrom(onCanActivateView$);
 
     // Start parallel navigation in a host popup.
     void TestBed.inject(WorkbenchPopupService).open({component: 'popup'}, {anchor: {top: 0, left: 0}, closeStrategy: {onFocusLost: false}});
@@ -198,7 +224,7 @@ describe('Microfrontend Host Popup', () => {
     expect(fixture.debugElement.parent).not.toShow(SpecPopup1Component);
 
     // Unblock first navigation.
-    canActivateView.next(true);
+    canActivateView$.next(true);
     await waitUntilStable();
 
     // Popup and view components should be visible.

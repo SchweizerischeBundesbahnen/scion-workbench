@@ -100,9 +100,12 @@ export class PopupOpenerPagePO implements MicrofrontendViewPagePO, Microfrontend
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([
-      waitUntilAttached(this._appPO.popups.nth(popupCount)).then(() => this._appPO.waitUntilIdle()), // Wait until idle to have stable bounding box and focus owner
+      waitUntilAttached(this._appPO.popups.nth(popupCount)).then(() => this._appPO.waitUntilAngularStable()), // Wait until idle to have stable bounding box and focus owner
       rejectWhenAttached(this.error),
     ]);
+
+    // Wait for popup to finish rendering.
+    await this._appPO.waitUntilAngularStable();
   }
 
   public async enterPosition(position: PopupOrigin): Promise<void> {

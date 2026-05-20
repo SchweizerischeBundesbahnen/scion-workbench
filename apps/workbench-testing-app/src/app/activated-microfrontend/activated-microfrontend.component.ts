@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ActivatedMicrofrontend, WORKBENCH_POPUP_REFERRER} from '@scion/workbench';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
@@ -21,6 +21,7 @@ import {SciKeyValueComponent} from '@scion/components.internal/key-value';
   selector: 'app-activated-microfrontend',
   templateUrl: './activated-microfrontend.component.html',
   styleUrl: './activated-microfrontend.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     SciAccordionComponent,
     SciAccordionItemDirective,

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationRef, assertNotInReactiveContext, DestroyRef, DOCUMENT, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
+import {ApplicationRef, assertNotInReactiveContext, DestroyRef, DOCUMENT, inject, Injectable, Injector, NgZone, runInInjectionContext, ɵZONELESS_ENABLED} from '@angular/core';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog.model';
 import {firstValueFrom} from 'rxjs';
@@ -31,6 +31,7 @@ export class ɵWorkbenchDialogService implements WorkbenchDialogService {
   private readonly _dialogRegistry = inject(WorkbenchDialogRegistry);
   private readonly _document = inject(DOCUMENT);
   private readonly _zone = inject(NgZone);
+  private readonly _zonelessEnabled = inject(ɵZONELESS_ENABLED);
 
   constructor() {
     this.installServiceLifecycleLogger();
@@ -41,7 +42,7 @@ export class ɵWorkbenchDialogService implements WorkbenchDialogService {
     assertNotInReactiveContext(this.open, 'Call WorkbenchDialogService.open() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
     // Ensure to run in Angular zone to display the dialog even when called from outside the Angular zone.
-    if (!NgZone.isInAngularZone()) {
+    if (!this._zonelessEnabled && !NgZone.isInAngularZone()) {
       return this._zone.run(() => this.open(component, options));
     }
 

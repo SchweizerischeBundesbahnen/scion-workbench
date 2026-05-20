@@ -25,7 +25,7 @@ export const appConfig: ApplicationConfig = {
     provideWorkbenchClient(),
     provideWorkbenchTheme(),
     provideAnimationsIfEnabled(),
-    provideZoneChangeDetection(),
+    environment.zoneEnabled ? provideZoneChangeDetection() : [],
   ],
 };
 

@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {DialogId, PartId, PopupId, ViewId, NotificationId, WORKBENCH_ELEMENT, WorkbenchDialogOptions, WorkbenchDialogService, WorkbenchElement} from '@scion/workbench-client';
+import {DialogId, NotificationId, PartId, PopupId, ViewId, WORKBENCH_ELEMENT, WorkbenchDialogOptions, WorkbenchDialogService, WorkbenchElement} from '@scion/workbench-client';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
@@ -29,6 +29,7 @@ import {Beans} from '@scion/toolkit/bean-manager';
     SciCheckboxComponent,
     MultiValueInputComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DialogOpenerPageComponent {
 
@@ -55,8 +56,8 @@ export class DialogOpenerPageComponent {
     }),
   });
 
-  protected dialogError: string | undefined;
-  protected returnValue: string | undefined;
+  protected dialogError = signal<string | undefined>(undefined);
+  protected returnValue = signal<string | undefined>(undefined);
 
   protected readonly nullList = `autocomplete-null-${UUID.randomUUID()}`;
 
@@ -65,13 +66,13 @@ export class DialogOpenerPageComponent {
   }
 
   protected async onDialogOpen(): Promise<void> {
-    this.dialogError = undefined;
-    this.returnValue = undefined;
+    this.dialogError.set(undefined);
+    this.returnValue.set(undefined);
 
     const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!;
     this._dialogService.open<string>(qualifier, this.readOptions())
-      .then(result => this.returnValue = result)
-      .catch((error: unknown) => this.dialogError = stringifyError(error) || 'Dialog was closed with an error');
+      .then(result => this.returnValue.set(result))
+      .catch((error: unknown) => this.dialogError.set(stringifyError(error)));
   }
 
   /**

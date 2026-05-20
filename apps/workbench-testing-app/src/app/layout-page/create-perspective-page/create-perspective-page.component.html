@@ -49,10 +49,10 @@
   <button (click)="onRegister()" [disabled]="form.invalid" class="e2e-register" sci-primary>Register</button>
 </form>
 
-@if (registerError === false) {
+@if (registerError() === false) {
   <output class="register-success e2e-register-success">Success</output>
 }
 
-@if (registerError) {
-  <output class="register-error e2e-register-error">{{registerError}}</output>
+@if (registerError()) {
+  <output class="register-error e2e-register-error">{{registerError()}}</output>
 }
