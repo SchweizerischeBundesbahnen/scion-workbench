@@ -10,6 +10,7 @@
 
 import {DomRect, fromRect} from './helper/testing.util';
 import {Locator} from '@playwright/test';
+import {ViewId} from '@scion/workbench';
 
 /**
  * Handle for interacting with the workbench view tab bar.
@@ -22,14 +23,14 @@ export class ViewTabBarPO {
   /**
    * Gets the view ids of the tabs in display order.
    */
-  public async getViewIds(locateBy?: {cssClass?: string; visible?: true}): Promise<string[]> {
+  public async getViewIds(locateBy?: {cssClass?: string; visible?: true}): Promise<ViewId[]> {
     const locateByCssClass = locateBy?.cssClass ? `:scope.${locateBy.cssClass}` : ':scope';
-    const viewIds = [];
+    const viewIds = new Array<ViewId>();
     for (const viewTabLocator of await this.locator.locator('wb-view-tab').locator(locateByCssClass).all()) {
       if (locateBy?.visible && !await viewTabLocator.isVisible()) {
         continue;
       }
-      viewIds.push((await viewTabLocator.getAttribute('data-viewid'))!);
+      viewIds.push((await viewTabLocator.getAttribute('data-viewid')) as ViewId);
     }
     return viewIds;
   }
@@ -65,5 +66,14 @@ export class ViewTabBarPO {
    */
   public async closeTabs(): Promise<void> {
     await this.locator.locator('wb-view-tab').first().press('Control+Alt+Shift+K');
+  }
+
+  /**
+   * Indicates whether the tabbar overflows.
+   */
+  public async hasTabbarOverflow(): Promise<boolean> {
+    const viewportSize = fromRect(await this.locator.locator('sci-viewport.e2e-tab-viewport').boundingBox());
+    const viewportClientSize = fromRect(await this.locator.locator('sci-viewport.e2e-tab-viewport div[part="content"]').boundingBox());
+    return viewportClientSize.width > viewportSize.width;
   }
 }
