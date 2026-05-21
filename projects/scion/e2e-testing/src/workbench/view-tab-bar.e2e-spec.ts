@@ -457,6 +457,76 @@ test.describe('View Tabbar', () => {
     await expect.poll(() => appPO.activePart({grid: 'mainArea'}).bar.viewTabBar.getViewIds()).toEqual([routerPageViewId, 'view.4', 'view.3', 'view.2']);
   });
 
+  test('should display the hidden view tab count on tabbar overflow', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+    await appPO.setDesignToken('--sci-workbench-tab-min-width', '300px');
+
+    await workbenchNavigator.createPerspective(layout => layout
+      .addPart('part.main'),
+    );
+
+    const partbar = appPO.part({partId: 'part.main'}).bar;
+
+    // Open router page.
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+
+    // Open view tabs until tabbar overflows.
+    while (!await partbar.viewTabBar.hasTabbarOverflow()) {
+      await expect.poll(() => partbar.getHiddenTabCount()).toBe(0);
+      await routerPage.navigate(['test-view'], {target: 'blank', activate: false}); // do not activate view to prevent scrolling
+    }
+
+    // Expect hidden view tab count to be 1.
+    await expect.poll(() => partbar.getHiddenTabCount()).toBe(1);
+
+    // Open new tab.
+    await routerPage.navigate(['test-view'], {target: 'view.101', activate: false}); // do not activate view to prevent scrolling
+    await expect.poll(() => partbar.getHiddenTabCount()).toBe(2);
+
+    // Open new tab.
+    await routerPage.navigate(['test-view'], {target: 'view.102', activate: false}); // do not activate view to prevent scrolling
+    await expect.poll(() => partbar.getHiddenTabCount()).toBe(3);
+
+    // Open new tab.
+    await routerPage.navigate(['test-view'], {target: 'view.103', activate: false}); // do not activate view to prevent scrolling
+    await expect.poll(() => partbar.getHiddenTabCount()).toBe(4);
+
+    // Open new tab.
+    await routerPage.navigate(['test-view'], {target: 'view.104', activate: false}); // do not activate view to prevent scrolling
+    await expect.poll(() => partbar.getHiddenTabCount()).toBe(5);
+
+    // Open new tab.
+    await routerPage.navigate(['test-view'], {target: 'view.105', activate: false}); // do not activate view to prevent scrolling
+    await expect.poll(() => partbar.getHiddenTabCount()).toBe(6);
+
+    // Close last view 'view.105'.
+    await appPO.workbench.closeViews('view.105');
+    await expect.poll(() => partbar.getHiddenTabCount()).toBe(5);
+
+    // Close last view 'view.104'.
+    await appPO.workbench.closeViews('view.104');
+    await expect.poll(() => partbar.getHiddenTabCount()).toBe(4);
+
+    // Close last view 'view.103'.
+    await appPO.workbench.closeViews('view.103');
+    await expect.poll(() => partbar.getHiddenTabCount()).toBe(3);
+
+    // Close last view 'view.102'.
+    await appPO.workbench.closeViews('view.102');
+    await expect.poll(() => partbar.getHiddenTabCount()).toBe(2);
+
+    // Close last view 'view.101'.
+    await appPO.workbench.closeViews('view.101');
+    await expect.poll(() => partbar.getHiddenTabCount()).toBe(1);
+
+    // Close last views.
+    const viewTabs = await partbar.viewTabBar.getViewIds();
+    while (viewTabs.length) {
+      await appPO.workbench.closeViews(viewTabs.pop()!);
+      await expect.poll(() => partbar.getHiddenTabCount()).toBe(0);
+    }
+  });
+
   test('should allow to have a sticky view tab', async ({appPO}) => {
     await appPO.navigateTo({microfrontendSupport: false, stickyViewTab: true});
 
