@@ -61,7 +61,7 @@ export class ɵWorkbenchTextService implements WorkbenchTextService, PreDestroy 
         waitUntilRegisteredTextProvider(options.provider, {timeout: 60_000}),
         catchError((error: unknown) => {
           // Prefix the key with an additional `%` character to escape the leading `%` character. See console formatting rules: https://developer.mozilla.org/en-US/docs/Web/API/console
-          console.error(`[NullTextError][${Beans.get(APP_IDENTITY)}] Failed to get text '%${translatable}' from application '${options.provider}'. Caused by: `, error);
+          console.error(`[TextProviderError][${Beans.get(APP_IDENTITY)}] Failed to get text '%${translatable}' from application '${options.provider}'. Caused by: `, error);
           return of(`%${key}`);
         }),
         // Remove cached text when an error occurs, or when the subscriber count drops to zero, after the specified TTL.

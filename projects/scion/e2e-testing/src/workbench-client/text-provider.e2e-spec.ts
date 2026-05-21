@@ -1455,6 +1455,93 @@ test.describe('Text Provider', () => {
         await expect.poll(() => activityItem.getTooltip()).toEqual('Tooltip - 123;456 - A;B');
       });
 
+      test('should not propagate error', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // Register part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'testee'},
+          properties: {
+            path: 'test-part',
+            title: '%part_title;options.error=true', // instruct provider to error
+            cssClass: 'testee',
+          },
+        });
+
+        // Create perspective.
+        await microfrontendNavigator.createPerspective('app1', {
+          type: 'perspective',
+          qualifier: {perspective: 'testee'},
+          properties: {
+            parts: [
+              {
+                id: 'part.testee',
+                qualifier: {part: 'testee'},
+              },
+            ],
+          },
+        });
+
+        // Expect translation key to be displayed.
+        await expect(appPO.part({cssClass: 'testee'}).bar.title).toHaveText('%part_title');
+
+        // Expected error to be logged.
+        await expect.poll(() => consoleLogs.get({severity: 'error'})).toContainEqual(
+          expect.stringContaining('[TextProviderError][workbench-host-app] Failed to get text \'%%part_title\' from application \'workbench-client-testing-app1\'. Caused by: '),
+        );
+      });
+
+      test('should not propagate error when parameter resolution fails', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // Register part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'testee'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-pages/text-test-page',
+            title: '%part_title;param=:param',
+            resolve: {
+              param: 'textprovider/workbench-client-testing-app1/values/:id/error', // append error segment to instruct provider to error
+            },
+            cssClass: 'testee',
+          },
+        });
+
+        // Create perspective.
+        await microfrontendNavigator.createPerspective('app1', {
+          type: 'perspective',
+          qualifier: {perspective: 'testee'},
+          properties: {
+            parts: [
+              {
+                id: 'part.testee',
+                qualifier: {part: 'testee'},
+                params: {
+                  id: '123',
+                },
+              },
+            ],
+          },
+        });
+
+        // Provide text.
+        const testPage = new TextTestPagePO(appPO.part({cssClass: 'testee'}));
+        await testPage.provideText('part_title', 'Title - {{param}}');
+
+        // Expect translation key to be displayed.
+        await expect(appPO.part({cssClass: 'testee'}).bar.title).toHaveText('Title - :param');
+
+        // Expected error to be logged.
+        await expect.poll(() => consoleLogs.get({severity: 'error'})).toContainEqual(
+          expect.stringContaining('[TextProviderError] Failed to resolve parameter \':param\' in text \'%%part_title\' from application \'workbench-client-testing-app1\'. Caused by: '),
+        );
+      });
+
       test('should cache texts on re-layout', async ({appPO, microfrontendNavigator, consoleLogs}) => {
         await appPO.navigateTo({microfrontendSupport: true, mainAreaInitialPartId: 'part.initial', logLevel: 'debug'});
 
@@ -1906,6 +1993,52 @@ test.describe('Text Provider', () => {
           await expect(nonDockedPart.bar.title).toHaveText('Title - 123 -  - :undefined');
           await expect.poll(() => activityItem.getTooltip()).toEqual('Tooltip - 123 -  - :undefined');
         });
+      });
+
+      test('should not propagate error when parameter resolution fails', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // Register part.
+        await microfrontendNavigator.registerCapability<WorkbenchPartCapability>('app1', {
+          type: 'part',
+          qualifier: {part: 'testee'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-part',
+            title: 'Title - :param',
+            resolve: {
+              param: 'textprovider/workbench-client-testing-app1/values/:id/error', // append error segment to instruct provider to error
+            },
+            cssClass: 'testee',
+          },
+        });
+
+        // Create perspective.
+        await microfrontendNavigator.createPerspective('app1', {
+          type: 'perspective',
+          qualifier: {perspective: 'testee'},
+          properties: {
+            parts: [
+              {
+                id: 'part.testee',
+                qualifier: {part: 'testee'},
+                params: {
+                  id: '123',
+                },
+              },
+            ],
+          },
+        });
+
+        // Expect translation key to be displayed.
+        await expect(appPO.part({cssClass: 'testee'}).bar.title).toHaveText('Title - :param');
+
+        // Expected error to be logged.
+        await expect.poll(() => consoleLogs.get({severity: 'error'})).toContainEqual(
+          expect.stringContaining('[TextProviderError] Failed to resolve parameter \':param\' in text \'Title - :param\' from application \'workbench-client-testing-app1\'. Caused by: '),
+        );
       });
 
       test('should support semicolon in text, parameter and resolver', async ({appPO, microfrontendNavigator}) => {
@@ -3660,6 +3793,68 @@ test.describe('Text Provider', () => {
         await expect(testPage.view.tab.heading).toHaveText('Heading - 123;456 - A;B');
       });
 
+      test('should not propagate error', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // Register test view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'testee'},
+          properties: {
+            path: 'test-view',
+            title: '%view_title;options.error=true', // instruct provider to error
+          },
+        });
+
+        // Open test view.
+        const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+        await routerPage.navigate({component: 'testee'}, {cssClass: 'testee'});
+
+        // Expect translation key to be displayed.
+        await expect(appPO.view({cssClass: 'testee'}).tab.title).toHaveText('%view_title');
+
+        // Expected error to be logged.
+        await expect.poll(() => consoleLogs.get({severity: 'error'})).toContainEqual(
+          expect.stringContaining('[TextProviderError][workbench-host-app] Failed to get text \'%%view_title\' from application \'workbench-client-testing-app1\'. Caused by: '),
+        );
+      });
+
+      test('should not propagate error when parameter resolution fails', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // Register test view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'testee'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-pages/text-test-page',
+            title: '%view_title;param=:param',
+            resolve: {
+              param: 'textprovider/workbench-client-testing-app1/values/:id/error', // append error segment to instruct provider to error
+            },
+          },
+        });
+
+        // Open test view.
+        const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+        await routerPage.navigate({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
+        const testPage = new TextTestPagePO(appPO.view({cssClass: 'testee'}));
+
+        // Provide text.
+        await testPage.provideText('view_title', 'Title - {{param}}');
+
+        // Expect translation key to be displayed.
+        await expect(testPage.view.tab.title).toHaveText('Title - :param');
+
+        // Expected error to be logged.
+        await expect.poll(() => consoleLogs.get({severity: 'error'})).toContainEqual(
+          expect.stringContaining('[TextProviderError] Failed to resolve parameter \':param\' in text \'%%view_title\' from application \'workbench-client-testing-app1\'. Caused by: '),
+        );
+      });
+
       test('should display localized title and heading set via handle', async ({appPO, microfrontendNavigator}) => {
         await appPO.navigateTo({microfrontendSupport: true});
 
@@ -3947,6 +4142,38 @@ test.describe('Text Provider', () => {
           await expect(testPage.view.tab.title).toHaveText('Title - 123 -  - :undefined');
           await expect(testPage.view.tab.heading).toHaveText('Heading - 123 -  - :undefined');
         });
+      });
+
+      test('should not propagate error when parameter resolution fails', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+        await appPO.navigateTo({microfrontendSupport: true});
+
+        // Register test view.
+        await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('app1', {
+          type: 'view',
+          qualifier: {component: 'testee'},
+          params: [
+            {name: 'id', required: true},
+          ],
+          properties: {
+            path: 'test-view',
+            title: 'Title - :param',
+            resolve: {
+              param: 'textprovider/workbench-client-testing-app1/values/:id/error', // append error segment to instruct provider to error
+            },
+          },
+        });
+
+        // Open test view.
+        const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+        await routerPage.navigate({component: 'testee'}, {params: {id: '123'}, cssClass: 'testee'});
+
+        // Expect translation key to be displayed.
+        await expect(appPO.view({cssClass: 'testee'}).tab.title).toHaveText('Title - :param');
+
+        // Expected error to be logged.
+        await expect.poll(() => consoleLogs.get({severity: 'error'})).toContainEqual(
+          expect.stringContaining('[TextProviderError] Failed to resolve parameter \':param\' in text \'Title - :param\' from application \'workbench-client-testing-app1\'. Caused by: '),
+        );
       });
 
       test('should support semicolon in text, parameter and resolver', async ({appPO, microfrontendNavigator}) => {

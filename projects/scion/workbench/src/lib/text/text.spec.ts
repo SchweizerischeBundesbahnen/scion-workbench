@@ -473,6 +473,50 @@ describe('Text Provider', () => {
     injector.destroy();
     expect(destroyed).toBeTrue();
   });
+
+  it('should not propagate error', () => {
+    // Spy console.
+    spyOn(console, 'error').and.callThrough();
+
+    TestBed.configureTestingModule({
+      providers: [
+        provideTextProvider(() => {
+          throw error;
+        }),
+      ],
+    });
+
+    const error = Error('UNEXPECTED');
+    const translated = text('%key', {injector: TestBed.inject(Injector)});
+
+    // Expect key to be returned.
+    expect(translated()).toEqual('%key');
+    // Expected error to be logged.
+    expect(console.error).toHaveBeenCalledWith(jasmine.stringContaining('[TextProviderError] Failed to get text for \'%%key\'. Caused by:'), error);
+  });
+
+  it('should not propagate error (text as signal)', () => {
+    // Spy console.
+    spyOn(console, 'error').and.callThrough();
+
+    TestBed.configureTestingModule({
+      providers: [
+        provideTextProvider(() => {
+          return computed(() => {
+            throw error;
+          });
+        }),
+      ],
+    });
+
+    const error = Error('UNEXPECTED');
+    const translated = text('%key', {injector: TestBed.inject(Injector)});
+
+    // Expect key to be returned.
+    expect(translated()).toEqual('%key');
+    // Expected error to be logged.
+    expect(console.error).toHaveBeenCalledWith(jasmine.stringContaining('[TextProviderError] Failed to get text for \'%%key\'. Caused by:'), error);
+  });
 });
 
 describe('Workbench Text Provider', () => {

@@ -71,10 +71,18 @@ function provideText(translatable: Translatable | undefined | null): Signal<stri
   }
 
   const {key, params} = parseTranslatable(translatable as `%${string}`);
+  const errorHandler = (error: unknown): string => {
+    // Prefix the key with an additional `%` character to escape the leading `%` character. See console formatting rules: https://developer.mozilla.org/en-US/docs/Web/API/console
+    console.error(`[TextProviderError] Failed to get text for '%${translatable}'. Caused by:`, error);
+    return translatable;
+  };
+
   for (const textProvider of textProviders) {
-    const text = textProvider(key, params);
+    // If `textProvider` throws an error, `runSafe` catches it and delegates execution to the error handler, logging the error and returning the translatable.
+    const text = runSafe(() => textProvider(key, params), errorHandler);
     if (text !== undefined) {
-      return isSignal(text) ? text : signal(text);
+      // If signal, wrap it in `computed` to handle errors.
+      return isSignal(text) ? computed(() => runSafe(() => text(), errorHandler)) : signal(text);
     }
   }
   return signal(translatable);
@@ -122,5 +130,19 @@ function parseMatrixParams(matrixParams: string | undefined): Record<string, str
    */
   function decodeSemicolons(value: string): string {
     return value.replaceAll('&#x3b', ';');
+  }
+}
+
+/**
+ * Runs the passed function.
+ *
+ * If the function throws an error, catches the error and delegates execution to the passed error handler, returning the handler's result.
+ */
+export function runSafe<T>(fn: () => T, onErrorFn: (error: unknown) => T): T {
+  try {
+    return fn();
+  }
+  catch (error) {
+    return onErrorFn(error);
   }
 }

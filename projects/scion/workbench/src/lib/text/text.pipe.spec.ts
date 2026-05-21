@@ -159,6 +159,39 @@ describe('Text Pipe', () => {
     expect(textCaptor1.destroyed).toBeTrue();
     expect(textCaptor2.destroyed).toBeUndefined();
   });
+
+  it('should not propagate error', async () => {
+    // Spy console.
+    spyOn(console, 'error').and.callThrough();
+
+    TestBed.configureTestingModule({
+      providers: [
+        provideTextProvider(() => {
+          throw error;
+        }),
+        {provide: ComponentFixtureAutoDetect, useValue: true},
+      ],
+    });
+
+    @Component({
+      selector: 'spec-testee',
+      template: '{{(\'%key\' | wbText)()}}',
+      imports: [
+        TextPipe,
+      ],
+    })
+    class SpecRootComponent {
+    }
+
+    const error = Error('UNEXPECTED');
+    const fixture = TestBed.createComponent(SpecRootComponent);
+    await fixture.whenStable();
+
+    // Expect key to be displayed.
+    expect(fixture.debugElement.nativeElement.innerText).toEqual('%key');
+    // Expected error to be logged.
+    expect(console.error).toHaveBeenCalledWith(jasmine.stringContaining('[TextProviderError] Failed to get text for \'%%key\'. Caused by:'), error);
+  });
 });
 
 function provideTextProvider(textProvider: WorkbenchTextProviderFn): EnvironmentProviders {
