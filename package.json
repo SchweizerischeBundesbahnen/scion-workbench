@@ -25,6 +25,7 @@
     "copy-src:scion-components": "cpx --clean --watch --verbose \"../scion-toolkit/projects/scion/components/**\" \"./src-lib/@scion/components\"",
     "copy-src:scion-components.internal": "cpx --clean --watch --verbose \"../scion-toolkit/projects/scion/components.internal/**\" \"./src-lib/@scion/components.internal\"",
     "copy-src:scion-microfrontend-platform": "cpx --clean --watch --verbose \"../scion-microfrontend-platform/projects/scion/microfrontend-platform/**\" \"./src-lib/@scion/microfrontend-platform\"",
+
     "workbench-client:build": "ng build --configuration production @scion/workbench-client",
     "workbench-client:lint": "ng lint @scion/workbench-client",
     "workbench-client:test": "ng test @scion/workbench-client",
@@ -77,6 +78,7 @@
     "workbench-client-testing-app:4202:dist-serve": "serve dist/workbench-client-testing-app-ci/browser -p 4202 --config ../../../apps/workbench-client-testing-app/vercel-test-server.config.json --no-request-logging",
     "workbench-client-testing-app:zone:serve": "ng serve workbench-client-testing-app --configuration=development-zone --port 4203",
     "workbench-client-testing-app:zone:dist-serve": "serve dist/workbench-client-testing-app-zone/browser -p 4203 --config ../../../apps/workbench-client-testing-app/vercel-test-server.config.json --no-request-logging",
+
     "e2e:build": "tsc -p projects/scion/e2e-testing/tsconfig.json",
     "e2e:run": "cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test --config projects/scion/e2e-testing/playwright.config.ts",
     "e2e:debug": "cross-env PLAYWRIGHT_BROWSERS_PATH=0 PWDEBUG=1 playwright test --config projects/scion/e2e-testing/playwright.config.ts",
