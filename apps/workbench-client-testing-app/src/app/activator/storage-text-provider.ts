@@ -36,6 +36,9 @@ export function provideTextFromStorage(): void {
           take(1),
         );
     }
+    else if (params['options.error']) {
+      throw Error('TEXT_PROVIDER_ERROR');
+    }
     else {
       return sessionStorage.observe$<string | undefined>(`textprovider.texts.${key}`).pipe(substituteParams(params));
     }
@@ -79,6 +82,13 @@ export function provideValueFromStorage(): void {
     const id = request.params!.get('id');
     console.debug(`[TextProvider][${appSymbolicName}] Requesting value: ${id}`);
     return sessionStorage.observe$<string | undefined>(`textprovider.values.${id}`).pipe(take(1));
+  });
+
+  // Register message listener that errors.
+  inject(MessageClient).onMessage(`textprovider/${appSymbolicName}/values/:id/error`, request => {
+    const id = request.params!.get('id');
+    console.debug(`[TextProvider][${appSymbolicName}] Requesting value: ${id}`);
+    throw Error('TEXT_PROVIDER_ERROR');
   });
 }
 

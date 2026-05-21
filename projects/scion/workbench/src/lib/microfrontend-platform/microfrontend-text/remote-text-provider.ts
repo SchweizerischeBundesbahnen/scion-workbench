@@ -9,14 +9,15 @@
  */
 
 import {Translatable, WORKBENCH_TEXT_PROVIDER, WorkbenchTextProviderFn} from '../../text/workbench-text-provider.model';
-import {EnvironmentProviders, makeEnvironmentProviders, Signal} from '@angular/core';
+import {EnvironmentProviders, inject, makeEnvironmentProviders, Signal} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {animationFrameScheduler, combineLatest, concatWith, map, NEVER, Observable, of, ReplaySubject, share, switchMap, timer} from 'rxjs';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {mapToBody, MessageClient} from '@scion/microfrontend-platform';
 import {WorkbenchTextService} from '@scion/workbench-client';
 import {Dictionaries} from '@scion/toolkit/util';
-import {finalize} from 'rxjs/operators';
+import {catchError, finalize} from 'rxjs/operators';
+import {Logger, LoggerNames} from '../../logging';
 
 /**
  * Registers a text provider for the SCION Workbench to get texts from micro apps.
@@ -63,7 +64,7 @@ export function provideRemoteTextProvider(): EnvironmentProviders {
     }
 
     // Request the text by intent. Parameters starting with the topic protocol 'topic://' are resolved via messaging.
-    const text$ = observeParams$(params, {provider})
+    const text$ = observeParams$(params, {provider, translatable: `%${key}`})
       .pipe(
         // Ensure the observable to never complete independent of text provider request completion, simplifying cache cleanup as
         // finalize is only called when the last subscriber unsubscribes, after the specified TTL.
@@ -102,7 +103,7 @@ export function provideRemoteTextProvider(): EnvironmentProviders {
     }
 
     // Substitute params. Parameters starting with the topic protocol 'topic://' are resolved via messaging.
-    const text$ = observeParams$(params, {provider})
+    const text$ = observeParams$(params, {provider, translatable: text})
       .pipe(
         // Never complete the observable, simplifying cache cleanup as `finalize` is only called when the last subscriber unsubscribes, after the specified TTL.
         concatWith(NEVER),
@@ -124,7 +125,8 @@ export function provideRemoteTextProvider(): EnvironmentProviders {
    *
    * Parameters starting with the topic protocol 'topic://' are resolved via topic-based messaging.
    */
-  function observeParams$(params: {[name: string]: string | `topic://${string}`}, options: {provider: string}): Observable<Array<[string, string]>> {
+  function observeParams$(params: {[name: string]: string | `topic://${string}`}, options: {provider: string; translatable: string}): Observable<Array<[string, string]>> {
+    const logger = inject(Logger);
     const observableParams: Array<Observable<[string, string]>> = Object.entries(params).map(([param, value]) => {
       if (!value.startsWith(TOPIC_PROTOCOL)) {
         return of([param, value]);
@@ -136,7 +138,13 @@ export function provideRemoteTextProvider(): EnvironmentProviders {
           mapToBody(),
           // Resolve text if the resolver returns a translatable.
           switchMap(resolved => resolved?.startsWith('%') ? Beans.get(WorkbenchTextService).text$(resolved, options) : of(resolved)),
-          map(resolved => [param, resolved ?? '']),
+          map(resolved => [param, resolved ?? ''] satisfies [string, string]),
+          // Do not propagate error to still display text and valid parameters.
+          catchError(error => {
+            // Prefix the key with an additional `%` character to escape the leading `%` character. See console formatting rules: https://developer.mozilla.org/en-US/docs/Web/API/console
+            logger.error(`[TextProviderError] Failed to resolve parameter ':${param}' in text '${options.translatable.startsWith('%') ? `%${options.translatable}` : options.translatable}' from application '${options.provider}'. Caused by: `, error, LoggerNames.MICROFRONTEND);
+            return of([param, `:${param}`] satisfies [string, string]);
+          }),
         );
     });
 
