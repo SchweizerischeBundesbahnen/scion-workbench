@@ -16,6 +16,8 @@ import {ViewPagePO} from './page-object/view-page.po';
 import {expectView} from '../matcher/view-matcher';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 import {waitForCondition} from '../helper/testing.util';
+import {MAIN_AREA} from '../workbench.model';
+import {LayoutPagePO} from './page-object/layout-page/layout-page.po';
 
 test.describe('View Tabbar', () => {
 
@@ -818,6 +820,55 @@ test.describe('View Tabbar', () => {
       // Expect active tab to be scrolled into view.
       await expect(appPO.view({viewId: 'view.103'}).tab.state('active')).toBeVisible();
       await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isScrolledIntoView()).toBe(true);
+    });
+
+    test('should scroll the activated tab into view', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.setDesignToken('--sci-workbench-tab-min-width', '300px');
+
+      await workbenchNavigator.createPerspective(layout => layout
+        .addPart(MAIN_AREA)
+        .addPart('part.left', {align: 'left'})
+        .navigatePart('part.left', ['test-layout']),
+      );
+
+      const partbar = appPO.part({partId: MAIN_AREA}).bar;
+      const layoutPage = new LayoutPagePO(appPO.part({partId: 'part.left'}));
+
+      // Open router page.
+      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+
+      // Open view tabs until 5 tabs are scrolled out of view.
+      while (await partbar.getHiddenTabCount() < 5) {
+        await routerPage.navigate(['test-view'], {target: 'blank', activate: false});
+      }
+
+      // Expect last view to be inactive.
+      const lastViewId = (await partbar.viewTabBar.getViewIds()).pop()!;
+      const lastViewTab = appPO.view({viewId: lastViewId}).tab;
+      await expect(lastViewTab.state('active')).not.toBeVisible();
+
+      // Expect last view to be scrolled out of view.
+      await expect.poll(() => lastViewTab.isScrolledIntoView()).toBe(false);
+
+      // Activate last view programmatically (without performing a navigation).
+      await layoutPage.modifyLayout(layout => layout.activateView(lastViewId));
+
+      // Expect last view to be active and scrolled into view.
+      await expect(lastViewTab.state('active')).toBeVisible();
+      await expect.poll(() => lastViewTab.isScrolledIntoView()).toBe(true);
+
+      // Scroll tabbar to the start.
+      await partbar.viewTabBar.setViewportScrollLeft(0);
+
+      // Expect last view to be scrolled out of view.
+      await expect.poll(() => lastViewTab.isScrolledIntoView()).toBe(false);
+
+      // Activate last view programmatically (without performing a navigation, only updating activation instant).
+      await layoutPage.modifyLayout(layout => layout.activateView(lastViewId));
+
+      // Expect last view to be scrolled into view.
+      await expect.poll(() => lastViewTab.isScrolledIntoView()).toBe(true);
     });
 
     test('should not scroll the active tab into view when closing an inactive tab', async ({appPO, workbenchNavigator}) => {
