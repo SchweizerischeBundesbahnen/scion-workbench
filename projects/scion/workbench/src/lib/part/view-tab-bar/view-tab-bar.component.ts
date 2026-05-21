@@ -448,6 +448,9 @@ export class ViewTabBarComponent implements OnDestroy {
       // Track navigation of the active view, scrolling its tab into view if necessary.
       activeView.navigation();
 
+      // Track activation instant of the active view, scrolling its tab into view if necessary.
+      activeView.activationInstant();
+
       // Track unsetting drag state to ensure the active view is scrolled into view after drop or cancel.
       this._onUnsetDragState();
 
