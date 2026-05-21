@@ -9,11 +9,26 @@
  */
 import {Locator} from '@playwright/test';
 import {MatcherReturnType} from 'playwright/types/test';
+import {retryOnError} from '../helper/testing.util';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toContainFocus}.
  */
 export async function toContainFocus(locator: Locator): Promise<MatcherReturnType> {
+  try {
+    // Retry assertion to behave like a Playwright web-first assertion, i.e., wait and retry until the expected condition is met.
+    await retryOnError(() => assertFocus(locator));
+    return {pass: true, message: () => 'Focus on element or children.'};
+  }
+  catch (error) {
+    return {pass: false, message: () => error instanceof Error ? error.message : `${error}`};
+  }
+}
+
+async function assertFocus(locator: Locator): Promise<void> {
   const focused = await locator.evaluate((element: HTMLElement) => !!document.activeElement && element.contains(document.activeElement));
-  return {pass: focused, message: () => focused ? 'Focus on element or children.' : 'No focus on element or children.'};
+
+  if (!focused) {
+    throw new Error('No focus on element or children.');
+  }
 }
