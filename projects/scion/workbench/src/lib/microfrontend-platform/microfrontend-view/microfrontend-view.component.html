@@ -10,7 +10,6 @@
                        [attr.data-capabilityid]="capability?.metadata!.id"
                        [attr.data-app]="capability?.metadata!.appSymbolicName"
                        [attr.data-focus]="focusWithin() ? '' : null"
-                       [keystrokes]="keystrokesToBubble()"
                        [class]="view.classList.asList()"
                        (focuswithin)="onFocusWithin($event)">
       <ng-container *ngComponentOutlet="splash"/>

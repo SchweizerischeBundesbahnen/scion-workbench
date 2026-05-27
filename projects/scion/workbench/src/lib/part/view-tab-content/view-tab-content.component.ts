@@ -10,16 +10,16 @@
 
 import {Component, inject} from '@angular/core';
 import {WorkbenchView} from '../../view/workbench-view.model';
-import {TextPipe} from '../../text/text.pipe';
-import {IconComponent} from '../../icon/icon.component';
+import {SciTextPipe} from '@scion/components/text';
+import {SciIconComponent} from '@scion/components/icon';
 
 @Component({
   selector: 'wb-view-tab-content',
   templateUrl: './view-tab-content.component.html',
   styleUrls: ['./view-tab-content.component.scss'],
   imports: [
-    TextPipe,
-    IconComponent,
+    SciTextPipe,
+    SciIconComponent,
   ],
 })
 export class ViewTabContentComponent {

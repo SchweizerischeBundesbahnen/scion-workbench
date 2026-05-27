@@ -1,42 +1,28 @@
 <!-- Title -->
 @if (part.title()) {
-  <span class="title e2e-title" (mousedown)="onPartBarMouseDown($event)">{{(part.title() | wbText)()}}</span>
+  <span class="title e2e-title" (mousedown)="onPartBarMouseDown($event)">{{(part.title() | sciText)()}}</span>
 }
+
+<sci-toolbar name="toolbar:workbench.part.titlebar"
+             [context]="toolbarActiveViewContext()"
+             [acceleratorTarget]="part.portal.element()"
+             (mousedown)="onToolbarMouseDown()"/>
 
 <!-- View Tabs -->
 @if (part.views().length) {
   <wb-view-tab-bar [maxWidth]="maxViewTabBarWidth()"/>
 }
 
-<!-- Start Actions -->
-@if (startActions().length) {
-  <div class="actions">
-    @for (action of startActions(); track action) {
-      <wb-part-action [action]="action" [ngClass]="action.cssClass" data-align="start"/>
-    }
-  </div>
-}
+<!-- .tabbar suffix is suboptimal since also used in parts without view tabs. Find better suffix, e.g., actionbar -->
+<sci-toolbar name="toolbar:workbench.part.tabbar"
+             [context]="toolbarActiveViewContext()"
+             [acceleratorTarget]="part.portal.element()"
+             (mousedown)="onToolbarMouseDown()"/>
 
-<!-- Filler -->
 <div class="filler e2e-filler" #filler (mousedown)="onPartBarMouseDown($event)"></div>
 
-<!-- End Actions -->
-@if (endActions().length) {
-  <div class="actions">
-    @for (action of endActions(); track action) {
-      <wb-part-action [action]="action" [ngClass]="action.cssClass" data-align="end"/>
-    }
-  </div>
-}
-
-<!-- View List Dropdown -->
-@if (part.views().length) {
-  <wb-view-list-button [title]="('%workbench.show_open_tabs.tooltip' | wbText)()"/>
-}
-
-<!-- Minimize Button -->
-@if (part.canMinimize()) {
-  <button (click)="onMinimize()" [title]="('%workbench.minimize.tooltip' | wbText)()" class="minimize e2e-minimize">
-    <wb-icon icon="workbench.minimize"/>
-  </button>
-}
+<sci-toolbar name="toolbar:workbench.part.toolbar"
+             [context]="toolbarActiveViewContext()"
+             [acceleratorTarget]="part.portal.element()"
+             (mousedown)="onToolbarMouseDown()"
+             wbToolbarVisibility/>

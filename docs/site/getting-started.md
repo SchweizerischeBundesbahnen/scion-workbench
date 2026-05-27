@@ -116,6 +116,8 @@ For a quick start, position the workbench absolutely and align it with the page 
 
 The workbench requires some styles to be imported into `styles.scss`, as follows:
 
+TODO [menu] Anpassen!
+
 ```scss
 @use '@scion/workbench';
 ```
@@ -132,7 +134,7 @@ In this getting started guide, we will use Material icons. To import Material ic
 
 
 ```scss
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL@20..24,400,0&display=block');
 ```
 
 For a nice typography, you can also install the Roboto font by adding the following lines to `styles.scss`:

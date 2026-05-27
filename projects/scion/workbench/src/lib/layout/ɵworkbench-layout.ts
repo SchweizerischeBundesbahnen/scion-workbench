@@ -16,15 +16,14 @@ import {Routing} from '../routing/routing.util';
 import {Commands, NavigationData, NavigationState, NavigationStates, Outlets} from '../routing/routing.model';
 import {ActivatedRoute, UrlSegment} from '@angular/router';
 import {ACTIVITY_ID_PREFIX, ActivityId, computeActivityId, computePartId, computeViewId, isPartId, isViewId, PART_ID_PREFIX, PartId, VIEW_ID_PREFIX, ViewId, WorkbenchOutlet} from '../workbench.identifiers';
-import {Arrays, Objects} from '@scion/toolkit/util';
+import {Arrays, Objects, prune} from '@scion/toolkit/util';
 import {UrlSegmentMatcher} from '../routing/url-segment-matcher';
 import {WorkbenchLayouts} from './workbench-layouts.util';
 import {Logger} from '../logging';
 import {ACTIVITY_PANEL_HEIGHT, ACTIVITY_PANEL_RATIO, ACTIVITY_PANEL_WIDTH, MActivity, MActivityLayout, MActivityStack} from '../activity/workbench-activity.model';
-import {RequireOne} from '../common/utility-types';
+import {RequireOne} from '@scion/toolkit/types';
 import {readCssVariable} from '../common/dom.util';
 import {ActivationInstantProvider} from '../activation-instant.provider';
-import {prune} from '../common/prune.util';
 
 /**
  * @inheritDoc
@@ -1496,15 +1495,15 @@ function createDefaultActivityLayout(): MActivityLayout {
     },
     panels: {
       left: {
-        width: Number.parseInt(readCssVariable(documentRoot, '--sci-workbench-layout-panel-left-width', `${ACTIVITY_PANEL_WIDTH}px`)),
+        width: Number.parseInt(readCssVariable(documentRoot, '--sci-workbench-activity-panel-left-width', `${ACTIVITY_PANEL_WIDTH}px`)),
         ratio: ACTIVITY_PANEL_RATIO,
       },
       right: {
-        width: Number.parseInt(readCssVariable(documentRoot, '--sci-workbench-layout-panel-right-width', `${ACTIVITY_PANEL_WIDTH}px`)),
+        width: Number.parseInt(readCssVariable(documentRoot, '--sci-workbench-activity-panel-right-width', `${ACTIVITY_PANEL_WIDTH}px`)),
         ratio: ACTIVITY_PANEL_RATIO,
       },
       bottom: {
-        height: Number.parseInt(readCssVariable(documentRoot, '--sci-workbench-layout-panel-bottom-height', `${ACTIVITY_PANEL_HEIGHT}px`)),
+        height: Number.parseInt(readCssVariable(documentRoot, '--sci-workbench-activity-panel-bottom-height', `${ACTIVITY_PANEL_HEIGHT}px`)),
         ratio: ACTIVITY_PANEL_RATIO,
       },
     },

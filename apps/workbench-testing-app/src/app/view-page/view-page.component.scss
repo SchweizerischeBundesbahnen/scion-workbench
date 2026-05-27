@@ -6,6 +6,26 @@
   gap: 1em;
   padding: 1em;
 
+  > sci-toolbar {
+    background-color: var(--sci-color-gray-100);
+    border: 1px solid var(--sci-color-border);
+    padding: .25em;
+  }
+
+  > sci-menubar {
+    background-color: var(--sci-color-gray-100);
+    border: 1px solid var(--sci-color-border);
+    padding: .125em .25em;
+  }
+
+  > div.context-menu {
+    border: 1px solid var(--sci-color-border);
+    border-radius: var(--sci-corner);
+    padding: .5em;
+    background-color: var(--sci-color-gray-100);
+    cursor: default;
+  }
+
   > section {
     display: flex;
     flex-direction: column;

@@ -1,6 +1,5 @@
-@if (part.title() || part.views().length || part.actions().length || part.canMinimize()) {
-  <wb-part-bar/>
-}
+<!-- Conditionally hidden via CSS; must not be removed from DOM for toolbars to compute toolbar items. -->
+<wb-part-bar/>
 
 @if (part.views().length) {
   <!-- Prevent splitting if there is no active view, i.e, when dragging the last view out of the tabbar. -->

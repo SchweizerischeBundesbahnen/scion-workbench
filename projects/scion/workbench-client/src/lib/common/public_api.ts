@@ -9,4 +9,3 @@
  */
 
 export {type Empty} from './utility-types';
-export {type Disposable} from './disposable';

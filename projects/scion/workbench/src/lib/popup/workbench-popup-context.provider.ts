@@ -8,10 +8,17 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {InjectionToken, Provider} from '@angular/core';
+import {inject, InjectionToken, Provider} from '@angular/core';
 import {provideWorkbenchMessageBoxService} from '../message-box/workbench-message-box-service.provider';
 import {provideWorkbenchDialogService} from '../dialog/workbench-dialog-service.provider';
-import {provideWorkbenchPopupService} from './workbench-popup-service.provider';
+import {provideWorkbenchPopupService} from '../popup/workbench-popup-service.provider';
+import {provideMenuAcceleratorTargetProvider, provideMenuContextProvider, provideMenuInjectionContextProvider, provideMenuService} from '@scion/components/menu';
+import {WorkbenchMenuContexts} from '../menu/workbench-menu-environment';
+import {ɵWorkbenchPopup} from './ɵworkbench-popup.model';
+import {WorkbenchPopup} from './workbench-popup.model';
+import {PopupId} from '../workbench.identifiers';
+import {WORKBENCH_ELEMENT} from '../workbench-element-references';
+import {WorkbenchPopupRegistry} from './workbench-popup.registry';
 
 /**
  * DI token to register providers available for DI if in the context of a workbench popup.
@@ -28,6 +35,22 @@ export function provideWorkbenchPopupContext(): Provider {
       provideWorkbenchDialogService(),
       provideWorkbenchMessageBoxService(),
       provideWorkbenchPopupService(),
+      provideMenuService(),
+      provideMenuContextProvider(() => {
+        return new Map().set(WorkbenchMenuContexts.PopupId, inject(WorkbenchPopup).id);
+      }),
+      provideMenuAcceleratorTargetProvider(() => {
+        return inject(ɵWorkbenchPopup).element;
+      }),
+      provideMenuInjectionContextProvider(context => {
+        const popupId = context.get(WorkbenchMenuContexts.PopupId) as PopupId;
+        return [
+          {provide: ɵWorkbenchPopup, useValue: inject(WorkbenchPopupRegistry).get(popupId)},
+          {provide: WorkbenchPopup, useExisting: ɵWorkbenchPopup},
+          {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchPopup},
+          ...inject(WORKBENCH_POPUP_CONTEXT),
+        ];
+      }),
     ],
     multi: true,
   };

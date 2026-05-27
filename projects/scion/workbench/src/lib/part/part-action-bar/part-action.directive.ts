@@ -50,6 +50,8 @@ import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
  * ```
  *
  * Alternatively, actions can be added using a factory function and registered via {@link WorkbenchService.registerPartAction}.
+ *
+ * @deprecated since version 22.0.0-beta.2. Replaced by the new Workbench Menu API. Use `contributeMenu` function to contribute to the partbar: `contributeMenu('toolbar:workbench.part.toolbar', (menu) => menu.addToolbarButton({label: '%label', onSelect: () => doSomething()}))`. Available locations: 'toolbar:workbench.part.toolbar', 'toolbar:workbench.part.tabbar', 'menu:workbench.part.toolbar'. You can inject the part using `inject(WorkbenchPart)`. Marked for removal in version 23.
  */
 @Directive({selector: 'ng-template[wbPartAction]'})
 export class WorkbenchPartActionDirective {

@@ -12,7 +12,7 @@ import {coerceArray, rejectWhenAttached, waitUntilAttached} from '../../helper/t
 import {Locator} from '@playwright/test';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
 import {ViewPO} from '../../view.po';
-import {Translatable, WorkbenchNotificationOptions} from '@scion/workbench';
+import {WorkbenchNotificationOptions} from '@scion/workbench';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {PartPO} from '../../part.po';
 import {PopupPO} from '../../popup.po';
@@ -20,6 +20,7 @@ import {DialogPO} from '../../dialog.po';
 import {WorkbenchDialogPagePO} from './workbench-dialog-page.po';
 import {WorkbenchPopupPagePO} from './workbench-popup-page.po';
 import {AppPO} from '../../app.po';
+import {Translatable} from '@scion/components/text';
 
 /**
  * Page object to interact with {@link NotificationPageComponent}.

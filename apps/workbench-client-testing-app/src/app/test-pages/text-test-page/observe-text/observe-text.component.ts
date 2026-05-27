@@ -15,7 +15,8 @@ import {UUID} from '@scion/toolkit/uuid';
 import {WorkbenchTextService} from '@scion/workbench-client';
 import {Subscription} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {prune, RecordComponent} from 'workbench-testing-app-common';
+import {RecordComponent} from 'workbench-testing-app-common';
+import {prune} from '@scion/toolkit/util';
 
 @Component({
   selector: 'app-observe-text',
@@ -55,7 +56,7 @@ export default class ObserveTextComponent {
     const provider = this.form.controls.provider.value;
     const ttl = this.form.controls.ttl.value || undefined;
 
-    this.subscription = this._workbenchTextService.text$(translatable, {params: prune(params), provider, ttl})
+    this.subscription = this._workbenchTextService.text$(translatable, {params: prune(params, {pruneIfEmpty: true}), provider, ttl})
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe({
         next: text => this.text.set(text ?? '<undefined>'),

@@ -5,6 +5,8 @@
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Icons
 
+TODO [menu] Anpassen!
+
 The SCION Workbench uses built-in icons in various places. Additionally, the application can use its own icons in the layout, such as for icons of docked workbench parts.
 
 ### How to Provide Icons
@@ -17,7 +19,7 @@ import {Type} from '@angular/core';
 
 provideWorkbench({
   iconProvider: (icon: string): ComponentType<unknown> | undefined => {
-    if (icon.startsWith('workbench.')) {
+    if (icon.startsWith('scion.')) {
       return undefined; // return `undefined` to not replace built-in workbench icons
     }
 
@@ -39,7 +41,7 @@ import {provideWorkbench, WorkbenchIconDescriptor} from '@scion/workbench';
 
 provideWorkbench({
   iconProvider: (icon: string): WorkbenchIconDescriptor | undefined => {
-    if (icon.startsWith('workbench.')) {
+    if (icon.startsWith('scion.')) {
       return undefined; // return `undefined` to not replace built-in workbench icons
     }
     return {
@@ -67,18 +69,18 @@ class CustomIconComponent {
 ### Built-In Workbench Icons
 The SCION Workbench requires the following icons, which can be replaced using an icon provider.
 
-| Icon Key            | Usage                                            |
-|---------------------|--------------------------------------------------|
-| workbench.clear     | Clear button in input fields                     |
-| workbench.close     | Close button in views, dialogs and notifications |
-| workbench.dirty     | Visual indicator for view with unsaved content   |
-| workbench.menu_down | Menu button of drop down menus                   |
-| workbench.minimize  | Minimize button in docked parts                  |
-| workbench.pin       | Visual indicator for a pinned view               |
-| workbench.search    | Visual indicator in search or filter fields      |
+| Icon Key        | Usage                                            |
+|-----------------|--------------------------------------------------|
+| scion.clear     | Clear button in input fields                     |
+| scion.close     | Close button in views, dialogs and notifications |
+| scion.dirty     | Visual indicator for view with unsaved content   |
+| scion.menu_down | Menu button of drop down menus                   |
+| scion.minimize  | Minimize button in docked parts                  |
+| scion.pin       | Visual indicator for a pinned view               |
+| scion.search    | Visual indicator in search or filter fields      |
 
 > [!TIP]
-> To not replace built-in workbench icons, the icon provider can return `undefined` for icons starting with the `workbench.` prefix.
+> To not replace built-in icons, the icon provider can return `undefined` for icons starting with the `scion.` prefix.
 
 
 ### Default Icon Provider
@@ -87,7 +89,7 @@ The SCION Workbench installs a Material icon provider if no icon provider is con
 The default icon provider requires the application to include the Material icon font, for example in `styles.scss`, as follows:
 
 ```scss
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL@20..24,400,0&display=block');
 ```
 
 The application can then reference icons from the Material Icons Font: https://fonts.google.com/icons

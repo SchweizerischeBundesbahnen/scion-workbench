@@ -8,13 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {createEnvironmentInjector, EnvironmentInjector, EnvironmentProviders, inject, Injector, makeEnvironmentProviders} from '@angular/core';
-import {map} from 'rxjs';
+import {DestroyRef, EnvironmentProviders, inject, Injector, makeEnvironmentProviders} from '@angular/core';
+import {map, Observable} from 'rxjs';
 import {provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
 import {WorkbenchClient} from '@scion/workbench-client';
-import {toObservable} from '@angular/core/rxjs-interop';
-import {text} from '../../text/text';
-import {finalize} from 'rxjs/operators';
+import {text} from '@scion/components/text';
+import {createDestroyableInjector} from '@scion/components/common';
+import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 
 /**
  * Registers a text provider for micro apps to request texts from the host app.
@@ -22,27 +22,24 @@ import {finalize} from 'rxjs/operators';
 export function provideHostTextProvider(): EnvironmentProviders {
   return makeEnvironmentProviders([
     provideMicrofrontendPlatformInitializer(() => {
-      const injector = inject(Injector);
+      const rootInjector = inject(Injector);
 
       WorkbenchClient.registerTextProvider((key, params) => {
-        const translatable = Object.entries(params).reduce((translatable, [name, value]) => `${translatable};${name}=${encodeSemicolons(value)}`, `%${key}`);
-        const environmentInjector = createEnvironmentInjector([], injector.get(EnvironmentInjector));
+        // Delegate to text provider registered in @scion/components.
+        // Use a wrapper observable to bind `text()` to the lifecycle of the subscription.
+        return new Observable(observer => {
+          const injector = createDestroyableInjector({parent: rootInjector});
 
-        return toObservable(text(translatable, {injector: environmentInjector}), {injector: environmentInjector})
-          .pipe(
-            map(text => text !== '' && text !== key ? text : undefined), // emit `undefined` if not found the text
-            finalize(() => environmentInjector.destroy()), // free resources when the communication terminates
-          );
+          toObservable(text(`%${key}`, {params, injector}), {injector})
+            .pipe(
+              map(text => text !== '' && text !== `%${key}` ? text : undefined), // emit `undefined` if not found the text
+              takeUntilDestroyed(injector.get(DestroyRef)),
+            )
+            .subscribe(observer);
+
+          return () => injector.destroy();
+        });
       });
     }),
   ]);
-}
-
-/**
- * Encodes semicolons (`;`) as `\\;` to prevent interpretation as interpolation parameter separators.
- *
- * @see Translatable
- */
-function encodeSemicolons(value: string): string {
-  return value.replaceAll(';', '\\;');
 }

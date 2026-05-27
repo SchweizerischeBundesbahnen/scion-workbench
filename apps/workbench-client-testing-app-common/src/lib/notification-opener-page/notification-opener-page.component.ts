@@ -15,7 +15,8 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {UUID} from '@scion/toolkit/uuid';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {MultiValueInputComponent, parseTypedString, prune, stringifyError} from 'workbench-testing-app-common';
+import {MultiValueInputComponent, parseTypedString, stringifyError} from 'workbench-testing-app-common';
+import {prune} from '@scion/toolkit/util';
 import {Beans} from '@scion/toolkit/bean-manager';
 
 @Component({

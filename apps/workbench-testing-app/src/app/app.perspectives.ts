@@ -12,7 +12,7 @@ import {PartialMatchRouteSnapshot, Route, ROUTES, Routes, UrlSegment} from '@ang
 import {canMatchWorkbenchPart, canMatchWorkbenchView, MAIN_AREA, WorkbenchLayout, WorkbenchLayoutFactory, WorkbenchPerspectives, WorkbenchRouteData} from '@scion/workbench';
 import {EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
 import {ViewSkeletonNavigationData} from './sample-view/sample-view.component';
-import {SettingsService} from './settings.service';
+import {Settings} from './settings.service';
 import {PartSkeletonNavigationData} from './sample-part/sample-part.component';
 import {environment} from '../environments/environment';
 
@@ -98,7 +98,7 @@ export const perspectives: WorkbenchPerspectives = {
         [PerspectiveData.label]: 'Focus Test Perspective',
         [PerspectiveData.menuItemLabel]: 'Focus Test Perspective',
         [PerspectiveData.menuGroup]: 'test-perspectives',
-        [PerspectiveData.visible]: () => inject(SettingsService).isEnabled('showTestPerspectives'),
+        [PerspectiveData.visible]: () => inject(Settings).showTestPerspectives(),
       },
     },
     {
@@ -131,11 +131,11 @@ export function provideRoutesForPerspectives(): EnvironmentProviders {
       provide: ROUTES,
       useFactory: (): Routes => [
         // Sample View
-        {path: '', canMatch: [(route: Route, segments: UrlSegment[], currentSnapshot: PartialMatchRouteSnapshot) => canMatchWorkbenchView('sample-view')(route, segments, currentSnapshot) && inject(SettingsService).isEnabled('showSkeletons')], loadComponent: () => import('./sample-view/sample-view.component'), data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'}},
-        {path: '', canMatch: [(route: Route, segments: UrlSegment[], currentSnapshot: PartialMatchRouteSnapshot) => canMatchWorkbenchView('sample-view')(route, segments, currentSnapshot) && !inject(SettingsService).isEnabled('showSkeletons')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'}},
+        {path: '', canMatch: [(route: Route, segments: UrlSegment[], currentSnapshot: PartialMatchRouteSnapshot) => canMatchWorkbenchView('sample-view')(route, segments, currentSnapshot) && inject(Settings).showSkeletons()], loadComponent: () => import('./sample-view/sample-view.component'), data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'}},
+        {path: '', canMatch: [(route: Route, segments: UrlSegment[], currentSnapshot: PartialMatchRouteSnapshot) => canMatchWorkbenchView('sample-view')(route, segments, currentSnapshot) && !inject(Settings).showSkeletons()], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'}},
         // Sample Part
-        {path: '', canMatch: [(route: Route, segments: UrlSegment[], currentSnapshot: PartialMatchRouteSnapshot) => canMatchWorkbenchPart('sample-part')(route, segments, currentSnapshot) && inject(SettingsService).isEnabled('showSkeletons')], loadComponent: () => import('./sample-part/sample-part.component')},
-        {path: '', canMatch: [(route: Route, segments: UrlSegment[], currentSnapshot: PartialMatchRouteSnapshot) => canMatchWorkbenchPart('sample-part')(route, segments, currentSnapshot) && !inject(SettingsService).isEnabled('showSkeletons')], loadComponent: () => import('./part-page/part-page.component')},
+        {path: '', canMatch: [(route: Route, segments: UrlSegment[], currentSnapshot: PartialMatchRouteSnapshot) => canMatchWorkbenchPart('sample-part')(route, segments, currentSnapshot) && inject(Settings).showSkeletons()], loadComponent: () => import('./sample-part/sample-part.component')},
+        {path: '', canMatch: [(route: Route, segments: UrlSegment[], currentSnapshot: PartialMatchRouteSnapshot) => canMatchWorkbenchPart('sample-part')(route, segments, currentSnapshot) && !inject(Settings).showSkeletons()], loadComponent: () => import('./part-page/part-page.component')},
       ],
       multi: true,
     },
@@ -149,7 +149,7 @@ function provideActivityPerspectiveLayout1(factory: WorkbenchLayoutFactory): Wor
     .addPart('projects', {dockTo: 'left-top'}, {label: 'Projects', icon: 'folder'})
     .addPart('inbox', {dockTo: 'left-top'}, {label: 'Inbox', icon: 'mail'})
     .addPart('bookmarks', {dockTo: 'left-bottom'}, {icon: 'bookmark', label: 'Bookmarks'})
-    .addPart('find', {dockTo: 'bottom-left'}, {label: 'Find', icon: 'search'})
+    .addPart('find', {dockTo: 'bottom-left'}, {label: 'Find', icon: 'scion.search'})
     .addPart('inventory', {dockTo: 'right-top'}, {label: 'Inventory', icon: 'inventory'})
     .addPart('notifications', {dockTo: 'right-top'}, {label: 'Notifications', icon: 'notifications'})
     .addPart('progress', {dockTo: 'bottom-right'}, {label: 'Progress', icon: 'overview'})
@@ -191,7 +191,7 @@ function provideActivityPerspectiveLayout2(factory: WorkbenchLayoutFactory): Wor
     .addPart('bookmarks', {dockTo: 'left-top'}, {icon: 'bookmark', label: 'Bookmarks'})
     .addPart('repositories', {dockTo: 'left-bottom'}, {icon: 'cloud', label: 'Repositories'})
     .addPart('terminal', {dockTo: 'bottom-left'}, {label: 'Terminal', icon: 'terminal'})
-    .addPart('find', {dockTo: 'bottom-left'}, {label: 'Find', icon: 'search'})
+    .addPart('find', {dockTo: 'bottom-left'}, {label: 'Find', icon: 'scion.search'})
     .addPart('commits', {dockTo: 'bottom-left'}, {icon: 'graph_1', label: 'Commits'})
     .addPart('structure', {dockTo: 'right-top'}, {icon: 'category', label: 'Structure'})
     .addPart('servers', {dockTo: 'right-top'}, {icon: 'storage', label: 'Servers'})

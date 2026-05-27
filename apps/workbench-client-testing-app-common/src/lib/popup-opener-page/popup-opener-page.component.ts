@@ -10,7 +10,7 @@
 
 import {Component, ElementRef, inject, signal, viewChild} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {CloseStrategy, DialogId, NotificationId, PartId, PopupId, PopupOrigin, ViewId, WORKBENCH_ELEMENT, WorkbenchElement, WorkbenchPopupService} from '@scion/workbench-client';
+import {DialogId, NotificationId, PartId, PopupId, PopupOrigin, ViewId, WORKBENCH_ELEMENT, WorkbenchElement, WorkbenchPopupService} from '@scion/workbench-client';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import {PopupPositionLabelPipe, Position} from './popup-position-label.pipe';
@@ -19,8 +19,9 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {UUID} from '@scion/toolkit/uuid';
-import {MultiValueInputComponent, parseTypedString, stringifyError, undefinedIfEmpty} from 'workbench-testing-app-common';
+import {MultiValueInputComponent, parseTypedString, stringifyError} from 'workbench-testing-app-common';
 import {Beans} from '@scion/toolkit/bean-manager';
+import {prune} from '@scion/toolkit/util';
 
 @Component({
   selector: 'app-popup-opener-page',
@@ -96,10 +97,10 @@ export class PopupOpenerPageComponent {
       params: params ?? undefined,
       anchor: options.anchor.controls.position.value === 'element' ? this._openButton().nativeElement : this._popupOrigin$,
       align: options.align.value || undefined,
-      closeStrategy: undefinedIfEmpty<CloseStrategy>({
+      closeStrategy: prune({
         onFocusLost: options.closeStrategy.controls.onFocusLost.value,
         onEscape: options.closeStrategy.controls.onEscape.value,
-      }),
+      }, {pruneIfEmpty: true}),
       cssClass: options.cssClass.value,
       context: parseTypedString(options.context.value, {undefinedIfEmpty: true}),
     })

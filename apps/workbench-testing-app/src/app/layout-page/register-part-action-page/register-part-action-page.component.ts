@@ -11,11 +11,11 @@
 import {Component, inject, input, signal} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WorkbenchPart, WorkbenchService} from '@scion/workbench';
-import {MultiValueInputComponent, stringifyError, undefinedIfEmpty} from 'workbench-testing-app-common';
+import {MultiValueInputComponent, stringifyError} from 'workbench-testing-app-common';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
-import {SettingsService} from '../../settings.service';
+import {Settings} from '../../settings.service';
 import {UUID} from '@scion/toolkit/uuid';
-import {Arrays} from '@scion/toolkit/util';
+import {Arrays, prune} from '@scion/toolkit/util';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 
 @Component({
@@ -31,7 +31,7 @@ import {SciMaterialIconDirective} from '@scion/components.internal/material-icon
 export default class RegisterPartActionPageComponent {
 
   private readonly _formBuilder = inject(NonNullableFormBuilder);
-  private readonly _settingsService = inject(SettingsService);
+  private readonly _settings = inject(Settings);
 
   protected readonly workbenchService = inject(WorkbenchService);
   protected readonly viewList = `view-list-${UUID.randomUUID()}`;
@@ -54,8 +54,8 @@ export default class RegisterPartActionPageComponent {
   protected onRegister(): void {
     this.registerError.set(undefined);
     // Capture form values because the action will be constructed asynchronously.
-    const canMatchPartIds = undefinedIfEmpty(this.form.controls.canMatch.controls.part.value.split(/\s+/).filter(Boolean));
-    const canMatchViewIds = undefinedIfEmpty(this.form.controls.canMatch.controls.view.value.split(/\s+/).filter(Boolean));
+    const canMatchPartIds = prune(this.form.controls.canMatch.controls.part.value.split(/\s+/).filter(Boolean), {pruneIfEmpty: true});
+    const canMatchViewIds = prune(this.form.controls.canMatch.controls.view.value.split(/\s+/).filter(Boolean), {pruneIfEmpty: true});
     const canMatchGrid = this.form.controls.canMatch.controls.grid.value || undefined;
     const content = this.form.controls.content.value;
     const align = this.form.controls.align.value || undefined;
@@ -96,7 +96,7 @@ export default class RegisterPartActionPageComponent {
   }
 
   private resetForm(): void {
-    if (this._settingsService.isEnabled('resetFormsOnSubmit')) {
+    if (this._settings.resetFormsOnSubmit()) {
       this.form.reset();
     }
   }

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Disposable} from './common/disposable';
+import {Disposable} from '@scion/toolkit/types';
 import {WorkbenchElement, WorkbenchPartActionFn, WorkbenchViewMenuItemFn} from './workbench.model';
 import {WorkbenchView} from './view/workbench-view.model';
 import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
@@ -173,6 +173,8 @@ export abstract class WorkbenchService {
    *
    * @param fn - function to contribute an action.
    * @return handle to unregister the action.
+   *
+   * @deprecated since version 22.0.0-beta.2. Replaced by the new Workbench Menu API. Use `contributeMenu` function to contribute to the partbar: `contributeMenu('toolbar:workbench.part.toolbar', (menu) => menu.addToolbarButton({label: '%label', onSelect: () => doSomething()}))`. Available locations: 'toolbar:workbench.part.toolbar', 'toolbar:workbench.part.tabbar', 'menu:workbench.part.toolbar'. You can inject the part using `inject(WorkbenchPart)`. Marked for removal in version 23.
    */
   public abstract registerPartAction(fn: WorkbenchPartActionFn): Disposable;
 
@@ -197,6 +199,8 @@ export abstract class WorkbenchService {
    *
    * @param fn - function to contribute a menu item.
    * @return handle to unregister the menu item.
+   *
+   * @deprecated since version 22.0.0-beta.2. Replaced by the new Workbench Menu API. Use `contributeMenu` function to contribute to the context menu: `contributeMenu('menu:workbench.view.contextmenu', (menu) => menu.addMenuItem({label: '%label', onSelect: () => doSomething()}))`. You can inject the view using `inject(WorkbenchView)`. Marked for removal in version 23.
    */
   public abstract registerViewMenuItem(fn: WorkbenchViewMenuItemFn): Disposable;
 
@@ -217,15 +221,23 @@ export abstract class WorkbenchService {
     /**
      * Controls the alignment of the bottom docked panel.
      *
-     * Defaults to the `--sci-workbench-layout-panel-align` design token, or `justify` if not set.
+     * Defaults to the `--sci-workbench-activity-panel-bottom-align` design token, or `justify` if not set.
      */
     panelAlignment: WritableSignal<'left' | 'right' | 'center' | 'justify'>;
     /**
      * Controls animation of docked panels.
      *
-     * Defaults to the `--sci-workbench-layout-panel-animate` design token, or `true` if not set.
+     * Defaults to the `--sci-workbench-activity-panel-animate` design token, or `true` if not set.
      */
     panelAnimation: WritableSignal<boolean>;
+    /**
+     * Controls when to display toolbars of the SCION Workbench.
+     *
+     * Set to `always` to always show workbench toolbars, or `on-hover-or-focus` to only show workbench toolbars when hovered or focused.
+     *
+     * Defaults to the `--sci-workbench-toolbar-visibility` design token, or `on-hover-or-focus` if not set.
+     */
+    toolbarVisibility: WritableSignal<'always' | 'on-hover-or-focus'>;
   };
 
   /**

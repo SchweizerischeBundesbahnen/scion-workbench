@@ -1,0 +1,39 @@
+/**
+ * Provides styles for an icon button's element states: :hover, :active, and :focus.
+ *
+ * Supports additional styling or overrides via @content.
+ */
+@mixin icon-button-element-states {
+  all: unset;
+  display: inline-grid;
+  place-content: center;
+  place-items: center;
+  padding: .25em;
+  border-radius: var(--sci-button-border-radius);
+  user-select: none;
+  overflow: hidden;
+  cursor: var(--sci-button-cursor);
+  --sci-icon-size: var(--sci-button-icon-size);
+
+  &:hover:where(:not(:disabled)) {
+    background-color: var(--sci-button-background-color-hover);
+  }
+
+  &:active:where(:not(:disabled)) {
+    background-color: var(--sci-button-background-color-active);
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: var(--sci-button-outline-width) solid var(--sci-color-accent);
+  }
+
+  &:disabled {
+    color: var(--sci-button-text-color-disabled);
+  }
+
+  @content;
+}

@@ -9,12 +9,12 @@
  */
 
 import {UrlSegment} from '@angular/router';
-import {CanCloseFn, CanCloseRef, WorkbenchMenuItem} from '../workbench.model';
+import {CanCloseFn, CanCloseRef} from '../workbench.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {NavigationData, NavigationState} from '../routing/routing.model';
 import {Signal} from '@angular/core';
 import {ViewId} from '../workbench.identifiers';
-import {Translatable} from '../text/workbench-text-provider.model';
+import {Translatable} from '@scion/components/text';
 
 /**
  * A view is a visual workbench element for displaying content stacked or side-by-side in the workbench layout.
@@ -52,24 +52,28 @@ export abstract class WorkbenchView {
   public abstract readonly navigation: Signal<WorkbenchViewNavigation | undefined>;
 
   /**
-   * Part which contains this view.
+   * Reference to the part that contains this view.
    *
    * Note: the part of a view can change, e.g., when the view is moved to another part.
    */
   public abstract readonly part: Signal<WorkbenchPart>;
 
   /**
-   * Title displayed in the view tab.
+   * Sets the tab title to be displayed for this view.
    *
    * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   *
+   * SCION uses text providers to resolve translation keys. A text provider can be registered using {@link WorkbenchConfig.textProvider}.
    */
   public abstract get title(): Signal<Translatable | null>;
   public abstract set title(title: Translatable | null);
 
   /**
-   * Subtitle displayed in the view tab.
+   * Sets the tab subtitle to be displayed for this view.
    *
    * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   *
+   * SCION uses text providers to resolve translation keys. A text provider can be registered using {@link WorkbenchConfig.textProvider}.
    */
   public abstract get heading(): Signal<Translatable | null>;
   public abstract set heading(heading: Translatable | null);
@@ -129,11 +133,6 @@ export abstract class WorkbenchView {
    * Indicates whether the tab of this view is scrolled into the tabbar.
    */
   public abstract readonly scrolledIntoView: Signal<boolean>;
-
-  /**
-   * Menu items associated with this view.
-   */
-  public abstract readonly menuItems: Signal<WorkbenchMenuItem[]>;
 
   /**
    * Gets the activation instant of this view.

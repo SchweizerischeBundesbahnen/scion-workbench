@@ -3,7 +3,7 @@ import {booleanAttribute, DestroyRef, DOCUMENT, ElementRef, inject, Injector, nu
 import {Arrays} from '@scion/toolkit/util';
 
 import {UID} from './uid.util';
-import {DisposeFn} from './disposable';
+import {DisposeFn} from '@scion/toolkit/types';
 import {Observable} from 'rxjs';
 import {clamp} from './math.util';
 

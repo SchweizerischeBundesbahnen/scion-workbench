@@ -12,7 +12,8 @@ import {Component, inject} from '@angular/core';
 import {WorkbenchRouter} from '@scion/workbench-client';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
-import {MultiValueInputComponent, prune} from 'workbench-testing-app-common';
+import {MultiValueInputComponent} from 'workbench-testing-app-common';
+import {prune} from '@scion/toolkit/util';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 
 @Component({
