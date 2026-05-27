@@ -12,10 +12,11 @@ import {Component, forwardRef, inject} from '@angular/core';
 import {AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator} from '@angular/forms';
 import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {WorkbenchDialogCapability, WorkbenchDialogSize} from '@scion/workbench-client';
-import {MultiValueInputComponent, parseTypedString, RecordComponent, undefinedIfEmpty} from 'workbench-testing-app-common';
+import {WorkbenchDialogCapability} from '@scion/workbench-client';
+import {MultiValueInputComponent, parseTypedString, RecordComponent} from 'workbench-testing-app-common';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {prune} from '@scion/toolkit/util';
 
 @Component({
   selector: 'app-dialog-capability-properties',
@@ -63,16 +64,16 @@ export class DialogCapabilityPropertiesComponent implements ControlValueAccessor
     this.form.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => {
-        this._cvaChangeFn({
-          path: parseTypedString(this.form.controls.path.value)!, // allow `undefined` to test capability validation
-          size: undefinedIfEmpty<WorkbenchDialogSize>({
-            width: parseTypedString(this.form.controls.size.controls.width.value)!, // allow `undefined` to test capability validation
-            height: parseTypedString(this.form.controls.size.controls.height.value)!, // allow `undefined` to test capability validation
+        this._cvaChangeFn(prune({
+          path: parseTypedString<string>(this.form.controls.path.value)!, // allow `undefined` to test capability validation
+          size: {
+            width: parseTypedString<string>(this.form.controls.size.controls.width.value)!, // allow `undefined` to test capability validation
+            height: parseTypedString<string>(this.form.controls.size.controls.height.value)!, // allow `undefined` to test capability validation
             minWidth: this.form.controls.size.controls.minWidth.value || undefined,
             maxWidth: this.form.controls.size.controls.maxWidth.value || undefined,
             minHeight: this.form.controls.size.controls.minHeight.value || undefined,
             maxHeight: this.form.controls.size.controls.maxHeight.value || undefined,
-          })!, // allow `undefined` to test capability validation
+          },
           title: this.form.controls.title.value || undefined,
           resolve: this.form.controls.resolve.value ?? undefined,
           closable: this.form.controls.closable.value ?? undefined,
@@ -80,7 +81,7 @@ export class DialogCapabilityPropertiesComponent implements ControlValueAccessor
           padding: this.form.controls.padding.value ?? undefined,
           showSplash: this.form.controls.showSplash.value ?? undefined,
           cssClass: this.form.controls.cssClass.value ?? undefined,
-        });
+        }, {recursive: true, pruneIfEmpty: true})!);
         this._cvaTouchedFn();
       });
   }

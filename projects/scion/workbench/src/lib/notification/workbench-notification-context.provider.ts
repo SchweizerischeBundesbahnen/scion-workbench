@@ -8,10 +8,17 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {InjectionToken, Provider} from '@angular/core';
+import {inject, InjectionToken, Provider} from '@angular/core';
 import {provideWorkbenchMessageBoxService} from '../message-box/workbench-message-box-service.provider';
 import {provideWorkbenchDialogService} from '../dialog/workbench-dialog-service.provider';
 import {provideWorkbenchPopupService} from '../popup/workbench-popup-service.provider';
+import {provideMenuAcceleratorTargetProvider, provideMenuContextProvider, provideMenuInjectionContextProvider, provideMenuService} from '@scion/components/menu';
+import {ɵWorkbenchNotification} from './ɵworkbench-notification.model';
+import {WORKBENCH_ELEMENT} from '../workbench-element-references';
+import {WorkbenchNotificationRegistry} from './workbench-notification.registry';
+import {WorkbenchMenuContexts} from '../menu/workbench-menu-environment';
+import {WorkbenchNotification} from './workbench-notification.model';
+import {NotificationId} from '../workbench.identifiers';
 
 /**
  * DI token to register providers available for DI if in the context of a workbench notification.
@@ -28,6 +35,22 @@ export function provideWorkbenchNotificationContext(): Provider {
       provideWorkbenchDialogService(),
       provideWorkbenchMessageBoxService(),
       provideWorkbenchPopupService(),
+      provideMenuService(),
+      provideMenuContextProvider(() => {
+        return new Map().set(WorkbenchMenuContexts.NotificationId, inject(WorkbenchNotification).id);
+      }),
+      provideMenuAcceleratorTargetProvider(() => {
+        return inject(ɵWorkbenchNotification).portal.element;
+      }),
+      provideMenuInjectionContextProvider(context => {
+        const notificationId = context.get(WorkbenchMenuContexts.NotificationId) as NotificationId;
+        return [
+          {provide: ɵWorkbenchNotification, useValue: inject(WorkbenchNotificationRegistry).get(notificationId)},
+          {provide: WorkbenchNotification, useExisting: ɵWorkbenchNotification},
+          {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchNotification},
+          ...inject(WORKBENCH_NOTIFICATION_CONTEXT),
+        ];
+      }),
     ],
     multi: true,
   };

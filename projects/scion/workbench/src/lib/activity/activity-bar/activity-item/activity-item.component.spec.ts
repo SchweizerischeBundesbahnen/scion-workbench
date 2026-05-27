@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, input, signal} from '@angular/core';
+import {Component, input, inputBinding, signal} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {provideWorkbenchForTest} from '../../../testing/workbench.provider';
@@ -33,8 +33,8 @@ describe('Activity Item Component', () => {
     await waitUntilWorkbenchStarted();
 
     // Expect default icon component to be rendered.
-    expect(fixture.debugElement.query(By.css('wb-activity-item[data-activityid="activity.1"] wb-icon.material-icons')).nativeElement.innerText).toEqual('icon-1');
-    expect(fixture.debugElement.query(By.css('wb-activity-item[data-activityid="activity.2"] wb-icon.material-icons')).nativeElement.innerText).toEqual('icon-2');
+    expect(fixture.debugElement.query(By.css('wb-activity-item[data-activityid="activity.1"] sci-icon.material-icons')).nativeElement.innerText).toEqual('icon-1');
+    expect(fixture.debugElement.query(By.css('wb-activity-item[data-activityid="activity.2"] sci-icon.material-icons')).nativeElement.innerText).toEqual('icon-2');
   });
 
   it('should render custom icon', async () => {
@@ -53,7 +53,7 @@ describe('Activity Item Component', () => {
             .addPart(MAIN_AREA)
             .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'icon-1', label: 'Activity 1', ɵactivityId: 'activity.1'})
             .addPart('part.activity-2', {dockTo: 'left-top'}, {icon: 'icon-2', label: 'Activity 2', ɵactivityId: 'activity.2'}),
-          iconProvider: icon => ({component: TesteeIconComponent, inputs: {icon}}),
+          iconProvider: icon => ({component: TesteeIconComponent, bindings: [inputBinding('icon', signal(icon))]}),
         }),
       ],
     });

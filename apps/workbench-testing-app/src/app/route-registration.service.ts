@@ -19,7 +19,8 @@ import RouterPageComponent from './router-page/router-page.component';
 import FocusTestPageComponent from './test-pages/focus-test-page/focus-test-page.component';
 import TextTestPageComponent from './test-pages/text-test-page/text-test-page.component';
 import {canMatchWorkbenchDialogCapability, canMatchWorkbenchMessageBoxCapability, canMatchWorkbenchNotificationCapability, canMatchWorkbenchPart, canMatchWorkbenchPartCapability, canMatchWorkbenchPopupCapability, canMatchWorkbenchView, canMatchWorkbenchViewCapability} from '@scion/workbench';
-import {CanMatchWorkbenchCapabilityDescriptor, CanMatchWorkbenchElementDescriptor, prune, RouteDescriptor} from 'workbench-testing-app-common';
+import {CanMatchWorkbenchCapabilityDescriptor, CanMatchWorkbenchElementDescriptor, RouteDescriptor} from 'workbench-testing-app-common';
+import {prune} from '@scion/toolkit/util';
 import PartPageComponent from './part-page/part-page.component';
 import {DialogOpenerPageComponent as MicrofrontendDialogOpenerPageComponent, MessageBoxOpenerPageComponent as MicrofrontendMessageBoxOpenerPageComponent, NotificationParamReducerTestPageComponent, PopupOpenerPageComponent as MicrofrontendPopupOpenerPageComponent} from 'workbench-client-testing-app-common';
 import SizeTestPageComponent from './test-pages/size-test-page/size-test-page.component';
@@ -59,9 +60,9 @@ function parseRoute(route: RouteDescriptor): Route {
   return prune({
     path: route.path,
     component: parseComponent(route.component),
-    data: route.data,
+    data: prune(route.data, {pruneIfEmpty: true}),
     canMatch: route.canMatch?.map(parseCanMatchFn),
-  }, {pruneIfEmpty: true})!;
+  });
 
   function parseComponent(component: string): Type<unknown> {
     switch (component) {

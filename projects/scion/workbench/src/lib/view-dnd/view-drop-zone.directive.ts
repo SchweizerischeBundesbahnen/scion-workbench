@@ -12,7 +12,7 @@ import {computed, Directive, effect, ElementRef, inject, input, NgZone, output, 
 import {createElement, positionElement, setAttribute, setStyle} from '../common/dom.util';
 import {ViewDragData, ViewDragService} from './view-drag.service';
 import {ViewDropPlaceholderRenderer} from './view-drop-placeholder-renderer.service';
-import {Disposable} from '../common/disposable';
+import {Disposable} from '@scion/toolkit/types';
 import {boundingClientRect} from '@scion/components/dimension';
 import {UUID} from '@scion/toolkit/uuid';
 import {BehaviorSubject, delay, identity, of, switchMap} from 'rxjs';

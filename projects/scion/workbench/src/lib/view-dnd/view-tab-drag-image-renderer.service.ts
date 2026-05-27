@@ -18,12 +18,11 @@ import {ViewTabDragImageComponent} from '../part/view-tab-drag-image/view-tab-dr
 import {CanCloseFn, CanCloseRef, WorkbenchMenuItem} from '../workbench.model';
 import {ViewId} from '../workbench.identifiers';
 import {WorkbenchView, WorkbenchViewNavigation} from '../view/workbench-view.model';
-import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../workbench.constants';
 import {WorkbenchPart} from '../part/workbench-part.model';
-import {Disposable} from '../common/disposable';
+import {Disposable} from '@scion/toolkit/types';
 import {throwError} from '../common/throw-error.util';
 import {UUID} from '@scion/toolkit/uuid';
-import {Translatable} from '../text/workbench-text-provider.model';
+import {Translatable} from '@scion/components/text';
 
 export type ConstrainFn = (rect: DOMRect) => DOMRect;
 
@@ -136,7 +135,6 @@ export class ViewTabDragImageRenderer {
       parent: this._injector,
       providers: [
         {provide: WorkbenchView, useValue: new DragImageWorkbenchView(dragData)},
-        {provide: VIEW_TAB_RENDERING_CONTEXT, useValue: 'drag-image' satisfies ViewTabRenderingContext},
       ],
     })));
     // Detect for changes because constructed outside of Angular.
@@ -211,7 +209,6 @@ class DragImageWorkbenchView implements WorkbenchView {
   public readonly last = signal(true).asReadonly();
   public readonly position = signal(0).asReadonly();
   public readonly scrolledIntoView = signal(true).asReadonly();
-  public readonly menuItems = signal([]);
   public readonly isClosable: Signal<boolean>;
   public readonly activationInstant = signal(0);
   public readonly bounds = signal(undefined);

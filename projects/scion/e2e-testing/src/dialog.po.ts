@@ -12,7 +12,7 @@ import {Locator, Page} from '@playwright/test';
 import {coerceArray, DomRect, fromRect, hasCssClass, selectBy} from './helper/testing.util';
 import {AppPO} from './app.po';
 import {DialogId} from '@scion/workbench';
-import {RequireOne} from './helper/utility-types';
+import {RequireOne} from '@scion/toolkit/types';
 
 /**
  * PO for interacting with a workbench dialog.

@@ -10,14 +10,15 @@
 
 import {Component, ElementRef, inject, signal, Type, viewChild} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {DialogId, NotificationId, PartId, PopupId, PopupOrigin, ViewId, WorkbenchPopupService} from '@scion/workbench';
+import {DialogId, NotificationId, PartId, PopupId, PopupOrigin, ViewId, WorkbenchPopupOptions, WorkbenchPopupService} from '@scion/workbench';
 import PopupPageComponent from '../popup-page/popup-page.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import {map, startWith, switchMap} from 'rxjs/operators';
 import {Observable, of, timer} from 'rxjs';
 import BlankTestPageComponent from '../test-pages/blank-test-page/blank-test-page.component';
 import {PopupPositionLabelPipe, Position} from './popup-position-label.pipe';
-import {MultiValueInputComponent, parseTypedString, prune, stringifyError} from 'workbench-testing-app-common';
+import {MultiValueInputComponent, parseTypedString, stringifyError} from 'workbench-testing-app-common';
+import {prune} from '@scion/toolkit/util';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
@@ -94,7 +95,7 @@ export default class PopupOpenerPageComponent {
     const component = this.readComponentFromUI();
     const options = this.form.controls.options.controls;
     await this._popupService.open<string>(component, prune({
-      inputs: {
+      inputs: prune({
         ...SciKeyValueFieldComponent.toDictionary(options.inputs, false),
         size: {
           width: this.form.controls.size.controls.width.value || undefined,
@@ -104,16 +105,16 @@ export default class PopupOpenerPageComponent {
           minHeight: this.form.controls.size.controls.minHeight.value || undefined,
           maxHeight: this.form.controls.size.controls.maxHeight.value || undefined,
         },
-      },
+      }, {pruneIfEmpty: true, recursive: true}),
       anchor: options.anchor.controls.position.value === 'element' ? this._openButton() : this.observePopupOrigin$(),
       align: options.align.value || undefined,
       cssClass: options.cssClass.value,
-      closeStrategy: {
+      closeStrategy: prune({
         onFocusLost: options.closeStrategy.controls.onFocusLost.value,
         onEscape: options.closeStrategy.controls.onEscape.value,
-      },
+      }, {pruneIfEmpty: true}),
       context: parseTypedString(options.context.value, {undefinedIfEmpty: true}),
-    }, {pruneIfEmpty: true})!)
+    } satisfies WorkbenchPopupOptions))
       .then(result => this.returnValue.set(result))
       .catch((error: unknown) => this.popupError.set(stringifyError(error)));
   }

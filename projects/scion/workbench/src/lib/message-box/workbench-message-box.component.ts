@@ -18,8 +18,7 @@ import {MessageBoxHeaderComponent} from './message-box-header/message-box-header
 import {ComponentType} from '@angular/cdk/portal';
 import {TypeofPipe} from '../common/typeof.pipe';
 import {SciDimension, SciDimensionDirective} from '@scion/components/dimension';
-import {TextPipe} from '../text/text.pipe';
-import {Translatable} from '../text/workbench-text-provider.model';
+import {SciTextPipe, Translatable} from '@scion/components/text';
 
 /**
  * Renders the workbench message box.
@@ -38,7 +37,7 @@ import {Translatable} from '../text/workbench-text-provider.model';
     MessageBoxHeaderComponent,
     MessageBoxFooterComponent,
     TypeofPipe,
-    TextPipe,
+    SciTextPipe,
   ],
   // Required for backward compatibility for zone-based applications to support child components with eager change detection.
   changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection

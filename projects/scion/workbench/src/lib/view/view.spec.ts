@@ -3195,7 +3195,7 @@ function isViewHeadingVisible(fixture: ComponentFixture<unknown>, viewId: ViewId
 
 function isViewDirty(fixture: ComponentFixture<unknown>, viewId: ViewId): boolean {
   const viewTabElement = fixture.debugElement.query(By.css(`wb-view-tab[data-viewid="${viewId}"]`));
-  return viewTabElement.query(By.css('wb-icon.e2e-dirty')) as DebugElement | null !== null;
+  return viewTabElement.query(By.css('sci-icon.e2e-dirty')) as DebugElement | null !== null;
 }
 
 function getViewCssClass(fixture: ComponentFixture<unknown>, viewId: ViewId): string[] {

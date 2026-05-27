@@ -11,14 +11,15 @@
 import {Component, DOCUMENT, effect, ElementRef, inject, NgZone, Provider, signal, untracked, viewChild, ChangeDetectionStrategy} from '@angular/core';
 import {fromEvent, NEVER, Observable, timer} from 'rxjs';
 import {NgComponentOutlet} from '@angular/common';
-import {TextPipe} from '../text/text.pipe';
-import {IconComponent} from '../icon/icon.component';
+import {SciTextPipe} from '@scion/components/text';
 import {ɵWorkbenchNotification} from './ɵworkbench-notification.model';
 import {trackFocus} from '../focus/workbench-focus-tracker.service';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {observeIn, subscribeIn} from '@scion/toolkit/operators';
 import {filter} from 'rxjs/operators';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
+import {contributeMenu, SciToolbarComponent, SciToolbarFactory} from '@scion/components/menu';
+import {ToolbarVisibilityDirective} from '../common/toolbar-visibility.directive';
 
 /**
  * Renders the content of a workbench notification.
@@ -28,10 +29,11 @@ import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneO
   templateUrl: './workbench-notification.component.html',
   styleUrl: './workbench-notification.component.scss',
   imports: [
-    TextPipe,
-    IconComponent,
+    SciTextPipe,
     NgComponentOutlet,
     SciViewportComponent,
+    SciToolbarComponent,
+    ToolbarVisibilityDirective,
   ],
   hostDirectives: [
     GlassPaneDirective,
@@ -44,6 +46,7 @@ import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneO
   host: {
     '[attr.data-notificationid]': 'notification.id',
     '[attr.data-severity]': 'notification.severity()',
+    '[attr.data-focus]': `notification.focused() ? '' : null`,
     '[style.min-height]': 'notification.size.minHeight()',
     '[style.height]': 'notification.size.height()',
     '[style.max-height]': 'notification.size.maxHeight()',
@@ -70,10 +73,29 @@ export class WorkbenchNotificationComponent {
     this.closeOnEscapeIfOnTop();
 
     trackFocus(inject(ElementRef).nativeElement as HTMLElement, this.notification);
+
+    contributeMenu({location: 'toolbar:workbench.notification.toolbar', position: 'end'}, toolbar => {
+      this.contributeToolbarAdditionsMenu(toolbar);
+      this.contributeCloseButton(toolbar);
+    });
   }
 
-  protected onClose(): void {
-    this.notification.close();
+  /**
+   * Contributes a menu for the application to contribute to the notification toolbar menu.
+   *
+   * Public contribution point: 'menu:workbench.notification.toolbar'
+   */
+  private contributeToolbarAdditionsMenu(toolbar: SciToolbarFactory): void {
+    toolbar.addToolbarMenu({icon: 'scion.more_vertical', visualMenuIndicator: false, menu: {name: 'menu:workbench.notification.toolbar'}}, menu => menu);
+  }
+
+  private contributeCloseButton(toolbar: SciToolbarFactory): void {
+    toolbar.addToolbarButton({
+      icon: 'scion.close',
+      tooltip: '%scion.workbench.close.tooltip',
+      cssClass: 'e2e-close',
+      onSelect: () => this.notification.close(),
+    });
   }
 
   protected onEscape(event: Event): void {

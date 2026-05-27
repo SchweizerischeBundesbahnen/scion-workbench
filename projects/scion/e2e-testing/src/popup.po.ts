@@ -12,7 +12,7 @@ import {Locator, Page} from '@playwright/test';
 import {coerceArray, DomRect, fromRect, getCssClasses, hasCssClass, selectBy} from './helper/testing.util';
 import {POPUP_DIAMOND_ANCHOR_SIZE} from './workbench/workbench-layout-constants';
 import {PopupId} from '@scion/workbench';
-import {RequireOne} from './helper/utility-types';
+import {RequireOne} from '@scion/toolkit/types';
 
 /**
  * Handle for interacting with a workbench popup.

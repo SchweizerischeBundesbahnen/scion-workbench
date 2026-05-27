@@ -9,7 +9,7 @@
  */
 
 import {Pipe, PipeTransform} from '@angular/core';
-import {undefinedIfEmpty} from './undefined-if-empty.util';
+import {prune} from '@scion/toolkit/util';
 
 /**
  * Returns `null` if the given object is empty.
@@ -18,6 +18,6 @@ import {undefinedIfEmpty} from './undefined-if-empty.util';
 export class NullIfEmptyPipe implements PipeTransform {
 
   public transform<T>(value: T): T | null {
-    return undefinedIfEmpty(value) ?? null;
+    return prune(value, {pruneIfEmpty: true}) ?? null;
   }
 }

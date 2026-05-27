@@ -13,7 +13,7 @@ import {AddPartsComponent, PartDescriptor} from '../tables/add-parts/add-parts.c
 import {AddViewsComponent, ViewDescriptor} from '../tables/add-views/add-views.component';
 import {NavigateViewsComponent, NavigationDescriptor} from '../tables/navigate-views/navigate-views.component';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {SettingsService} from '../../settings.service';
+import {Settings} from '../../settings.service';
 import {WorkbenchPart, WorkbenchRouter, WorkbenchService, WorkbenchView} from '@scion/workbench';
 import {MultiValueInputComponent, stringifyError} from 'workbench-testing-app-common';
 import {toSignal} from '@angular/core/rxjs-interop';
@@ -37,7 +37,7 @@ import {AddDockedPartsComponent, DockedPartDescriptor} from '../tables/add-docke
 export default class ModifyLayoutPageComponent {
 
   private readonly _formBuilder = inject(NonNullableFormBuilder);
-  private readonly _settingsService = inject(SettingsService);
+  private readonly _settings = inject(Settings);
   private readonly _workbenchRouter = inject(WorkbenchRouter);
 
   protected readonly form = this._formBuilder.group({
@@ -169,7 +169,7 @@ export default class ModifyLayoutPageComponent {
   }
 
   private resetForm(): void {
-    if (this._settingsService.isEnabled('resetFormsOnSubmit')) {
+    if (this._settings.resetFormsOnSubmit()) {
       this.form.reset();
     }
   }

@@ -11,7 +11,6 @@
 import {afterRenderEffect, Component, DestroyRef, DOCUMENT, ElementRef, inject, Provider, untracked, viewChild, ChangeDetectionStrategy} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {ViewMenuService} from '../part/view-context-menu/view-menu.service';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
 import {Logger, LoggerNames} from '../logging';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
@@ -68,7 +67,6 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
     this._focusTrackerRef = trackFocus(this._host, this.view);
 
     this.installComponentLifecycleLogger();
-    this.installMenuAccelerators();
     this.unsetActiveElementOnPartDeactivate();
   }
 
@@ -104,10 +102,6 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
         this._activeElementBeforeDetach = activeElement;
       }
     }
-  }
-
-  private installMenuAccelerators(): void {
-    inject(ViewMenuService).installMenuAccelerators(inject(ElementRef), this.view);
   }
 
   /**

@@ -8,10 +8,17 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {InjectionToken, Provider} from '@angular/core';
+import {inject, InjectionToken, Provider} from '@angular/core';
 import {provideWorkbenchMessageBoxService} from '../message-box/workbench-message-box-service.provider';
-import {provideWorkbenchDialogService} from './workbench-dialog-service.provider';
+import {provideWorkbenchDialogService} from '../dialog/workbench-dialog-service.provider';
 import {provideWorkbenchPopupService} from '../popup/workbench-popup-service.provider';
+import {provideMenuAcceleratorTargetProvider, provideMenuContextProvider, provideMenuInjectionContextProvider, provideMenuService} from '@scion/components/menu';
+import {WorkbenchMenuContexts} from '../menu/workbench-menu-environment';
+import {WorkbenchDialog} from './workbench-dialog.model';
+import {ɵWorkbenchDialog} from './ɵworkbench-dialog.model';
+import {DialogId} from '../workbench.identifiers';
+import {WORKBENCH_ELEMENT} from '../workbench-element-references';
+import {WorkbenchDialogRegistry} from './workbench-dialog.registry';
 
 /**
  * DI token to register providers available for DI if in the context of a workbench dialog.
@@ -28,6 +35,22 @@ export function provideWorkbenchDialogContext(): Provider {
       provideWorkbenchDialogService(),
       provideWorkbenchMessageBoxService(),
       provideWorkbenchPopupService(),
+      provideMenuService(),
+      provideMenuContextProvider(() => {
+        return new Map().set(WorkbenchMenuContexts.DialogId, inject(WorkbenchDialog).id);
+      }),
+      provideMenuAcceleratorTargetProvider(() => {
+        return inject(ɵWorkbenchDialog).element;
+      }),
+      provideMenuInjectionContextProvider(context => {
+        const dialogId = context.get(WorkbenchMenuContexts.DialogId) as DialogId;
+        return [
+          {provide: ɵWorkbenchDialog, useValue: inject(WorkbenchDialogRegistry).get(dialogId)},
+          {provide: WorkbenchDialog, useExisting: ɵWorkbenchDialog},
+          {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchDialog},
+          ...inject(WORKBENCH_DIALOG_CONTEXT),
+        ];
+      }),
     ],
     multi: true,
   };

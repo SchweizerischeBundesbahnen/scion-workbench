@@ -14,8 +14,8 @@ import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDA
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {Commands, NavigationData, NavigationState} from '@scion/workbench';
-import {RouterCommandsComponent} from 'workbench-testing-app-common';
-import {MultiValueInputComponent, prune, RecordComponent} from 'workbench-testing-app-common';
+import {MultiValueInputComponent, RecordComponent, RouterCommandsComponent} from 'workbench-testing-app-common';
+import {prune} from '@scion/toolkit/util';
 import {UUID} from '@scion/toolkit/uuid';
 
 @Component({
@@ -65,13 +65,13 @@ export class NavigateViewsComponent implements ControlValueAccessor, Validator {
         this._cvaChangeFn(this.form.controls.navigations.controls.map(navigationFormGroup => prune({
           id: navigationFormGroup.controls.id.value,
           commands: navigationFormGroup.controls.commands.value,
-          extras: ({
+          extras: prune({
             hint: navigationFormGroup.controls.extras.controls.hint.value || undefined,
             data: navigationFormGroup.controls.extras.controls.data.value ?? undefined,
             state: navigationFormGroup.controls.extras.controls.state.value ?? undefined,
             cssClass: navigationFormGroup.controls.extras.controls.cssClass.value,
-          }),
-        }, {pruneIfEmpty: true})!));
+          }, {pruneIfEmpty: true}),
+        })));
         this._cvaTouchedFn();
       });
   }

@@ -1,31 +1,31 @@
-<header>{{('%workbench.page_not_found.title' | wbText)()}}</header>
+<header>{{('%scion.workbench.page_not_found.title' | sciText)()}}</header>
 
 @if (view) {
-  @let message = '%workbench.page_not_found_view.message;path=' + path() | wbText;
+  @let message = '%scion.workbench.page_not_found_view.message;path=' + path() | sciText;
   <section class="message" [innerHTML]="message()"></section>
 } @else if (part) {
-  @let message = '%workbench.page_not_found_part.message;path=' + path() | wbText;
+  @let message = '%scion.workbench.page_not_found_part.message;path=' + path() | sciText;
   <section class="message" [innerHTML]="message()"></section>
 } @else {
-  @let message = '%workbench.page_not_found.message;path=' + path() | wbText;
+  @let message = '%scion.workbench.page_not_found.message;path=' + path() | sciText;
   <section class="message" [innerHTML]="message()"></section>
 }
 
 <section class="actions">
   @if (view) {
-    <button (click)="workbenchService.resetPerspective()">{{('%workbench.reset_perspective.action' | wbText)()}}</button>
-    <button (click)="view.close()">{{('%workbench.close.action' | wbText)()}}</button>
+    <button (click)="workbenchService.resetPerspective()">{{('%scion.workbench.reset_perspective.action' | sciText)()}}</button>
+    <button (click)="view.close()">{{('%scion.workbench.close.action' | sciText)()}}</button>
   } @else if (part) {
-    <button (click)="workbenchService.resetPerspective()">{{('%workbench.reset_perspective.action' | wbText)()}}</button>
+    <button (click)="workbenchService.resetPerspective()">{{('%scion.workbench.reset_perspective.action' | sciText)()}}</button>
   } @else if (dialog) {
-    <button (click)="dialog.close()">{{('%workbench.close.action' | wbText)()}}</button>
+    <button (click)="dialog.close()">{{('%scion.workbench.close.action' | sciText)()}}</button>
   } @else if (popup) {
-    <button (click)="popup.close()">{{('%workbench.close.action' | wbText)()}}</button>
+    <button (click)="popup.close()">{{('%scion.workbench.close.action' | sciText)()}}</button>
   }
 </section>
 
 @if (isDevMode) {
-  @let hint = '%workbench.page_not_found_developer_hint.message' | wbText;
-  @let tooltip = '%workbench.dev_mode_only_hint.tooltip' | wbText;
+  @let hint = '%scion.workbench.page_not_found_developer_hint.message' | sciText;
+  @let tooltip = '%scion.workbench.dev_mode_only_hint.tooltip' | sciText;
   <section class="developer-hint" [title]="tooltip()">{{hint()}}</section>
 }

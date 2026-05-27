@@ -12,10 +12,11 @@ import {Component, forwardRef, inject} from '@angular/core';
 import {AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator} from '@angular/forms';
 import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {MultiValueInputComponent, parseTypedString, prune} from 'workbench-testing-app-common';
+import {MultiValueInputComponent, parseTypedString} from 'workbench-testing-app-common';
+import {prune} from '@scion/toolkit/util';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
-import {WorkbenchNotificationCapability, WorkbenchNotificationSize} from '@scion/workbench-client';
+import {WorkbenchNotificationCapability} from '@scion/workbench-client';
 
 @Component({
   selector: 'app-notification-capability-properties',
@@ -55,17 +56,17 @@ export class NotificationCapabilityPropertiesComponent implements ControlValueAc
     this.form.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => {
-        this._cvaChangeFn({
-          path: parseTypedString(this.form.controls.path.value)!, // allow `undefined` to test capability validation
-          size: prune<WorkbenchNotificationSize>({
-            height: parseTypedString(this.form.controls.size.controls.height.value)!, // allow `undefined` to test capability validation
+        this._cvaChangeFn(prune({
+          path: parseTypedString<string>(this.form.controls.path.value)!, // allow `undefined` to test capability validation
+          size: {
+            height: parseTypedString<string>(this.form.controls.size.controls.height.value)!, // allow `undefined` to test capability validation
             minHeight: this.form.controls.size.controls.minHeight.value || undefined,
             maxHeight: this.form.controls.size.controls.maxHeight.value || undefined,
-          }, {pruneIfEmpty: true}),
+          },
           groupParamsReducer: this.form.controls.groupParamsReducer.value || undefined,
           showSplash: this.form.controls.showSplash.value ?? undefined,
           cssClass: this.form.controls.cssClass.value ?? undefined,
-        });
+        }, {recursive: true, pruneIfEmpty: true})!);
         this._cvaTouchedFn();
       });
   }

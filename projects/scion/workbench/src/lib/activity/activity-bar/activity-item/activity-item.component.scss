@@ -14,9 +14,9 @@
     cursor: var(--sci-workbench-activity-item-cursor);
     user-select: none;
     overflow: hidden;
-    height: 24px;
-    width: 24px;
-    font-size: 24px;
+    height: var(--sci-workbench-activity-item-size);
+    width: var(--sci-workbench-activity-item-size);
+    --sci-icon-size: var(--sci-workbench-activity-item-size);
 
     &:hover {
       background-color: var(--sci-workbench-activity-item-background-color-hover);

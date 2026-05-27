@@ -13,7 +13,8 @@ import {AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR,
 import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchPopupCapability} from '@scion/workbench-client';
-import {MultiValueInputComponent, parseTypedString, prune} from 'workbench-testing-app-common';
+import {MultiValueInputComponent, parseTypedString} from 'workbench-testing-app-common';
+import {prune} from '@scion/toolkit/util';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 
@@ -59,7 +60,7 @@ export class PopupCapabilityPropertiesComponent implements ControlValueAccessor,
       .pipe(takeUntilDestroyed())
       .subscribe(() => {
         this._cvaChangeFn(prune({
-          path: parseTypedString(this.form.controls.path.value)!, // allow `undefined` to test capability validation
+          path: parseTypedString<string>(this.form.controls.path.value)!, // allow `undefined` to test capability validation
           size: {
             width: this.form.controls.size.controls.width.value || undefined,
             height: this.form.controls.size.controls.height.value || undefined,
@@ -71,7 +72,7 @@ export class PopupCapabilityPropertiesComponent implements ControlValueAccessor,
           showSplash: this.form.controls.showSplash.value ?? undefined,
           pinToDesktop: this.form.controls.pinToDesktop.value,
           cssClass: this.form.controls.cssClass.value ?? undefined,
-        }, {pruneIfEmpty: true})!);
+        }, {recursive: true, pruneIfEmpty: true})!);
         this._cvaTouchedFn();
       });
   }

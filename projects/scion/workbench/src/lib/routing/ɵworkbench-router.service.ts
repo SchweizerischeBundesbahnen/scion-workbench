@@ -11,7 +11,7 @@
 import {NavigationExtras, Router, UrlSegment, UrlTree} from '@angular/router';
 import {WorkbenchRouter} from './workbench-router.service';
 import {Defined, Objects} from '@scion/toolkit/util';
-import {afterNextRender, assertNotInReactiveContext, inject, Injectable, Injector, NgZone, runInInjectionContext, ɵZONELESS_ENABLED} from '@angular/core';
+import {ApplicationRef, assertNotInReactiveContext, inject, Injectable, Injector, NgZone, runInInjectionContext, ɵZONELESS_ENABLED} from '@angular/core';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {MAIN_AREA_LAYOUT_QUERY_PARAM} from '../workbench.constants';
 import {ANGULAR_ROUTER_MUTEX, SingleTaskExecutor} from '../executor/single-task-executor';
@@ -34,6 +34,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
   private readonly _workbenchViewRegistry = inject(WorkbenchViewRegistry);
   private readonly _injector = inject(Injector);
+  private readonly _applicationRef = inject(ApplicationRef);
   private readonly _zone = inject(NgZone);
   private readonly _zonelessEnabled = inject(ɵZONELESS_ENABLED);
   /** Mutex to serialize Workbench Router navigation requests, preventing race conditions when modifying the active workbench layout to operate on the most-recent layout. */
@@ -103,7 +104,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
       }
 
       // Block subsequent navigation(s) until Angular has flushed the changed layout to the DOM.
-      await new Promise<void>(resolve => afterNextRender(resolve, {injector: this._injector}));
+      await this._applicationRef.whenStable();
       return newLayout;
     });
 

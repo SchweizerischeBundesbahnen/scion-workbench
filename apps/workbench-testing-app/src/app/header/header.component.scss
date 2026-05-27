@@ -1,49 +1,19 @@
 :host {
   display: flex;
-  align-items: center;
-  height: 43px;
-  padding: .5em;
-  user-select: none;
-  gap: .25em;
+  justify-content: space-between;
+  background-color: var(--sci-color-background-primary);
+  border-bottom: 1px solid var(--sci-color-border);
+  padding: .25em;
 
-  > button.perspective-switcher {
-    all: unset;
-    flex: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: .5em;
-    padding: .3em .5em .3em .75em;
-    border-radius: var(--sci-corner);
-    background-color: var(--sci-color-accent);
-    color: var(--sci-color-background-accent);
-    min-width: 100px;
-
-    > span.icon {
-      font-size: 20px;
-    }
-
-    &:hover, &.menu-open {
-      background-color: color-mix(in srgb, var(--sci-color-accent) 95%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
-    }
+  > sci-toolbar[name="toolbar:settings"] {
+    padding: .25em 0;
   }
 
-  > div.filler {
-    flex: auto;
-  }
-
-  > div.theme-switcher {
-    flex: none;
-    display: flex;
-    gap: .25em;
-    align-items: center;
-  }
-
-  > button.settings {
-    flex: none;
-
-    &.menu-open {
-      background-color: var(--sci-workbench-button-background-color-hover);
-    }
+  // We have to use ::ng-deep since the button is not part of our component.
+  > sci-toolbar[name="toolbar:main"] ::ng-deep button.perspective-switcher {
+    --sci-toolbar-item-background-color: var(--sci-color-accent);
+    --sci-toolbar-item-text-color: var(--sci-color-accent-inverse);
+    --sci-toolbar-item-background-color-hover: color-mix(in srgb, var(--sci-color-accent) 95%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+    --sci-toolbar-item-background-color-active: color-mix(in srgb, var(--sci-toolbar-item-background-color-hover) 95%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
   }
 }

@@ -14,7 +14,8 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MAIN_AREA, WorkbenchPartCapability, WorkbenchViewRef} from '@scion/workbench-client';
-import {MultiValueInputComponent, parseTypedString, prune, RecordComponent} from 'workbench-testing-app-common';
+import {MultiValueInputComponent, parseTypedString, RecordComponent} from 'workbench-testing-app-common';
+import {prune} from '@scion/toolkit/util';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {UUID} from '@scion/toolkit/uuid';
@@ -65,23 +66,23 @@ export class PartCapabilityPropertiesComponent implements ControlValueAccessor, 
       .pipe(takeUntilDestroyed())
       .subscribe(() => {
         this._cvaChangeFn(prune({
-          path: parseTypedString(this.form.controls.path.value)!, // allow `undefined` to test capability validation,
+          path: parseTypedString<string>(this.form.controls.path.value)!, // allow `undefined` to test capability validation,
           views: this.form.controls.views.controls.map((viewFormGroup: FormGroup<ViewFormGroup>): WorkbenchViewRef => ({
             qualifier: viewFormGroup.controls.qualifier.value!,
             params: viewFormGroup.controls.params.value,
             active: viewFormGroup.controls.active.value,
             cssClass: viewFormGroup.controls.cssClass.value,
           })),
-          title: parseTypedString(this.form.controls.title.value) || undefined,
+          title: parseTypedString<string>(this.form.controls.title.value) || undefined,
           extras: {
-            icon: parseTypedString(this.form.controls.extras.controls.icon.value) || undefined!,
-            label: parseTypedString(this.form.controls.extras.controls.label.value) || undefined!,
-            tooltip: parseTypedString(this.form.controls.extras.controls.tooltip.value) || undefined,
+            icon: parseTypedString<string>(this.form.controls.extras.controls.icon.value) || undefined!,
+            label: parseTypedString<string>(this.form.controls.extras.controls.label.value) || undefined!,
+            tooltip: parseTypedString<string>(this.form.controls.extras.controls.tooltip.value) || undefined,
           },
           resolve: this.form.controls.resolve.value ?? undefined,
           showSplash: this.form.controls.showSplash.value ?? undefined,
           cssClass: this.form.controls.cssClass.value ?? undefined,
-        }, {pruneIfEmpty: true}));
+        }, {recursive: true, pruneIfEmpty: true}));
         this._cvaTouchedFn();
       });
   }

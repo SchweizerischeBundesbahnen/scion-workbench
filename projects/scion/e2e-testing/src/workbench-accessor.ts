@@ -10,7 +10,7 @@
 
 import {Page} from '@playwright/test';
 import {DialogId, NotificationId, PartId, PopupId, ViewId, WorkbenchService} from '@scion/workbench';
-import {RequireOne} from './helper/utility-types';
+import {RequireOne} from '@scion/toolkit/types';
 
 /**
  * Enables programmatic interaction with the Workbench API.

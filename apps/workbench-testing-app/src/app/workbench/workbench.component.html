@@ -21,18 +21,4 @@
       </ng-template>
     }
   }
-
-  <ng-template wbPartAction [canMatch]="isNotPeripheralPart" align="start" cssClass="e2e-open-new-tab" let-part>
-    <button [wbRouterLink]="'/start-page'" [wbRouterLinkExtras]="{target: 'blank', partId: part.id, position: 'end'}" sciMaterialIcon>
-      add
-    </button>
-  </ng-template>
-
-  <ng-template wbViewMenuItem group="move" cssClass="e2e-move-view" (action)="onMoveView($event)">
-    Move View...
-  </ng-template>
-
-  <ng-template wbViewMenuItem group="x-debug" cssClass="e2e-show-view-info" [accelerator]="['F1']" (action)="onShowViewInfo($event)">
-    Show View Info
-  </ng-template>
 </wb-workbench>

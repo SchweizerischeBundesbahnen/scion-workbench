@@ -9,8 +9,7 @@
  */
 
 import {effect, inject} from '@angular/core';
-import {toSignal} from '@angular/core/rxjs-interop';
-import {SettingsService} from '../settings.service';
+import {Settings} from '../settings.service';
 
 /**
  * Highlights glasspanes if enabled in settings.
@@ -18,7 +17,7 @@ import {SettingsService} from '../settings.service';
  * This function must be called within an injection context.
  */
 export function installGlasspaneHighlighter(): void {
-  const highlightGlasspane = toSignal(inject(SettingsService).observe$('highlightGlasspane'));
+  const highlightGlasspane = inject(Settings).highlightGlasspane;
 
   // Enable highlighting based on 'highlightGlasspane' setting.
   effect(() => {
