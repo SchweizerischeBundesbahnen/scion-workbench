@@ -25,7 +25,7 @@ test.describe('HTML base HREF', () => {
    * ```
    */
   test('should fetch the icon font if deployed in a subdirectory (esbuild)', async ({page, appPO}) => {
-    const response = page.waitForResponse(/scion-workbench-icons\.(ttf|woff)/);
+    const response = page.waitForResponse(/scion-icons\.(ttf|woff)/);
     await appPO.navigateTo({url: 'http://localhost:4300/subdir/browser/', microfrontendSupport: false});
     // The icon font is loaded when a view is opened (chevron icon in the tab bar).
     await appPO.openNewViewTab();
@@ -49,7 +49,7 @@ test.describe('HTML base HREF', () => {
    * TODO [Angular 22] remove when `@angular-devkit/build-angular:browser` builder is deprecated
    */
   test('should fetch the icon font if deployed in a subdirectory (webpack)', async ({page, appPO}) => {
-    const response = page.waitForResponse(/scion-workbench-icons\.(ttf|woff)/);
+    const response = page.waitForResponse(/scion-icons\.(ttf|woff)/);
     await appPO.navigateTo({url: 'http://localhost:4400/subdir/', microfrontendSupport: false});
     // The icon font is loaded when a view is opened (chevron icon in the tab bar).
     await appPO.openNewViewTab();

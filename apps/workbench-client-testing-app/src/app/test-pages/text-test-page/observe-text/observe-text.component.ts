@@ -15,7 +15,8 @@ import {UUID} from '@scion/toolkit/uuid';
 import {WorkbenchTextService} from '@scion/workbench-client';
 import {Subscription} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {prune, RecordComponent} from 'workbench-testing-app-common';
+import {RecordComponent} from 'workbench-testing-app-common';
+import {prune} from '@scion/toolkit/util';
 
 @Component({
   selector: 'app-observe-text',

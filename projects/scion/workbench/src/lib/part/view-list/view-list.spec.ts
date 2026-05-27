@@ -18,6 +18,7 @@ import {toSignal} from '@angular/core/rxjs-interop';
 import {asyncScheduler, of} from 'rxjs';
 import {observeOn} from 'rxjs/operators';
 
+// TODO [menu] Rewrite to menu API
 describe('View List', () => {
 
   it('should list views', async () => {

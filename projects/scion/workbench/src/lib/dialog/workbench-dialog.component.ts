@@ -25,6 +25,9 @@ import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneO
 import {filter, map, startWith, takeUntil} from 'rxjs/operators';
 import {fromMutation$} from '@scion/toolkit/observable';
 import {trackFocus} from '../focus/workbench-focus-tracker.service';
+import {setStyle} from '../common/dom.util';
+import {contributeMenu, SciToolbarFactory} from '@scion/components/menu';
+import {WorkbenchMenuContexts} from '../menu/workbench-menu-environment-provider';
 
 /**
  * Renders the content of a workbench dialog.
@@ -73,6 +76,7 @@ export class WorkbenchDialogComponent {
   private readonly _zone = inject(NgZone);
   private readonly _cdkTrapFocus = viewChild.required(CdkTrapFocus);
   private readonly _dialogElement = viewChild.required<ElementRef<HTMLElement>>('dialog_element');
+  private readonly _header = viewChild.required<ElementRef<HTMLElement>>('header');
 
   /** Element of the dialog that has or last had focus */
   private readonly _activeElement$ = new BehaviorSubject<HTMLElement | undefined>(undefined);
@@ -92,12 +96,37 @@ export class WorkbenchDialogComponent {
     this.autoFocus();
 
     trackFocus(this._host, this.dialog);
+
+    contributeMenu({location: 'toolbar:workbench.dialog.toolbar', position: 'end'}, toolbar => {
+      this.contributeToolbarAdditionsMenu(toolbar);
+      this.contributeCloseButton(toolbar);
+    }, {requiredContext: new Map().set(WorkbenchMenuContexts.ViewId, undefined)}); // clear view constraint to contribute to parts with and without views
   }
 
   private setDialogOffset(): void {
     const stackPosition = this.dialog.getPositionInDialogStack();
     this.transformTranslateX.set(stackPosition * 10);
     this.transformTranslateY.set(stackPosition * 10);
+  }
+
+  /**
+   * Contributes a menu for the application to contribute to the dialog toolbar m.
+   *
+   * Public contribution point: 'menu:workbench.dialog.toolbar'
+   */
+  private contributeToolbarAdditionsMenu(toolbar: SciToolbarFactory): void {
+    toolbar.addToolbarMenu({icon: 'more_vert', visualMenuHint: false, menu: {name: 'menu:workbench.dialog.toolbar'}}, menu => menu);
+  }
+
+  private contributeCloseButton(toolbar: SciToolbarFactory): void {
+    if (this.dialog.closable()) {
+      toolbar.addToolbarButton({
+        icon: 'scion.close',
+        tooltip: '%scion.workbench.close.tooltip',
+        cssClass: 'e2e-close',
+        onSelect: () => this.dialog.close(),
+      });
+    }
   }
 
   /**
@@ -112,11 +141,19 @@ export class WorkbenchDialogComponent {
     const activeElement = this._activeElement$.getValue();
     if (activeElement) {
       activeElement.focus();
+      return;
     }
-    else if (!this._cdkTrapFocus().focusTrap.focusFirstTabbableElement()) {
-      // Focus dialog element so that it can be closed via Escape keystroke.
-      this._dialogElement().nativeElement.focus();
+
+    // Temporarily hide header to prevent dialog toolbar from receiving focus.
+    setStyle(this._header().nativeElement, {visibility: 'hidden'});
+    const focused = this._cdkTrapFocus().focusTrap.focusFirstTabbableElement();
+    setStyle(this._header().nativeElement, {visibility: null});
+    if (focused) {
+      return;
     }
+
+    // Focus dialog element so that it can be closed via Escape keystroke.
+    this._dialogElement().nativeElement.focus();
   }
 
   /**

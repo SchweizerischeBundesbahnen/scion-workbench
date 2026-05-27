@@ -10,14 +10,16 @@
 
 import {ChangeDetectionStrategy, Component, inject, signal, Type} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {DialogId, PartId, PopupId, Translatable, ViewId, NotificationId, WorkbenchMessageBoxOptions, WorkbenchMessageBoxService} from '@scion/workbench';
-import {MultiValueInputComponent, parseTypedString, prune, stringifyError} from 'workbench-testing-app-common';
+import {DialogId, NotificationId, PartId, PopupId, ViewId, WorkbenchMessageBoxOptions, WorkbenchMessageBoxService} from '@scion/workbench';
+import {MultiValueInputComponent, parseTypedString, stringifyError} from 'workbench-testing-app-common';
+import {prune} from '@scion/toolkit/util';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import MessageBoxPageComponent from '../message-box-page/message-box-page.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import {UUID} from '@scion/toolkit/uuid';
+import {Translatable} from '@scion/components/text';
 
 @Component({
   selector: 'app-message-box-opener-page',

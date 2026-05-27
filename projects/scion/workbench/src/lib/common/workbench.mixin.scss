@@ -49,3 +49,53 @@
 
   @content;
 }
+
+/**
+ * Shows the toolbar only on hover or focus, only if the attribute [data-visibility="always"] is not set.
+ * If hidden, also sets the toolbar width to 0 to not occupy space. Does not set the `display` property to allow for animation.
+ *
+ * Use with `ToolbarVisibilityDirective` to set the `data-visiblity` attribute based on the `scion.workbench.appearance.toolbar.visibility` setting.
+ *
+ * Usage:
+ * ```html
+ * <sci-toolbar name="toolbar:main" wbToolbarVisibility/>
+ * ```
+ *
+ * ```css
+ * :host {
+ *   &:hover {
+ *     --on-hover: true;
+ *   }
+ *
+ *   &:focus-within {
+ *     --on-focus: true;
+ *   }
+ *
+ *   sci-toolbar {
+ *     @include toolbar-visibility(on-hover, on-focus);
+ *   }
+ * }
+ * ```
+ */
+@mixin toolbar-visibility($is-hovered, $is-focused) {
+  &:not([data-visibility="always"]) {
+    opacity: 0;
+    transition: opacity ease-in .5s;
+
+    // Show toolbar on hover or focus.
+    @container style(#{$is-hovered}: true) or style(#{$is-focused}: true) {
+      opacity: 1;
+    }
+
+    // Prevent animation on focus, i.e., when loading the page.
+    @container style(#{$is-focused}: true) {
+      transition: none;
+    }
+
+    // Prevent occuping space if hidden.
+    @container (not style(#{$is-hovered}: true)) and (not style(#{$is-focused}: true)) {
+      width: 0; // free space if hidden
+      visibility: hidden; // hide toolbar
+    }
+  }
+}

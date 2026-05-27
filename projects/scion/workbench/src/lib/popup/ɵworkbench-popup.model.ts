@@ -55,6 +55,8 @@ export class ɵWorkbenchPopup implements Popup, WorkbenchPopup, Blockable {
   public readonly destroyed = signal<boolean>(false);
   public readonly bounds = boundingClientRect(computed(() => this._componentRef()?.location.nativeElement as HTMLElement | undefined));
   public readonly blockedBy: Signal<ɵWorkbenchDialog | null>;
+  // TODO [menu] Consider using a wbPortal like other workbench elements
+  public readonly element = computed(() => this._componentRef()?.location.nativeElement as HTMLElement | undefined);
   // TODO [Angular 22] Remove with Angular 22. Used for backward compatiblity.
   public readonly input: unknown | undefined;
   public result: unknown | Error | undefined;

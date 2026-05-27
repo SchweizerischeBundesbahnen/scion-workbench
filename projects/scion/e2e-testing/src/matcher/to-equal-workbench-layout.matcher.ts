@@ -11,11 +11,13 @@
 import {Locator} from '@playwright/test';
 import {MatcherReturnType} from 'playwright/types/test';
 import {MAIN_AREA} from '../workbench.model';
-import {prune, retryOnError} from '../helper/testing.util';
-import {ActivityId, PartId, Translatable, ViewId} from '@scion/workbench';
+import {retryOnError} from '../helper/testing.util';
+import {ActivityId, PartId, ViewId} from '@scion/workbench';
 import {SASHBOX_SPLITTER_SIZE} from '../workbench/workbench-layout-constants';
 import {Objects} from '../helper/objects.util';
 import {dasherize} from '../helper/dasherize.util';
+import {Translatable} from '@scion/components/text';
+import {prune} from '@scion/toolkit/util';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.

@@ -13,7 +13,7 @@ import {ViewId, WorkbenchPopupReferrer} from '@scion/workbench-client';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Params} from '@angular/router';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
-import {prune} from '../../helper/testing.util';
+import {prune} from '@scion/toolkit/util';
 import {parseTypedString} from '../../helper/typed-value.util';
 import {Capability} from '@scion/microfrontend-platform';
 

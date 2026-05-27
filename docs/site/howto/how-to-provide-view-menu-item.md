@@ -65,7 +65,7 @@ import {WorkbenchService} from '@scion/workbench';
 
 inject(WorkbenchService).registerViewMenuItem(() => ({
   content: MenuItemComponent,
-  accelerator: ['ctrl', 'alt', '1'],
+  accelerator: {ctrl: true, alt: true, key: '1'},
   group: 'some-group',
   onAction: () => {
     // do something
@@ -176,7 +176,7 @@ import {provideWorkbench} from '@scion/workbench';
 provideWorkbench({
   viewMenuItems: {
     close: {
-      accelerator: ['F4'], // use different accelerator
+      accelerator: {key: 'F4'}, // use different accelerator
     },
     closeAll: false, // remove from context menu
   },

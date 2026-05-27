@@ -7,11 +7,11 @@
   grid-template-rows: 1em;
   gap: .25em;
 
-  &:has(wb-icon.dirty) {
+  &:has(sci-icon.dirty) {
     grid-template-columns: auto 1fr;
   }
 
-  > wb-icon.dirty {
+  > sci-icon.dirty {
     align-self: center;
     color: var(--sci-workbench-tab-text-color); // do not inherit color from active tab
   }

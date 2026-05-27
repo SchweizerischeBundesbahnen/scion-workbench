@@ -11,7 +11,7 @@
 import {firstValueFrom, Subscription} from 'rxjs';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {ACTIVATION_CONTEXT, APP_IDENTITY, ContextService, IntentClient, IS_PLATFORM_HOST, ManifestService, MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
-import {Disposable} from '../common/disposable';
+import {Disposable} from '@scion/toolkit/types';
 import {WorkbenchTextProviderCapability, WorkbenchTextProviderFn} from './workbench-text-provider.model';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 

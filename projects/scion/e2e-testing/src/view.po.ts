@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, selectBy, DomRect, fromRect, getCssClasses} from './helper/testing.util';
+import {coerceArray, DomRect, fromRect, getCssClasses, selectBy} from './helper/testing.util';
 import {Locator, Page} from '@playwright/test';
 import {PartPO} from './part.po';
 import {ViewTabPO} from './view-tab.po';
@@ -16,7 +16,7 @@ import {ViewId} from '@scion/workbench';
 import {ViewInfo} from './workbench/page-object/view-info-dialog.po';
 import {ScrollbarPO} from './scrollbar.po';
 import {WorkbenchAccessor, WorkbenchViewNavigationE2E} from './workbench-accessor';
-import {RequireOne} from './helper/utility-types';
+import {RequireOne} from '@scion/toolkit/types';
 import {MAIN_AREA} from './workbench.model';
 
 /**

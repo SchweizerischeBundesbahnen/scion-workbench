@@ -75,7 +75,7 @@ export class WorkbenchComponent {
    */
   private installMaximizeShortcutListener(): void {
     const zone = inject(NgZone);
-    fromEvent<KeyboardEvent>(window, 'keydown', {capture: true}) // capturing phase for a higher precedence
+    fromEvent<KeyboardEvent>(window, 'keydown')
       .pipe(
         subscribeIn(fn => zone.runOutsideAngular(fn)),
         filter(event => event.ctrlKey && event.shiftKey && event.key === 'F12'),

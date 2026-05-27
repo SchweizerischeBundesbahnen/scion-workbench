@@ -10,7 +10,7 @@
 
 import {inject, Injectable, IterableDiffers} from '@angular/core';
 import {Capability, ManifestService, Qualifier} from '@scion/microfrontend-platform';
-import {WorkbenchCapabilities, WorkbenchPartCapability, WorkbenchPartRef, WorkbenchPerspectiveCapability, WorkbenchViewCapability, WorkbenchViewRef} from '@scion/workbench-client';
+import {Translatable, WorkbenchCapabilities, WorkbenchPartCapability, WorkbenchPartRef, WorkbenchPerspectiveCapability, WorkbenchViewCapability, WorkbenchViewRef} from '@scion/workbench-client';
 import {WorkbenchService} from '../../workbench.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MAIN_AREA, MAIN_AREA_ALTERNATIVE_ID, WorkbenchLayout} from '../../layout/workbench-layout';
@@ -23,7 +23,6 @@ import {WorkbenchPerspectiveData} from './workbench-perspective-data';
 import {computeViewId} from '../../workbench.identifiers';
 import {createRemoteTranslatable} from '../microfrontend-text/remote-text-provider';
 import {MicrofrontendPartNavigationData} from '../microfrontend-part/microfrontend-part-navigation-data';
-import {Translatable} from '../../text/workbench-text-provider.model';
 import {MICROFRONTEND_PART_NAVIGATION_HINT} from '../microfrontend-part/microfrontend-part-routes';
 import {Params, ParamValidator} from './param-validator';
 import {MicrofrontendViewNavigationData} from '../microfrontend-view/microfrontend-view-navigation-data';

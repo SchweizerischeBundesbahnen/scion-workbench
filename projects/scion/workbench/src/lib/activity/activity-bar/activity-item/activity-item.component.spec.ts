@@ -33,8 +33,8 @@ describe('Activity Item Component', () => {
     await waitUntilWorkbenchStarted();
 
     // Expect default icon component to be rendered.
-    expect(fixture.debugElement.query(By.css('wb-activity-item[data-activityid="activity.1"] wb-icon.material-icons')).nativeElement.innerText).toEqual('icon-1');
-    expect(fixture.debugElement.query(By.css('wb-activity-item[data-activityid="activity.2"] wb-icon.material-icons')).nativeElement.innerText).toEqual('icon-2');
+    expect(fixture.debugElement.query(By.css('wb-activity-item[data-activityid="activity.1"] sci-icon.material-icons')).nativeElement.innerText).toEqual('icon-1');
+    expect(fixture.debugElement.query(By.css('wb-activity-item[data-activityid="activity.2"] sci-icon.material-icons')).nativeElement.innerText).toEqual('icon-2');
   });
 
   it('should render custom icon', async () => {

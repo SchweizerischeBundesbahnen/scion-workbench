@@ -13,7 +13,8 @@ import {AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR,
 import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchPopupCapability} from '@scion/workbench-client';
-import {MultiValueInputComponent, parseTypedString, prune} from 'workbench-testing-app-common';
+import {MultiValueInputComponent, parseTypedString} from 'workbench-testing-app-common';
+import {prune} from '@scion/toolkit/util';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 

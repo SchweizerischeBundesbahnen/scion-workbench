@@ -10,10 +10,11 @@
 
 import {Component, inject, signal, Type} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {NotificationService, Translatable, WorkbenchNotificationOptions, WorkbenchNotificationService} from '@scion/workbench';
+import {NotificationService, WorkbenchNotificationOptions, WorkbenchNotificationService} from '@scion/workbench';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
-import {MultiValueInputComponent, parseTypedString, prune, stringifyError} from 'workbench-testing-app-common';
+import {MultiValueInputComponent, parseTypedString, stringifyError} from 'workbench-testing-app-common';
+import {prune} from '@scion/toolkit/util';
 import NotificationPageComponent from '../notification-page/notification-page.component';
 import {UUID} from '@scion/toolkit/uuid';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
@@ -23,6 +24,7 @@ import {firstValueFrom, timer} from 'rxjs';
 import DialogOpenerPageComponent from '../dialog-opener-page/dialog-opener-page.component';
 import PopupOpenerPageComponent from '../popup-opener-page/popup-opener-page.component';
 import WorkbenchHandleBoundsTestPageComponent from '../test-pages/workbench-handle-bounds-test-page/workbench-handle-bounds-test-page.component';
+import {Translatable} from '@scion/components/text';
 
 @Component({
   selector: 'app-notification-opener-page',
