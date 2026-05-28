@@ -5,8 +5,6 @@ import {NotificationId} from '../workbench.identifiers';
 import {WorkbenchNotification, WorkbenchNotificationSize} from './workbench-notification.model';
 import {WorkbenchNotificationOptions} from './workbench-notification.options';
 import {Translatable} from '../text/workbench-text-provider.model';
-import {ɵNotification} from './ɵnotification';
-import {Notification} from './notification';
 import {WorkbenchNotificationRegistry} from './workbench-notification.registry';
 import {WORKBENCH_ELEMENT} from '../workbench-element-references';
 import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
@@ -75,7 +73,6 @@ export class ɵWorkbenchNotification implements WorkbenchNotification, Blockable
       providers: [
         {provide: ɵWorkbenchNotification, useValue: this},
         {provide: WorkbenchNotification, useExisting: ɵWorkbenchNotification},
-        {provide: Notification, useClass: ɵNotification},
         {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchNotification},
         inject(WORKBENCH_NOTIFICATION_CONTEXT, {optional: true}) ?? [],
         ...this._options.providers ?? [],

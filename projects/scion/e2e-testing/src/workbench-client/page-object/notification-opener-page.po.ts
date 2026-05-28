@@ -16,7 +16,6 @@ import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../view.po';
 import {Translatable, WorkbenchNotificationOptions} from '@scion/workbench-client';
-import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {AppPO} from '../../app.po';
 
 /**
@@ -41,11 +40,6 @@ export class NotificationOpenerPagePO implements MicrofrontendViewPagePO {
   public async show(message: Translatable | null, options?: NotificationOpenerPageOptions): Promise<void>;
   public async show(qualifier: Qualifier, options?: NotificationOpenerPageOptions): Promise<void>;
   public async show(content: Translatable | Qualifier | null, options?: NotificationOpenerPageOptions): Promise<void> {
-    // Select API.
-    const legacyAPI = options?.legacyAPI;
-    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-legacy-api')).toggle(legacyAPI?.enabled ?? false);
-    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-legacy-api-text-as-confg')).toggle(legacyAPI?.textAsConfig ?? true);
-
     // Clear qualifier.
     const qualifierField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
     await qualifierField.clear();
@@ -105,15 +99,6 @@ export class NotificationOpenerPagePO implements MicrofrontendViewPagePO {
  * Controls opening of a notification.
  */
 export type NotificationOpenerPageOptions = WorkbenchNotificationOptions & {
-  /**
-   * Controls if to use the legacy Workbench Notification API.
-   *
-   * TODO [Angular 22] Remove with Angular 22. Used for backward compatiblity.
-   */
-  legacyAPI?: {
-    enabled: true;
-    textAsConfig: boolean;
-  };
   /**
    * Controls how many notifications to open. Defaults to 1.
    */

@@ -9,7 +9,6 @@
  */
 
 import {coerceArray, rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
-import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
 import {ViewPO} from '../../view.po';
@@ -39,7 +38,7 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO, WorkbenchD
   }
 
   public async show(message: Translatable | null, options?: NotificationOpenerPageOptions): Promise<void>;
-  public async show(component: 'component:notification-page' | 'component:focus-test-page' | 'component:dialog-opener-page' | 'component:popup-opener-page' | 'component:workbench-handle-bounds-test-page' | 'component:legacy-notification-page', options?: NotificationOpenerPageOptions): Promise<void>;
+  public async show(component: 'component:notification-page' | 'component:focus-test-page' | 'component:dialog-opener-page' | 'component:popup-opener-page' | 'component:workbench-handle-bounds-test-page', options?: NotificationOpenerPageOptions): Promise<void>;
   public async show(content: Translatable | null | 'component:notification-page', options?: NotificationOpenerPageOptions): Promise<void> {
     if (options?.injector) {
       throw Error('[PageObjectError] PageObject does not support the option `injector`.');
@@ -47,10 +46,6 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO, WorkbenchD
     if (options?.providers) {
       throw Error('[PageObjectError] PageObject does not support the option `providers`.');
     }
-
-    // Select API.
-    const legacyAPI = options?.legacyAPI ?? false;
-    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-legacy-api')).toggle(legacyAPI);
 
     // Enter text or component.
     const componentMatch = content && /^component:(?<component>.+)$/.exec(content);
@@ -62,10 +57,7 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO, WorkbenchD
     }
 
     // Enter inputs
-    if (legacyAPI && options?.inputLegacy) {
-      await this.locator.locator('input.e2e-input').fill(options.inputLegacy);
-    }
-    else if (!legacyAPI && options?.inputs) {
+    if (options?.inputs) {
       const inputsField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-inputs'));
       await inputsField.clear();
       await inputsField.addEntries(options.inputs);
@@ -142,21 +134,9 @@ export type NotificationOpenerPageOptions = Omit<WorkbenchNotificationOptions, '
   /**
    * Controls if to reduce inputs of notifications belonging to the same group.
    */
-  groupInputReduceFn?: 'concat-input-reducer' | 'concat-input-async-reducer' | 'concat-input-legacy-reducer';
+  groupInputReduceFn?: 'concat-input-reducer' | 'concat-input-async-reducer';
   /**
    * Controls how many notifications to open. Defaults to 1.
    */
   count?: number;
-  /**
-   * Controls if to use the legacy Workbench Notification API.
-   *
-   * TODO [Angular 22] Remove with Angular 22. Used for backward compatiblity.
-   */
-  legacyAPI?: true;
-  /**
-   * Input data if using the legacy Workbench Notification API.
-   *
-   * TODO [Angular 22] Remove with Angular 22. Used for backward compatiblity.
-   */
-  inputLegacy?: string;
 };

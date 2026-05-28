@@ -14,7 +14,6 @@ import {NgComponentOutlet} from '@angular/common';
 import {TextPipe} from '../text/text.pipe';
 import {IconComponent} from '../icon/icon.component';
 import {ɵWorkbenchNotification} from './ɵworkbench-notification.model';
-import {RemoveLegacyInputPipe} from './remove-legacy-input.pipe';
 import {trackFocus} from '../focus/workbench-focus-tracker.service';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {observeIn, subscribeIn} from '@scion/toolkit/operators';
@@ -32,7 +31,6 @@ import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneO
     TextPipe,
     IconComponent,
     NgComponentOutlet,
-    RemoveLegacyInputPipe,
     SciViewportComponent,
   ],
   hostDirectives: [

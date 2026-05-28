@@ -10,14 +10,12 @@
 
 import {Component, inject, signal, Type} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {NotificationService, Translatable, WorkbenchNotificationOptions, WorkbenchNotificationService} from '@scion/workbench';
-import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {Translatable, WorkbenchNotificationOptions, WorkbenchNotificationService} from '@scion/workbench';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {MultiValueInputComponent, parseTypedString, prune, stringifyError} from 'workbench-testing-app-common';
 import NotificationPageComponent from '../notification-page/notification-page.component';
 import {UUID} from '@scion/toolkit/uuid';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
-import {LegacyNotificationPageComponent} from '../legacy-notification-page/legacy-notification-page.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import {firstValueFrom, timer} from 'rxjs';
 import DialogOpenerPageComponent from '../dialog-opener-page/dialog-opener-page.component';
@@ -31,7 +29,6 @@ import WorkbenchHandleBoundsTestPageComponent from '../test-pages/workbench-hand
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,
-    SciCheckboxComponent,
     MultiValueInputComponent,
     SciKeyValueFieldComponent,
   ],
@@ -40,7 +37,6 @@ export default class NotificationOpenerPageComponent {
 
   private readonly _formBuilder = inject(NonNullableFormBuilder);
   private readonly _notificationService = inject(WorkbenchNotificationService);
-  private readonly _legacyNotificationService = inject(NotificationService);
 
   protected readonly durationList = `duration-list-${UUID.randomUUID()}`;
 
@@ -54,12 +50,9 @@ export default class NotificationOpenerPageComponent {
       group: this._formBuilder.control(''),
       groupInputReduceFn: this._formBuilder.control(''),
       inputs: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
-      inputLegacy: this._formBuilder.control(''),
       cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
     }),
     count: this._formBuilder.control(1),
-    // TODO [Angular 22] Remove backward compatiblity.
-    legacyAPI: this._formBuilder.control(false),
   });
 
   protected notificationOpenError = signal<string | undefined>(undefined);
@@ -74,37 +67,22 @@ export default class NotificationOpenerPageComponent {
   private showNotification(): void {
     this.notificationOpenError.set(undefined);
     try {
-      if (this.form.controls.legacyAPI.value) {
-        const options = this.form.controls.options.controls;
-        this._legacyNotificationService.notify(prune({
-          content: this.isUseComponent() ? this.readComponentFromUI() : restoreLineBreaks(this.form.controls.text.value),
-          componentInput: (this.isUseComponent() ? options.inputLegacy.value || undefined : undefined),
-          title: restoreLineBreaks(options.title.value) || undefined,
-          severity: options.severity.value || undefined,
-          duration: this.readDurationFromUI(),
-          group: options.group.value || undefined,
-          groupInputReduceFn: this.readGroupInputReducerFromUI(this.form.controls.options.controls.groupInputReduceFn.value || undefined),
-          cssClass: options.cssClass.value,
-        }));
+      const options: WorkbenchNotificationOptions = prune({
+        inputs: SciKeyValueFieldComponent.toDictionary(this.form.controls.options.controls.inputs) ?? undefined,
+        title: restoreLineBreaks(this.form.controls.options.controls.title.value) || undefined,
+        severity: this.form.controls.options.controls.severity.value || undefined,
+        duration: this.readDurationFromUI(),
+        group: this.form.controls.options.controls.group.value || undefined,
+        groupInputReduceFn: this.readGroupInputReducerFromUI(this.form.controls.options.controls.groupInputReduceFn.value || undefined),
+        cssClass: this.form.controls.options.controls.cssClass.value ?? undefined,
+      });
+
+      if (this.isUseComponent()) {
+        this._notificationService.show(this.readComponentFromUI(), options);
       }
       else {
-        const options: WorkbenchNotificationOptions = prune({
-          inputs: SciKeyValueFieldComponent.toDictionary(this.form.controls.options.controls.inputs) ?? undefined,
-          title: restoreLineBreaks(this.form.controls.options.controls.title.value) || undefined,
-          severity: this.form.controls.options.controls.severity.value || undefined,
-          duration: this.readDurationFromUI(),
-          group: this.form.controls.options.controls.group.value || undefined,
-          groupInputReduceFn: this.readGroupInputReducerFromUI(this.form.controls.options.controls.groupInputReduceFn.value || undefined),
-          cssClass: this.form.controls.options.controls.cssClass.value ?? undefined,
-        });
-
-        if (this.isUseComponent()) {
-          this._notificationService.show(this.readComponentFromUI(), options);
-        }
-        else {
-          const text = parseTypedString<Translatable>(restoreLineBreaks(this.form.controls.text.value)) ?? null;
-          this._notificationService.show(text, options);
-        }
+        const text = parseTypedString<Translatable>(restoreLineBreaks(this.form.controls.text.value)) ?? null;
+        this._notificationService.show(text, options);
       }
     }
     catch (error) {
@@ -122,8 +100,6 @@ export default class NotificationOpenerPageComponent {
         return DialogOpenerPageComponent;
       case 'popup-opener-page':
         return PopupOpenerPageComponent;
-      case 'legacy-notification-page':
-        return LegacyNotificationPageComponent;
       case 'workbench-handle-bounds-test-page':
         return WorkbenchHandleBoundsTestPageComponent;
       default:
@@ -148,8 +124,6 @@ export default class NotificationOpenerPageComponent {
         return undefined;
       case 'concat-input-reducer':
         return concatInputReduceFn;
-      case 'concat-input-legacy-reducer':
-        return concatInputLegacyReduceFn as unknown as GroupInputReducerFn;
       case 'concat-input-async-reducer':
         return concatInputAsyncReduceFn;
       default:
@@ -181,13 +155,6 @@ async function concatInputAsyncReduceFn(prevInput: {[name: string]: unknown}, cu
     ...inputs,
     [key]: `${prevInput[key] as string}, ${value as string}`,
   }), {});
-}
-
-/**
- * Concatenates the inputs of the previous and current notification (legacy Notification API).
- */
-function concatInputLegacyReduceFn(prevInput: string, currInput: string): string {
-  return `${prevInput}, ${currInput}`;
 }
 
 /**
