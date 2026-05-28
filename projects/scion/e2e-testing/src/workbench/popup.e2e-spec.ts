@@ -28,62 +28,6 @@ import {waitUntilBoundingBoxStable} from '../helper/testing.util';
 
 test.describe('Workbench Popup', () => {
 
-  test.describe('Legacy Popup API', () => {
-    test('should open popup', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
-
-      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.open('popup-page', {
-        anchor: 'element',
-        align: 'north',
-        cssClass: 'testee',
-        legacyAPI: true,
-      });
-
-      const popup = appPO.popup({cssClass: 'testee'});
-      const popupPage = new PopupPagePO(popup);
-
-      await expectPopup(popupPage).toBeVisible();
-      await expectPopup(popupPage).toHavePosition('north', popupOpenerPage.openButton);
-    });
-
-    test('should size the popup as configured', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
-
-      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.open('popup-page', {
-        anchor: 'element',
-        size: {width: '300px', height: '400px'},
-        cssClass: 'testee',
-        legacyAPI: true,
-      });
-
-      const popup = appPO.popup({cssClass: 'testee'});
-
-      await expect.poll(() => popup.getBoundingBox('slot')).toEqual(expect.objectContaining({
-        width: 300,
-        height: 400,
-      }));
-    });
-
-    test('should allow passing a value to the popup component', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
-
-      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.open('popup-page', {
-        anchor: 'element',
-        cssClass: 'testee',
-        legacyAPI: true,
-        inputLegacy: 'TEST INPUT',
-      });
-
-      const popup = appPO.popup({cssClass: 'testee'});
-      const popupPage = new PopupPagePO(popup);
-
-      await expect(popupPage.input).toHaveText('TEST INPUT');
-    });
-  });
-
   test.describe('Popup Alignment (Element Anchor)', () => {
 
     test('should, by default, open in the north of the anchor', async ({appPO, workbenchNavigator}) => {

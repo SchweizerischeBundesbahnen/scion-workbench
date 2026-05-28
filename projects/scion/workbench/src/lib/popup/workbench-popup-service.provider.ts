@@ -9,10 +9,8 @@
  */
 
 import {Provider} from '@angular/core';
-import {ɵPopupService} from './ɵpopup.service';
 import {ɵWorkbenchPopupService} from './ɵworkbench-popup.service';
 import {WorkbenchPopupService} from './workbench-popup.service';
-import {PopupService} from './popup.service';
 
 /**
  * Provides {@link WorkbenchPopupService} for dependency injection.
@@ -20,8 +18,6 @@ import {PopupService} from './popup.service';
 export function provideWorkbenchPopupService(): Provider[] {
   return [
     ɵWorkbenchPopupService,
-    ɵPopupService,
     {provide: WorkbenchPopupService, useExisting: ɵWorkbenchPopupService},
-    {provide: PopupService, useExisting: ɵPopupService},
   ];
 }

@@ -9,7 +9,7 @@
  */
 
 import {Component, inject, input} from '@angular/core';
-import {ActivatedMicrofrontend, Popup, WorkbenchPopup} from '@scion/workbench';
+import {ActivatedMicrofrontend, WorkbenchPopup} from '@scion/workbench';
 import {UUID} from '@scion/toolkit/uuid';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
@@ -52,7 +52,6 @@ export default class PopupPageComponent {
   private readonly _formBuilder = inject(NonNullableFormBuilder);
 
   protected readonly popup = inject(WorkbenchPopup);
-  protected readonly legacyPopup = inject(Popup);
   protected readonly activatedMicrofrontend = inject(ActivatedMicrofrontend, {optional: true});
   protected readonly uuid = UUID.randomUUID();
 

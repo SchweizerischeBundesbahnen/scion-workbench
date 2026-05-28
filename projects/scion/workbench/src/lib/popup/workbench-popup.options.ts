@@ -55,20 +55,6 @@ export interface WorkbenchPopupOptions {
   closeStrategy?: CloseStrategy;
 
   /**
-   * Specifies the preferred popup size. Defaults to the content's intrinsic size, constrained by min and max size, if set.
-   *
-   * @deprecated since version 21.0.0-beta.1. Popup size should be set by the popup component. To migrate, inject `WorkbenchPopup` into the popup component and set the size via the `WorkbenchPopup.size` property. Marked for removal in version 22.
-   */
-  size?: {
-    minHeight?: string;
-    height?: string;
-    maxHeight?: string;
-    minWidth?: string;
-    width?: string;
-    maxWidth?: string;
-  };
-
-  /**
    * Specifies CSS class(es) to add to the popup, e.g., to locate the popup in tests.
    */
   cssClass?: string | string[];
