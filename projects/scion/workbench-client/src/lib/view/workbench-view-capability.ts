@@ -219,18 +219,6 @@ export interface WorkbenchViewCapability extends Capability {
  */
 export interface ViewParamDefinition extends ParamDefinition {
   /**
-   * Controls how the workbench router should pass this parameter to the workbench view.
-   *
-   * By default, parameters are passed via the workbench URL as matrix parameters.
-   * Marking a parameter as "transient" instructs the router to pass it via navigational state, useful for large objects.
-   *
-   * Transient parameters are not persistent, they are only added to the browser's session history to support back/forward browser navigation.
-   * Microfrontends must be able to restore state without relying on transient parameters.
-   *
-   * @deprecated since version 1.0.0-beta.36. Marked for removal. No replacement. Instead, send large data as retained message to a random topic and pass the topic as parameter. After receiving the data, the view should delete the retained message to free resources.
-   */
-  transient?: boolean;
-  /**
    * @inheritDoc
    */
   [property: string]: any;

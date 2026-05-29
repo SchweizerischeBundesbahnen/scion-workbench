@@ -1,9 +1,6 @@
 <span class="header">Name</span>
 <span class="header checkbox">Required</span>
 <span class="header">Default</span>
-@if (showTransientParams()) {
-  <span class="header checkbox">Transient</span>
-}
 <span class="header checkbox">Deprecated</span>
 <span class="header">Deprecation Message</span>
 <span class="header">Deprecation Use Instead</span>
@@ -16,10 +13,6 @@
   <sci-checkbox [formControl]="paramFormGroup.controls.required" class="e2e-required"/>
   <!-- Default -->
   <input [formControl]="paramFormGroup.controls.default" class="e2e-default">
-  @if (showTransientParams()) {
-    <!-- Transient -->
-    <sci-checkbox [formControl]="paramFormGroup.controls.transient" class="e2e-transient"/>
-  }
   <!-- Deprecated -->
   <sci-checkbox [formControl]="paramFormGroup.controls.deprecated" class="e2e-deprecated"/>
   <!-- Deprecated Message -->

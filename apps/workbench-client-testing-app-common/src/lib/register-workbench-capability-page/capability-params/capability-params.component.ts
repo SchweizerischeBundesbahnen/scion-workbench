@@ -8,12 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, computed, forwardRef, inject, input, Signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, forwardRef, inject, Signal} from '@angular/core';
 import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator, Validators} from '@angular/forms';
-import {mergeWith, noop} from 'rxjs';
-import {takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-interop';
+import {noop} from 'rxjs';
+import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
-import {ViewParamDefinition} from '@scion/workbench-client';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {ParamDefinition} from '@scion/microfrontend-platform';
 import {UUID} from '@scion/toolkit/uuid';
@@ -34,14 +33,11 @@ import {parseTypedString, prune, toTypedString} from 'workbench-testing-app-comm
     {provide: NG_VALIDATORS, multi: true, useExisting: forwardRef(() => CapabilityParamsComponent)},
   ],
   host: {
-    '[attr.data-show-transient-params]': `showTransientParams() ? '' : null`,
     '[class.empty]': `form.controls.params.controls.length`,
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CapabilityParamsComponent implements ControlValueAccessor, Validator {
-
-  public readonly showTransientParams = input<boolean>(false);
 
   private readonly _formBuilder = inject(NonNullableFormBuilder);
 
@@ -56,16 +52,12 @@ export class CapabilityParamsComponent implements ControlValueAccessor, Validato
 
   constructor() {
     this.form.valueChanges
-      .pipe(
-        mergeWith(toObservable(this.showTransientParams)),
-        takeUntilDestroyed(),
-      )
+      .pipe(takeUntilDestroyed())
       .subscribe(() => {
         const params: ParamDefinition[] = this.form.controls.params.controls.map((paramFormGroup): ParamDefinition => {
           return prune({
             name: paramFormGroup.controls.name.value!,
             required: paramFormGroup.controls.required.value ?? false,
-            transient: this.showTransientParams() ? (paramFormGroup.controls.transient.value ?? undefined) : undefined,
             default: parseTypedString(paramFormGroup.controls.default.value, {undefinedIfEmpty: true}),
             deprecated: (() => {
               if (!paramFormGroup.controls.deprecated.value) {
@@ -102,7 +94,6 @@ export class CapabilityParamsComponent implements ControlValueAccessor, Validato
     return this._formBuilder.group({
       name: this._formBuilder.control(param?.name, {validators: Validators.required}),
       required: this._formBuilder.control(param?.required),
-      transient: this._formBuilder.control((param as ViewParamDefinition | undefined)?.transient),
       default: this._formBuilder.control(toTypedString(param?.default, {emptyIfUndefined: true}) || ''),
       deprecated: this._formBuilder.control(param?.deprecated === true ? true : undefined),
       deprecatedMessage: this._formBuilder.control({value: typeof param?.deprecated === 'object' ? param.deprecated.message : undefined, disabled: param?.deprecated !== true}),
@@ -177,7 +168,6 @@ export class CapabilityParamsComponent implements ControlValueAccessor, Validato
 interface ParamFormGroup {
   name: FormControl<string | undefined>;
   required: FormControl<boolean | undefined>;
-  transient: FormControl<boolean | undefined>;
   default: FormControl<string>;
   deprecated: FormControl<boolean | undefined>;
   deprecatedMessage: FormControl<string | undefined>;

@@ -16,7 +16,6 @@ import {provideStableCapabilityId} from '../stable-capability-id-assigner.provid
 import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
 import {provideViewCommandHandlers} from './microfrontend-view-command-handler.service';
 import {MicrofrontendViewIntentHandler} from './microfrontend-view-intent-handler.interceptor';
-import {MicrofrontendViewTransientParameterDeprecationLogger} from './microfrontend-view-transient-parameter-deprecation-logger.interceptor';
 import {ViewCapabilityPreloadCapabilityInterceptor} from './view-capability-preload-capability-interceptor.service';
 import {MicrofrontendViewCapabilityValidator} from './microfrontend-view-capability-validator.interceptor';
 import {provideMicrofrontendViewRoute} from './microfrontend-view-routes';
@@ -36,7 +35,6 @@ export function provideMicrofrontendView(): EnvironmentProviders {
     MicrofrontendViewCapabilityValidator,
     MicrofrontendViewIntentionProvider,
     ViewCapabilityPreloadCapabilityInterceptor,
-    MicrofrontendViewTransientParameterDeprecationLogger,
     provideMicrofrontendViewRoute(),
     provideLegacyMicrofrontendViewRoute(),
     provideViewCommandHandlers(),
@@ -52,8 +50,6 @@ export function provideMicrofrontendView(): EnvironmentProviders {
     Beans.register(CapabilityInterceptor, {useValue: inject(MicrofrontendViewCapabilityValidator), multi: true});
     // Register view intent handler.
     Beans.register(IntentInterceptor, {useValue: inject(MicrofrontendViewIntentHandler), multi: true});
-    // Register logger to inform about deprecated transient view parameters.
-    Beans.register(CapabilityInterceptor, {useValue: inject(MicrofrontendViewTransientParameterDeprecationLogger), multi: true});
     // Mark views not defining the `lazy` property as 'non-lazy' to maintain compatibility with applications setting view titles in the microfrontend.
     if (inject(MicrofrontendPlatformConfig).preloadInactiveViews) {
       Beans.register(CapabilityInterceptor, {useValue: inject(ViewCapabilityPreloadCapabilityInterceptor), multi: true});
