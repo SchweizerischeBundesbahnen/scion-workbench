@@ -10,13 +10,12 @@
 
 import {EnvironmentProviders, inject, makeEnvironmentProviders, Provider} from '@angular/core';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {CapabilityInterceptor, HostManifestInterceptor, IntentInterceptor, MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
+import {CapabilityInterceptor, HostManifestInterceptor, IntentInterceptor} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchPopupService, ɵWorkbenchDialogService, ɵWorkbenchMessageBoxService, ɵWorkbenchPopupService} from '@scion/workbench-client';
 import {provideStableCapabilityId} from '../stable-capability-id-assigner.provider';
 import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer';
 import {provideViewCommandHandlers} from './microfrontend-view-command-handler.service';
 import {MicrofrontendViewIntentHandler} from './microfrontend-view-intent-handler.interceptor';
-import {ViewCapabilityPreloadCapabilityInterceptor} from './view-capability-preload-capability-interceptor.service';
 import {MicrofrontendViewCapabilityValidator} from './microfrontend-view-capability-validator.interceptor';
 import {provideMicrofrontendViewRoute} from './microfrontend-view-routes';
 import {MicrofrontendViewIntentionProvider} from './microfrontend-view-intention-provider.interceptor';
@@ -34,7 +33,6 @@ export function provideMicrofrontendView(): EnvironmentProviders {
     MicrofrontendViewIntentHandler,
     MicrofrontendViewCapabilityValidator,
     MicrofrontendViewIntentionProvider,
-    ViewCapabilityPreloadCapabilityInterceptor,
     provideMicrofrontendViewRoute(),
     provideLegacyMicrofrontendViewRoute(),
     provideViewCommandHandlers(),
@@ -50,10 +48,6 @@ export function provideMicrofrontendView(): EnvironmentProviders {
     Beans.register(CapabilityInterceptor, {useValue: inject(MicrofrontendViewCapabilityValidator), multi: true});
     // Register view intent handler.
     Beans.register(IntentInterceptor, {useValue: inject(MicrofrontendViewIntentHandler), multi: true});
-    // Mark views not defining the `lazy` property as 'non-lazy' to maintain compatibility with applications setting view titles in the microfrontend.
-    if (inject(MicrofrontendPlatformConfig).preloadInactiveViews) {
-      Beans.register(CapabilityInterceptor, {useValue: inject(ViewCapabilityPreloadCapabilityInterceptor), multi: true});
-    }
   }
 
   /**

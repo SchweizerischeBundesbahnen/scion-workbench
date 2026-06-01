@@ -136,26 +136,6 @@ test.describe('Workbench View Capability', () => {
     });
   });
 
-  test('should not mark host views as "non-lazy" if "preloadInactiveMicrofrontendViews" compat mode is enabled', async ({appPO, microfrontendNavigator, consoleLogs}) => {
-    await appPO.navigateTo({microfrontendSupport: true, preloadInactiveMicrofrontendViews: true});
-
-    const registeredCapability = await microfrontendNavigator.registerCapability<WorkbenchViewCapability>('host', {
-      type: 'view',
-      qualifier: {component: 'testee'},
-      properties: {
-        path: '',
-      },
-    });
-
-    // Expect lazy property not to be set to `true`.
-    expect(registeredCapability.properties.lazy).toBeUndefined();
-
-    // Expect no warning to be logged.
-    await expect.poll(() => consoleLogs.get({severity: 'warning', message: /Deprecation/})).toEqual(expect.not.arrayContaining([
-      expect.stringContaining(`[Deprecation] Application 'workbench-host-app' provides a "non-lazy" view capability`),
-    ]));
-  });
-
   test('should error if host capability defines "lazy" property (unsupported)', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 

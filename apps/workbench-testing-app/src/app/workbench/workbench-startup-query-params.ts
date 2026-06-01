@@ -86,11 +86,6 @@ export const WorkbenchStartupQueryParams = {
   LOG_LEVEL: 'logLevel',
 
   /**
-   * Query param to control whether to preload inactive microfrontend views not defining the `lazy` property.
-   */
-  PRELOAD_INACTIVE_MICROFRONTEND_VIEWS: 'preloadInactiveMicrofrontendViews',
-
-  /**
    * Query param to enable zone change detection for app1.
    */
   ZONE_ENABLED: 'zoneEnabled',
@@ -160,13 +155,6 @@ export const WorkbenchStartupQueryParams = {
   logLevel: (): LogLevel | undefined => {
     const logLevel = new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.LOG_LEVEL) as 'debug' | 'info' | 'warn' | 'error' | null ?? undefined;
     return logLevel ? LogLevel[logLevel.toUpperCase() as keyof typeof LogLevel] as LogLevel | undefined : undefined;
-  },
-
-  /**
-   * Reads the query param to control whether to preload inactive microfrontend views not defining the `lazy` property.
-   */
-  preloadInactiveMicrofrontendViews: (): true | undefined => {
-    return booleanAttribute(new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.PRELOAD_INACTIVE_MICROFRONTEND_VIEWS)) || undefined;
   },
 
   /**
