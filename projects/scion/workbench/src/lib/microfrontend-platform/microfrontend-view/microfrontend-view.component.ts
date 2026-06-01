@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Injector, linkedSignal, Provider, signal, Signal, untracked, viewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Injector, linkedSignal, Provider, signal, Signal, untracked, viewChild, ChangeDetectionStrategy} from '@angular/core';
 import {firstValueFrom, MonoTypeOperatorFunction, switchMap, tap} from 'rxjs';
 import {filter, first, map, take} from 'rxjs/operators';
 import {ManifestService, mapToBody, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
@@ -53,6 +53,8 @@ import {Routing} from '../../routing/routing.util';
   viewProviders: [
     configureMicrofrontendGlassPane(),
   ],
+  // Required for backward compatibility for zone-based applications to support child components with eager change detection.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a custom element
 })
 export class MicrofrontendViewComponent {
@@ -209,9 +211,8 @@ export class MicrofrontendViewComponent {
 
     // When navigating to another view capability of the same app, wait until transported the params to the microfrontend before loading the
     // new microfrontend into the iframe, allowing the currently loaded microfrontend to clean up subscriptions.
-    if (prevCapability &&
-      prevCapability.metadata!.appSymbolicName === capability.metadata!.appSymbolicName &&
-      prevCapability.metadata!.id !== capability.metadata!.id) {
+    if (prevCapability?.metadata!.appSymbolicName === capability.metadata!.appSymbolicName &&
+      prevCapability.metadata.id !== capability.metadata!.id) {
       await this.waitForCapabilityParam(capability.metadata!.id);
     }
 

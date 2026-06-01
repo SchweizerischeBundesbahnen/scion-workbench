@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WorkbenchRouter} from '@scion/workbench';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
@@ -18,7 +18,6 @@ import {UUID} from '@scion/toolkit/uuid';
   selector: 'app-part-opener-page',
   templateUrl: './part-opener-page.component.html',
   styleUrl: './part-opener-page.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,

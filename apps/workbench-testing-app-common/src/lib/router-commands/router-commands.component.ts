@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, forwardRef, inject} from '@angular/core';
-import {PRIMARY_OUTLET, Router, UrlSegmentGroup} from '@angular/router';
+import {Component, forwardRef, inject} from '@angular/core';
+import {PRIMARY_OUTLET, Router} from '@angular/router';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {UUID} from '@scion/toolkit/uuid';
 import {Commands} from '@scion/workbench';
@@ -20,7 +20,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
   selector: 'app-router-commands',
   templateUrl: './router-commands.component.html',
   styleUrls: ['./router-commands.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
   ],
@@ -57,7 +56,7 @@ export class RouterCommandsComponent implements ControlValueAccessor {
     }
 
     const urlTree = this._router.parseUrl(value);
-    const segmentGroup = urlTree.root.children[PRIMARY_OUTLET] as UrlSegmentGroup | undefined;
+    const segmentGroup = urlTree.root.children[PRIMARY_OUTLET];
     if (!segmentGroup) {
       return []; // path syntax error
     }

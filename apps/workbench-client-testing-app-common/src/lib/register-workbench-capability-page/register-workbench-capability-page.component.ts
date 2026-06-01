@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {Capability, ManifestService, ParamDefinition} from '@scion/microfrontend-platform';
@@ -52,7 +52,6 @@ import {Beans} from '@scion/toolkit/bean-manager';
     MessageBoxCapabilityPropertiesComponent,
     CapabilityParamsComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterWorkbenchCapabilityPageComponent {
 

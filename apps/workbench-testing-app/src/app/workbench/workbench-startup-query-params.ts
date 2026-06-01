@@ -86,11 +86,6 @@ export const WorkbenchStartupQueryParams = {
   LOG_LEVEL: 'logLevel',
 
   /**
-   * Query param to enable zone change detection for app1.
-   */
-  ZONE_ENABLED: 'zoneEnabled',
-
-  /**
    * Reads the query param to bootstrap the app with a specific app config.
    *
    * Params can be passed in the form of matrix params: "app-with-guard;forbidden=true"
@@ -154,13 +149,6 @@ export const WorkbenchStartupQueryParams = {
    */
   logLevel: (): LogLevel | undefined => {
     const logLevel = new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.LOG_LEVEL) as 'debug' | 'info' | 'warn' | 'error' | null ?? undefined;
-    return logLevel ? LogLevel[logLevel.toUpperCase() as keyof typeof LogLevel] as LogLevel | undefined : undefined;
-  },
-
-  /**
-   * Reads the query param to control whether to start the app with zone change detection.
-   */
-  zoneEnabled: (): boolean => {
-    return booleanAttribute(new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.ZONE_ENABLED)) || false;
+    return logLevel ? LogLevel[logLevel.toUpperCase() as keyof typeof LogLevel] : undefined;
   },
 } as const;

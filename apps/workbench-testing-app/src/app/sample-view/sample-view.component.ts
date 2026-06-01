@@ -54,7 +54,7 @@ export default class SampleViewComponent {
 
   constructor() {
     effect(() => {
-      const navigationData = this.view.navigation()!.data as ViewSkeletonNavigationData | undefined;
+      const navigationData = this.view.navigation()!.data;
       untracked(() => this.onNavigationChange(navigationData ?? {}));
     });
     effect(() => {

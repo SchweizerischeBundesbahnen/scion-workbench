@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, computed, forwardRef, inject, Signal} from '@angular/core';
+import {Component, computed, forwardRef, inject, Signal} from '@angular/core';
 import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator, Validators} from '@angular/forms';
 import {noop} from 'rxjs';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
@@ -37,7 +37,6 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
     {provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => PerspectiveCapabilityPropertiesComponent)},
     {provide: NG_VALIDATORS, multi: true, useExisting: forwardRef(() => PerspectiveCapabilityPropertiesComponent)},
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PerspectiveCapabilityPropertiesComponent implements ControlValueAccessor, Validator {
 

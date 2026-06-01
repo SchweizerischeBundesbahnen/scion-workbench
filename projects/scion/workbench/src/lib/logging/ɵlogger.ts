@@ -19,7 +19,7 @@ import {WorkbenchConfig} from '../workbench-config';
 @Injectable(/* DO NOT provide via 'providedIn' metadata as registered under `Logger` DI token. */)
 export class ɵLogger implements Logger {
 
-  // TODO [Angular 22] Remove cast when Angular supports type safety for multi-injection with abstract class DI tokens. See https://github.com/angular/angular/issues/55555
+  // TODO [Angular 23] Remove cast when Angular supports type safety for multi-injection with abstract class DI tokens. See https://github.com/angular/angular/issues/55555
   private readonly _logAppenders = inject(LogAppender, {optional: true}) as LogAppender[] | null ?? [];
   private readonly _logLevel: Signal<LogLevel>;
 
@@ -86,7 +86,7 @@ function queryParam(queryParam: string): Signal<string | null> {
  * Parses the given log level string into a {@link LogLevel} enum.
  */
 function parseLogLevel(logLevel: string | null): LogLevel | undefined {
-  return logLevel ? LogLevel[logLevel.toUpperCase() as keyof typeof LogLevel] as LogLevel | undefined : undefined;
+  return logLevel ? LogLevel[logLevel.toUpperCase() as keyof typeof LogLevel] : undefined;
 }
 
 /**

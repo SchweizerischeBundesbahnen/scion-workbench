@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {WorkbenchView} from '@scion/workbench';
 
 @Component({
@@ -16,7 +16,6 @@ import {WorkbenchView} from '@scion/workbench';
   templateUrl: './non-standalone-view-test-page.component.html',
   styleUrls: ['./non-standalone-view-test-page.component.scss'],
   standalone: false, // eslint-disable-line @angular-eslint/prefer-standalone
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NonStandaloneViewTestPageComponent {
 

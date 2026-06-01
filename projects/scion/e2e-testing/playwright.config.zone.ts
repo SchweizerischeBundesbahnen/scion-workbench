@@ -24,24 +24,13 @@ export default defineConfig({
       reuseExistingServer: false,
     },
     {
-      command: 'npm run workbench-client-testing-app:4201:dist-serve',
+      command: 'npm run workbench-client-testing-app:4201:dist-serve-zone',
       port: 4201,
       reuseExistingServer: false,
     },
     {
-      command: 'npm run workbench-client-testing-app:4202:dist-serve',
+      command: 'npm run workbench-client-testing-app:4202:dist-serve-zone',
       port: 4202,
-      reuseExistingServer: false,
-    },
-    {
-      command: 'npm run workbench-testing-app:basehref:dist-serve',
-      port: 4300,
-      reuseExistingServer: false,
-    },
-    // TODO [Angular 23] remove when `@angular-devkit/build-angular:browser` builder is deprecated
-    {
-      command: 'npm run workbench-testing-app:basehref-webpack:dist-serve',
-      port: 4400,
       reuseExistingServer: false,
     },
   ] : [],
@@ -58,8 +47,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
-  testMatch: /.*\.e2e-spec\.ts/,
-  testIgnore: /.*\.zone\.e2e-spec\.ts/,
+  testMatch: /.*\.zone\.e2e-spec\.ts/,
 });
 
 // Install SCION-specific matchers that can be used as expectations.

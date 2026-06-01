@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {afterRenderEffect, Component, DOCUMENT, ElementRef, inject, Provider, untracked, viewChild} from '@angular/core';
+import {afterRenderEffect, Component, DOCUMENT, ElementRef, inject, Provider, untracked, viewChild, ChangeDetectionStrategy} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {RouterOutletRootContextDirective} from '../../routing/router-outlet-root-context.directive';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
@@ -33,6 +33,8 @@ import {WorkbenchPart} from '../workbench-part.model';
   hostDirectives: [
     GlassPaneDirective,
   ],
+  // Required for backward compatibility for zone-based applications to support child components with eager change detection.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
   providers: [
     configurePartGlassPane(),
   ],

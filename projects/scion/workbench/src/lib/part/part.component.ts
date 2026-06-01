@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, DestroyRef, effect, inject, Injector, OnInit, untracked} from '@angular/core';
+import {ChangeDetectorRef, Component, DestroyRef, effect, inject, Injector, OnInit, untracked, ChangeDetectionStrategy} from '@angular/core';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
@@ -27,6 +27,8 @@ import {dasherize} from '../common/dasherize.util';
     ViewDropZoneDirective,
     WorkbenchPortalOutletDirective,
   ],
+  // Required for backward compatibility for zone-based applications to support child components with eager change detection.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
   host: {
     '[attr.data-partid]': 'part.id',
     '[attr.data-peripheral]': `part.peripheral() ? '' : null`,

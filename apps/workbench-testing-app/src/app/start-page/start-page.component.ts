@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, HostBinding, HostListener, inject, viewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, effect, HostBinding, HostListener, inject, viewChild} from '@angular/core';
 import {PartId, WorkbenchConfig, WorkbenchRouteData, WorkbenchRouter, WorkbenchService, WorkbenchView} from '@scion/workbench';
 import {ManifestService} from '@scion/microfrontend-platform';
 import {Observable} from 'rxjs';
@@ -28,7 +28,6 @@ import {SciTabbarComponent, SciTabDirective} from '@scion/components.internal/ta
   selector: 'app-start-page',
   templateUrl: './start-page.component.html',
   styleUrls: ['./start-page.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     NgClass,
     AsyncPipe,

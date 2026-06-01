@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, effect, ElementRef, inject, input, signal, Signal, TemplateRef, untracked, viewChild, ViewContainerRef} from '@angular/core';
+import {Component, computed, effect, ElementRef, inject, input, signal, Signal, TemplateRef, untracked, viewChild, ViewContainerRef, ChangeDetectionStrategy} from '@angular/core';
 import {setStyle} from '../common/dom.util';
 import {boundingClientRect} from '@scion/components/dimension';
 import {rootEffect} from '../common/rxjs-interop.util';
@@ -37,6 +37,8 @@ import {rootEffect} from '../common/rxjs-interop.util';
  */
 @Component({
   selector: 'wb-content-as-overlay',
+  // Required for backward compatibility for zone-based applications to support child components with eager change detection.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
   templateUrl: './content-as-overlay.component.html',
 })
 export class ContentAsOverlayComponent {

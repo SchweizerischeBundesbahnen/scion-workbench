@@ -8,14 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {Component} from '@angular/core';
 import {UUID} from '@scion/toolkit/uuid';
 
 @Component({
   selector: 'app-desktop-page',
   templateUrl: './desktop-page.component.html',
   styleUrl: './desktop-page.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[attr.data-component-instance-id]': `uuid`,
   },

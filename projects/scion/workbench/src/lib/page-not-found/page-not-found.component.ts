@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, computed, inject, isDevMode} from '@angular/core';
+import {Component, computed, inject, isDevMode} from '@angular/core';
 import {TextPipe} from '../text/text.pipe';
 import {WorkbenchService} from '../workbench.service';
 import {WorkbenchView} from '../view/workbench-view.model';
@@ -23,7 +23,6 @@ import {WorkbenchPopup} from '../popup/workbench-popup.model';
   imports: [
     TextPipe,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class PageNotFoundComponent {
 

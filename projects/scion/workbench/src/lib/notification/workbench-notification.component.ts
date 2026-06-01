@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DOCUMENT, effect, ElementRef, inject, NgZone, Provider, signal, untracked, viewChild} from '@angular/core';
+import {Component, DOCUMENT, effect, ElementRef, inject, NgZone, Provider, signal, untracked, viewChild, ChangeDetectionStrategy} from '@angular/core';
 import {fromEvent, NEVER, Observable, timer} from 'rxjs';
 import {NgComponentOutlet} from '@angular/common';
 import {TextPipe} from '../text/text.pipe';
@@ -39,6 +39,8 @@ import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneO
   providers: [
     configureNotificationGlassPane(),
   ],
+  // Required for backward compatibility for zone-based applications to support child components with eager change detection.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
   host: {
     '[attr.data-notificationid]': 'notification.id',
     '[attr.data-severity]': 'notification.severity()',

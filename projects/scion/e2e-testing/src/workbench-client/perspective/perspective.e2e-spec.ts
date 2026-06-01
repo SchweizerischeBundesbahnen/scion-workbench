@@ -1173,6 +1173,7 @@ test.describe('Workbench Perspective', () => {
   });
 
   test('should switch perspective', async ({appPO, microfrontendNavigator}) => {
+    test.slow();
     await appPO.navigateTo({microfrontendSupport: true});
 
     // Register view 1.

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {FocusMonitor, MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
 import {AsyncPipe} from '@angular/common';
 import {SciViewportComponent} from '@scion/components/viewport';
@@ -28,6 +28,8 @@ import {of} from 'rxjs';
     CdkTrapFocus,
     SciViewportComponent,
   ],
+  // Required for testing of backward compatibility for zone-based applications.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
   host: {
     '[attr.data-focus]': `hasFocus() ? '' : null`,
   },

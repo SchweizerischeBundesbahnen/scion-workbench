@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {afterRenderEffect, Component, computed, effect, ElementRef, inject, input, NgZone, OnDestroy, signal, untracked, viewChild, viewChildren} from '@angular/core';
+import {afterRenderEffect, Component, computed, effect, ElementRef, inject, input, NgZone, OnDestroy, signal, untracked, viewChild, viewChildren, ChangeDetectionStrategy} from '@angular/core';
 import {ViewTabComponent} from '../view-tab/view-tab.component';
 import {map, mergeMap, takeUntil} from 'rxjs/operators';
 import {from, fromEvent, merge, Observable, OperatorFunction, Subject} from 'rxjs';
@@ -56,6 +56,8 @@ import {PART_BAR_ELEMENT} from '../part-bar/part-bar.component';
   selector: 'wb-view-tab-bar',
   templateUrl: './view-tab-bar.component.html',
   styleUrls: ['./view-tab-bar.component.scss'],
+  // Required for backward compatibility for zone-based applications to support child components with eager change detection.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
   imports: [
     SciViewportComponent,
     ViewTabComponent,

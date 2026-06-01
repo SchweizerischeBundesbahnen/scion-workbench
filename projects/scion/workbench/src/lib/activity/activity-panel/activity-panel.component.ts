@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject, input, Signal} from '@angular/core';
+import {Component, computed, inject, input, Signal, ChangeDetectionStrategy} from '@angular/core';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {GridComponent} from '../../layout/grid/grid.component';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
@@ -30,6 +30,8 @@ import {Objects} from '@scion/toolkit/util';
     SciSashDirective,
     GridComponent,
   ],
+  // Required for backward compatibility for zone-based applications to support child components with eager change detection.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
   host: {
     '[attr.data-panel]': 'panel()',
   },

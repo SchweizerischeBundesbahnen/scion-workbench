@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, computed, inject, signal, Signal} from '@angular/core';
+import {Component, computed, inject, signal, Signal} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {Translatable, WORKBENCH_ELEMENT, WorkbenchElement, WorkbenchNotificationOptions, WorkbenchNotificationService} from '@scion/workbench-client';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
@@ -28,7 +28,6 @@ import {Beans} from '@scion/toolkit/bean-manager';
     SciKeyValueFieldComponent,
     MultiValueInputComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationOpenerPageComponent {
 

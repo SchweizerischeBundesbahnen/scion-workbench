@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, DestroyRef, DOCUMENT, effect, ElementRef, inject, NgZone, Provider, viewChild, ViewContainerRef} from '@angular/core';
+import {ChangeDetectorRef, Component, DestroyRef, DOCUMENT, effect, ElementRef, inject, NgZone, Provider, viewChild, ViewContainerRef, ChangeDetectionStrategy} from '@angular/core';
 import {IFRAME_OVERLAY_HOST, VIEW_DROP_ZONE_OVERLAY_HOST, WORKBENCH_COMPONENT_REF} from './workbench-element-references';
 import {WorkbenchLauncher} from './startup/workbench-launcher.service';
 import {WorkbenchStartup} from './startup/workbench-startup.service';
@@ -43,6 +43,8 @@ import {filter} from 'rxjs/operators';
     GlassPaneDirective,
     LayoutComponent,
   ],
+  // Required for backward compatibility for zone-based applications to support child components with eager change detection.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
   viewProviders: [
     configureWorkbenchGlassPane(),
   ],

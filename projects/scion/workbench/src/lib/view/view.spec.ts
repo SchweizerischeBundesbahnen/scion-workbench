@@ -9,7 +9,7 @@
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {booleanAttribute, Component, DebugElement, DestroyRef, Directive, effect, inject, Injector, OnDestroy, OnInit, signal, Type} from '@angular/core';
+import {booleanAttribute, ChangeDetectionStrategy, Component, DebugElement, DestroyRef, Directive, effect, inject, Injector, OnDestroy, OnInit, signal, Type} from '@angular/core';
 import {ActivatedRoute, provideRouter} from '@angular/router';
 import {WorkbenchViewRegistry} from './workbench-view.registry';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
@@ -3113,6 +3113,8 @@ describe('View', () => {
 @Component({
   selector: 'spec-view',
   template: '{{onCheckForChanges()}}',
+  // Required for testing backward compatibility for zone-based applications and components with eager change detection.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
 })
 class SpecViewComponent {
 
@@ -3153,6 +3155,8 @@ class SpecViewComponent {
 @Component({
   selector: 'spec-view-1',
   template: '{{onCheckForChanges()}}',
+  // Required for testing backward compatibility for zone-based applications and components with eager change detection.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
 })
 class SpecView1Component extends SpecViewComponent {
 }
@@ -3160,6 +3164,8 @@ class SpecView1Component extends SpecViewComponent {
 @Component({
   selector: 'spec-view-2',
   template: '{{onCheckForChanges()}}',
+  // Required for testing backward compatibility for zone-based applications and components with eager change detection.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
 })
 class SpecView2Component extends SpecViewComponent {
 }

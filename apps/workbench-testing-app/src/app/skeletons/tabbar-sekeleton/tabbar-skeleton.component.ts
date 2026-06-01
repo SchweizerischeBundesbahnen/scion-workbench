@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, inject, input, model, signal} from '@angular/core';
+import {Component, inject, input, model, signal} from '@angular/core';
 import {WorkbenchPart, WorkbenchView} from '@scion/workbench';
 import {ArrayPipe} from '../array.pipe';
 
@@ -19,7 +19,6 @@ import {ArrayPipe} from '../array.pipe';
   selector: 'app-tabbar-skeleton',
   templateUrl: './tabbar-skeleton.component.html',
   styleUrls: ['./tabbar-skeleton.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ArrayPipe,
   ],

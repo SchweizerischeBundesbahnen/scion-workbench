@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, effect, ElementRef, forwardRef, HostBinding, HostListener, inject, input, linkedSignal, output, untracked, viewChild} from '@angular/core';
+import {booleanAttribute, ChangeDetectorRef, Component, DestroyRef, effect, ElementRef, forwardRef, HostBinding, HostListener, inject, input, linkedSignal, output, untracked, viewChild} from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {noop} from 'rxjs';
 import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
@@ -24,7 +24,6 @@ import {IconComponent} from '../icon/icon.component';
   selector: 'wb-filter-field',
   templateUrl: './filter-field.component.html',
   styleUrls: ['./filter-field.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     TextPipe,

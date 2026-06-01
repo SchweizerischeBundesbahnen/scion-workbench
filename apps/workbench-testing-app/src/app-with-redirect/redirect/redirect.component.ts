@@ -8,12 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'app-redirect',
   template: '308 Redirect',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class RedirectComponent {
 }

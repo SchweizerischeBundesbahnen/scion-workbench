@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {DialogId, NotificationId, PartId, PopupId, ViewId, WORKBENCH_ELEMENT, WorkbenchDialogOptions, WorkbenchDialogService, WorkbenchElement} from '@scion/workbench-client';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
@@ -29,7 +29,6 @@ import {Beans} from '@scion/toolkit/bean-manager';
     SciCheckboxComponent,
     MultiValueInputComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DialogOpenerPageComponent {
 

@@ -15,10 +15,10 @@
     "name": "SCION contributors"
   },
   "dependencies": {
-    "tslib": "^2.4.0"
+    "tslib": "^2.8.0"
   },
   "peerDependencies": {
-    "rxjs": "^7.5.0",
+    "rxjs": "^7.8.0",
     "@scion/toolkit": "^2.1.0",
     "@scion/microfrontend-platform": "^2.0.0"
   },

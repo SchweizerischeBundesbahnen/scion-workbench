@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, HostBinding, HostListener, inject, Injector, runInInjectionContext, Signal} from '@angular/core';
+import {Component, computed, HostBinding, HostListener, inject, Injector, runInInjectionContext, Signal, ChangeDetectionStrategy} from '@angular/core';
 import {OverlayRef} from '@angular/cdk/overlay';
 import {WorkbenchMenuItem} from '../../workbench.model';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
@@ -25,6 +25,8 @@ import {MenuItemComponent} from './menu-item/menu-item.component';
   selector: 'wb-view-menu',
   templateUrl: './view-menu.component.html',
   styleUrls: ['./view-menu.component.scss'],
+  // Required for backward compatibility for zone-based applications to support child components with eager change detection.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
   imports: [
     NgClass,
     KeyValuePipe,

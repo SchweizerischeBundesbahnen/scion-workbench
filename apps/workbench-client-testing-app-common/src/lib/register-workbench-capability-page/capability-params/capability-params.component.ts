@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, computed, forwardRef, inject, Signal} from '@angular/core';
+import {Component, computed, forwardRef, inject, Signal} from '@angular/core';
 import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator, Validators} from '@angular/forms';
 import {noop} from 'rxjs';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
@@ -35,7 +35,6 @@ import {parseTypedString, prune, toTypedString} from 'workbench-testing-app-comm
   host: {
     '[class.empty]': `form.controls.params.controls.length`,
   },
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CapabilityParamsComponent implements ControlValueAccessor, Validator {
 

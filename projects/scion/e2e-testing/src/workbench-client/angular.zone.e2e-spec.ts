@@ -21,13 +21,12 @@ import {RouterPagePO} from './page-object/router-page.po';
  * the context of Observable emissions. Angular applications typically install such a decorator to have Observables emit in the
  * correct zone.
  *
- * This test expects the zone client testing app to be served on 'http://localhost:4203'
- * The app has the zone polyfill and the zone change detection enabled.
+ * This test expects the client testing app to be served with zone change detection enabled.
  */
 test.describe('Angular Zone Synchronization', () => {
 
   test('should emit in the same Angular zone as subscribed to "WorkbenchView#partId$"', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({zoneEnabled: true, microfrontendSupport: true});
+    await appPO.navigateTo({microfrontendSupport: true});
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
@@ -58,7 +57,7 @@ test.describe('Angular Zone Synchronization', () => {
   });
 
   test('should emit in the same Angular zone as subscribed to "WorkbenchView#capability$"', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({zoneEnabled: true, microfrontendSupport: true});
+    await appPO.navigateTo({microfrontendSupport: true});
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
@@ -89,7 +88,7 @@ test.describe('Angular Zone Synchronization', () => {
   });
 
   test('should emit in the same Angular zone as subscribed to "WorkbenchView#params$"', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({zoneEnabled: true, microfrontendSupport: true});
+    await appPO.navigateTo({microfrontendSupport: true});
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
@@ -120,7 +119,7 @@ test.describe('Angular Zone Synchronization', () => {
   });
 
   test('should emit in the same Angular zone as subscribed to "WorkbenchView#active$"', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({zoneEnabled: true, microfrontendSupport: true});
+    await appPO.navigateTo({microfrontendSupport: true});
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
@@ -151,7 +150,7 @@ test.describe('Angular Zone Synchronization', () => {
   });
 
   test('should emit in the same Angular zone as subscribed to "WorkbenchView#focused$"', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({zoneEnabled: true, microfrontendSupport: true});
+    await appPO.navigateTo({microfrontendSupport: true});
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
@@ -182,7 +181,7 @@ test.describe('Angular Zone Synchronization', () => {
   });
 
   test('should emit in the same Angular zone as subscribed to "WorkbenchPart#active$"', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({zoneEnabled: true, microfrontendSupport: true});
+    await appPO.navigateTo({microfrontendSupport: true});
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
@@ -213,7 +212,7 @@ test.describe('Angular Zone Synchronization', () => {
   });
 
   test('should emit in the same Angular zone as subscribed to "WorkbenchPart#focused$"', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({zoneEnabled: true, microfrontendSupport: true});
+    await appPO.navigateTo({microfrontendSupport: true});
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',

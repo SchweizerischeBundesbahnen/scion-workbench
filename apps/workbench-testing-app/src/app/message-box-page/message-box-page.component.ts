@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
+import {Component, inject, input} from '@angular/core';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import ActivatedMicrofrontendComponent from '../activated-microfrontend/activated-microfrontend.component';
 import {ActivatedMicrofrontend} from '@scion/workbench';
@@ -20,7 +20,6 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
   selector: 'app-message-box-page',
   templateUrl: './message-box-page.component.html',
   styleUrls: ['./message-box-page.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     SciFormFieldComponent,
     ActivatedMicrofrontendComponent,

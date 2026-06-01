@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, inject, numberAttribute, signal} from '@angular/core';
+import {Component, inject, numberAttribute, signal} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WORKBENCH_ELEMENT, WorkbenchElement, WorkbenchNavigationExtras, WorkbenchRouter} from '@scion/workbench-client';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
@@ -29,7 +29,6 @@ import {Beans} from '@scion/toolkit/bean-manager';
     SciCheckboxComponent,
     MultiValueInputComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RouterPageComponent {
 

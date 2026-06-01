@@ -48,8 +48,8 @@ export function provideLegacyMicrofrontendPartRoute(): EnvironmentProviders {
  * Matches if a legacy microfrontend part navigation.
  */
 function canMatchLegacyMicrofrontendPartNavigation(): CanMatchFn {
-  return async (route, segments): Promise<boolean> => {
-    if (!canMatchWorkbenchPart(MICROFRONTEND_PART_NAVIGATION_HINT)(route, segments)) {
+  return async (route, segments, currentSnapshot): Promise<boolean> => {
+    if (!canMatchWorkbenchPart(MICROFRONTEND_PART_NAVIGATION_HINT)(route, segments, currentSnapshot)) {
       return false;
     }
 

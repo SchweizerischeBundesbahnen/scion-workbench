@@ -64,8 +64,8 @@ export function provideMicrofrontendViewRoute(): EnvironmentProviders {
  * if the view capability exists.
  */
 function canMatchMicrofrontendView(matcher: {host: boolean}): CanMatchFn {
-  return (route, segments): boolean => {
-    if (!canMatchWorkbenchView(MICROFRONTEND_VIEW_NAVIGATION_HINT)(route, segments)) {
+  return (route, segments, currentSnapshot): boolean => {
+    if (!canMatchWorkbenchView(MICROFRONTEND_VIEW_NAVIGATION_HINT)(route, segments, currentSnapshot)) {
       return false;
     }
 

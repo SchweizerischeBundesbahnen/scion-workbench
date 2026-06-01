@@ -47,8 +47,8 @@ export function provideLegacyMicrofrontendViewRoute(): EnvironmentProviders {
  * Matches if a legacy microfrontend view navigation.
  */
 function canMatchLegacyMicrofrontendViewNavigation(): CanMatchFn {
-  return async (route, segments): Promise<boolean> => {
-    if (!canMatchWorkbenchView(true)(route, segments)) {
+  return async (route, segments, currentSnapshot): Promise<boolean> => {
+    if (!canMatchWorkbenchView(true)(route, segments, currentSnapshot)) {
       return false;
     }
 

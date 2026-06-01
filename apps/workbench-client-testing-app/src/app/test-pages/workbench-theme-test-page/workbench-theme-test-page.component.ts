@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {WorkbenchThemeMonitor} from '@scion/workbench-client';
 import {AsyncPipe} from '@angular/common';
@@ -21,7 +21,6 @@ import {AsyncPipe} from '@angular/common';
     AsyncPipe,
     SciFormFieldComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class WorkbenchThemeTestPageComponent {
 

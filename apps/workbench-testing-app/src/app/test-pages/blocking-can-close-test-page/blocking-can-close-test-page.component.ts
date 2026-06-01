@@ -8,14 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {WorkbenchView} from '@scion/workbench';
 import {noop} from 'rxjs';
 
 @Component({
   selector: 'app-blocking-can-close-test-page',
   template: 'Blocking CanClose Test Page',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class BlockingCanCloseTestPageComponent {
 

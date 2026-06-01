@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject} from '@angular/core';
+import {Component, computed, inject, ChangeDetectionStrategy} from '@angular/core';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {ViewDragService} from '../../view-dnd/view-drag.service';
@@ -51,6 +51,8 @@ import {WorkbenchDesktop} from '../../desktop/workbench-desktop.model';
     ViewDropZoneDirective,
     WorkbenchPortalOutletDirective,
   ],
+  // Required for backward compatibility for zone-based applications to support child components with eager change detection.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
   host: {
     '[attr.data-grid]': 'dasherize(part.gridName())',
     '[attr.data-active]': `part.active() ? '' : null`,
