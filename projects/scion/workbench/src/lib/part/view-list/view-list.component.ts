@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, computed, effect, HostBinding, HostListener, inject, Signal, viewChild} from '@angular/core';
+import {Component, computed, effect, HostBinding, HostListener, inject, Signal, viewChild} from '@angular/core';
 import {OverlayRef} from '@angular/cdk/overlay';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
@@ -24,7 +24,6 @@ import {text} from '../../text/text';
   selector: 'wb-view-list',
   templateUrl: './view-list.component.html',
   styleUrls: ['./view-list.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     FilterFieldComponent,

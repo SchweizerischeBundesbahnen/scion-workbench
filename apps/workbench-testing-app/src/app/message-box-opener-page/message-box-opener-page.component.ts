@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, inject, signal, Type} from '@angular/core';
+import {Component, inject, signal, Type} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {DialogId, PartId, PopupId, Translatable, ViewId, NotificationId, WorkbenchMessageBoxOptions, WorkbenchMessageBoxService} from '@scion/workbench';
 import {MultiValueInputComponent, parseTypedString, prune, stringifyError} from 'workbench-testing-app-common';
@@ -30,7 +30,6 @@ import {UUID} from '@scion/toolkit/uuid';
     SciCheckboxComponent,
     MultiValueInputComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class MessageBoxOpenerPageComponent {
 

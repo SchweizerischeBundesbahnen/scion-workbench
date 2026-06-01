@@ -8,12 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
 import {FieldValidationDirective, SciKeyValueFieldComponent} from 'workbench-testing-app-common';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SettingsService} from '../../settings.service';
-import {Field, form, hidden, required} from '@angular/forms/signals';
+import {form, FormField, hidden, required} from '@angular/forms/signals';
 import {Qualifier} from '@scion/microfrontend-platform';
 import {RouteRegistrationService} from '../../route-registration.service';
 
@@ -21,12 +21,11 @@ import {RouteRegistrationService} from '../../route-registration.service';
   selector: 'app-register-route-page',
   templateUrl: './register-route-page.component.html',
   styleUrls: ['./register-route-page.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,
     SciKeyValueFieldComponent,
-    Field,
+    FormField,
     FieldValidationDirective,
   ],
 })

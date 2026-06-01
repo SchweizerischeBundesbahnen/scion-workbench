@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, effect, ElementRef, HostListener, inject, NgZone, Provider, signal, untracked, viewChild} from '@angular/core';
+import {Component, effect, ElementRef, HostListener, inject, NgZone, Provider, signal, untracked, viewChild, ChangeDetectionStrategy} from '@angular/core';
 import {animationFrames, BehaviorSubject, debounce, fromEvent} from 'rxjs';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {AsyncPipe, NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
@@ -52,6 +52,8 @@ import {trackFocus} from '../focus/workbench-focus-tracker.service';
   viewProviders: [
     configureDialogGlassPane(),
   ],
+  // Required for backward compatibility for zone-based applications to support child components with eager change detection.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
   host: {
     '[attr.data-dialogid]': 'dialog.id',
     '[class.justified]': '!dialog.padding()',

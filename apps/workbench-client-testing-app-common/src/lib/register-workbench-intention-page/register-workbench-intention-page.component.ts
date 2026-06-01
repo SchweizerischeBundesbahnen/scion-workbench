@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Intention, ManifestService} from '@scion/microfrontend-platform';
 import {WORKBENCH_ELEMENT, WorkbenchCapabilities, WorkbenchElement} from '@scion/workbench-client';
@@ -26,7 +26,6 @@ import {Beans} from '@scion/toolkit/bean-manager';
     SciFormFieldComponent,
     SciKeyValueFieldComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterWorkbenchIntentionPageComponent {
 

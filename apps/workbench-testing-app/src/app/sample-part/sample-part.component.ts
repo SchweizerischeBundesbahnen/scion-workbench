@@ -54,7 +54,7 @@ export default class SamplePartComponent {
 
   constructor() {
     effect(() => {
-      const navigationData = this.part.navigation()!.data as PartSkeletonNavigationData | undefined;
+      const navigationData = this.part.navigation()!.data;
       untracked(() => this.onNavigationChange(navigationData ?? {}));
     });
   }

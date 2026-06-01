@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {Intent, IntentClient} from '@scion/microfrontend-platform';
@@ -24,7 +24,6 @@ import {stringifyError} from 'workbench-testing-app-common';
     SciFormFieldComponent,
     SciKeyValueFieldComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PublishIntentPageComponent {
 

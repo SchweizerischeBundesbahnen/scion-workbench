@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, computed, createComponent, DestroyRef, effect, ElementRef, EnvironmentInjector, inject, Injector, input, Renderer2, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
+import {Component, computed, createComponent, DestroyRef, effect, ElementRef, EnvironmentInjector, inject, Injector, input, Renderer2, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
 import {WORKBENCH_ICON_PROVIDER, WorkbenchIconDescriptor, WorkbenchIconProviderFn} from './workbench-icon-provider.model';
 
 /**
@@ -23,7 +23,6 @@ import {WORKBENCH_ICON_PROVIDER, WorkbenchIconDescriptor, WorkbenchIconProviderF
   selector: 'wb-icon',
   template: '',
   styleUrl: './icon.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IconComponent {
 

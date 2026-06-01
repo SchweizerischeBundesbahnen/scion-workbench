@@ -46,9 +46,9 @@ SCION Workbench enables the creation of Angular web applications that require a 
 ***
 
 ### Versions
+- `v22.0.0-beta.1` and newer are compatible with Angular version 22.x.
 - `v21.0.0-beta.1` and newer are compatible with Angular version 21.x.
 - `v20.0.0-beta.1` and newer are compatible with Angular version 20.x.
-- `v19.0.0-beta.1` and newer are compatible with Angular version 19.x.
 
 Older versions are no longer supported.
 ***

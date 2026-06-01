@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, ChangeDetectionStrategy} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 
 /**
@@ -24,6 +24,8 @@ import {RouterOutlet} from '@angular/router';
 @Component({
   templateUrl: './empty-outlet.component.html',
   styleUrls: ['./empty-outlet.component.scss'],
+  // Required for backward compatibility for zone-based applications to support child components with eager change detection.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
   imports: [RouterOutlet],
 })
 export class ɵEmptyOutletComponent {

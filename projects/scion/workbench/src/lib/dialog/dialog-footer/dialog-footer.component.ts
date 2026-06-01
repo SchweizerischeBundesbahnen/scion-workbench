@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ɵWorkbenchDialog} from '../ɵworkbench-dialog.model';
 import {NgTemplateOutlet} from '@angular/common';
 import {NullIfEmptyPipe} from '../../common/null-if-empty.pipe';
@@ -20,6 +20,8 @@ import {DialogActionFilterPipe} from './dialog-action-filter.pipe';
   selector: 'wb-dialog-footer',
   templateUrl: './dialog-footer.component.html',
   styleUrls: ['./dialog-footer.component.scss'],
+  // Required for backward compatibility for zone-based applications to support child components with eager change detection.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
   imports: [
     NgTemplateOutlet,
     NullIfEmptyPipe,

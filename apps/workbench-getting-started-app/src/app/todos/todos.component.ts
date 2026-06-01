@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {WorkbenchRouterLinkDirective} from '@scion/workbench';
 import {TodoService} from '../todo.service';
 
@@ -8,7 +8,6 @@ import {TodoService} from '../todo.service';
   imports: [
     WorkbenchRouterLinkDirective,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class TodosComponent {
 

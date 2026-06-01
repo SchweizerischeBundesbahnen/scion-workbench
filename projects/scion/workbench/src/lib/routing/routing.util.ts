@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ActivatedRoute, ActivatedRouteSnapshot, ActivationEnd, ActivationStart, ChildrenOutletContexts, Event, NavigationStart, OutletContext, PRIMARY_OUTLET, Router, RouterEvent, UrlSegment, UrlSegmentGroup, UrlTree} from '@angular/router';
+import {ActivatedRoute, ActivatedRouteSnapshot, ActivationEnd, ActivationStart, ChildrenOutletContexts, Event, NavigationStart, OutletContext, PRIMARY_OUTLET, Router, RouterEvent, UrlSegment, UrlTree} from '@angular/router';
 import {Commands} from '../routing/routing.model';
 import {inject, Injector} from '@angular/core';
 import {EMPTY, iif, MonoTypeOperatorFunction, Observable, of, OperatorFunction, pairwise, race, switchMap} from 'rxjs';
@@ -67,7 +67,7 @@ export const Routing = {
    */
   pathToCommands: (path: string): Commands => {
     const urlTree = inject(Router).parseUrl(path);
-    const segmentGroup = urlTree.root.children[PRIMARY_OUTLET] as UrlSegmentGroup | undefined;
+    const segmentGroup = urlTree.root.children[PRIMARY_OUTLET];
     if (!segmentGroup?.segments) {
       throw Error(`[RouterError] Cannot match any routes for path '${path}'.`);
     }

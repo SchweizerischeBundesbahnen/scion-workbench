@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, DOCUMENT, inject, Injector, NgZone, signal, Signal, untracked} from '@angular/core';
+import {Component, computed, DOCUMENT, inject, Injector, NgZone, signal, Signal, untracked, ChangeDetectionStrategy} from '@angular/core';
 import {ViewDragService} from '../../view-dnd/view-drag.service';
 import {CdkPortalOutlet, ComponentPortal} from '@angular/cdk/portal';
 import {WorkbenchConfig} from '../../workbench-config';
@@ -37,6 +37,8 @@ import {PartId} from '../../workbench.identifiers';
     TextPipe,
     IconComponent,
   ],
+  // Required for backward compatibility for zone-based applications to support child components with eager change detection.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
   host: {
     '[attr.data-viewid]': 'view().id',
     '[attr.data-active]': `view().active() ? '' : null`,

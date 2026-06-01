@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, effect, ElementRef, inject, Provider, viewChild} from '@angular/core';
+import {Component, effect, ElementRef, inject, Provider, viewChild, ChangeDetectionStrategy} from '@angular/core';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
@@ -34,6 +34,8 @@ import {NgComponentOutlet} from '@angular/common';
   providers: [
     configurePopupGlassPane(),
   ],
+  // Required for backward compatibility for zone-based applications to support child components with eager change detection.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
   host: {
     '[attr.data-popupid]': 'popup.id',
     '[style.width]': 'popup.size.width()',

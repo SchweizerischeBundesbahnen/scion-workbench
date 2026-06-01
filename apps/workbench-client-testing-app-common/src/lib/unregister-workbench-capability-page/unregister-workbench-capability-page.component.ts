@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ManifestService} from '@scion/microfrontend-platform';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
@@ -27,7 +27,6 @@ import {Beans} from '@scion/toolkit/bean-manager';
     ReactiveFormsModule,
     SciFormFieldComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UnregisterWorkbenchCapabilityPageComponent {
 

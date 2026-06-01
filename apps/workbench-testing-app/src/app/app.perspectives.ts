@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Route, ROUTES, Routes, UrlSegment} from '@angular/router';
+import {PartialMatchRouteSnapshot, Route, ROUTES, Routes, UrlSegment} from '@angular/router';
 import {canMatchWorkbenchPart, canMatchWorkbenchView, MAIN_AREA, WorkbenchLayout, WorkbenchLayoutFactory, WorkbenchPerspectives, WorkbenchRouteData} from '@scion/workbench';
 import {EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
 import {ViewSkeletonNavigationData} from './sample-view/sample-view.component';
@@ -131,11 +131,11 @@ export function provideRoutesForPerspectives(): EnvironmentProviders {
       provide: ROUTES,
       useFactory: (): Routes => [
         // Sample View
-        {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchView('sample-view')(route, segments) && inject(SettingsService).isEnabled('showSkeletons')], loadComponent: () => import('./sample-view/sample-view.component'), data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'}},
-        {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchView('sample-view')(route, segments) && !inject(SettingsService).isEnabled('showSkeletons')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'}},
+        {path: '', canMatch: [(route: Route, segments: UrlSegment[], currentSnapshot: PartialMatchRouteSnapshot) => canMatchWorkbenchView('sample-view')(route, segments, currentSnapshot) && inject(SettingsService).isEnabled('showSkeletons')], loadComponent: () => import('./sample-view/sample-view.component'), data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'}},
+        {path: '', canMatch: [(route: Route, segments: UrlSegment[], currentSnapshot: PartialMatchRouteSnapshot) => canMatchWorkbenchView('sample-view')(route, segments, currentSnapshot) && !inject(SettingsService).isEnabled('showSkeletons')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'}},
         // Sample Part
-        {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchPart('sample-part')(route, segments) && inject(SettingsService).isEnabled('showSkeletons')], loadComponent: () => import('./sample-part/sample-part.component')},
-        {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchPart('sample-part')(route, segments) && !inject(SettingsService).isEnabled('showSkeletons')], loadComponent: () => import('./part-page/part-page.component')},
+        {path: '', canMatch: [(route: Route, segments: UrlSegment[], currentSnapshot: PartialMatchRouteSnapshot) => canMatchWorkbenchPart('sample-part')(route, segments, currentSnapshot) && inject(SettingsService).isEnabled('showSkeletons')], loadComponent: () => import('./sample-part/sample-part.component')},
+        {path: '', canMatch: [(route: Route, segments: UrlSegment[], currentSnapshot: PartialMatchRouteSnapshot) => canMatchWorkbenchPart('sample-part')(route, segments, currentSnapshot) && !inject(SettingsService).isEnabled('showSkeletons')], loadComponent: () => import('./part-page/part-page.component')},
       ],
       multi: true,
     },

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, Injector, input, runInInjectionContext, TemplateRef} from '@angular/core';
+import {Component, inject, Injector, input, runInInjectionContext, TemplateRef, ChangeDetectionStrategy} from '@angular/core';
 import {WorkbenchPartAction} from '../../workbench.model';
 import {WorkbenchPart} from '../workbench-part.model';
 import {ComponentType} from '@angular/cdk/portal';
@@ -20,6 +20,8 @@ import {InstanceofPipe} from '../../common/instanceof.pipe';
   selector: 'wb-part-action',
   templateUrl: './part-action.component.html',
   styleUrl: './part-action.component.scss',
+  // Required for backward compatibility for zone-based applications to support child components with eager change detection.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
   imports: [
     NgTemplateOutlet,
     NgComponentOutlet,

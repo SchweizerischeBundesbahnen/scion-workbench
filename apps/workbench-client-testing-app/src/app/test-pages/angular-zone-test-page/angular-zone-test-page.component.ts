@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Component, inject, NgZone} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, NgZone} from '@angular/core';
 import {NgTemplateOutlet} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {Beans} from '@scion/toolkit/bean-manager';
@@ -30,6 +30,8 @@ import {firstValueFrom} from 'rxjs';
     SciAccordionComponent,
     SciAccordionItemDirective,
   ],
+  // Required for testing of backward compatibility for zone-based applications.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
 })
 export default class AngularZoneTestPageComponent {
 

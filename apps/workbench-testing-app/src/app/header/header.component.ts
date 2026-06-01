@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, effect, inject, Injector, runInInjectionContext, signal, untracked, WritableSignal} from '@angular/core';
+import {Component, effect, inject, Injector, runInInjectionContext, signal, untracked, WritableSignal} from '@angular/core';
 import {PerspectiveData} from '../app.perspectives';
 import {MenuItem, MenuItemSeparator} from '../menu/menu-item';
 import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-params';
@@ -27,7 +27,6 @@ import {comparePerspectives} from './perspective-comparator.util';
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     SciMaterialIconDirective,

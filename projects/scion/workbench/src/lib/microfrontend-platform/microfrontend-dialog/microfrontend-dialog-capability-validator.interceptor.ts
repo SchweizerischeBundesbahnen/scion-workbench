@@ -10,7 +10,7 @@
 
 import {Capability, CapabilityInterceptor} from '@scion/microfrontend-platform';
 import {Injectable} from '@angular/core';
-import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchDialogSize} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchDialogCapability} from '@scion/workbench-client';
 import {Objects} from '@scion/toolkit/util';
 import {Microfrontends} from '../common/microfrontend.util';
 
@@ -70,7 +70,7 @@ export class MicrofrontendDialogCapabilityValidator implements CapabilityInterce
       return;
     }
 
-    const size = capability.properties?.size as Partial<WorkbenchDialogSize> | undefined;
+    const size = capability.properties?.size;
     if (!size?.width || !size.height) {
       throw Error(`[DialogDefinitionError] Dialog capability requires the 'size' property with a width and a height [app=${app(capability)}, dialog=${qualifier(capability)}]`);
     }

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, forwardRef, inject, input} from '@angular/core';
+import {Component, forwardRef, inject, input} from '@angular/core';
 import {noop} from 'rxjs';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -18,7 +18,6 @@ import {Arrays} from '@scion/toolkit/util';
   selector: 'app-multi-value-input',
   templateUrl: './multi-value-input.component.html',
   styleUrls: ['./multi-value-input.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
   ],

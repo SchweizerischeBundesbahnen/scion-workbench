@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DOCUMENT, ElementRef, inject, viewChild} from '@angular/core';
+import {Component, DOCUMENT, ElementRef, inject, viewChild, ChangeDetectionStrategy} from '@angular/core';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {OnAttach, OnDetach} from '../../portal/wb-component-portal';
 import {trackFocus} from '../../focus/workbench-focus-tracker.service';
@@ -22,6 +22,8 @@ import {NgTemplateOutlet} from '@angular/common';
   selector: 'wb-desktop-slot',
   templateUrl: './desktop-slot.component.html',
   styleUrl: './desktop-slot.component.scss',
+  // Required for backward compatibility for zone-based applications to support child components with eager change detection.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
   imports: [
     SciViewportComponent,
     NgTemplateOutlet,

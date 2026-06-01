@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Component, effect, inject, input, signal} from '@angular/core';
+import {Component, effect, inject, input, signal, ChangeDetectionStrategy} from '@angular/core';
 import {MessageBoxFooterComponent} from './message-box-footer/message-box-footer.component';
 import {WorkbenchMessageBoxOptions} from './workbench-message-box.options';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog.model';
@@ -40,6 +40,8 @@ import {Translatable} from '../text/workbench-text-provider.model';
     TypeofPipe,
     TextPipe,
   ],
+  // Required for backward compatibility for zone-based applications to support child components with eager change detection.
+  changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection
   host: {
     // Ensure host element to be focusable in order to close the message box on Escape keystroke.
     '[attr.tabindex]': '-1',

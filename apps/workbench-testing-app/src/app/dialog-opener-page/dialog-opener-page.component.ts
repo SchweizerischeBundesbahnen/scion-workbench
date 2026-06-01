@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationRef, ChangeDetectionStrategy, Component, inject, signal, Type} from '@angular/core';
+import {ApplicationRef, Component, inject, signal, Type} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {DialogId, NotificationId, PartId, PopupId, ViewId, WorkbenchDialogService} from '@scion/workbench';
 import {MultiValueInputComponent, parseTypedString, stringifyError} from 'workbench-testing-app-common';
@@ -37,7 +37,6 @@ import WorkbenchHandleBoundsTestPageComponent from '../test-pages/workbench-hand
     MultiValueInputComponent,
   ],
   hostDirectives: [{directive: PopupSizeDirective, inputs: ['size']}],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class DialogOpenerPageComponent {
 

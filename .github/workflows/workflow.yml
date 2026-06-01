@@ -1,7 +1,7 @@
 name: Continuous Integration and Delivery
 on: [ push, pull_request, workflow_dispatch ]
 env:
-  NODE_VERSION: 24.11.0
+  NODE_VERSION: 26.3.0
 permissions:
   contents: read
 jobs:
@@ -9,12 +9,12 @@ jobs:
     name: 'Installing NPM modules'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: 'Caching NPM modules if necessary'
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: node-modules-cache
         with:
           path: ./node_modules
@@ -29,8 +29,8 @@ jobs:
       workbench-version: ${{ steps.workbench-package-json.outputs.version }}
       workbench-client-version: ${{ steps.workbench-client-package-json.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: 'Reading package.json version of scion/workbench'
@@ -44,42 +44,42 @@ jobs:
         with:
           path: projects/scion/workbench-client/package.json
       - name: 'Restoring NPM modules from cache'
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ./node_modules
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
       - name: 'Building @scion/workbench-client'
         run: npm run workbench-client:build
       - name: 'Uploading dist/scion/workbench-client'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: workbench-client-dist
           path: dist/scion/workbench-client
       - name: 'Building @scion/workbench'
         run: npm run workbench:build
       - name: 'Uploading dist/scion/workbench'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: workbench-dist
           path: dist/scion/workbench
       - name: 'Building workbench-testing-app-common'
         run: npm run workbench-testing-app-common:build
       - name: 'Uploading dist/workbench-testing-app-common'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: workbench-testing-app-common-dist
           path: dist/workbench-testing-app-common
       - name: 'Building workbench-client-testing-app-common'
         run: npm run workbench-client-testing-app-common:build
       - name: 'Uploading dist/workbench-client-testing-app-common'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: workbench-client-testing-app-common-dist
           path: dist/workbench-client-testing-app-common
       - name: 'Building TypeDoc for @scion/workbench-client'
         run: npm run workbench-client:typedoc
       - name: 'Uploading dist/workbench-client-api'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: workbench-client-api
           path: dist/workbench-client-api
@@ -90,32 +90,32 @@ jobs:
     needs: build-libs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: 'Downloading dist/scion/workbench'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-dist
           path: dist/scion/workbench
       - name: 'Downloading dist/scion/workbench-client'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-client-dist
           path: dist/scion/workbench-client
       - name: 'Downloading dist/workbench-testing-app-common'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-testing-app-common-dist
           path: dist/workbench-testing-app-common
       - name: 'Downloading dist/workbench-client-testing-app-common'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-client-testing-app-common-dist
           path: dist/workbench-client-testing-app-common
       - name: 'Restoring NPM modules from cache'
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ./node_modules
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
@@ -148,38 +148,38 @@ jobs:
           - name: workbench-getting-started-app
             cmd: npm run workbench-getting-started-app:build
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: 'Restoring NPM modules from cache'
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ./node_modules
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
       - name: 'Downloading dist/scion/workbench'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-dist
           path: dist/scion/workbench
       - name: 'Downloading dist/scion/workbench-client'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-client-dist
           path: dist/scion/workbench-client
       - name: 'Downloading dist/workbench-testing-app-common'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-testing-app-common-dist
           path: dist/workbench-testing-app-common
       - name: 'Downloading dist/workbench-client-testing-app-common'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-client-testing-app-common-dist
           path: dist/workbench-client-testing-app-common
       - name: 'Building ${{ matrix.app.name }}'
         run: ${{ matrix.app.cmd }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.app.name }}
           path: dist/${{ matrix.app.name }}
@@ -188,22 +188,22 @@ jobs:
     needs: build-libs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: 'Downloading dist/scion/workbench'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-dist
           path: dist/scion/workbench
       - name: 'Downloading dist/scion/workbench-client'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-client-dist
           path: dist/scion/workbench-client
       - name: 'Restoring NPM modules from cache'
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ./node_modules
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
@@ -218,47 +218,42 @@ jobs:
         shardIndex: [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 ]
         shardTotal: [ 20 ]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: 'Downloading dist/scion/workbench'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-dist
           path: dist/scion/workbench
       - name: 'Downloading dist/scion/workbench-client'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-client-dist
           path: dist/scion/workbench-client
       - name: 'Downloading app: workbench-testing-app-ci (dist)'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-testing-app-ci
           path: dist/workbench-testing-app-ci
       - name: 'Downloading app: workbench-testing-app-basehref (dist)'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-testing-app-basehref
           path: dist/workbench-testing-app-basehref
       - name: 'Downloading app: workbench-testing-app-basehref-webpack (dist)'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-testing-app-basehref-webpack
           path: dist/workbench-testing-app-basehref-webpack
       - name: 'Downloading app: workbench-client-testing-app-ci (dist)'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-client-testing-app-ci
           path: dist/workbench-client-testing-app-ci
-      - name: 'Downloading app: workbench-client-testing-app-zone (dist)'
-        uses: actions/download-artifact@v4
-        with:
-          name: workbench-client-testing-app-zone
-          path: dist/workbench-client-testing-app-zone
       - name: 'Restoring NPM modules from cache'
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ./node_modules
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
@@ -266,9 +261,52 @@ jobs:
         run: npm run e2e:headless -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
       - name: Upload Playwright results
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-test-results-${{ matrix.shardIndex }}
+          path: test-results/
+          retention-days: 7
+  e2e-zone:
+    name: 'E2E Zone Testing'
+    needs: [ build-libs, build-apps ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: 'Downloading dist/scion/workbench'
+        uses: actions/download-artifact@v7
+        with:
+          name: workbench-dist
+          path: dist/scion/workbench
+      - name: 'Downloading dist/scion/workbench-client'
+        uses: actions/download-artifact@v7
+        with:
+          name: workbench-client-dist
+          path: dist/scion/workbench-client
+      - name: 'Downloading app: workbench-testing-app-ci (dist)'
+        uses: actions/download-artifact@v7
+        with:
+          name: workbench-testing-app-ci
+          path: dist/workbench-testing-app-ci
+      - name: 'Downloading app: workbench-client-testing-app-zone (dist)'
+        uses: actions/download-artifact@v7
+        with:
+          name: workbench-client-testing-app-zone
+          path: dist/workbench-client-testing-app-zone
+      - name: 'Restoring NPM modules from cache'
+        uses: actions/cache@v5
+        with:
+          path: ./node_modules
+          key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+      - name: Run e2e zone tests
+        run: npm run e2e-zone:headless
+      - name: Upload Playwright results
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-test-results-zone
           path: test-results/
           retention-days: 7
   workbench-release-guard:
@@ -286,7 +324,7 @@ jobs:
     outputs:
       should-release: ${{ steps.tag-release-commit.outputs.is-release-commit }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: 'If release commit present, add release tag'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/tag-release-commit@master
         id: tag-release-commit
@@ -308,7 +346,7 @@ jobs:
     outputs:
       should-release: ${{ steps.tag-release-commit.outputs.is-release-commit }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: 'If release commit present, add release tag'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/tag-release-commit@master
         id: tag-release-commit
@@ -325,32 +363,32 @@ jobs:
       - build-libs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: 'Downloading app: workbench-testing-app-vercel-latest (dist)'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-testing-app-vercel-latest
           path: dist/workbench-testing-app-vercel-latest
       - name: 'Downloading app: workbench-client-testing-app-vercel-latest (dist)'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-client-testing-app-vercel-latest
           path: dist/workbench-client-testing-app-vercel-latest
       - name: 'Downloading app: workbench-testing-app-vercel-release (dist)'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-testing-app-vercel-release
           path: dist/workbench-testing-app-vercel-release
       - name: 'Downloading app: workbench-client-testing-app-vercel-release (dist)'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-client-testing-app-vercel-release
           path: dist/workbench-client-testing-app-vercel-release
       - name: 'Downloading app: workbench-getting-started-app (dist)'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-getting-started-app
           path: dist/workbench-getting-started-app
@@ -413,12 +451,12 @@ jobs:
       - workbench-release-guard
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: 'Downloading dist/scion/workbench'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-dist
           path: dist/scion/workbench
@@ -440,17 +478,17 @@ jobs:
       - workbench-client-release-guard
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: 'Downloading dist/scion/workbench-client'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-client-dist
           path: dist/scion/workbench-client
       - name: 'Downloading dist/workbench-client-api'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: workbench-client-api
           path: dist/workbench-client-api

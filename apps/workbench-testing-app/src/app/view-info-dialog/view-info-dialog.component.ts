@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, computed, inject, input, Signal} from '@angular/core';
+import {Component, computed, inject, input, Signal} from '@angular/core';
 import {Translatable, WorkbenchDialog, WorkbenchDialogActionDirective, WorkbenchView} from '@scion/workbench';
 import {ActivatedRoute, Router} from '@angular/router';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
@@ -22,7 +22,6 @@ import {UUID} from '@scion/toolkit/uuid';
   selector: 'app-view-info-dialog',
   templateUrl: './view-info-dialog.component.html',
   styleUrls: ['./view-info-dialog.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     SciFormFieldComponent,
     JoinPipe,

@@ -149,9 +149,6 @@ export class AppPO {
     if (options?.logLevel) {
       this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.LOG_LEVEL, options.logLevel);
     }
-    if (options?.zoneEnabled) {
-      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.ZONE_ENABLED, String(true));
-    }
 
     const featureQueryParams = new URLSearchParams();
     if (options?.stickyViewTab) {
@@ -617,10 +614,6 @@ export interface Options {
    * Sets the log level of the SCION Workbench. Defaults to `info`.
    */
   logLevel?: 'debug' | 'info' | 'warn' | 'error';
-  /**
-   * Enables zone change detection in client app 1 if true. Defaults to `false`.
-   */
-  zoneEnabled?: boolean;
 }
 
 /**
@@ -685,11 +678,6 @@ export enum WorkbenchStartupQueryParams {
    * Query param to set the log level of the SCION Workbench.
    */
   LOG_LEVEL = 'logLevel',
-
-  /**
-   * Query param to enable zone change detection for app1.
-   */
-  ZONE_ENABLED = 'zoneEnabled',
 }
 
 /**

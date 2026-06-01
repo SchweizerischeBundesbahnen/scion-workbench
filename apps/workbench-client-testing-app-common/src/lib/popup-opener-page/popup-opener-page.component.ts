@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, ElementRef, inject, signal, viewChild} from '@angular/core';
+import {Component, ElementRef, inject, signal, viewChild} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {CloseStrategy, DialogId, NotificationId, PartId, PopupId, PopupOrigin, ViewId, WORKBENCH_ELEMENT, WorkbenchElement, WorkbenchPopupService} from '@scion/workbench-client';
 import {Observable} from 'rxjs';
@@ -36,7 +36,6 @@ import {Beans} from '@scion/toolkit/bean-manager';
     PopupPositionLabelPipe,
     MultiValueInputComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PopupOpenerPageComponent {
 

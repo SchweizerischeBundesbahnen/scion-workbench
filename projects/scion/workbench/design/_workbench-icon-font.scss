@@ -37,7 +37,7 @@ $-default-icon-font-config: (
  * ```
  */
 @mixin install-icon-font($config) {
-  $config: if($config, $config, ());
+  $config: if(sass($config): $config; else: ());
   $config: map.merge($-default-icon-font-config, $config);
   $path: map.get($config, directory) + '/' + map.get($config, filename);
   $version: map.get($config, version);

@@ -476,7 +476,8 @@ describe('Dialog', () => {
     @Component({selector: 'spec-dialog', template: ''})
     class SpecDialogComponent {
 
-      constructor(dialog: WorkbenchDialog) {
+      constructor() {
+        const dialog = inject(WorkbenchDialog);
         dialog.title = '%title';
         dialog.size.width = '500px';
       }

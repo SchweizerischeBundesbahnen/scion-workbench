@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {Router} from '@angular/router';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
@@ -20,7 +20,6 @@ import {Commands} from '@scion/workbench';
   selector: 'app-angular-router-test-page',
   templateUrl: './angular-router-test-page.component.html',
   styleUrls: ['./angular-router-test-page.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     SciFormFieldComponent,
     RouterCommandsComponent,

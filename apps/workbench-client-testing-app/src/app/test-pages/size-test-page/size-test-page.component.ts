@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, ElementRef, inject, signal} from '@angular/core';
+import {Component, ElementRef, inject, signal} from '@angular/core';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {animationFrameScheduler, interval, map, Observable} from 'rxjs';
 import {distinctUntilChanged} from 'rxjs/operators';
@@ -21,7 +21,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
   imports: [
     SciViewportComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class SizeTestPageComponent {
 

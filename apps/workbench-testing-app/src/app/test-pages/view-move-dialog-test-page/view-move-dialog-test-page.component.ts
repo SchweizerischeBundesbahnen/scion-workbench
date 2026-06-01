@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, inject, input} from '@angular/core';
+import {Component, inject, input} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {WORKBENCH_ID, WorkbenchDialog, WorkbenchDialogActionDirective, WorkbenchView} from '@scion/workbench';
@@ -19,7 +19,6 @@ import {UUID} from '@scion/toolkit/uuid';
   selector: 'app-view-move-dialog-test-page',
   templateUrl: './view-move-dialog-test-page.component.html',
   styleUrls: ['./view-move-dialog-test-page.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     SciFormFieldComponent,
     ReactiveFormsModule,
