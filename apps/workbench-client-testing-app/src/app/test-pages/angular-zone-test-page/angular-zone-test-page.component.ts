@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Component, inject, NgZone} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, NgZone} from '@angular/core';
 import {NgTemplateOutlet} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {Beans} from '@scion/toolkit/bean-manager';
@@ -30,6 +30,7 @@ import {firstValueFrom} from 'rxjs';
     SciAccordionComponent,
     SciAccordionItemDirective,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export default class AngularZoneTestPageComponent {
 

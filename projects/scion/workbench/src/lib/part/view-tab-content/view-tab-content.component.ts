@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {Component, inject, ChangeDetectionStrategy} from '@angular/core';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {TextPipe} from '../../text/text.pipe';
 import {IconComponent} from '../../icon/icon.component';
@@ -17,6 +17,7 @@ import {IconComponent} from '../../icon/icon.component';
   selector: 'wb-view-tab-content',
   templateUrl: './view-tab-content.component.html',
   styleUrls: ['./view-tab-content.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     TextPipe,
     IconComponent,

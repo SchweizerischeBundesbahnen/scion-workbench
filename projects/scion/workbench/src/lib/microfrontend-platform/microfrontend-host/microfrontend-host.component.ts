@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject, Injector, input, Signal, untracked} from '@angular/core';
+import {Component, computed, inject, Injector, input, Signal, untracked, ChangeDetectionStrategy} from '@angular/core';
 import {Logger, LoggerNames} from '../../logging';
 import {rootEffect} from '../../common/rxjs-interop.util';
 import {RouterOutlet} from '@angular/router';
@@ -35,6 +35,7 @@ import {MicrofrontendHostOutlet} from './microfrontend-host-routes';
     '[attr.data-app]': 'capability().metadata!.appSymbolicName',
     '[attr.data-focus]': `workbenchElement.focused() ? '' : null`,
   },
+  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [
     {
       provide: ActivatedMicrofrontend,

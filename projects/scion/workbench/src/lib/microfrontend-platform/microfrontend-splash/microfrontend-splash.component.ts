@@ -8,14 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {Component} from '@angular/core';
 import {SciThrobberComponent} from '@scion/components/throbber';
 
 @Component({
   selector: 'wb-microfrontend-splash',
   templateUrl: './microfrontend-splash.component.html',
   styleUrls: ['./microfrontend-splash.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [SciThrobberComponent],
 })
 export class MicrofrontendSplashComponent {

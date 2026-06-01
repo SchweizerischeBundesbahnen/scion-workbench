@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject, input} from '@angular/core';
+import {Component, computed, inject, input, ChangeDetectionStrategy} from '@angular/core';
 import {MPart, MTreeNode} from '../workbench-grid.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {WorkbenchLayoutService} from '../workbench-layout.service';
@@ -37,6 +37,7 @@ import {TreeNodeSashSizesPipe} from './tree-node-sash-sizes.pipe';
     SciSashDirective,
     TreeNodeSashSizesPipe,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     '[attr.data-parentnodeid]': 'element().parent?.id',
     '[attr.data-nodeid]': 'nodeId()',

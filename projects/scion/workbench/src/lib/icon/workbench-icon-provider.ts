@@ -9,7 +9,7 @@
  */
 
 import {WorkbenchIconDescriptor, WorkbenchIconProviderFn} from './workbench-icon-provider.model';
-import {Component, input} from '@angular/core';
+import {Component, input, ChangeDetectionStrategy} from '@angular/core';
 
 /**
  * Provides icons used by the SCION Workbench.
@@ -54,6 +54,7 @@ const workbenchIcons: {[icon: string]: string} = {
 @Component({
   selector: 'wb-workbench-icon',
   template: '{{ligature()}}',
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     '[class.scion-workbench-icons]': 'true',
   },

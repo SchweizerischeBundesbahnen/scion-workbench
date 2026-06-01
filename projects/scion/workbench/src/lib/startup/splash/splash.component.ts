@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {Component} from '@angular/core';
 import {SciThrobberComponent} from '@scion/components/throbber';
 
 /**
@@ -18,7 +18,6 @@ import {SciThrobberComponent} from '@scion/components/throbber';
   selector: 'wb-splash',
   templateUrl: './splash.component.html',
   styleUrls: ['./splash.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [SciThrobberComponent],
 })
 export class SplashComponent {

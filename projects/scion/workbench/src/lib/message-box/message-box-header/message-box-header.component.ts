@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Component, input} from '@angular/core';
+import {Component, input, ChangeDetectionStrategy} from '@angular/core';
 import {Translatable} from '../../text/workbench-text-provider.model';
 import {TextPipe} from '../../text/text.pipe';
 
@@ -18,6 +18,7 @@ import {TextPipe} from '../../text/text.pipe';
   imports: [
     TextPipe,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     '[attr.data-severity]': 'severity()',
   },

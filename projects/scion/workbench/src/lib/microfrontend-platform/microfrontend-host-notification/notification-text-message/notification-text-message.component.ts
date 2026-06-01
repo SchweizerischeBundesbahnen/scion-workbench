@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {Component, inject, ChangeDetectionStrategy} from '@angular/core';
 import {eNOTIFICATION_MESSAGE_PARAM} from '@scion/workbench-client';
 import {UUID} from '@scion/toolkit/uuid';
 import {Translatable} from '../../../text/workbench-text-provider.model';
@@ -28,6 +28,7 @@ import {ActivatedMicrofrontend} from '../../microfrontend-host/microfrontend-hos
   imports: [
     TextPipe,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     '[class.empty]': '!message?.length',
   },

@@ -64,8 +64,8 @@ export function provideMicrofrontendPartRoute(): EnvironmentProviders {
  * if the part capability exists.
  */
 function canMatchMicrofrontendPart(matcher: {host: boolean}): CanMatchFn {
-  return (route, segments): boolean => {
-    if (!canMatchWorkbenchPart(MICROFRONTEND_PART_NAVIGATION_HINT)(route, segments)) {
+  return (route, segments, currentSnapshot): boolean => {
+    if (!canMatchWorkbenchPart(MICROFRONTEND_PART_NAVIGATION_HINT)(route, segments, currentSnapshot)) {
       return false;
     }
 

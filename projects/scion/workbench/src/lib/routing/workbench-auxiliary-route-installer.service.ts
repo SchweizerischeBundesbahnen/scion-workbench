@@ -70,7 +70,7 @@ export class WorkbenchAuxiliaryRouteInstaller {
             .map(route => ({...route, canMatch: [...route.canMatch ?? [], matchesIfNavigated]})),
           )
           // Copy the route for each outlet to prevent unexpected routing behavior like infinite loops.
-          // TODO [Angular 22] Run test suite to check if still required
+          // TODO [Angular 23] Run test suite to check if still required
           .map(route => ({...route})),
       }))
       // Add "Page Not Found" wildcard route.

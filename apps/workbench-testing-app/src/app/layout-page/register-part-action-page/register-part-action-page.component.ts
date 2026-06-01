@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, inject, input, signal} from '@angular/core';
+import {Component, inject, input, signal} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WorkbenchPart, WorkbenchService} from '@scion/workbench';
 import {MultiValueInputComponent, stringifyError, undefinedIfEmpty} from 'workbench-testing-app-common';
@@ -22,7 +22,6 @@ import {SciMaterialIconDirective} from '@scion/components.internal/material-icon
   selector: 'app-register-part-action-page',
   templateUrl: './register-part-action-page.component.html',
   styleUrls: ['./register-part-action-page.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,
@@ -106,7 +105,6 @@ export default class RegisterPartActionPageComponent {
 @Component({
   selector: 'app-text',
   template: '{{text()}}',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class TextComponent {
 
@@ -116,7 +114,6 @@ class TextComponent {
 @Component({
   selector: 'app-mat-button',
   template: '<button sciMaterialIcon>{{ligature()}}</button>',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     SciMaterialIconDirective,
   ],

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {Component} from '@angular/core';
 import {ArrayPipe} from '../array.pipe';
 import {SciViewportComponent} from '@scion/components/viewport';
 
@@ -19,7 +19,6 @@ import {SciViewportComponent} from '@scion/components/viewport';
   selector: 'app-list-skeleton',
   templateUrl: './list-skeleton.component.html',
   styleUrls: ['./list-skeleton.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ArrayPipe,
     SciViewportComponent,

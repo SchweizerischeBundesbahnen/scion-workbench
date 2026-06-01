@@ -9,7 +9,7 @@
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {booleanAttribute, Component, DebugElement, DestroyRef, Directive, effect, inject, Injector, OnDestroy, OnInit, signal, Type} from '@angular/core';
+import {booleanAttribute, ChangeDetectionStrategy, Component, DebugElement, DestroyRef, Directive, effect, inject, Injector, OnDestroy, OnInit, signal, Type} from '@angular/core';
 import {ActivatedRoute, provideRouter} from '@angular/router';
 import {WorkbenchViewRegistry} from './workbench-view.registry';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
@@ -3113,6 +3113,7 @@ describe('View', () => {
 @Component({
   selector: 'spec-view',
   template: '{{onCheckForChanges()}}',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 class SpecViewComponent {
 
@@ -3153,6 +3154,7 @@ class SpecViewComponent {
 @Component({
   selector: 'spec-view-1',
   template: '{{onCheckForChanges()}}',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 class SpecView1Component extends SpecViewComponent {
 }
@@ -3160,6 +3162,7 @@ class SpecView1Component extends SpecViewComponent {
 @Component({
   selector: 'spec-view-2',
   template: '{{onCheckForChanges()}}',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 class SpecView2Component extends SpecViewComponent {
 }

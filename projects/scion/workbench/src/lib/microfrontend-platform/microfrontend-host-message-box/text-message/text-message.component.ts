@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {Component, inject, ChangeDetectionStrategy} from '@angular/core';
 import {eMESSAGE_BOX_MESSAGE_PARAM} from '@scion/workbench-client';
 import {UUID} from '@scion/toolkit/uuid';
 import {Translatable} from '../../../text/workbench-text-provider.model';
@@ -29,6 +29,7 @@ import {WorkbenchDialog} from '../../../dialog/workbench-dialog.model';
   imports: [
     TextPipe,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     '[class.empty]': '!message?.length',
   },

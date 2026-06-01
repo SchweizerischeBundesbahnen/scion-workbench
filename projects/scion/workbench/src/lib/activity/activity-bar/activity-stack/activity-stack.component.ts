@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, input} from '@angular/core';
+import {Component, input, ChangeDetectionStrategy} from '@angular/core';
 import {MActivityStack} from '../../workbench-activity.model';
 import {ActivityItemComponent} from '../activity-item/activity-item.component';
 
@@ -19,6 +19,7 @@ import {ActivityItemComponent} from '../activity-item/activity-item.component';
   selector: 'wb-activity-stack',
   templateUrl: './activity-stack.component.html',
   styleUrls: ['./activity-stack.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ActivityItemComponent,
   ],

@@ -25,7 +25,8 @@ export const appConfig: ApplicationConfig = {
     provideWorkbenchClient(),
     provideWorkbenchTheme(),
     provideAnimationsIfEnabled(),
-    environment.zoneEnabled ? provideZoneChangeDetection() : [],
+    // Only provide zone CD if the polyfill is loaded (see angular.json).
+    'Zone' in window ? provideZoneChangeDetection() : [],
   ],
 };
 

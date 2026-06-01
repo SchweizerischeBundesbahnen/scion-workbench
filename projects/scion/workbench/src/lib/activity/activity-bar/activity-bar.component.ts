@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, input} from '@angular/core';
+import {Component, inject, input, ChangeDetectionStrategy} from '@angular/core';
 import {ActivityStackComponent} from './activity-stack/activity-stack.component';
 import {ɵWorkbenchService} from '../../ɵworkbench.service';
 
@@ -22,6 +22,7 @@ import {ɵWorkbenchService} from '../../ɵworkbench.service';
   imports: [
     ActivityStackComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     '[attr.data-align]': 'align()',
   },

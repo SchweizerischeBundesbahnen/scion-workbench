@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject, input, Signal, untracked} from '@angular/core';
+import {Component, computed, inject, input, Signal, untracked, ChangeDetectionStrategy} from '@angular/core';
 import {MActivity} from '../../workbench-activity.model';
 import {ɵWorkbenchRouter} from '../../../routing/ɵworkbench-router.service';
 import {IconComponent} from '../../../icon/icon.component';
@@ -27,6 +27,7 @@ import {WorkbenchFocusMonitor} from '../../../focus/workbench-focus-tracker.serv
   imports: [
     IconComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     '[attr.data-active]': `active() ? '' : null`,
     '[attr.data-focus-within-activity]': `focusWithinActivity() ? '' : null`,

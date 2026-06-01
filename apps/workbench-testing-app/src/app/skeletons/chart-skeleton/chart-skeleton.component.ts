@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, HostListener, inject, signal} from '@angular/core';
+import {Component, HostListener, inject, signal} from '@angular/core';
 import {Skeletons} from '../skeletons.util';
 import {WorkbenchPart, WorkbenchView} from '@scion/workbench';
 import {Chart} from './chart';
@@ -22,7 +22,6 @@ import {Chart} from './chart';
   selector: 'app-chart-skeleton',
   templateUrl: './chart-skeleton.component.html',
   styleUrls: ['./chart-skeleton.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[attr.title]': `'Click to generate a new chart series.'`,
   },

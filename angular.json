@@ -605,12 +605,6 @@
                   "maximumError": "8kB"
                 }
               ],
-              "fileReplacements": [
-                {
-                  "replace": "apps/workbench-client-testing-app/src/environments/environment.ts",
-                  "with": "apps/workbench-client-testing-app/src/environments/environment.zone.ts"
-                }
-              ],
               "outputHashing": "all",
               "outputPath": "dist/workbench-client-testing-app-zone",
               "polyfills": [
@@ -626,12 +620,6 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true,
-              "fileReplacements": [
-                {
-                  "replace": "apps/workbench-client-testing-app/src/environments/environment.ts",
-                  "with": "apps/workbench-client-testing-app/src/environments/environment.zone.ts"
-                }
-              ],
               "polyfills": [
                 "zone.js"
               ]

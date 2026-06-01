@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, ElementRef, inject, Injector, input, Signal} from '@angular/core';
+import {Component, computed, ElementRef, inject, Injector, input, Signal, ChangeDetectionStrategy} from '@angular/core';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {VIEW_DRAG_TRANSFER_TYPE, ViewDragService} from '../../view-dnd/view-drag.service';
 import {createElement} from '../../common/dom.util';
@@ -39,6 +39,7 @@ import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
     TextPipe,
     IconComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     '[attr.data-viewid]': 'view().id',
     '[attr.data-active]': `view().active() ? '' : null`,

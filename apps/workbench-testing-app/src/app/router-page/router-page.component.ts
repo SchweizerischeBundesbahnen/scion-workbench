@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, inject, Injector, numberAttribute, signal} from '@angular/core';
+import {Component, inject, Injector, numberAttribute, signal} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {WorkbenchNavigationExtras, WorkbenchRouter, WorkbenchRouterLinkDirective, WorkbenchService, WorkbenchView} from '@scion/workbench';
 import {NgTemplateOutlet} from '@angular/common';
@@ -24,7 +24,6 @@ import {UUID} from '@scion/toolkit/uuid';
   selector: 'app-router-page',
   templateUrl: './router-page.component.html',
   styleUrls: ['./router-page.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     NgTemplateOutlet,
     WorkbenchRouterLinkDirective,

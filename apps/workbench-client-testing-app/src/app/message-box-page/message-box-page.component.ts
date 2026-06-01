@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, ElementRef, inject} from '@angular/core';
+import {Component, ElementRef, inject} from '@angular/core';
 import {WorkbenchMessageBox} from '@scion/workbench-client';
 import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
@@ -50,7 +50,6 @@ import {startWith} from 'rxjs/operators';
     '[style.position]': `form.controls.componentSize.controls.positionAbsolute.value ? 'absolute' : 'static'`,
     '[attr.data-component-instance-id]': `uuid`,
   },
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class MessageBoxPageComponent {
 

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject, input} from '@angular/core';
+import {Component, computed, inject, input, ChangeDetectionStrategy} from '@angular/core';
 import {ActivityBarComponent} from '../activity/activity-bar/activity-bar.component';
 import {WorkbenchLayoutService} from './workbench-layout.service';
 import {SciSashboxComponent, SciSashDirective} from '@scion/components/sashbox';
@@ -41,6 +41,7 @@ import {WorkbenchDesktop} from '../desktop/workbench-desktop.model';
     ViewDropZoneDirective,
     WorkbenchPortalOutletDirective,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     '[@.disabled]': 'perspectiveService.switchingPerspective() || perspectiveService.resettingPerspective()',
   },

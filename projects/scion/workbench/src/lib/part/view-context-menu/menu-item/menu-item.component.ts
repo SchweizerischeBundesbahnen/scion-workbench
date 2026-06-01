@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, Injector, input, runInInjectionContext, TemplateRef} from '@angular/core';
+import {Component, inject, Injector, input, runInInjectionContext, TemplateRef, ChangeDetectionStrategy} from '@angular/core';
 import {WorkbenchMenuItem} from '../../../workbench.model';
 import {WORKBENCH_ELEMENT} from '../../../workbench-element-references';
 import {ComponentType} from '@angular/cdk/portal';
@@ -21,6 +21,7 @@ import {WorkbenchView} from '../../../view/workbench-view.model';
   selector: 'wb-menu-item',
   templateUrl: './menu-item.component.html',
   styleUrl: './menu-item.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     NgTemplateOutlet,
     NgComponentOutlet,

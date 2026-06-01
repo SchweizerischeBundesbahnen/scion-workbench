@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {WorkbenchDialog} from '@scion/workbench-client';
 import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
@@ -47,7 +47,6 @@ import {CdkTrapFocus} from '@angular/cdk/a11y';
     '[style.width]': 'form.controls.componentSize.controls.width.value',
     '[attr.data-component-instance-id]': `uuid`,
   },
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class DialogPageComponent {
 

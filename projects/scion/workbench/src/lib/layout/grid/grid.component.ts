@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, input} from '@angular/core';
+import {Component, inject, input, ChangeDetectionStrategy} from '@angular/core';
 import {GridElementComponent} from '../grid-element/grid-element.component';
 import {RequiresDropZonePipe} from '../../view-dnd/requires-drop-zone.pipe';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../../view-dnd/view-drop-zone.directive';
@@ -43,6 +43,7 @@ import {ViewDragService} from '../../view-dnd/view-drag.service';
   selector: 'wb-grid',
   templateUrl: './grid.component.html',
   styleUrls: ['./grid.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     GridElementComponent,
     ViewDropZoneDirective,

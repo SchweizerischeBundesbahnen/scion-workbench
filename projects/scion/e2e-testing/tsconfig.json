@@ -2,7 +2,7 @@
 /* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
   "compilerOptions": {
-    "baseUrl": "../../../",
+    "rootDir": "../../../",
     "outDir": "../../../out-tsc/playwright",
     "sourceMap": true,
     "strict": true,
@@ -23,13 +23,13 @@
     ],
     "paths": {
       "@scion/workbench": [
-        "projects/scion/workbench/src/public-api"
+        "../../../projects/scion/workbench/src/public-api"
       ],
       "@scion/workbench-client": [
-        "projects/scion/workbench-client/src/public-api"
+        "../../../projects/scion/workbench-client/src/public-api"
       ],
       "workbench-testing-app-common": [
-        "apps/workbench-testing-app-common/src/public-api.ts"
+        "../../../apps/workbench-testing-app-common/src/public-api.ts"
       ]
     }
   }

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {afterRenderEffect, Component, DestroyRef, DOCUMENT, ElementRef, inject, Provider, untracked, viewChild} from '@angular/core';
+import {afterRenderEffect, Component, DestroyRef, DOCUMENT, ElementRef, inject, Provider, untracked, viewChild, ChangeDetectionStrategy} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ViewMenuService} from '../part/view-context-menu/view-menu.service';
@@ -44,6 +44,7 @@ import {FocusTrackerRef, trackFocus} from '../focus/workbench-focus-tracker.serv
     '[class.view-drag]': 'viewDragService.dragging()',
     '[class]': 'view.classList.asList()',
   },
+  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [
     configureViewGlassPane(),
   ],

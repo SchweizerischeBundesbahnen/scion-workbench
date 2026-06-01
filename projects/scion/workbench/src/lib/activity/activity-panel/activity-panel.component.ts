@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject, input, Signal} from '@angular/core';
+import {Component, computed, inject, input, Signal, ChangeDetectionStrategy} from '@angular/core';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {GridComponent} from '../../layout/grid/grid.component';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
@@ -30,6 +30,7 @@ import {Objects} from '@scion/toolkit/util';
     SciSashDirective,
     GridComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     '[attr.data-panel]': 'panel()',
   },

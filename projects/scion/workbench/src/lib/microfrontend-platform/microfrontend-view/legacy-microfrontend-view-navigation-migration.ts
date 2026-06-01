@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
+import {Component, EnvironmentProviders, inject, makeEnvironmentProviders, ChangeDetectionStrategy} from '@angular/core';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {WorkbenchView} from '../../view/workbench-view.model';
@@ -47,8 +47,8 @@ export function provideLegacyMicrofrontendViewRoute(): EnvironmentProviders {
  * Matches if a legacy microfrontend view navigation.
  */
 function canMatchLegacyMicrofrontendViewNavigation(): CanMatchFn {
-  return async (route, segments): Promise<boolean> => {
-    if (!canMatchWorkbenchView(true)(route, segments)) {
+  return async (route, segments, currentSnapshot): Promise<boolean> => {
+    if (!canMatchWorkbenchView(true)(route, segments, currentSnapshot)) {
       return false;
     }
 
@@ -69,6 +69,7 @@ function canMatchLegacyMicrofrontendViewNavigation(): CanMatchFn {
  */
 @Component({
   selector: 'wb-microfrontend-view-navigation-migration',
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: 'Migrating View...',
 })
 class MicrofrontendViewNavigationMigrationComponent {

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
+import {Component, EnvironmentProviders, inject, makeEnvironmentProviders, ChangeDetectionStrategy} from '@angular/core';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {WorkbenchPart} from '../../part/workbench-part.model';
@@ -48,8 +48,8 @@ export function provideLegacyMicrofrontendPartRoute(): EnvironmentProviders {
  * Matches if a legacy microfrontend part navigation.
  */
 function canMatchLegacyMicrofrontendPartNavigation(): CanMatchFn {
-  return async (route, segments): Promise<boolean> => {
-    if (!canMatchWorkbenchPart(MICROFRONTEND_PART_NAVIGATION_HINT)(route, segments)) {
+  return async (route, segments, currentSnapshot): Promise<boolean> => {
+    if (!canMatchWorkbenchPart(MICROFRONTEND_PART_NAVIGATION_HINT)(route, segments, currentSnapshot)) {
       return false;
     }
 
@@ -74,6 +74,7 @@ function canMatchLegacyMicrofrontendPartNavigation(): CanMatchFn {
  */
 @Component({
   selector: 'wb-microfrontend-part-navigation-migration',
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: 'Migrating Part...',
 })
 class MicrofrontendPartNavigationMigrationComponent {

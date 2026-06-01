@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, ChangeDetectionStrategy} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 
 /**
@@ -24,6 +24,7 @@ import {RouterOutlet} from '@angular/router';
 @Component({
   templateUrl: './empty-outlet.component.html',
   styleUrls: ['./empty-outlet.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [RouterOutlet],
 })
 export class ɵEmptyOutletComponent {

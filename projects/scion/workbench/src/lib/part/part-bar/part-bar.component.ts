@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, effect, ElementRef, inject, InjectionToken, NgZone, Signal, untracked, viewChild} from '@angular/core';
+import {Component, computed, effect, ElementRef, inject, InjectionToken, NgZone, Signal, untracked, viewChild, ChangeDetectionStrategy} from '@angular/core';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {PartActionComponent} from '../part-action/part-action.component';
@@ -38,6 +38,7 @@ export const PART_BAR_ELEMENT = new InjectionToken<HTMLElement>('PART_BAR_ELEMEN
     TextPipe,
     IconComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [
     {provide: PART_BAR_ELEMENT, useFactory: () => inject(ElementRef).nativeElement as HTMLElement},
   ],

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, isDevMode} from '@angular/core';
+import {Component, inject, isDevMode, ChangeDetectionStrategy} from '@angular/core';
 import {TextPipe} from '../text/text.pipe';
 import {WorkbenchView} from '../view/workbench-view.model';
 
@@ -19,6 +19,7 @@ import {WorkbenchView} from '../view/workbench-view.model';
   selector: 'wb-null-content',
   templateUrl: './null-content.component.html',
   styleUrls: ['./null-content.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     TextPipe,
   ],

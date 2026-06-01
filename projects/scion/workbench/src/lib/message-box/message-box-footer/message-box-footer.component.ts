@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Component, ElementRef, inject, input, output, viewChildren} from '@angular/core';
+import {Component, ElementRef, inject, input, output, viewChildren, ChangeDetectionStrategy} from '@angular/core';
 import {KeyValuePipe} from '@angular/common';
 import {observeOn} from 'rxjs/operators';
 import {animationFrameScheduler, firstValueFrom} from 'rxjs';
@@ -22,6 +22,7 @@ import {TextPipe} from '../../text/text.pipe';
     KeyValuePipe,
     TextPipe,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     '[attr.data-severity]': 'severity()',
   },

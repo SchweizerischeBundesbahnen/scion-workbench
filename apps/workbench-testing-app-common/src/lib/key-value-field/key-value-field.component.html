@@ -7,9 +7,9 @@
 
 @for (entryField of form; track $index) {
   <!-- Key -->
-  <input [field]="entryField.key" class="e2e-key">
+  <input [formField]="entryField.key" class="e2e-key">
   <!-- Value -->
-  <input [field]="entryField.value" class="e2e-value">
+  <input [formField]="entryField.value" class="e2e-value">
   <!-- Remove Button -->
   <button class="e2e-remove" type="button" (click)="onRemove($index)" title="Remove Entry" sciMaterialIcon>remove</button>
 }

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, computed, inject, Injector, input, Signal} from '@angular/core';
+import {Component, computed, inject, Injector, input, Signal} from '@angular/core';
 import {CdkPortalOutlet, ComponentPortal} from '@angular/cdk/portal';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
@@ -23,7 +23,6 @@ import {IconComponent} from '../../icon/icon.component';
   selector: 'wb-view-list-item',
   templateUrl: './view-list-item.component.html',
   styleUrls: ['./view-list-item.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CdkPortalOutlet,
     TextPipe,

@@ -22,7 +22,6 @@
  */
 export const environment = {
   animationEnabled: false,
-  zoneEnabled: false,
   apps: {
     app1: {
       symbolicName: 'workbench-client-testing-app1',
