@@ -9,7 +9,7 @@
  */
 
 import {WorkbenchIconDescriptor, WorkbenchIconProviderFn} from './workbench-icon-provider.model';
-import {Component, input, ChangeDetectionStrategy} from '@angular/core';
+import {Component, input} from '@angular/core';
 
 /**
  * Provides Material icons for non-workbench icons.
@@ -36,7 +36,6 @@ export const materialIconProvider: WorkbenchIconProviderFn = (ligature: string):
 @Component({
   selector: 'wb-material-icon',
   template: '{{ligature()}}',
-  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     '[class.material-icons]': 'true',
     '[class.material-icons-outlined]': 'true',

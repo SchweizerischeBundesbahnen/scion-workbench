@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, ChangeDetectionStrategy} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {FocusMonitor, MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
 import {AsyncPipe} from '@angular/common';
 import {SciViewportComponent} from '@scion/components/viewport';
@@ -28,7 +28,6 @@ import {of} from 'rxjs';
     CdkTrapFocus,
     SciViewportComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     '[attr.data-focus]': `hasFocus() ? '' : null`,
   },

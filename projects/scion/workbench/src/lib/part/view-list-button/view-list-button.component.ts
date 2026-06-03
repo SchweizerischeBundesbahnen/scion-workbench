@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, DestroyRef, ElementRef, HostListener, inject, Injector, signal, Signal, ChangeDetectionStrategy} from '@angular/core';
+import {Component, computed, DestroyRef, ElementRef, HostListener, inject, Injector, signal, Signal} from '@angular/core';
 import {ConnectedPosition, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {ViewListComponent} from '../view-list/view-list.component';
@@ -23,7 +23,6 @@ import {IconComponent} from '../../icon/icon.component';
     '[class.menu-open]': `menuState() === 'open'`,
     '[attr.tabindex]': '0',
   },
-  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     IconComponent,
   ],

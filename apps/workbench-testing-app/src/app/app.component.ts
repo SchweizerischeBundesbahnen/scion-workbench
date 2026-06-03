@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {afterEveryRender, Component, DoCheck, DOCUMENT, ElementRef, inject, Signal, ChangeDetectionStrategy} from '@angular/core';
+import {afterEveryRender, Component, DoCheck, DOCUMENT, ElementRef, inject, Signal} from '@angular/core';
 import {filter, map, scan} from 'rxjs/operators';
 import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} from '@angular/router';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
@@ -28,7 +28,6 @@ import {installMicrofrontendApplicationLabels} from './microfrontend-application
     RouterOutlet,
     HeaderComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     '[attr.data-workbench-id]': 'workbenchId',
     '[attr.data-perspective-id]': 'activePerspective()?.id',
