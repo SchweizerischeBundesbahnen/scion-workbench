@@ -56,7 +56,10 @@ export default class SampleViewComponent {
   constructor() {
     effect(() => {
       const navigationData = this.view.navigation()!.data as ViewSkeletonNavigationData | undefined;
-      untracked(() => this.onNavigationChange(navigationData ?? {}));
+      untracked(() => {
+        this.view.closable = navigationData?.closable ?? true;
+        this.onNavigationChange(navigationData ?? {})
+      });
     });
     effect(() => {
       const title = this.view.title();
@@ -89,6 +92,7 @@ export default class SampleViewComponent {
     data = {
       style: data.style ?? this.tabs[this.selectedTab()],
       title: data.title ?? this.view.title() ?? undefined,
+      closable: this.view.closable(),
     };
 
     if (Objects.isEqual(data, this.view.navigation()!.data)) {
@@ -127,4 +131,5 @@ export interface ViewSkeletonNavigationData extends NavigationData {
    * Type of skeleton.
    */
   style?: SkeletonStyle;
+  closable?: boolean;
 }

@@ -47,6 +47,58 @@ export const perspectives: WorkbenchPerspectives = {
   initialPerspective: environment.initialPerspective,
   perspectives: [
     {
+      id: 'planner',
+      layout: factory => factory
+        // Add main area part.
+        .addPart(MAIN_AREA)
+        .addPart('orders', {dockTo: 'left-top'}, {label: 'Aufträge', icon: 'folder'})
+        .addPart('capacities', {dockTo: 'left-bottom'}, {label: 'Kapazitäten', icon: 'train'})
+        .addPart('calendar', {dockTo: 'right-top'}, {label: 'Kalender', icon: 'calendar_month'})
+        .addPart('find', {dockTo: 'right-bottom'}, {label: 'Suche', icon: 'search'})
+        .addPart('notifications', {dockTo: 'right-bottom'}, {icon: 'notifications', label: 'Benachrichtigungen'})
+        .addPart('progress', {dockTo: 'right-bottom'}, {label: 'Verarbeitung', icon: 'manufacturing'})
+        .addPart('problems', {dockTo: 'right-bottom'}, {label: 'Problems', icon: 'data_alert'})
+        .addPart('conflicts', {dockTo: 'bottom-left'}, {label: 'Konflikte (25)', icon: 'problem'})
+        .addPart('rules', {dockTo: 'bottom-right'}, {label: 'Regeln', icon: 'rule_folder'})
+
+        // Add views to the 'rules' part.
+        .addView('rules-public', {partId: 'rules'})
+        .addView('rules-delta', {partId: 'rules'})
+
+        // Add views to the 'find' part.
+        .addView('find-1', {partId: 'find'})
+        .addView('find-2', {partId: 'find'})
+
+        // Navigate parts to display content.
+        .navigatePart('conflicts', [], {hint: 'sample-part', data: {style: 'table'} satisfies PartSkeletonNavigationData})
+        .navigatePart('capacities', [], {hint: 'sample-part', data: {style: 'list'} satisfies PartSkeletonNavigationData})
+        .navigatePart('orders', [], {hint: 'sample-part', data: {style: 'list'} satisfies PartSkeletonNavigationData})
+        .navigatePart('progress', [], {hint: 'sample-part', data: {style: 'list'} satisfies PartSkeletonNavigationData})
+        .navigatePart('problems', [], {hint: 'sample-part', data: {style: 'table'} satisfies PartSkeletonNavigationData})
+        .navigatePart('calendar', [], {hint: 'calendar'})
+
+        // Navigate views to display content.
+        .navigateView('find-1', [], {hint: 'sample-view', data: {style: 'list', title: `BN-AA IC-343`} satisfies ViewSkeletonNavigationData})
+        .navigateView('find-2', [], {hint: 'sample-view', data: {style: 'list', title: `ZUE-AA IC-5`} satisfies ViewSkeletonNavigationData})
+
+        .navigateView('rules-public', [], {hint: 'sample-view', data: {style: 'table', title: `Öffentlich`, closable: false} satisfies ViewSkeletonNavigationData})
+        .navigateView('rules-delta', [], {hint: 'sample-view', data: {style: 'table', title: `Regeldelta`, closable: false} satisfies ViewSkeletonNavigationData})
+
+        // Activate parts.
+        .activatePart('orders')
+        .activatePart('capacities')
+        .activatePart('calendar')
+        .activatePart('find')
+        .activatePart('conflicts')
+        .activatePart('rules')
+      ,
+      data: {
+        [PerspectiveData.label]: 'Planung',
+        [PerspectiveData.menuItemLabel]: 'Planung',
+        [PerspectiveData.menuGroup]: 'default',
+      },
+    },
+    {
       id: 'blank',
       layout: factory => factory.addPart(MAIN_AREA),
       data: {

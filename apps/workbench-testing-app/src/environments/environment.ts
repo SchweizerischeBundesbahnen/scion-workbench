@@ -42,9 +42,9 @@ const microfrontendPlatformConfig: MicrofrontendPlatformConfig = {
 };
 
 export const environment = {
-  animationEnabled: false,
-  logAngularChangeDetectionCycles: true,
+  animationEnabled: true,
+  logAngularChangeDetectionCycles: false,
   showMicrofrontendApplicationLabels: true,
-  initialPerspective: 'blank',
+  initialPerspective: 'planner',
   microfrontendPlatformConfig,
 };

@@ -67,6 +67,18 @@ export class AppComponent implements DoCheck {
     afterEveryRender(() => {
       this._host.setAttribute('data-last-render', Date.now().toString());
     });
+
+    const perspective = inject(WorkbenchService).activePerspective;
+    const router = inject(WorkbenchRouter);
+    effect(() => {
+      if (perspective()?.id === 'planner') {
+        untracked(() => {
+          void router.navigate(['zwl'], {target: 'view.zwl-1'});
+          void router.navigate(['zwl'], {target: 'view.zwl-2'});
+          void router.navigate(['map'], {target: 'view.map'});
+        });
+      }
+    })
   }
 
   public ngDoCheck(): void {

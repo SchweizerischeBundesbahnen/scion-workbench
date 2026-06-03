@@ -78,6 +78,19 @@ export const routes: Routes = [
     loadComponent: () => import('./sample-view/sample-view.component'),
     data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'},
   },
+  {
+    path: '',
+    loadComponent: () => import('./sample-components/calendar.component'),
+    canMatch: [canMatchWorkbenchPart('calendar')],
+  },
+  {
+    path: 'zwl',
+    loadComponent: () => import('./sample-components/zwl.component'),
+  },
+  {
+    path: 'map',
+    loadComponent: () => import('./sample-components/map.component'),
+  },
   ...testPageRoutes,
   {
     path: '',
