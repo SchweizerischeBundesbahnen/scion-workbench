@@ -16,6 +16,5 @@ export {ɵWorkbenchPopupMessageHeaders} from './ɵworkbench-popup.model';
 export {type WorkbenchPopupCapability, type WorkbenchPopupSize} from './workbench-popup-capability';
 export {type WorkbenchPopupConfig} from './workbench-popup.config';
 export {type WorkbenchPopupOptions, type CloseStrategy} from './workbench-popup.options';
-export {type WorkbenchPopupReferrer} from './workbench-popup-referrer';
 export {type Point, type TopLeftPoint, type TopRightPoint, type BottomLeftPoint, type BottomRightPoint, type PopupOrigin} from './popup.origin';
 export {type ɵPopupContext, ɵPOPUP_CONTEXT} from './workbench-popup-context';

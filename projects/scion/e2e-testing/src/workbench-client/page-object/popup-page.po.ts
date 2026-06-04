@@ -9,7 +9,7 @@
  */
 
 import {PopupPO} from '../../popup.po';
-import {ViewId, WorkbenchPopupCapability, WorkbenchPopupReferrer} from '@scion/workbench-client';
+import {WorkbenchPopupCapability} from '@scion/workbench-client';
 import {Params} from '@angular/router';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Locator} from '@playwright/test';
@@ -17,8 +17,7 @@ import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendPopupPagePO} from '../../workbench/page-object/workbench-popup-page.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
-import {prune, waitForAttribute} from '../../helper/testing.util';
-import {parseTypedString} from '../../helper/typed-value.util';
+import {waitForAttribute} from '../../helper/testing.util';
 
 /**
  * Page object to interact with {@link PopupPageComponent}.
@@ -89,20 +88,6 @@ export class PopupPagePO implements MicrofrontendPopupPagePO {
     await accordion.expand();
     try {
       return await accordion.itemLocator().locator('span.e2e-route-fragment').innerText();
-    }
-    finally {
-      await accordion.collapse();
-    }
-  }
-
-  public async getReferrer(): Promise<WorkbenchPopupReferrer> {
-    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-referrer'));
-    await accordion.expand();
-    try {
-      return prune({
-        viewId: parseTypedString(await accordion.itemLocator().locator('output.e2e-view-id').innerText()) as ViewId | undefined,
-        viewCapabilityId: parseTypedString<string>(await accordion.itemLocator().locator('output.e2e-view-capability-id').innerText()) as string | undefined,
-      });
     }
     finally {
       await accordion.collapse();

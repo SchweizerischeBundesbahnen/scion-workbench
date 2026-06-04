@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, Injectable, InjectionToken, Provider} from '@angular/core';
+import {inject, Injectable, Provider} from '@angular/core';
 import {Handler, IntentInterceptor, IntentMessage, mapToBody, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
-import {WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchPopupReferrer, ɵWorkbenchCommands, ɵWorkbenchPopupCommand} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchPopupCapability, ɵWorkbenchCommands, ɵWorkbenchPopupCommand} from '@scion/workbench-client';
 import {MicrofrontendPopupComponent} from './microfrontend-popup.component';
 import {Observable} from 'rxjs';
 import {Logger, LoggerNames} from '../../logging';
@@ -19,11 +19,8 @@ import {stringifyError} from '../../common/stringify-error.util';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchPopupService} from '../../popup/workbench-popup.service';
 import {PopupOrigin} from '../../popup/popup.origin';
-import {isViewId, PopupId} from '../../workbench.identifiers';
-import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
+import {PopupId} from '../../workbench.identifiers';
 import {prune} from '../../common/prune.util';
-import {MICROFRONTEND_VIEW_NAVIGATION_HINT} from '../microfrontend-view/microfrontend-view-routes';
-import {MicrofrontendViewNavigationData} from '../microfrontend-view/microfrontend-view-navigation-data';
 import {MicrofrontendHostComponent} from '../microfrontend-host/microfrontend-host.component';
 import {ɵWorkbenchPopup} from '../../popup/ɵworkbench-popup.model';
 import {MicrofrontendHostPopup} from '../microfrontend-host-popup/microfrontend-host-popup.model';
@@ -41,7 +38,6 @@ import {Microfrontends} from '../common/microfrontend.util';
 export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
 
   private readonly _popupService = inject(WorkbenchPopupService);
-  private readonly _viewRegistry = inject(WorkbenchViewRegistry);
   private readonly _logger = inject(Logger);
   private readonly _openedPopups = new Set<PopupId>();
 
@@ -100,11 +96,8 @@ export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
 
     return this._popupService.open(isHostProvider ? MicrofrontendHostComponent : MicrofrontendPopupComponent, prune({
       id: command.popupId,
-      inputs: isHostProvider ? {} : {capability, params, referrer: this.getReferrer(command), closeOnFocusLost},
-      providers: isHostProvider ? [
-        provideActivatedMicrofrontend(capability, params, referrer),
-        {provide: WORKBENCH_POPUP_REFERRER, useValue: this.getReferrer(command)},
-      ] : undefined,
+      inputs: isHostProvider ? {} : {capability, params, closeOnFocusLost},
+      providers: isHostProvider ? [provideActivatedMicrofrontend(capability, params, referrer)] : undefined,
       anchor: this.observePopupOrigin$(command),
       context: command.context,
       align: command.align,
@@ -122,27 +115,6 @@ export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
   private observePopupOrigin$(command: ɵWorkbenchPopupCommand): Observable<PopupOrigin> {
     return Beans.get(MessageClient).observe$<PopupOrigin>(ɵWorkbenchCommands.popupOriginTopic(command.popupId)).pipe(mapToBody());
   }
-
-  /**
-   * Returns information about the context in which a popup was opened.
-   */
-  private getReferrer(command: ɵWorkbenchPopupCommand): WorkbenchPopupReferrer {
-    if (!isViewId(command.context)) {
-      return {};
-    }
-
-    const view = this._viewRegistry.get(command.context);
-    return {
-      viewId: view.id,
-      viewCapabilityId: (() => {
-        const navigation = view.navigation();
-        if (navigation?.hint === MICROFRONTEND_VIEW_NAVIGATION_HINT) {
-          return (navigation.data as unknown as MicrofrontendViewNavigationData).capabilityId;
-        }
-        return undefined;
-      })(),
-    };
-  }
 }
 
 /**
@@ -154,10 +126,3 @@ function provideActivatedMicrofrontend(capability: WorkbenchPopupCapability, par
     useValue: () => new MicrofrontendHostPopup(inject(ɵWorkbenchPopup), capability, params, referrer),
   };
 }
-
-/**
- * DI token to inject the deprecated referrer previously available on the removed `WorkbenchPopup.referrer`.
- *
- * @deprecated since version 21.0.0-beta.2. Marked for removal. No replacement. Instead, add a parameter to the popup capability for the popup opener to pass required referrer information.
- */
-export const WORKBENCH_POPUP_REFERRER = new InjectionToken<WorkbenchPopupReferrer>('WORKBENCH_POPUP_REFERRER');

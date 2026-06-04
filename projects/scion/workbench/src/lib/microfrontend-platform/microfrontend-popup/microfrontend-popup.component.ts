@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, input, signal, untracked, viewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, input, signal, untracked, viewChild} from '@angular/core';
 import {ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
-import {WorkbenchPopupCapability, WorkbenchPopupReferrer, ɵPOPUP_CONTEXT, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
+import {WorkbenchPopupCapability, ɵPOPUP_CONTEXT, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
 import {NgComponentOutlet} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
@@ -30,6 +30,7 @@ import {ɵWorkbenchPopup} from '../../popup/ɵworkbench-popup.model';
   templateUrl: './microfrontend-popup.component.html',
   imports: [NgComponentOutlet],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a custom element
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     '[class.workbench-drag]': 'workbenchLayoutService.dragging()',
   },
@@ -39,7 +40,6 @@ export class MicrofrontendPopupComponent {
   public readonly capability = input.required<WorkbenchPopupCapability>();
   public readonly params = input.required<Map<string, unknown>>();
   public readonly closeOnFocusLost = input.required<boolean>();
-  public readonly referrer = input.required<WorkbenchPopupReferrer>();
 
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _outletRouter = inject(OutletRouter);
@@ -107,7 +107,6 @@ export class MicrofrontendPopupComponent {
         popupId: this.popup.id,
         capability: this.capability(),
         params: this.params(),
-        referrer: this.referrer(),
       };
       const routerOutletElement = this._routerOutletElement().nativeElement;
 

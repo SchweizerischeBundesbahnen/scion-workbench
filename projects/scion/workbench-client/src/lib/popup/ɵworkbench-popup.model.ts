@@ -13,7 +13,6 @@ import {Beans} from '@scion/toolkit/bean-manager';
 import {ContextService, mapToBody, MessageClient, MicrofrontendPlatformClient, OUTLET_CONTEXT, OutletContext} from '@scion/microfrontend-platform';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {ɵPopupContext} from './workbench-popup-context';
-import {WorkbenchPopupReferrer} from './workbench-popup-referrer';
 import {Observable} from 'rxjs';
 import {shareReplay} from 'rxjs/operators';
 import {decorateObservable} from '../observable-decorator';
@@ -29,14 +28,12 @@ export class ɵWorkbenchPopup implements WorkbenchPopup {
   public readonly id: PopupId;
   public readonly params: Map<string, unknown>;
   public readonly capability: WorkbenchPopupCapability;
-  public readonly referrer: WorkbenchPopupReferrer;
   public readonly focused$: Observable<boolean>;
 
   constructor(context: ɵPopupContext) {
     this.id = context.popupId;
     this.capability = context.capability;
     this.params = context.params;
-    this.referrer = context.referrer;
     void this.requestFocus();
     this.focused$ = Beans.get(MessageClient).observe$<boolean>(ɵWorkbenchCommands.popupFocusedTopic(this.id))
       .pipe(
