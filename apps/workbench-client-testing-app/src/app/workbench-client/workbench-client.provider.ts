@@ -9,12 +9,13 @@
  */
 
 import {EnvironmentProviders, inject, InjectionToken, Injector, makeEnvironmentProviders, NgZone, provideAppInitializer} from '@angular/core';
-import {APP_IDENTITY, ContextService, FocusMonitor, IntentClient, ManifestService, MessageClient, ObservableDecorator, OutletRouter, PlatformPropertyService, PreferredSizeService} from '@scion/microfrontend-platform';
+import {APP_IDENTITY, ContextService, FocusMonitor, IntentClient, ManifestService, MessageClient, MicrofrontendPlatformStopper, ObservableDecorator, OutletRouter, PlatformPropertyService, PreferredSizeService} from '@scion/microfrontend-platform';
 import {WorkbenchClient, WorkbenchDialog, WorkbenchDialogService, WorkbenchMessageBox, WorkbenchMessageBoxService, WorkbenchNotification, WorkbenchNotificationService, WorkbenchPart, WorkbenchPopup, WorkbenchPopupService, WorkbenchRouter, WorkbenchTextService, WorkbenchThemeMonitor, WorkbenchView} from '@scion/workbench-client';
 import {NgZoneObservableDecorator} from './ng-zone-observable-decorator';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {environment} from '../../environments/environment';
 import {runWorkbenchClientInitializers, WorkbenchClientStartupPhase} from './workbench-client-initializer';
+import {OnUnloadMicrofrontendPlatformStopper} from '../app.component';
 
 /**
  * DI token providing access to the {@link APP_IDENTITY}.
@@ -64,6 +65,8 @@ async function connectToWorkbenchFn(): Promise<void> {
   const injector = inject(Injector);
 
   Beans.register(ObservableDecorator, {useValue: new NgZoneObservableDecorator(zone)});
+  console.log('>>>> connectToWorkbenchFn');
+  Beans.register(MicrofrontendPlatformStopper, {useClass: OnUnloadMicrofrontendPlatformStopper, eager: true});
   await runWorkbenchClientInitializers(WorkbenchClientStartupPhase.PreConnect, injector);
   await zone.runOutsideAngular(() => WorkbenchClient.connect(determineAppSymbolicName()));
   await runWorkbenchClientInitializers(WorkbenchClientStartupPhase.PostConnect, injector);

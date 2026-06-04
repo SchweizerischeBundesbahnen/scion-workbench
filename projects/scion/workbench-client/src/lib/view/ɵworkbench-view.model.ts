@@ -11,7 +11,7 @@
 import {Beans, PreDestroy} from '@scion/toolkit/bean-manager';
 import {combineLatest, firstValueFrom, merge, Observable, OperatorFunction, pipe, Subject, Subscription} from 'rxjs';
 import {WorkbenchViewCapability} from './workbench-view-capability';
-import {ManifestService, mapToBody, MessageClient, MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
+import {ManifestService, mapToBody, MessageClient, MicrofrontendPlatform, MicrofrontendPlatformClient, PlatformState} from '@scion/microfrontend-platform';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {distinctUntilChanged, filter, map, mergeMap, shareReplay, skip, switchMap, takeUntil, tap} from 'rxjs/operators';
 import {Observables} from '@scion/toolkit/util';
@@ -51,6 +51,10 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
   };
 
   constructor(public id: ViewId) {
+    void MicrofrontendPlatform.whenState(PlatformState.Stopping).then(() => {
+      console.log('>>>> Stopping');
+      void Beans.get(MessageClient).publish('test/view', 'Stopping view');
+    });
     this._beforeUnload$ = Beans.get(MessageClient).observe$<void>(ɵWorkbenchCommands.viewUnloadingTopic(this.id))
       .pipe(map(() => undefined), shareReplay({refCount: false, bufferSize: 1}));
 
@@ -193,6 +197,8 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
   }
 
   public preDestroy(): void {
+    console.log('>>>> preDestroy');
+    void Beans.get(MessageClient).publish('test/view', 'preDestroy view');
     this._canCloseSubscription?.unsubscribe();
     this._canCloseSubscription = undefined;
     this._destroy$.next();

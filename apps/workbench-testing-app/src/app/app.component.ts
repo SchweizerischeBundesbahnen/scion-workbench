@@ -19,6 +19,8 @@ import {SettingsService} from './settings.service';
 import {installFocusHighlighter} from './focus-highlight/focus-highlighter';
 import {installGlasspaneHighlighter} from './glasspane-highlight/glasspane-highlighter';
 import {installMicrofrontendApplicationLabels} from './microfrontend-application-labels/microfrontend-application-labels';
+import {Beans} from '@scion/toolkit/bean-manager';
+import {MessageClient} from '@scion/microfrontend-platform';
 
 @Component({
   selector: 'app-root',
@@ -59,6 +61,14 @@ export class AppComponent implements DoCheck {
     afterEveryRender(() => {
       this._host.setAttribute('data-last-render', Date.now().toString());
     });
+
+    void inject(WorkbenchStartup).whenDone.then(() => {
+
+      void Beans.get(MessageClient).onMessage('test/:action', msg => {
+        console.log('>>>> onMessage ', msg.params?.get('action'), msg.body);
+      });
+    });
+
   }
 
   public ngDoCheck(): void {
