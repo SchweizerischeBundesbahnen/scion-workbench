@@ -14,7 +14,7 @@ import {AsyncPipe} from '@angular/common';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {RouterOutlet} from '@angular/router';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
-import {APP_SYMBOLIC_NAME} from './workbench-client/workbench-client.provider';
+import {APP_SYMBOLIC_NAME} from '@scion/workbench-client-angular';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {of} from 'rxjs';
 

@@ -12,9 +12,7 @@ import {Observable} from 'rxjs';
 import {Translatable} from './workbench-text-provider.model';
 
 /**
- * Provides texts from micro applications.
- *
- * Applications can register a text provider using {@link WorkbenchClient.registerTextProvider} to provide texts to other applications.
+ * Provides texts from SCION Workbench and micro applications.
  *
  * To get texts from another application, the application must declare an intention:
  *
@@ -26,6 +24,11 @@ import {Translatable} from './workbench-text-provider.model';
  *   }
  * },
  * ```
+ *
+ * Applications can register a text provider to provide texts to other applications.
+ *
+ * Register a text provider via options object when connecting to the workbench using {@link WorkbenchClient.connect}.
+ * Angular applications using `@scion/workbench-client-angular` can register a text provider via `provideTextProvider` function.
  *
  * @category Localization
  */

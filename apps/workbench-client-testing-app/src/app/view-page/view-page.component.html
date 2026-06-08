@@ -1,3 +1,19 @@
+<sci-menubar name="menubar:view"/>
+
+@if (toolbarVisible) {
+  <sci-toolbar name="toolbar:view"/>
+}
+
+<div class="toolbar">
+  <button (click)="toggleToolbar()">Toggle Toolbar ({{toolbarVisible ? 'visible' : 'not visible'}})</button>
+  <button (click)="toggleMenu1()">Menu 1 ({{contributionRef1 ? 'contributed' : 'not contributed'}})</button>
+  <button (click)="toggleMenu2()">Menu 2 ({{contributionRef2 ? 'contributed' : 'not contributed'}})</button>
+</div>
+
+<div class="context-menu" (contextmenu)="onContextMenuOpen($event)">Right-click to open a context menu</div>
+
+<div class="context-menu" (contextmenu)="onContextMenuWorkbenchClientOpen($event)">Right-click to open a context menu (Workbench Client)</div>
+
 <section>
   <sci-form-field label="View ID">
     <span class="e2e-view-id">{{view.id}}</span>
