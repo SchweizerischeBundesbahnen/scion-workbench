@@ -12,8 +12,7 @@ import {inject, NgModule} from '@angular/core';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Capability, ManifestService, MessageClient} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchNotificationCapability, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
-import {APP_SYMBOLIC_NAME} from '../workbench-client/workbench-client.provider';
-import {provideTextFromStorage, provideValueFromStorage} from './storage-text-provider';
+import {APP_SYMBOLIC_NAME} from '@scion/workbench-client-angular';
 
 @NgModule({})
 export default class ActivatorModule {
@@ -21,12 +20,6 @@ export default class ActivatorModule {
   constructor() {
     // Register capabilities.
     void registerCapabilities().then(() => Beans.get(MessageClient).publish('activator-ready'));
-
-    // Register text provider with texts from storage.
-    provideTextFromStorage();
-
-    // Register message listener that replies with values from session storage.
-    provideValueFromStorage();
   }
 }
 

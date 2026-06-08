@@ -13,9 +13,9 @@ import {animationFrameScheduler, catchError, concatWith, first, MonoTypeOperator
 import {APP_IDENTITY, Intent, IntentClient, ManifestService, mapToBody} from '@scion/microfrontend-platform';
 import {Beans, PreDestroy} from '@scion/toolkit/bean-manager';
 import {finalize} from 'rxjs/operators';
-import {Translatable} from './workbench-text-provider.model';
+import {Translatable, WorkbenchTextProviderFn, ɵWORKBNCH_CLIENT_TEXT_PROVIDER} from './workbench-text-provider.model';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
-import {Maps} from '@scion/toolkit/util';
+import {Maps, Observables} from '@scion/toolkit/util';
 
 /** @inheritDoc */
 export class ɵWorkbenchTextService implements WorkbenchTextService, PreDestroy {
@@ -43,22 +43,12 @@ export class ɵWorkbenchTextService implements WorkbenchTextService, PreDestroy 
       return this._cache.get(cacheKey)!;
     }
 
-    const translateIntent: Intent = {
-      type: WorkbenchCapabilities.TextProvider,
-      qualifier: {provider: options.provider},
-      params: new Map()
-        .set('key', key)
-        .set('params', Object.fromEntries(params)),
-    };
-
-    const text$ = Beans.get(IntentClient).request$<string | undefined>(translateIntent, undefined, {retain: true})
+    const text$ = requestText$(key, params)
       .pipe(
         // Ensure the observable to never complete independent of text provider request completion, providing consistent
         // behavior to consumers and simplifying cache cleanup as finalize is only called when the last subscriber unsubscribes,
         // after the specified TTL.
         concatWith(NEVER),
-        mapToBody(),
-        waitUntilRegisteredTextProvider(options.provider, {timeout: 60_000}),
         catchError((error: unknown) => {
           // Prefix the key with an additional `%` character to escape the leading `%` character. See console formatting rules: https://developer.mozilla.org/en-US/docs/Web/API/console
           console.error(`[TextProviderError][${Beans.get(APP_IDENTITY)}] Failed to get text '%${translatable}' from application '${options.provider}'. Caused by: `, error);
@@ -71,9 +61,35 @@ export class ɵWorkbenchTextService implements WorkbenchTextService, PreDestroy 
           resetOnRefCountZero: () => timer(options.ttl ?? 0, animationFrameScheduler), // reset asynchronously to prevent flickering of translated texts on re-layout
         }),
       );
+
+    // Cache observable.
     this._cache.set(cacheKey, text$);
 
     return text$;
+
+    /**
+     * Requests the specified text, resolving texts of the current application via the local text provider and texts from other applications via intent.
+     */
+    function requestText$(key: string, params: Map<string, string>): Observable<string | undefined> {
+      // Resolve text via local text provider if requesting local text.
+      if (Beans.get(APP_IDENTITY) === options.provider) {
+        const localTextProvider = Beans.opt<WorkbenchTextProviderFn>(ɵWORKBNCH_CLIENT_TEXT_PROVIDER);
+        return Observables.coerce(localTextProvider?.(key, Object.fromEntries(params)));
+      }
+
+      const translateIntent: Intent = {
+        type: WorkbenchCapabilities.TextProvider,
+        qualifier: {provider: options.provider},
+        params: new Map()
+          .set('key', key)
+          .set('params', Object.fromEntries(params)),
+      };
+      return Beans.get(IntentClient).request$<string | undefined>(translateIntent, undefined, {retain: true})
+        .pipe(
+          mapToBody(),
+          waitUntilRegisteredTextProvider(options.provider, {timeout: 60_000}),
+        );
+    }
   }
 
   public preDestroy(): void {

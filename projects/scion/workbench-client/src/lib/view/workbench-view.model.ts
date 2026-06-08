@@ -89,16 +89,22 @@ export abstract class WorkbenchView {
   public abstract readonly partId$: Observable<PartId>;
 
   /**
-   * Sets the title to be displayed in the view tab.
+   * Sets the tab title to be displayed for this view.
    *
    * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   *
+   * SCION uses text providers to resolve translation keys. A text provider can be registered when connecting to the workbench using `WorkbenchClient.connect`.
+   * Angular applications using `@scion/workbench-client-angular` should register a text provider using {@link provideTextProvider}.
    */
   public abstract setTitle(title: Translatable): void;
 
   /**
-   * Sets the subtitle to be displayed in the view tab.
+   * Sets the tab subtitle to be displayed for this view.
    *
    * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   *
+   * SCION uses text providers to resolve translation keys. A text provider can be registered when connecting to the workbench using `WorkbenchClient.connect`.
+   * Angular applications using `@scion/workbench-client-angular` should register a text provider using {@link provideTextProvider}.
    */
   public abstract setHeading(heading: Translatable): void;
 

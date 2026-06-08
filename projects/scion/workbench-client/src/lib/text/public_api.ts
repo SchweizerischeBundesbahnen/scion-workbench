@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {type WorkbenchTextProviderFn, type Translatable} from './workbench-text-provider.model';
+export {type WorkbenchTextProviderFn, type Translatable, ɵWORKBNCH_CLIENT_TEXT_PROVIDER} from './workbench-text-provider.model';
 export {WorkbenchTextService} from './workbench-text.service';
 export {ɵWorkbenchTextService} from './ɵworkbench-text.service';
+export {ɵWorkbenchTextProviderCapabilityInstaller} from './ɵworkbench-text-provider-capability-installer';

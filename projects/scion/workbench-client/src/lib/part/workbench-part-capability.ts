@@ -41,7 +41,7 @@ export interface WorkbenchPartCapability extends Capability {
    *
    * Parameters can be:
    * - read in the microfrontend by injecting the {@link WorkbenchPart} handle (or `ActivatedMicrofrontend` if a host microfrontend)
-   * - referenced in the path, title, label, tooltip and resolvers using the colon syntax
+   * - referenced in the path, title, label, tooltip, and resolvers using the colon syntax
    *
    * @inheritDoc
    */
@@ -95,11 +95,14 @@ export interface WorkbenchPartCapability extends Capability {
      */
     views?: WorkbenchViewRef[];
     /**
-     * Specifies the title displayed in the part bar.
+     * Specifies the title to be displayed for the part.
      *
      * Defaults to {@link extras.label} if a docked part. Set to `false` to not display a title.
      *
      * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+     *
+     * SCION uses text providers to resolve translation keys. A text provider can be registered when connecting to the workbench using `WorkbenchClient.connect`.
+     * Angular applications using `@scion/workbench-client-angular` should register a text provider using {@link provideTextProvider}.
      *
      * Text and interpolation parameters can reference capability parameters and resolvers using the colon syntax. See {@link resolve} for defining resolvers.
      */
@@ -107,13 +110,13 @@ export interface WorkbenchPartCapability extends Capability {
     /**
      * Controls the appearance of a docked part and its toggle button.
      *
-     * A docked part is a part that is docked to the left, right, or bottom side of the workbench.
+     * A docked part is a part docked to the left, right, or bottom side of the workbench.
      *
      * This property only applies to docked parts. The perspective determines whether a part is docked or positioned relative to another part.
      */
     extras?: DockedPartExtras;
     /**
-     * Defines resolvers for use in the title, label and tooltip.
+     * Defines resolvers for use in the title, label, and tooltip.
      *
      * A resolver defines a topic where a request is sent to resolve text or a translation key, typically based on capability parameters. Topic segments can reference capability parameters using the colon syntax.
      *
@@ -155,29 +158,35 @@ export interface WorkbenchPartCapability extends Capability {
 }
 
 /**
- * Controls the appearance of a docked part and its toggle button.
+ * Controls the appearance of a docked part and its toggle button in the docking area.
  *
- * A docked part is a part that is docked to the left, right, or bottom side of the workbench.
+ * A docked part is a part docked to the left, right, or bottom side of the workbench.
  */
 export interface DockedPartExtras {
   /**
-   * Specifies the icon (key) displayed in the toggle button.
+   * Specifies the icon to be displayed in the docking area for the part.
    *
    * Refer to the documentation of the workbench host application for available icons.
    */
   icon: string;
   /**
-   * Specifies the label displayed in the toggle button.
+   * Specifies the label to be displayed in the docking area for the part.
    *
    * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   *
+   * SCION uses text providers to resolve translation keys. A text provider can be registered when connecting to the workbench using `WorkbenchClient.connect`.
+   * Angular applications using `@scion/workbench-client-angular` should register a text provider using {@link provideTextProvider}.
    *
    * Text and interpolation parameters can reference capability parameters and resolvers using the colon syntax. See {@link resolve} for defining resolvers.
    */
   label: Translatable;
   /**
-   * Specifies the tooltip displayed when hovering over the toggle button.
+   * Specifies the tooltip to be displayed when hovering over the part's toggle button in the docking area.
    *
    * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   *
+   * SCION uses text providers to resolve translation keys. A text provider can be registered when connecting to the workbench using `WorkbenchClient.connect`.
+   * Angular applications using `@scion/workbench-client-angular` should register a text provider using {@link provideTextProvider}.
    *
    * Text and interpolation parameters can reference capability parameters and resolvers using the colon syntax. See {@link resolve} for defining resolvers.
    */

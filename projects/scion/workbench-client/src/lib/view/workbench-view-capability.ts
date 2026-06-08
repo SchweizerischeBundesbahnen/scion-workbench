@@ -87,9 +87,12 @@ export interface WorkbenchViewCapability extends Capability {
      */
     lazy?: boolean;
     /**
-     * Specifies the title of the view tab.
+     * Specifies the tab title to be displayed for the view.
      *
      * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+     *
+     * SCION uses text providers to resolve translation keys. A text provider can be registered when connecting to the workbench using `WorkbenchClient.connect`.
+     * Angular applications using `@scion/workbench-client-angular` should register a text provider using {@link provideTextProvider}.
      *
      * Text and interpolation parameters can reference capability parameters and resolvers using the colon syntax. See {@link resolve} for defining resolvers.
      *
@@ -127,9 +130,12 @@ export interface WorkbenchViewCapability extends Capability {
      */
     title?: Translatable;
     /**
-     * Specifies the subtitle of the view tab.
+     * Specifies the tab subtitle to be displayed for the view.
      *
      * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+     *
+     * SCION uses text providers to resolve translation keys. A text provider can be registered when connecting to the workbench using `WorkbenchClient.connect`.
+     * Angular applications using `@scion/workbench-client-angular` should register a text provider using {@link provideTextProvider}.
      *
      * Text and interpolation parameters can reference capability parameters and resolvers using the colon syntax. See {@link resolve} for defining resolvers.
      *

@@ -51,6 +51,8 @@ export abstract class WorkbenchMessageBoxService {
    *
    * @param message - Specifies the text to display, if any.
    *                  Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   *                  SCION uses text providers to resolve translation keys. A text provider can be registered when connecting to the workbench using `WorkbenchClient.connect`.
+   *                  Angular applications using `@scion/workbench-client-angular` should register a text provider using {@link provideTextProvider}.
    * @param options - Controls the appearance and behavior of the message box.
    * @returns Promise that resolves to the key of the action button that the user clicked to close the message box,
    *          or that rejects if the message box couldn't be opened, e.g., because of missing the intention.

@@ -19,9 +19,12 @@ import {Translatable} from '../text/workbench-text-provider.model';
 export interface WorkbenchMessageBoxOptions {
 
   /**
-   * Specifies the title of the message box.
+   * Specifies the title to be displayed for the message box.
    *
    * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   *
+   * SCION uses text providers to resolve translation keys. A text provider can be registered when connecting to the workbench using `WorkbenchClient.connect`.
+   * Angular applications using `@scion/workbench-client-angular` should register a text provider using {@link provideTextProvider}.
    */
   title?: Translatable;
 
@@ -30,6 +33,9 @@ export interface WorkbenchMessageBoxOptions {
    *
    * Each property in the object literal represents a button, with the property value used as the button label.
    * The label can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   *
+   * SCION uses text providers to resolve translation keys. A text provider can be registered when connecting to the workbench using `WorkbenchClient.connect`.
+   * Angular applications using `@scion/workbench-client-angular` should register a text provider using {@link provideTextProvider}.
    *
    * Clicking a button closes the message box and returns the property key to the message box opener.
    *

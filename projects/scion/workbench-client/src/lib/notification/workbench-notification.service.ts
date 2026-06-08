@@ -35,6 +35,8 @@ export abstract class WorkbenchNotificationService {
    *
    * @param message - Specifies the text to display, if any.
    *                  Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   *                  SCION uses text providers to resolve translation keys. A text provider can be registered when connecting to the workbench using `WorkbenchClient.connect`.
+   *                  Angular applications using `@scion/workbench-client-angular` should register a text provider using {@link provideTextProvider}.
    * @param options - Controls the appearance and behavior of the notification.
    * @returns Promise that resolves when the notification is displayed, or that rejects otherwise, e.g., because of missing the intention.
    */
