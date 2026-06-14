@@ -54,6 +54,7 @@ import {toSignal} from '@angular/core/rxjs-interop';
     '[style.min-width]': 'form.controls.componentSize.controls.minWidth.value',
     '[style.max-width]': 'form.controls.componentSize.controls.maxWidth.value',
     '[attr.data-component-instance-id]': `uuid`,
+    '[attr.data-referrer]': 'popup.referrer.appSymbolicName',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -18,6 +18,7 @@ import {shareReplay} from 'rxjs/operators';
 import {decorateObservable} from '../observable-decorator';
 import {PopupId} from '../workbench.identifiers';
 import {WorkbenchPopup} from './workbench-popup.model';
+import {Referrer} from '../workbench.model';
 
 /**
  * @ignore
@@ -26,14 +27,16 @@ import {WorkbenchPopup} from './workbench-popup.model';
 export class ɵWorkbenchPopup implements WorkbenchPopup {
 
   public readonly id: PopupId;
-  public readonly params: Map<string, unknown>;
   public readonly capability: WorkbenchPopupCapability;
+  public readonly params: Map<string, unknown>;
+  public readonly referrer: Referrer;
   public readonly focused$: Observable<boolean>;
 
   constructor(context: ɵPopupContext) {
     this.id = context.popupId;
     this.capability = context.capability;
     this.params = context.params;
+    this.referrer = context.referrer;
     void this.requestFocus();
     this.focused$ = Beans.get(MessageClient).observe$<boolean>(ɵWorkbenchCommands.popupFocusedTopic(this.id))
       .pipe(

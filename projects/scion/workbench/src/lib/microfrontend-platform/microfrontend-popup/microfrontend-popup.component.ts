@@ -38,6 +38,7 @@ export class MicrofrontendPopupComponent {
 
   public readonly capability = input.required<WorkbenchPopupCapability>();
   public readonly params = input.required<Map<string, unknown>>();
+  public readonly referrer = input.required<string>();
   public readonly closeOnFocusLost = input.required<boolean>();
 
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
@@ -106,6 +107,7 @@ export class MicrofrontendPopupComponent {
         popupId: this.popup.id,
         capability: this.capability(),
         params: this.params(),
+        referrer: {appSymbolicName: this.referrer()},
       };
       const routerOutletElement = this._routerOutletElement().nativeElement;
 

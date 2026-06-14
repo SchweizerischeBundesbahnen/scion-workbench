@@ -96,7 +96,7 @@ export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
 
     return this._popupService.open(isHostProvider ? MicrofrontendHostComponent : MicrofrontendPopupComponent, prune({
       id: command.popupId,
-      inputs: isHostProvider ? {} : {capability, params, closeOnFocusLost},
+      inputs: isHostProvider ? {} : {capability, params, referrer, closeOnFocusLost},
       providers: isHostProvider ? [provideActivatedMicrofrontend(capability, params, referrer)] : undefined,
       anchor: this.observePopupOrigin$(command),
       context: command.context,

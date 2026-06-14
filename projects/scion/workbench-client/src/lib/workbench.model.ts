@@ -25,3 +25,13 @@ export type WorkbenchElement = WorkbenchPart | WorkbenchView | WorkbenchDialog |
  * @see WorkbenchElement
  */
 export const WORKBENCH_ELEMENT = Symbol('WORKBENCH_ELEMENT');
+
+/**
+ * Identifies the source context from which a workbench element was opened.
+ */
+export interface Referrer {
+  /**
+   * Symbolic name of the referring application.
+   */
+  readonly appSymbolicName: string;
+}
