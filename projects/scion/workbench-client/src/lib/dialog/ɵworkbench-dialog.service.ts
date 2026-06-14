@@ -34,11 +34,7 @@ export class ɵWorkbenchDialogService implements WorkbenchDialogService {
       modality: options?.modality,
       animate: options?.animate,
       cssClass: options?.cssClass,
-      context: (() => {
-        // TODO [Angular 22] Remove backward compatiblity.
-        const context = options?.context && (typeof options.context === 'object' ? options.context.viewId : options.context);
-        return Defined.orElse(context, this._context);
-      })(),
+      context: Defined.orElse(options?.context, this._context),
     };
 
     const closeResult$ = Beans.get(IntentClient).request$<R>(intent, command)

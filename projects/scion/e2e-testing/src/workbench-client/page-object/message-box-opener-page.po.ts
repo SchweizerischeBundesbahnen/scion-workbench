@@ -98,8 +98,7 @@ export class MessageBoxOpenerPagePO implements MicrofrontendViewPagePO, Microfro
       await this.locator.locator('select.e2e-modality').selectOption(options.modality);
     }
 
-    const context = options?.context && (typeof options.context === 'object' ? options.context.viewId : options.context);
-    await this.locator.locator('input.e2e-context').fill(context || (context === null ? '<null>' : '<undefined>'));
+    await this.locator.locator('input.e2e-context').fill(options?.context || (options?.context === null ? '<null>' : '<undefined>'));
 
     if (options?.contentSelectable) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-content-selectable')).toggle(options.contentSelectable);

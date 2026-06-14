@@ -66,5 +66,5 @@ export class ɵWorkbenchPopupService implements WorkbenchPopupService {
  * Computes the popup's invocation context based on passsed options and injection context.
  */
 function createPopupInvocationContext(options: WorkbenchPopupOptions, injector: Injector): WorkbenchInvocationContext | null {
-  return createInvocationContext(options.context && (typeof options.context === 'object' ? options.context.viewId : options.context), {injector});
+  return createInvocationContext(options.context, {injector});
 }

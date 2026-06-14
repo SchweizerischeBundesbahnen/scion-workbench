@@ -112,5 +112,5 @@ function createDialogInvocationContext(options: WorkbenchDialogOptions, injector
     return null;
   }
 
-  return createInvocationContext(options.context && (typeof options.context === 'object' ? options.context.viewId : options.context), {injector});
+  return createInvocationContext(options.context, {injector});
 }
