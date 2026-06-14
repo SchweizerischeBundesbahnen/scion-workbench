@@ -1569,32 +1569,6 @@ test.describe('Workbench View', () => {
       ]);
     });
 
-    test('should not load view lazy by default if compat mode is enabled', async ({appPO, microfrontendNavigator, consoleLogs}) => {
-      await appPO.navigateTo({microfrontendSupport: true, preloadInactiveMicrofrontendViews: true});
-
-      // Register test view without defining the `lazy` property.
-      await microfrontendNavigator.registerCapability('app1', {
-        type: 'view',
-        qualifier: {component: 'testee'},
-        properties: {
-          path: 'test-pages/microfrontend-test-page-1',
-          title: 'Test View',
-          lazy: undefined, // default
-        },
-      });
-
-      // Open test view without activating it.
-      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.navigate({component: 'testee'}, {target: 'view.1', activate: false});
-      const testPage = new MicrofrontendTestPage1PO(appPO.view({viewId: 'view.1'}));
-
-      // Expect microfrontend to be loaded.
-      await expectView(testPage).toBeInactive({loaded: true});
-      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /MicrofrontendTestPage/})).toEqual([
-        '[MicrofrontendTestPage1Component#construct]',
-      ]);
-    });
-
     test('should load lazy view when opened in new active view', async ({appPO, microfrontendNavigator, consoleLogs}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 

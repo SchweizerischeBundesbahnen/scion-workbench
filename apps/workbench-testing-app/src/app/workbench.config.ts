@@ -18,10 +18,7 @@ import {provideTextFromStorage} from './text/storage-text-provider';
  * Configures SCION Workbench for the testing application.
  */
 export const workbenchConfig: WorkbenchConfig = {
-  microfrontendPlatform: WorkbenchStartupQueryParams.standalone() ? undefined : {
-    ...environment.microfrontendPlatformConfig, // eslint-disable-line  @typescript-eslint/no-misused-spread
-    preloadInactiveViews: WorkbenchStartupQueryParams.preloadInactiveMicrofrontendViews() ?? environment.microfrontendPlatformConfig.preloadInactiveViews,
-  },
+  microfrontendPlatform: WorkbenchStartupQueryParams.standalone() ? undefined : environment.microfrontendPlatformConfig,
   layout: perspectives,
   dialog: {
     modalityScope: WorkbenchStartupQueryParams.dialogModalityScope(),
