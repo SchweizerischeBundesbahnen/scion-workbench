@@ -18,6 +18,7 @@ import {shareReplay} from 'rxjs/operators';
 import {decorateObservable} from '../observable-decorator';
 import {DialogId} from '../workbench.identifiers';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
+import {Referrer} from '../workbench.model';
 
 /**
  * @ignore
@@ -28,7 +29,7 @@ export class ɵWorkbenchMessageBox implements WorkbenchMessageBox {
   public readonly id: DialogId;
   public readonly capability: WorkbenchMessageBoxCapability;
   public readonly params: Map<string, unknown>;
-  public readonly referrer: WorkbenchMessageBox['referrer'];
+  public readonly referrer: Referrer;
   public readonly focused$: Observable<boolean>;
 
   constructor(context: ɵMessageBoxContext) {

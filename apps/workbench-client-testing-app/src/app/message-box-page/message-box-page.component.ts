@@ -49,6 +49,7 @@ import {startWith} from 'rxjs/operators';
     // thus allowing it to shrink when an accordion is collapsed.
     '[style.position]': `form.controls.componentSize.controls.positionAbsolute.value ? 'absolute' : 'static'`,
     '[attr.data-component-instance-id]': `uuid`,
+    '[attr.data-referrer]': 'messageBox.referrer.appSymbolicName',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
