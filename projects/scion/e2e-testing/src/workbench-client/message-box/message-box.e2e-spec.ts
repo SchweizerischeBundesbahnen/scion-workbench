@@ -17,6 +17,7 @@ import {MAIN_AREA} from '../../workbench.model';
 import {DialogOpenerPagePO} from '../page-object/dialog-opener-page.po';
 import {PopupOpenerPagePO} from '../page-object/popup-opener-page.po';
 import {canMatchWorkbenchDialogCapability, canMatchWorkbenchPartCapability, canMatchWorkbenchPopupCapability} from '../../workbench/page-object/layout-page/register-route-page.po';
+import {WorkbenchMessageBoxCapability} from '../page-object/register-workbench-capability-page.po';
 
 test.describe('Workbench Message Box Microfrontend', () => {
 
@@ -909,6 +910,33 @@ test.describe('Workbench Message Box Microfrontend', () => {
         // Expect message box not to be closed
         await expectMessageBox(messageBoxPage).toBeVisible();
       });
+    });
+  });
+
+  test.describe('Referrer', () => {
+
+    test('should have referrer', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability<WorkbenchMessageBoxCapability>('app2', {
+        type: 'messagebox',
+        qualifier: {component: 'testee', app: 'app2'},
+        private: false,
+        properties: {
+          path: 'test-message-box',
+        },
+      });
+      await microfrontendNavigator.registerIntention('app1', {type: 'messagebox', qualifier: {component: 'testee', app: 'app2'}});
+
+      // Open message box of app2 from app1.
+      const messageBoxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
+      await messageBoxOpenerPage.open({component: 'testee', app: 'app2'}, {cssClass: 'testee'});
+
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const messageBoxPage = new MessageBoxPagePO(messageBox);
+
+      await expectMessageBox(messageBoxPage).toBeVisible();
+      await expect.poll(() => messageBoxPage.getReferrer()).toEqual('workbench-client-testing-app1');
     });
   });
 });

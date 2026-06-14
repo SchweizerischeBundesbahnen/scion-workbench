@@ -11,6 +11,7 @@
 import {WorkbenchMessageBoxCapability} from '../message-box/workbench-message-box-capability';
 import {DialogId} from '../workbench.identifiers';
 import {Observable} from 'rxjs';
+import {Referrer} from '../workbench.model';
 
 /**
  * Handle to interact with a message box opened via {@link WorkbenchMessageBoxService}.
@@ -40,15 +41,9 @@ export abstract class WorkbenchMessageBox {
   public abstract readonly params: Map<string, unknown>;
 
   /**
-   * Provides information about where the message box was opened.
+   * Identifies the source context from which the message box was opened.
    */
-  public abstract readonly referrer: {
-
-    /**
-     * Symbolic name of the application that opened the messagebox.
-     */
-    readonly appSymbolicName: string;
-  };
+  public abstract readonly referrer: Referrer;
 
   /**
    * Indicates whether this message box has the focus.

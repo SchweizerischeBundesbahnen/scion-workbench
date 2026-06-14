@@ -10,6 +10,7 @@
 
 import {WorkbenchMessageBoxCapability} from '../message-box/workbench-message-box-capability';
 import {DialogId} from '../workbench.identifiers';
+import {Referrer} from '../workbench.model';
 
 /**
  * Information about the message box embedding a microfrontend.
@@ -23,15 +24,7 @@ export interface ɵMessageBoxContext {
   dialogId: DialogId;
   capability: WorkbenchMessageBoxCapability;
   params: Map<string, unknown>;
-  /**
-   * Provides information about where the message box was opened.
-   */
-  referrer: {
-    /**
-     * Symbolic name of the application that opened the messagebox.
-     */
-    appSymbolicName: string;
-  };
+  referrer: Referrer;
 }
 
 /**
