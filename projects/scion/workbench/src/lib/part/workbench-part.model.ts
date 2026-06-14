@@ -13,7 +13,7 @@ import {WorkbenchView} from '../view/workbench-view.model';
 import {Signal} from '@angular/core';
 import {NavigationData, NavigationState} from '../routing/routing.model';
 import {UrlSegment} from '@angular/router';
-import {PartId, ViewId} from '../workbench.identifiers';
+import {PartId} from '../workbench.identifiers';
 import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
@@ -80,20 +80,6 @@ export abstract class WorkbenchPart {
    * Indicates whether this part has the focus.
    */
   public abstract readonly focused: Signal<boolean>;
-
-  /**
-   * Identifies the active view, or `null` if none.
-   *
-   * @deprecated since version 20.0.0-beta.4. Use `WorkbenchPart.activeView` instead. API will be removed in version 22.
-   */
-  public abstract readonly activeViewId: Signal<ViewId | null>;
-
-  /**
-   * Identifies views opened in this part.
-   *
-   * @deprecated since version 20.0.0-beta.4. Use `WorkbenchPart.views` instead. API will be removed in version 22.
-   */
-  public abstract readonly viewIds: Signal<ViewId[]>;
 
   /**
    * Gets the active view of this part, or `null` if none.
