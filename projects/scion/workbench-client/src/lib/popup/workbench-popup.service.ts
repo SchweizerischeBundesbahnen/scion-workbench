@@ -10,7 +10,6 @@
 
 import {Qualifier} from '@scion/microfrontend-platform';
 import {WorkbenchPopupOptions} from './workbench-popup.options';
-import {WorkbenchPopupConfig} from './workbench-popup.config';
 
 /**
  * Displays a microfrontend in a popup.
@@ -42,5 +41,5 @@ export abstract class WorkbenchPopupService {
    * @returns Promise that resolves to the popup result, if any, or that rejects if the popup was closed with an error or couldn't be opened,
    *          e.g., because of missing the intention or because no `popup` capability was found matching the qualifier and is visible to the application.
    */
-  public abstract open<T>(qualifier: Qualifier, options: WorkbenchPopupOptions | WorkbenchPopupConfig): Promise<T | undefined>; // eslint-disable-line @typescript-eslint/no-duplicate-type-constituents
+  public abstract open<T>(qualifier: Qualifier, options: WorkbenchPopupOptions): Promise<T | undefined>;
 }

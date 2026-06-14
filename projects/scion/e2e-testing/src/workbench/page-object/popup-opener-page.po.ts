@@ -53,10 +53,6 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO, WorkbenchDialogPa
       throw Error('[PageObjectError] PageObject does not support the option `providers`.');
     }
 
-    // Select API.
-    const legacyAPI = options.legacyAPI ?? false;
-    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-legacy-api')).toggle(legacyAPI);
-
     // Enter component.
     await this.locator.locator('select.e2e-popup-component').selectOption(component);
 
@@ -72,14 +68,9 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO, WorkbenchDialogPa
     await this.locator.locator('select.e2e-align').selectOption(options.align ?? '');
 
     // Enter inputs
-    if (legacyAPI) {
-      await this.locator.locator('input.e2e-input').fill(options.inputLegacy ?? '');
-    }
-    else {
-      const inputsField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-inputs'));
-      await inputsField.clear();
-      await inputsField.addEntries(options.inputs ?? {});
-    }
+    const inputsField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-inputs'));
+    await inputsField.clear();
+    await inputsField.addEntries(options.inputs ?? {});
 
     // Enter context.
     const context = options.context && (typeof options.context === 'object' ? options.context.viewId : options.context);
@@ -239,18 +230,6 @@ export interface PopupOpenerPageOptions {
    * @see WorkbenchPopupOptions.anchor
    */
   anchor: 'element' | PopupOrigin;
-  /**
-   * Controls if to use the legacy Workbench Popup API.
-   *
-   * TODO [Angular 22] Remove with Angular 22. Used for backward compatiblity.
-   */
-  legacyAPI?: true;
-  /**
-   * Input data if using the legacy Workbench Popup API.
-   *
-   * TODO [Angular 22] Remove with Angular 22. Used for backward compatiblity.
-   */
-  inputLegacy?: string;
   /**
    * Controls at which size to open the popup.
    */
