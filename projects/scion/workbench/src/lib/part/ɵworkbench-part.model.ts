@@ -57,8 +57,6 @@ export class ɵWorkbenchPart implements WorkbenchPart, Blockable {
   public readonly activationInstant = signal(0);
   public readonly active = signal(false);
   public readonly focused = computed(() => this._focusMonitor.activeElement()?.id === this.id);
-  public readonly viewIds = computed(() => this.views().map(view => view.id));
-  public readonly activeViewId = computed(() => this.activeView()?.id ?? null);
   public readonly mPart: WritableSignal<MPart>;
   public readonly gridName: WritableSignal<keyof WorkbenchGrids>;
   public readonly peripheral = signal(false);
