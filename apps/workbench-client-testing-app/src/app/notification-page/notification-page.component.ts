@@ -42,6 +42,7 @@ import {startWith} from 'rxjs/operators';
   ],
   host: {
     '[style.height]': 'form.controls.componentSize.controls.height.value',
+    '[attr.data-referrer]': 'notification.referrer.appSymbolicName',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

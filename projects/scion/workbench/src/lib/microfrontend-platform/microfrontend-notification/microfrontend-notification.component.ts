@@ -146,9 +146,7 @@ export class MicrofrontendNotificationComponent {
         notificationId: this.notification.id,
         capability: this.capability(),
         params: this.params(),
-        referrer: {
-          appSymbolicName: this.referrer(),
-        },
+        referrer: {appSymbolicName: this.referrer()},
       };
       const routerOutletElement = this._routerOutletElement().nativeElement;
 

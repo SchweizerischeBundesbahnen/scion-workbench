@@ -10,6 +10,7 @@
 
 import {NotificationId} from '../workbench.identifiers';
 import {WorkbenchNotificationCapability} from './workbench-notification-capability';
+import {Referrer} from '../workbench.model';
 
 /**
  * Information about the notification embedding a microfrontend.
@@ -23,15 +24,7 @@ export interface ɵNotificationContext {
   notificationId: NotificationId;
   capability: WorkbenchNotificationCapability;
   params: Map<string, unknown>;
-  /**
-   * Provides information about where the notification was opened.
-   */
-  referrer: {
-    /**
-     * Symbolic name of the application that opened the notification.
-     */
-    appSymbolicName: string;
-  };
+  referrer: Referrer;
 }
 
 /**

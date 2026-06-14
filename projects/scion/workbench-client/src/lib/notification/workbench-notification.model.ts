@@ -11,6 +11,7 @@
 import {NotificationId} from '../workbench.identifiers';
 import {Observable} from 'rxjs';
 import {WorkbenchNotificationCapability} from './workbench-notification-capability';
+import {Referrer} from '../workbench.model';
 
 /**
  * Handle to interact with a notification opened via {@link WorkbenchNotificationService}.
@@ -40,15 +41,9 @@ export abstract class WorkbenchNotification {
   public abstract readonly params: Map<string, unknown>;
 
   /**
-   * Provides information about where the notification was opened.
+   * Identifies the source context from which the notification was opened.
    */
-  public abstract readonly referrer: {
-
-    /**
-     * Symbolic name of the application that opened the notification.
-     */
-    readonly appSymbolicName: string;
-  };
+  public abstract readonly referrer: Referrer;
 
   /**
    * Indicates whether this notification has the focus.

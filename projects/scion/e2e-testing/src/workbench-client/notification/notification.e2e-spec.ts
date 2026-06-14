@@ -549,6 +549,34 @@ test.describe('Workbench Notification Microfrontend', () => {
     await expect.poll(() => focusTestPage.isFocused()).toBe(true);
   });
 
+  test.describe('Referrer', () => {
+
+    test('should have referrer', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability<WorkbenchNotificationCapability>('app2', {
+        type: 'notification',
+        qualifier: {component: 'testee', app: 'app2'},
+        private: false,
+        properties: {
+          path: 'test-notification',
+          size: {height: 'auto'},
+        },
+      });
+      await microfrontendNavigator.registerIntention('app1', {type: 'notification', qualifier: {component: 'testee', app: 'app2'}});
+
+      // Open notification of app2 from app1.
+      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+      await notificationOpenerPage.show({component: 'testee', app: 'app2'}, {cssClass: 'testee'});
+
+      const notification = appPO.notification({cssClass: 'testee'});
+      const notificationPage = new NotificationPagePO(notification);
+
+      await expectNotification(notificationPage).toBeVisible();
+      await expect.poll(() => notificationPage.getReferrer()).toEqual('workbench-client-testing-app1');
+    });
+  });
+
   test.describe('Severity', () => {
     test('should, by default, show notification with info severity', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
