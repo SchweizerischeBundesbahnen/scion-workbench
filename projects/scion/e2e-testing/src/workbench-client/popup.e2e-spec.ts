@@ -23,6 +23,7 @@ import {RouterPagePO as WorkbenchRouterPagePO} from '../workbench/page-object/ro
 import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
 import {canMatchWorkbenchDialogCapability, canMatchWorkbenchNotificationCapability, canMatchWorkbenchPartCapability, canMatchWorkbenchPopupCapability} from '../workbench/page-object/layout-page/register-route-page.po';
 import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
+import {WorkbenchPopupCapability} from './page-object/register-workbench-capability-page.po';
 
 test.describe('Workbench Popup', () => {
 
@@ -192,6 +193,34 @@ test.describe('Workbench Popup', () => {
     // Move the anchor to another position.
     await popupOpenerPage.enterPosition({left: 300, top: 400});
     await expectPopup(popupPage).toHavePosition('south', view, {left: 300, top: 400});
+  });
+
+  test.describe('Referrer', () => {
+
+    test('should have referrer', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability<WorkbenchPopupCapability>('app2', {
+        type: 'popup',
+        qualifier: {component: 'testee', app: 'app2'},
+        private: false,
+        properties: {
+          path: 'test-popup',
+          size: {width: '100px', height: '100px'},
+        },
+      });
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'testee', app: 'app2'}});
+
+      // Open popup of app2 from app1.
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.open({component: 'testee', app: 'app2'}, {anchor: 'element', cssClass: 'testee'});
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+
+      await expectPopup(popupPage).toBeVisible();
+      await expect.poll(() => popupPage.getReferrer()).toEqual('workbench-client-testing-app1');
+    });
   });
 
   test.describe('Popup Result', () => {

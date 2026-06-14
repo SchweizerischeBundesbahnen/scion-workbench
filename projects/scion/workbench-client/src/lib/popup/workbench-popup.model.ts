@@ -11,6 +11,7 @@
 import {WorkbenchPopupCapability} from './workbench-popup-capability';
 import {Observable} from 'rxjs';
 import {PopupId} from '../workbench.identifiers';
+import {Referrer} from '../workbench.model';
 
 /**
  * A popup is a visual workbench element for displaying content above other content. The popup is positioned relative
@@ -51,6 +52,11 @@ export abstract class WorkbenchPopup {
    * Parameters passed to the microfrontend loaded into the popup.
    */
   public abstract readonly params: Map<string, unknown>;
+
+  /**
+   * Identifies the source context from which the popup was opened.
+   */
+  public abstract readonly referrer: Referrer;
 
   /**
    * Indicates whether this popup has the focus.

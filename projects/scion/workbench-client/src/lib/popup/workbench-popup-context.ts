@@ -10,6 +10,7 @@
 
 import {WorkbenchPopupCapability} from './workbench-popup-capability';
 import {PopupId} from '../workbench.identifiers';
+import {Referrer} from '../workbench.model';
 
 /**
  * Context when displaying a microfrontend in a popup.
@@ -23,6 +24,7 @@ export interface ɵPopupContext {
   popupId: PopupId;
   params: Map<string, unknown>;
   capability: WorkbenchPopupCapability;
+  referrer: Referrer;
 }
 
 /**

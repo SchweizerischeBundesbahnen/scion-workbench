@@ -35,6 +35,10 @@ export class PopupPagePO implements MicrofrontendPopupPagePO {
     this._hasFocusLocator = this.outlet.frameLocator.locator('app-root[data-focus]');
   }
 
+  public async getReferrer(): Promise<string | null> {
+    return this.locator.getAttribute('data-referrer');
+  }
+
   public getComponentInstanceId(): Promise<string> {
     return waitForAttribute(this.locator, 'data-component-instance-id');
   }
