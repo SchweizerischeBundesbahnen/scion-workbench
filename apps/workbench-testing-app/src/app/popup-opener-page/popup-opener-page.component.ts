@@ -10,7 +10,7 @@
 
 import {Component, ElementRef, inject, signal, Type, viewChild} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {DialogId, NotificationId, PartId, PopupId, PopupOrigin, PopupService, ViewId, WorkbenchPopupService} from '@scion/workbench';
+import {DialogId, NotificationId, PartId, PopupId, PopupOrigin, ViewId, WorkbenchPopupService} from '@scion/workbench';
 import PopupPageComponent from '../popup-page/popup-page.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import {map, startWith, switchMap} from 'rxjs/operators';
@@ -48,7 +48,6 @@ import WorkbenchHandleBoundsTestPageComponent from '../test-pages/workbench-hand
 export default class PopupOpenerPageComponent {
 
   private readonly _popupService = inject(WorkbenchPopupService);
-  private readonly _legacyPopupService = inject(PopupService);
   private readonly _formBuilder = inject(NonNullableFormBuilder);
   private readonly _openButton = viewChild.required<ElementRef<HTMLButtonElement>>('open_button');
 
@@ -66,7 +65,6 @@ export default class PopupOpenerPageComponent {
       }),
       align: this._formBuilder.control<'east' | 'west' | 'north' | 'south' | ''>(''),
       inputs: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
-      inputLegacy: this._formBuilder.control(''),
       context: this._formBuilder.control<ViewId | PartId | DialogId | PopupId | NotificationId | '<null>' | ''>(''),
       cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
       closeStrategy: this._formBuilder.group({
@@ -82,7 +80,6 @@ export default class PopupOpenerPageComponent {
       minWidth: this._formBuilder.control(''),
       maxWidth: this._formBuilder.control(''),
     }),
-    legacyAPI: this._formBuilder.control(false),
   });
 
   protected popupError = signal<string | undefined>(undefined);
@@ -94,18 +91,11 @@ export default class PopupOpenerPageComponent {
     this.popupError.set(undefined);
     this.returnValue.set(undefined);
 
-    if (this.form.controls.legacyAPI.value) {
-      const options = this.form.controls.options.controls;
-      await this._legacyPopupService.open<string>(prune({
-        component: this.readComponentFromUI(),
-        input: options.inputLegacy.value || undefined,
-        anchor: options.anchor.controls.position.value === 'element' ? this._openButton() : this.observePopupOrigin$(),
-        align: options.align.value || undefined,
-        cssClass: options.cssClass.value,
-        closeStrategy: {
-          onFocusLost: options.closeStrategy.controls.onFocusLost.value,
-          onEscape: options.closeStrategy.controls.onEscape.value,
-        },
+    const component = this.readComponentFromUI();
+    const options = this.form.controls.options.controls;
+    await this._popupService.open<string>(component, prune({
+      inputs: {
+        ...SciKeyValueFieldComponent.toDictionary(options.inputs, false),
         size: {
           width: this.form.controls.size.controls.width.value || undefined,
           height: this.form.controls.size.controls.height.value || undefined,
@@ -114,38 +104,18 @@ export default class PopupOpenerPageComponent {
           minHeight: this.form.controls.size.controls.minHeight.value || undefined,
           maxHeight: this.form.controls.size.controls.maxHeight.value || undefined,
         },
-        context: parseTypedString(options.context.value, {undefinedIfEmpty: true}),
-      }, {pruneIfEmpty: true})!)
-        .then(result => this.returnValue.set(result))
-        .catch((error: unknown) => this.popupError.set(stringifyError(error)));
-    }
-    else {
-      const component = this.readComponentFromUI();
-      const options = this.form.controls.options.controls;
-      await this._popupService.open<string>(component, prune({
-        inputs: {
-          ...SciKeyValueFieldComponent.toDictionary(options.inputs, false),
-          size: {
-            width: this.form.controls.size.controls.width.value || undefined,
-            height: this.form.controls.size.controls.height.value || undefined,
-            minWidth: this.form.controls.size.controls.minWidth.value || undefined,
-            maxWidth: this.form.controls.size.controls.maxWidth.value || undefined,
-            minHeight: this.form.controls.size.controls.minHeight.value || undefined,
-            maxHeight: this.form.controls.size.controls.maxHeight.value || undefined,
-          },
-        },
-        anchor: options.anchor.controls.position.value === 'element' ? this._openButton() : this.observePopupOrigin$(),
-        align: options.align.value || undefined,
-        cssClass: options.cssClass.value,
-        closeStrategy: {
-          onFocusLost: options.closeStrategy.controls.onFocusLost.value,
-          onEscape: options.closeStrategy.controls.onEscape.value,
-        },
-        context: parseTypedString(options.context.value, {undefinedIfEmpty: true}),
-      }, {pruneIfEmpty: true})!)
-        .then(result => this.returnValue.set(result))
-        .catch((error: unknown) => this.popupError.set(stringifyError(error)));
-    }
+      },
+      anchor: options.anchor.controls.position.value === 'element' ? this._openButton() : this.observePopupOrigin$(),
+      align: options.align.value || undefined,
+      cssClass: options.cssClass.value,
+      closeStrategy: {
+        onFocusLost: options.closeStrategy.controls.onFocusLost.value,
+        onEscape: options.closeStrategy.controls.onEscape.value,
+      },
+      context: parseTypedString(options.context.value, {undefinedIfEmpty: true}),
+    }, {pruneIfEmpty: true})!)
+      .then(result => this.returnValue.set(result))
+      .catch((error: unknown) => this.popupError.set(stringifyError(error)));
   }
 
   private readComponentFromUI(): Type<unknown> {

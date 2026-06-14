@@ -9,7 +9,7 @@
  */
 
 import {Blockable} from '../glass-pane/blockable';
-import {assertNotInReactiveContext, ComponentRef, computed, DestroyableInjector, DestroyRef, DOCUMENT, effect, ElementRef, inject, InjectionToken, Injector, NgZone, Signal, signal, untracked, WritableSignal} from '@angular/core';
+import {assertNotInReactiveContext, ComponentRef, computed, DestroyableInjector, DestroyRef, DOCUMENT, effect, ElementRef, inject, Injector, NgZone, Signal, signal, untracked} from '@angular/core';
 import {WorkbenchFocusMonitor} from '../focus/workbench-focus-tracker.service';
 import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
 import {WorkbenchPopupComponent} from './workbench-popup.component';
@@ -33,11 +33,10 @@ import {WorkbenchPopup, WorkbenchPopupSize} from './workbench-popup.model';
 import {WorkbenchInvocationContext} from '../invocation-context/invocation-context';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {WorkbenchPopupOptions} from './workbench-popup.options';
-import {Popup} from './popup';
 import {WORKBENCH_POPUP_CONTEXT} from './workbench-popup-context.provider';
 
 /** @inheritDoc */
-export class ɵWorkbenchPopup implements Popup, WorkbenchPopup, Blockable {
+export class ɵWorkbenchPopup implements WorkbenchPopup, Blockable {
 
   /** Injector for the popup; destroyed when the popup is closed. */
   public readonly injector = inject(Injector) as DestroyableInjector;
@@ -55,8 +54,6 @@ export class ɵWorkbenchPopup implements Popup, WorkbenchPopup, Blockable {
   public readonly destroyed = signal<boolean>(false);
   public readonly bounds = boundingClientRect(computed(() => this._componentRef()?.location.nativeElement as HTMLElement | undefined));
   public readonly blockedBy: Signal<ɵWorkbenchDialog | null>;
-  // TODO [Angular 22] Remove with Angular 22. Used for backward compatiblity.
-  public readonly input: unknown | undefined;
   public result: unknown | Error | undefined;
 
   constructor(public id: PopupId,
@@ -64,10 +61,9 @@ export class ɵWorkbenchPopup implements Popup, WorkbenchPopup, Blockable {
               public invocationContext: WorkbenchInvocationContext | null,
               private _options: WorkbenchPopupOptions) {
     this._portal = this.createPortal();
-    this.input = this._portal.injector?.get(LEGACY_POPUP_INPUT, undefined, {optional: true});
     this._popupOrigin = this.trackPopupOrigin();
     this._cssClass.set(Arrays.coerce(this._options.cssClass));
-    this.size = new ɵWorkbenchPopupSize(this._options);
+    this.size = new ɵWorkbenchPopupSize();
     this.blockedBy = inject(WorkbenchDialogRegistry).top(this.id);
     this.attached = this.monitorHostElementAttached();
 
@@ -128,7 +124,6 @@ export class ɵWorkbenchPopup implements Popup, WorkbenchPopup, Blockable {
       providers: [
         {provide: ɵWorkbenchPopup, useValue: this},
         {provide: WorkbenchPopup, useExisting: ɵWorkbenchPopup},
-        {provide: Popup, useExisting: ɵWorkbenchPopup},
         {provide: WORKBENCH_ELEMENT, useExisting: ɵWorkbenchPopup},
         inject(WORKBENCH_POPUP_CONTEXT, {optional: true}) ?? [],
         this._options.providers ?? [],
@@ -357,16 +352,6 @@ export class ɵWorkbenchPopup implements Popup, WorkbenchPopup, Blockable {
     untracked(() => this._cssClass.set(new Array<string>().concat(this._options.cssClass ?? []).concat(cssClass)));
   }
 
-  // TODO [Angular 22] Remove with Angular 22. Used for backward compatiblity.
-  public set cssClasses(cssClasses: string[]) {
-    this.cssClass = cssClasses;
-  }
-
-  // TODO [Angular 22] Remove with Angular 22. Used for backward compatiblity.
-  public get cssClasses(): string[] {
-    return this.cssClass();
-  }
-
   /**
    * Inputs passed to the popup.
    */
@@ -388,22 +373,12 @@ export class ɵWorkbenchPopup implements Popup, WorkbenchPopup, Blockable {
 /** @inheritDoc */
 class ɵWorkbenchPopupSize implements WorkbenchPopupSize {
 
-  private readonly _height: WritableSignal<string | undefined>;
-  private readonly _width: WritableSignal<string | undefined>;
-  private readonly _minHeight: WritableSignal<string | undefined>;
-  private readonly _maxHeight: WritableSignal<string | undefined>;
-  private readonly _minWidth: WritableSignal<string | undefined>;
-  private readonly _maxWidth: WritableSignal<string | undefined>;
-
-  constructor(options: WorkbenchPopupOptions) {
-    // Migrate deprecation analogous to `ɵWorkbenchDialogSize`.
-    this._height = signal<string | undefined>(options.size?.height);
-    this._width = signal<string | undefined>(options.size?.width);
-    this._minHeight = signal<string | undefined>(options.size?.minHeight);
-    this._maxHeight = signal<string | undefined>(options.size?.maxHeight);
-    this._minWidth = signal<string | undefined>(options.size?.minWidth);
-    this._maxWidth = signal<string | undefined>(options.size?.maxWidth);
-  }
+  private readonly _height = signal<string | undefined>(undefined);
+  private readonly _width = signal<string | undefined>(undefined);
+  private readonly _minHeight = signal<string | undefined>(undefined);
+  private readonly _maxHeight = signal<string | undefined>(undefined);
+  private readonly _minWidth = signal<string | undefined>(undefined);
+  private readonly _maxWidth = signal<string | undefined>(undefined);
 
   /** @inheritDoc */
   public get height(): Signal<string | undefined> {
@@ -516,8 +491,3 @@ function mapToPageCoordinates(origin: PopupOrigin, relativeTo: DOMRect): Point {
 function isEqualDomRect(a: DOMRect | undefined, b: DOMRect | undefined): boolean {
   return a?.top === b?.top && a?.right === b?.right && a?.bottom === b?.bottom && a?.left === b?.left;
 }
-
-/**
- * TODO [Angular 22] Remove with Angular 22. Used for backward compatiblity.
- */
-export const LEGACY_POPUP_INPUT = new InjectionToken<unknown>('LEGACY_POPUP_INPUT');

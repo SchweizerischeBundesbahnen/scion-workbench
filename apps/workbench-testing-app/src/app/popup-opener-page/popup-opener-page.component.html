@@ -64,11 +64,7 @@
 
     <!-- Inputs -->
     <sci-form-field label="Inputs">
-      @if (form.controls.legacyAPI.value) {
-        <input [formControl]="form.controls.options.controls.inputLegacy" class="e2e-input" placeholder="Data to pass to the popup component">
-      } @else {
-        <sci-key-value-field [keyValueFormArray]="form.controls.options.controls.inputs" [addable]="true" [removable]="true" class="e2e-inputs"/>
-      }
+      <sci-key-value-field [keyValueFormArray]="form.controls.options.controls.inputs" [addable]="true" [removable]="true" class="e2e-inputs"/>
     </sci-form-field>
 
     <!-- Context -->
@@ -127,12 +123,6 @@
       </sci-form-field>
     </ng-template>
   </sci-accordion>
-
-  <section>
-    <sci-form-field label="Legacy API">
-      <sci-checkbox [formControl]="form.controls.legacyAPI" class="e2e-legacy-api"/>
-    </sci-form-field>
-  </section>
 </form>
 
 <button (click)="onOpen()" [disabled]="form.invalid" class="open e2e-open" #open_button sci-primary>
