@@ -11,6 +11,5 @@
 export {MicrofrontendPlatformConfigLoader} from './microfrontend-platform-config-loader';
 export {WorkbenchPerspectiveData} from './microfrontend-perspective/workbench-perspective-data';
 export {provideMicrofrontendPlatformInitializer, type MicrofrontendPlatformInitializerOptions, MicrofrontendPlatformStartupPhase} from './microfrontend-platform-initializer';
-export {WORKBENCH_POPUP_REFERRER} from './microfrontend-popup/microfrontend-popup-intent-handler.interceptor';
 export * from './microfrontend-platform.config';
 export * from './microfrontend-host/public_api';

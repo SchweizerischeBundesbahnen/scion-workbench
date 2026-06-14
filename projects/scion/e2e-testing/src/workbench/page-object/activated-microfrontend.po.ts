@@ -9,11 +9,9 @@
  */
 
 import {Locator} from '@playwright/test';
-import {ViewId, WorkbenchPopupReferrer} from '@scion/workbench-client';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Params} from '@angular/router';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
-import {prune} from '../../helper/testing.util';
 import {parseTypedString} from '../../helper/typed-value.util';
 import {Capability} from '@scion/microfrontend-platform';
 
@@ -54,19 +52,6 @@ export class ActivatedMicrofrontendPO {
     await this.accordion.expand();
     try {
       return parseTypedString<string>(await this.accordion.itemLocator().locator('output.e2e-referrer').innerText())!;
-    }
-    finally {
-      await this.accordion.collapse();
-    }
-  }
-
-  public async getPopupLegacyReferrer(): Promise<WorkbenchPopupReferrer> {
-    await this.accordion.expand();
-    try {
-      return prune({
-        viewId: parseTypedString(await this.accordion.itemLocator().locator('output.e2e-popup-legacy-referrer-view-id').innerText()) as ViewId | undefined,
-        viewCapabilityId: parseTypedString(await this.accordion.itemLocator().locator('output.e2e-popup-legacy-referrer-view-capability-id').innerText()) as string | undefined,
-      });
     }
     finally {
       await this.accordion.collapse();

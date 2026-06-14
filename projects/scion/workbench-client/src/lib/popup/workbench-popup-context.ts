@@ -9,7 +9,6 @@
  */
 
 import {WorkbenchPopupCapability} from './workbench-popup-capability';
-import {WorkbenchPopupReferrer} from './workbench-popup-referrer';
 import {PopupId} from '../workbench.identifiers';
 
 /**
@@ -24,8 +23,6 @@ export interface ɵPopupContext {
   popupId: PopupId;
   params: Map<string, unknown>;
   capability: WorkbenchPopupCapability;
-  /** @deprecated since version 1.0.0-beta.34. No replacement. Marked for removal. */
-  referrer: WorkbenchPopupReferrer;
 }
 
 /**

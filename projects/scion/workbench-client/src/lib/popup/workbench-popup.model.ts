@@ -9,7 +9,6 @@
  */
 
 import {WorkbenchPopupCapability} from './workbench-popup-capability';
-import {WorkbenchPopupReferrer} from './workbench-popup-referrer';
 import {Observable} from 'rxjs';
 import {PopupId} from '../workbench.identifiers';
 
@@ -66,13 +65,6 @@ export abstract class WorkbenchPopup {
    * @see WorkbenchPopupCapability.properties.showSplash
    */
   public abstract signalReady(): void;
-
-  /**
-   * Provides information about the context in which this popup was opened.
-   *
-   * @deprecated since version 1.0.0-beta.34. Marked for removal. No replacement. Instead, add a parameter to the popup capability for the popup opener to pass required referrer information.
-   */
-  public abstract readonly referrer: WorkbenchPopupReferrer;
 
   /**
    * Sets a result that will be passed to the popup opener when the popup is closed on focus loss {@link CloseStrategy#onFocusLost}.
