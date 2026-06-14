@@ -146,9 +146,6 @@ export class AppPO {
     if (options?.mainAreaInitialPartId) {
       this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.MAIN_AREA_INITIAL_PART_ID, options.mainAreaInitialPartId);
     }
-    if (options?.preloadInactiveMicrofrontendViews) {
-      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.PRELOAD_INACTIVE_MICROFRONTEND_VIEWS, String(true));
-    }
     if (options?.logLevel) {
       this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.LOG_LEVEL, options.logLevel);
     }
@@ -621,12 +618,6 @@ export interface Options {
    */
   logLevel?: 'debug' | 'info' | 'warn' | 'error';
   /**
-   * Controls whether to preload inactive microfrontend views not defining the `lazy` property to maintain compatibility with applications setting view titles and headings in view microfrontends. Defaults to `false`.
-   *
-   * @deprecated since version 20.0.0-beta.6. Introduced in 20.0.0-beta.6 to maintain compatibility with applications setting view titles and headings in view microfrontends. API will be removed in version 22.
-   */
-  preloadInactiveMicrofrontendViews?: true;
-  /**
    * Enables zone change detection in client app 1 if true. Defaults to `false`.
    */
   zoneEnabled?: boolean;
@@ -694,11 +685,6 @@ export enum WorkbenchStartupQueryParams {
    * Query param to set the log level of the SCION Workbench.
    */
   LOG_LEVEL = 'logLevel',
-
-  /**
-   * Query param to control whether to preload inactive microfrontend views not defining the `lazy` property.
-   */
-  PRELOAD_INACTIVE_MICROFRONTEND_VIEWS = 'preloadInactiveMicrofrontendViews',
 
   /**
    * Query param to enable zone change detection for app1.
