@@ -46,6 +46,7 @@ import {CdkTrapFocus} from '@angular/cdk/a11y';
     '[style.height]': 'form.controls.componentSize.controls.height.value',
     '[style.width]': 'form.controls.componentSize.controls.width.value',
     '[attr.data-component-instance-id]': `uuid`,
+    '[attr.data-referrer]': 'dialog.referrer.appSymbolicName',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

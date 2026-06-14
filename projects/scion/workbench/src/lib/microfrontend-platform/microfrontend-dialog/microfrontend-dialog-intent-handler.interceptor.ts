@@ -80,7 +80,7 @@ export class MicrofrontendDialogIntentHandler implements IntentInterceptor {
     this._logger.debug(() => 'Handling microfrontend dialog intent', LoggerNames.MICROFRONTEND, command);
 
     return this._dialogService.open(isHostProvider ? MicrofrontendHostComponent : MicrofrontendDialogComponent, prune({
-      inputs: isHostProvider ? {} : {capability, params},
+      inputs: isHostProvider ? {} : {capability, params, referrer},
       providers: isHostProvider ? [provideActivatedMicrofrontend(capability, params, referrer)] : undefined,
       modality: command.modality,
       context: command.context,
