@@ -19,6 +19,7 @@ import {WorkbenchDialogCapability} from './workbench-dialog-capability';
 import {decorateObservable} from '../observable-decorator';
 import {DialogId} from '../workbench.identifiers';
 import {Translatable} from '../text/workbench-text-provider.model';
+import {Referrer} from '../workbench.model';
 
 /**
  * @ignore
@@ -31,12 +32,14 @@ export class ɵWorkbenchDialog implements WorkbenchDialog {
   public readonly id: DialogId;
   public readonly capability: WorkbenchDialogCapability;
   public readonly params: Map<string, unknown>;
+  public readonly referrer: Referrer;
   public readonly focused$: Observable<boolean>;
 
-  constructor(private _context: ɵDialogContext) {
-    this.id = this._context.dialogId;
-    this.capability = this._context.capability;
-    this.params = this._context.params;
+  constructor(context: ɵDialogContext) {
+    this.id = context.dialogId;
+    this.capability = context.capability;
+    this.params = context.params;
+    this.referrer = context.referrer;
     this.focused$ = Beans.get(MessageClient).observe$<boolean>(ɵWorkbenchCommands.dialogFocusedTopic(this.id))
       .pipe(
         mapToBody(),
@@ -49,7 +52,7 @@ export class ɵWorkbenchDialog implements WorkbenchDialog {
    * @inheritDoc
    */
   public setTitle(title: Translatable): void {
-    void Beans.get(MessageClient).publish(ɵWorkbenchCommands.dialogTitleTopic(this._context.dialogId), title);
+    void Beans.get(MessageClient).publish(ɵWorkbenchCommands.dialogTitleTopic(this.id), title);
   }
 
   /**
@@ -59,10 +62,10 @@ export class ɵWorkbenchDialog implements WorkbenchDialog {
     this._destroy$.next();
     if (result instanceof Error) {
       const headers = new Map().set(ɵWorkbenchDialogMessageHeaders.CLOSE_WITH_ERROR, true);
-      void Beans.get(MessageClient).publish(ɵWorkbenchCommands.dialogCloseTopic(this._context.dialogId), result.message, {headers});
+      void Beans.get(MessageClient).publish(ɵWorkbenchCommands.dialogCloseTopic(this.id), result.message, {headers});
     }
     else {
-      void Beans.get(MessageClient).publish(ɵWorkbenchCommands.dialogCloseTopic(this._context.dialogId), result);
+      void Beans.get(MessageClient).publish(ɵWorkbenchCommands.dialogCloseTopic(this.id), result);
     }
   }
 

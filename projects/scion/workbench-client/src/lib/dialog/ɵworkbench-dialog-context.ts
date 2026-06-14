@@ -10,6 +10,7 @@
 
 import {WorkbenchDialogCapability} from './workbench-dialog-capability';
 import {DialogId} from '../workbench.identifiers';
+import {Referrer} from '../workbench.model';
 
 /**
  * Context when displaying a microfrontend in a dialog.
@@ -23,6 +24,7 @@ export interface ɵDialogContext {
   dialogId: DialogId;
   capability: WorkbenchDialogCapability;
   params: Map<string, unknown>;
+  referrer: Referrer;
 }
 
 /**

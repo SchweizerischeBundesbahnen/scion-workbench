@@ -41,6 +41,7 @@ export class MicrofrontendDialogComponent {
 
   public readonly capability = input.required<WorkbenchDialogCapability>();
   public readonly params = input.required<Map<string, unknown>>();
+  public readonly referrer = input.required<string>();
 
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _outletRouter = inject(OutletRouter);
@@ -108,6 +109,7 @@ export class MicrofrontendDialogComponent {
         dialogId: this.dialog.id,
         capability: this.capability(),
         params: this.params(),
+        referrer: {appSymbolicName: this.referrer()},
       };
       const routerOutletElement = this._routerOutletElement().nativeElement;
 

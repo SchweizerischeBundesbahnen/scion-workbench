@@ -23,6 +23,7 @@ import {FocusTestPagePO} from '../page-object/test-pages/focus-test-page.po';
 import {PopupOpenerPagePO} from '../page-object/popup-opener-page.po';
 import {canMatchWorkbenchDialogCapability, canMatchWorkbenchPartCapability, canMatchWorkbenchPopupCapability} from '../../workbench/page-object/layout-page/register-route-page.po';
 import {NotificationOpenerPagePO} from '../page-object/notification-opener-page.po';
+import {WorkbenchDialogCapability} from '../page-object/register-workbench-capability-page.po';
 
 test.describe('Workbench Dialog', () => {
 
@@ -2173,6 +2174,34 @@ test.describe('Workbench Dialog', () => {
         const dialogSize = await dialog.getBoundingBox('dialog');
         expect(pageSize.width).toBeLessThan(dialogSize.width - dialogBorder);
       }).toPass();
+    });
+  });
+
+  test.describe('Referrer', () => {
+
+    test('should have referrer', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability<WorkbenchDialogCapability>('app2', {
+        type: 'dialog',
+        qualifier: {component: 'testee', app: 'app2'},
+        private: false,
+        properties: {
+          path: 'test-dialog',
+          size: {height: '500px', width: '300px'},
+        },
+      });
+      await microfrontendNavigator.registerIntention('app1', {type: 'dialog', qualifier: {component: 'testee', app: 'app2'}});
+
+      // Open dialog of app2 from app1.
+      const dialogOpenerPage = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+      await dialogOpenerPage.open({component: 'testee', app: 'app2'}, {cssClass: 'testee'});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(dialog);
+
+      await expectDialog(dialogPage).toBeVisible();
+      await expect.poll(() => dialogPage.getReferrer()).toEqual('workbench-client-testing-app1');
     });
   });
 });

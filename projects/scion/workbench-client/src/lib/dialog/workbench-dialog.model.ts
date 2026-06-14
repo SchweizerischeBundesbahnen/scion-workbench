@@ -12,6 +12,7 @@ import {WorkbenchDialogCapability} from './workbench-dialog-capability';
 import {Observable} from 'rxjs';
 import {DialogId} from '../workbench.identifiers';
 import {Translatable} from '../text/workbench-text-provider.model';
+import {Referrer} from '../workbench.model';
 
 /**
  * Handle to interact with a dialog opened via {@link WorkbenchDialogService}.
@@ -39,6 +40,11 @@ export abstract class WorkbenchDialog {
    * Parameters passed to the microfrontend loaded into the dialog.
    */
   public abstract readonly params: Map<string, unknown>;
+
+  /**
+   * Identifies the source context from which the dialog was opened.
+   */
+  public abstract readonly referrer: Referrer;
 
   /**
    * Sets the title of the dialog.

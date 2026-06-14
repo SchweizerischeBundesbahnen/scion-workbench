@@ -35,6 +35,10 @@ export class DialogPagePO implements MicrofrontendDialogPagePO {
     this._hasFocusLocator = this.outlet.frameLocator.locator('app-root[data-focus]');
   }
 
+  public async getReferrer(): Promise<string | null> {
+    return this.locator.getAttribute('data-referrer');
+  }
+
   public async enterTitle(title: Translatable): Promise<void> {
     await this.locator.locator('input.e2e-title').fill(title);
   }
