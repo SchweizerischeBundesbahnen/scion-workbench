@@ -2352,7 +2352,7 @@ describe('WorkbenchLayout Component', () => {
     );
     await waitUntilStable();
 
-    // Enter transient states.
+    // Enter component states.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.1'));
     await waitUntilStable();
     enterComponentState(fixture, 'view.1', 'A');
@@ -2461,7 +2461,7 @@ describe('WorkbenchLayout Component', () => {
     );
     await waitUntilStable();
 
-    // Enter transient states.
+    // Enter component states.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.1'));
     await waitUntilStable();
     enterComponentState(fixture, 'view.1', 'A');
@@ -2567,7 +2567,7 @@ describe('WorkbenchLayout Component', () => {
     );
     await waitUntilStable();
 
-    // Enter transient states.
+    // Enter component states.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.1'));
     await waitUntilStable();
     enterComponentState(fixture, 'view.1', 'A');
@@ -2871,7 +2871,7 @@ describe('WorkbenchLayout Component', () => {
     );
     await waitUntilStable();
 
-    // Enter transient states.
+    // Enter component states.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.1'));
     await waitUntilStable();
     enterComponentState(fixture, 'view.1', 'A');
@@ -3018,7 +3018,7 @@ describe('WorkbenchLayout Component', () => {
     );
     await waitUntilStable();
 
-    // Enter transient states.
+    // Enter component states.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.1'));
     await waitUntilStable();
     enterComponentState(fixture, 'view.1', 'A');
@@ -3163,7 +3163,7 @@ describe('WorkbenchLayout Component', () => {
     );
     await waitUntilStable();
 
-    // Enter transient states.
+    // Enter component states.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.1'));
     await waitUntilStable();
     enterComponentState(fixture, 'view.1', 'A');

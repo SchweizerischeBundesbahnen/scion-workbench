@@ -12,7 +12,7 @@ import {coerceArray, rejectWhenAttached, toMatrixNotation, waitUntilAttached} fr
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
-import {DockingArea, RelativeTo, ViewParamDefinition, WorkbenchDialogCapability as _WorkbenchDialogCapability, WorkbenchMessageBoxCapability as _WorkbenchMessageBoxCapability, WorkbenchNotificationCapability as _WorkbenchNotificationCapability, WorkbenchPartCapability as _WorkbenchPartCapability, WorkbenchPartRef, WorkbenchPerspectiveCapability as _WorkbenchPerspectiveCapability, WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability} from '@scion/workbench-client';
+import {DockingArea, RelativeTo, WorkbenchDialogCapability as _WorkbenchDialogCapability, WorkbenchMessageBoxCapability as _WorkbenchMessageBoxCapability, WorkbenchNotificationCapability as _WorkbenchNotificationCapability, WorkbenchPartCapability as _WorkbenchPartCapability, WorkbenchPartRef, WorkbenchPerspectiveCapability as _WorkbenchPerspectiveCapability, WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability} from '@scion/workbench-client';
 import {ActivatorCapability as _ActivatorCapability, Capability, Qualifier} from '@scion/microfrontend-platform';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO, WorkbenchViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
@@ -127,11 +127,6 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
       if (typeof param.deprecated === 'object') {
         await paramsLocator.locator('input.e2e-deprecated-message').nth(paramIndex).fill(param.deprecated.message ?? '');
         await paramsLocator.locator('input.e2e-deprecated-use-instead').nth(paramIndex).fill(param.deprecated.useInstead ?? '');
-      }
-
-      const transient = (param as ViewParamDefinition).transient;
-      if (transient !== undefined) {
-        await new SciCheckboxPO(paramsLocator.locator('sci-checkbox.e2e-transient').nth(paramIndex)).toggle(transient);
       }
     }
   }
