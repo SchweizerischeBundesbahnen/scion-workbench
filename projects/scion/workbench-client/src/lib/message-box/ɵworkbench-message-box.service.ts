@@ -45,11 +45,7 @@ export class ɵWorkbenchMessageBoxService implements WorkbenchMessageBoxService 
       modality: options?.modality,
       contentSelectable: options?.contentSelectable,
       cssClass: options?.cssClass,
-      context: (() => {
-        // TODO [Angular 22] Remove backward compatiblity.
-        const context = options?.context && (typeof options.context === 'object' ? options.context.viewId : options.context);
-        return Defined.orElse(context, this._context);
-      })(),
+      context: Defined.orElse(options?.context, this._context),
     };
 
     const action$ = Beans.get(IntentClient).request$<string>(intent, command)

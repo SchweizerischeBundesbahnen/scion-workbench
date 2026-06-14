@@ -49,7 +49,7 @@ export default class DialogOpenerPageComponent {
     component: this._formBuilder.control('dialog-page', Validators.required),
     options: this._formBuilder.group({
       inputs: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
-      modality: this._formBuilder.control<'' | 'none' | 'context' | 'application' | 'view'>(''),
+      modality: this._formBuilder.control<'' | 'none' | 'context' | 'application'>(''),
       context: this._formBuilder.control<ViewId | PartId | DialogId | PopupId | NotificationId | '<null>' | ''>(''),
       cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
       animate: this._formBuilder.control(undefined),

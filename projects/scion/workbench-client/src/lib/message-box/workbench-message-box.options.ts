@@ -60,9 +60,8 @@ export interface WorkbenchMessageBoxOptions {
    * - 'none': Non-blocking message box.
    * - `context`: Blocks a specific part of the application, as specified in {@link context}, defaulting to the calling context.
    * - `application`: Blocks the workbench or browser viewport, based on global workbench settings.
-   * - `view`: Deprecated. Same as `context`. Marked for removal.
    */
-  modality?: 'none' | 'context' | 'application' | ViewModality;
+  modality?: 'none' | 'context' | 'application';
 
   /**
    * Binds the message box to a context (e.g., part or view). Defaults to the calling context.
@@ -72,7 +71,7 @@ export interface WorkbenchMessageBoxOptions {
    *
    * Set to `null` to open the message box outside a context.
    */
-  context?: ViewId | PartId | DialogId | PopupId | NotificationId | Context | null;
+  context?: ViewId | PartId | DialogId | PopupId | NotificationId | null;
 
   /**
    * Specifies if the user can select text displayed in the message box. Defaults to `false`.
@@ -90,19 +89,4 @@ export interface WorkbenchMessageBoxOptions {
    * Specifies CSS class(es) to add to the message box, e.g., to locate the message box in tests.
    */
   cssClass?: string | string[];
-}
-
-/**
- * @deprecated since version 1.0.0-beta.34. Renamed to `context`. Marked for removal.
- */
-type ViewModality = 'view';
-
-/**
- * @deprecated since version 1.0.0-beta.34. Set view id directly. Migrate `{context: {viewId: 'view.x'}}` to `{context: 'view.x'}`. Marked for removal.
- */
-interface Context {
-  /**
-   * @deprecated since version 1.0.0-beta.34. Set view id directly. Migrate `{context: {viewId: 'view.x'}}` to `{context: 'view.x'}`. Marked for removal.
-   */
-  viewId?: ViewId | null;
 }

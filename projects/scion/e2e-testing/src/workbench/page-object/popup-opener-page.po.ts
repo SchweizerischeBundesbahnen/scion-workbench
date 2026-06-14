@@ -73,8 +73,7 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO, WorkbenchDialogPa
     await inputsField.addEntries(options.inputs ?? {});
 
     // Enter context.
-    const context = options.context && (typeof options.context === 'object' ? options.context.viewId : options.context);
-    await this.locator.locator('input.e2e-context').fill(context || (context === null ? '<null>' : '<undefined>'));
+    await this.locator.locator('input.e2e-context').fill(options.context || (options.context === null ? '<null>' : '<undefined>'));
 
     // Enter CSS class.
     await this.locator.locator('input.e2e-class').fill(coerceArray(options.cssClass).join(' '));

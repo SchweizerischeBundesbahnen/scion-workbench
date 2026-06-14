@@ -66,7 +66,7 @@ export interface WorkbenchPopupOptions {
    *
    * Set to `null` to open the popup outside a context.
    */
-  context?: ViewId | PartId | DialogId | PopupId | NotificationId | Context | null;
+  context?: ViewId | PartId | DialogId | PopupId | NotificationId | null;
 
   /**
    * Specifies the injector for the instantiation of the popup, giving control over the objects available
@@ -114,14 +114,4 @@ export interface CloseStrategy {
    * No return value will be returned to the popup opener.
    */
   onEscape?: boolean;
-}
-
-/**
- * @deprecated since version 20.0.0-beta.9. Set view id directly. Migrate `{context: {viewId: 'view.x'}}` to `{context: 'view.x'}`. Marked for removal in version 22.
- */
-interface Context {
-  /**
-   * @deprecated since version 20.0.0-beta.9. Set view id directly. Migrate `{context: {viewId: 'view.x'}}` to `{context: 'view.x'}`. Marked for removal in version 22.
-   */
-  viewId?: ViewId | null;
 }

@@ -127,12 +127,11 @@ export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
    * Returns information about the context in which a popup was opened.
    */
   private getReferrer(command: ɵWorkbenchPopupCommand): WorkbenchPopupReferrer {
-    const context = command.context && (typeof command.context === 'object' ? command.context.viewId : command.context);
-    if (!isViewId(context)) {
+    if (!isViewId(command.context)) {
       return {};
     }
 
-    const view = this._viewRegistry.get(context);
+    const view = this._viewRegistry.get(command.context);
     return {
       viewId: view.id,
       viewCapabilityId: (() => {

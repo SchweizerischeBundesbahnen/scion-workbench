@@ -24,15 +24,5 @@ export interface ɵWorkbenchPopupCommand {
     onEscape?: boolean;
   };
   cssClass?: string | string[];
-  context?: ViewId | PartId | DialogId | PopupId | NotificationId | Context | null;
-}
-
-/**
- * @deprecated since version 1.0.0-beta.34. Set view id directly. Migrate `{context: {viewId: 'view.x'}}` to `{context: 'view.x'}`. Marked for removal.
- */
-interface Context {
-  /**
-   * @deprecated since version 1.0.0-beta.34. Set view id directly. Migrate `{context: {viewId: 'view.x'}}` to `{context: 'view.x'}`. Marked for removal.
-   */
-  viewId?: ViewId | null;
+  context?: ViewId | PartId | DialogId | PopupId | NotificationId | null;
 }

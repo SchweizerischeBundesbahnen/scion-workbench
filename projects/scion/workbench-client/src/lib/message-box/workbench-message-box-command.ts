@@ -21,25 +21,10 @@ export interface ɵWorkbenchMessageBoxCommand {
   title?: Translatable;
   actions?: {[key: string]: Translatable};
   severity?: 'info' | 'warn' | 'error';
-  modality?: 'none' | 'context' | 'application' | ViewModality;
+  modality?: 'none' | 'context' | 'application';
   contentSelectable?: boolean;
   cssClass?: string | string[];
-  context?: ViewId | PartId | DialogId | PopupId | NotificationId | Context | null;
-}
-
-/**
- * @deprecated since version 1.0.0-beta.34. Renamed to `context`. Marked for removal.
- */
-type ViewModality = 'view';
-
-/**
- * @deprecated since version 1.0.0-beta.34. Set view id directly. Migrate `{context: {viewId: 'view.x'}}` to `{context: 'view.x'}`. Marked for removal.
- */
-interface Context {
-  /**
-   * @deprecated since version 1.0.0-beta.34. Set view id directly. Migrate `{context: {viewId: 'view.x'}}` to `{context: 'view.x'}`. Marked for removal.
-   */
-  viewId?: ViewId | null;
+  context?: ViewId | PartId | DialogId | PopupId | NotificationId | null;
 }
 
 /**

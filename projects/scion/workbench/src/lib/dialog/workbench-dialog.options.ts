@@ -35,7 +35,7 @@ export interface WorkbenchDialogOptions {
    * - `application`: Blocks the workbench or browser viewport, based on {@link WorkbenchConfig.dialog.modalityScope}.
    * - `view`: Deprecated. Same as `context`. Will be removed in version 22.
    */
-  modality?: 'none' | 'context' | 'application' | ViewModality;
+  modality?: 'none' | 'context' | 'application';
 
   /**
    * Binds the dialog to a context (e.g., part or view). Defaults to the calling context.
@@ -45,7 +45,7 @@ export interface WorkbenchDialogOptions {
    *
    * Set to `null` to open the dialog outside a context.
    */
-  context?: ViewId | PartId | DialogId | PopupId | NotificationId | Context | null;
+  context?: ViewId | PartId | DialogId | PopupId | NotificationId | null;
 
   /**
    * Specifies the injector for the instantiation of the dialog, giving control over the objects available
@@ -79,19 +79,4 @@ export interface WorkbenchDialogOptions {
    * Controls whether to animate the opening of the dialog. Defaults to `false`.
    */
   animate?: boolean;
-}
-
-/**
- * @deprecated since version 20.0.0-beta.9. Renamed to `context`. Will be removed in version 22.
- */
-type ViewModality = 'view';
-
-/**
- * @deprecated since version 20.0.0-beta.9. Set view id directly. Migrate `{context: {viewId: 'view.x'}}` to `{context: 'view.x'}`. Marked for removal in version 22.
- */
-interface Context {
-  /**
-   * @deprecated since version 20.0.0-beta.9. Set view id directly. Migrate `{context: {viewId: 'view.x'}}` to `{context: 'view.x'}`. Marked for removal in version 22.
-   */
-  viewId?: ViewId | null;
 }
