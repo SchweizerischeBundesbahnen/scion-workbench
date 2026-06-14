@@ -12,7 +12,6 @@ export {type WorkbenchNotificationCapability, type WorkbenchNotificationSize} fr
 export {WorkbenchNotificationService} from './workbench-notification.service';
 export {type WorkbenchNotificationOptions} from './workbench-notification.options';
 export {ɵWorkbenchNotificationService} from './ɵworkbench-notification.service';
-export {type WorkbenchNotificationConfig} from './workbench-notification.config';
 export {type ɵWorkbenchNotificationCommand, eNOTIFICATION_MESSAGE_PARAM} from './workbench-notification-command';
 export {type ɵNotificationContext, ɵNOTIFICATION_CONTEXT} from './ɵworkbench-notification-context';
 export {WorkbenchNotification} from './workbench-notification.model';

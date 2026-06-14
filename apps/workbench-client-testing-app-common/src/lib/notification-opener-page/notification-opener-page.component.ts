@@ -10,11 +10,10 @@
 
 import {ChangeDetectionStrategy, Component, computed, inject, signal, Signal} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {Translatable, WORKBENCH_ELEMENT, WorkbenchElement, WorkbenchNotificationConfig, WorkbenchNotificationOptions, WorkbenchNotificationService} from '@scion/workbench-client';
+import {Translatable, WORKBENCH_ELEMENT, WorkbenchElement, WorkbenchNotificationOptions, WorkbenchNotificationService} from '@scion/workbench-client';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {UUID} from '@scion/toolkit/uuid';
-import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {MultiValueInputComponent, parseTypedString, prune, stringifyError} from 'workbench-testing-app-common';
 import {Beans} from '@scion/toolkit/bean-manager';
@@ -28,7 +27,6 @@ import {Beans} from '@scion/toolkit/bean-manager';
     SciFormFieldComponent,
     SciKeyValueFieldComponent,
     MultiValueInputComponent,
-    SciCheckboxComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -57,11 +55,6 @@ export class NotificationOpenerPageComponent {
       group: this._formBuilder.control(''),
       cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
     }),
-    // TODO [Angular 22] Remove backward compatiblity.
-    legacyAPI: this._formBuilder.group({
-      enabled: this._formBuilder.control(false),
-      textAsConfig: this._formBuilder.control(false),
-    }),
     count: this._formBuilder.control(1),
   });
 
@@ -87,22 +80,12 @@ export class NotificationOpenerPageComponent {
 
     const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier) ?? undefined;
     try {
-      if (this.form.controls.legacyAPI.controls.enabled.value) {
-        if (this.form.controls.legacyAPI.controls.textAsConfig.value) {
-          await this._notificationService.show(this.readConfig(options), qualifier);
-        }
-        else {
-          await this._notificationService.show(restoreLineBreaks(this.form.controls.text.value) || '', qualifier);
-        }
+      if (qualifier) {
+        await this._notificationService.show(qualifier, this.readOptions(options));
       }
       else {
-        if (qualifier) {
-          await this._notificationService.show(qualifier, this.readOptions(options));
-        }
-        else {
-          const message = parseTypedString<Translatable>(restoreLineBreaks(this.form.controls.text.value)) ?? null;
-          await this._notificationService.show(message, this.readOptions(options));
-        }
+        const message = parseTypedString<Translatable>(restoreLineBreaks(this.form.controls.text.value)) ?? null;
+        await this._notificationService.show(message, this.readOptions(options));
       }
     }
     catch (error) {
@@ -118,23 +101,6 @@ export class NotificationOpenerPageComponent {
     const cssClass = Array.isArray(formOptions.cssClass.value) ? formOptions.cssClass.value : [formOptions.cssClass.value ?? ''];
     return prune({
       title: restoreLineBreaks(formOptions.title.value) || undefined,
-      params: SciKeyValueFieldComponent.toDictionary(formOptions.params) ?? undefined,
-      severity: formOptions.severity.value || undefined,
-      duration: this.readDurationFromUI(),
-      group: formOptions.group.value || undefined,
-      cssClass: cssClass.concat(options?.index !== undefined ? `notification-${options.index}` : ''),
-    });
-  }
-
-  /**
-   * Reads config from the UI.
-   */
-  private readConfig(options?: {index?: number}): WorkbenchNotificationConfig {
-    const formOptions = this.form.controls.options.controls;
-    const cssClass = Array.isArray(formOptions.cssClass.value) ? formOptions.cssClass.value : [formOptions.cssClass.value ?? ''];
-    return prune({
-      title: restoreLineBreaks(formOptions.title.value) || undefined,
-      content: restoreLineBreaks(this.form.controls.text.value) || undefined,
       params: SciKeyValueFieldComponent.toDictionary(formOptions.params) ?? undefined,
       severity: formOptions.severity.value || undefined,
       duration: this.readDurationFromUI(),

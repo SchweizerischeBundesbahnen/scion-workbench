@@ -8,9 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {Notification} from './notification';
-export {type NotificationConfig} from './notification.config';
-export {NotificationService} from './notification.service';
 export {WorkbenchNotification} from './workbench-notification.model';
 export {type WorkbenchNotificationOptions} from './workbench-notification.options';
 export {WorkbenchNotificationService} from './workbench-notification.service';

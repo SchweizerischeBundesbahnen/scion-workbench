@@ -9,11 +9,10 @@
  */
 
 import {Intent, IntentClient, Qualifier, RequestError} from '@scion/microfrontend-platform';
-import {WorkbenchNotificationConfig} from './workbench-notification.config';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {Maps} from '@scion/toolkit/util';
-import {firstValueFrom, lastValueFrom} from 'rxjs';
+import {firstValueFrom} from 'rxjs';
 import {Translatable} from '../text/workbench-text-provider.model';
 import {WorkbenchNotificationService} from './workbench-notification.service';
 import {WorkbenchNotificationOptions} from './workbench-notification.options';
@@ -26,27 +25,9 @@ import {eNOTIFICATION_MESSAGE_PARAM, ɵWorkbenchNotificationCommand} from './wor
 export class ɵWorkbenchNotificationService implements WorkbenchNotificationService {
 
   /** @inheritDoc */
-  public show(message: Translatable, options?: WorkbenchNotificationOptions): Promise<void>;
-  public show(qualifier: Qualifier, options?: WorkbenchNotificationOptions): Promise<void>;
-  public show(notification: WorkbenchNotificationConfig, qualifier?: Qualifier): Promise<void>;
-  // TODO [Angular 22] Remove backward compatiblity. Replace content with content of `showNotification`
-  public show(arg1: Translatable | Qualifier | WorkbenchNotificationConfig | null, arg2?: WorkbenchNotificationOptions | Qualifier): Promise<void> {
-    // New API to open built-in text notification.
-    if (typeof arg1 === 'string' || arg1 === null) {
-      return this.showNotification(arg1, arg2);
-    }
-
-    // Legacy API.
-    const config = arg1 as unknown as Partial<WorkbenchNotificationConfig>;
-    if (!Object.keys(config).length || config.title || config.content || config.params || config.severity || config.duration || config.group || config.cssClass) {
-      return this.showNotificationLegacy(arg1, arg2 as Qualifier | undefined);
-    }
-
-    // New API to open custom host notification.
-    return this.showNotification(arg1 as Qualifier, arg2 as WorkbenchNotificationOptions | undefined);
-  }
-
-  private async showNotification(message: Translatable | Qualifier | null, options?: WorkbenchNotificationOptions): Promise<void> {
+  public async show(message: Translatable, options?: WorkbenchNotificationOptions): Promise<void>;
+  public async show(qualifier: Qualifier, options?: WorkbenchNotificationOptions): Promise<void>;
+  public async show(message: Translatable | Qualifier | null, options?: WorkbenchNotificationOptions): Promise<void> {
     const intent = ((): Intent => {
       if (typeof message === 'string' || message === null) {
         return {type: WorkbenchCapabilities.Notification, qualifier: {}, params: new Map().set(eNOTIFICATION_MESSAGE_PARAM, message ?? undefined)};
@@ -65,19 +46,6 @@ export class ɵWorkbenchNotificationService implements WorkbenchNotificationServ
 
     try {
       await firstValueFrom(Beans.get(IntentClient).request$<void>(intent, command), {defaultValue: undefined});
-    }
-    catch (error) {
-      throw (error instanceof RequestError ? error.message : error);
-    }
-  }
-
-  private async showNotificationLegacy(notification: Translatable | WorkbenchNotificationConfig, qualifier?: Qualifier): Promise<void> {
-    const config: WorkbenchNotificationConfig = typeof notification === 'string' ? {content: notification} : notification;
-    const params = Maps.coerce(config.params);
-
-    const showNotification$ = Beans.get(IntentClient).request$<void>({type: WorkbenchCapabilities.Notification, qualifier, params}, config);
-    try {
-      await lastValueFrom(showNotification$, {defaultValue: undefined});
     }
     catch (error) {
       throw (error instanceof RequestError ? error.message : error);

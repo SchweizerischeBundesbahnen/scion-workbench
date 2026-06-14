@@ -10,7 +10,7 @@
 
 import {inject, Injectable, Provider} from '@angular/core';
 import {Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
-import {eNOTIFICATION_MESSAGE_PARAM, WorkbenchCapabilities, WorkbenchNotificationCapability, WorkbenchNotificationConfig, ɵWorkbenchNotificationCommand} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchNotificationCapability, ɵWorkbenchNotificationCommand} from '@scion/workbench-client';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Arrays} from '@scion/toolkit/util';
@@ -23,7 +23,6 @@ import {Microfrontends} from '../common/microfrontend.util';
 import {WorkbenchNotificationService} from '../../notification/workbench-notification.service';
 import {MicrofrontendHostNotification} from '../microfrontend-host-notification/microfrontend-host-notification.model';
 import {ɵWorkbenchNotification} from '../../notification/ɵworkbench-notification.model';
-import {TEXT_NOTIFICATION_CAPABILITY_IDENTITY, TEXT_NOTIFICATION_CAPABILITY_IDENTITY_PROPERTY} from '../microfrontend-host-notification/notification-text-message/notification-text-message.component';
 import {firstValueFrom} from 'rxjs';
 
 /**
@@ -46,7 +45,7 @@ export class MicrofrontendNotificationIntentHandler implements IntentInterceptor
     if (intentMessage.intent.type === WorkbenchCapabilities.Notification) {
       const replyTo = intentMessage.headers.get(MessageHeaders.ReplyTo) as string;
 
-      await this.showNotification(intentMessage as IntentMessage<ɵWorkbenchNotificationCommand | WorkbenchNotificationConfig>);
+      await this.showNotification(intentMessage as IntentMessage<ɵWorkbenchNotificationCommand>);
       void Beans.get(MessageClient).publish(replyTo, undefined, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)});
 
       // Do not continue the handler chain to swallow the intent.
@@ -59,19 +58,14 @@ export class MicrofrontendNotificationIntentHandler implements IntentInterceptor
   /**
    * Displays the microfrontend declared by the resolved capability in a notification.
    */
-  private async showNotification(intentMessage: IntentMessage<ɵWorkbenchNotificationCommand | WorkbenchNotificationConfig>): Promise<void> {
-    const command: ɵWorkbenchNotificationCommand | WorkbenchNotificationConfig = intentMessage.body!;
+  private async showNotification(intentMessage: IntentMessage<ɵWorkbenchNotificationCommand>): Promise<void> {
+    const command: ɵWorkbenchNotificationCommand = intentMessage.body!;
     const capability = intentMessage.capability as WorkbenchNotificationCapability;
     const capabilityId = capability.metadata!.id;
     const groupParamsReducer = capability.properties.groupParamsReducer;
     const params = intentMessage.intent.params ?? new Map<string, unknown>();
     const referrer = intentMessage.headers.get(MessageHeaders.AppSymbolicName) as string;
     const isHostProvider = Microfrontends.isHostProvider(capability);
-    const legacyTextNotification = isLegacyTextNotification(capability, intentMessage);
-
-    if (legacyTextNotification) {
-      params.set(eNOTIFICATION_MESSAGE_PARAM, (command as WorkbenchNotificationConfig).content);
-    }
 
     this._logger.debug(() => 'Handling microfrontend notification intent', LoggerNames.MICROFRONTEND, command);
     this._notificationService.show(isHostProvider ? MicrofrontendHostComponent : MicrofrontendNotificationComponent, prune({
@@ -79,7 +73,7 @@ export class MicrofrontendNotificationIntentHandler implements IntentInterceptor
       providers: isHostProvider ? [provideActivatedMicrofrontend(capability, params, referrer)] : undefined,
       title: createRemoteTranslatable(command.title, {appSymbolicName: referrer}),
       severity: command.severity,
-      duration: legacyTextNotification && typeof command.duration === 'number' ? command.duration * 1000 : command.duration,
+      duration: command.duration,
       group: command.group ? `${command.group}_${capabilityId}_${referrer}` : undefined, // Use distinct group name for different referrers and capabilities not to overwrite each other
       groupInputReduceFn: groupParamsReducer ? createParamsReducerFn(groupParamsReducer) : undefined,
       cssClass: Arrays.coerce(capability.properties.cssClass).concat(Arrays.coerce(command.cssClass)),
@@ -97,16 +91,6 @@ function createParamsReducerFn(reducerTopic: string): (prevInput: {[name: string
     const reducedParams = await firstValueFrom(Beans.get(MessageClient).request$<{[name: string]: unknown}>(reducerTopic, {prevParams, currParams}, {retain: true}));
     return {...currInput, params: new Map(Object.entries(reducedParams.body ?? currParams))};
   };
-}
-
-/**
- * Indicates whether the notification is opened by a legacy client.
- *
- * TODO [Angular 22] Remove with Angular 22. Used for backward compatiblity.
- */
-function isLegacyTextNotification(capability: WorkbenchNotificationCapability, intentMessage: IntentMessage): boolean {
-  const isTextMessage = capability.properties[TEXT_NOTIFICATION_CAPABILITY_IDENTITY_PROPERTY] === TEXT_NOTIFICATION_CAPABILITY_IDENTITY;
-  return isTextMessage && !intentMessage.intent.params?.has(eNOTIFICATION_MESSAGE_PARAM);
 }
 
 /**

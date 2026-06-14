@@ -9,7 +9,6 @@
  */
 
 import {Qualifier} from '@scion/microfrontend-platform';
-import {WorkbenchNotificationConfig} from './workbench-notification.config';
 import {Translatable} from '../text/workbench-text-provider.model';
 import {WorkbenchNotificationOptions} from './workbench-notification.options';
 
@@ -53,15 +52,4 @@ export abstract class WorkbenchNotificationService {
    * @see WorkbenchMessageBox
    */
   public abstract show(qualifier: Qualifier, options?: WorkbenchNotificationOptions): Promise<void>;
-
-  /**
-   * Displays the specified message as workbench notification.
-   *
-   * @param notification - Configures content and appearance of the notification.
-   * @param qualifier - Identifies the `notification` capability that provides the microfrontend to show as workbench notification.
-   * @returns Promise that resolves when the notification is displayed or that rejects if the intention is missing or no matching `notification` capability is found.
-   *
-   * @deprecated since version 1.0.0-beta.36. Pass text or qualifier as first argument. Marked for removal.
-   */
-  public abstract show(notification: WorkbenchNotificationConfig, qualifier?: Qualifier): Promise<void>;
 }
