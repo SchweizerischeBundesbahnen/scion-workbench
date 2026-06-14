@@ -18,6 +18,7 @@ import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {WorkbenchNotification} from './workbench-notification.model';
 import {ɵNotificationContext} from './ɵworkbench-notification-context';
 import {WorkbenchNotificationCapability} from './workbench-notification-capability';
+import {Referrer} from '../workbench.model';
 
 /**
  * @ignore
@@ -28,16 +29,16 @@ export class ɵWorkbenchNotification implements WorkbenchNotification, PreDestro
   public readonly id: NotificationId;
   public readonly capability: WorkbenchNotificationCapability;
   public readonly params: Map<string, unknown>;
-  public readonly referrer: WorkbenchNotification['referrer'];
+  public readonly referrer: Referrer;
   public readonly focused$: Observable<boolean>;
 
   private readonly _destroy$ = new Subject<void>();
 
-  constructor(private _context: ɵNotificationContext) {
-    this.id = this._context.notificationId;
-    this.capability = this._context.capability;
-    this.params = this._context.params;
-    this.referrer = this._context.referrer;
+  constructor(context: ɵNotificationContext) {
+    this.id = context.notificationId;
+    this.capability = context.capability;
+    this.params = context.params;
+    this.referrer = context.referrer;
     this.focused$ = Beans.get(MessageClient).observe$<boolean>(ɵWorkbenchCommands.notificationFocusedTopic(this.id))
       .pipe(
         mapToBody(),

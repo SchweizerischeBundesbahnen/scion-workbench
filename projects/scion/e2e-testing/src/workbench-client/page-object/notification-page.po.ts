@@ -30,6 +30,10 @@ export class NotificationPagePO {
     this.locator = this.outlet.frameLocator.locator('app-notification-page');
   }
 
+  public async getReferrer(): Promise<string | null> {
+    return this.locator.getAttribute('data-referrer');
+  }
+
   public async getNotificationCapability(): Promise<WorkbenchNotificationCapability> {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-notification-capability'));
     await accordion.expand();
