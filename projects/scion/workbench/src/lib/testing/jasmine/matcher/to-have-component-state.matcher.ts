@@ -24,7 +24,7 @@ export const toHaveComponentStateCustomMatcher: jasmine.CustomMatcherFactories =
         const viewComponent = TestBed.inject(WorkbenchViewRegistry).get(viewId).slot.portal.element()!;
         const actual = viewComponent.querySelector<HTMLOptionElement>('input.component-state')!.value;
         if (actual !== expected) {
-          return fail(`Expected transient state '${actual}' of view '${viewId}' to equal '${expected}'. Maybe, the component was not detached but destroyed during layout change.`);
+          return fail(`Expected component state '${actual}' of view '${viewId}' to equal '${expected}'. Maybe, the component was not detached but destroyed during layout change.`);
         }
         return pass();
 

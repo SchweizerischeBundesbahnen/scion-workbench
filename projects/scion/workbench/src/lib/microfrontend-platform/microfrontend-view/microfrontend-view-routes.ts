@@ -8,8 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {CanMatchFn, Params, Route} from '@angular/router';
-import {WorkbenchViewCapability} from '@scion/workbench-client';
+import {CanMatchFn, Route} from '@angular/router';
 import {EnvironmentProviders, inject, makeEnvironmentProviders, Provider} from '@angular/core';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {ViewId} from '../../workbench.identifiers';
@@ -30,28 +29,6 @@ import {Microfrontends} from '../common/microfrontend.util';
  * Hint passed to the navigation when navigating a microfrontend view.
  */
 export const MICROFRONTEND_VIEW_NAVIGATION_HINT = 'scion.workbench.microfrontend-view';
-
-/**
- * Key for associating transient parameters with the navigation state of a microfrontend view navigation.
- */
-export const MICROFRONTEND_VIEW_STATE_TRANSIENT_PARAMS = 'transientParams';
-
-/**
- * Splits given params into URL and transient params.
- */
-export function splitMicrofrontendViewParams(params: Params, capability: WorkbenchViewCapability): {params: Params; transientParams: Params} {
-  const transientParamNames = new Set(capability.params?.filter(param => param.transient).map(param => param.name));
-
-  return Object.entries(params).reduce((groups, [name, value]: [string, unknown]) => {
-    if (transientParamNames.has(name)) {
-      groups.transientParams[name] = value;
-    }
-    else {
-      groups.params[name] = value;
-    }
-    return groups;
-  }, {params: {} as Params, transientParams: {} as Params});
-}
 
 /**
  * Provides the route for integrating microfrontend views.

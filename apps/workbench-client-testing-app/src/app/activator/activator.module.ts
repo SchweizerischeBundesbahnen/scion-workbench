@@ -205,13 +205,6 @@ function provideViewCapability(app: 'app1' | 'app2'): WorkbenchViewCapability {
   return {
     type: WorkbenchCapabilities.View,
     qualifier: {component: 'view', app},
-    params: [
-      {
-        name: 'transientParam',
-        required: false,
-        transient: true,
-      },
-    ],
     description: 'View to interact with WorkbenchView handle',
     private: false,
     properties: {

@@ -23,7 +23,7 @@ import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {ViewMenuService} from '../../part/view-context-menu/view-menu.service';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {stringifyError} from '../../common/stringify-error.util';
-import {MICROFRONTEND_VIEW_NAVIGATION_HINT, MICROFRONTEND_VIEW_STATE_TRANSIENT_PARAMS, splitMicrofrontendViewParams} from './microfrontend-view-routes';
+import {MICROFRONTEND_VIEW_NAVIGATION_HINT} from './microfrontend-view-routes';
 import {NgComponentOutlet} from '@angular/common';
 import {ContentAsOverlayComponent, ContentAsOverlayConfig} from '../../content-projection/content-as-overlay.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -121,19 +121,15 @@ export class MicrofrontendViewComponent {
   private computeNavigationContext(): Signal<NavigationContext> {
     const manifestObjectCache = inject(ManifestObjectCache);
     const navigationData = computed(() => this.view.navigation()!.data as unknown as MicrofrontendViewNavigationData);
-    const transientParams = computed(() => this.view.navigation()!.state?.[MICROFRONTEND_VIEW_STATE_TRANSIENT_PARAMS] ?? {});
     const capability = manifestObjectCache.capability<WorkbenchViewCapability>(computed(() => navigationData().capabilityId));
 
     return linkedSignal({
-      source: () => ({navigationData: navigationData(), capability: capability(), transientParams: transientParams()}),
-      computation: ({navigationData, capability, transientParams}, previousNavigationContext) => ({
+      source: () => ({navigationData: navigationData(), capability: capability()}),
+      computation: ({navigationData, capability}, previousNavigationContext) => ({
         capabilityId: navigationData.capabilityId,
         capability: capability,
         prevCapability: previousNavigationContext?.value.capability,
-        params: Maps.coerce({
-          ...navigationData.params,
-          ...transientParams,
-        }),
+        params: Maps.coerce(navigationData.params),
         referrer: navigationData.referrer,
       }),
       equal: (a, b) => a.capability?.metadata!.id === b.capability?.metadata!.id && Objects.isEqual(a.params, b.params), // do not create new navigation context when navigating to the same capability with the same params
@@ -251,7 +247,7 @@ export class MicrofrontendViewComponent {
       .pipe(takeUntilDestroyed())
       .subscribe((request: TopicMessage<ɵViewParamsUpdateCommand>) => {
         const replyTo = request.headers.get(MessageHeaders.ReplyTo) as string;
-        const {capabilityId, referrer, capability} = this.navigationContext();
+        const {capabilityId, referrer} = this.navigationContext();
 
         // Ignore request if not target of this capability.
         if (request.params!.get('capabilityId') !== capabilityId) {
@@ -270,8 +266,7 @@ export class MicrofrontendViewComponent {
           const paramsHandling = request.body!.paramsHandling;
           const currentParams = Dictionaries.coerce(currentNavigationContext.params);
           const newParams = Dictionaries.coerce(request.body!.params);
-          const mergedParams = prune(paramsHandling === 'merge' ? {...currentParams, ...newParams} : newParams);
-          const {params, transientParams} = splitMicrofrontendViewParams(mergedParams, capability!);
+          const params = prune(paramsHandling === 'merge' ? {...currentParams, ...newParams} : newParams);
 
           return layout.navigateView(this.view.id, [], {
             hint: MICROFRONTEND_VIEW_NAVIGATION_HINT,
@@ -280,9 +275,6 @@ export class MicrofrontendViewComponent {
               params,
               referrer,
             } satisfies MicrofrontendViewNavigationData,
-            state: prune({
-              [MICROFRONTEND_VIEW_STATE_TRANSIENT_PARAMS]: Object.keys(transientParams).length ? transientParams : undefined,
-            }),
           });
         })
           .then(success => this._messageClient.publish(replyTo, success, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)}))

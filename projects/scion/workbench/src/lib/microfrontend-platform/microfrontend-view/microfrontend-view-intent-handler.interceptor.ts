@@ -12,7 +12,7 @@ import {Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders
 import {inject, Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchViewCapability, ɵWorkbenchNavigateCommand} from '@scion/workbench-client';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
-import {MICROFRONTEND_VIEW_NAVIGATION_HINT, MICROFRONTEND_VIEW_STATE_TRANSIENT_PARAMS, splitMicrofrontendViewParams} from './microfrontend-view-routes';
+import {MICROFRONTEND_VIEW_NAVIGATION_HINT} from './microfrontend-view-routes';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Dictionaries} from '@scion/toolkit/util';
@@ -54,11 +54,10 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
     const capability = message.capability as WorkbenchViewCapability;
     const command: ɵWorkbenchNavigateCommand = message.body ?? {};
 
-    const intentParams = prune(Dictionaries.coerce(message.intent.params));
-    const {params, transientParams} = splitMicrofrontendViewParams(intentParams, capability);
+    const params = prune(Dictionaries.coerce(message.intent.params));
     const targets = this.resolveTargets(message, command);
 
-    this._logger.debug(() => `Navigating to: ${capability.properties.path}`, LoggerNames.MICROFRONTEND_ROUTING, capability, params, transientParams);
+    this._logger.debug(() => `Navigating to: ${capability.properties.path}`, LoggerNames.MICROFRONTEND_ROUTING, capability, params);
     const navigations = await Promise.all(targets.map(target => {
       return this._workbenchRouter.navigate([], prune({
         target,
@@ -73,9 +72,6 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
           params,
           referrer: message.headers.get(MessageHeaders.AppSymbolicName) as string,
         } satisfies MicrofrontendViewNavigationData,
-        state: {
-          [MICROFRONTEND_VIEW_STATE_TRANSIENT_PARAMS]: Object.keys(transientParams).length ? transientParams : undefined,
-        },
       }));
     }));
     return navigations.every(Boolean);
