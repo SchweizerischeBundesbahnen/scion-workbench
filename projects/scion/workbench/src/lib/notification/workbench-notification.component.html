@@ -9,7 +9,7 @@
     {{(notification.slot.text | wbText)()}}
   } @else if (notification.slot.component) {
     <sci-viewport class="e2e-notification-slot">
-      <ng-container *ngComponentOutlet="notification.slot.component; inputs: notification.inputs | wbRemoveLegacyInput;"/>
+      <ng-container *ngComponentOutlet="notification.slot.component; inputs: notification.inputs;"/>
     </sci-viewport>
 
     <!-- Extra DIV to capture bounds available to slotted content, excluding viewport content padding. May differ from the actual content size if content overflows or does not fill the slot. -->

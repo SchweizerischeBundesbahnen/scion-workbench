@@ -6,7 +6,6 @@
         <option value="focus-test-page">FocusTestPageComponent</option>
         <option value="dialog-opener-page">DialogOpenerPageComponent</option>
         <option value="popup-opener-page">PopupOpenerPageComponent</option>
-        <option value="legacy-notification-page">LegacyNotificationPageComponent</option>
         <option value="workbench-handle-bounds-test-page">WorkbenchHandleBoundsTestPageComponent</option>
         <option value="">default</option>
       </select>
@@ -20,11 +19,7 @@
 
     @if (isUseComponent()) {
       <sci-form-field label="Inputs">
-        @if (form.controls.legacyAPI.value) {
-          <input [formControl]="form.controls.options.controls.inputLegacy" class="e2e-input" placeholder="Data to pass to the notification component">
-        } @else {
-          <sci-key-value-field [keyValueFormArray]="form.controls.options.controls.inputs" [addable]="true" [removable]="true" class="e2e-inputs"/>
-        }
+        <sci-key-value-field [keyValueFormArray]="form.controls.options.controls.inputs" [addable]="true" [removable]="true" class="e2e-inputs"/>
       </sci-form-field>
     }
   </section>
@@ -62,7 +57,6 @@
       <select [formControl]="form.controls.options.controls.groupInputReduceFn" class="e2e-group-input-reducer">
         <option value="concat-input-reducer">Input Concatenator</option>
         <option value="concat-input-async-reducer">Async Input Concatenator</option>
-        <option value="concat-input-legacy-reducer">Legacy Input Concatenator</option>
         <option value="">none</option>
       </select>
     </sci-form-field>
@@ -75,10 +69,6 @@
   <section>
     <sci-form-field label="Notification Count">
       <input [formControl]="form.controls.count" type="number" class="e2e-count">
-    </sci-form-field>
-
-    <sci-form-field label="Legacy API">
-      <sci-checkbox [formControl]="form.controls.legacyAPI" class="e2e-legacy-api"/>
     </sci-form-field>
   </section>
 </form>
