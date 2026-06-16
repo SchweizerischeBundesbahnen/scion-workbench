@@ -13,6 +13,7 @@
 * **workbench-client/popup:** remove deprecated Workbench Popup API ([0d63673](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/0d63673c4c283761c51dea50da897fb3f585d194))
 * **workbench-client/popup:** remove deprecated properties from `WorkbenchPopup` handle ([0b7f7e9](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/0b7f7e955bdad4c470c851e59a7155707885fd87))
 * **workbench-client/view:** remove support for deprecated transient parameters ([87a4cea](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/87a4ceaa6761afd8d057ea2e4cdacb672d02fc7b))
+* **workbench-client/perspective:** remove support for deprecated perspective definition ([06cd3f5](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/06cd3f53ec5106f3089eed6a8461e56fc6773194))
 
 ### BREAKING CHANGES
 
@@ -36,7 +37,9 @@
 
   To migrate, refer to the Deprecations section in the changelog of version [`1.0.0-beta.36` (2025-11-27)](https://github.com/SchweizerischeBundesbahnen/scion-workbench/blob/master/docs/site/changelog-workbench-client/changelog.md#100-beta36-2025-11-27).
 
+* **workbench-client/perspective:** Support for deprecated perspective definition has been removed. Parts must now be modeled as separate part capabilities and views referenced from part capabilities.
 
+  To migrate, refer to the Deprecations section in the changelog of version [`1.0.0-beta.34` (2025-11-11)](https://github.com/SchweizerischeBundesbahnen/scion-workbench/blob/master/docs/site/changelog-workbench-client/changelog.md#100-beta34-2025-11-11).
 
 # [1.0.0-beta.41](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.40...workbench-client-1.0.0-beta.41) (2026-04-13)
 
