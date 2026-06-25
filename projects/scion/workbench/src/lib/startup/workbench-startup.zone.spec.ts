@@ -13,7 +13,6 @@ import {NgZone} from '@angular/core';
 import {WorkbenchLauncher} from './workbench-launcher.service';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {provideWorkbenchInitializer, WorkbenchStartupPhase} from './workbench-initializer';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 
 describe('Workbench Startup', () => {
 

@@ -12,7 +12,6 @@ import {TestBed} from '@angular/core/testing';
 import {Component, inject, OnDestroy} from '@angular/core';
 import {provideRouter, Router} from '@angular/router';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {styleFixture, waitUntilWorkbenchStarted, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';

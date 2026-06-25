@@ -16,7 +16,6 @@ import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {provideWorkbenchInitializer, WorkbenchInitializerFn, WorkbenchStartupPhase} from './workbench-initializer';
 import {resolveWhen} from '../common/resolve-when.util';
 import {styleFixture} from '../testing/testing.util';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {firstValueFrom, timer} from 'rxjs';
 import {WorkbenchStartup} from './workbench-startup.service';
 import {WorkbenchComponent} from '../workbench.component';

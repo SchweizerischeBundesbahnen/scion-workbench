@@ -15,7 +15,6 @@ import {WorkbenchViewRegistry} from './workbench-view.registry';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {WorkbenchView, WorkbenchViewNavigation} from './workbench-view.model';
 import {firstValueFrom, ReplaySubject, Subject} from 'rxjs';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {By} from '@angular/platform-browser';

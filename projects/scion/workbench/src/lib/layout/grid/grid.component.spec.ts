@@ -14,7 +14,6 @@ import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {toBeRegisteredCustomMatcher} from '../../testing/jasmine/matcher/to-be-registered.matcher';
 import {Component} from '@angular/core';
-import {expect} from '../../testing/jasmine/matcher/custom-matchers.definition';
 import {ViewDragService} from '../../view-dnd/view-drag.service';
 import {MAIN_AREA} from '../workbench-layout';
 import {toHaveComponentStateCustomMatcher} from '../../testing/jasmine/matcher/to-have-component-state.matcher';

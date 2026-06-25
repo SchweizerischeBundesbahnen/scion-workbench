@@ -9,7 +9,6 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {any, MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {TestComponent} from '../testing/test.component';
 import {WorkbenchRouter} from '../routing/workbench-router.service';

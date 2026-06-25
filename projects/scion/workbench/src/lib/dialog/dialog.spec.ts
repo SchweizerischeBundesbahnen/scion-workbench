@@ -2,7 +2,6 @@ import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {Component, DestroyRef, EnvironmentInjector, inject, InjectionToken, Injector, signal, Type} from '@angular/core';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {WorkbenchDialogService} from './workbench-dialog.service';
 import {WorkbenchComponent} from '../workbench.component';
@@ -18,12 +17,21 @@ import {TestComponent} from '../testing/test.component';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog.model';
 import {LogLevel} from '../logging';
 import {WorkbenchMessageBoxService} from '../message-box/workbench-message-box.service';
+import {contributeMenu, SciToolbarComponent, SciToolbarFactoryFn} from '@scion/components/menu';
+import {noop} from 'rxjs';
+import {ToolbarPO} from '../testing/jasmine/matcher/toolbar.po';
+import {toEqualToolbarCustomMatcher} from '../testing/jasmine/matcher/to-equal-toolbar.matcher';
+import {Disposable} from '@scion/toolkit/types';
+import {WORKBENCH_ELEMENT} from '../workbench-element-references';
+import {WorkbenchPopupService} from '../popup/workbench-popup.service';
+import {WorkbenchPopupRegistry} from '../popup/workbench-popup.registry';
 
 describe('Dialog', () => {
 
   beforeEach(() => {
     jasmine.addMatchers(toShowCustomMatcher);
     jasmine.addMatchers(toBeActiveCustomMatcher);
+    jasmine.addAsyncMatchers(toEqualToolbarCustomMatcher);
   });
 
   it('should destroy handle\'s injector when closing the dialog', async () => {
@@ -493,6 +501,324 @@ describe('Dialog', () => {
     // Expect dialog title to be translated.
     const titleElement = document.querySelector<HTMLElement>('wb-dialog.testee wb-dialog-header div.e2e-title')!;
     expect(titleElement.innerText).toEqual('TITLE (translated)');
+  });
+
+  describe('Toolbar', () => {
+
+    it('should run factory function in dialog injection context', async () => {
+      TestBed.configureTestingModule({providers: [provideWorkbenchForTest()]});
+
+      @Component({selector: 'spec-dialog', template: ''})
+      class SpecDialogComponent {
+      }
+
+      const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+      await waitUntilWorkbenchStarted();
+
+      // Contribute to toolbar.
+      contributeMenu('toolbar:workbench.dialog.toolbar', toolbar => toolbar
+        .addToolbarButton({label: `[elementId=${inject(WORKBENCH_ELEMENT).id}, dialogId=${inject(WorkbenchDialog).id}]`, onSelect: noop}), {injector: TestBed.inject(Injector)},
+      );
+
+      // Open dialog 1.
+      void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent, {modality: 'none', cssClass: 'testee-1'});
+      await waitUntilStable();
+
+      // Open dialog 2.
+      void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent, {modality: 'none', cssClass: 'testee-2'});
+      await waitUntilStable();
+
+      const toolbarDialog1 = new ToolbarPO(fixture, {selector: 'wb-dialog.testee-1 sci-toolbar[name="toolbar:workbench.dialog.toolbar"]'});
+      const toolbarDialog2 = new ToolbarPO(fixture, {selector: 'wb-dialog.testee-2 sci-toolbar[name="toolbar:workbench.dialog.toolbar"]'});
+
+      const dialog1 = TestBed.inject(WorkbenchDialogRegistry).elements().find(dialog => dialog.cssClass().includes('testee-1'))!;
+      const dialog2 = TestBed.inject(WorkbenchDialogRegistry).elements().find(dialog => dialog.cssClass().includes('testee-2'))!;
+
+      // Expect toolbars.
+      await expectAsync(toolbarDialog1).toEqualToolbar([
+        {
+          type: 'menu-item',
+          label: `[elementId=${dialog1.id}, dialogId=${dialog1.id}]`,
+        },
+        {
+          type: 'menu-item',
+          cssClass: 'e2e-close',
+        },
+      ]);
+      await expectAsync(toolbarDialog2).toEqualToolbar([
+        {
+          type: 'menu-item',
+          label: `[elementId=${dialog2.id}, dialogId=${dialog2.id}]`,
+        },
+        {
+          type: 'menu-item',
+          cssClass: 'e2e-close',
+        },
+      ]);
+    });
+
+    it('should allow injecting context services in factory function', async () => {
+      TestBed.configureTestingModule({providers: [provideWorkbenchForTest()]});
+
+      @Component({selector: 'spec-dialog', template: ''})
+      class SpecTesteeComponent {
+      }
+
+      const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+      await waitUntilWorkbenchStarted();
+
+      // Contribute to toolbar.
+      contributeMenu('toolbar:workbench.dialog.toolbar', toolbar => {
+        const dialogService = inject(WorkbenchDialogService);
+        const messageBoxService = inject(WorkbenchMessageBoxService);
+        const popupService = inject(WorkbenchPopupService);
+        toolbar.addToolbarButton({
+          label: 'Dialog',
+          cssClass: 'testee-dialog',
+          onSelect: () => {
+            void dialogService.open(SpecTesteeComponent, {cssClass: 'testee-dialog'});
+          },
+        });
+        toolbar.addToolbarButton({
+          label: 'MessageBox',
+          cssClass: 'testee-messagebox',
+          onSelect: () => {
+            void messageBoxService.open(SpecTesteeComponent, {cssClass: 'testee-messagebox'});
+          },
+        });
+        toolbar.addToolbarButton({
+          label: 'Popup',
+          cssClass: 'testee-popup',
+          onSelect: () => {
+            void popupService.open(SpecTesteeComponent, {cssClass: 'testee-popup', closeStrategy: {onFocusLost: false}, anchor: {x: 0, y: 0}});
+          },
+        });
+      }, {injector: TestBed.inject(Injector)});
+
+      // Open dialog 1.
+      void TestBed.inject(WorkbenchDialogService).open(SpecTesteeComponent, {modality: 'none', cssClass: 'testee'});
+      await waitUntilStable();
+      const dialog1 = TestBed.inject(WorkbenchDialogRegistry).elements().find(dialog => dialog.cssClass().includes('testee'))!;
+
+      // Open dialog from dialog.
+      const toolbar = new ToolbarPO(fixture, {selector: 'wb-dialog.testee sci-toolbar[name="toolbar:workbench.dialog.toolbar"]'});
+      toolbar.button({cssClass: 'testee-dialog'}).nativeElement.click();
+      await waitUntilStable();
+
+      // Expect invocation context.
+      const dialog2 = TestBed.inject(WorkbenchDialogRegistry).elements().find(dialog => dialog.cssClass().includes('testee-dialog'))!;
+      expect(dialog2.invocationContext!.elementId).toEqual(dialog1.id);
+      dialog2.close();
+      await waitUntilStable();
+
+      // Open messagebox from dialog.
+      toolbar.button({cssClass: 'testee-messagebox'}).nativeElement.click();
+      await waitUntilStable();
+
+      // Expect invocation context.
+      const messageBox = TestBed.inject(WorkbenchDialogRegistry).elements().find(messageBox => messageBox.cssClass().includes('testee-messagebox'))!;
+      expect(messageBox.invocationContext!.elementId).toEqual(dialog1.id);
+      messageBox.close();
+      await waitUntilStable();
+
+      // Open popup from dialog.
+      toolbar.button({cssClass: 'testee-popup'}).nativeElement.click();
+      await waitUntilStable();
+
+      // Expect invocation context.
+      const popup = TestBed.inject(WorkbenchPopupRegistry).elements().find(popup => popup.cssClass().includes('testee-popup'))!;
+      expect(popup.invocationContext!.elementId).toEqual(dialog1.id);
+    });
+
+    it('should contribute to toolbar from component', async () => {
+      TestBed.configureTestingModule({providers: [provideWorkbenchForTest()]});
+
+      @Component({selector: 'spec-dialog', template: ''})
+      class SpecDialogComponent {
+
+        private readonly _injector = inject(Injector);
+
+        public contributeMenu(location: `toolbar:${string}`, toolbarFactoryFn: SciToolbarFactoryFn): Disposable {
+          return contributeMenu(location, toolbarFactoryFn, {injector: this._injector});
+        }
+      }
+
+      const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+      await waitUntilWorkbenchStarted();
+
+      // Open dialog 1.
+      void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent, {modality: 'none', cssClass: 'testee-1'});
+
+      // Open dialog 2.
+      void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent, {modality: 'none', cssClass: 'testee-2'});
+      await waitUntilStable();
+
+      const toolbarDialog1 = new ToolbarPO(fixture, {selector: 'wb-dialog.testee-1 sci-toolbar[name="toolbar:workbench.dialog.toolbar"]'});
+      const toolbarDialog2 = new ToolbarPO(fixture, {selector: 'wb-dialog.testee-2 sci-toolbar[name="toolbar:workbench.dialog.toolbar"]'});
+
+      const dialog1 = TestBed.inject(WorkbenchDialogRegistry).elements().find(dialog => dialog.cssClass().includes('testee-1'))!;
+      const dialog2 = TestBed.inject(WorkbenchDialogRegistry).elements().find(dialog => dialog.cssClass().includes('testee-2'))!;
+
+      const specDialogComponent1 = fixture.debugElement.parent!.query(By.css('wb-dialog.testee-1')).query(By.directive(SpecDialogComponent)).componentInstance as SpecDialogComponent;
+      const specDialogComponent2 = fixture.debugElement.parent!.query(By.css('wb-dialog.testee-2')).query(By.directive(SpecDialogComponent)).componentInstance as SpecDialogComponent;
+
+      // Contribute to toolbar in dialog 1.
+      specDialogComponent1.contributeMenu('toolbar:workbench.dialog.toolbar', toolbar => toolbar
+        .addToolbarButton({label: `[elementId=${inject(WORKBENCH_ELEMENT).id}, dialogId=${inject(WorkbenchDialog).id}]`, onSelect: noop}),
+      );
+      await expectAsync(toolbarDialog1).toEqualToolbar([
+        {
+          type: 'menu-item',
+          label: `[elementId=${dialog1.id}, dialogId=${dialog1.id}]`,
+        },
+        {
+          type: 'menu-item',
+          cssClass: 'e2e-close',
+        },
+      ]);
+      await expectAsync(toolbarDialog2).toEqualToolbar([
+        {
+          type: 'menu-item',
+          cssClass: 'e2e-close',
+        },
+
+      ]);
+
+      // Contribute to toolbar in dialog 2.
+      specDialogComponent2.contributeMenu('toolbar:workbench.dialog.toolbar', toolbar => toolbar
+        .addToolbarButton({label: `[elementId=${inject(WORKBENCH_ELEMENT).id}, dialogId=${inject(WorkbenchDialog).id}]`, onSelect: noop}),
+      );
+      await expectAsync(toolbarDialog1).toEqualToolbar([
+        {
+          type: 'menu-item',
+          label: `[elementId=${dialog1.id}, dialogId=${dialog1.id}]`,
+        },
+        {
+          type: 'menu-item',
+          cssClass: 'e2e-close',
+        },
+      ]);
+      await expectAsync(toolbarDialog2).toEqualToolbar([
+        {
+          type: 'menu-item',
+          label: `[elementId=${dialog2.id}, dialogId=${dialog2.id}]`,
+        },
+        {
+          type: 'menu-item',
+          cssClass: 'e2e-close',
+        },
+      ]);
+    });
+
+    it('should invoke onSelect callback on pressing keystroke', async () => {
+      TestBed.configureTestingModule({providers: [provideWorkbenchForTest({})]});
+
+      @Component({
+        selector: 'spec-dialog',
+        template: '<sci-toolbar name="toolbar:testee"/>',
+        imports: [SciToolbarComponent],
+      })
+      class SpecDialogComponent {
+      }
+
+      const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+      await waitUntilWorkbenchStarted();
+
+      // Spy console.
+      const spy = spyOn(console, 'log').and.callThrough();
+
+      const toolbarDialogBuiltIn1 = new ToolbarPO(fixture, {selector: 'wb-dialog.testee-1 sci-toolbar[name="toolbar:workbench.dialog.toolbar"]'});
+      const toolbarDialogBuiltIn2 = new ToolbarPO(fixture, {selector: 'wb-dialog.testee-2 sci-toolbar[name="toolbar:workbench.dialog.toolbar"]'});
+
+      const toolbarDialogComponent1 = new ToolbarPO(fixture, {selector: 'wb-dialog.testee-1 spec-dialog sci-toolbar'});
+      const toolbarDialogComponent2 = new ToolbarPO(fixture, {selector: 'wb-dialog.testee-2 spec-dialog sci-toolbar'});
+
+      // Contribute to built-in dialog toolbar.
+      contributeMenu('toolbar:workbench.dialog.toolbar', toolbar => {
+        const dialog = inject(WorkbenchDialog);
+        toolbar.addToolbarButton({
+          label: 'testee', accelerator: {alt: true, key: '1'}, onSelect: () => {
+            console.log(`toolbar:workbench.dialog.toolbar onSelect ${dialog.id}`);
+          },
+        });
+      }, {injector: TestBed.inject(Injector)});
+
+      // Contribute to toolbar in dialog component.
+      contributeMenu('toolbar:testee', toolbar => {
+        const dialog = inject(WorkbenchDialog);
+        toolbar.addToolbarButton({
+          label: 'testee', accelerator: {alt: true, key: '1'}, onSelect: () => {
+            console.log(`toolbar:testee onSelect ${dialog.id}`);
+          },
+        });
+      }, {injector: TestBed.inject(Injector)});
+
+      // Open dialog 1.
+      void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent, {modality: 'none', cssClass: 'testee-1'});
+
+      // Open dialog 2.
+      void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent, {modality: 'none', cssClass: 'testee-2'});
+      await waitUntilStable();
+
+      const dialog1 = TestBed.inject(WorkbenchDialogRegistry).elements().find(dialog => dialog.cssClass().includes('testee-1'))!;
+      const dialog2 = TestBed.inject(WorkbenchDialogRegistry).elements().find(dialog => dialog.cssClass().includes('testee-2'))!;
+
+      // Press alt-1 on document.
+      document.dispatchEvent(new KeyboardEvent('keydown', {altKey: true, key: '1', bubbles: true}));
+      expect(console.log).not.toHaveBeenCalledWith(`toolbar:workbench.dialog.toolbar onSelect ${dialog1.id}`);
+      expect(console.log).not.toHaveBeenCalledWith(`toolbar:testee onSelect ${dialog1.id}`);
+      expect(console.log).not.toHaveBeenCalledWith(`toolbar:workbench.dialog.toolbar onSelect ${dialog2.id}`);
+      expect(console.log).not.toHaveBeenCalledWith(`toolbar:testee onSelect ${dialog2.id}`);
+
+      // Press alt-1 on dialog 1.
+      const dialogComponent1 = fixture.debugElement.parent!.query(By.css('wb-dialog.testee-1'));
+      dialogComponent1.nativeElement.dispatchEvent(new KeyboardEvent('keydown', {altKey: true, key: '1', bubbles: true}));
+      expect(console.log).toHaveBeenCalledWith(`toolbar:workbench.dialog.toolbar onSelect ${dialog1.id}`);
+      expect(console.log).toHaveBeenCalledWith(`toolbar:testee onSelect ${dialog1.id}`);
+      expect(console.log).not.toHaveBeenCalledWith(`toolbar:workbench.dialog.toolbar onSelect ${dialog2.id}`);
+      expect(console.log).not.toHaveBeenCalledWith(`toolbar:testee onSelect ${dialog2.id}`);
+      spy.calls.reset();
+
+      // Press alt-1 on built-in toolbar in dialog 1.
+      toolbarDialogBuiltIn1.nativeElement.dispatchEvent(new KeyboardEvent('keydown', {altKey: true, key: '1', bubbles: true}));
+      expect(console.log).toHaveBeenCalledWith(`toolbar:workbench.dialog.toolbar onSelect ${dialog1.id}`);
+      expect(console.log).toHaveBeenCalledWith(`toolbar:testee onSelect ${dialog1.id}`);
+      expect(console.log).not.toHaveBeenCalledWith(`toolbar:workbench.dialog.toolbar onSelect ${dialog2.id}`);
+      expect(console.log).not.toHaveBeenCalledWith(`toolbar:testee onSelect ${dialog2.id}`);
+      spy.calls.reset();
+
+      // Press alt-1 on toolbar in dialog component 1.
+      toolbarDialogComponent1.nativeElement.dispatchEvent(new KeyboardEvent('keydown', {altKey: true, key: '1', bubbles: true}));
+      expect(console.log).toHaveBeenCalledWith(`toolbar:workbench.dialog.toolbar onSelect ${dialog1.id}`);
+      expect(console.log).toHaveBeenCalledWith(`toolbar:testee onSelect ${dialog1.id}`);
+      expect(console.log).not.toHaveBeenCalledWith(`toolbar:workbench.dialog.toolbar onSelect ${dialog2.id}`);
+      expect(console.log).not.toHaveBeenCalledWith(`toolbar:testee onSelect ${dialog2.id}`);
+      spy.calls.reset();
+
+      // Press alt-1 on dialog 2.
+      const dialogComponent2 = fixture.debugElement.parent!.query(By.css('wb-dialog.testee-2'));
+      dialogComponent2.nativeElement.dispatchEvent(new KeyboardEvent('keydown', {altKey: true, key: '1', bubbles: true}));
+      expect(console.log).not.toHaveBeenCalledWith(`toolbar:workbench.dialog.toolbar onSelect ${dialog1.id}`);
+      expect(console.log).not.toHaveBeenCalledWith(`toolbar:testee onSelect ${dialog1.id}`);
+      expect(console.log).toHaveBeenCalledWith(`toolbar:workbench.dialog.toolbar onSelect ${dialog2.id}`);
+      expect(console.log).toHaveBeenCalledWith(`toolbar:testee onSelect ${dialog2.id}`);
+      spy.calls.reset();
+
+      // Press alt-1 on built-in toolbar in dialog 2.
+      toolbarDialogBuiltIn2.nativeElement.dispatchEvent(new KeyboardEvent('keydown', {altKey: true, key: '1', bubbles: true}));
+      expect(console.log).not.toHaveBeenCalledWith(`toolbar:workbench.dialog.toolbar onSelect ${dialog1}`);
+      expect(console.log).not.toHaveBeenCalledWith(`toolbar:testee onSelect ${dialog1}`);
+      expect(console.log).toHaveBeenCalledWith(`toolbar:workbench.dialog.toolbar onSelect ${dialog2.id}`);
+      expect(console.log).toHaveBeenCalledWith(`toolbar:testee onSelect ${dialog2.id}`);
+      spy.calls.reset();
+
+      // Press alt-1 on toolbar in dialog component 2.
+      toolbarDialogComponent2.nativeElement.dispatchEvent(new KeyboardEvent('keydown', {altKey: true, key: '1', bubbles: true}));
+      expect(console.log).not.toHaveBeenCalledWith(`toolbar:workbench.dialog.toolbar onSelect ${dialog1}`);
+      expect(console.log).not.toHaveBeenCalledWith(`toolbar:testee onSelect ${dialog1}`);
+      expect(console.log).toHaveBeenCalledWith(`toolbar:workbench.dialog.toolbar onSelect ${dialog2.id}`);
+      expect(console.log).toHaveBeenCalledWith(`toolbar:testee onSelect ${dialog2.id}`);
+    });
   });
 });
 

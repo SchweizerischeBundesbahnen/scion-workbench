@@ -1,6 +1,5 @@
 import {TestBed} from '@angular/core/testing';
 import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchMessageBoxService} from './workbench-message-box.service';

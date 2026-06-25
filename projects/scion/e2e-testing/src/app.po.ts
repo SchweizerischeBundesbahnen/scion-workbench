@@ -193,6 +193,7 @@ export class AppPO {
       await expect.poll(() => consoleLogs.get(), `Expected application to be bootstraped with app config "${options.appConfig}".`).toContain(`Bootstrapping application: "${options.appConfig}"`);
     }
     consoleLogs.dispose();
+    await this.waitUntilAngularStable();
   }
 
   /**
@@ -387,7 +388,7 @@ export class AppPO {
    */
   public async openNewViewTab(): Promise<StartPagePO> {
     const navigationId = await this.getCurrentNavigationId();
-    await this.header.clickSettingMenuItem({cssClass: 'e2e-open-start-page'});
+    await this.header.clickSettingMenuItem({cssClass: ['e2e-open-view', 'e2e-open-start-page']});
     // Wait until opened the start page to get its view id.
     await this.waitForLayoutChange({navigationId});
     await this.waitUntilAngularStable();

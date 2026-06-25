@@ -33,7 +33,7 @@ test.describe('Workbench Component', () => {
     consoleLogs.clear();
 
     // Unmount the workbench component by navigating the primary router outlet.
-    await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
+    await appPO.header.clickSettingMenuItem({cssClass: ['e2e-navigate-primary-outlet', 'e2e-navigate-to-blank-page']});
 
     // Expect the workbench component to be destroyed.
     await expect(appPO.workbenchRoot).not.toBeAttached();
@@ -48,10 +48,10 @@ test.describe('Workbench Component', () => {
     consoleLogs.clear();
 
     // Unmount the workbench component by navigating the primary router outlet.
-    await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
+    await appPO.header.clickSettingMenuItem({cssClass: ['e2e-navigate-primary-outlet', 'e2e-navigate-to-blank-page']});
 
     // Re-mount the workbench component by navigating the primary router.
-    await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
+    await appPO.header.clickSettingMenuItem({cssClass: ['e2e-navigate-primary-outlet', 'e2e-navigate-to-workbench-page']});
 
     // Expect the workbench not to be started again.
     await expect.poll(() => consoleLogs.get({severity: 'debug', message: /WorkbenchLifecycleHookLogger.*WorkbenchStartupPhase\.Startup/})).toHaveLength(0);
@@ -61,10 +61,10 @@ test.describe('Workbench Component', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Unmount the workbench component by navigating the primary router outlet.
-    await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
+    await appPO.header.clickSettingMenuItem({cssClass: ['e2e-navigate-primary-outlet', 'e2e-navigate-to-blank-page']});
 
     // Re-mount the workbench component by navigating the primary router.
-    await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
+    await appPO.header.clickSettingMenuItem({cssClass: ['e2e-navigate-primary-outlet', 'e2e-navigate-to-workbench-page']});
 
     // Expect no errors to be logged.
     await expect.poll(() => consoleLogs.get({severity: 'error'})).toHaveLength(0);
@@ -81,10 +81,10 @@ test.describe('Workbench Component', () => {
     await testPage.enterText('view state');
 
     // Unmount the workbench component by navigating the primary router outlet.
-    await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
+    await appPO.header.clickSettingMenuItem({cssClass: ['e2e-navigate-primary-outlet', 'e2e-navigate-to-blank-page']});
 
     // Re-mount the workbench component by navigating the primary router.
-    await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
+    await appPO.header.clickSettingMenuItem({cssClass: ['e2e-navigate-primary-outlet', 'e2e-navigate-to-workbench-page']});
 
     // Expect the view to display.
     await expectView(testPage).toBeActive();
@@ -103,14 +103,14 @@ test.describe('Workbench Component', () => {
     await expectView(viewPage).toBeActive();
 
     // Unmount the workbench component by navigating the primary router outlet.
-    await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
+    await appPO.header.clickSettingMenuItem({cssClass: ['e2e-navigate-primary-outlet', 'e2e-navigate-to-blank-page']});
 
     // Expect the DOM not to contain workbench elements.
     await expect(appPO.workbenchRoot).not.toBeAttached();
     await expectView(viewPage).not.toBeAttached();
 
     // Re-mount the workbench component by navigating the primary router.
-    await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
+    await appPO.header.clickSettingMenuItem({cssClass: ['e2e-navigate-primary-outlet', 'e2e-navigate-to-workbench-page']});
 
     // Expect the view and the microfrontend to display.
     await expect(appPO.workbenchRoot).toBeVisible();
@@ -121,10 +121,10 @@ test.describe('Workbench Component', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // Unmount the workbench component by navigating the primary router outlet.
-    await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
+    await appPO.header.clickSettingMenuItem({cssClass: ['e2e-navigate-primary-outlet', 'e2e-navigate-to-blank-page']});
 
     // Re-mount the workbench component by navigating the primary router.
-    await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
+    await appPO.header.clickSettingMenuItem({cssClass: ['e2e-navigate-primary-outlet', 'e2e-navigate-to-workbench-page']});
 
     // Open view with a microfrontend.
     const viewPage = await microfrontendNavigator.openInNewTab(MicrofrontendViewPagePO, 'app1');
@@ -148,18 +148,18 @@ test.describe('Workbench Component', () => {
     await expect.poll(() => appPO.views().count()).toBeGreaterThan(0);
 
     // Expect part action modeled as content of the workbench component to display.
-    await expect(appPO.activePart({grid: 'mainArea'}).bar.action({cssClass: 'e2e-open-new-tab'}).locator).toBeVisible();
+    await expect(appPO.activePart({grid: 'mainArea'}).bar.tabBar.item({cssClass: 'e2e-open-new-tab'}).locator).toBeVisible();
 
     // Unmount the workbench component by navigating the primary router outlet.
-    await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
+    await appPO.header.clickSettingMenuItem({cssClass: ['e2e-navigate-primary-outlet', 'e2e-navigate-to-blank-page']});
 
     // Re-mount the workbench component by navigating the primary router.
-    await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
+    await appPO.header.clickSettingMenuItem({cssClass: ['e2e-navigate-primary-outlet', 'e2e-navigate-to-workbench-page']});
 
     // Expect part action to display.
-    await expect(appPO.activePart({grid: 'mainArea'}).bar.action({cssClass: 'e2e-open-new-tab'}).locator).toBeVisible();
+    await expect(appPO.activePart({grid: 'mainArea'}).bar.tabBar.item({cssClass: 'e2e-open-new-tab'}).locator).toBeVisible();
 
     // Expect previous part action to be destroyed.
-    await expect(appPO.activePart({grid: 'mainArea'}).bar.action({cssClass: 'e2e-open-new-tab'}).locator).toHaveCount(1);
+    await expect(appPO.activePart({grid: 'mainArea'}).bar.tabBar.item({cssClass: 'e2e-open-new-tab'}).locator).toHaveCount(1);
   });
 });

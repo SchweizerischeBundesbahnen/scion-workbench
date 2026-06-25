@@ -229,43 +229,43 @@ test.describe('Workbench Notification', () => {
     await expect.poll(() => notification.getBoundingBox().then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
   });
 
-  test('should wrap title', async ({appPO, microfrontendNavigator}) => {
+  test('should not wrap title', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true, designTokens: {'--sci-workbench-notification-width': '350px'}});
 
     await microfrontendNavigator.registerIntention('app1', {type: 'notification'});
 
-    // Display notification with a single line.
+    // Display notification with a short title.
     const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-    await notificationOpenerPage.show(null, {title: 'Single Line', cssClass: 'testee'});
+    await notificationOpenerPage.show(null, {title: 'Short Title', cssClass: 'testee'});
 
     const notification = appPO.notification({cssClass: 'testee'});
     const notificationPage = new TextNotificationPO(notification);
 
     await expectNotification(notificationPage).toBeAttached();
 
-    const singleLineBounds = await notification.getBoundingBox();
+    const shortTitleBounds = await notification.getBoundingBox();
 
     // Close the notification.
     await notification.close();
     await expectNotification(notificationPage).not.toBeAttached();
 
-    // Display notification with multiple lines.
-    await notificationOpenerPage.show(null, {title: 'Multiple Lines '.repeat(100), cssClass: 'testee'});
+    // Display notification with long title.
+    await notificationOpenerPage.show(null, {title: 'Long Title '.repeat(100), cssClass: 'testee'});
 
-    // Expect the notification to break words.
+    // Expect the notification not to break words.
     await expect.poll(() => notification.hasVerticalOverflow()).toBe(false);
     await expect.poll(() => notification.getBoundingBox().then(bounds => bounds.width)).toEqual(350);
-    await expect.poll(() => notification.getBoundingBox().then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
+    await expect.poll(() => notification.getBoundingBox().then(bounds => bounds.height)).toEqual(shortTitleBounds.height);
   });
 
-  test('should wrap "unbreakable" title', async ({appPO, microfrontendNavigator}) => {
+  test('should not wrap "unbreakable" title', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true, designTokens: {'--sci-workbench-notification-width': '350px'}});
 
     await microfrontendNavigator.registerIntention('app1', {type: 'notification'});
 
-    // Display notification with a single line.
+    // Display notification with a short title.
     const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-    await notificationOpenerPage.show(null, {title: 'Single Line', cssClass: 'testee'});
+    await notificationOpenerPage.show(null, {title: 'Short Title', cssClass: 'testee'});
 
     const notification = appPO.notification({cssClass: 'testee'});
     const notificationPage = new TextNotificationPO(notification);
@@ -278,13 +278,13 @@ test.describe('Workbench Notification', () => {
     await notification.close();
     await expectNotification(notificationPage).not.toBeAttached();
 
-    // Display notification with multiple lines.
-    await notificationOpenerPage.show(null, {title: 'MultipleLines'.repeat(100), cssClass: 'testee'});
+    // Display notification with a long title.
+    await notificationOpenerPage.show(null, {title: 'LongTitle'.repeat(100), cssClass: 'testee'});
 
-    // Expect the notification to break words.
+    // Expect the notification not to break words.
     await expect.poll(() => notification.hasVerticalOverflow()).toBe(false);
     await expect.poll(() => notification.getBoundingBox().then(bounds => bounds.width)).toEqual(350);
-    await expect.poll(() => notification.getBoundingBox().then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
+    await expect.poll(() => notification.getBoundingBox().then(bounds => bounds.height)).toEqual(singleLineBounds.height);
   });
 
   test('should, by default, show notification with info severity', async ({appPO, microfrontendNavigator}) => {

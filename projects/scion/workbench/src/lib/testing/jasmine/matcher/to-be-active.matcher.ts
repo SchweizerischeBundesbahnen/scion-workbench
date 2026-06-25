@@ -14,7 +14,7 @@ import {TestBed} from '@angular/core/testing';
 import {DebugElement, DOCUMENT} from '@angular/core';
 
 /**
- * Provides the implementation of {@link CustomMatchers#toBeActive}.
+ * Provides the implementation of {@link CustomMatcherFactories#toBeActive}.
  */
 export const toBeActiveCustomMatcher: jasmine.CustomMatcherFactories = {
   toBeActive: (): CustomMatcher => {

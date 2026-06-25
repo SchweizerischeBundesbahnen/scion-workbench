@@ -31,6 +31,7 @@ export const environment = {
   animationEnabled: true,
   logAngularChangeDetectionCycles: false,
   showMicrofrontendApplicationLabels: true,
+  showToolbarsOnlyOnHoverOrFocus: true,
   initialPerspective: 'activity-perspective-1',
   microfrontendPlatformConfig,
 };

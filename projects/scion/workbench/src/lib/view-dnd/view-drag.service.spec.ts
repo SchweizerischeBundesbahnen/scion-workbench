@@ -3,7 +3,6 @@ import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {ViewDragData, ViewDragService} from './view-drag.service';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 import {UUID} from '@scion/toolkit/uuid';

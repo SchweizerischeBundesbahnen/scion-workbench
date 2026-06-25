@@ -14,7 +14,7 @@ import {ViewTabPO} from '../view-tab.po';
 import {ViewDrageHandlePO} from '../view-drag-handle.po';
 import {hasCssClass, waitForCondition, waitUntilStable} from '../helper/testing.util';
 import {LayoutPagePO} from './page-object/layout-page/layout-page.po';
-import {PartActionPO} from '../part-action.po';
+import {ToolbarItemPO} from '../toolbar-item.po';
 import {expectView} from '../matcher/view-matcher';
 import {ViewPagePO} from './page-object/view-page.po';
 import {ConsoleLogs} from '../helper/console-logs';
@@ -224,7 +224,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
 
       // Expect drag image not to snap to the tabbar.
       await expect.poll(() => dragHandle.getBoundingBox()).toEqual(expect.objectContaining({
-        top: tabbarBounds.top + 20,
+        top: Math.ceil(tabbarBounds.top) + 20,
         height: tabbarBounds.height,
       }));
     });
@@ -885,7 +885,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await layoutPage.view.tab.close();
 
     // Log change of part action position.
-    await installPositionLogger(appPO.part({partId: 'part.part'}).bar.action({cssClass: 'testee'}).locator, {label: 'part-action'});
+    await installPositionLogger(appPO.part({partId: 'part.part'}).bar.tabBar.item({cssClass: 'testee'}).locator, {label: 'part-action'});
 
     // Drag tab to the right.
     const dragHandle = await tab1.startDrag();
@@ -919,7 +919,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await layoutPage.view.tab.close();
 
     // Capture position of the part action.
-    const partAction = appPO.part({partId: 'part.part'}).bar.action({cssClass: 'testee'});
+    const partAction = appPO.part({partId: 'part.part'}).bar.tabBar.item({cssClass: 'testee'});
     const {left} = await partAction.getBoundingBox();
 
     // Drag tab to the right.
@@ -961,7 +961,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await layoutPage.view.tab.close();
 
     // Wait until positioned the part action.
-    await installPositionLogger(appPO.part({partId: 'part.part'}).bar.action({cssClass: 'testee'}).locator, {label: 'part-action'});
+    await installPositionLogger(appPO.part({partId: 'part.part'}).bar.tabBar.item({cssClass: 'testee'}).locator, {label: 'part-action'});
     consoleLogs.clear();
 
     // Start dragging the tab.
@@ -994,7 +994,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await layoutPage.view.tab.close();
 
     // Log change of part action position.
-    await installPositionLogger(appPO.part({partId: 'part.bottom'}).bar.action({cssClass: 'testee'}).locator, {label: 'part-action'});
+    await installPositionLogger(appPO.part({partId: 'part.bottom'}).bar.tabBar.item({cssClass: 'testee'}).locator, {label: 'part-action'});
     const topTabbarBounds = await appPO.part({partId: 'part.top'}).bar.viewTabBar.getBoundingBox();
     const bottomTabbarBounds = await appPO.part({partId: 'part.bottom'}).bar.viewTabBar.getBoundingBox();
 
@@ -1137,19 +1137,19 @@ test.describe('View Drag & Drop (Tabbar)', () => {
   });
 });
 
-async function getLeft(tab: ViewTabPO | ViewDrageHandlePO | PartActionPO): Promise<number> {
+async function getLeft(tab: ViewTabPO | ViewDrageHandlePO | ToolbarItemPO): Promise<number> {
   return (await tab.getBoundingBox()).left;
 }
 
-async function getHCenter(tab: ViewTabPO | ViewDrageHandlePO | PartActionPO): Promise<number> {
+async function getHCenter(tab: ViewTabPO | ViewDrageHandlePO | ToolbarItemPO): Promise<number> {
   return (await tab.getBoundingBox()).hcenter;
 }
 
-async function getRight(tab: ViewTabPO | ViewDrageHandlePO | PartActionPO): Promise<number> {
+async function getRight(tab: ViewTabPO | ViewDrageHandlePO | ToolbarItemPO): Promise<number> {
   return (await tab.getBoundingBox()).right;
 }
 
-async function getWidth(tab: ViewTabPO | ViewDrageHandlePO | PartActionPO): Promise<number> {
+async function getWidth(tab: ViewTabPO | ViewDrageHandlePO | ToolbarItemPO): Promise<number> {
   return (await tab.getBoundingBox()).width;
 }
 

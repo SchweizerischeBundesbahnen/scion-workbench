@@ -23,6 +23,7 @@ import {contributeMenu} from '@scion/components/menu';
 import {ViewMoveDialogTestPageComponent} from './test-pages/view-move-dialog-test-page/view-move-dialog-test-page.component';
 import {ViewInfoDialogComponent} from './view-info-dialog/view-info-dialog.component';
 import {createDestroyableInjector} from '@scion/components/common';
+import {environment} from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -67,6 +68,8 @@ export class AppComponent implements DoCheck {
     afterEveryRender(() => {
       this._host.setAttribute('data-last-render', Date.now().toString());
     });
+
+    inject(WorkbenchService).settings.toolbarVisibility.set(environment.showToolbarsOnlyOnHoverOrFocus ? 'on-hover-or-focus' : 'always');
   }
 
   public ngDoCheck(): void {
@@ -104,7 +107,7 @@ export class AppComponent implements DoCheck {
     contributeMenu('toolbar:workbench.part.tabbar', toolbar => {
       const part = inject(WorkbenchPart);
       if (!part.peripheral()) {
-        toolbar.addToolbarButton({icon: 'scion.add', onSelect: () => this.workbenchRouter.navigate(['/start-page'], {target: 'blank', partId: part.id, position: 'end'})});
+        toolbar.addToolbarButton({icon: 'scion.add', cssClass: 'e2e-open-new-tab', onSelect: () => this.workbenchRouter.navigate(['/start-page'], {target: 'blank', partId: part.id, position: 'end'})});
       }
     });
   }

@@ -13,7 +13,6 @@ import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {withComponentContent} from '../testing/test.component';
 import {WorkbenchComponent} from '../workbench.component';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {Component} from '@angular/core';

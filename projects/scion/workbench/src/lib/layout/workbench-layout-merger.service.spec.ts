@@ -12,7 +12,6 @@ import {TestBed} from '@angular/core/testing';
 import {any, MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {MAIN_AREA} from './workbench-layout';
 import {WorkbenchLayoutMerger} from './workbench-layout-merger.service';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {ɵWorkbenchLayoutFactory} from './ɵworkbench-layout.factory';
 import {segments} from '../testing/testing.util';
 import {ɵWorkbenchLayout} from './ɵworkbench-layout';

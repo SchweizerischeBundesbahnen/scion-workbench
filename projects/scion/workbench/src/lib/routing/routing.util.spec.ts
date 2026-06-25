@@ -21,7 +21,6 @@ import {ViewId} from '../workbench.identifiers';
 import {WorkbenchComponent} from '../workbench.component';
 import {By} from '@angular/platform-browser';
 import {Component, inject, OnDestroy} from '@angular/core';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 
 describe('Routing.segmentsToCommands', () => {
 

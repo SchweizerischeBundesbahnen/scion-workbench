@@ -12,7 +12,6 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {Component, DebugElement, Type} from '@angular/core';
 import {provideRouter, Routes} from '@angular/router';
 import {WorkbenchRouter} from './workbench-router.service';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';
 import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';

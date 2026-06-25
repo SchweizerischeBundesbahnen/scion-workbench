@@ -40,6 +40,7 @@ export const environment = {
   animationEnabled: false,
   logAngularChangeDetectionCycles: true,
   showMicrofrontendApplicationLabels: true,
+  showToolbarsOnlyOnHoverOrFocus: true,
   initialPerspective: 'blank',
   microfrontendPlatformConfig,
 };

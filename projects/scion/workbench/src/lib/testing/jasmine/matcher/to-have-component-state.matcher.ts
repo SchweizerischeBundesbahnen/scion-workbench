@@ -15,7 +15,7 @@ import {WorkbenchViewRegistry} from '../../../view/workbench-view.registry';
 import {ViewId} from '../../../workbench.identifiers';
 
 /**
- * Provides the implementation of {@link CustomMatchers#toHaveComponentState}.
+ * Provides the implementation of {@link CustomMatcherFactories#toHaveComponentState}.
  */
 export const toHaveComponentStateCustomMatcher: jasmine.CustomMatcherFactories = {
   toHaveComponentState: (): CustomMatcher => {

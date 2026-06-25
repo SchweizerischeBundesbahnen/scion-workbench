@@ -16,7 +16,7 @@ import {WorkbenchPartRegistry} from '../../../part/workbench-part.registry';
 import {PartId, ViewId} from '../../../workbench.identifiers';
 
 /**
- * Provides the implementation of {@link CustomMatchers#toBeRegistered}.
+ * Provides the implementation of {@link CustomMatcherFactories#toBeRegistered}.
  */
 export const toBeRegisteredCustomMatcher: jasmine.CustomMatcherFactories = {
   toBeRegistered: (): CustomMatcher => {

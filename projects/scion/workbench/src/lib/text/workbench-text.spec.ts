@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {Injector} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
 import {SciTextProviderFn, text} from '@scion/components/text';

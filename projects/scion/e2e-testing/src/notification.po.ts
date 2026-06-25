@@ -12,6 +12,7 @@ import {Locator, Page} from '@playwright/test';
 import {coerceArray, DomRect, fromRect, getCssClasses, hasCssClass, selectBy} from './helper/testing.util';
 import {RequireOne} from '@scion/toolkit/types';
 import {NotificationId} from '../../workbench/src/lib/workbench.identifiers';
+import {ToolbarPO} from './toolbar.po';
 
 /**
  * Handle for interacting with a workbench notification.
@@ -21,13 +22,15 @@ export class NotificationPO {
   public readonly locator: Locator;
   public readonly locateBy?: {id?: NotificationId; cssClass?: string[]};
   public readonly title: Locator;
+  public readonly toolbar: ToolbarPO;
   public readonly viewport: Locator;
   public readonly slot: Locator;
 
   constructor(page: Page, locateBy: RequireOne<{notificationId: NotificationId; cssClass: string | string[]}>, options?: {nth?: number}) {
     this.locateBy = {id: locateBy.notificationId, cssClass: coerceArray(locateBy.cssClass)};
     this.locator = page.locator(selectBy('wb-notification', {attributes: {'data-notificationid': locateBy.notificationId}, cssClass: locateBy.cssClass})).nth(options?.nth ?? 0);
-    this.title = this.locator.locator('header.e2e-title');
+    this.title = this.locator.locator('header > span.e2e-title');
+    this.toolbar = new ToolbarPO(this.locator.locator('sci-toolbar[name="toolbar:workbench.notification.toolbar"]'));
     this.viewport = this.locator.locator('sci-viewport.e2e-notification-slot');
     this.slot = this.locator.locator('div.e2e-notification-slot-bounds');
   }

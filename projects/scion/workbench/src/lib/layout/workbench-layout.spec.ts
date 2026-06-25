@@ -11,7 +11,6 @@
 import {MAIN_AREA_INITIAL_PART_ID, ɵWorkbenchLayout} from './ɵworkbench-layout';
 import {MAIN_AREA, WorkbenchLayout} from './workbench-layout';
 import {any, MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {TestBed} from '@angular/core/testing';
 import {WorkbenchLayoutFactory} from './workbench-layout.factory';
 import {ɵWorkbenchLayoutFactory} from './ɵworkbench-layout.factory';
@@ -2170,28 +2169,28 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.grid({partId: 'part.innerRight'})).toEqual({gridName: 'mainArea', grid: workbenchLayout.grids.mainArea});
     expect(workbenchLayout.grid({partId: 'part.outerLeft'})).toEqual({gridName: 'main', grid: workbenchLayout.grids.main});
     expect(workbenchLayout.grid({partId: 'part.outerRight'})).toEqual({gridName: 'main', grid: workbenchLayout.grids.main});
-    expect(workbenchLayout.grid({partId: 'part.activity-1'})).toEqual({gridName: 'activity.1', grid: workbenchLayout.grids['activity.1']});
-    expect(workbenchLayout.grid({partId: 'part.activity-2-top'})).toEqual({gridName: 'activity.2', grid: workbenchLayout.grids['activity.2']});
-    expect(workbenchLayout.grid({partId: 'part.activity-2-bottom'})).toEqual({gridName: 'activity.2', grid: workbenchLayout.grids['activity.2']});
+    expect(workbenchLayout.grid({partId: 'part.activity-1'})).toEqual({gridName: 'activity.1', grid: workbenchLayout.grids['activity.1']!});
+    expect(workbenchLayout.grid({partId: 'part.activity-2-top'})).toEqual({gridName: 'activity.2', grid: workbenchLayout.grids['activity.2']!});
+    expect(workbenchLayout.grid({partId: 'part.activity-2-bottom'})).toEqual({gridName: 'activity.2', grid: workbenchLayout.grids['activity.2']!});
 
     // Find by node id.
     const rootNode = workbenchLayout.grids['activity.2']!.root;
-    expect(workbenchLayout.grid({nodeId: rootNode.id})).toEqual({gridName: 'activity.2', grid: workbenchLayout.grids['activity.2']});
+    expect(workbenchLayout.grid({nodeId: rootNode.id})).toEqual({gridName: 'activity.2', grid: workbenchLayout.grids['activity.2']!});
 
     // Find by view id.
     expect(workbenchLayout.grid({viewId: 'view.1'})).toEqual({gridName: 'mainArea', grid: workbenchLayout.grids.mainArea});
     expect(workbenchLayout.grid({viewId: 'view.2'})).toEqual({gridName: 'mainArea', grid: workbenchLayout.grids.mainArea});
     expect(workbenchLayout.grid({viewId: 'view.3'})).toEqual({gridName: 'main', grid: workbenchLayout.grids.main});
     expect(workbenchLayout.grid({viewId: 'view.4'})).toEqual({gridName: 'main', grid: workbenchLayout.grids.main});
-    expect(workbenchLayout.grid({viewId: 'view.5'})).toEqual({gridName: 'activity.1', grid: workbenchLayout.grids['activity.1']});
-    expect(workbenchLayout.grid({viewId: 'view.6'})).toEqual({gridName: 'activity.2', grid: workbenchLayout.grids['activity.2']});
-    expect(workbenchLayout.grid({viewId: 'view.7'})).toEqual({gridName: 'activity.2', grid: workbenchLayout.grids['activity.2']});
+    expect(workbenchLayout.grid({viewId: 'view.5'})).toEqual({gridName: 'activity.1', grid: workbenchLayout.grids['activity.1']!});
+    expect(workbenchLayout.grid({viewId: 'view.6'})).toEqual({gridName: 'activity.2', grid: workbenchLayout.grids['activity.2']!});
+    expect(workbenchLayout.grid({viewId: 'view.7'})).toEqual({gridName: 'activity.2', grid: workbenchLayout.grids['activity.2']!});
 
     // Find by grid.
     expect(workbenchLayout.grid({grid: workbenchLayout.grids.main})).toEqual({gridName: 'main', grid: workbenchLayout.grids.main});
     expect(workbenchLayout.grid({grid: workbenchLayout.grids.mainArea})).toEqual({gridName: 'mainArea', grid: workbenchLayout.grids.mainArea});
-    expect(workbenchLayout.grid({grid: workbenchLayout.grids['activity.1']!})).toEqual({gridName: 'activity.1', grid: workbenchLayout.grids['activity.1']});
-    expect(workbenchLayout.grid({grid: workbenchLayout.grids['activity.2']!})).toEqual({gridName: 'activity.2', grid: workbenchLayout.grids['activity.2']});
+    expect(workbenchLayout.grid({grid: workbenchLayout.grids['activity.1']!})).toEqual({gridName: 'activity.1', grid: workbenchLayout.grids['activity.1']!});
+    expect(workbenchLayout.grid({grid: workbenchLayout.grids['activity.2']!})).toEqual({gridName: 'activity.2', grid: workbenchLayout.grids['activity.2']!});
 
     // Expect to throw if finding no grid.
     expect(() => workbenchLayout.grid({partId: 'part.99'})).toThrowError(/NullGridError/);
@@ -2224,10 +2223,10 @@ describe('WorkbenchLayout', () => {
 
     // Find by node id.
     expect(workbenchLayout.treeNode({nodeId: childTreeNode.id})).toBe(childTreeNode);
-    expect(workbenchLayout.treeNode({nodeId: childTreeNode.id})).toBe(workbenchLayout.part({partId: 'part.right'}).parent);
-    expect(workbenchLayout.treeNode({nodeId: childTreeNode.id})).toBe(workbenchLayout.part({partId: 'part.bottom'}).parent);
+    expect(workbenchLayout.treeNode({nodeId: childTreeNode.id})).toBe(workbenchLayout.part({partId: 'part.right'}).parent!);
+    expect(workbenchLayout.treeNode({nodeId: childTreeNode.id})).toBe(workbenchLayout.part({partId: 'part.bottom'}).parent!);
     expect(workbenchLayout.treeNode({nodeId: rootTreeNode.id})).toBe(rootTreeNode);
-    expect(workbenchLayout.treeNode({nodeId: rootTreeNode.id})).toBe(childTreeNode.parent);
+    expect(workbenchLayout.treeNode({nodeId: rootTreeNode.id})).toBe(childTreeNode.parent!);
   });
 
   it('should return whether a part is contained in the layout', () => {
