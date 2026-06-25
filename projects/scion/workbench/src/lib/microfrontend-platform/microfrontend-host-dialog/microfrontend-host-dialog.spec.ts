@@ -16,7 +16,6 @@ import {toShowCustomMatcher} from '../../testing/jasmine/matcher/to-show.matcher
 import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../../testing/testing.util';
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
 import {WorkbenchComponent} from '../../workbench.component';
-import {expect} from '../../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchDialogService} from '@scion/workbench-client';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {canMatchWorkbenchDialogCapability} from '../microfrontend-host/microfrontend-host-routes';

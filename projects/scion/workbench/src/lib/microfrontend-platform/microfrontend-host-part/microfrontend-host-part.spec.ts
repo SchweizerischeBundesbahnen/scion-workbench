@@ -15,7 +15,6 @@ import {Component} from '@angular/core';
 import {canMatchWorkbenchPartCapability} from '../microfrontend-host/microfrontend-host-routes';
 import {LogLevel} from '../../logging';
 import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../../testing/testing.util';
-import {expect} from '../../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchPerspectiveService} from '../../perspective/workbench-perspective.service';
 import {ManifestService} from '@scion/microfrontend-platform';
 import {MAIN_AREA, WorkbenchPerspectiveCapability, WorkbenchCapabilities} from '@scion/workbench-client';

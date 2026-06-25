@@ -12,7 +12,6 @@ import {TestBed} from '@angular/core/testing';
 import {NgZone} from '@angular/core';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from './microfrontend-platform-initializer';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchLauncher} from '../startup/workbench-launcher.service';
 
 describe('Microfrontend Platform Initializer', () => {

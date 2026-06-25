@@ -86,7 +86,7 @@ export class WorkbenchNotificationComponent {
    * Public contribution point: 'menu:workbench.notification.toolbar'
    */
   private contributeToolbarAdditionsMenu(toolbar: SciToolbarFactory): void {
-    toolbar.addToolbarMenu({icon: 'scion.more_vertical', visualMenuIndicator: false, menu: {name: 'menu:workbench.notification.toolbar'}}, menu => menu);
+    toolbar.addToolbarMenu({icon: 'scion.more_vertical', visualMenuIndicator: false, cssClass: 'e2e-notification-additions-menu', menu: {name: 'menu:workbench.notification.toolbar'}}, menu => menu);
   }
 
   private contributeCloseButton(toolbar: SciToolbarFactory): void {

@@ -10,7 +10,6 @@
 
 import {TestBed} from '@angular/core/testing';
 import {Component, inject, Injectable, InjectionToken} from '@angular/core';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {provideRouter, Routes} from '@angular/router';
 import {styleFixture, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';

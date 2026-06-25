@@ -10,6 +10,7 @@
 
 import {Locator} from '@playwright/test';
 import {SciToggleButtonPO} from './@scion/components.internal/toggle-button.po';
+import {MenuPO} from './menu.po';
 
 /**
  * Handle for interacting with the header of the testing application.
@@ -49,36 +50,25 @@ export class AppHeaderPO {
   }
 
   /**
-   * Opens the settings menu.
+   * Clicks specified setting in settings menu.
    */
-  public async openSettingsMenu(): Promise<Locator> {
-    const menu = this._locator.page()
-      .locator('sci-menu.e2e-settings-menu') // CDK overlay
-      .locator('app-menu');
-
-    // Open the menu only if not yet opened.
-    if (!await menu.isVisible()) {
-      await this._locator.locator('button.e2e-settings-menu').click();
-      // Wait until the menu is opened.
-      await menu.waitFor({state: 'visible'});
-    }
-    return menu;
+  public async clickSettingMenuItem(locateBy: {cssClass: string | string[]}, options?: {check?: boolean}): Promise<void> {
+    const menu = await this.openSettingsMenu();
+    return menu.clickMenuItem({cssClass: locateBy.cssClass}, {check: options?.check});
   }
 
   /**
-   * Clicks specified setting in settings menu.
+   * Opens the settings menu.
    */
-  public async clickSettingMenuItem(locateBy: {cssClass: string}, options?: {check?: boolean}): Promise<void> {
-    const menu = await this.openSettingsMenu();
+  public async openSettingsMenu(): Promise<MenuPO> {
+    const menu = new MenuPO(this._locator.page().locator('sci-menu.e2e-settings-menu'));
 
-    // Locate the menu item.
-    const menuItem = menu.locator(`button.e2e-menu-item.${locateBy.cssClass}`);
-
-    // Do not toggle the menu item if already in the expected state.
-    if (options?.check !== undefined && (await menuItem.locator('span.e2e-check-mark').isVisible()) === options.check) {
-      return this._locator.page().keyboard.press('Escape');
+    // Open the menu only if not yet opened.
+    if (!await menu.locator.isVisible()) {
+      await this._locator.locator('button.e2e-settings-menu').click();
+      // Wait until the menu is opened.
+      await menu.locator.waitFor({state: 'visible'});
     }
-
-    return menuItem.click();
+    return menu;
   }
 }

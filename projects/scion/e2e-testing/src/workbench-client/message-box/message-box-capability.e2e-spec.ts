@@ -22,6 +22,7 @@ test.describe('Workbench Message Box Capability', () => {
       qualifier: {component: 'testee'},
       properties: {
         path: '<undefined>',
+        cssClass: 'testee',
       },
     });
     await expect(registeredCapability).rejects.toThrow(/\[MessageBoxDefinitionError] MessageBox capabilities require a path/);
@@ -87,6 +88,7 @@ test.describe('Workbench Message Box Capability', () => {
         qualifier: {component: 'testee'},
         properties: {
           path: '<undefined>',
+          cssClass: 'testee',
         },
       });
 

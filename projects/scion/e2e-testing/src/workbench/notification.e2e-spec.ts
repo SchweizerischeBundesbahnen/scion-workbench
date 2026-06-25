@@ -19,6 +19,7 @@ import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
 import {expectDialog} from '../matcher/dialog-matcher';
 import {DialogPagePO} from './page-object/dialog-page.po';
 import {WorkbenchHandleBoundsTestPagePO} from './page-object/test-pages/workbench-handle-bounds-test-page.po';
+import {MenuPO} from '../menu.po';
 
 test.describe('Workbench Notification', () => {
 
@@ -58,12 +59,7 @@ test.describe('Workbench Notification', () => {
     const notificationPage = new TextNotificationPO(notification);
 
     // Expect text not to be displayed.
-    await expect(notificationPage.text).toBeEmpty();
-
-    // Expect the text message box page to display without height.
-    await expect.poll(() => notificationPage.getTextBoundingBox()).toMatchObject({
-      height: 0,
-    });
+    await expect(notificationPage.text).not.toBeAttached();
   });
 
   test('should close last notification when pressing the ESC key', async ({appPO, workbenchNavigator, page}) => {
@@ -779,12 +775,12 @@ test.describe('Workbench Notification', () => {
     await expect.poll(() => notification.getBoundingBox().then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
   });
 
-  test('should wrap title', async ({appPO, workbenchNavigator}) => {
+  test('should not wrap title', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false, designTokens: {'--sci-workbench-notification-width': '350px'}});
 
-    // Display notification with a single line.
+    // Display notification with a short title.
     const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
-    await notificationOpenerPage.show(null, {title: 'Single Line', cssClass: 'testee'});
+    await notificationOpenerPage.show(null, {title: 'Short Title', cssClass: 'testee'});
 
     const notification = appPO.notification({cssClass: 'testee'});
     const notificationPage = new TextNotificationPO(notification);
@@ -796,21 +792,21 @@ test.describe('Workbench Notification', () => {
     // Close the notification.
     await notification.close();
 
-    // Display notification with multiple lines.
-    await notificationOpenerPage.show(null, {title: 'Multiple Lines '.repeat(100), cssClass: 'testee'});
+    // Display notification with a long title.
+    await notificationOpenerPage.show(null, {title: 'Long Title '.repeat(100), cssClass: 'testee'});
 
-    // Expect the notification to break words.
+    // Expect the notification not to break words.
     await expect.poll(() => notification.hasVerticalOverflow()).toBe(false);
     await expect.poll(() => notification.getBoundingBox().then(bounds => bounds.width)).toEqual(350);
-    await expect.poll(() => notification.getBoundingBox().then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
+    await expect.poll(() => notification.getBoundingBox().then(bounds => bounds.height)).toEqual(singleLineBounds.height);
   });
 
-  test('should wrap "unbreakable" title', async ({appPO, workbenchNavigator}) => {
+  test('should not wrap "unbreakable" title', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false, designTokens: {'--sci-workbench-notification-width': '350px'}});
 
-    // Display notification with a single line.
+    // Display notification with a short title.
     const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
-    await notificationOpenerPage.show(null, {title: 'Single Line', cssClass: 'testee'});
+    await notificationOpenerPage.show(null, {title: 'Short Title', cssClass: 'testee'});
 
     const notification = appPO.notification({cssClass: 'testee'});
     const notificationPage = new TextNotificationPO(notification);
@@ -822,13 +818,13 @@ test.describe('Workbench Notification', () => {
     // Close the notification.
     await notification.close();
 
-    // Display notification with multiple lines.
-    await notificationOpenerPage.show(null, {title: 'MultipleLines'.repeat(100), cssClass: 'testee'});
+    // Display notification with a long title.
+    await notificationOpenerPage.show(null, {title: 'LongTitle'.repeat(100), cssClass: 'testee'});
 
-    // Expect the notification to break words.
+    // Expect the notification not to break words.
     await expect.poll(() => notification.hasVerticalOverflow()).toBe(false);
     await expect.poll(() => notification.getBoundingBox().then(bounds => bounds.width)).toEqual(350);
-    await expect.poll(() => notification.getBoundingBox().then(bounds => bounds.height)).toBeGreaterThan(singleLineBounds.height);
+    await expect.poll(() => notification.getBoundingBox().then(bounds => bounds.height)).toEqual(singleLineBounds.height);
   });
 
   test('should not reduce the input of notifications in the same group', async ({appPO, workbenchNavigator}) => {
@@ -1273,6 +1269,32 @@ test.describe('Workbench Notification', () => {
       // Expect the notification not to display after 2.5s.
       await page.waitForTimeout(1000);
       expect(await notification.locator.isVisible()).toBe(false);
+    });
+  });
+
+  test.describe('Menu', () => {
+
+    test('should close notification menu when pressing Escape', async ({appPO, workbenchNavigator, page}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open notification.
+      const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+      await notificationOpenerPage.show('component:workbench-notification-menu-test-page', {cssClass: 'testee'});
+      const notification = appPO.notification({cssClass: 'testee'});
+      await expect(notification.locator).toBeAttached();
+
+      // Open notification menu.
+      const item = notification.toolbar.item({cssClass: 'e2e-notification-additions-menu'});
+      await item.locator.click();
+      const menu = new MenuPO(page.locator('sci-menu.e2e-notification-additions-menu'));
+      await expect(menu.locator).toBeAttached();
+
+      // Close menu.
+      await page.keyboard.press('Escape');
+
+      // Expect notification not to be closed.
+      await expect(menu.locator).not.toBeAttached();
+      await expect(notification.locator).toBeAttached();
     });
   });
 });

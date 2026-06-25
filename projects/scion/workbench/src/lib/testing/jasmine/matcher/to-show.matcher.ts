@@ -15,7 +15,7 @@ import {DebugElement, Predicate, Type} from '@angular/core';
 import {By} from '@angular/platform-browser';
 
 /**
- * Provides the implementation of {@link CustomMatchers#toShow}.
+ * Provides the implementation of {@link CustomMatcherFactories#toShow}.
  */
 export const toShowCustomMatcher: jasmine.CustomMatcherFactories = {
   toShow: (): CustomMatcher => {

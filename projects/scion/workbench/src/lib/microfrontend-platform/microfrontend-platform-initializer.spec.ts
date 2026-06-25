@@ -12,7 +12,6 @@ import {TestBed} from '@angular/core/testing';
 import {inject, Injector} from '@angular/core';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {MicrofrontendPlatformInitializerFn, MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from './microfrontend-platform-initializer';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchLauncher} from '../startup/workbench-launcher.service';
 import {firstValueFrom, timer} from 'rxjs';
 import {provideWorkbenchInitializer, WorkbenchStartupPhase} from '../startup/workbench-initializer';

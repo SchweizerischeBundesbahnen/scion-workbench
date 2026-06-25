@@ -987,7 +987,7 @@ test.describe('Focus Tracker', () => {
     await expect(viewPage.firstField).toBeFocused();
 
     // TEST: Click part action.
-    const partAction = appPO.part({partId: 'part.main'}).bar.action({cssClass: 'testee'});
+    const partAction = appPO.part({partId: 'part.main'}).bar.toolBar.item({cssClass: 'testee'});
     await partAction.locator.click();
 
     // Expect tab of 'view.1' to have focus.
@@ -1030,7 +1030,7 @@ test.describe('Focus Tracker', () => {
     await expect.poll(() => logPart.getLog()).toEqual(['view.1']);
     await expect(appPO.view({viewId: 'view.1'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.1'}).tab.state('focus-within-view')).toBeVisible();
-    await expect(viewListMenu.filter).toBeFocused();
+    await expect(viewListMenu.filter).not.toBeFocused();
   });
 
   test('should not lose DOM focus when clicking part title', async ({appPO, workbenchNavigator}) => {

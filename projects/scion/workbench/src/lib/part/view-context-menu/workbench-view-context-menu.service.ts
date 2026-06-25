@@ -278,13 +278,15 @@ export class WorkbenchViewContextMenuService {
 
 @Component({
   selector: 'wb-menu-item',
-  template: '<ng-container *ngTemplateOutlet="template(); context: context()"/>',
+  template: '<ng-container *ngTemplateOutlet="template(); context: context(); injector: injector"/>',
   imports: [NgTemplateOutlet],
 })
 class MenuItemComponent {
 
   public readonly template = input.required<TemplateRef<unknown>>();
   public readonly context = input<{[name: string]: unknown}>();
+
+  protected readonly injector = inject(Injector);
 }
 
 /**

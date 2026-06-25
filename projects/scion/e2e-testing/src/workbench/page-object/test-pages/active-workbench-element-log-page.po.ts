@@ -24,7 +24,7 @@ export class ActiveWorkbenchElementLogPagePO {
    */
   public async clearLog(): Promise<void> {
     // Click via JavaScript to not gain focus.
-    const closeButton = this.part.bar.action({cssClass: 'e2e-clear'}).locator.locator('button');
+    const closeButton = this.part.bar.toolBar.item({cssClass: 'e2e-clear'}).locator.locator('button');
     await closeButton.evaluate((button: HTMLElement) => button.click());
   }
 

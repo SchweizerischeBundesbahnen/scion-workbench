@@ -13,6 +13,7 @@ import {coerceArray, DomRect, fromRect, hasCssClass, selectBy} from './helper/te
 import {AppPO} from './app.po';
 import {DialogId} from '@scion/workbench';
 import {RequireOne} from '@scion/toolkit/types';
+import {ToolbarPO} from './toolbar.po';
 
 /**
  * PO for interacting with a workbench dialog.
@@ -22,6 +23,7 @@ export class DialogPO {
   public readonly locator: Locator;
   public readonly dialog: Locator;
   public readonly header: Locator;
+  public readonly toolbar: ToolbarPO;
   public readonly title: Locator;
   public readonly closeButton: Locator;
   public readonly resizeHandles: Locator;
@@ -37,6 +39,7 @@ export class DialogPO {
 
     this.dialog = this.locator.locator('div.e2e-dialog');
     this.header = this.dialog.locator('header.e2e-dialog-header');
+    this.toolbar = new ToolbarPO(this.locator.locator('sci-toolbar[name="toolbar:workbench.dialog.toolbar"]'));
     this.title = this.header.locator('div.e2e-title > span');
     this.closeButton = this.header.locator('button.e2e-close');
     this.viewport = this.locator.locator('sci-viewport.e2e-dialog-slot');

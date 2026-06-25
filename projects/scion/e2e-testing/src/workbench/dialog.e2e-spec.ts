@@ -27,6 +27,7 @@ import {expectPopup} from '../matcher/popup-matcher';
 import {LargeTestPagePO} from './page-object/test-pages/large-test-page.po';
 import {WorkbenchHandleBoundsTestPagePO} from './page-object/test-pages/workbench-handle-bounds-test-page.po';
 import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
+import {MenuPO} from '../menu.po';
 
 test.describe('Workbench Dialog', () => {
 
@@ -1226,11 +1227,11 @@ test.describe('Workbench Dialog', () => {
       await expectDialog(dialogPage).toBeVisible();
 
       // Unmount the workbench component by navigating the primary router outlet.
-      await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
+      await appPO.header.clickSettingMenuItem({cssClass: ['e2e-navigate-primary-outlet', 'e2e-navigate-to-blank-page']});
       await expectDialog(dialogPage).toBeHidden();
 
       // Re-mount the workbench component by navigating the primary router.
-      await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
+      await appPO.header.clickSettingMenuItem({cssClass: ['e2e-navigate-primary-outlet', 'e2e-navigate-to-workbench-page']});
       await expectDialog(dialogPage).toBeVisible();
       await expect.poll(() => appPO.isViewBlocked(dialogOpenerPage.view.getViewId())).toBe(true);
       await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(true);
@@ -1350,11 +1351,11 @@ test.describe('Workbench Dialog', () => {
       await expectDialog(dialogPage).toBeVisible();
 
       // Unmount the workbench component by navigating the primary router outlet.
-      await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
+      await appPO.header.clickSettingMenuItem({cssClass: ['e2e-navigate-primary-outlet', 'e2e-navigate-to-blank-page']});
       await expectDialog(dialogPage).toBeHidden();
 
       // Re-mount the workbench component by navigating the primary router.
-      await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
+      await appPO.header.clickSettingMenuItem({cssClass: ['e2e-navigate-primary-outlet', 'e2e-navigate-to-workbench-page']});
       await expectDialog(dialogPage).toBeVisible();
       await expect.poll(() => appPO.isViewBlocked(dialogOpenerPage.view.getViewId())).toBe(false);
       await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
@@ -1385,13 +1386,19 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('focus-test-page', {cssClass: 'testee'});
 
-      const focusTestPage = new FocusTestPagePO(appPO.dialog({cssClass: 'testee'}));
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const focusTestPage = new FocusTestPagePO(dialog);
+
+      await expect(focusTestPage.firstField).toBeFocused();
 
       await page.keyboard.press('Tab');
       await expect(focusTestPage.middleField).toBeFocused();
 
       await page.keyboard.press('Tab');
       await expect(focusTestPage.lastField).toBeFocused();
+
+      await page.keyboard.press('Tab');
+      await expect(dialog.closeButton).toBeFocused();
 
       await page.keyboard.press('Tab');
       await expect(focusTestPage.firstField).toBeFocused();
@@ -1403,7 +1410,13 @@ test.describe('Workbench Dialog', () => {
       // Open the dialog.
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('focus-test-page', {cssClass: 'testee'});
-      const focusTestPage = new FocusTestPagePO(appPO.dialog({cssClass: 'testee'}));
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const focusTestPage = new FocusTestPagePO(dialog);
+
+      await expect(focusTestPage.firstField).toBeFocused();
+
+      await page.keyboard.press('Shift+Tab');
+      await expect(dialog.closeButton).toBeFocused();
 
       await page.keyboard.press('Shift+Tab');
       await expect(focusTestPage.lastField).toBeFocused();
@@ -1449,11 +1462,11 @@ test.describe('Workbench Dialog', () => {
       await expect(focusTestPage.middleField).toBeFocused();
 
       // Unmount the workbench component by navigating the primary router outlet.
-      await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
+      await appPO.header.clickSettingMenuItem({cssClass: ['e2e-navigate-primary-outlet', 'e2e-navigate-to-blank-page']});
       await expect(focusTestPage.middleField).not.toBeFocused();
 
       // Re-mount the workbench component by navigating the primary router.
-      await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
+      await appPO.header.clickSettingMenuItem({cssClass: ['e2e-navigate-primary-outlet', 'e2e-navigate-to-workbench-page']});
       await expect(focusTestPage.middleField).toBeFocused();
     });
 
@@ -3372,6 +3385,32 @@ test.describe('Workbench Dialog', () => {
       await expect.poll(() => appPO.isViewBlocked(dialogOpenerPage.view.getViewId())).toBe(true);
       await expect.poll(() => appPO.isViewBlocked(focusTestPage.view.getViewId())).toBe(true);
       await expect.poll(() => appPO.isDialogBlocked(dialog.getDialogId())).toBe(false);
+    });
+  });
+
+  test.describe('Menu', () => {
+
+    test('should close dialog menu when pressing Escape', async ({appPO, workbenchNavigator, page}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open the dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('workbench-dialog-menu-test-page', {cssClass: 'testee'});
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      await expect(dialog.locator).toBeAttached();
+
+      // Open dialog menu.
+      const item = dialog.toolbar.item({cssClass: 'e2e-dialog-additions-menu'});
+      await item.locator.click();
+      const menu = new MenuPO(page.locator('sci-menu.e2e-dialog-additions-menu'));
+      await expect(menu.locator).toBeAttached();
+
+      // Close menu.
+      await page.keyboard.press('Escape');
+
+      // Expect dialog not to be closed.
+      await expect(menu.locator).not.toBeAttached();
+      await expect(dialog.locator).toBeAttached();
     });
   });
 });

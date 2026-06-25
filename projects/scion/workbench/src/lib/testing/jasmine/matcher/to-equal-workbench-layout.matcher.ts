@@ -28,7 +28,7 @@ import {throwError} from '../../../common/throw-error.util';
 import {ActivityId} from '../../../workbench.identifiers';
 
 /**
- * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
+ * Provides the implementation of {@link CustomMatcherFactories#toEqualWorkbenchLayout}.
  */
 export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories = {
   toEqualWorkbenchLayout: (util: MatchersUtil): CustomMatcher => {

@@ -10,7 +10,6 @@
 
 import {TestBed} from '@angular/core/testing';
 import {WorkbenchViewRegistry} from './workbench-view.registry';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {TestComponent} from '../testing/test.component';
 import {provideRouter} from '@angular/router';

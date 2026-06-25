@@ -13,7 +13,6 @@ import {TestComponent} from '../testing/test.component';
 import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchPartRegistry} from './workbench-part.registry';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
@@ -30,11 +29,13 @@ import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/
 import {WorkbenchMessageBoxService} from '../message-box/workbench-message-box.service';
 import {WorkbenchDialogService} from '../dialog/workbench-dialog.service';
 import {LogLevel} from '../logging';
+import {toBeVisibleCustomMatcher} from '../testing/jasmine/matcher/to-be-visible.matcher';
 
 describe('WorkbenchPart', () => {
 
   beforeEach(() => {
     jasmine.addMatchers(toEqualWorkbenchLayoutCustomMatcher);
+    jasmine.addAsyncMatchers(toBeVisibleCustomMatcher);
   });
 
   it('should destroy handle\'s injector when removing the part', async () => {
@@ -932,7 +933,7 @@ describe('WorkbenchPart', () => {
       // Expect part bar of 'part.activity-top' to show with title.
       expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.activity-top"] > wb-part-bar > span.e2e-title')).nativeElement.innerText).toEqual('ACTIVITY');
       // Expect part bar of 'part.activity-bottom' not to show.
-      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.activity-bottom"] > wb-part-bar'))).toBeNull();
+      await expectAsync(() => fixture.debugElement.query(By.css('wb-part[data-partid="part.activity-bottom"] > wb-part-bar'))).not.toBeVisible();
     });
 
     it('should show part bar if part has views', async () => {
@@ -1013,7 +1014,7 @@ describe('WorkbenchPart', () => {
       await waitUntilWorkbenchStarted();
 
       // Expect part bar not to show.
-      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.testee"] > wb-part-bar'))).toBeNull();
+      await expectAsync(() => fixture.debugElement.query(By.css('wb-part[data-partid="part.testee"] > wb-part-bar'))).not.toBeVisible();
     });
   });
 

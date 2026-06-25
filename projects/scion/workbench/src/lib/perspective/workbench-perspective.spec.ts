@@ -14,7 +14,6 @@ import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchService} from '../workbench.service';
 import {TestComponent, withComponentContent} from '../testing/test.component';
 import {Component, DestroyRef, inject, isSignal, provideAppInitializer} from '@angular/core';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {firstValueFrom, Subject, timer} from 'rxjs';
 import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {MAIN_AREA} from '../layout/workbench-layout';

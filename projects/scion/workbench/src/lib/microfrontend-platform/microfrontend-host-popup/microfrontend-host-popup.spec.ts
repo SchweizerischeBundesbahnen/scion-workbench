@@ -15,7 +15,6 @@ import {firstValueFrom, Subject} from 'rxjs';
 import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../../testing/testing.util';
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
 import {WorkbenchComponent} from '../../workbench.component';
-import {expect} from '../../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchPopupService} from '@scion/workbench-client';
 import {toShowCustomMatcher} from '../../testing/jasmine/matcher/to-show.matcher';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';

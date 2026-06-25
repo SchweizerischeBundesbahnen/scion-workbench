@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, effect, ElementRef, inject, InjectionToken, NgZone, Signal, untracked, viewChild, ChangeDetectionStrategy} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, InjectionToken, NgZone, Signal, untracked, viewChild} from '@angular/core';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {ViewTabBarComponent} from '../view-tab-bar/view-tab-bar.component';
@@ -187,6 +187,9 @@ export class PartBarComponent {
             cssClass: 'e2e-close',
             onSelect: () => void view.close(),
           });
+        },
+        attributes: {
+          'data-viewid': view.id,
         },
         active: view.active,
         onFilter: filter => filterText().toLowerCase().includes(filter.toLowerCase()),

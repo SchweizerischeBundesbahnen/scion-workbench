@@ -23,6 +23,7 @@ import DialogOpenerPageComponent from '../dialog-opener-page/dialog-opener-page.
 import PopupOpenerPageComponent from '../popup-opener-page/popup-opener-page.component';
 import WorkbenchHandleBoundsTestPageComponent from '../test-pages/workbench-handle-bounds-test-page/workbench-handle-bounds-test-page.component';
 import {Translatable} from '@scion/components/text';
+import WorkbenchNotificationMenuTestPageComponent from '../test-pages/workbench-notification-menu-test-page/workbench-notification-menu-test-page.component';
 
 @Component({
   selector: 'app-notification-opener-page',
@@ -104,6 +105,8 @@ export default class NotificationOpenerPageComponent {
         return PopupOpenerPageComponent;
       case 'workbench-handle-bounds-test-page':
         return WorkbenchHandleBoundsTestPageComponent;
+      case 'workbench-notification-menu-test-page':
+        return WorkbenchNotificationMenuTestPageComponent;
       default:
         throw Error(`[IllegalNotificationComponent] Notification component not supported: ${this.form.controls.component.value}`);
     }

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DomRect, fromRect, getCssClasses, getPerspectiveId} from './helper/testing.util';
+import {DomRect, fromRect, getCssClasses, getPerspectiveId, waitUntilBoundingBoxStable} from './helper/testing.util';
 import {Locator, Page} from '@playwright/test';
 import {PartPO} from './part.po';
 import {ViewTabContextMenuPO} from './view-tab-context-menu.po';
@@ -133,9 +133,19 @@ export class ViewTabPO {
    * Opens the context menu of this view tab.
    */
   public async openContextMenu(): Promise<ViewTabContextMenuPO> {
-    await this.locator.click({button: 'right'});
+    await this.locator.hover();
+    const box = await waitUntilBoundingBoxStable(this.locator);
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+
+    await this.locator.evaluate((element, {x, y}) => {
+      element.dispatchEvent(new MouseEvent('contextmenu', {clientX: x, clientY: y}));
+    }, {x, y});
+
     const viewId = await this.getViewId();
-    return new ViewTabContextMenuPO(this.locator.page().locator(`div.cdk-overlay-pane wb-view-menu[data-viewid="${viewId}"]`));
+    const contextMenu = this.locator.page().locator(`sci-menu.e2e-view-contextmenu[data-viewid="${viewId}"]`);
+    await contextMenu.waitFor({state: 'visible'});
+    return new ViewTabContextMenuPO(contextMenu);
   }
 
   /**

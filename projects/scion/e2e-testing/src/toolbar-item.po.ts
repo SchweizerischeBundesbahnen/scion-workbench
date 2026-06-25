@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2026 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,10 +11,7 @@
 import {Locator} from '@playwright/test';
 import {DomRect, fromRect} from './helper/testing.util';
 
-/**
- * Handle for interacting with a part action.
- */
-export class PartActionPO {
+export class ToolbarItemPO {
 
   constructor(public readonly locator: Locator) {
   }

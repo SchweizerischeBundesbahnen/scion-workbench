@@ -10,7 +10,6 @@
 
 import {TestBed} from '@angular/core/testing';
 import {ɵWorkbenchLayoutFactory} from './ɵworkbench-layout.factory';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchLayouts} from './workbench-layouts.util';
 
 describe('WorkbenchLayouts.findPart', () => {

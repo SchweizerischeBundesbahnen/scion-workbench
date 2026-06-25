@@ -22,8 +22,8 @@ export class TextNotificationPO implements WorkbenchNotificationPagePO {
   public readonly text: Locator;
 
   constructor(public notification: NotificationPO) {
-    this.locator = this.notification.locator.locator('div.e2e-slot');
-    this.text = this.locator;
+    this.locator = this.notification.locator;
+    this.text = this.locator.locator('div.e2e-slot');
   }
 
   public async getTextBoundingBox(): Promise<DomRect> {

@@ -30,6 +30,7 @@ export const environment = {
   animationEnabled: false,
   logAngularChangeDetectionCycles: false,
   showMicrofrontendApplicationLabels: false,
+  toolbarVisibility: 'always',
   initialPerspective: 'blank',
   microfrontendPlatformConfig,
 };

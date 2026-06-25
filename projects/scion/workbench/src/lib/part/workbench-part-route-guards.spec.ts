@@ -9,7 +9,6 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {provideRouter, RouterOutlet} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';

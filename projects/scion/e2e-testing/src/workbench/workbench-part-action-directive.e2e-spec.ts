@@ -45,45 +45,45 @@ test.describe('Workbench Part Action Directive', () => {
 
     // Activate view 1.
     await viewPage1.view.tab.click();
-    await expect(appPO.part({partId: 'part.left'}).bar.action({cssClass: 'view-1-search-action'}).locator).toBeVisible();
-    await expect(appPO.part({partId: 'part.left'}).bar.action({cssClass: 'view-2-settings-action'}).locator).not.toBeAttached();
-    await expect(appPO.part({partId: 'part.left'}).bar.action({cssClass: 'view-2-launch-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.left'}).bar.toolBar.item({cssClass: 'view-1-search-action'}).locator).toBeVisible();
+    await expect(appPO.part({partId: 'part.left'}).bar.toolBar.item({cssClass: 'view-2-settings-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.left'}).bar.toolBar.item({cssClass: 'view-2-launch-action'}).locator).not.toBeAttached();
 
-    await expect(appPO.part({partId: 'part.right-top'}).bar.action({cssClass: 'view-1-search-action'}).locator).not.toBeAttached();
-    await expect(appPO.part({partId: 'part.right-top'}).bar.action({cssClass: 'view-2-settings-action'}).locator).not.toBeAttached();
-    await expect(appPO.part({partId: 'part.right-top'}).bar.action({cssClass: 'view-2-launch-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.right-top'}).bar.toolBar.item({cssClass: 'view-1-search-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.right-top'}).bar.toolBar.item({cssClass: 'view-2-settings-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.right-top'}).bar.toolBar.item({cssClass: 'view-2-launch-action'}).locator).not.toBeAttached();
 
-    await expect(appPO.part({partId: 'part.right-bottom'}).bar.action({cssClass: 'view-1-search-action'}).locator).not.toBeAttached();
-    await expect(appPO.part({partId: 'part.right-bottom'}).bar.action({cssClass: 'view-2-settings-action'}).locator).not.toBeAttached();
-    await expect(appPO.part({partId: 'part.right-bottom'}).bar.action({cssClass: 'view-2-launch-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.right-bottom'}).bar.toolBar.item({cssClass: 'view-1-search-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.right-bottom'}).bar.toolBar.item({cssClass: 'view-2-settings-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.right-bottom'}).bar.toolBar.item({cssClass: 'view-2-launch-action'}).locator).not.toBeAttached();
 
     // Activate view 2.
     await viewPage2.view.tab.click();
-    await expect(appPO.part({partId: 'part.left'}).bar.action({cssClass: 'view-1-search-action'}).locator).not.toBeAttached();
-    await expect(appPO.part({partId: 'part.left'}).bar.action({cssClass: 'view-2-settings-action'}).locator).toBeVisible();
-    await expect(appPO.part({partId: 'part.left'}).bar.action({cssClass: 'view-2-launch-action'}).locator).toBeVisible();
+    await expect(appPO.part({partId: 'part.left'}).bar.toolBar.item({cssClass: 'view-1-search-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.left'}).bar.toolBar.item({cssClass: 'view-2-settings-action'}).locator).toBeVisible();
+    await expect(appPO.part({partId: 'part.left'}).bar.toolBar.item({cssClass: 'view-2-launch-action'}).locator).toBeVisible();
 
-    await expect(appPO.part({partId: 'part.right-top'}).bar.action({cssClass: 'view-1-search-action'}).locator).not.toBeAttached();
-    await expect(appPO.part({partId: 'part.right-top'}).bar.action({cssClass: 'view-2-settings-action'}).locator).not.toBeAttached();
-    await expect(appPO.part({partId: 'part.right-top'}).bar.action({cssClass: 'view-2-launch-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.right-top'}).bar.toolBar.item({cssClass: 'view-1-search-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.right-top'}).bar.toolBar.item({cssClass: 'view-2-settings-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.right-top'}).bar.toolBar.item({cssClass: 'view-2-launch-action'}).locator).not.toBeAttached();
 
-    await expect(appPO.part({partId: 'part.right-bottom'}).bar.action({cssClass: 'view-1-search-action'}).locator).not.toBeAttached();
-    await expect(appPO.part({partId: 'part.right-bottom'}).bar.action({cssClass: 'view-2-settings-action'}).locator).not.toBeAttached();
-    await expect(appPO.part({partId: 'part.right-bottom'}).bar.action({cssClass: 'view-2-launch-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.right-bottom'}).bar.toolBar.item({cssClass: 'view-1-search-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.right-bottom'}).bar.toolBar.item({cssClass: 'view-2-settings-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.right-bottom'}).bar.toolBar.item({cssClass: 'view-2-launch-action'}).locator).not.toBeAttached();
 
     // Close all views.
     await appPO.part({partId: 'part.left'}).bar.viewTabBar.closeTabs();
-    await expect(appPO.part({partId: 'part.left'}).bar.action({cssClass: 'view-1-search-action'}).locator).not.toBeAttached();
-    await expect(appPO.part({partId: 'part.left'}).bar.action({cssClass: 'view-2-settings-action'}).locator).not.toBeAttached();
-    await expect(appPO.part({partId: 'part.left'}).bar.action({cssClass: 'view-2-launch-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.left'}).bar.toolBar.item({cssClass: 'view-1-search-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.left'}).bar.toolBar.item({cssClass: 'view-2-settings-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.left'}).bar.toolBar.item({cssClass: 'view-2-launch-action'}).locator).not.toBeAttached();
 
-    await expect(appPO.part({partId: 'part.right-top'}).bar.action({cssClass: 'view-1-search-action'}).locator).not.toBeAttached();
-    await expect(appPO.part({partId: 'part.right-top'}).bar.action({cssClass: 'view-2-settings-action'}).locator).not.toBeAttached();
-    await expect(appPO.part({partId: 'part.right-top'}).bar.action({cssClass: 'view-2-launch-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.right-top'}).bar.toolBar.item({cssClass: 'view-1-search-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.right-top'}).bar.toolBar.item({cssClass: 'view-2-settings-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.right-top'}).bar.toolBar.item({cssClass: 'view-2-launch-action'}).locator).not.toBeAttached();
 
-    await expect(appPO.part({partId: 'part.right-bottom'}).bar.action({cssClass: 'view-1-search-action'}).locator).not.toBeAttached();
-    await expect(appPO.part({partId: 'part.right-bottom'}).bar.action({cssClass: 'view-2-settings-action'}).locator).not.toBeAttached();
-    await expect(appPO.part({partId: 'part.right-bottom'}).bar.action({cssClass: 'view-2-launch-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.right-bottom'}).bar.toolBar.item({cssClass: 'view-1-search-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.right-bottom'}).bar.toolBar.item({cssClass: 'view-2-settings-action'}).locator).not.toBeAttached();
+    await expect(appPO.part({partId: 'part.right-bottom'}).bar.toolBar.item({cssClass: 'view-2-launch-action'}).locator).not.toBeAttached();
   });
 
   test('should stick to a part if registered in the context of a part', async ({appPO, workbenchNavigator}) => {
@@ -111,18 +111,18 @@ test.describe('Workbench Part Action Directive', () => {
     ]);
 
     // Expect 'testee-1' part action to be visible in left part.
-    await expect(appPO.part({partId: 'part.left'}).bar.action({cssClass: 'left-part-testee-1'}).locator).toBeVisible();
-    await expect(appPO.part({partId: 'part.right'}).bar.action({cssClass: 'left-part-testee-1'}).locator).not.toBeVisible();
-    await expect(appPO.part({partId: 'part.bottom'}).bar.action({cssClass: 'left-part-testee-1'}).locator).not.toBeVisible();
+    await expect(appPO.part({partId: 'part.left'}).bar.toolBar.item({cssClass: 'left-part-testee-1'}).locator).toBeVisible();
+    await expect(appPO.part({partId: 'part.right'}).bar.toolBar.item({cssClass: 'left-part-testee-1'}).locator).not.toBeVisible();
+    await expect(appPO.part({partId: 'part.bottom'}).bar.toolBar.item({cssClass: 'left-part-testee-1'}).locator).not.toBeVisible();
 
     // Expect 'testee-2' part action to be visible in right part.
-    await expect(appPO.part({partId: 'part.left'}).bar.action({cssClass: 'right-part-testee-2'}).locator).not.toBeVisible();
-    await expect(appPO.part({partId: 'part.right'}).bar.action({cssClass: 'right-part-testee-2'}).locator).toBeVisible();
-    await expect(appPO.part({partId: 'part.bottom'}).bar.action({cssClass: 'right-part-testee-2'}).locator).not.toBeVisible();
+    await expect(appPO.part({partId: 'part.left'}).bar.toolBar.item({cssClass: 'right-part-testee-2'}).locator).not.toBeVisible();
+    await expect(appPO.part({partId: 'part.right'}).bar.toolBar.item({cssClass: 'right-part-testee-2'}).locator).toBeVisible();
+    await expect(appPO.part({partId: 'part.bottom'}).bar.toolBar.item({cssClass: 'right-part-testee-2'}).locator).not.toBeVisible();
 
     // Expect 'testee-2' part action to be visible in right part.
-    await expect(appPO.part({partId: 'part.left'}).bar.action({cssClass: 'right-part-testee-3'}).locator).not.toBeVisible();
-    await expect(appPO.part({partId: 'part.right'}).bar.action({cssClass: 'right-part-testee-3'}).locator).toBeVisible();
-    await expect(appPO.part({partId: 'part.bottom'}).bar.action({cssClass: 'right-part-testee-3'}).locator).not.toBeVisible();
+    await expect(appPO.part({partId: 'part.left'}).bar.toolBar.item({cssClass: 'right-part-testee-3'}).locator).not.toBeVisible();
+    await expect(appPO.part({partId: 'part.right'}).bar.toolBar.item({cssClass: 'right-part-testee-3'}).locator).toBeVisible();
+    await expect(appPO.part({partId: 'part.bottom'}).bar.toolBar.item({cssClass: 'right-part-testee-3'}).locator).not.toBeVisible();
   });
 });

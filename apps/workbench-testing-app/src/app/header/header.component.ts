@@ -61,7 +61,7 @@ export class HeaderComponent {
 
   private contributeWorkbenchSettingsGroup(menu: SciMenuFactory): void {
     menu.addGroup({label: 'Workbench Settings'}, group => group
-      .addMenu({label: 'Panel Alignment'}, menu => menu
+      .addMenu({label: 'Panel Alignment', cssClass: 'e2e-panel-alignment'}, menu => menu
         .addMenuItem({
           label: 'Left',
           checked: computed(() => this._workbenchService.settings.panelAlignment() === 'left'),
@@ -148,7 +148,7 @@ export class HeaderComponent {
 
   private contributeOpenGroup(menu: SciMenuFactory): void {
     menu.addGroup(group => group
-      .addMenu({label: 'Open View'}, menu => menu
+      .addMenu({label: 'Open View', cssClass: 'e2e-open-view'}, menu => menu
         .addMenuItem({
           label: 'Open Start Page',
           cssClass: 'e2e-open-start-page',
@@ -185,7 +185,7 @@ export class HeaderComponent {
   }
 
   private contributeNavigateGroup(menu: SciMenuFactory): void {
-    menu.addGroup(group => group.addMenu({label: 'Navigate Primary Router Outlet'}, menu => menu
+    menu.addGroup(group => group.addMenu({label: 'Navigate Primary Router Outlet', cssClass: 'e2e-navigate-primary-outlet'}, menu => menu
       .addMenuItem({
         label: 'Navigate to Workbench Page',
         cssClass: 'e2e-navigate-to-workbench-page',

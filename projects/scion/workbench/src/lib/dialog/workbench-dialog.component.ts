@@ -116,7 +116,7 @@ export class WorkbenchDialogComponent {
    * Public contribution point: 'menu:workbench.dialog.toolbar'
    */
   private contributeToolbarAdditionsMenu(toolbar: SciToolbarFactory): void {
-    toolbar.addToolbarMenu({icon: 'scion.more_vertical', visualMenuIndicator: false, menu: {name: 'menu:workbench.dialog.toolbar'}}, menu => menu);
+    toolbar.addToolbarMenu({icon: 'scion.more_vertical', visualMenuIndicator: false, cssClass: 'e2e-dialog-additions-menu', menu: {name: 'menu:workbench.dialog.toolbar'}}, menu => menu);
   }
 
   private contributeCloseButton(toolbar: SciToolbarFactory): void {

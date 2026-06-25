@@ -13,13 +13,18 @@ import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../../te
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
 import {WorkbenchComponent} from '../../workbench.component';
 import {WorkbenchService} from '../../workbench.service';
-import {PartId, ViewId} from '../../workbench.identifiers';
+import {PartId} from '../../workbench.identifiers';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {asyncScheduler, of} from 'rxjs';
 import {observeOn} from 'rxjs/operators';
+import {MenuPO} from '../../testing/jasmine/matcher/menu.po';
+import {toEqualMenuCustomMatcher} from '../../testing/jasmine/matcher/to-equal-menu.matcher';
 
-// TODO [menu] Rewrite to menu API
 describe('View List', () => {
+
+  beforeEach(() => {
+    jasmine.addAsyncMatchers(toEqualMenuCustomMatcher);
+  });
 
   it('should list views', async () => {
     TestBed.configureTestingModule({
@@ -36,14 +41,52 @@ describe('View List', () => {
       ],
     });
 
-    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
-    const viewListMenuLeftPart = await openViewListMenu({partId: 'part.left'});
-    expect(await getViewListItems(viewListMenuLeftPart)).toEqual(['view.101', 'view.102']);
+    const menu = new MenuPO(fixture);
 
-    const viewListMenuRightPart = await openViewListMenu({partId: 'part.right'});
-    expect(await getViewListItems(viewListMenuRightPart)).toEqual(['view.103', 'view.104']);
+    await openViewListMenu({partId: 'part.left'});
+    await expectAsync(menu).toEqualMenu([
+      {
+        type: 'group',
+        children: [
+          {
+            type: 'menu-item',
+            attributes: {
+              'data-viewid': 'view.101',
+            },
+          },
+          {
+            type: 'menu-item',
+            attributes: {
+              'data-viewid': 'view.102',
+            },
+          },
+        ],
+      },
+    ]);
+
+    await openViewListMenu({partId: 'part.right'});
+    await expectAsync(menu).toEqualMenu([
+      {
+        type: 'group',
+        children: [
+          {
+            type: 'menu-item',
+            attributes: {
+              'data-viewid': 'view.103',
+            },
+          },
+          {
+            type: 'menu-item',
+            attributes: {
+              'data-viewid': 'view.104',
+            },
+          },
+        ],
+      },
+    ]);
   });
 
   it('should filter views', async () => {
@@ -58,17 +101,70 @@ describe('View List', () => {
       ],
     });
 
-    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     const workbenchService = TestBed.inject(WorkbenchService);
     workbenchService.getView('view.101')!.title = 'view.101';
     workbenchService.getView('view.102')!.title = 'view.102';
 
-    const viewListMenu = await openViewListMenu({partId: 'part.main'});
-    expect(await getViewListItems(viewListMenu, {filter: 'view.'})).toEqual(['view.101', 'view.102']);
-    expect(await getViewListItems(viewListMenu, {filter: 'view.101'})).toEqual(['view.101']);
-    expect(await getViewListItems(viewListMenu, {filter: 'view.102'})).toEqual(['view.102']);
+    const menu = new MenuPO(fixture);
+    await openViewListMenu({partId: 'part.main'});
+
+    menu.filterMenuItems('view.');
+    await expectAsync(menu).toEqualMenu([
+      {
+        type: 'group',
+        children: [
+          {
+            type: 'menu-item',
+            label: 'view.101',
+            attributes: {
+              'data-viewid': 'view.101',
+            },
+          },
+          {
+            type: 'menu-item',
+            label: 'view.102',
+            attributes: {
+              'data-viewid': 'view.102',
+            },
+          },
+        ],
+      },
+    ]);
+
+    menu.filterMenuItems('view.101');
+    await expectAsync(menu).toEqualMenu([
+      {
+        type: 'group',
+        children: [
+          {
+            type: 'menu-item',
+            label: 'view.101',
+            attributes: {
+              'data-viewid': 'view.101',
+            },
+          },
+        ],
+      },
+    ]);
+
+    menu.filterMenuItems('view.102');
+    await expectAsync(menu).toEqualMenu([
+      {
+        type: 'group',
+        children: [
+          {
+            type: 'menu-item',
+            label: 'view.102',
+            attributes: {
+              'data-viewid': 'view.102',
+            },
+          },
+        ],
+      },
+    ]);
   });
 
   it('should filter views by translated titles', async () => {
@@ -93,19 +189,76 @@ describe('View List', () => {
       ],
     });
 
-    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     const workbenchService = TestBed.inject(WorkbenchService);
     workbenchService.getView('view.101')!.title = '%view.101';
     workbenchService.getView('view.102')!.title = '%view.102';
 
-    const viewListMenu = await openViewListMenu({partId: 'part.main'});
-    expect(await getViewListItems(viewListMenu, {filter: 'view.'})).toEqual(['view.101', 'view.102']);
-    expect(await getViewListItems(viewListMenu, {filter: 'view.101'})).toEqual([]);
-    expect(await getViewListItems(viewListMenu, {filter: 'view.102'})).toEqual([]);
-    expect(await getViewListItems(viewListMenu, {filter: 'view.a'})).toEqual(['view.101']);
-    expect(await getViewListItems(viewListMenu, {filter: 'view.b'})).toEqual(['view.102']);
+    const menu = new MenuPO(fixture);
+    await openViewListMenu({partId: 'part.main'});
+
+    menu.filterMenuItems('view.');
+    await expectAsync(menu).toEqualMenu([
+      {
+        type: 'group',
+        children: [
+          {
+            type: 'menu-item',
+            label: 'view.a',
+            attributes: {
+              'data-viewid': 'view.101',
+            },
+          },
+          {
+            type: 'menu-item',
+            label: 'view.b',
+            attributes: {
+              'data-viewid': 'view.102',
+            },
+          },
+        ],
+      },
+    ]);
+
+    menu.filterMenuItems('view.101');
+    await expectAsync(menu).toEqualMenu([]);
+
+    menu.filterMenuItems('view.102');
+    await expectAsync(menu).toEqualMenu([]);
+
+    menu.filterMenuItems('view.a');
+    await expectAsync(menu).toEqualMenu([
+      {
+        type: 'group',
+        children: [
+          {
+            type: 'menu-item',
+            label: 'view.a',
+            attributes: {
+              'data-viewid': 'view.101',
+            },
+          },
+        ],
+      },
+    ]);
+
+    menu.filterMenuItems('view.b');
+    await expectAsync(menu).toEqualMenu([
+      {
+        type: 'group',
+        children: [
+          {
+            type: 'menu-item',
+            label: 'view.b',
+            attributes: {
+              'data-viewid': 'view.102',
+            },
+          },
+        ],
+      },
+    ]);
   });
 
   it('should filter views by translated titles (async text provider)', async () => {
@@ -130,37 +283,81 @@ describe('View List', () => {
       ],
     });
 
-    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
     const workbenchService = TestBed.inject(WorkbenchService);
     workbenchService.getView('view.101')!.title = '%view.101';
     workbenchService.getView('view.102')!.title = '%view.102';
 
-    const viewListMenu = await openViewListMenu({partId: 'part.main'});
-    expect(await getViewListItems(viewListMenu, {filter: 'view.'})).toEqual(['view.101', 'view.102']);
-    expect(await getViewListItems(viewListMenu, {filter: 'view.101'})).toEqual([]);
-    expect(await getViewListItems(viewListMenu, {filter: 'view.102'})).toEqual([]);
-    expect(await getViewListItems(viewListMenu, {filter: 'view.a'})).toEqual(['view.101']);
-    expect(await getViewListItems(viewListMenu, {filter: 'view.b'})).toEqual(['view.102']);
+    const menu = new MenuPO(fixture);
+    await openViewListMenu({partId: 'part.main'});
+
+    menu.filterMenuItems('view.');
+    await expectAsync(menu).toEqualMenu([
+      {
+        type: 'group',
+        children: [
+          {
+            type: 'menu-item',
+            label: 'view.a',
+            attributes: {
+              'data-viewid': 'view.101',
+            },
+          },
+          {
+            type: 'menu-item',
+            label: 'view.b',
+            attributes: {
+              'data-viewid': 'view.102',
+            },
+          },
+        ],
+      },
+    ]);
+
+    menu.filterMenuItems('view.101');
+    await expectAsync(menu).toEqualMenu([]);
+
+    menu.filterMenuItems('view.102');
+    await expectAsync(menu).toEqualMenu([]);
+
+    menu.filterMenuItems('view.a');
+    await expectAsync(menu).toEqualMenu([
+      {
+        type: 'group',
+        children: [
+          {
+            type: 'menu-item',
+            label: 'view.a',
+            attributes: {
+              'data-viewid': 'view.101',
+            },
+          },
+        ],
+      },
+    ]);
+
+    menu.filterMenuItems('view.b');
+    await expectAsync(menu).toEqualMenu([
+      {
+        type: 'group',
+        children: [
+          {
+            type: 'menu-item',
+            label: 'view.b',
+            attributes: {
+              'data-viewid': 'view.102',
+            },
+          },
+        ],
+      },
+    ]);
   });
 });
 
-async function openViewListMenu(locator: {partId: PartId}): Promise<HTMLElement> {
-  const viewListButton = document.querySelector<HTMLElement>(`wb-part[data-partid="${locator.partId}"] wb-part-bar wb-view-list-button`)!;
+async function openViewListMenu(locator: {partId: PartId}): Promise<void> {
+  const viewListButton = document.querySelector<HTMLElement>(`wb-part[data-partid="${locator.partId}"] wb-part-bar button.e2e-view-list`)!;
   viewListButton.click();
   await waitUntilStable();
-  return document.querySelector<HTMLElement>(`div.cdk-overlay-pane wb-view-list[data-partid="${locator.partId}"]`)!;
-}
-
-async function getViewListItems(viewListMenu: HTMLElement, options?: {filter?: string}): Promise<ViewId[]> {
-  if (options?.filter) {
-    const inputElement = viewListMenu.querySelector<HTMLInputElement>('wb-filter-field input')!;
-    inputElement.value = options.filter;
-    inputElement.dispatchEvent(new Event('input'));
-    await waitUntilStable();
-  }
-
-  const listItemElements = Array.from(viewListMenu.querySelectorAll<HTMLElement>('wb-view-list-item'));
-  return Array.from(listItemElements).map(listItemElement => listItemElement.getAttribute('data-viewid') as ViewId);
 }
