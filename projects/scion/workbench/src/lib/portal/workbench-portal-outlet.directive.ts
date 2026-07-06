@@ -8,8 +8,26 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Directive, effect, inject, input, TemplateRef, untracked, ViewContainerRef} from '@angular/core';
+import {Component, DestroyRef, Directive, effect, inject, input, output, TemplateRef, untracked, ViewContainerRef} from '@angular/core';
 import {WbComponentPortal} from './wb-component-portal';
+
+@Component({
+  selector: 'wb-destroy-listener',
+  template: '',
+  styles: `
+    :host {
+      display: none;
+    }
+  `,
+})
+class DestroyComponent {
+
+  public destroying = output<void>();
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => this.destroying.emit());
+  }
+}
 
 /**
  * Renders a {@link WbComponentPortal}, similar to `CdkPortalOutlet`, but with the option to detach it when destroying this directive.
@@ -43,7 +61,24 @@ export class WorkbenchPortalOutletDirective {
     // Insert a pseudo-element before the portal to detect when Angular is about to destroy the portal.
     // This element gets destroyed first, enabling the portal to detach to prevent destruction.
     // TODO [Animations]: The scroll position and focus cannot be read in this hook
-    this._viewContainerRef.createEmbeddedView(nullTemplate).onDestroy(() => !this.destroyOnDetach() && this.detach(this.portal()));
+    this._viewContainerRef.createEmbeddedView(nullTemplate).onDestroy(() => {
+      console.log('CHILD TEMPLATE DESTROY');
+      !this.destroyOnDetach() && this.detach(this.portal());
+    });
+
+    const component = this._viewContainerRef.createComponent(DestroyComponent);
+
+    component.onDestroy(() => {
+      console.log('CHILD COMPONENT DESTROY');
+    });
+
+    component.instance.destroying.subscribe(() => {
+      console.log('CHILD COMPONENT DESTROY EVENT');
+    });
+
+    component.hostView.onDestroy(() => {
+      console.log('CHILD COMPONENT HOSTVIEW DESTROY EVENT');
+    });
 
     // Add an extra element between the pseudo-element and the portal to prevent breaking Angular's destroy algorithm.
     // Angular's destroy algorithm terminates when an element removes its immediate successor during destruction, but it continues

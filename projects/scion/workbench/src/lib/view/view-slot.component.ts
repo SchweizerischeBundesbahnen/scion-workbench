@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {afterRenderEffect, Component, DestroyRef, DOCUMENT, ElementRef, inject, Provider, untracked, viewChild, ChangeDetectionStrategy} from '@angular/core';
+import {afterRenderEffect, ChangeDetectionStrategy, Component, DestroyRef, DOCUMENT, effect, ElementRef, inject, NgZone, Provider, untracked, viewChild} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ViewMenuService} from '../part/view-context-menu/view-menu.service';
@@ -18,9 +18,11 @@ import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
 import {WorkbenchView} from './workbench-view.model';
-import {OnAttach, OnDetach} from '../portal/wb-component-portal';
+import {OnAttach} from '../portal/wb-component-portal';
 import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-context.directive';
 import {FocusTrackerRef, trackFocus} from '../focus/workbench-focus-tracker.service';
+import {outputToObservable} from '@angular/core/rxjs-interop';
+import {subscribeIn} from '@scion/toolkit/operators';
 
 /**
  * Acts as a placeholder for a view's content that Angular fills based on the current router state of the associated view outlet.
@@ -50,13 +52,14 @@ import {FocusTrackerRef, trackFocus} from '../focus/workbench-focus-tracker.serv
     configureViewGlassPane(),
   ],
 })
-export class ViewSlotComponent implements OnAttach, OnDetach {
+export class ViewSlotComponent implements OnAttach {
 
   protected readonly view = inject(ɵWorkbenchView);
   protected readonly viewDragService = inject(ViewDragService);
 
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _document = inject(DOCUMENT);
+  private readonly _zone = inject(NgZone);
   private readonly _viewport = viewChild.required(SciViewportComponent);
   private readonly _focusTrackerRef: FocusTrackerRef;
 
@@ -70,6 +73,8 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
     this.installComponentLifecycleLogger();
     this.installMenuAccelerators();
     this.unsetActiveElementOnPartDeactivate();
+    this.installScrollListener();
+    this.installFocusListener();
   }
 
   public focus(): void {
@@ -88,21 +93,6 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
     if (this.view.focused()) {
       this._activeElementBeforeDetach?.focus();
       this._activeElementBeforeDetach = undefined;
-    }
-  }
-
-  /**
-   * Method invoked before detaching this component from the DOM.
-   */
-  public onDetach(): void {
-    this._scrollTop = this._viewport().scrollTop;
-    this._scrollLeft = this._viewport().scrollLeft;
-
-    if (this.view.focused()) {
-      const activeElement = this._document.activeElement;
-      if (this._host.contains(activeElement) && activeElement instanceof HTMLElement) {
-        this._activeElementBeforeDetach = activeElement;
-      }
     }
   }
 
@@ -127,6 +117,35 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
     const logger = inject(Logger);
     logger.debug(() => `Constructing ViewComponent. [viewId=${this.view.id}]`, LoggerNames.LIFECYCLE);
     inject(DestroyRef).onDestroy(() => logger.debug(() => `Destroying ViewComponent [viewId=${this.view.id}]'`, LoggerNames.LIFECYCLE));
+  }
+
+  private installScrollListener(): void {
+    effect(onCleanup => {
+      const subscription = outputToObservable(this._viewport().scroll).pipe(
+        subscribeIn(fn => this._zone.runOutsideAngular(fn)),
+      ).subscribe(() => {
+        this._scrollTop = this._viewport().scrollTop;
+        this._scrollLeft = this._viewport().scrollLeft;
+      });
+
+      onCleanup(() => subscription.unsubscribe());
+    });
+  }
+
+  private installFocusListener(): void {
+    const focusListener = (event: Event): void => {
+      const target = event.target;
+      if (target instanceof HTMLElement && this._host.contains(target)) {
+        this._activeElementBeforeDetach = target;
+      }
+    };
+
+    this._host.addEventListener('focusin', focusListener);
+    this._host.addEventListener('sci-microfrontend-focusin', focusListener);
+    inject(DestroyRef).onDestroy(() => {
+      this._host.removeEventListener('focusin', focusListener);
+      this._host.removeEventListener('sci-microfrontend-focusin', focusListener);
+    });
   }
 }
 

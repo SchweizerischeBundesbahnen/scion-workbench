@@ -49,13 +49,11 @@ export class DesktopSlotComponent implements OnAttach, OnDetach {
    * Method invoked after attached this component to the DOM.
    */
   public onAttach(): void {
-    requestAnimationFrame(() => {
-      this._viewport().scrollTop = this._scrollTop;
-      this._viewport().scrollLeft = this._scrollLeft;
+    this._viewport().scrollTop = this._scrollTop;
+    this._viewport().scrollLeft = this._scrollLeft;
 
-      this._activeElementBeforeDetach?.focus();
-      this._activeElementBeforeDetach = undefined;
-    });
+    this._activeElementBeforeDetach?.focus();
+    this._activeElementBeforeDetach = undefined;
   }
 
   /**
