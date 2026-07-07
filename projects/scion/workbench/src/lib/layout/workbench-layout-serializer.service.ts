@@ -30,6 +30,7 @@ import {WorkbenchLayouts} from './workbench-layouts.util';
 import {WorkbenchLayoutMigrationV6} from './migration/workbench-layout-migration-v6.service';
 import {throwError} from '../common/throw-error.util';
 import {Objects} from '@scion/toolkit/util';
+import {WorkbenchLayoutMigrationV7} from './migration/workbench-layout-migration-v7.service';
 
 /**
  * Represents the current version of the workbench layout.
@@ -38,7 +39,7 @@ import {Objects} from '@scion/toolkit/util';
  *
  * @see WorkbenchMigrator
  */
-const WORKBENCH_LAYOUT_VERSION = 6;
+const WORKBENCH_LAYOUT_VERSION = 7;
 
 /**
  * Represents the current version of the workbench grid model.
@@ -72,7 +73,8 @@ export class WorkbenchLayoutSerializer {
     .registerMigration(2, inject(WorkbenchLayoutMigrationV3))
     .registerMigration(3, inject(WorkbenchLayoutMigrationV4))
     .registerMigration(4, inject(WorkbenchLayoutMigrationV5))
-    .registerMigration(5, inject(WorkbenchLayoutMigrationV6));
+    .registerMigration(5, inject(WorkbenchLayoutMigrationV6))
+    .registerMigration(6, inject(WorkbenchLayoutMigrationV7));
 
   /**
    * Migrates a serialized {@link MPartGrid} to the latest version.
