@@ -11,8 +11,8 @@
 import {Commands, NavigationData, NavigationState} from '../routing/routing.model';
 import {ActivatedRoute} from '@angular/router';
 import {ActivityId} from '../workbench.identifiers';
-import {Translatable} from '../text/workbench-text-provider.model';
 import {WorkbenchLayoutFactory} from './workbench-layout.factory';
+import {Translatable} from '@scion/components/text';
 
 /**
  * The workbench layout is an arrangement of parts and views. Parts can be docked to the side or positioned relative to each other.
@@ -271,9 +271,11 @@ export interface ReferencePart {
  */
 export interface PartExtras {
   /**
-   * Title displayed in the part bar.
+   * Specifies the title to be displayed for the part.
    *
    * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   *
+   * SCION uses text providers to resolve translation keys. A text provider can be registered using {@link WorkbenchConfig.textProvider}.
    */
   title?: Translatable;
   /**
@@ -287,51 +289,51 @@ export interface PartExtras {
 }
 
 /**
- * Controls the appearance of a docked part and its toggle button.
+ * Controls the appearance of a docked part and its toggle button in the docking area.
  *
- * A docked part is a part that is docked to the left, right, or bottom side of the workbench.
+ * A docked part is a part docked to the left, right, or bottom side of the workbench.
  *
  * Docked parts can be minimized to create more space for the main content. Users cannot drag
  * views into or out of docked parts.
  */
 export interface DockedPartExtras {
   /**
-   * Icon (key) displayed in the toggle button.
+   * Specifies the icon to be displayed in the docking area for the part.
    *
-   * The actual icon is resolved through an {@link WorkbenchIconProviderFn} registered in {@link WorkbenchConfig.iconProvider}.
+   * SCION uses icon providers to render icons. An icon provider can be registered using {@link WorkbenchConfig.iconProvider}.
+   * If no icon provider is registered, SCION uses a Material icon provider and interprets the icon as a Material Icon font ligature.
    *
-   * If no icon provider is configured, the icon defaults to a Material Icon font ligature. The default icon provider requires
-   * the application to include the Material icon font, for example in `styles.scss`, as follows:
-   *
-   * ```scss
-   * @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded');
-   * ```
-   *
-   * The application can then reference icons from the Material Icons Font: https://fonts.google.com/icons
+   * Refer to https://fonts.google.com/icons for available icons and instructions on including the Material icon font.
    */
   icon: string;
   /**
-   * Label displayed in the toggle button.
+   * Specifies the label to be displayed in the docking area for the part.
    *
    * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   *
+   * SCION uses text providers to resolve translation keys. A text provider can be registered using {@link WorkbenchConfig.textProvider}.
    */
   label: Translatable;
   /**
-   * Tooltip displayed when hovering over the toggle button.
+   * Specifies the tooltip to be displayed when hovering over the part's toggle button in the docking area.
    *
    * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   *
+   * SCION uses text providers to resolve translation keys. A text provider can be registered using {@link WorkbenchConfig.textProvider}.
    */
   tooltip?: Translatable;
   /**
-   * Title displayed in the part bar.
+   * Specifies the title to be displayed for the part.
    *
    * If not provided, defaults to {@link DockedPartExtras.label}. Set to `false` to not display a title.
    *
    * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   *
+   * SCION uses text providers to resolve translation keys. A text provider can be registered using {@link WorkbenchConfig.textProvider}.
    */
   title?: Translatable | false;
   /**
-   * CSS class(es) to add to the docked part and its toggle button, e.g., to locate the part in tests.
+   * Specifies CSS class(es) to add to the docked part and its toggle button in the docking area, e.g., to locate the part in tests.
    */
   cssClass?: string | string[];
   /**

@@ -18,8 +18,8 @@ import {WorkbenchView} from '../../view/workbench-view.model';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {distinctUntilChanged, map} from 'rxjs/operators';
 import {WorkbenchPartRegistry} from '../workbench-part.registry';
-import {IconComponent} from '../../icon/icon.component';
-import {TextPipe} from '../../text/text.pipe';
+import {SciIconComponent} from '@scion/components/icon';
+import {SciTextPipe} from '@scion/components/text';
 import {PartId} from '../../workbench.identifiers';
 
 /**
@@ -34,8 +34,8 @@ import {PartId} from '../../workbench.identifiers';
   ],
   imports: [
     CdkPortalOutlet,
-    TextPipe,
-    IconComponent,
+    SciTextPipe,
+    SciIconComponent,
   ],
   // Required for backward compatibility for zone-based applications to support child components with eager change detection.
   changeDetection: ChangeDetectionStrategy.Eager, // eslint-disable-line @angular-eslint/prefer-on-push-component-change-detection

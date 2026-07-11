@@ -16,8 +16,8 @@ import {SciMaterialIconDirective} from '@scion/components.internal/material-icon
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {ParamDefinition} from '@scion/microfrontend-platform';
 import {UUID} from '@scion/toolkit/uuid';
-import {Arrays} from '@scion/toolkit/util';
-import {parseTypedString, prune, toTypedString} from 'workbench-testing-app-common';
+import {Arrays, prune} from '@scion/toolkit/util';
+import {parseTypedString, toTypedString} from 'workbench-testing-app-common';
 
 @Component({
   selector: 'app-capability-params',

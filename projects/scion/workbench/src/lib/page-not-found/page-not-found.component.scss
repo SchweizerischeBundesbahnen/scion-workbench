@@ -31,7 +31,7 @@
 
     > button:is(button, #sci-reset) {
       all: unset;
-      cursor: var(--sci-workbench-button-cursor);
+      cursor: var(--sci-button-cursor);
       padding: .5em 1.5em;
       color: var(--sci-color-accent-inverse);
       background-color: var(--sci-color-accent);

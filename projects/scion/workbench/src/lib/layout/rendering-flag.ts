@@ -14,7 +14,7 @@ import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {skipUntil} from 'rxjs/operators';
 
 /**
- * Creates a writable signal to read and write specified flag from and to workbench storage.
+ * Creates a writable signal to read and write the specified flag from and to workbench storage.
  */
 export function renderingFlag<T extends string | number | boolean | null>(storageKey: string, defaultValue: T, options?: {injector?: Injector}): WritableSignal<T> {
   const injector = options?.injector ?? inject(Injector);

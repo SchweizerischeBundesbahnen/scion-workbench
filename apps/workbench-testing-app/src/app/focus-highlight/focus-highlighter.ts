@@ -10,8 +10,7 @@
 
 import {afterRenderEffect, effect, inject, untracked} from '@angular/core';
 import {WorkbenchElement, WorkbenchService} from '@scion/workbench';
-import {toSignal} from '@angular/core/rxjs-interop';
-import {SettingsService} from '../settings.service';
+import {Settings} from '../settings.service';
 
 /**
  * Highlights the active workbench element if enabled in settings.
@@ -20,7 +19,7 @@ import {SettingsService} from '../settings.service';
  */
 export function installFocusHighlighter(): void {
   const workbenchService = inject(WorkbenchService);
-  const highlightFocus = toSignal(inject(SettingsService).observe$('highlightFocus'));
+  const highlightFocus = inject(Settings).highlightFocus;
 
   // Enable highlighting based on 'highlightFocus' setting.
   effect(() => {
@@ -43,8 +42,8 @@ export function installFocusHighlighter(): void {
     untracked(() => {
       const element = activeWorkbenchElement ? querySelector(activeWorkbenchElement) : null;
       if (element) {
-        element.setAttribute('data-focus', '');
-        onCleanup(() => element.removeAttribute('data-focus'));
+        element.setAttribute('data-highlight-focus', '');
+        onCleanup(() => element.removeAttribute('data-highlight-focus'));
       }
     });
   });

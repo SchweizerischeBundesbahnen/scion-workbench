@@ -9,8 +9,8 @@
  */
 
 import {Signal} from '@angular/core';
-import {Translatable} from '../text/workbench-text-provider.model';
 import {DialogId} from '../workbench.identifiers';
+import {Translatable} from '@scion/components/text';
 
 /**
  * Handle to interact with a dialog opened via {@link WorkbenchDialogService}.
@@ -27,9 +27,11 @@ export abstract class WorkbenchDialog {
   public abstract readonly id: DialogId;
 
   /**
-   * Sets the title of the dialog.
+   * Sets the title to be displayed for this dialog.
    *
    * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   *
+   * SCION uses text providers to resolve translation keys. A text provider can be registered using {@link WorkbenchConfig.textProvider}.
    */
   public abstract get title(): Signal<Translatable | undefined>;
   public abstract set title(title: Translatable | undefined);

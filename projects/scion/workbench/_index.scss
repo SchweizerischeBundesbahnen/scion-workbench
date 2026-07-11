@@ -57,7 +57,7 @@
  * );
  * ```
  *
- * ### Theme Selection
+ * ## Theme Selection
  * A theme is selected based on the user's OS color scheme preference, or selected manually using the `WorkbenchService`.
  *
  * ```ts
@@ -65,76 +65,94 @@
  * ```
  * The selected theme is stored in workbench storage and will be selected when loading the application the next time.
  *
- * ### SCION Design Tokens
+ * ## SCION Design Tokens
  * SCION Workbench supports the following design tokens:
  *
- * #### Static Color Tokens
+ * [Workbench Design Tokens (light theme)](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-workbench/master/projects/scion/workbench/design/_workbench-light-theme-design-tokens.scss)
+ * [Workbench Design Tokens (dark theme)](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-workbench/master/projects/scion/workbench/design/_workbench-dark-theme-design-tokens.scss)
+ *
+ * ### Component Design Tokens
+ * Tokens specific to SCION Components.
+ *
+ * [Component Design Tokens (light theme)](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-toolkit/master/projects/scion/components/design/components/_scion-component-light-tokens.scss)
+ * [Component Design Tokens (dark theme)](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-toolkit/master/projects/scion/components/design/components/_scion-component-dark-tokens.scss)
+ *
+ * ### Static Color Tokens
  * Colors that have a fixed color value across all themes.
  *
  * [Static Color Tokens](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-toolkit/master/projects/scion/components/design/colors/_scion-static-colors.scss)
  *
- * #### Named Color Tokens
- * Predefined set of named colors as palette of tints and shades.
+ * ### Named Color Tokens
+ * Predefined set of named colors as a palette of tints and shades.
  *
  * [Named Color Tokens (light theme)](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-toolkit/master/projects/scion/components/design/colors/_scion-light-colors.scss)
  * [Named Color Tokens (dark theme)](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-toolkit/master/projects/scion/components/design/colors/_scion-dark-colors.scss)
  *
- * #### Semantic Tokens
+ * ### Semantic Tokens
  * Tokens for a particular usage.
  *
  * [Semantic Tokens (light theme)](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-toolkit/master/projects/scion/components/design/themes/_scion-light-theme.scss)
  * [Semantic Tokens (dark theme)](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-toolkit/master/projects/scion/components/design/themes/_scion-dark-theme.scss)
  *
- * #### Workbench-specific Tokens
- * Tokens specific to the SCION Workbench.
  *
- * [Workbench-specific Tokens (light theme)](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-workbench/master/projects/scion/workbench/design/_workbench-light-theme-design-tokens.scss)
- * [Workbench-specific Tokens (dark theme)](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-workbench/master/projects/scion/workbench/design/_workbench-dark-theme-design-tokens.scss)
+ * ## SCION Icon Font
+ * This module provides the standard icon font used by SCION components.
  *
+ * By default, SCION icons are loaded from the CDN: https://cdn.jsdelivr.net/npm/@scion/components/resources/scion-icons.
  *
- * ## Workbench Icon Font
- * The SCION Workbench requires some icons packed as icon font. The location of the icon font can be configured via the SCSS module `@scion/workbench`,
- * required if deploying the application in a subdirectory, or to configure a custom icon font.
+ * ### Content Security Policy (CSP)
+ * Applications enforcing a Content Security Policy must whitelist the CDN using the `font-src` directive.
  *
- * ```scss
- * @use '@scion/workbench' with (
- *   $icon-font: (
- *      directory: '/path/to/font', // defaults to '/fonts' if omitted
- *      filename: 'scion-workbench-icons' // defaults to 'scion-workbench-icons' if omitted
- *      version: '1.0.0' // appended to the HTTP request to load the icon font, enabling browser cache invalidation when icons change
- *  );
+ * ```
+ * Content-Security-Policy: font-src 'self' https://cdn.jsdelivr.net/npm/@scion/components/;
  * ```
  *
- * The icon font can be customized using the [IcoMoon](https://icomoon.io/app) web application by importing the icon font definition file `scion-workbench-icons.json`.
+ * ### Self-Hosting the SCION Icon Font
+ * As an alternative to loading SCION icons from the CDN, the application can host the SCION icon font.
  *
- * If deploying the application in a subdirectory, use a relative directory path for the browser to load the icon files relative to the document base URL (as specified in the `<base>` HTML tag).
- * Note that using a relative path requires to exclude the icon files from the application build. Depending on building the application with esbuild `@angular/build:application`
- * or webpack `@angular-devkit/build-angular:browser`, different steps are required to exclude the icons from the build.
+ * To host the icon font locally:
+ * 1. Download the icon font from `https://cdn.jsdelivr.net/npm/@scion/components/resources/scion-icons/scion-icons.zip`.
+ * 2. Extract the font files into the application's public assets folder (e.g., `/public/scion-icons`).
+ * 3. Configure the path in the `@scion/workbench` SCSS module:
+ *    ```scss
+ *    @use '@scion/workbench' with (
+ *      $icon-font: (
+ *        directory: '/scion-icons' // must start with a leading slash
+ *      )
+ *    );
+ *    ```
  *
- * ### Using @angular/build:application (esbuild, default since Angular 20)
- * Configure the `@scion/workbench` SCSS module to load the icon font relative to the document base URL:
+ * ### Loading Self-Hosted Icon Font Relative to Document Base
+ * Applications deployed in a subdirectory must configure the `@scion/workbench` SCSS module to load the self-hosted icon font relative to the document base URL (defined by the `<base>` HTML tag)
+ * and exclude the font files from the application build.
+ *
+ * Different steps are required depending on whether building the application with esbuild or Webpack.
+ *
+ * **Using `@angular/build:application` (esbuild, default since Angular 20)**
+ *
+ * 1. Remove the leading slash from the directory configuration:
+ *    ```scss
+ *    @use '@scion/workbench' with (
+ *      $icon-font: (
+ *        directory: 'scion-icons' // relative to document base URL
+ *      )
+ *    );
+ *    ```
+ * 2. Exclude the font files from the application build via `externalDependencies` in `angular.json`:
+ *    ```json
+ *    "externalDependencies": [
+ *      "scion-icons/scion-icons.*"
+ *    ]
+ *    ```
+ *
+ * **Using `@angular-devkit/build-angular:browser` (Webpack)**
+ *
+ * Configure the directory path with a leading caret (`^`), instructing Webpack to exclude the font files from the application build:
+ *
  * ```scss
  * @use '@scion/workbench' with (
  *   $icon-font: (
- *     directory: 'path/to/font' // no leading slash, typically `fonts`
- *   )
- * );
- * ```
- *
- * Add the path to the `externalDependencies` build option in the `angular.json` file:
- * ```json
- * "externalDependencies": [
- *   "path/to/font/scion-workbench-icons.*"
- * ]
- *   ```
- *
- * ### Using @angular-devkit/build-angular:browser (webpack)
- * Configure the `@scion/workbench` SCSS module to load the icon font relative to the document base URL:
- *
- * ```scss
- * @use '@scion/workbench' with (
- *   $icon-font: (
- *     directory: '^path/to/font' // no leading slash but with a caret (^), typically `^fonts`
+ *     directory: '^scion-icons' // leading caret excludes the font files from Webpack build
  *   )
  * );
  * ```
@@ -145,7 +163,6 @@
 @use './design/workbench-light-theme-design-tokens';
 @use './design/workbench-dark-theme-design-tokens';
 @use './design/workbench-global-styles' as workbench;
-@use './design/workbench-icon-font' as workbench-icons;
 @use './design/workbench-view-global-styles' as workbench-view;
 @use './design/workbench-popup-global-styles' as workbench-popup;
 @use './design/workbench-dialog-global-styles' as workbench-dialog;
@@ -157,11 +174,8 @@ $-built-in-themes: (
 );
 $themes: $-built-in-themes !default;
 $themes: sci-design.ɵthemes-augment($themes, $-built-in-themes);
-@use '@scion/components' with ($themes: $themes);
-
-// Install workbench icon font
 $icon-font: null !default;
-@include workbench-icons.install-icon-font($icon-font);
+@use '@scion/components' with ($themes: $themes, $icon-font: $icon-font);
 
 // Install global workbench styles
 @include workbench.install-global-styles();

@@ -13,7 +13,7 @@ import {AddPartsComponent, PartDescriptor} from '../tables/add-parts/add-parts.c
 import {AddViewsComponent, ViewDescriptor} from '../tables/add-views/add-views.component';
 import {NavigateViewsComponent, NavigationDescriptor} from '../tables/navigate-views/navigate-views.component';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {SettingsService} from '../../settings.service';
+import {Settings} from '../../settings.service';
 import {WorkbenchLayout, WorkbenchLayoutFactory, WorkbenchLayoutFn, WorkbenchService} from '@scion/workbench';
 import {MultiValueInputComponent, stringifyError} from 'workbench-testing-app-common';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
@@ -43,7 +43,7 @@ import {AddDockedPartsComponent, DockedPartDescriptor} from '../tables/add-docke
 export default class CreatePerspectivePageComponent {
 
   private readonly _formBuilder = inject(NonNullableFormBuilder);
-  private readonly _settingsService = inject(SettingsService);
+  private readonly _settings = inject(Settings);
   private readonly _workbenchService = inject(WorkbenchService);
 
   protected readonly form = this._formBuilder.group({
@@ -193,7 +193,7 @@ export default class CreatePerspectivePageComponent {
   }
 
   private resetForm(): void {
-    if (this._settingsService.isEnabled('resetFormsOnSubmit')) {
+    if (this._settings.resetFormsOnSubmit()) {
       this.form.reset();
       this.form.setControl('data', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
     }

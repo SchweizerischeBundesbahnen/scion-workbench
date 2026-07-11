@@ -9,6 +9,14 @@
     background-color: var(--sci-workbench-part-peripheral-background-color);
   }
 
+  &:hover {
+    --ɵsci-workbench-part-hover: true;
+  }
+
+  &[data-focus] {
+    --ɵsci-workbench-part-focus: true;
+  }
+
   > wb-part-bar {
     flex: none;
   }

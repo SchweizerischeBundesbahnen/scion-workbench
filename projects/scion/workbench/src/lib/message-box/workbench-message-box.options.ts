@@ -9,7 +9,7 @@
  */
 import {Injector, Provider} from '@angular/core';
 import {DialogId, NotificationId, PartId, PopupId, ViewId} from '../workbench.identifiers';
-import {Translatable} from '../text/workbench-text-provider.model';
+import {Translatable} from '@scion/components/text';
 
 /**
  * Controls the appearance and behavior of a message box.
@@ -17,9 +17,11 @@ import {Translatable} from '../text/workbench-text-provider.model';
 export interface WorkbenchMessageBoxOptions {
 
   /**
-   * Specifies the title of the message box.
+   * Specifies the title to be displayed for the message box.
    *
    * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   *
+   * SCION uses text providers to resolve translation keys. A text provider can be registered using {@link WorkbenchConfig.textProvider}.
    */
   title?: Translatable;
 

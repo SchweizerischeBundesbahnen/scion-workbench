@@ -34,7 +34,7 @@ export abstract class WorkbenchTextService {
   /**
    * Gets the text for given {@link Translatable} from the specified application. Text requests are cached.
    *
-   * A {@link Translatable} is a string that, if starting with the percent symbol (`%`), is passed to the specified application for translation, with the percent symbol omitted.
+   * A {@link Translatable} is a string that, if it starts with the percent symbol (`%`), is passed to the specified application for translation, with the percent symbol omitted.
    * Otherwise, the text is returned as is.
    *
    * Interpolation parameters can either be passed via options or appended to the translatable in matrix notation. If appended to the translatable, semicolons must be escaped with two backslashes (`\\;`).

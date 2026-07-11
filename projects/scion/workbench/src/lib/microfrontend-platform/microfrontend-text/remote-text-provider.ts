@@ -8,46 +8,38 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Translatable, WORKBENCH_TEXT_PROVIDER, WorkbenchTextProviderFn} from '../../text/workbench-text-provider.model';
 import {EnvironmentProviders, inject, makeEnvironmentProviders, Signal} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {animationFrameScheduler, combineLatest, concatWith, map, NEVER, Observable, of, ReplaySubject, share, switchMap, timer} from 'rxjs';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {mapToBody, MessageClient} from '@scion/microfrontend-platform';
-import {WorkbenchTextService} from '@scion/workbench-client';
+import {Translatable, WorkbenchTextService} from '@scion/workbench-client';
 import {Dictionaries} from '@scion/toolkit/util';
 import {catchError, finalize} from 'rxjs/operators';
+import {provideTextProvider} from '@scion/components/text';
 import {Logger, LoggerNames} from '../../logging';
 
 /**
  * Registers a text provider for the SCION Workbench to get texts from micro apps.
  *
- * This text provider provides texts for keys matching the format: "workbench.external.scion-workbench-client.<APP_SYMBOLIC_NAME>.<TRANSLATABLE>".
+ * This text provider provides texts for keys matching the format: "scion.workbench.internal.scion-workbench-client.<APP_SYMBOLIC_NAME>.<TRANSLATABLE>".
  *
  * @see createRemoteTranslatable
  */
 export function provideRemoteTextProvider(): EnvironmentProviders {
-  const REMOTE_TRANSLATION_KEY = /^workbench\.external\.scion-workbench-client\.(?<provider>[^\\.]+)\.%(?<key>.+)$/;
-  const REMOTE_TEXT = /^workbench\.external\.scion-workbench-client\.(?<provider>[^\\.]+)\.(?<text>[^%].+)$/;
+  const REMOTE_TRANSLATION_KEY = /^scion\.workbench\.internal\.scion-workbench-client\.(?<provider>[^\\.]+)\.%(?<key>.+)$/;
+  const REMOTE_TEXT = /^scion\.workbench\.internal\.scion-workbench-client\.(?<provider>[^\\.]+)\.(?<text>[^%].+)$/;
   const cache = new Map<string, Observable<string>>();
 
   return makeEnvironmentProviders([
-    {
-      provide: WORKBENCH_TEXT_PROVIDER,
-      useValue: provideRemoteText satisfies WorkbenchTextProviderFn,
-      multi: true,
-    },
-    {
-      provide: WORKBENCH_TEXT_PROVIDER,
-      useValue: interpolateRemoteText satisfies WorkbenchTextProviderFn,
-      multi: true,
-    },
+    provideTextProvider(provideRemoteText),
+    provideTextProvider(interpolateRemoteText),
   ]);
 
   /**
    * Provides text from a remote app.
    */
-  function provideRemoteText(translationKey: string | `workbench.external.scion-workbench-client.${string}.%${string}`, params: {[name: string]: string | `topic://${string}`}): Signal<string> | undefined {
+  function provideRemoteText(translationKey: string | `scion.workbench.internal.scion-workbench-client.${string}.%${string}`, params: {[name: string]: string | `topic://${string}`}): Signal<string> | undefined {
     // Test if the key matches a remote translation key.
     const match = REMOTE_TRANSLATION_KEY.exec(translationKey);
     if (!match) {
@@ -86,7 +78,7 @@ export function provideRemoteTextProvider(): EnvironmentProviders {
   /**
    * Substitutes named parameters in a remote text.
    */
-  function interpolateRemoteText(translationKey: string | `workbench.external.scion-workbench-client.${string}.${string}`, params: {[name: string]: string | `topic://${string}`}): Signal<string> | undefined {
+  function interpolateRemoteText(translationKey: string | `scion.workbench.internal.scion-workbench-client.${string}.${string}`, params: {[name: string]: string | `topic://${string}`}): Signal<string> | undefined {
     // Test if the key matches a remote text.
     const match = REMOTE_TEXT.exec(translationKey);
     if (!match) {
@@ -198,7 +190,7 @@ export function createRemoteTranslatable(translatable: Translatable | undefined,
     return translatable;
   }
 
-  const remoteTranslatablePrefix = `%workbench.external.scion-workbench-client.${config.appSymbolicName}`;
+  const remoteTranslatablePrefix = `%scion.workbench.internal.scion-workbench-client.${config.appSymbolicName}`;
   if (translatable.startsWith('%')) {
     // Substitute named parameters in interpolation params.
     return `${remoteTranslatablePrefix}.${translatable}`.replace(/(?<==):(?<namedParam>[^;]+)/g, (match: string, param: string) => valueParams.get(param) ?? topicParams.get(param) ?? match);

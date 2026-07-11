@@ -77,6 +77,26 @@ inject(WorkbenchService).settings.theme.set('scion-light');
 SCION Workbench supports the following design tokens:
 
 <details>
+  <summary><strong>Workbench Design Tokens</strong></summary>
+  <br>
+
+Tokens specific to the SCION Workbench.
+
+[Workbench Design Tokens (light theme)](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-workbench/master/projects/scion/workbench/design/_workbench-light-theme-design-tokens.scss), [Workbench Design Tokens (dark theme)](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-workbench/master/projects/scion/workbench/design/_workbench-dark-theme-design-tokens.scss)
+
+</details>
+
+<details>
+  <summary><strong>Component Design Tokens</strong></summary>
+  <br>
+
+Tokens specific to SCION Components.
+
+[Component Design Tokens (light theme)](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-toolkit/master/projects/scion/components/design/components/_scion-component-light-tokens.scss), [Component Design Tokens (dark theme)](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-toolkit/master/projects/scion/components/design/components/_scion-component-dark-tokens.scss)
+
+</details>
+
+<details>
   <summary><strong>Static Color Tokens</strong></summary>
   <br>
 
@@ -90,7 +110,7 @@ Colors that have a fixed color value across all themes.
   <summary><strong>Named Color Tokens</strong></summary>
   <br>
 
-Predefined set of named colors as palette of tints and shades.
+Predefined set of named colors as a palette of tints and shades.
 
 [Named Color Tokens (light theme)](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-toolkit/master/projects/scion/components/design/colors/_scion-light-colors.scss), [Named Color Tokens (dark theme)](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-toolkit/master/projects/scion/components/design/colors/_scion-dark-colors.scss)
 
@@ -103,16 +123,6 @@ Predefined set of named colors as palette of tints and shades.
 Tokens for a particular usage.
 
 [Semantic Tokens (light theme)](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-toolkit/master/projects/scion/components/design/themes/_scion-light-theme.scss), [Semantic Tokens (dark theme)](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-toolkit/master/projects/scion/components/design/themes/_scion-dark-theme.scss)
-
-</details>
-
-<details>
-  <summary><strong>Workbench-specific Tokens</strong></summary>
-  <br>
-
-Tokens specific to the SCION Workbench.
-
-[Workbench-specific Tokens (light theme)](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-workbench/master/projects/scion/workbench/design/_workbench-light-theme-design-tokens.scss), [Workbench-specific Tokens (dark theme)](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-workbench/master/projects/scion/workbench/design/_workbench-dark-theme-design-tokens.scss)
 
 </details>
 

@@ -9,7 +9,7 @@
  */
 
 import {Injector, Provider} from '@angular/core';
-import {Translatable} from '../text/workbench-text-provider.model';
+import {Translatable} from '@scion/components/text';
 
 /**
  * Controls the appearance and behavior of a notification.
@@ -17,9 +17,11 @@ import {Translatable} from '../text/workbench-text-provider.model';
 export interface WorkbenchNotificationOptions {
 
   /**
-   * Specifies the title of the notification.
+   * Specifies the title to be displayed for the notification.
    *
    * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   *
+   * SCION uses text providers to resolve translation keys. A text provider can be registered using {@link WorkbenchConfig.textProvider}.
    */
   title?: Translatable;
 

@@ -16,6 +16,7 @@ import {WorkbenchViewCapability} from '@scion/workbench-client';
 import {MultiValueInputComponent, parseTypedString, RecordComponent} from 'workbench-testing-app-common';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {prune} from '@scion/toolkit/util';
 
 @Component({
   selector: 'app-view-capability-properties',
@@ -56,7 +57,7 @@ export class ViewCapabilityPropertiesComponent implements ControlValueAccessor, 
     this.form.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => {
-        this._cvaChangeFn({
+        this._cvaChangeFn(prune({
           path: parseTypedString(this.form.controls.path.value)!, // allow `undefined` to test capability validation
           title: this.form.controls.title.value || undefined,
           heading: this.form.controls.heading.value || undefined,
@@ -66,7 +67,7 @@ export class ViewCapabilityPropertiesComponent implements ControlValueAccessor, 
           closable: this.form.controls.closable.value ?? undefined,
           showSplash: this.form.controls.showSplash.value ?? undefined,
           pinToDesktop: this.form.controls.pinToDesktop.value,
-        });
+        }, {recursive: true, pruneIfEmpty: true})!);
         this._cvaTouchedFn();
       });
   }
