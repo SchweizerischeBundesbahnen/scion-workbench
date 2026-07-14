@@ -4,9 +4,9 @@
 }
 
 <sci-toolbar name="toolbar:workbench.part.titlebar"
-             [context]="toolbarActiveViewContext()"
+             [context]="toolbarContext()"
              [acceleratorTarget]="part.portal.element()"
-             (mousedown)="onToolbarMouseDown()"/>
+             (mousedown)="onPartBarMouseDown($event)"/>
 
 <!-- View Tabs -->
 @if (part.views().length) {
@@ -14,14 +14,14 @@
 }
 
 <sci-toolbar name="toolbar:workbench.part.tabbar"
-             [context]="toolbarActiveViewContext()"
+             [context]="toolbarContext()"
              [acceleratorTarget]="part.portal.element()"
-             (mousedown)="onToolbarMouseDown()"/>
+             (mousedown)="onPartBarMouseDown($event)"/>
 
 <div class="filler e2e-filler" #filler (mousedown)="onPartBarMouseDown($event)"></div>
 
 <sci-toolbar name="toolbar:workbench.part.toolbar"
-             [context]="toolbarActiveViewContext()"
+             [context]="toolbarContext()"
              [acceleratorTarget]="part.portal.element()"
-             (mousedown)="onToolbarMouseDown()"
+             (mousedown)="onPartBarMouseDown($event)"
              wbToolbarVisibility/>

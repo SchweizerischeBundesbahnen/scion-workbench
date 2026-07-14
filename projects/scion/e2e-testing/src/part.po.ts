@@ -17,7 +17,7 @@ import {PartId} from '@scion/workbench';
 import {coerceArray, DomRect, fromRect, getCssClasses, selectBy} from './helper/testing.util';
 import {PartSlotPO} from './part-slot.po';
 import {WorkbenchAccessor, WorkbenchPartNavigationE2E} from './workbench-accessor';
-import {RequireOne} from './helper/utility-types';
+import {RequireOne} from '@scion/toolkit/types';
 
 /**
  * Handle for interacting with a workbench part.

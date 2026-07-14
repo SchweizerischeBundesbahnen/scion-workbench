@@ -8,19 +8,24 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {WorkbenchPartAction} from '../workbench.model';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {Signal} from '@angular/core';
 import {NavigationData, NavigationState} from '../routing/routing.model';
 import {UrlSegment} from '@angular/router';
 import {PartId} from '../workbench.identifiers';
-import {Translatable} from '../text/workbench-text-provider.model';
+import {Translatable} from '@scion/components/text';
 
 /**
  * A part is a visual element of the workbench layout. Parts can be docked to the side or
  * positioned relative to each other. A part can display content or stack views.
  *
  * The part component can inject this handle to interact with the part.
+ *
+ * TODO [MENU]: Document public menu contribution points:
+ * - toolbar:workbench.part.titlebar
+ * - toolbar:workbench.part.tabbar
+ * - toolbar:workbench.part.toolbar
+ * - menu:workbench.part.toolbar
  *
  * @see WorkbenchView
  */
@@ -42,11 +47,13 @@ export abstract class WorkbenchPart {
   public abstract readonly alternativeId: string | undefined;
 
   /**
-   * Title displayed in the part bar.
+   * Sets the title to be displayed for this part.
    *
    * Note that the title of the top-leftmost part of a docked part cannot be changed.
    *
    * Can be text or a translation key. A translation key starts with the percent symbol (`%`) and may include parameters in matrix notation for text interpolation.
+   *
+   * SCION uses text providers to resolve translation keys. A text provider can be registered using {@link WorkbenchConfig.textProvider}.
    */
   public abstract get title(): Signal<Translatable | undefined>;
   public abstract set title(title: Translatable | undefined);
@@ -90,11 +97,6 @@ export abstract class WorkbenchPart {
    * Gets views opened in this part.
    */
   public abstract readonly views: Signal<WorkbenchView[]>;
-
-  /**
-   * Actions associated with this part.
-   */
-  public abstract readonly actions: Signal<WorkbenchPartAction[]>;
 
   /**
    * Specifies CSS class(es) to add to the part, e.g., to locate the part in tests.

@@ -1,0 +1,14 @@
+@use '../app.mixin';
+
+:host {
+  display: flex;
+  gap: .25em;
+  align-items: center;
+  height: 100%;
+
+  > button {
+    @include app.icon-button-element-states() {
+      font-size: var(--sci-button-icon-size);
+    }
+  }
+}

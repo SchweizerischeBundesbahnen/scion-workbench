@@ -23,12 +23,11 @@ export class AppHeaderPO {
    * Switches to the specified perspective.
    */
   public async switchPerspective(perspectiveId: string): Promise<void> {
-    await this._locator.locator('button.e2e-perspective-switcher-menu-button').click();
+    await this._locator.locator('button.e2e-perspective-switcher-menu').click();
 
     const menuItem = this._locator.page()
-      .locator('.e2e-application-menu') // CDK overlay
-      .locator('app-menu')
-      .locator(`button.e2e-menu-item[data-perspectiveid="${perspectiveId}"]`);
+      .locator('sci-menu.e2e-perspective-switcher-menu') // CDK overlay
+      .locator(`button[data-perspectiveid="${perspectiveId}"]`);
 
     // Wait until the menu is attached.
     await menuItem.waitFor({state: 'attached'});
@@ -54,12 +53,12 @@ export class AppHeaderPO {
    */
   public async openSettingsMenu(): Promise<Locator> {
     const menu = this._locator.page()
-      .locator('.e2e-application-menu') // CDK overlay
+      .locator('sci-menu.e2e-settings-menu') // CDK overlay
       .locator('app-menu');
 
     // Open the menu only if not yet opened.
     if (!await menu.isVisible()) {
-      await this._locator.locator('button.e2e-settings-menu-button').click();
+      await this._locator.locator('button.e2e-settings-menu').click();
       // Wait until the menu is opened.
       await menu.waitFor({state: 'visible'});
     }

@@ -54,6 +54,8 @@ export class ɵWorkbenchPopup implements WorkbenchPopup, Blockable {
   public readonly destroyed = signal<boolean>(false);
   public readonly bounds = boundingClientRect(computed(() => this._componentRef()?.location.nativeElement as HTMLElement | undefined));
   public readonly blockedBy: Signal<ɵWorkbenchDialog | null>;
+  // TODO [menu] Consider using a wbPortal like other workbench elements
+  public readonly element = computed(() => this._componentRef()?.location.nativeElement as HTMLElement | undefined);
   public result: unknown | Error | undefined;
 
   constructor(public id: PopupId,

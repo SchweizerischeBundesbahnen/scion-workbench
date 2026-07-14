@@ -1,0 +1,12 @@
+<!-- Dark Mode -->
+<button (click)="onActivateDarkTheme()">
+  <sci-icon>dark_mode</sci-icon>
+</button>
+
+<!-- Theme Switcher -->
+<sci-toggle-button [formControl]="lightThemeActiveFormControl" class="e2e-color-scheme"/>
+
+<!-- Light Mode -->
+<button (click)="onActivateLightTheme()">
+  <sci-icon>light_mode</sci-icon>
+</button>

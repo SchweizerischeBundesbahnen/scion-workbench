@@ -12,7 +12,7 @@ import {EnvironmentProviders, inject, makeEnvironmentProviders, provideEnvironme
 import {WorkbenchService} from './workbench.service';
 import {WorkbenchUrlObserver} from './routing/workbench-url-observer.service';
 import {WorkbenchConfig} from './workbench-config';
-import {ViewMenuService} from './part/view-context-menu/view-menu.service';
+import {WorkbenchViewContextMenuService} from './part/view-context-menu/workbench-view-context-menu.service';
 import {ViewMoveHandler} from './view/view-move-handler.service';
 import {provideWorkbenchMicrofrontendSupport} from './microfrontend-platform/workbench-microfrontend-support';
 import {provideLogging} from './logging';
@@ -22,8 +22,8 @@ import {DefaultWorkbenchStorage, WorkbenchStorage} from './storage/workbench-sto
 import {provideLocationPatch} from './routing/ɵlocation';
 import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
 import {ViewTabDragImageRenderer} from './view-dnd/view-tab-drag-image-renderer.service';
-import {provideTextProviders} from './text/text-providers';
-import {provideIconProviders} from './icon/icon-providers';
+import {provideWorkbenchTextProviders} from './text/text-providers';
+import {provideIconProvider} from '@scion/components/icon';
 import {provideWorkbenchViewContext} from './view/workbench-view-context.provider';
 import {provideWorkbenchPartContext} from './part/workbench-part-context.provider';
 import {provideWorkbenchDialogContext} from './dialog/workbench-dialog-context.provider';
@@ -129,16 +129,16 @@ export function provideWorkbench(config?: WorkbenchConfig): EnvironmentProviders
       useClass: config.storage ?? DefaultWorkbenchStorage,
     },
     provideWorkbenchInitializer(() => void inject(WorkbenchThemeSwitcher), {phase: WorkbenchStartupPhase.PreStartup}),
-    provideWorkbenchInitializer(() => void inject(ViewMenuService)),
+    provideWorkbenchInitializer(() => inject(WorkbenchViewContextMenuService).registerBuiltInMenuItems()),
     provideWorkbenchInitializer(() => void inject(ViewMoveHandler)),
     provideWorkbenchInitializer(() => void inject(ViewTabDragImageRenderer)),
     provideWorkbenchInitializer(() => inject(WorkbenchPerspectiveService).init(), {phase: WorkbenchStartupPhase.PostStartup}),
     provideEnvironmentInitializer(() => inject(WorkbenchUrlObserver)),
     provideEnvironmentInitializer(() => rejectIfNotRootEnvironment()),
-    provideTextProviders(config),
-    provideIconProviders(config),
     provideLogging(config),
     provideLocationPatch(),
+    provideIconProvider(config.iconProvider),
+    provideWorkbenchTextProviders(config),
     provideWorkbenchPartContext(),
     provideWorkbenchViewContext(),
     provideWorkbenchDialogContext(),

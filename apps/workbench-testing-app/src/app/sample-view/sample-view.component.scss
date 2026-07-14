@@ -97,11 +97,11 @@
     transition: opacity ease-in-out .15s;
 
     &:active {
-      background-color: var(--sci-workbench-button-background-color-active);
+      background-color: var(--sci-button-background-color-active);
     }
 
     &:hover {
-      background-color: var(--sci-workbench-button-background-color-hover);
+      background-color: var(--sci-button-background-color-hover);
     }
   }
 

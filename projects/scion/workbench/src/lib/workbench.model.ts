@@ -41,6 +41,8 @@ export interface CanCloseRef {
  * Represents an action of a {@link WorkbenchPart}.
  *
  * Part actions are displayed in the part bar, enabling interaction with the part and its content. Actions can be aligned to the left or right.
+ *
+ * @deprecated since version 22.0.0-beta.2. Replaced by the new Workbench Menu API. Marked for removal in version 23.
  */
 export interface WorkbenchPartAction {
   /**
@@ -99,6 +101,8 @@ export interface WorkbenchPartAction {
  * Represents a menu item contained in the context menu of a {@link WorkbenchView}.
  *
  * Right-clicking on a view tab opens a context menu to interact with the view and its content.
+ *
+ * @deprecated since version 22.0.0-beta.2. Replaced by the new Workbench Menu API. Marked for removal in version 23.
  */
 export interface WorkbenchMenuItem {
   /**
@@ -178,6 +182,8 @@ export interface WorkbenchMenuItem {
  * - Can call `inject` to get any required dependencies.
  * - Runs in a reactive context and is called again when tracked signals change.
  *   Use Angular's `untracked` function to execute code outside this reactive context.
+ *
+ * @deprecated since version 22.0.0-beta.2. Replaced by the new Workbench Menu API. Marked for removal in version 23.
  */
 export type WorkbenchPartActionFn = (part: WorkbenchPart) => WorkbenchPartAction | ComponentType<unknown> | TemplateRef<unknown> | null;
 
@@ -189,6 +195,8 @@ export type WorkbenchPartActionFn = (part: WorkbenchPart) => WorkbenchPartAction
  * - Can call `inject` to get any required dependencies.
  * - Runs in a reactive context and is called again when tracked signals change.
  *   Use Angular's `untracked` function to execute code outside this reactive context.
+ *
+ * @deprecated since version 22.0.0-beta.2. Replaced by the new Workbench Menu API. Marked for removal in version 23.
  */
 export type WorkbenchViewMenuItemFn = (view: WorkbenchView) => WorkbenchMenuItem | null;
 

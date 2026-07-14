@@ -33,17 +33,6 @@ export default defineConfig({
       port: 4202,
       reuseExistingServer: false,
     },
-    {
-      command: 'npm run workbench-testing-app:basehref:dist-serve',
-      port: 4300,
-      reuseExistingServer: false,
-    },
-    // TODO [Angular 23] remove when `@angular-devkit/build-angular:browser` builder is deprecated
-    {
-      command: 'npm run workbench-testing-app:basehref-webpack:dist-serve',
-      port: 4400,
-      reuseExistingServer: false,
-    },
   ] : [],
   use: {
     browserName: 'chromium',

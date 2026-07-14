@@ -16,10 +16,10 @@ The SCION Workbench has no built-in user interface for changing settings; the ap
 
 Controls the alignment of the bottom panel of docked parts. Avalable alignments are `justify`, `center`, `left` and `right`. Defaults to `justify`.
 
-Set the default panel alignment via `--sci-workbench-layout-panel-align` design token.
+Set the default panel alignment via `--sci-workbench-activity-panel-bottom-align` design token.
 ```scss
 :root {
-  --sci-workbench-layout-panel-align: center;
+  --sci-workbench-activity-panel-bottom-align: center;
 }
 ```
 
@@ -47,10 +47,10 @@ inject(WorkbenchService).settings.panelAlignment.set('center')
 
 Enables slide-in and slide-out animations of panels. Defaults to `true`.
 
-Set the default animation behavior via `--sci-workbench-layout-panel-animate` design token.
+Set the default animation behavior via `--sci-workbench-activity-panel-animate` design token.
 ```scss
 :root {
-  --sci-workbench-layout-panel-animate: false;
+  --sci-workbench-activity-panel-animate: false;
 }
 ``` 
 

@@ -9,8 +9,7 @@
  */
 
 import {effect, inject} from '@angular/core';
-import {toSignal} from '@angular/core/rxjs-interop';
-import {SettingsService} from '../settings.service';
+import {Settings} from '../settings.service';
 
 /**
  * Shows microfrontend application labels if enabled in settings.
@@ -18,7 +17,7 @@ import {SettingsService} from '../settings.service';
  * This function must be called within an injection context.
  */
 export function installMicrofrontendApplicationLabels(): void {
-  const showMicrofrontendApplicationLabels = toSignal(inject(SettingsService).observe$('showMicrofrontendApplicationLabels'));
+  const showMicrofrontendApplicationLabels = inject(Settings).showMicrofrontendApplicationLabels;
 
   // Show microfrontend application labels based on 'showMicrofrontendApplicationLabels' setting.
   effect(() => {

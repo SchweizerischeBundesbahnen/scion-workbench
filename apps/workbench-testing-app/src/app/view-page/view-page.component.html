@@ -1,3 +1,10 @@
+@if (settings.showSampleMenus()) {
+  <sci-menubar name="menubar:demo"/>
+  <sci-toolbar name="toolbar:demo"/>
+
+  <div class="context-menu" (contextmenu)="onContextMenuOpen($event)">Right-click to open a context menu</div>
+}
+
 <section>
   <sci-form-field label="View ID">
     <span class="e2e-view-id">{{view.id}}</span>

@@ -15,7 +15,7 @@ import {SciTabbarPO} from './@scion/components.internal/tabbar.po';
 import {SciRouterOutletPO} from './workbench-client/page-object/sci-router-outlet.po';
 import {WorkbenchViewPagePO} from './workbench/page-object/workbench-view-page.po';
 import {PartId, ViewId} from '@scion/workbench';
-import {RequireOne} from './helper/utility-types';
+import {RequireOne} from '@scion/toolkit/types';
 
 /**
  * Page object to interact with {@link StartPageComponent}.

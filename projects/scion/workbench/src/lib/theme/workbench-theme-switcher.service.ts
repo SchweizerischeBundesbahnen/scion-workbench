@@ -39,13 +39,7 @@ export class WorkbenchThemeSwitcher {
   }
 
   /**
-   * Synchronizes {@link WorkbenchService.settings.theme} and 'sci-theme' attribute on HTML root element.
-   *
-   * ```html
-   * <html [attr.sci-theme]="workbenchService.settings.theme">
-   *   ...
-   * </html>
-   * ```
+   * Synchronizes {@link theme} and 'sci-theme' attribute on HTML root element.
    */
   private installThemeAttributeSynchronizer(): void {
     const documentRoot = inject(DOCUMENT).documentElement;

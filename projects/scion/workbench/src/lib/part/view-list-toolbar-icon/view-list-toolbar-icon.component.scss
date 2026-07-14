@@ -1,0 +1,36 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  --ɵsci-viewlist-count-visible: true;
+
+  // Do not display hidden view tab count if font size is zero.
+  @container style(--sci-workbench-part-hidden-tab-count-size: 0) or style(--sci-workbench-part-hidden-tab-count-size: 0px) {
+    --ɵsci-viewlist-count-visible: false;
+  }
+
+  // Do not display hidden view tab count if all view tabs are visible.
+  &:not(:has(span.count)) {
+    --ɵsci-viewlist-count-visible: false;
+  }
+
+  > sci-icon.menu-down {
+    flex: none;
+    line-height: 0;
+
+    @container style(--ɵsci-viewlist-count-visible: true) {
+      transform: translateY(-4px);
+      --sci-icon-size: 12px;
+    }
+  }
+
+  > span.count {
+    flex: none;
+    font-size: var(--sci-workbench-part-hidden-tab-count-size);
+    line-height: 0;
+
+    @container style(--ɵsci-viewlist-count-visible: false) {
+      display: none;
+    }
+  }
+}

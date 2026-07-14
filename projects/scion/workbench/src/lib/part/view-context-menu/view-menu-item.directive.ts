@@ -47,6 +47,8 @@ import {WorkbenchView} from '../../view/workbench-view.model';
  * ```
  *
  * Alternatively, menu items can be added using a factory function and registered via {@link WorkbenchService.registerViewMenuItem}.
+ *
+ * @deprecated since version 22.0.0-beta.2. Replaced by the new Workbench Menu API. Use `contributeMenu` function to contribute to the context menu: `contributeMenu('menu:workbench.view.contextmenu', (menu) => menu.addMenuItem({label: '%label', onSelect: () => doSomething()}))`. You can inject the view using `inject(WorkbenchView)`. Marked for removal in version 23.
  */
 @Directive({selector: 'ng-template[wbViewMenuItem]'})
 export class WorkbenchViewMenuItemDirective {

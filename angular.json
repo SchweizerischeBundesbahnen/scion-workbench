@@ -37,13 +37,6 @@
             },
             "styles": [
               "projects/scion/workbench/_index.scss"
-            ],
-            "assets": [
-              {
-                "glob": "scion-workbench-icons.*",
-                "input": "resources/scion-workbench-icons/fonts",
-                "output": "/fonts"
-              }
             ]
           }
         },
@@ -65,11 +58,6 @@
               "projects/scion/workbench/_index.scss"
             ],
             "assets": [
-              {
-                "glob": "scion-workbench-icons.*",
-                "input": "resources/scion-workbench-icons/fonts",
-                "output": "/fonts"
-              }
             ],
             "polyfills": [
               "zone.js",
@@ -153,11 +141,6 @@
                 "glob": "favicon.ico",
                 "input": "resources/branding",
                 "output": "/"
-              },
-              {
-                "glob": "scion-workbench-icons.*",
-                "input": "resources/scion-workbench-icons/fonts",
-                "output": "/fonts"
               }
             ],
             "styles": [
@@ -245,11 +228,6 @@
                 "output": "/"
               },
               {
-                "glob": "scion-workbench-icons.*",
-                "input": "resources/scion-workbench-icons/fonts",
-                "output": "/fonts"
-              },
-              {
                 "glob": "scion-workbench-banner.svg",
                 "input": "resources/branding",
                 "output": "/"
@@ -331,99 +309,10 @@
               "outputHashing": "all",
               "outputPath": "dist/workbench-testing-app-ci"
             },
-            "production-basehref": {
-              "fileReplacements": [
-                {
-                  "replace": "apps/workbench-testing-app/src/environments/environment.ts",
-                  "with": "apps/workbench-testing-app/src/environments/environment.ci.ts"
-                }
-              ],
-              "outputHashing": "all",
-              "outputPath": "dist/workbench-testing-app-basehref/subdir",
-              "baseHref": "/subdir/browser/",
-              "styles": [
-                "apps/workbench-testing-app/src/styles-base-href-esbuild.scss"
-              ],
-              "externalDependencies": [
-                "fonts/scion-workbench-icons.*"
-              ]
-            },
             "development": {
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
-            },
-            "development-basehref": {
-              "optimization": false,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "baseHref": "/subdir/browser/",
-              "styles": [
-                "apps/workbench-testing-app/src/styles-base-href-esbuild.scss"
-              ],
-              "externalDependencies": [
-                "fonts/scion-workbench-icons.*"
-              ]
-            }
-          },
-          "defaultConfiguration": "development"
-        },
-        "build-basehref-webpack": {
-          "builder": "@angular-devkit/build-angular:browser",
-          "options": {
-            "outputPath": "dist/workbench-testing-app-basehref-webpack/subdir",
-            "baseHref": "/subdir/",
-            "index": "apps/workbench-testing-app/src/index.html",
-            "main": "apps/workbench-testing-app/src/main.ts",
-            "tsConfig": "apps/workbench-testing-app/tsconfig.app.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "apps/workbench-testing-app/public"
-              },
-              {
-                "glob": "favicon.ico",
-                "input": "resources/branding",
-                "output": "/"
-              },
-              {
-                "glob": "scion-workbench-icons.*",
-                "input": "resources/scion-workbench-icons/fonts",
-                "output": "/fonts"
-              },
-              {
-                "glob": "scion-workbench-banner.svg",
-                "input": "resources/branding",
-                "output": "/"
-              }
-            ],
-            "styles": [
-              "apps/workbench-testing-app/src/styles-base-href-webpack.scss"
-            ],
-            "stylePreprocessorOptions": {
-              "includePaths": [
-                "projects/scion/workbench"
-              ]
-            }
-          },
-          "configurations": {
-            "production": {
-              "fileReplacements": [
-                {
-                  "replace": "apps/workbench-testing-app/src/environments/environment.ts",
-                  "with": "apps/workbench-testing-app/src/environments/environment.ci.ts"
-                }
-              ],
-              "outputHashing": "all"
-            },
-            "development": {
-              "buildOptimizer": false,
-              "optimization": false,
-              "vendorChunk": true,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "namedChunks": true
             }
           },
           "defaultConfiguration": "development"
@@ -437,20 +326,11 @@
             "development": {
               "buildTarget": "workbench-testing-app:build:development",
               "headers": {
-                "Content-Security-Policy": "default-src 'self'; connect-src 'self' blob: localhost:* *.vercel.app; frame-src 'self' localhost:* *.vercel.app; font-src 'self' https://fonts.gstatic.com; style-src 'self' https://fonts.googleapis.com 'nonce-STATIC_NONCE'; script-src 'self' 'nonce-STATIC_NONCE';"
+                "Content-Security-Policy": "default-src 'self'; connect-src 'self' blob: localhost:* *.vercel.app; frame-src 'self' localhost:* *.vercel.app; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net/gh/SchweizerischeBundesbahnen/scion-toolkit@issue/592/; style-src 'self' https://fonts.googleapis.com 'nonce-STATIC_NONCE'; script-src 'self' 'nonce-STATIC_NONCE';"
               }
-            },
-            "development-basehref": {
-              "buildTarget": "workbench-testing-app:build:development-basehref"
             }
           },
           "defaultConfiguration": "development"
-        },
-        "serve-basehref-webpack": {
-          "builder": "@angular-devkit/build-angular:dev-server",
-          "options": {
-            "buildTarget": "workbench-testing-app:build-basehref-webpack:development"
-          }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
@@ -636,7 +516,7 @@
             "development": {
               "buildTarget": "workbench-client-testing-app:build:development",
               "headers": {
-                "Content-Security-Policy": "default-src 'self'; connect-src 'self' blob: localhost:*; frame-src 'self' localhost:*; font-src 'self' https://fonts.gstatic.com; style-src 'self' https://fonts.googleapis.com 'nonce-STATIC_NONCE'; script-src 'self' 'nonce-STATIC_NONCE'; frame-ancestors localhost:4200"
+                "Content-Security-Policy": "default-src 'self'; connect-src 'self' blob: localhost:*; frame-src 'self' localhost:*; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net/gh/SchweizerischeBundesbahnen/scion-toolkit@issue/592/; style-src 'self' https://fonts.googleapis.com 'nonce-STATIC_NONCE'; script-src 'self' 'nonce-STATIC_NONCE'; frame-ancestors localhost:4200"
               }
             },
             "development-zone": {

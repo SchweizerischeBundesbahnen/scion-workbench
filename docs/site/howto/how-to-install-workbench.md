@@ -111,6 +111,8 @@ The workbench requires some styles to be imported into `styles.scss`, as follows
 @use '@scion/workbench';
 ``` 
 
+TODO [menu] Anpassen!
+
 Next, download the workbench icon font from <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/scion-workbench-icons/fonts/fonts.zip">GitHub</a>. After downloading, unzip the font files and place the extracted files in the `/public/fonts` folder.
 
 > **Note**: Deploying the application in a subdirectory requires the additional steps described [here][link-how-to-configure-icons-if-deploying-app-in-subdirectory].
