@@ -9,7 +9,7 @@
  */
 
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
-import {FocusMonitor, MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
+import {ACTIVATION_CONTEXT, ContextService, FocusMonitor, MessageClient, MicrofrontendPlatform, MicrofrontendPlatformClient, MicrofrontendPlatformStopper} from '@scion/microfrontend-platform';
 import {AsyncPipe} from '@angular/common';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {RouterOutlet} from '@angular/router';
@@ -17,6 +17,7 @@ import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {APP_SYMBOLIC_NAME} from './workbench-client/workbench-client.provider';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {of} from 'rxjs';
+import {Beans, PreDestroy} from '@scion/toolkit/bean-manager';
 
 @Component({
   selector: 'app-root',
@@ -39,4 +40,49 @@ export class AppComponent {
   protected readonly appSymbolicName = inject(APP_SYMBOLIC_NAME, {optional: true}); // only available if running in the workbench context
   protected readonly workbenchContextActive = MicrofrontendPlatformClient.isConnected();
   protected readonly hasFocus = toSignal(inject(FocusMonitor, {optional: true})?.focus$ ?? of(false)); // only available if running in the workbench context
+
+  // constructor() {
+  //
+  //   // const messageClient = Beans.get(MessageClient);
+  //   // addEventListener('beforeunload', () => {
+  //   //   console.log('>>>> beforeunload');
+  //   //   void messageClient.publish('test/beforeunload', 'last will beforeunload');
+  //   // });
+  //   //
+  //   // addEventListener('unload', () => {
+  //   //   console.log('>>>> unload');
+  //   //   void messageClient.publish('test/unload', 'last will unload');
+  //   // });
+  //   //
+  //   // addEventListener('pagehide', () => {
+  //   //   console.log('>>>> client:pagehide');
+  //   //   void messageClient.publish('test/pagehide', 'last will pagehide');
+  //   // });
+  //   //
+  //   // addEventListener('visibilitychange', () => {
+  //   //   console.log('>>>> visibilitychange');
+  //   // });
+  // }
+}
+
+export class OnUnloadMicrofrontendPlatformStopper implements MicrofrontendPlatformStopper, PreDestroy {
+
+  constructor() {
+    let activationContext = false;
+    void Beans.get(ContextService).isPresent(ACTIVATION_CONTEXT).then(value => activationContext = value);
+    // test 123
+    console.log('>>>> OnUnloadMicrofrontendPlatformStopper');
+    // Destroys the platform when the document is about to be unloaded.
+    window.addEventListener('pagehide', event => {
+      if (!activationContext) {
+        console.log('>>>> client:onPagehide: sending last will, event.persisted3', event.persisted);
+        void Beans.get(MessageClient).publish('test/pagehide', 'last will pagehide');
+      }
+      return void MicrofrontendPlatform.destroy();
+    }, {once: true});
+  }
+
+  public preDestroy(): void {
+    console.log('>>>> preDestroy');
+  }
 }
