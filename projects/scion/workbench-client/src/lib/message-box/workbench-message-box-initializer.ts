@@ -25,7 +25,8 @@ export class WorkbenchMessageBoxInitializer implements Initializer {
   public async init(): Promise<void> {
     const messageBoxContext = await Beans.get(ContextService).lookup<ɵMessageBoxContext>(ɵMESSAGE_BOX_CONTEXT);
     if (messageBoxContext !== null) {
-      Beans.register(WorkbenchMessageBox, {useValue: new ɵWorkbenchMessageBox(messageBoxContext)});
+      // Handles must be registered with `useFactory` to support the bean manager's PreDestroy lifecycle hook.
+      Beans.register(WorkbenchMessageBox, {useFactory: () => new ɵWorkbenchMessageBox(messageBoxContext)});
       Beans.register(WORKBENCH_ELEMENT, {useExisting: WorkbenchMessageBox});
     }
   }

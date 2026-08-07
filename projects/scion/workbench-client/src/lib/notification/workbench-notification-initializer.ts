@@ -25,7 +25,8 @@ export class WorkbenchNotificationInitializer implements Initializer {
   public async init(): Promise<void> {
     const notificationContext = await Beans.get(ContextService).lookup<ɵNotificationContext>(ɵNOTIFICATION_CONTEXT);
     if (notificationContext !== null) {
-      Beans.register(WorkbenchNotification, {useValue: new ɵWorkbenchNotification(notificationContext)});
+      // Handles must be registered with `useFactory` to support the bean manager's PreDestroy lifecycle hook.
+      Beans.register(WorkbenchNotification, {useFactory: () => new ɵWorkbenchNotification(notificationContext)});
       Beans.register(WORKBENCH_ELEMENT, {useExisting: WorkbenchNotification});
     }
   }

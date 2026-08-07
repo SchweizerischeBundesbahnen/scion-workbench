@@ -25,7 +25,8 @@ export class WorkbenchPartInitializer implements Initializer {
   public async init(): Promise<void> {
     const partContext = await Beans.get(ContextService).lookup<ɵWorkbenchPartContext>(ɵWORKBENCH_PART_CONTEXT);
     if (partContext !== null) {
-      Beans.register(WorkbenchPart, {useValue: new ɵWorkbenchPart(partContext)});
+      // Handles must be registered with `useFactory` to support the bean manager's PreDestroy lifecycle hook.
+      Beans.register(WorkbenchPart, {useFactory: () => new ɵWorkbenchPart(partContext)});
       Beans.register(WORKBENCH_ELEMENT, {useExisting: WorkbenchPart});
     }
   }
