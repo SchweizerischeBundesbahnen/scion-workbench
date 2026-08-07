@@ -25,7 +25,8 @@ export class WorkbenchDialogInitializer implements Initializer {
   public async init(): Promise<void> {
     const dialogContext = await Beans.get(ContextService).lookup<ɵDialogContext>(ɵDIALOG_CONTEXT);
     if (dialogContext !== null) {
-      Beans.register(WorkbenchDialog, {useValue: new ɵWorkbenchDialog(dialogContext)});
+      // Handles must be registered with `useFactory` to support the bean manager's PreDestroy lifecycle hook.
+      Beans.register(WorkbenchDialog, {useFactory: () => new ɵWorkbenchDialog(dialogContext)});
       Beans.register(WORKBENCH_ELEMENT, {useExisting: WorkbenchDialog});
     }
   }

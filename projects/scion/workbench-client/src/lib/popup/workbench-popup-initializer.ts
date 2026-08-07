@@ -25,7 +25,8 @@ export class WorkbenchPopupInitializer implements Initializer {
   public async init(): Promise<void> {
     const popupContext = await Beans.get(ContextService).lookup<ɵPopupContext>(ɵPOPUP_CONTEXT);
     if (popupContext !== null) {
-      Beans.register(WorkbenchPopup, {useValue: new ɵWorkbenchPopup(popupContext)});
+      // Handles must be registered with `useFactory` to support the bean manager's PreDestroy lifecycle hook.
+      Beans.register(WorkbenchPopup, {useFactory: () => new ɵWorkbenchPopup(popupContext)});
       Beans.register(WORKBENCH_ELEMENT, {useExisting: WorkbenchPopup});
     }
   }
