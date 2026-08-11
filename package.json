@@ -101,7 +101,7 @@
     "@angular/forms": "22.0.1",
     "@angular/platform-browser": "22.0.1",
     "@angular/router": "22.0.1",
-    "@scion/components": "22.0.0",
+    "@scion/components": "22.2.0",
     "@scion/components.internal": "22.0.0",
     "@scion/microfrontend-platform": "2.1.0",
     "@scion/toolkit": "2.1.0",

@@ -83,6 +83,11 @@ export const testPageRoutes: Routes = [
         loadComponent: () => import('./workbench-handle-bounds-test-page/workbench-handle-bounds-test-page.component'),
         data: {[WorkbenchRouteData.title]: 'Workbench Handle Bounds'},
       },
+      {
+        path: 'viewport-test-page',
+        loadComponent: () => import('workbench-client-testing-app-common').then(m => m.ViewportTestPageComponent),
+        data: {[WorkbenchRouteData.title]: 'SciViewport'},
+      },
     ],
   },
   // The following routes must be registered as top-level routes, not as children of another route.
