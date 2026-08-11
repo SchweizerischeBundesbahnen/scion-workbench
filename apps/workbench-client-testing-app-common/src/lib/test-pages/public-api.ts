@@ -9,3 +9,4 @@
  */
 
 export {NotificationParamReducerTestPageComponent} from './notification-param-reducer-test-page/notification-param-reducer-test-page.component';
+export {ViewportTestPageComponent} from './viewport-test-page/viewport-test-page.component';

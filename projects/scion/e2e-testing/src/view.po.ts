@@ -57,8 +57,8 @@ export class ViewPO {
     this.part = this.tab.part;
     this.viewport = this.locator.locator('> sci-viewport');
     this.scrollbars = {
-      vertical: new ScrollbarPO(this.viewport.locator('> sci-scrollbar.e2e-vertical')),
-      horizontal: new ScrollbarPO(this.viewport.locator('> sci-scrollbar.e2e-horizontal')),
+      vertical: new ScrollbarPO(this.viewport.locator('> sci-scrollbar[direction="vscroll"]')),
+      horizontal: new ScrollbarPO(this.viewport.locator('> sci-scrollbar[direction="hscroll"]')),
     };
   }
 

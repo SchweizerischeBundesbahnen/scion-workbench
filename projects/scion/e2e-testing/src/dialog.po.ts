@@ -44,8 +44,8 @@ export class DialogPO {
     this.footer = this.dialog.locator('footer.e2e-dialog-footer');
     this.resizeHandles = this.dialog.locator('div.e2e-resize-handle');
     this.contentScrollbars = {
-      vertical: this.viewport.locator('sci-scrollbar.e2e-vertical'),
-      horizontal: this.viewport.locator('sci-scrollbar.e2e-horizontal'),
+      vertical: this.viewport.locator('sci-scrollbar[direction="vscroll"]'),
+      horizontal: this.viewport.locator('sci-scrollbar[direction="hscroll"]'),
     };
   }
 

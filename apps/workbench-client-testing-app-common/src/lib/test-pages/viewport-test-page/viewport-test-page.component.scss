@@ -1,0 +1,17 @@
+:host {
+  display: flex;
+  flex-direction: column;
+
+  > sci-viewport {
+    flex: 1 1 0;
+
+    &::part(content) {
+      background-color: lightskyblue;
+      display: grid;
+      grid-template-columns: auto auto;
+      grid-template-rows: auto auto;
+      place-content: space-between space-between;
+      height: 10000px;
+    }
+  }
+}

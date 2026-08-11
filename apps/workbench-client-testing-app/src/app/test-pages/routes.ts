@@ -149,6 +149,10 @@ const routes: Routes = [
     path: 'text-test-page',
     loadComponent: () => import('./text-test-page/text-test-page.component'),
   },
+  {
+    path: 'viewport-test-page',
+    loadComponent: () => import('workbench-client-testing-app-common').then(m => m.ViewportTestPageComponent),
+  },
 ];
 
 export default routes;
