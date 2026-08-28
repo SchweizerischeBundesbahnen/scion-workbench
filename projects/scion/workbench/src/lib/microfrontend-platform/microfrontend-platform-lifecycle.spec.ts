@@ -15,6 +15,8 @@ import {WorkbenchLauncher} from '../startup/workbench-launcher.service';
 import {waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {provideRouter} from '@angular/router';
+import {filter} from 'rxjs/operators';
+import {firstValueFrom} from 'rxjs';
 
 describe('Microfrontend Platform Lifecycle', () => {
 
@@ -43,7 +45,6 @@ describe('Microfrontend Platform Lifecycle', () => {
     TestBed.resetTestingModule();
 
     // Expect SCION Microfrontend Platform to be stopped.
-    await MicrofrontendPlatform.whenState(PlatformState.Stopped);
-    expect(MicrofrontendPlatform.state).toEqual(PlatformState.Stopped);
+    await expectAsync(firstValueFrom(MicrofrontendPlatform.state$.pipe(filter(state => state === PlatformState.Stopped)))).toBeResolved();
   });
 });

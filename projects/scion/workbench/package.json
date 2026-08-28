@@ -31,7 +31,7 @@
     "@angular/router": "^22.0.0",
     "@scion/components": "^22.0.0",
     "@scion/toolkit": "^2.1.0",
-    "@scion/microfrontend-platform": "^2.0.0",
+    "@scion/microfrontend-platform": "^3.0.0",
     "@scion/workbench-client": "^1.0.0-beta.42",
     "rxjs": "^7.8.0"
   },

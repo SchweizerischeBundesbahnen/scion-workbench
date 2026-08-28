@@ -84,7 +84,7 @@ async function startMicrofrontendPlatform(): Promise<void> {
   await zone.runOutsideAngular(() => MicrofrontendPlatformHost.start(microfrontendPlatformConfig));
 
   // Destroy the SCION Microfrontend Platform on shutdown.
-  injector.get(DestroyRef).onDestroy(() => void MicrofrontendPlatform.destroy());
+  injector.get(DestroyRef).onDestroy(() => MicrofrontendPlatform.destroy());
 
   logger.debug('SCION Microfrontend Platform started.', LoggerNames.LIFECYCLE, microfrontendPlatformConfig);
 }
