@@ -14,6 +14,7 @@ import {ACTIVATION_CONTEXT, APP_IDENTITY, ContextService, IntentClient, IS_PLATF
 import {Disposable} from '../common/disposable';
 import {WorkbenchTextProviderCapability, WorkbenchTextProviderFn} from './workbench-text-provider.model';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
+import {filter} from 'rxjs/operators';
 
 /**
  * Provides texts to the SCION Workbench and micro apps.
@@ -31,7 +32,7 @@ export function registerTextProvider(textProvider: WorkbenchTextProviderFn): Dis
   const resources = new Subscription();
 
   // Wait until starting or started the platform.
-  Promise.race([MicrofrontendPlatform.whenState(PlatformState.Starting), MicrofrontendPlatform.whenState(PlatformState.Started)])
+  firstValueFrom(MicrofrontendPlatform.state$.pipe(filter(state => state === PlatformState.Starting || state === PlatformState.Started)))
     .then(async () => {
       await assertInHostOrActivator();
       await throwIfAlreadyRegistered();
@@ -78,7 +79,7 @@ export function registerTextProvider(textProvider: WorkbenchTextProviderFn): Dis
     });
 
   // Unregister text provider when stopping the platform, e.g., during hot code replacement.
-  void MicrofrontendPlatform.whenState(PlatformState.Stopping).then(() => resources.unsubscribe());
+  MicrofrontendPlatform.onState(PlatformState.Stopping, () => resources.unsubscribe());
 
   return {
     dispose: () => resources.unsubscribe(),
