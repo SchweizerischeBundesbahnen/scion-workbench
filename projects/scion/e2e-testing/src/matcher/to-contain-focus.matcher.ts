@@ -7,28 +7,36 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Locator} from '@playwright/test';
+import {ExpectMatcherState, Locator} from '@playwright/test';
 import {MatcherReturnType} from 'playwright/types/test';
 import {retryOnError} from '../helper/testing.util';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toContainFocus}.
  */
-export async function toContainFocus(locator: Locator): Promise<MatcherReturnType> {
+export async function toContainFocus(this: ExpectMatcherState, locator: Locator): Promise<MatcherReturnType> {
   try {
     // Retry assertion to behave like a Playwright web-first assertion, i.e., wait and retry until the expected condition is met.
-    await retryOnError(() => assertFocus(locator));
-    return {pass: true, message: () => 'Focus on element or children.'};
+    await retryOnError(() => this.isNot ? assertNotToContainFocus(locator) : assertToContainFocus(locator));
+    return {pass: !this.isNot, message: () => 'passed'}; // Invert `pass` because negation is already handled by the assertion above, but Playwright still applies its own `.not` inversion.
   }
   catch (error) {
-    return {pass: false, message: () => error instanceof Error ? error.message : `${error}`};
+    return {pass: this.isNot, message: () => error instanceof Error ? error.message : `${error}`}; // Invert `pass` because negation is already handled by the assertion above, but Playwright still applies its own `.not` inversion.
   }
 }
 
-async function assertFocus(locator: Locator): Promise<void> {
+async function assertToContainFocus(locator: Locator): Promise<void> {
   const focused = await locator.evaluate((element: HTMLElement) => !!document.activeElement && element.contains(document.activeElement));
 
   if (!focused) {
-    throw new Error('No focus on element or children.');
+    throw new Error('Expected element to contain focus.');
+  }
+}
+
+async function assertNotToContainFocus(locator: Locator): Promise<void> {
+  const focused = await locator.evaluate((element: HTMLElement) => !!document.activeElement && element.contains(document.activeElement));
+
+  if (focused) {
+    throw new Error('Expected element not to contain focus.');
   }
 }
